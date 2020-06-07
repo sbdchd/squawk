@@ -16,7 +16,7 @@ cargo install squawk
 
 ## Usage
 
-```console
+```shell
 ❯ squawk example.sql
 example.sql:2:1: warning: prefer-text-field
 
@@ -58,7 +58,7 @@ example.sql:13:2: warning: adding-field-with-default
 
 ### `squawk --help`
 
-```console
+```
 squawk 0.1.0
 Find problems in your SQL
 
