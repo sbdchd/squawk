@@ -3,6 +3,13 @@ name = "squawk"
 version = "0.1.0"
 authors = ["Steve Dignam <steve@dignam.xyz>"]
 edition = "2018"
+license = "GPL-3.0"
+description = "Linter for Postgresql focused on database migrations."
+repository = "https://github.com/sbdchd/squawk"
+documentation = "https://github.com/sbdchd/squawk/blob/master/README.md"
+readme = "README.md"
+keywords = ["postgres", "postgresql", "linter"]
+categories = ["command-line-utilities", "development-tools"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
