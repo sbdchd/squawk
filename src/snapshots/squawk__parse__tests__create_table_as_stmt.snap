@@ -1,0 +1,92 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CreateTableAsStmt(
+                    Object({
+                        "into": Object({
+                            "IntoClause": Object({
+                                "onCommit": Number(
+                                    0,
+                                ),
+                                "rel": Object({
+                                    "RangeVar": Object({
+                                        "inh": Bool(
+                                            true,
+                                        ),
+                                        "location": Number(
+                                            14,
+                                        ),
+                                        "relname": String(
+                                            "films2",
+                                        ),
+                                        "relpersistence": String(
+                                            "p",
+                                        ),
+                                    }),
+                                }),
+                            }),
+                        }),
+                        "query": Object({
+                            "SelectStmt": Object({
+                                "fromClause": Array([
+                                    Object({
+                                        "RangeVar": Object({
+                                            "inh": Bool(
+                                                true,
+                                            ),
+                                            "location": Number(
+                                                32,
+                                            ),
+                                            "relname": String(
+                                                "films",
+                                            ),
+                                            "relpersistence": String(
+                                                "p",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "op": Number(
+                                    0,
+                                ),
+                                "targetList": Array([
+                                    Object({
+                                        "ResTarget": Object({
+                                            "location": Number(
+                                                -1,
+                                            ),
+                                            "val": Object({
+                                                "ColumnRef": Object({
+                                                    "fields": Array([
+                                                        Object({
+                                                            "A_Star": Object({}),
+                                                        }),
+                                                    ]),
+                                                    "location": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                            }),
+                                        }),
+                                    }),
+                                ]),
+                            }),
+                        }),
+                        "relkind": Number(
+                            37,
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    37,
+                ),
+            },
+        ),
+    ],
+)

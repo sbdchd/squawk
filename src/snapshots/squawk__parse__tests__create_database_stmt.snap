@@ -1,0 +1,137 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CreatedbStmt(
+                    Object({
+                        "dbname": String(
+                            "lusiadas",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    25,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: CreatedbStmt(
+                    Object({
+                        "dbname": String(
+                            "sales",
+                        ),
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "salesapp",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "owner",
+                                    ),
+                                    "location": Number(
+                                        49,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "salesspace",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "tablespace",
+                                    ),
+                                    "location": Number(
+                                        64,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 26,
+                stmt_len: Some(
+                    59,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: CreatedbStmt(
+                    Object({
+                        "dbname": String(
+                            "music",
+                        ),
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "LATIN1",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "encoding",
+                                    ),
+                                    "location": Number(
+                                        109,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "template0",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "template",
+                                    ),
+                                    "location": Number(
+                                        127,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 86,
+                stmt_len: Some(
+                    59,
+                ),
+            },
+        ),
+    ],
+)

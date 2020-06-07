@@ -1,0 +1,20 @@
+---
+source: src/reporter.rs
+expression: "String::from_utf8_lossy(&buff)"
+---
+main.sql:1:0: [33mwarning[0m: adding-not-nullable-field
+
+   1 | 
+   2 |    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+
+  [1mnote[0m: Adding a NOT NULL field requires exclusive locks and table rewrites.
+  [1mhelp[0m: Make the field nullable.
+
+main.sql:3:1: [33mwarning[0m: adding-not-nullable-field
+
+   3 | ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
+
+  [1mnote[0m: Adding a NOT NULL field requires exclusive locks and table rewrites.
+  [1mhelp[0m: Make the field nullable.
+
+

@@ -1,0 +1,70 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterTSConfigurationStmt(
+                    Object({
+                        "cfgname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "astro_en",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "dicts": Array([
+                            Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "astrosyn",
+                                        ),
+                                    }),
+                                }),
+                            ]),
+                            Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "english_ispell",
+                                        ),
+                                    }),
+                                }),
+                            ]),
+                            Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "english_stem",
+                                        ),
+                                    }),
+                                }),
+                            ]),
+                        ]),
+                        "kind": Number(
+                            0,
+                        ),
+                        "tokentype": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "asciiword",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    115,
+                ),
+            },
+        ),
+    ],
+)

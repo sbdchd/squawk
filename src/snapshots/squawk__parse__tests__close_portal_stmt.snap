@@ -1,0 +1,23 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: ClosePortalStmt(
+                    Object({
+                        "portalname": String(
+                            "curs1",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    12,
+                ),
+            },
+        ),
+    ],
+)

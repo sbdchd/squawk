@@ -1,0 +1,62 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: SelectStmt(
+                    SelectStmt {
+                        distinct_clause: None,
+                        into_clause: None,
+                        target_list: Some(
+                            [
+                                Object({
+                                    "ResTarget": Object({
+                                        "location": Number(
+                                            10,
+                                        ),
+                                        "val": Object({
+                                            "A_Const": Object({
+                                                "location": Number(
+                                                    10,
+                                                ),
+                                                "val": Object({
+                                                    "Integer": Object({
+                                                        "ival": Number(
+                                                            1,
+                                                        ),
+                                                    }),
+                                                }),
+                                            }),
+                                        }),
+                                    }),
+                                }),
+                            ],
+                        ),
+                        from_clause: None,
+                        where_clause: None,
+                        group_clause: None,
+                        having_clause: None,
+                        window_clause: None,
+                        values_lists: None,
+                        sort_clause: None,
+                        limit_offset: None,
+                        limit_count: None,
+                        locking_clause: None,
+                        with_clause: None,
+                        op: None,
+                        all: false,
+                        larg: None,
+                        rarg: None,
+                    },
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    11,
+                ),
+            },
+        ),
+    ],
+)

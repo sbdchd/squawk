@@ -1,0 +1,25 @@
+---
+source: src/rules.rs
+expression: "check_sql(&bad_sql, &[])"
+---
+Ok(
+    [
+        RuleViolation {
+            kind: AddingNotNullableField,
+            span: Span {
+                start: 0,
+                len: Some(
+                    124,
+                ),
+            },
+            messages: [
+                Note(
+                    "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                ),
+                Help(
+                    "Make the field nullable.",
+                ),
+            ],
+        },
+    ],
+)

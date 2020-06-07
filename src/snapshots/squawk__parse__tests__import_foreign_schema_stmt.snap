@@ -1,0 +1,32 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: ImportForeignSchemaStmt(
+                    Object({
+                        "list_type": Number(
+                            0,
+                        ),
+                        "local_schema": String(
+                            "films",
+                        ),
+                        "remote_schema": String(
+                            "foreign_films",
+                        ),
+                        "server_name": String(
+                            "film_server",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    75,
+                ),
+            },
+        ),
+    ],
+)

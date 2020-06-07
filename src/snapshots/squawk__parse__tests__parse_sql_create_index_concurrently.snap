@@ -1,0 +1,55 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: IndexStmt(
+                    IndexStmt {
+                        access_method: "btree",
+                        idxname: "table_name_idx",
+                        index_params: [
+                            IndexElem(
+                                IndexElem {
+                                    name: "table_field",
+                                    expr: None,
+                                    indexcolname: None,
+                                    collation: None,
+                                    opclass: [],
+                                    ordering: Default,
+                                    nulls_ordering: Default,
+                                },
+                            ),
+                        ],
+                        relation: RangeVar(
+                            RangeVar {
+                                catalogname: None,
+                                schemaname: None,
+                                relname: "table_name",
+                                inh: true,
+                                relpersistence: "p",
+                                alias: None,
+                                location: 46,
+                            },
+                        ),
+                        concurrent: true,
+                        unique: false,
+                        primary: false,
+                        isconstraint: false,
+                        deferrable: false,
+                        initdeferred: false,
+                        transformed: false,
+                        if_not_exists: false,
+                        table_space: None,
+                    },
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    74,
+                ),
+            },
+        ),
+    ],
+)

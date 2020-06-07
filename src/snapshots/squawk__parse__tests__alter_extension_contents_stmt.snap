@@ -1,0 +1,33 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterObjectSchemaStmt(
+                    Object({
+                        "newschema": String(
+                            "utils",
+                        ),
+                        "object": Object({
+                            "String": Object({
+                                "str": String(
+                                    "hstore",
+                                ),
+                            }),
+                        }),
+                        "objectType": Number(
+                            15,
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    39,
+                ),
+            },
+        ),
+    ],
+)

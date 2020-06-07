@@ -1,0 +1,116 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterPublicationStmt(
+                    Object({
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "update, delete",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "publish",
+                                    ),
+                                    "location": Number(
+                                        33,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "pubname": String(
+                            "noinsert",
+                        ),
+                        "tableAction": Number(
+                            0,
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    60,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: AlterPublicationStmt(
+                    Object({
+                        "pubname": String(
+                            "mypublication",
+                        ),
+                        "tableAction": Number(
+                            2,
+                        ),
+                        "tables": Array([
+                            Object({
+                                "RangeVar": Object({
+                                    "inh": Bool(
+                                        true,
+                                    ),
+                                    "location": Number(
+                                        104,
+                                    ),
+                                    "relname": String(
+                                        "users",
+                                    ),
+                                    "relpersistence": String(
+                                        "p",
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "RangeVar": Object({
+                                    "inh": Bool(
+                                        true,
+                                    ),
+                                    "location": Number(
+                                        111,
+                                    ),
+                                    "relname": String(
+                                        "departments",
+                                    ),
+                                    "relpersistence": String(
+                                        "p",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 61,
+                stmt_len: Some(
+                    61,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: RenameStmt(
+                    RenameStmt {
+                        newname: "new_name",
+                        behavior: Restrict,
+                        relation: None,
+                        relation_type: AccessMethod,
+                        rename_type: Publication,
+                        subname: None,
+                    },
+                ),
+                stmt_location: 123,
+                stmt_len: None,
+            },
+        ),
+    ],
+)

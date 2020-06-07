@@ -1,0 +1,78 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CreateUserMappingStmt(
+                    Object({
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "bob",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "user",
+                                    ),
+                                    "location": Number(
+                                        48,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "secret",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "password",
+                                    ),
+                                    "location": Number(
+                                        60,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "servername": String(
+                            "foo",
+                        ),
+                        "user": Object({
+                            "RoleSpec": Object({
+                                "location": Number(
+                                    24,
+                                ),
+                                "rolename": String(
+                                    "bob",
+                                ),
+                                "roletype": Number(
+                                    0,
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    78,
+                ),
+            },
+        ),
+    ],
+)

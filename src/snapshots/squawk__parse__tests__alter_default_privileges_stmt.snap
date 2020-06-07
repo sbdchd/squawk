@@ -1,0 +1,81 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterDefaultPrivilegesStmt(
+                    Object({
+                        "action": Object({
+                            "GrantStmt": Object({
+                                "behavior": Number(
+                                    0,
+                                ),
+                                "grantees": Array([
+                                    Object({
+                                        "RoleSpec": Object({
+                                            "location": Number(
+                                                70,
+                                            ),
+                                            "roletype": Number(
+                                                3,
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "is_grant": Bool(
+                                    true,
+                                ),
+                                "objtype": Number(
+                                    1,
+                                ),
+                                "privileges": Array([
+                                    Object({
+                                        "AccessPriv": Object({
+                                            "priv_name": String(
+                                                "select",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "targtype": Number(
+                                    2,
+                                ),
+                            }),
+                        }),
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "myschema",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "schemas",
+                                    ),
+                                    "location": Number(
+                                        25,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    76,
+                ),
+            },
+        ),
+    ],
+)

@@ -1,0 +1,81 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: ExecuteStmt(
+                    Object({
+                        "name": String(
+                            "fooplan",
+                        ),
+                        "params": Array([
+                            Object({
+                                "A_Const": Object({
+                                    "location": Number(
+                                        17,
+                                    ),
+                                    "val": Object({
+                                        "Integer": Object({
+                                            "ival": Number(
+                                                1,
+                                            ),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                            Object({
+                                "A_Const": Object({
+                                    "location": Number(
+                                        20,
+                                    ),
+                                    "val": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "Hunter Valley",
+                                            ),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                            Object({
+                                "A_Const": Object({
+                                    "location": Number(
+                                        37,
+                                    ),
+                                    "val": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "t",
+                                            ),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                            Object({
+                                "A_Const": Object({
+                                    "location": Number(
+                                        42,
+                                    ),
+                                    "val": Object({
+                                        "Float": Object({
+                                            "str": String(
+                                                "200.00",
+                                            ),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    49,
+                ),
+            },
+        ),
+    ],
+)

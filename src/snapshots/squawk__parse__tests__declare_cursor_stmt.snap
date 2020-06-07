@@ -1,0 +1,72 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: DeclareCursorStmt(
+                    Object({
+                        "options": Number(
+                            32,
+                        ),
+                        "portalname": String(
+                            "curs2",
+                        ),
+                        "query": Object({
+                            "SelectStmt": Object({
+                                "fromClause": Array([
+                                    Object({
+                                        "RangeVar": Object({
+                                            "inh": Bool(
+                                                true,
+                                            ),
+                                            "location": Number(
+                                                44,
+                                            ),
+                                            "relname": String(
+                                                "tenk1",
+                                            ),
+                                            "relpersistence": String(
+                                                "p",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "op": Number(
+                                    0,
+                                ),
+                                "targetList": Array([
+                                    Object({
+                                        "ResTarget": Object({
+                                            "location": Number(
+                                                37,
+                                            ),
+                                            "val": Object({
+                                                "ColumnRef": Object({
+                                                    "fields": Array([
+                                                        Object({
+                                                            "A_Star": Object({}),
+                                                        }),
+                                                    ]),
+                                                    "location": Number(
+                                                        37,
+                                                    ),
+                                                }),
+                                            }),
+                                        }),
+                                    }),
+                                ]),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    49,
+                ),
+            },
+        ),
+    ],
+)

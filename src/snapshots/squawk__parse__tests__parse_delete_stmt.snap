@@ -1,0 +1,36 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: DeleteStmt(
+                    Object({
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    12,
+                                ),
+                                "relname": String(
+                                    "table_name",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    24,
+                ),
+            },
+        ),
+    ],
+)

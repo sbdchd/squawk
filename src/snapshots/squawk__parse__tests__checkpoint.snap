@@ -1,0 +1,19 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CheckPointStmt(
+                    Object({}),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    11,
+                ),
+            },
+        ),
+    ],
+)

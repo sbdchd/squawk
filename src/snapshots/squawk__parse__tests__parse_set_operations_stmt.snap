@@ -1,0 +1,166 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: SelectStmt(
+                    SelectStmt {
+                        distinct_clause: None,
+                        into_clause: None,
+                        target_list: None,
+                        from_clause: None,
+                        where_clause: None,
+                        group_clause: None,
+                        having_clause: None,
+                        window_clause: None,
+                        values_lists: None,
+                        sort_clause: None,
+                        limit_offset: None,
+                        limit_count: None,
+                        locking_clause: None,
+                        with_clause: None,
+                        op: Union,
+                        all: false,
+                        larg: Some(
+                            SelectStmt(
+                                SelectStmt {
+                                    distinct_clause: None,
+                                    into_clause: None,
+                                    target_list: Some(
+                                        [
+                                            Object({
+                                                "ResTarget": Object({
+                                                    "location": Number(
+                                                        7,
+                                                    ),
+                                                    "val": Object({
+                                                        "ColumnRef": Object({
+                                                            "fields": Array([
+                                                                Object({
+                                                                    "A_Star": Object({}),
+                                                                }),
+                                                            ]),
+                                                            "location": Number(
+                                                                7,
+                                                            ),
+                                                        }),
+                                                    }),
+                                                }),
+                                            }),
+                                        ],
+                                    ),
+                                    from_clause: Some(
+                                        Array([
+                                            Object({
+                                                "RangeVar": Object({
+                                                    "inh": Bool(
+                                                        true,
+                                                    ),
+                                                    "location": Number(
+                                                        14,
+                                                    ),
+                                                    "relname": String(
+                                                        "table_name",
+                                                    ),
+                                                    "relpersistence": String(
+                                                        "p",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                    ),
+                                    where_clause: None,
+                                    group_clause: None,
+                                    having_clause: None,
+                                    window_clause: None,
+                                    values_lists: None,
+                                    sort_clause: None,
+                                    limit_offset: None,
+                                    limit_count: None,
+                                    locking_clause: None,
+                                    with_clause: None,
+                                    op: None,
+                                    all: false,
+                                    larg: None,
+                                    rarg: None,
+                                },
+                            ),
+                        ),
+                        rarg: Some(
+                            SelectStmt(
+                                SelectStmt {
+                                    distinct_clause: None,
+                                    into_clause: None,
+                                    target_list: Some(
+                                        [
+                                            Object({
+                                                "ResTarget": Object({
+                                                    "location": Number(
+                                                        40,
+                                                    ),
+                                                    "val": Object({
+                                                        "ColumnRef": Object({
+                                                            "fields": Array([
+                                                                Object({
+                                                                    "A_Star": Object({}),
+                                                                }),
+                                                            ]),
+                                                            "location": Number(
+                                                                40,
+                                                            ),
+                                                        }),
+                                                    }),
+                                                }),
+                                            }),
+                                        ],
+                                    ),
+                                    from_clause: Some(
+                                        Array([
+                                            Object({
+                                                "RangeVar": Object({
+                                                    "inh": Bool(
+                                                        true,
+                                                    ),
+                                                    "location": Number(
+                                                        47,
+                                                    ),
+                                                    "relname": String(
+                                                        "table_foo",
+                                                    ),
+                                                    "relpersistence": String(
+                                                        "p",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                    ),
+                                    where_clause: None,
+                                    group_clause: None,
+                                    having_clause: None,
+                                    window_clause: None,
+                                    values_lists: None,
+                                    sort_clause: None,
+                                    limit_offset: None,
+                                    limit_count: None,
+                                    locking_clause: None,
+                                    with_clause: None,
+                                    op: None,
+                                    all: false,
+                                    larg: None,
+                                    rarg: None,
+                                },
+                            ),
+                        ),
+                    },
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    58,
+                ),
+            },
+        ),
+    ],
+)

@@ -1,0 +1,57 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CreateTrigStmt(
+                    Object({
+                        "events": Number(
+                            16,
+                        ),
+                        "funcname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "check_account_update",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    50,
+                                ),
+                                "relname": String(
+                                    "accounts",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                        "row": Bool(
+                            true,
+                        ),
+                        "timing": Number(
+                            2,
+                        ),
+                        "trigname": String(
+                            "check_update",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    120,
+                ),
+            },
+        ),
+    ],
+)

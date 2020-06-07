@@ -1,0 +1,42 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: VariableSetStmt(
+                    Object({
+                        "args": Array([
+                            Object({
+                                "A_Const": Object({
+                                    "location": Number(
+                                        25,
+                                    ),
+                                    "val": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "1",
+                                            ),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                        ]),
+                        "kind": Number(
+                            0,
+                        ),
+                        "name": String(
+                            "my.vars.id",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    28,
+                ),
+            },
+        ),
+    ],
+)

@@ -1,0 +1,35 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: DropRoleStmt(
+                    Object({
+                        "roles": Array([
+                            Object({
+                                "RoleSpec": Object({
+                                    "location": Number(
+                                        11,
+                                    ),
+                                    "rolename": String(
+                                        "jonathan",
+                                    ),
+                                    "roletype": Number(
+                                        0,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    19,
+                ),
+            },
+        ),
+    ],
+)

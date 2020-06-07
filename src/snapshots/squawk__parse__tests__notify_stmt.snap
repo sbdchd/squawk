@@ -1,0 +1,41 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: NotifyStmt(
+                    Object({
+                        "conditionname": String(
+                            "virtual",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    15,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: NotifyStmt(
+                    Object({
+                        "conditionname": String(
+                            "virtual",
+                        ),
+                        "payload": String(
+                            "This is the payload",
+                        ),
+                    }),
+                ),
+                stmt_location: 16,
+                stmt_len: Some(
+                    38,
+                ),
+            },
+        ),
+    ],
+)

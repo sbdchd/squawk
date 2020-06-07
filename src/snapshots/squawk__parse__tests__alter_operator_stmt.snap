@@ -1,0 +1,291 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterOwnerStmt(
+                    Object({
+                        "newowner": Object({
+                            "RoleSpec": Object({
+                                "location": Number(
+                                    41,
+                                ),
+                                "rolename": String(
+                                    "joe",
+                                ),
+                                "roletype": Number(
+                                    0,
+                                ),
+                            }),
+                        }),
+                        "object": Object({
+                            "ObjectWithArgs": Object({
+                                "objargs": Array([
+                                    Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                20,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "text",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                26,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "text",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "objname": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "@@",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                            }),
+                        }),
+                        "objectType": Number(
+                            25,
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    44,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: AlterObjectSchemaStmt(
+                    Object({
+                        "newschema": String(
+                            "bar",
+                        ),
+                        "object": Object({
+                            "ObjectWithArgs": Object({
+                                "objargs": Array([
+                                    Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                65,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "text",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                71,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "text",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "objname": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "@@",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                            }),
+                        }),
+                        "objectType": Number(
+                            25,
+                        ),
+                    }),
+                ),
+                stmt_location: 45,
+                stmt_len: Some(
+                    46,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: AlterOperatorStmt(
+                    Object({
+                        "opername": Object({
+                            "ObjectWithArgs": Object({
+                                "objargs": Array([
+                                    Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                112,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "_int4",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                119,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "_int4",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "objname": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "&&",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                            }),
+                        }),
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                142,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "_int_contsel",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "restrict",
+                                    ),
+                                    "location": Number(
+                                        131,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                163,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "_int_contjoinsel",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "join",
+                                    ),
+                                    "location": Number(
+                                        156,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 92,
+                stmt_len: Some(
+                    88,
+                ),
+            },
+        ),
+    ],
+)

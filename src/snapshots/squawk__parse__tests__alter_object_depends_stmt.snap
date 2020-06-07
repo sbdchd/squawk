@@ -1,0 +1,118 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterObjectDependsStmt(
+                    Object({
+                        "extname": Object({
+                            "String": Object({
+                                "str": String(
+                                    "extension_name",
+                                ),
+                            }),
+                        }),
+                        "object": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "name",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "objectType": Number(
+                            40,
+                        ),
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    23,
+                                ),
+                                "relname": String(
+                                    "table_name",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    74,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: AlterObjectDependsStmt(
+                    Object({
+                        "extname": Object({
+                            "String": Object({
+                                "str": String(
+                                    "extension_name",
+                                ),
+                            }),
+                        }),
+                        "object": Object({
+                            "ObjectWithArgs": Object({
+                                "objargs": Array([
+                                    Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                96,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "pg_catalog",
+                                                        ),
+                                                    }),
+                                                }),
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "int4",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "objname": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "sqrt",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                            }),
+                        }),
+                        "objectType": Number(
+                            19,
+                        ),
+                    }),
+                ),
+                stmt_location: 75,
+                stmt_len: Some(
+                    70,
+                ),
+            },
+        ),
+    ],
+)

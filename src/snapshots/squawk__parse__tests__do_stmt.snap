@@ -1,0 +1,42 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: DoStmt(
+                    Object({
+                        "args": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "DECLARE r record;\nBEGIN\n    FOR r IN SELECT table_schema, table_name FROM information_schema.tables\n             WHERE table_type = \'VIEW\' AND table_schema = \'public\'\n    LOOP\n        EXECUTE \'GRANT ALL ON \' || quote_ident(r.table_schema) || \'.\' || quote_ident(r.table_name) || \' TO webuser\';\n    END LOOP;\nEND",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "as",
+                                    ),
+                                    "location": Number(
+                                        4,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    318,
+                ),
+            },
+        ),
+    ],
+)

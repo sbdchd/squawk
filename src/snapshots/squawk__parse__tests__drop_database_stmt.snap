@@ -1,0 +1,41 @@
+---
+source: src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: DropdbStmt(
+                    Object({
+                        "dbname": String(
+                            "name",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    19,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: DropdbStmt(
+                    Object({
+                        "dbname": String(
+                            "name",
+                        ),
+                        "missing_ok": Bool(
+                            true,
+                        ),
+                    }),
+                ),
+                stmt_location: 20,
+                stmt_len: Some(
+                    29,
+                ),
+            },
+        ),
+    ],
+)
