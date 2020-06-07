@@ -484,7 +484,7 @@ lazy_static! {
                 ViolationMessage::Note(
                     "Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.".into(),
                 ),
-                ViolationMessage::Note(
+                ViolationMessage::Help(
                     "Create an index CONCURRENTLY and create the constraint using the index.".into(),
                 ),
 
@@ -570,6 +570,18 @@ mod test_rules {
     use super::*;
 
     use insta::assert_debug_snapshot;
+
+    /// Ensure we handle both serializing and deserializing RuleViolationKind
+    #[test]
+    fn test_parsing_rule_kind() {
+        let rule_names = RULES.iter().map(|r| r.name.clone());
+        for rule in rule_names {
+            assert_eq!(
+                RuleViolationKind::try_from(rule.to_string().as_ref()),
+                Ok(rule)
+            );
+        }
+    }
 
     /// Ensure we stort the resulting violations by where they occur in the file.
     #[test]

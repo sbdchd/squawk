@@ -1,13 +1,104 @@
-# squawk
+# squawk [![cargo-badge](https://img.shields.io/crates/v/squawk.svg)](https://crates.io/crates/squawk)
 
-> linter for Postgres migrations that prevents downtime for migrations
-> and backwards incompatible changes.
+> linter for Postgres migrations
 
 ## Why?
 
 Prevent unexpected downtime caused by database migrations.
 
 Also it seemed like a nice project to spend more time with Rust.
+
+## Install
+
+```shell
+cargo install squawk
+```
+
+## Usage
+
+```console
+❯ squawk example.sql
+example.sql:2:1: warning: prefer-text-field
+
+   2 | --
+   3 | -- Create model Bar
+   4 | --
+   5 | CREATE TABLE "core_bar" (
+   6 |     "id" serial NOT NULL PRIMARY KEY,
+   7 |     "alpha" varchar(100) NOT NULL
+   8 | );
+
+  note: Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.
+  help: Use a text field with a check constraint.
+
+example.sql:9:2: warning: require-concurrent-index-creation
+
+   9 |
+  10 | CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
+
+  note: Creating an index blocks writes.
+  note: Create the index CONCURRENTLY.
+
+example.sql:11:2: warning: disallowed-unique-constraint
+
+  11 |
+  12 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+
+  note: Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.
+  help: Create an index CONCURRENTLY and create the constraint using the index.
+
+example.sql:13:2: warning: adding-field-with-default
+
+  13 |
+  14 | ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+
+  note: In Postgres versions <11 adding a field with a DEFAULT requires a table rewrite with an ACCESS EXCLUSIVE lock.
+  help: Add the field as nullable, then set a default, backfill, and remove nullabilty.
+```
+
+### `squawk --help`
+
+```console
+squawk 0.1.0
+Find problems in your SQL
+
+USAGE:
+    squawk [FLAGS] [OPTIONS] [--] [paths]...
+
+FLAGS:
+    -h, --help
+            Prints help information
+
+        --list-rules
+            List all available rules
+
+    -V, --version
+            Prints version information
+
+
+OPTIONS:
+        --dump-ast <dump-ast>
+            Output AST in JSON [possible values: Raw, Parsed]
+
+    -e, --exclude <exclude>...
+            Exclude specific warnings
+
+            For example: --exclude=require-concurrent-index-creation,ban-drop-database
+        --explain <explain>
+            Provide documentation on the given rule
+
+        --reporter <reporter>
+            Style of error reporting [possible values: Tty, Gcc, Json]
+
+
+ARGS:
+    <paths>...
+            Paths to search
+```
+
+## Rules
+
+### foo
 
 ## prior art
 
