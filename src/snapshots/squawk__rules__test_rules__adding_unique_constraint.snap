@@ -16,7 +16,7 @@ Ok(
                 Note(
                     "Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.",
                 ),
-                Note(
+                Help(
                     "Create an index CONCURRENTLY and create the constraint using the index.",
                 ),
             ],

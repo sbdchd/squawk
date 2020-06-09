@@ -12,6 +12,8 @@ Also it seemed like a nice project to spend more time with Rust.
 
 ```shell
 cargo install squawk
+
+brew install https://raw.githubusercontent.com/sbdchd/squawk/master/Formula/squawk.rb
 ```
 
 ## Usage
@@ -98,7 +100,83 @@ ARGS:
 
 ## Rules
 
-### foo
+Individual rules can be disabled via the `--exclude` flag
+
+```shell
+squawk --exclude=adding-field-with-default,disallowed-unique-constraint example.sql
+```
+
+### `require-concurrent-index-creation`
+
+Ensure all index creations use the `CONCURRENTLY` option.
+
+This rule ignores indexes added to tables created in the same transaction.
+
+During a normal index creation updates are blocked. `CONCURRENTLY` avoids the
+issue of blocking.
+
+<https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY>
+
+### `constraint-missing-not-valid`
+
+Check that all new constraints have `NOT VALID`.
+
+By default new constraints require a table scan and block writes to the
+table. Using `NOT VALID` with a later `VALIDATE CONSTRAINT` call prevents the
+table scan and results in the validation step only requiring a `SHARE UPDATE EXCLUSIVE` lock.
+
+<https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES>
+
+### `adding-field-with-default`
+
+On Postgres versions less than 11, adding a field with a `DEFAULT` requires a
+table rewrite with an `ACCESS EXCLUSIVE` lock.
+
+<https://www.postgresql.org/docs/10/sql-altertable.html#SQL-ALTERTABLE-NOTES>
+
+### `changing-column-type`
+
+Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads.
+
+Changing the type of the column may also break other clients reading from the
+table.
+
+<https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES>
+
+### `adding-not-nullable-field`
+
+A `NOT NULL` constraint requires a table scan and the `ALTER TABLE` requires
+an `ACCESS EXCLUSIVE` lock.
+
+Usually this is paired with a `DEFAULT` which has issues on version less than
+\11. See the `adding-field-with-default` rule.
+
+### `renaming-column`
+
+Renaming a column may break existing clients.
+
+### `renaming-table`
+
+Renaming a table may break existing clients.
+
+### `disallowed-unique-constraint`
+
+Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads.
+
+Instead create an index `CONCURRENTLY` and create the `CONSTRAINT` `USING` the index.
+
+<https://www.postgresql.org/docs/current/sql-altertable.html>
+
+### `ban-drop-database`
+
+Dropping a database may break existing clients.
+
+### `prefer-text-field`
+
+Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock.
+
+Using a text field with a `CHECK CONSTRAINT` makes it easier to change the
+max length. See the `constraint-missing-not-valid` rule.
 
 ## prior art
 
@@ -118,6 +196,7 @@ ARGS:
 - <https://dba.stackexchange.com/questions/158499/postgres-how-is-set-not-null-more-efficient-than-check-constraint>
 - <https://www.postgresql.org/docs/10/sql-altertable.html#SQL-ALTERTABLE-NOTES>
 - <https://www.postgresql.org/docs/current/explicit-locking.html>
+- <https://benchling.engineering/move-fast-and-migrate-things-how-we-automated-migrations-in-postgres-d60aba0fc3d4>
 
 ## dev
 
