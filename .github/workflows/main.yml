@@ -43,6 +43,12 @@ jobs:
           default: true
           override: true
 
+      - name: Install Clang
+        shell: powershell
+        run: |
+          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
+          scoop install llvm --global
+
       - name: Build
         run: cargo build --all --release
 
