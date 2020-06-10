@@ -48,7 +48,6 @@ jobs:
         run: |
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
           scoop install llvm --global
-          scoop install clang --global
 
       - name: Build
         run: cargo build --all --release
