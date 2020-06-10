@@ -48,6 +48,9 @@ jobs:
         run: |
           Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
           scoop install llvm --global
+          dir C:\ProgramData\scoop\apps\llvm\10.0.0\bin\
+          Get-Item C:\ProgramData\scoop\apps\llvm\10.0.0\bin\libclang.dll
+          set PATH=C:\ProgramData\scoop\apps\llvm\10.0.0\bin;%PATH%
 
       - name: Build
         run: cargo build --all --release
