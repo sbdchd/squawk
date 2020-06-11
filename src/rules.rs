@@ -581,7 +581,6 @@ mod test_rules {
                 Ok(rule)
             );
         }
-        assert!(false);
     }
 
     /// Ensure we stort the resulting violations by where they occur in the file.
