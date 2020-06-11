@@ -71,14 +71,14 @@ mod tests {
         // NOTE: the span information for these starts at 0 even though the SQL
         // is offset.
         let sql = r#"   SELECT 1;"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
     #[test]
     fn test_span_with_new_line_and_indent() {
         let sql = r#"
     SELECT 1;"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -91,7 +91,7 @@ mod tests {
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
 
         assert_debug_snapshot!(res);
     }
@@ -99,7 +99,7 @@ mod tests {
     #[test]
     fn test_error_paths() {
         let sql = r#"lsakdjf;asdlfkjasd;lfj"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -111,41 +111,41 @@ CREATE INDEX "table_name_field_name_idx" ON "table_name" ("field_name");
 CREATE INDEX "table_name_field_name_idx" ON "table_name" ("field_name" varchar_pattern_ops);
 COMMIT;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_select_string_literal() {
         let sql = r#"SELECT 'some string';"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_select_one() {
         let sql = r#"SELECT 1;"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
     #[test]
     fn test_parse_sql_create_index_concurrently() {
         let sql = r#"CREATE INDEX CONCURRENTLY "table_name_idx" ON "table_name" ("table_field");"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_insert_stmt() {
         let sql = r#"INSERT INTO table_name VALUES (1, 2, 3);"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res)
     }
 
     #[test]
     fn test_parsing_update_stmt() {
         let sql = r#"UPDATE table_name SET foo = 'bar' WHERE buzz > 10;"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res)
     }
 
@@ -167,186 +167,186 @@ CREATE TABLE "core_foo" (
 CREATE INDEX "age_index" ON "core_foo" ("age");
 COMMIT;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res)
     }
 
     #[test]
     fn test_parse_sql_create_index() {
         let sql = r#"CREATE INDEX "table_name_idx" ON "table_name" ("table_field");"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
     #[test]
     fn test_parse_delete_stmt() {
         let sql = r#"DELETE FROM "table_name";"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
 
         let sql = r#"DELETE FROM "table_name" WHERE account_age > 10;"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parse_set_operations_stmt() {
         let sql = r#"SELECT * from "table_name" UNION SELECT * from "table_foo";"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
 
         let sql = r#"SELECT * from "table_name" UNION ALL SELECT * from "table_foo";"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parse_create_schema_stmt() {
         let sql = r#"CREATE SCHEMA schema_name;"#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parse_replica_identity_stmt() {
         let sql = "ALTER TABLE aa REPLICA IDENTITY FULL;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parse_alter_collation_stmt() {
         let sql = "ALTER COLLATION name RENAME TO new_name;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parse_alter_domain_stmt() {
         let sql = "ALTER DOMAIN zipcode SET NOT NULL;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_grant_stmt() {
         let sql = "GRANT INSERT ON films TO PUBLIC;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_grant_role() {
         let sql = "GRANT admins TO joe;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_alter_default_privileges_stmt() {
         let sql = "ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT SELECT ON TABLES TO PUBLIC;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_copy_stmt() {
         let sql = "COPY country FROM '/usr1/proj/bray/sql/country_data';";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_variable_set_stmt() {
         let sql = "set session my.vars.id = '1';";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_variable_show_stmt() {
         let sql = "SHOW name";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_create_table_space_stmt() {
         let sql = "CREATE TABLESPACE dbspace LOCATION '/data/dbs';";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_drop_table_space_stmt() {
         let sql = "DROP TABLESPACE dbspace;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_alter_table_space_stmt() {
         let sql = "ALTER TABLESPACE index_space RENAME TO fast_raid;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_create_extension() {
         let sql = "CREATE EXTENSION hstore;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_alter_table_extension() {
         let sql = "ALTER EXTENSION hstore UPDATE TO '2.0';";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_drop_extension() {
         let sql = "DROP EXTENSION hstore;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_alter_extension_contents_stmt() {
         let sql = "ALTER EXTENSION hstore SET SCHEMA utils;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
 
         let sql = "ALTER EXTENSION hstore ADD FUNCTION populate_record(anyelement, hstore);";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_create_foreign_data_wrapper() {
         let sql = "CREATE FOREIGN DATA WRAPPER dummy;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_alter_foreign_data_wrapper() {
         let sql = "ALTER FOREIGN DATA WRAPPER dbi OPTIONS (ADD foo '1', DROP 'bar');";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_create_foreign_server_stmt() {
         let sql = "CREATE SERVER myserver FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'foo', dbname 'foodb', port '5432');";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_alter_foreign_server_stmt() {
         let sql = "ALTER SERVER foo OPTIONS (host 'foo', dbname 'foodb');";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -363,28 +363,28 @@ CREATE FOREIGN TABLE films (
 )
 SERVER film_server;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_create_user_mapping_stmt() {
         let sql = "CREATE USER MAPPING FOR bob SERVER foo OPTIONS (user 'bob', password 'secret');";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_alter_user_mapping_stmt() {
         let sql = "ALTER USER MAPPING FOR bob SERVER foo OPTIONS (SET password 'public');";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_drop_user_mapping_stmt() {
         let sql = "DROP USER MAPPING IF EXISTS FOR bob SERVER foo;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -394,32 +394,32 @@ SERVER film_server;
 IMPORT FOREIGN SCHEMA foreign_films
     FROM SERVER film_server INTO films;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_create_policy_stmt() {
         let sql = "CREATE POLICY name ON table_name FOR ALL;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_alter_policy_stmt() {
         let sql = "ALTER POLICY name ON table_name RENAME TO new_name;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
 
         let sql = "ALTER POLICY name ON table_name TO PUBLIC WITH CHECK (account_age > 10);";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_create_access_method_stmt() {
         let sql = "CREATE ACCESS METHOD heptree TYPE INDEX HANDLER heptree_handler;";
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -431,7 +431,7 @@ CREATE TRIGGER check_update
     FOR EACH ROW
     EXECUTE PROCEDURE check_account_update();
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -441,7 +441,7 @@ CREATE TRIGGER check_update
 CREATE EVENT TRIGGER abort_ddl ON ddl_command_start
    EXECUTE PROCEDURE abort_any_command();
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -450,7 +450,7 @@ CREATE EVENT TRIGGER abort_ddl ON ddl_command_start
         let sql = r#"
 ALTER EVENT TRIGGER name DISABLE;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -467,7 +467,7 @@ $$;
 
 CALL insert_data(1, 2);
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -482,7 +482,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -493,7 +493,7 @@ CREATE TRUSTED PROCEDURAL LANGUAGE plpgsql
     HANDLER plpgsql_call_handler
     VALIDATOR plpgsql_validator;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -504,7 +504,7 @@ CREATE ROLE miriam
     WITH LOGIN PASSWORD 'jw8s0F4' 
     VALID UNTIL '2005-01-01';
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -513,7 +513,7 @@ CREATE ROLE miriam
         let sql = r#"
 ALTER ROLE miriam CREATEROLE CREATEDB;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -522,7 +522,7 @@ ALTER ROLE miriam CREATEROLE CREATEDB;
         let sql = r#"
 ALTER ROLE worker_bee SET maintenance_work_mem = 100000;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -531,7 +531,7 @@ ALTER ROLE worker_bee SET maintenance_work_mem = 100000;
         let sql = r#"
 DROP ROLE jonathan;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -540,7 +540,7 @@ DROP ROLE jonathan;
         let sql = r#"
 CREATE SEQUENCE serial START 101;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -549,7 +549,7 @@ CREATE SEQUENCE serial START 101;
         let sql = r#"
 ALTER SEQUENCE serial RESTART WITH 105;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -563,7 +563,7 @@ CREATE AGGREGATE sum (complex)
     initcond = '(0,0)'
 );
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
 
         let sql = r#"
@@ -578,7 +578,7 @@ CREATE OPERATOR === (
     HASHES, MERGES
 );
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
 
         let sql = r#"
@@ -589,7 +589,7 @@ CREATE TYPE box (
     ELEMENT = float4
 );
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -602,7 +602,7 @@ CHECK(
 OR VALUE ~ '^\d{5}-\d{4}$'
 );
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -624,7 +624,7 @@ CREATE OPERATOR CLASS gist__int_ops
         FUNCTION        6       g_int_picksplit (internal, internal),
         FUNCTION        7       g_int_same (_int4, _int4, internal);
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -637,7 +637,7 @@ ALTER OPERATOR CLASS name USING index_method
 ALTER OPERATOR CLASS name USING index_method
     SET SCHEMA new_schema;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -662,7 +662,7 @@ ALTER OPERATOR FAMILY integer_ops USING btree ADD
   OPERATOR 5 > (int2, int4) ,
   FUNCTION 1 btint24cmp(int2, int4) ;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -672,7 +672,7 @@ ALTER OPERATOR FAMILY integer_ops USING btree ADD
 TRUNCATE bigtable, fattable, bar RESTART IDENTITY;
 TRUNCATE foo CASCADE;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -681,7 +681,7 @@ TRUNCATE foo CASCADE;
         let sql = r#"
 COMMENT ON AGGREGATE my_aggregate (double precision) IS 'Computes sample variance';
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -690,7 +690,7 @@ COMMENT ON AGGREGATE my_aggregate (double precision) IS 'Computes sample varianc
         let sql = r#"
 SECURITY LABEL FOR selinux ON TABLE mytable IS 'system_u:object_r:sepgsql_table_t:s0';
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -700,7 +700,7 @@ SECURITY LABEL FOR selinux ON TABLE mytable IS 'system_u:object_r:sepgsql_table_
 DECLARE
     curs2 CURSOR FOR SELECT * FROM tenk1;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -709,7 +709,7 @@ DECLARE
         let sql = r#"
 CLOSE curs1;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -718,7 +718,7 @@ CLOSE curs1;
         let sql = r#"
 FETCH FORWARD 5 FROM foo;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -727,7 +727,7 @@ FETCH FORWARD 5 FROM foo;
         let sql = r#"
 CREATE STATISTICS s1 (dependencies) ON a, b FROM t1;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -736,7 +736,7 @@ CREATE STATISTICS s1 (dependencies) ON a, b FROM t1;
         let sql = r#"
 EXPLAIN ANALYZE SELECT * FROM t1 WHERE (a = 1) AND (b = 0);
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -749,7 +749,7 @@ ALTER FUNCTION sqrt(integer) SET SCHEMA maths;
 ALTER FUNCTION check_password(text) SET search_path = admin, pg_temp;
 ALTER FUNCTION check_password(text) RESET search_path;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -765,7 +765,7 @@ BEGIN
     END LOOP;
 END$$;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -777,7 +777,7 @@ ALTER TRIGGER name ON table_name
 ALTER FUNCTION sqrt(integer) 
     DEPENDS ON EXTENSION extension_name;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -788,7 +788,7 @@ ALTER OPERATOR @@ (text, text) OWNER TO joe;
 ALTER OPERATOR @@ (text, text) SET SCHEMA bar;
 ALTER OPERATOR && (_int4, _int4) SET (RESTRICT = _int_contsel, JOIN = _int_contjoinsel);
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -802,7 +802,7 @@ CREATE RULE "_RETURN" AS
 
 CREATE RULE notify_me AS ON UPDATE TO mytable DO ALSO NOTIFY mytable;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -812,7 +812,7 @@ CREATE RULE notify_me AS ON UPDATE TO mytable DO ALSO NOTIFY mytable;
 NOTIFY virtual;
 NOTIFY virtual, 'This is the payload';
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -821,7 +821,7 @@ NOTIFY virtual, 'This is the payload';
         let sql = r#"
 LISTEN virtual;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -830,7 +830,7 @@ LISTEN virtual;
         let sql = r#"
 UNLISTEN virtual;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -842,7 +842,7 @@ CREATE TYPE complex AS (
     i       double precision
 );
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -851,7 +851,7 @@ CREATE TYPE complex AS (
         let sql = r#"
 CREATE TYPE happiness AS ENUM ('happy', 'very happy', 'ecstatic');
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -863,7 +863,7 @@ CREATE TYPE floatrange AS RANGE (
     subtype_diff = float8mi
 );
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -872,7 +872,7 @@ CREATE TYPE floatrange AS RANGE (
         let sql = r#"
 ALTER TYPE colors ADD VALUE 'orange' AFTER 'red';
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -885,7 +885,7 @@ CREATE VIEW comedies AS
     FROM films
     WHERE kind = 'Comedy';
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -894,7 +894,7 @@ CREATE VIEW comedies AS
         let sql = r#"
 LOAD 'filename';
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -905,7 +905,7 @@ CREATE DATABASE lusiadas;
 CREATE DATABASE sales OWNER salesapp TABLESPACE salesspace;
 CREATE DATABASE music ENCODING 'LATIN1' TEMPLATE template0;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -918,7 +918,7 @@ ALTER DATABASE name SET TABLESPACE new_tablespace;
 ALTER DATABASE name RESET configuration_parameter;
 ALTER DATABASE name RESET ALL;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -928,7 +928,7 @@ ALTER DATABASE name RESET ALL;
 DROP DATABASE name;
 DROP DATABASE IF EXISTS name;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -938,7 +938,7 @@ DROP DATABASE IF EXISTS name;
 ALTER SYSTEM SET wal_level = hot_standby;
 ALTER SYSTEM RESET wal_level;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -949,7 +949,7 @@ CLUSTER employees USING employees_ind;
 CLUSTER employees;
 CLUSTER;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -958,7 +958,7 @@ CLUSTER;
         let sql = r#"
 VACUUM (VERBOSE, ANALYZE) foo;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -968,7 +968,7 @@ VACUUM (VERBOSE, ANALYZE) foo;
 CREATE TABLE films2 AS
   TABLE films;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -978,7 +978,7 @@ CREATE TABLE films2 AS
 REFRESH MATERIALIZED VIEW order_summary;
 REFRESH MATERIALIZED VIEW annual_statistics_basis WITH NO DATA;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -987,7 +987,7 @@ REFRESH MATERIALIZED VIEW annual_statistics_basis WITH NO DATA;
         let sql = r#"
 CHECKPOINT;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -998,7 +998,7 @@ DISCARD PLANS;
 DISCARD SEQUENCES;
 DISCARD TEMP;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1008,7 +1008,7 @@ DISCARD TEMP;
 LOCK TABLE films IN SHARE MODE;
 LOCK TABLE films IN SHARE ROW EXCLUSIVE MODE;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1019,7 +1019,7 @@ SET CONSTRAINTS ALL DEFERRED;
 SET CONSTRAINTS ALL IMMEDIATE;
 SET CONSTRAINTS foo IMMEDIATE;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1031,7 +1031,7 @@ REINDEX TABLE table_name;
 REINDEX DATABASE table_name;
 REINDEX SYSTEM table_name;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1040,7 +1040,7 @@ REINDEX SYSTEM table_name;
         let sql = r#"
 CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM myfunc;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1049,7 +1049,7 @@ CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM myfunc;
         let sql = r#"
 CREATE CAST (bigint AS int4) WITH FUNCTION int4(bigint) AS ASSIGNMENT;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1061,7 +1061,7 @@ CREATE TRANSFORM FOR hstore LANGUAGE plpythonu (
     TO SQL WITH FUNCTION plpython_to_hstore(internal)
 );
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1071,7 +1071,7 @@ CREATE TRANSFORM FOR hstore LANGUAGE plpythonu (
 PREPARE fooplan (int, text, bool, numeric) AS
     INSERT INTO foo VALUES($1, $2, $3, $4);
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1080,7 +1080,7 @@ PREPARE fooplan (int, text, bool, numeric) AS
         let sql = r#"
 EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1089,7 +1089,7 @@ EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);
         let sql = r#"
 DEALLOCATE PREPARE ALL;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1098,7 +1098,7 @@ DEALLOCATE PREPARE ALL;
         let sql = r#"
 DROP OWNED BY foo CASCADE;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1107,7 +1107,7 @@ DROP OWNED BY foo CASCADE;
         let sql = r#"
 REASSIGN OWNED BY old_role TO new_role;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1116,7 +1116,7 @@ REASSIGN OWNED BY old_role TO new_role;
         let sql = r#"
 ALTER TEXT SEARCH DICTIONARY my_dict ( StopWords = newrussian );
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1126,7 +1126,7 @@ ALTER TEXT SEARCH DICTIONARY my_dict ( StopWords = newrussian );
 ALTER TEXT SEARCH CONFIGURATION astro_en
     ADD MAPPING FOR asciiword WITH astrosyn, english_ispell, english_stem;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1137,7 +1137,7 @@ CREATE PUBLICATION mypublication FOR TABLE users, departments;
 CREATE PUBLICATION insert_only FOR TABLE mydata
     WITH (publish = 'insert');
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1148,7 +1148,7 @@ ALTER PUBLICATION noinsert SET (publish = 'update, delete');
 ALTER PUBLICATION mypublication ADD TABLE users, departments;
 ALTER PUBLICATION name RENAME TO new_name
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1159,7 +1159,7 @@ CREATE SUBSCRIPTION mysub
          CONNECTION 'host=192.168.1.50 port=5432 user=foo dbname=foodb'
         PUBLICATION mypublication, insert_only;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1169,7 +1169,7 @@ CREATE SUBSCRIPTION mysub
 ALTER SUBSCRIPTION mysub SET PUBLICATION insert_only;
 ALTER SUBSCRIPTION mysub DISABLE;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
@@ -1178,7 +1178,7 @@ ALTER SUBSCRIPTION mysub DISABLE;
         let sql = r#"
 DROP SUBSCRIPTION mysub;
 "#;
-        let res = parse_sql_query(&sql);
+        let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 }

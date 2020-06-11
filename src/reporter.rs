@@ -4,7 +4,7 @@ use crate::rules::{
     check_sql, CheckSQLError, RuleViolation, RuleViolationKind, Span, SquawkRule, ViolationMessage,
     RULES,
 };
-use console::{strip_ansi_codes, style};
+use console::style;
 use serde::Serialize;
 use std::convert::TryFrom;
 use std::fs::File;
@@ -327,6 +327,7 @@ mod test_reporter {
     use super::*;
 
     use crate::rules::check_sql;
+    use console::strip_ansi_codes;
     use insta::{assert_debug_snapshot, assert_display_snapshot};
 
     #[test]
@@ -336,7 +337,7 @@ mod test_reporter {
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(&sql, &[]).expect("valid sql should parse");
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
 
         let filename = "main.sql";
 
@@ -344,7 +345,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, &sql, filename),
+            &pretty_violations(violations, sql, filename),
             &Reporter::Gcc,
         );
         assert!(res.is_ok());
@@ -362,13 +363,13 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(&sql, &[]).expect("valid sql should parse");
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
         let filename = "main.sql";
         let mut buff = Vec::new();
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, &sql, filename),
+            &pretty_violations(violations, sql, filename),
             &Reporter::Tty,
         );
 
@@ -383,13 +384,13 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(&sql, &[]).expect("valid sql should parse");
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
         let filename = "main.sql";
         let mut buff = Vec::new();
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, &sql, filename),
+            &pretty_violations(violations, sql, filename),
             &Reporter::Json,
         );
 
@@ -406,9 +407,9 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(&sql, &[]).expect("valid sql should parse");
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
 
         let filename = "main.sql";
-        assert_debug_snapshot!(pretty_violations(violations, &sql, filename));
+        assert_debug_snapshot!(pretty_violations(violations, sql, filename));
     }
 }

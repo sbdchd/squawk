@@ -591,7 +591,7 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        let res = check_sql(&sql, &[]).expect("valid parsing of SQL");
+        let res = check_sql(sql, &[]).expect("valid parsing of SQL");
         let mut prev_span_start = -1;
         for violation in res.iter() {
             assert!(violation.span.start > prev_span_start);
@@ -612,13 +612,13 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
 
         let ok_sql = r#"
   -- use CONCURRENTLY
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
-        assert_debug_snapshot!(check_sql(&ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[]));
     }
 
     /// ```sql
@@ -635,14 +635,14 @@ mod test_rules {
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
    "#;
 
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
 
         let ok_sql = r#"
 -- use `NOT VALID`
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
    "#;
-        assert_debug_snapshot!(check_sql(&ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[]));
     }
 
     ///
@@ -667,9 +667,9 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
    "#;
 
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
 
-        assert_debug_snapshot!(check_sql(&ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[]));
     }
 
     /// ```sql
@@ -694,8 +694,8 @@ ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
 ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
    "#;
 
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
-        assert_debug_snapshot!(check_sql(&ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[]));
     }
 
     ///
@@ -723,8 +723,8 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
         "#;
 
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
-        assert_debug_snapshot!(check_sql(&ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[]));
     }
 
     #[test]
@@ -737,7 +737,7 @@ BEGIN;
 ALTER TABLE "core_recipe" ALTER COLUMN "edits" TYPE text USING "edits"::text;
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
 
         let bad_sql = r#"
 BEGIN;
@@ -749,7 +749,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE text USING "foo"::text;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
     }
 
     #[test]
@@ -764,14 +764,14 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
 
         let bad_sql = r#"
 -- not sure how this would ever work, but might as well test it
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
 
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
     }
 
     #[test]
@@ -780,7 +780,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
         "#;
 
-        assert_debug_snapshot!(check_sql(&sql, &[]));
+        assert_debug_snapshot!(check_sql(sql, &[]));
     }
 
     #[test]
@@ -789,7 +789,7 @@ ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
 ALTER TABLE "table_name" RENAME TO "new_table_name";
         "#;
 
-        assert_debug_snapshot!(check_sql(&sql, &[]));
+        assert_debug_snapshot!(check_sql(sql, &[]));
     }
 
     #[test]
@@ -799,7 +799,7 @@ DROP DATABASE "table_name";
 DROP DATABASE IF EXISTS "table_name";
 DROP DATABASE IF EXISTS "table_name"
         "#;
-        assert_debug_snapshot!(check_sql(&sql, &[]));
+        assert_debug_snapshot!(check_sql(sql, &[]));
     }
 
     #[test]
@@ -828,7 +828,7 @@ COMMIT;
         "#;
 
         assert_debug_snapshot!(check_sql(
-            &sql,
+            sql,
             &[RuleViolationKind::PreferTextField.to_string()]
         ));
     }
@@ -845,7 +845,7 @@ BEGIN;
 ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
 COMMIT;
 "#;
-        assert_debug_snapshot!(check_sql(&sql, &[]), @r###"
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
         Ok(
             [
                 RuleViolation {
@@ -883,7 +883,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
 "#;
-        assert_debug_snapshot!(check_sql(&bad_sql, &[]), @r###"
+        assert_debug_snapshot!(check_sql(bad_sql, &[]), @r###"
         Ok(
             [
                 RuleViolation {
@@ -921,7 +921,7 @@ CREATE TABLE "core_bar" (
 --
 ALTER TABLE "core_bar" ADD CONSTRAINT "text_size" CHECK (LENGTH("bravo") <= 100);
 COMMIT;"#;
-        assert_debug_snapshot!(check_sql(&ok_sql, &[]), @r###"
+        assert_debug_snapshot!(check_sql(ok_sql, &[]), @r###"
         Ok(
             [],
         )
