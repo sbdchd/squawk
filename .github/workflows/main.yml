@@ -3,34 +3,8 @@ name: Rust CI
 on: push
 
 jobs:
-  # build-linux:
-  #   runs-on: ubuntu-latest
-
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v1
-
-  #     - name: Install latest rust toolchain
-  #       uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         default: true
-  #         override: true
-
-  #     - name: Build
-  #       run: cargo build --all --release && mv target/release/squawk target/release/PROJECT_NAME_amd64
-
-  #     - name: Release
-  #       uses: softprops/action-gh-release@v1
-  #       if: startsWith(github.ref, 'refs/tags/')
-  #       with:
-  #         files: |
-  #           target/release/PROJECT_NAME_amd64
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-win:
-    runs-on: windows-latest
+  build-linux:
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
@@ -43,49 +17,44 @@ jobs:
           default: true
           override: true
 
-      - name: Install Clang
-        shell: powershell
-        run: |
-          Invoke-Expression (New-Object System.Net.WebClient).DownloadString('https://get.scoop.sh')
-          scoop install llvm --global
-          Get-Item C:\ProgramData\scoop\apps\llvm\10.0.0\bin\libclang.dll
-          dir C:\ProgramData\scoop\apps\llvm\10.0.0\bin\
-          cp C:\ProgramData\scoop\apps\llvm\10.0.0\bin\libclang.dll C:\msys64\mingw64\bin\
-
       - name: Build
-        run: cargo build --all --release
+        run: cargo build --all --release && mv target/release/squawk target/release/PROJECT_NAME_amd64
 
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          files: target/release/squawk.exe
+          files: |
+            target/release/PROJECT_NAME_amd64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # build-mac:
-  #   runs-on: macos-latest
+  # windows isn't supported by libpg_query
+  # https://github.com/lfittl/libpg_query/issues/44
 
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v1
+  build-mac:
+    runs-on: macos-latest
 
-  #     - name: Install latest rust toolchain
-  #       uses: actions-rs/toolchain@v1
-  #       with:
-  #         toolchain: stable
-  #         target: x86_64-apple-darwin
-  #         default: true
-  #         override: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
 
-  #     - name: Build for mac
-  #       run: cargo build --all --release && mv target/release/squawk target/release/PROJECT_NAME_darwin
+      - name: Install latest rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          target: x86_64-apple-darwin
+          default: true
+          override: true
 
-  #     - name: Release
-  #       uses: softprops/action-gh-release@v1
-  #       if: startsWith(github.ref, 'refs/tags/')
-  #       with:
-  #         files: |
-  #           target/release/PROJECT_NAME_darwin
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build for mac
+        run: cargo build --all --release && mv target/release/squawk target/release/PROJECT_NAME_darwin
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            target/release/PROJECT_NAME_darwin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
