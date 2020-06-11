@@ -1,4 +1,4 @@
-# squawk [![cargo-badge](https://img.shields.io/crates/v/squawk.svg)](https://crates.io/crates/squawk)
+# squawk [![cargo-badge](https://img.shields.io/crates/v/squawk.svg)](https://crates.io/crates/squawk) ![Rust CI](https://github.com/sbdchd/squawk/workflows/Rust%20CI/badge.svg)
 
 > linter for Postgres migrations
 
@@ -192,6 +192,7 @@ max length. See the `constraint-missing-not-valid` rule.
 
 - <https://www.braintreepayments.com/blog/safe-operations-for-high-volume-postgresql/>
 - <https://gocardless.com/blog/zero-downtime-postgres-migrations-the-hard-parts/>
+- <https://www.citusdata.com/blog/2018/02/22/seven-tips-for-dealing-with-postgres-locks/>
 - <https://realpython.com/create-django-index-without-downtime/#non-atomic-migrations>
 - <https://dba.stackexchange.com/questions/158499/postgres-how-is-set-not-null-more-efficient-than-check-constraint>
 - <https://www.postgresql.org/docs/10/sql-altertable.html#SQL-ALTERTABLE-NOTES>
@@ -202,10 +203,10 @@ max length. See the `constraint-missing-not-valid` rule.
 
 ```shell
 cargo install
-cargo test
 cargo run
-cargo clippy -- -W clippy::nursery
-cargo fmt
+./s/test
+./s/lint
+./s/fmt
 ```
 
 ## how it works
