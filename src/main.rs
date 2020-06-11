@@ -15,7 +15,7 @@ use structopt::StructOpt;
 fn handle_exit_err<E: std::fmt::Debug>(res: Result<(), E>) -> ! {
     match res {
         Ok(_) => process::exit(0),
-        Err(err) => {
+                    Err(err) => {
             eprintln!("{:#?}", err);
             process::exit(1)
         }
