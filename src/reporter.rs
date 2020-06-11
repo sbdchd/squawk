@@ -4,7 +4,7 @@ use crate::rules::{
     check_sql, CheckSQLError, RuleViolation, RuleViolationKind, Span, SquawkRule, ViolationMessage,
     RULES,
 };
-use console::style;
+use console::{strip_ansi_codes, style};
 use serde::Serialize;
 use std::convert::TryFrom;
 use std::fs::File;
@@ -373,7 +373,8 @@ SELECT 1;
         );
 
         assert!(res.is_ok());
-        assert_display_snapshot!(String::from_utf8_lossy(&buff));
+        // remove the color codes so tests behave in CI as they do locally
+        assert_display_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
     }
     #[test]
     fn test_display_violations_json() {
