@@ -327,6 +327,7 @@ mod test_reporter {
     use super::*;
 
     use crate::rules::check_sql;
+    use console::strip_ansi_codes;
     use insta::{assert_debug_snapshot, assert_display_snapshot};
 
     #[test]
@@ -336,7 +337,7 @@ mod test_reporter {
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(&sql, &[]).expect("valid sql should parse");
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
 
         let filename = "main.sql";
 
@@ -344,7 +345,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, &sql, filename),
+            &pretty_violations(violations, sql, filename),
             &Reporter::Gcc,
         );
         assert!(res.is_ok());
@@ -362,18 +363,19 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(&sql, &[]).expect("valid sql should parse");
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
         let filename = "main.sql";
         let mut buff = Vec::new();
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, &sql, filename),
+            &pretty_violations(violations, sql, filename),
             &Reporter::Tty,
         );
 
         assert!(res.is_ok());
-        assert_display_snapshot!(String::from_utf8_lossy(&buff));
+        // remove the color codes so tests behave in CI as they do locally
+        assert_display_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
     }
     #[test]
     fn test_display_violations_json() {
@@ -382,13 +384,13 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(&sql, &[]).expect("valid sql should parse");
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
         let filename = "main.sql";
         let mut buff = Vec::new();
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, &sql, filename),
+            &pretty_violations(violations, sql, filename),
             &Reporter::Json,
         );
 
@@ -405,9 +407,9 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(&sql, &[]).expect("valid sql should parse");
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
 
         let filename = "main.sql";
-        assert_debug_snapshot!(pretty_violations(violations, &sql, filename));
+        assert_debug_snapshot!(pretty_violations(violations, sql, filename));
     }
 }
