@@ -10,6 +10,10 @@ Also it seemed like a nice project to spend more time with Rust.
 
 ## Install
 
+Note: due to `squawk`'s dependency on
+[`libpg_query`](https://github.com/lfittl/libpg_query/issues/44), `squawk`
+only supports Linux and macOS
+
 ```shell
 cargo install squawk
 
