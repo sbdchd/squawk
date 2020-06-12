@@ -17,7 +17,11 @@ only supports Linux and macOS
 ```shell
 cargo install squawk
 
+# macOS
 brew install https://raw.githubusercontent.com/sbdchd/squawk/master/Formula/squawk.rb
+
+# or install binaries directly via the releases page
+https://github.com/sbdchd/squawk/releases
 ```
 
 ## Usage
@@ -65,7 +69,7 @@ example.sql:13:2: warning: adding-field-with-default
 ### `squawk --help`
 
 ```
-squawk 0.1.0
+squawk
 Find problems in your SQL
 
 USAGE:
