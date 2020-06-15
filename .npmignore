@@ -1,0 +1,9 @@
+# ignore everything
+/*
+
+# unignore desired files
+!package.json
+!README.md
+!LICENSE
+!js
+.DS_Store
