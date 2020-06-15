@@ -15,6 +15,8 @@ Note: due to `squawk`'s dependency on
 only supports Linux and macOS
 
 ```shell
+npm install -g squawk-cli
+
 cargo install squawk
 
 # macOS
