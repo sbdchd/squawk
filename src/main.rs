@@ -49,6 +49,7 @@ struct Opt {
 
 fn main() {
     let opts = Opt::from_args();
+    let mut clap_app = Opt::clap();
     let stdout = io::stdout();
     let mut handle = stdout.lock();
     if !opts.paths.is_empty() {
@@ -70,13 +71,11 @@ fn main() {
                 }
             }
         }
-    }
-
-    if opts.list_rules {
+    } else if opts.list_rules {
         handle_exit_err(list_rules(&mut handle));
-    }
-
-    if let Some(rule_name) = opts.explain {
+    } else if let Some(rule_name) = opts.explain {
         handle_exit_err(explain_rule(&mut handle, &rule_name));
+    } else {
+        clap_app.print_long_help().expect("problem printing help");
     }
 }
