@@ -13,13 +13,10 @@ use std::io::prelude::*;
 use structopt::clap::arg_enum;
 use structopt::StructOpt;
 
-fn get_sql_from_path(path: &str) -> Option<String> {
-    if let Ok(mut file) = File::open(path) {
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).ok().map(|_| contents)
-    } else {
-        None
-    }
+fn get_sql_from_path(path: &str) -> Result<String, std::io::Error> {
+    let mut file = File::open(path)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).map(|_| contents)
 }
 
 arg_enum! {
@@ -77,16 +74,14 @@ pub fn dump_ast_for_paths<W: io::Write>(
         Ok(())
     };
     if is_stdin {
-        if let Ok(sql) = get_sql_from_stdin() {
-            process_dump_ast(&sql)?;
-        }
+        let sql = get_sql_from_stdin()?;
+        process_dump_ast(&sql)?;
         return Ok(());
     }
 
     for path in paths {
-        if let Some(sql) = get_sql_from_path(path) {
-            process_dump_ast(&sql)?;
-        }
+        let sql = get_sql_from_path(path)?;
+        process_dump_ast(&sql)?;
     }
     Ok(())
 }
@@ -130,16 +125,14 @@ pub fn check_files<W: io::Write>(
     };
 
     if is_stdin {
-        if let Ok(sql) = get_sql_from_stdin() {
-            found_errors = process_violations(&sql, "stdin")?;
-        }
+        let sql = get_sql_from_stdin()?;
+        found_errors = process_violations(&sql, "stdin")?;
         return Ok(found_errors);
     }
 
     for path in paths {
-        if let Some(sql) = get_sql_from_path(path) {
-            found_errors = process_violations(&sql, &path)?;
-        }
+        let sql = get_sql_from_path(path)?;
+        found_errors = process_violations(&sql, &path)?;
     }
     Ok(found_errors)
 }
