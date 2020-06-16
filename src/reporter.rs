@@ -267,7 +267,8 @@ pub fn pretty_violations(
 
             let col = content.find(|c: char| c != '\n').unwrap_or(0);
 
-            let problem_sql = &sql[start + 1..start + len + 1];
+            // slice off the beginning new lines
+            let problem_sql = &content[col..];
 
             ReportViolation {
                 file: filename.into(),
@@ -411,5 +412,57 @@ SELECT 1;
 
         let filename = "main.sql";
         assert_debug_snapshot!(pretty_violations(violations, sql, filename));
+    }
+
+    /// pretty_violations was slicing the SQL improperly, trimming off the first
+    /// letter.
+    #[test]
+    fn test_trimming_sql_newlines() {
+        let sql = r#"ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;"#;
+        let violations = check_sql(sql, &[]).expect("valid sql should parse");
+
+        assert_debug_snapshot!(violations, @r###"
+        [
+            RuleViolation {
+                kind: AddingNotNullableField,
+                span: Span {
+                    start: 0,
+                    len: Some(
+                        59,
+                    ),
+                },
+                messages: [
+                    Note(
+                        "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                    ),
+                    Help(
+                        "Make the field nullable.",
+                    ),
+                ],
+            },
+        ]
+        "###);
+
+        let filename = "main.sql";
+        assert_debug_snapshot!(pretty_violations(violations, sql, filename), @r###"
+        [
+            ReportViolation {
+                file: "main.sql",
+                line: 1,
+                column: 0,
+                level: Warning,
+                messages: [
+                    Note(
+                        "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                    ),
+                    Help(
+                        "Make the field nullable.",
+                    ),
+                ],
+                rule_name: AddingNotNullableField,
+                sql: "ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;",
+            },
+        ]
+        "###);
     }
 }
