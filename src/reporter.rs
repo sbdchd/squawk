@@ -61,12 +61,12 @@ pub fn dump_ast_for_paths<W: io::Write>(
     let mut process_dump_ast = |sql: &str| -> Result<(), DumpAstError> {
         match dump_ast {
             DumpAstOption::Raw => {
-                let json_ast = parse_sql_query_json(&sql)?;
+                let json_ast = parse_sql_query_json(sql)?;
                 let json_str = serde_json::to_string(&json_ast)?;
                 writeln!(f, "{}", json_str)?;
             }
             DumpAstOption::Parsed => {
-                let ast = parse_sql_query(&sql)?;
+                let ast = parse_sql_query(sql)?;
                 let ast_str = serde_json::to_string(&ast)?;
                 writeln!(f, "{}", ast_str)?;
             }
@@ -120,7 +120,7 @@ pub fn check_files<W: io::Write>(
         if !violations.is_empty() {
             found_errors = true;
         }
-        print_violations(f, &pretty_violations(violations, &sql, path), &reporter)?;
+        print_violations(f, &pretty_violations(violations, sql, path), &reporter)?;
         Ok(found_errors)
     };
 
@@ -132,7 +132,7 @@ pub fn check_files<W: io::Write>(
 
     for path in paths {
         let sql = get_sql_from_path(path)?;
-        found_errors = process_violations(&sql, &path)?;
+        found_errors = process_violations(&sql, path)?;
     }
     Ok(found_errors)
 }
