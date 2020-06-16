@@ -1,6 +1,6 @@
 ---
 source: src/rules.rs
-expression: "check_sql(&bad_sql, &[])"
+expression: "check_sql(bad_sql, &[])"
 ---
 Ok(
     [
@@ -16,7 +16,7 @@ Ok(
                 Note(
                     "Creating an index blocks writes.",
                 ),
-                Note(
+                Help(
                     "Create the index CONCURRENTLY.",
                 ),
             ],

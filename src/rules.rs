@@ -399,7 +399,7 @@ lazy_static! {
                 ViolationMessage::Note(
                     "Creating an index blocks writes.".into()
                 ),
-                ViolationMessage::Note(
+                ViolationMessage::Help(
                     "Create the index CONCURRENTLY.".into()
                 ),
             ],

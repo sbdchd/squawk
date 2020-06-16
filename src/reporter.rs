@@ -13,16 +13,10 @@ use std::io::prelude::*;
 use structopt::clap::arg_enum;
 use structopt::StructOpt;
 
-fn get_sql_from_path(path: &str) -> Option<String> {
-    if path == "-" {
-        return get_sql_from_stdin().ok();
-    }
-    if let Ok(mut file) = File::open(path) {
-        let mut contents = String::new();
-        file.read_to_string(&mut contents).ok().map(|_| contents)
-    } else {
-        None
-    }
+fn get_sql_from_path(path: &str) -> Result<String, std::io::Error> {
+    let mut file = File::open(path)?;
+    let mut contents = String::new();
+    file.read_to_string(&mut contents).map(|_| contents)
 }
 
 arg_enum! {
@@ -61,23 +55,33 @@ impl std::convert::From<serde_json::error::Error> for DumpAstError {
 pub fn dump_ast_for_paths<W: io::Write>(
     f: &mut W,
     paths: &[String],
+    is_stdin: bool,
     dump_ast: DumpAstOption,
 ) -> Result<(), DumpAstError> {
-    for path in paths {
-        if let Some(sql) = get_sql_from_path(path) {
-            match dump_ast {
-                DumpAstOption::Raw => {
-                    let json_ast = parse_sql_query_json(&sql)?;
-                    let json_str = serde_json::to_string(&json_ast)?;
-                    writeln!(f, "{}", json_str)?;
-                }
-                DumpAstOption::Parsed => {
-                    let ast = parse_sql_query(&sql)?;
-                    let ast_str = serde_json::to_string(&ast)?;
-                    writeln!(f, "{}", ast_str)?;
-                }
+    let mut process_dump_ast = |sql: &str| -> Result<(), DumpAstError> {
+        match dump_ast {
+            DumpAstOption::Raw => {
+                let json_ast = parse_sql_query_json(sql)?;
+                let json_str = serde_json::to_string(&json_ast)?;
+                writeln!(f, "{}", json_str)?;
+            }
+            DumpAstOption::Parsed => {
+                let ast = parse_sql_query(sql)?;
+                let ast_str = serde_json::to_string(&ast)?;
+                writeln!(f, "{}", ast_str)?;
             }
         }
+        Ok(())
+    };
+    if is_stdin {
+        let sql = get_sql_from_stdin()?;
+        process_dump_ast(&sql)?;
+        return Ok(());
+    }
+
+    for path in paths {
+        let sql = get_sql_from_path(path)?;
+        process_dump_ast(&sql)?;
     }
     Ok(())
 }
@@ -103,20 +107,32 @@ impl std::convert::From<CheckSQLError> for CheckFilesError {
 pub fn check_files<W: io::Write>(
     f: &mut W,
     paths: &[String],
+    is_stdin: bool,
     reporter: Reporter,
     excluded_rules: Option<Vec<String>>,
 ) -> Result<bool, CheckFilesError> {
     let mut found_errors = false;
     let excluded_rules = excluded_rules.unwrap_or_else(|| vec![]);
-    for path in paths {
-        if let Some(sql) = get_sql_from_path(path) {
-            let violations = check_sql(&sql, &excluded_rules)?;
-            if !violations.is_empty() {
-                found_errors = true
-            }
-            let filename = if path == "-" { "stdin" } else { &path };
-            print_violations(f, &pretty_violations(violations, &sql, filename), &reporter)?;
+
+    let mut process_violations = |sql: &str, path: &str| -> Result<bool, CheckFilesError> {
+        let mut found_errors = false;
+        let violations = check_sql(sql, &excluded_rules)?;
+        if !violations.is_empty() {
+            found_errors = true;
         }
+        print_violations(f, &pretty_violations(violations, sql, path), &reporter)?;
+        Ok(found_errors)
+    };
+
+    if is_stdin {
+        let sql = get_sql_from_stdin()?;
+        found_errors = process_violations(&sql, "stdin")?;
+        return Ok(found_errors);
+    }
+
+    for path in paths {
+        let sql = get_sql_from_path(path)?;
+        found_errors = process_violations(&sql, path)?;
     }
     Ok(found_errors)
 }
