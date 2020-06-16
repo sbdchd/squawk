@@ -8,6 +8,7 @@ extern crate lazy_static;
 use crate::reporter::{
     check_files, dump_ast_for_paths, explain_rule, list_rules, DumpAstOption, Reporter,
 };
+use atty::Stream;
 use std::io;
 use std::process;
 use structopt::StructOpt;
@@ -51,12 +52,19 @@ fn main() {
     let opts = Opt::from_args();
     let stdout = io::stdout();
     let mut handle = stdout.lock();
-    if !opts.paths.is_empty() {
+
+    let is_stdin = !atty::is(Stream::Stdin);
+    if !opts.paths.is_empty() || is_stdin {
         if let Some(dump_ast_kind) = opts.dump_ast {
-            handle_exit_err(dump_ast_for_paths(&mut handle, &opts.paths, dump_ast_kind));
+            handle_exit_err(dump_ast_for_paths(
+                &mut handle,
+                &opts.paths,
+                is_stdin,
+                dump_ast_kind,
+            ));
         } else {
             let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-            match check_files(&mut handle, &opts.paths, reporter, opts.exclude) {
+            match check_files(&mut handle, &opts.paths, is_stdin, reporter, opts.exclude) {
                 Ok(found_errors) => {
                     if found_errors {
                         process::exit(1);
