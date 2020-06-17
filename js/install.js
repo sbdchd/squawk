@@ -42,9 +42,6 @@ const fetch = require("node-fetch").default
 const path = require("path")
 const crypto = require("crypto")
 const { binaryPath } = require("./helpers")
-if (foo==1){
-  console.log("bar")
-}
 
 // e.g.: https://github.com/sbdchd/squawk/releases/download/v0.1.3/squawk-darwin-x86_64
 const RELEASES_BASE_URL = "https://github.com/sbdchd/squawk/releases/download"
