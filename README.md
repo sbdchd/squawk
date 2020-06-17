@@ -219,6 +219,13 @@ cargo run
 ./s/fmt
 ```
 
+### releasing a new version
+
+1. bump version in `Cargo.toml` and follow the `cargo` release steps
+2. bump version in `package.json` and follow the `npm` steps
+3. bump version in `Formula/squawk.rb` and update the SHA
+4. create a new release on github - CI will attach the binaries automatically
+
 ## how it works
 
 squawk wraps calls to [libpg_query-sys](https://github.com/tdbgamer/libpg_query-sys) in a safe
