@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -ex
+
+./node_modules/.bin/tsc --noEmit --project tsconfig.json

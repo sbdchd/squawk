@@ -1,0 +1,8 @@
+build/
+node_modules/
+coverage/
+.venv/
+.mypy_cache/
+.terraform/
+.pytest_cache/
+target/
