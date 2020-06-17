@@ -1,0 +1,3 @@
+# don't ever lint node_modules
+node_modules
+.eslintrc.js
