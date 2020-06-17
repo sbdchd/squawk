@@ -5,6 +5,13 @@
   "repository": "git@github.com:sbdchd/squawk.git",
   "author": "Steve Dignam <steve@dignam.xyz>",
   "license": "GPL-3.0",
+  "keywords": [
+    "postgres",
+    "postgresql",
+    "linter",
+    "SQL",
+    "migrations"
+  ],
   "bin": {
     "squawk": "js/bin/squawk"
   },
