@@ -7,7 +7,8 @@ mod rules;
 #[macro_use]
 extern crate lazy_static;
 use crate::reporter::{
-    check_files, dump_ast_for_paths, explain_rule, list_rules, DumpAstOption, Reporter,
+    check_files, dump_ast_for_paths, explain_rule, list_rules, print_violations, DumpAstOption,
+    Reporter,
 };
 use atty::Stream;
 use std::io;
@@ -51,19 +52,30 @@ struct Opt {
     /// Output SQL and Errors in a GitHub comment
     #[structopt(long)]
     upload_to_github: bool,
-    /// GitHub Private Key. Paired with `--upload-to-github`.
+    /// GitHub Private Key.
     #[structopt(long, env = "GITHUB_PRIVATE_KEY")]
     github_private_key: Option<String>,
-    /// GitHub App Id. Paired with `--upload-to-github`.
+    /// GitHub App Id.
     #[structopt(long, env = "GITHUB_APP_ID")]
     github_app_id: Option<String>,
-    /// GitHub Install Id. The installation that squawk is acting on. Paired with
-    /// `--upload-to-github`.
+    /// GitHub Install Id. The installation that squawk is acting on.
     #[structopt(long, env = "GITHUB_INSTALL_ID")]
     github_install_id: Option<String>,
     /// GitHub Bot Id. The User id of the bot.
     #[structopt(long, env = "GITHUB_BOT_ID")]
     github_bot_id: Option<String>,
+    /// GitHub Repo Owner
+    /// github.com/sbdchd/squawk, sbdchd is the owner
+    #[structopt(long, env = "GITHUB_REPO_OWNER")]
+    github_repo_owner: Option<String>,
+    /// GitHub Repo Name
+    /// github.com/sbdchd/squawk, squawk is the name
+    #[structopt(long, env = "GITHUB_REPO_NAME")]
+    github_repo_name: Option<String>,
+    /// GitHub Pull Request Number
+    /// github.com/sbdchd/squawk/pull/10, 10 is the PR number
+    #[structopt(long, env = "GITHUB_PR_NUMBER")]
+    github_pr_number: Option<i64>,
 }
 
 fn main() {
@@ -73,104 +85,7 @@ fn main() {
     let mut handle = stdout.lock();
 
     let is_stdin = !atty::is(Stream::Stdin);
-    if opts.upload_to_github {
-        let now_unix_time = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .expect("problem getting current time");
-        let comment = format!(
-            r##"
-# foo bar
-
-testing 123
-
-updated @ {}
-
-    
-    "##,
-            now_unix_time.as_secs()
-        );
-
-        match (
-            opts.github_private_key,
-            opts.github_app_id,
-            opts.github_install_id,
-            opts.github_bot_id,
-        ) {
-            (Some(private_key), Some(app_id), Some(install_id), Some(bot_id)) => {
-                // let res = comment_on_pr();
-                // println!("{:#?}", res);
-                let jwt =
-                    github::generate_jwt(private_key, app_id).expect("successfully generated jwt");
-                match github::create_access_token(&jwt, &install_id) {
-                    Ok(access_token) => {
-                        let owner = "sbdchd";
-                        let repo = "squawk";
-                        let issue = 14i64;
-
-                        match github::list_comments(owner, repo, issue, &access_token.token) {
-                            Ok(comments) => {
-                                match comments.iter().find(|x| x.user.id.to_string() == bot_id) {
-                                    Some(prev_comment) => {
-                                        println!("updating {:#?}", prev_comment);
-                                        let res = github::update_comment(
-                                            owner,
-                                            repo,
-                                            prev_comment.id,
-                                            &comment,
-                                            &access_token.token,
-                                        );
-                                        println!("res from update {:#?}", res);
-                                    }
-                                    None => {
-                                        let res = github::create_comment(
-                                            github::CommentArgs {
-                                                owner: owner.into(),
-                                                repo: repo.into(),
-                                                issue: issue,
-                                                body: comment.into(),
-                                            },
-                                            &access_token.token,
-                                        );
-                                        println!("creating new comment");
-                                    }
-                                }
-                            }
-                            err => {
-                                eprintln!(
-                                    "missing github private key or app_id or install_id {:#?}",
-                                    err
-                                );
-                                process::exit(1)
-                            }
-                        }
-
-                        // println!("{:#?}", res);
-                    }
-                    err => {
-                        eprintln!(
-                            "missing github private key or app_id or install_id {:#?}",
-                            err
-                        );
-                        process::exit(1)
-                    }
-                }
-                // let res = github::get_app_installs(&jwt);
-                // github::create_comment(
-                //     github::CommentArgs {
-                //         owner: "sbdchd".into(),
-                //         repo: "squawk".into(),
-                //         issue: 10,
-                //         body: comment.into(),
-                //     },
-                //     &jwt,
-                // );
-            }
-            _ => {
-                eprintln!("missing github private key or app_id or install_id");
-                process::exit(1)
-            }
-        }
-    } else if !opts.paths.is_empty() || is_stdin {
+    if !opts.paths.is_empty() || is_stdin {
         if let Some(dump_ast_kind) = opts.dump_ast {
             handle_exit_err(dump_ast_for_paths(
                 &mut handle,
@@ -179,18 +94,81 @@ updated @ {}
                 dump_ast_kind,
             ));
         } else {
-            let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-            match check_files(&mut handle, &opts.paths, is_stdin, reporter, opts.exclude) {
-                Ok(found_errors) => {
-                    if found_errors {
-                        process::exit(1);
-                    } else {
-                        process::exit(0);
+            match check_files(&opts.paths, is_stdin, opts.exclude) {
+                Ok(violations) => {
+                    if opts.upload_to_github {
+                        match (
+                            opts.github_private_key,
+                            opts.github_app_id,
+                            opts.github_install_id,
+                            opts.github_bot_id,
+                            opts.github_repo_owner,
+                            opts.github_repo_name,
+                            opts.github_pr_number,
+                        ) {
+                            (
+                                Some(private_key),
+                                Some(app_id),
+                                Some(install_id),
+                                Some(bot_id),
+                                Some(repo_owner),
+                                Some(repo_name),
+                                Some(pr_number),
+                            ) => {
+                                let now_unix_time = SystemTime::now()
+                                    .duration_since(UNIX_EPOCH)
+                                    .expect("problem getting current time");
+                                // TOOD(sbdchd): generate actually comment content
+
+                                let comment_body = format!(
+                                    r##"
+# foo bar
+
+testing 123
+violations count {violations}
+
+--- 
+
+updated @ {timestamp}
+    "##,
+                                    timestamp = now_unix_time.as_secs(),
+                                    violations = violations.len()
+                                );
+                                let res = github::comment_on_pr(
+                                    &private_key,
+                                    &app_id,
+                                    &install_id,
+                                    &bot_id,
+                                    &repo_owner,
+                                    &repo_name,
+                                    pr_number,
+                                    &comment_body,
+                                );
+                                println!("{:#?}", res);
+                                process::exit(1)
+                            }
+
+                            values => {
+                                eprintln!("missing github argument {:#?}", values);
+                                process::exit(1);
+                            }
+                        }
+                    }
+                    let reporter = opts.reporter.unwrap_or(Reporter::Tty);
+                    match print_violations(&mut handle, &violations, &reporter) {
+                        Ok(_) => {
+                            let exit_code = if !violations.is_empty() { 1 } else { 0 };
+                            process::exit(exit_code);
+                        }
+                        Err(e) => {
+                            eprintln!("{:#?}", e);
+                            process::exit(1);
+                        }
                     }
                 }
-                Err(e) => {
+                e => {
                     eprintln!("{:#?}", e);
-                    process::exit(1);
+                    process::exit(1)
                 }
             }
         }

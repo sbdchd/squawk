@@ -104,37 +104,31 @@ impl std::convert::From<CheckSQLError> for CheckFilesError {
     }
 }
 
-pub fn check_files<W: io::Write>(
-    f: &mut W,
+pub fn check_files(
     paths: &[String],
     is_stdin: bool,
-    reporter: Reporter,
     excluded_rules: Option<Vec<String>>,
-) -> Result<bool, CheckFilesError> {
-    let mut found_errors = false;
+) -> Result<Vec<ReportViolation>, CheckFilesError> {
     let excluded_rules = excluded_rules.unwrap_or_else(|| vec![]);
 
-    let mut process_violations = |sql: &str, path: &str| -> Result<bool, CheckFilesError> {
-        let mut found_errors = false;
+    let mut output_violations = vec![];
+
+    let mut process_violations = |sql: &str, path: &str| -> Result<(), CheckFilesError> {
         let violations = check_sql(sql, &excluded_rules)?;
-        if !violations.is_empty() {
-            found_errors = true;
-        }
-        print_violations(f, &pretty_violations(violations, sql, path), &reporter)?;
-        Ok(found_errors)
+        output_violations.append(&mut pretty_violations(violations, sql, path));
+        Ok(())
     };
 
     if is_stdin {
         let sql = get_sql_from_stdin()?;
-        found_errors = process_violations(&sql, "stdin")?;
-        return Ok(found_errors);
+        process_violations(&sql, "stdin")?;
     }
 
     for path in paths {
         let sql = get_sql_from_path(path)?;
-        found_errors = process_violations(&sql, path)?;
+        process_violations(&sql, path)?;
     }
-    Ok(found_errors)
+    Ok(output_violations)
 }
 
 fn get_sql_from_stdin() -> Result<String, io::Error> {
