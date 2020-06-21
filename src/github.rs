@@ -174,7 +174,7 @@ pub fn comment_on_pr(
     private_key: &str,
     app_id: i64,
     install_id: i64,
-    bot_id: i64,
+    bot_name: &str,
     pr: PullRequest,
     comment_body: String,
 ) -> Result<Value, GithubError> {
@@ -182,7 +182,12 @@ pub fn comment_on_pr(
     let access_token = create_access_token(&jwt, install_id)?;
     let comments = list_comments(&pr, &access_token.token)?;
 
-    match comments.iter().find(|x| x.user.id == bot_id) {
+    let bot_name = format!("{}[bot]", bot_name);
+
+    match comments
+        .iter()
+        .find(|x| x.user.r#type == "Bot" && x.user.login == bot_name)
+    {
         Some(prev_comment) => update_comment(
             &pr.owner,
             &pr.repo,
