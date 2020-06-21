@@ -374,7 +374,7 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
 ```
 {}
 ```"#,
-            violations_text
+            violations_text.trim_matches('\n')
         )
     } else {
         "None found.".to_string()
@@ -407,7 +407,7 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
 
 pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
     let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
-    let body = format!(
+    format!(
         r#"
 # [Squawk](https://github.com/sbdchd/squawk) Report 🦉
 
@@ -428,9 +428,9 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
             .flat_map(|x| get_sql_file_content(x).ok())
             .collect::<Vec<String>>()
             .join("\n")
-    );
-
-    body
+    )
+    .trim_matches('\n')
+    .into()
 }
 
 #[cfg(test)]
@@ -443,24 +443,70 @@ mod test_github_comment {
     /// let's check the case of multiple migrations
     #[test]
     fn test_generating_comment_multiple_files() {
-        let violations = vec![];
+        let violations = vec![ViolationContent {
+            filename: "alpha.sql".into(),
+            sql: r#"
+SELECT 1;
+                "#
+            .into(),
+            violations: vec![ReportViolation {
+                file: "alpha.sql".into(),
+                line: 1,
+                column: 0,
+                level: ViolationLevel::Warning,
+                messages: vec![
+                    ViolationMessage::Note(
+                        "Adding a NOT NULL field requires exclusive locks and table rewrites."
+                            .into(),
+                    ),
+                    ViolationMessage::Help("Make the field nullable.".into()),
+                ],
+                rule_name: RuleViolationKind::AddingNotNullableField,
+                sql: "ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;".into(),
+            }],
+        }];
 
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
+# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
 
-        # [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+### **1** violations across **1** file(s)
 
-        ### **0** violations across **0** file(s)
+## 🚛 Source SQL
 
-        ## 🚛 Source SQL
+<details open>
 
-        ---
+<summary><code>alpha.sql</code></summary>
 
-        [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+```sql
 
-        > ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
-        "###);
+SELECT 1;
+                
+```
+
+### 🚒 Rule Violations (1)
+
+
+```
+alpha.sql:1:0: warning: adding-not-nullable-field
+
+   1 | ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+
+  note: Adding a NOT NULL field requires exclusive locks and table rewrites.
+  help: Make the field nullable.
+```
+
+</details>
+
+    
+    
+---
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+"###);
     }
 
     /// Even when we don't have violations we still want to output the SQL for
@@ -496,62 +542,61 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
+# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
 
-        # [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+### **0** violations across **2** file(s)
 
-        ### **0** violations across **2** file(s)
+## 🚛 Source SQL
 
-        ## 🚛 Source SQL
+<details open>
 
-        <details open>
+<summary><code>alpha.sql</code></summary>
 
-        <summary><code>alpha.sql</code></summary>
+```sql
 
-        ```sql
+BEGIN;
+--
+-- Create model Bar
+--
+CREATE TABLE "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "alpha" varchar(100) NOT NULL
+);
+                
+```
 
-        BEGIN;
-        --
-        -- Create model Bar
-        --
-        CREATE TABLE "core_bar" (
-            "id" serial NOT NULL PRIMARY KEY,
-            "alpha" varchar(100) NOT NULL
-        );
-                        
-        ```
+### 🚒 Rule Violations (0)
 
-        ### 🚒 Rule Violations (0)
+None found.
 
-        None found.
+</details>
 
-        </details>
+    
+    
 
-            
-            
+<details open>
 
-        <details open>
+<summary><code>bravo.sql</code></summary>
 
-        <summary><code>bravo.sql</code></summary>
+```sql
 
-        ```sql
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+                
+```
 
-        ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
-                        
-        ```
+### 🚒 Rule Violations (0)
 
-        ### 🚒 Rule Violations (0)
+None found.
 
-        None found.
+</details>
 
-        </details>
+    
+    
+---
 
-            
-            
-        ---
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-        [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-        > ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
         "###);
     }
 
@@ -564,18 +609,17 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
+# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
 
-        # [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+### **0** violations across **0** file(s)
 
-        ### **0** violations across **0** file(s)
+## 🚛 Source SQL
 
-        ## 🚛 Source SQL
+---
 
-        ---
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-        [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-        > ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
         "###);
     }
 }
