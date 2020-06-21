@@ -5,20 +5,12 @@ use serde_json::Value;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
 
-/*
-TODO(sbdchd):
-1. get output from squawk
-2. construct markdown for comment
-3. query github to see if PR already has a comment we should update
-4. create/update the comment with the markdown
-*/
-
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Serialize)]
 struct CommentBody {
     pub body: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug)]
 pub struct CommentArgs {
     pub owner: String,
     pub repo: String,
@@ -26,7 +18,7 @@ pub struct CommentArgs {
     pub body: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct GithubAccessToken {
     pub expires_at: String,
     pub permissions: Value,
@@ -35,7 +27,7 @@ pub struct GithubAccessToken {
 }
 
 /// https://developer.github.com/v3/apps/#create-an-installation-access-token-for-an-app
-pub fn create_access_token(jwt: &str, install_id: &str) -> Result<GithubAccessToken, GithubError> {
+fn create_access_token(jwt: &str, install_id: &str) -> Result<GithubAccessToken, GithubError> {
     reqwest::Client::new()
         .post(&format!(
             "https://api.github.com/app/installations/{install_id}/access_tokens",
@@ -50,7 +42,7 @@ pub fn create_access_token(jwt: &str, install_id: &str) -> Result<GithubAccessTo
 }
 
 /// https://developer.github.com/v3/issues/comments/#create-an-issue-comment
-pub fn create_comment(comment: CommentArgs, secret: &str) -> Result<Value, GithubError> {
+fn create_comment(comment: CommentArgs, secret: &str) -> Result<Value, GithubError> {
     let comment_body = CommentBody { body: comment.body };
     reqwest::Client::new()
         .post(&format!(
@@ -101,7 +93,7 @@ struct Claim {
 /// Create an authentication token to make application requests.
 /// https://developer.github.com/apps/building-github-apps/authenticating-with-github-apps/#authenticating-as-a-github-app
 /// This is different from authenticating as an installation
-pub fn generate_jwt(
+fn generate_jwt(
     private_key: &str,
     app_identifier: &str,
 ) -> Result<String, jsonwebtoken::errors::Error> {
@@ -122,20 +114,15 @@ pub fn generate_jwt(
 }
 
 /// https://developer.github.com/v3/issues/comments/#list-issue-comments
-pub fn list_comments(
-    owner: &str,
-    repo: &str,
-    issue: i64,
-    secret: &str,
-) -> Result<Vec<Comment>, GithubError> {
+fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubError> {
     // TODO(sbdchd): use the next links to get _all_ the comments
     // see: https://developer.github.com/v3/guides/traversing-with-pagination/
     reqwest::Client::new()
         .get(&format!(
             "https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/comments",
-            owner = owner,
-            repo = repo,
-            issue_number = issue
+            owner = pr.owner,
+            repo = pr.repo,
+            issue_number = pr.issue
         ))
         .query(&[("per_page", 100)])
         .header(AUTHORIZATION, format!("Bearer {}", secret))
@@ -146,15 +133,13 @@ pub fn list_comments(
 }
 
 /// https://developer.github.com/v3/issues/comments/#update-an-issue-comment
-pub fn update_comment(
+fn update_comment(
     owner: &str,
     repo: &str,
     comment_id: i64,
-    body: &str,
+    body: String,
     secret: &str,
 ) -> Result<Value, GithubError> {
-    let comment_body = CommentBody { body: body.into() };
-    println!("updating comment with body: {:#?}", comment_body);
     reqwest::Client::new()
         .patch(&format!(
             "https://api.github.com/repos/{owner}/{repo}/issues/comments/{comment_id}",
@@ -163,11 +148,17 @@ pub fn update_comment(
             comment_id = comment_id
         ))
         .header(AUTHORIZATION, format!("Bearer {}", secret))
-        .json(&comment_body)
+        .json(&CommentBody { body })
         .send()
         .map_err(|_| GithubError::Unknown)?
         .json::<Value>()
         .map_err(|_| GithubError::Unknown)
+}
+
+pub struct PullRequest {
+    pub owner: String,
+    pub repo: String,
+    pub issue: i64,
 }
 
 pub fn comment_on_pr(
@@ -175,36 +166,29 @@ pub fn comment_on_pr(
     app_id: &str,
     install_id: &str,
     bot_id: &str,
-    owner: &str,
-    repo: &str,
-    issue: i64,
-    comment_body: &str,
-) -> Result<(), GithubError> {
+    pr: PullRequest,
+    comment_body: String,
+) -> Result<Value, GithubError> {
     let jwt = generate_jwt(private_key, app_id).expect("successfully generated jwt");
-    let access_token = create_access_token(&jwt, &install_id)?;
-    let comments = list_comments(owner, repo, issue, &access_token.token)?;
+    let access_token = create_access_token(&jwt, install_id)?;
+    let comments = list_comments(&pr, &access_token.token)?;
 
     match comments.iter().find(|x| x.user.id.to_string() == bot_id) {
-        Some(prev_comment) => {
-            let res = update_comment(
-                owner,
-                repo,
-                prev_comment.id,
-                &comment_body,
-                &access_token.token,
-            );
-        }
-        None => {
-            let res = create_comment(
-                CommentArgs {
-                    owner: owner.into(),
-                    repo: repo.into(),
-                    issue,
-                    body: comment_body.into(),
-                },
-                &access_token.token,
-            );
-        }
+        Some(prev_comment) => update_comment(
+            &pr.owner,
+            &pr.repo,
+            prev_comment.id,
+            comment_body,
+            &access_token.token,
+        ),
+        None => create_comment(
+            CommentArgs {
+                owner: pr.owner,
+                repo: pr.repo,
+                issue: pr.issue,
+                body: comment_body,
+            },
+            &access_token.token,
+        ),
     }
-    Ok(())
 }

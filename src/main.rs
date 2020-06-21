@@ -7,13 +7,12 @@ mod rules;
 #[macro_use]
 extern crate lazy_static;
 use crate::reporter::{
-    check_files, dump_ast_for_paths, explain_rule, list_rules, print_violations, DumpAstOption,
-    Reporter,
+    check_files, dump_ast_for_paths, explain_rule, get_comment_body, list_rules, print_violations,
+    DumpAstOption, Reporter,
 };
 use atty::Stream;
 use std::io;
 use std::process;
-use std::time::{SystemTime, UNIX_EPOCH};
 use structopt::StructOpt;
 
 fn handle_exit_err<E: std::fmt::Debug>(res: Result<(), E>) -> ! {
@@ -49,6 +48,8 @@ struct Opt {
     /// Style of error reporting
     #[structopt(long, possible_values = &Reporter::variants(), case_insensitive = true)]
     reporter: Option<Reporter>,
+
+    // TODO(sbdchd): consider subcommand & refactor ids to parse as `i64` instead of String
     /// Output SQL and Errors in a GitHub comment
     #[structopt(long)]
     upload_to_github: bool,
@@ -115,34 +116,19 @@ fn main() {
                                 Some(repo_name),
                                 Some(pr_number),
                             ) => {
-                                let now_unix_time = SystemTime::now()
-                                    .duration_since(UNIX_EPOCH)
-                                    .expect("problem getting current time");
-                                // TOOD(sbdchd): generate actually comment content
-
-                                let comment_body = format!(
-                                    r##"
-# foo bar
-
-testing 123
-violations count {violations}
-
---- 
-
-updated @ {timestamp}
-    "##,
-                                    timestamp = now_unix_time.as_secs(),
-                                    violations = violations.len()
-                                );
+                                let comment_body = get_comment_body(violations);
+                                let pr = github::PullRequest {
+                                    issue: pr_number,
+                                    owner: repo_owner,
+                                    repo: repo_name,
+                                };
                                 let res = github::comment_on_pr(
                                     &private_key,
                                     &app_id,
                                     &install_id,
                                     &bot_id,
-                                    &repo_owner,
-                                    &repo_name,
-                                    pr_number,
-                                    &comment_body,
+                                    pr,
+                                    comment_body,
                                 );
                                 println!("{:#?}", res);
                                 process::exit(1)
@@ -155,9 +141,9 @@ updated @ {timestamp}
                         }
                     }
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-                    match print_violations(&mut handle, &violations, &reporter) {
+                    let exit_code = if !violations.is_empty() { 1 } else { 0 };
+                    match print_violations(&mut handle, violations, &reporter) {
                         Ok(_) => {
-                            let exit_code = if !violations.is_empty() { 1 } else { 0 };
                             process::exit(exit_code);
                         }
                         Err(e) => {
