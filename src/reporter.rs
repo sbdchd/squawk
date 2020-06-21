@@ -4,6 +4,7 @@ use crate::rules::{
     check_sql, CheckSQLError, RuleViolation, RuleViolationKind, Span, SquawkRule, ViolationMessage,
     RULES,
 };
+use console::strip_ansi_codes;
 use console::style;
 use serde::Serialize;
 use std::convert::TryFrom;
@@ -104,37 +105,31 @@ impl std::convert::From<CheckSQLError> for CheckFilesError {
     }
 }
 
-pub fn check_files<W: io::Write>(
-    f: &mut W,
+pub fn check_files(
     paths: &[String],
     is_stdin: bool,
-    reporter: Reporter,
     excluded_rules: Option<Vec<String>>,
-) -> Result<bool, CheckFilesError> {
-    let mut found_errors = false;
+) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let excluded_rules = excluded_rules.unwrap_or_else(|| vec![]);
 
-    let mut process_violations = |sql: &str, path: &str| -> Result<bool, CheckFilesError> {
-        let mut found_errors = false;
+    let mut output_violations = vec![];
+
+    let mut process_violations = |sql: &str, path: &str| -> Result<(), CheckFilesError> {
         let violations = check_sql(sql, &excluded_rules)?;
-        if !violations.is_empty() {
-            found_errors = true;
-        }
-        print_violations(f, &pretty_violations(violations, sql, path), &reporter)?;
-        Ok(found_errors)
+        output_violations.push(pretty_violations(violations, sql, path));
+        Ok(())
     };
 
     if is_stdin {
         let sql = get_sql_from_stdin()?;
-        found_errors = process_violations(&sql, "stdin")?;
-        return Ok(found_errors);
+        process_violations(&sql, "stdin")?;
     }
 
     for path in paths {
         let sql = get_sql_from_path(path)?;
-        found_errors = process_violations(&sql, path)?;
+        process_violations(&sql, path)?;
     }
-    Ok(found_errors)
+    Ok(output_violations)
 }
 
 fn get_sql_from_stdin() -> Result<String, io::Error> {
@@ -178,136 +173,160 @@ pub struct ReportViolation {
     pub level: ViolationLevel,
     pub messages: Vec<ViolationMessage>,
     pub rule_name: RuleViolationKind,
+    // don't output in JSON format
     #[serde(skip_serializing)]
     pub sql: String,
 }
 
 fn fmt_gcc<W: io::Write>(
     f: &mut W,
-    violations: &[ReportViolation],
+    files: &[ViolationContent],
 ) -> std::result::Result<(), std::io::Error> {
-    for violation in violations {
-        let message = violation
-            .messages
-            .iter()
-            .map(|v| {
-                match v {
-                    ViolationMessage::Note(s) => s,
-                    ViolationMessage::Help(s) => s,
-                }
-                .to_string()
-            })
-            .collect::<Vec<String>>()
-            .join(" ");
-        writeln!(
-            f,
-            "{}:{}:{}: {}: {} {}",
-            violation.file,
-            violation.line,
-            violation.column,
-            violation.level,
-            violation.rule_name,
-            message
-        )?;
+    for file in files {
+        for violation in &file.violations {
+            let message = violation
+                .messages
+                .iter()
+                .map(|v| {
+                    match v {
+                        ViolationMessage::Note(s) => s,
+                        ViolationMessage::Help(s) => s,
+                    }
+                    .to_string()
+                })
+                .collect::<Vec<String>>()
+                .join(" ");
+            writeln!(
+                f,
+                "{}:{}:{}: {}: {} {}",
+                violation.file,
+                violation.line,
+                violation.column,
+                violation.level,
+                violation.rule_name,
+                message
+            )?;
+        }
     }
     Ok(())
 }
 
-fn fmt_tty<W: io::Write>(
+pub fn fmt_tty_violation<W: io::Write>(
     f: &mut W,
-    violations: &[ReportViolation],
-) -> std::result::Result<(), std::io::Error> {
-    for violation in violations {
-        writeln!(
-            f,
-            "{}:{}:{}: {}: {}",
-            violation.file,
-            violation.line,
-            violation.column,
-            style(format!("{}", violation.level)).yellow(),
-            violation.rule_name
-        )?;
+    violation: &ReportViolation,
+) -> Result<(), std::io::Error> {
+    writeln!(
+        f,
+        "{}:{}:{}: {}: {}",
+        violation.file,
+        violation.line,
+        violation.column,
+        style(format!("{}", violation.level)).yellow(),
+        violation.rule_name
+    )?;
 
-        writeln!(f)?;
-        for (i, line) in violation.sql.lines().enumerate() {
-            // TODO(sbdchd): handle the transition from 2 digits to 3
-            writeln!(f, "  {: >2} | {}", violation.line + i, line)?;
-        }
-        writeln!(f)?;
-        for msg in &violation.messages {
-            match msg {
-                ViolationMessage::Note(note) => {
-                    writeln!(f, "  {}: {}", style("note").bold(), note)?;
-                }
-                ViolationMessage::Help(help) => {
-                    writeln!(f, "  {}: {}", style("help").bold(), help)?;
-                }
+    writeln!(f)?;
+    for (i, line) in violation.sql.lines().enumerate() {
+        // TODO(sbdchd): handle the transition from 2 digits to 3
+        writeln!(f, "  {: >2} | {}", violation.line + i, line)?;
+    }
+    writeln!(f)?;
+    for msg in &violation.messages {
+        match msg {
+            ViolationMessage::Note(note) => {
+                writeln!(f, "  {}: {}", style("note").bold(), note)?;
+            }
+            ViolationMessage::Help(help) => {
+                writeln!(f, "  {}: {}", style("help").bold(), help)?;
             }
         }
-        writeln!(f)?;
+    }
+    writeln!(f)
+}
+
+pub fn fmt_tty<W: io::Write>(f: &mut W, files: &[ViolationContent]) -> Result<(), std::io::Error> {
+    for file in files {
+        for violation in &file.violations {
+            fmt_tty_violation(f, violation)?;
+        }
     }
     Ok(())
 }
 
 fn fmt_json<W: io::Write>(
     f: &mut W,
-    violations: &[ReportViolation],
+    files: Vec<ViolationContent>,
 ) -> std::result::Result<(), std::io::Error> {
+    let violations = files
+        .into_iter()
+        .flat_map(|x| x.violations)
+        .collect::<Vec<_>>();
     let json_str = serde_json::to_string(&violations)?;
     writeln!(f, "{}", json_str)
+}
+
+#[derive(Debug)]
+pub struct ViolationContent {
+    pub filename: String,
+    pub sql: String,
+    pub violations: Vec<ReportViolation>,
 }
 
 pub fn pretty_violations(
     violations: Vec<RuleViolation>,
     sql: &str,
     filename: &str,
-) -> Vec<ReportViolation> {
-    violations
-        .into_iter()
-        .map(|violation| {
-            // NOTE: the span information from postgres includes the preceeding
-            // whitespace for nodes.
-            let Span { start, len } = violation.span;
+) -> ViolationContent {
+    ViolationContent {
+        filename: filename.into(),
+        sql: sql.into(),
+        violations: violations
+            .into_iter()
+            .map(|violation| {
+                // NOTE: the span information from postgres includes the preceeding
+                // whitespace for nodes.
+                let Span { start, len } = violation.span;
 
-            let start = start as usize;
+                let start = start as usize;
 
-            let len = len.unwrap_or(0) as usize;
+                let len = len.unwrap_or(0) as usize;
 
-            // 1-indexed
-            let lineno = sql[..start].lines().count() + 1;
+                // 1-indexed
+                let lineno = sql[..start].lines().count() + 1;
 
-            let content = &sql[start..start + len + 1];
+                let content = &sql[start..start + len + 1];
 
-            // TODO(sbdchd): could remove the leading whitespace and comments to
-            // get cleaner reports
+                // TODO(sbdchd): could remove the leading whitespace and comments to
+                // get cleaner reports
 
-            let col = content.find(|c: char| c != '\n').unwrap_or(0);
+                let col = content.find(|c: char| c != '\n').unwrap_or(0);
 
-            // slice off the beginning new lines
-            let problem_sql = &content[col..];
+                // slice off the beginning new lines
+                let problem_sql = &content[col..];
 
-            ReportViolation {
-                file: filename.into(),
-                line: lineno,
-                column: col,
-                level: ViolationLevel::Warning,
-                messages: violation.messages,
-                rule_name: violation.kind,
-                sql: problem_sql.into(),
-            }
-        })
-        .collect()
+                ReportViolation {
+                    file: filename.into(),
+                    line: lineno,
+                    column: col,
+                    level: ViolationLevel::Warning,
+                    messages: violation.messages,
+                    rule_name: violation.kind,
+                    sql: problem_sql.into(),
+                }
+            })
+            .collect(),
+    }
 }
 
 pub fn print_violations<W: io::Write>(
     writer: &mut W,
-    violations: &[ReportViolation],
+    violations: Vec<ViolationContent>,
     reporter: &Reporter,
 ) -> Result<(), std::io::Error> {
     match reporter {
-        Reporter::Gcc => fmt_gcc(writer, violations),
+        Reporter::Gcc => fmt_gcc(writer, &violations),
         Reporter::Json => fmt_json(writer, violations),
-        Reporter::Tty => fmt_tty(writer, violations),
+        Reporter::Tty => fmt_tty(writer, &violations),
     }
 }
 
@@ -339,12 +358,277 @@ pub fn explain_rule<W: io::Write>(writer: &mut W, name: &str) -> Result<(), std:
     Ok(())
 }
 
+fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::Error> {
+    let sql = violation.sql;
+    let mut buff = Vec::new();
+    let violation_count = violation.violations.len();
+    for v in violation.violations {
+        fmt_tty_violation(&mut buff, &v)?;
+    }
+    let violations_text_raw = &String::from_utf8_lossy(&buff);
+    let violations_text = strip_ansi_codes(violations_text_raw);
+
+    let violation_content = if violation_count > 0 {
+        format!(
+            r#"
+```
+{}
+```"#,
+            violations_text.trim_matches('\n')
+        )
+    } else {
+        "None found.".to_string()
+    };
+
+    Ok(format!(
+        r#"
+<details open>
+
+<summary><code>{filename}</code></summary>
+
+```sql
+{sql}
+```
+
+### 🚒 Rule Violations ({violation_count})
+
+{violation_content}
+
+</details>
+
+    
+    "#,
+        filename = violation.filename,
+        sql = sql,
+        violation_count = violation_count,
+        violation_content = violation_content
+    ))
+}
+
+pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
+    let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
+    format!(
+        r#"
+# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+
+### **{violation_count}** violations across **{file_count}** file(s)
+
+## 🚛 Source SQL
+{sql_file_content}
+---
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+"#,
+        violation_count = violations_count,
+        file_count = files.len(),
+        sql_file_content = files
+            .into_iter()
+            .flat_map(|x| get_sql_file_content(x).ok())
+            .collect::<Vec<String>>()
+            .join("\n")
+    )
+    .trim_matches('\n')
+    .into()
+}
+
+#[cfg(test)]
+mod test_github_comment {
+    use super::*;
+
+    use insta::assert_display_snapshot;
+
+    /// Most cases, hopefully, will be a single migration for a given PR, but
+    /// let's check the case of multiple migrations
+    #[test]
+    fn test_generating_comment_multiple_files() {
+        let violations = vec![ViolationContent {
+            filename: "alpha.sql".into(),
+            sql: r#"
+SELECT 1;
+                "#
+            .into(),
+            violations: vec![ReportViolation {
+                file: "alpha.sql".into(),
+                line: 1,
+                column: 0,
+                level: ViolationLevel::Warning,
+                messages: vec![
+                    ViolationMessage::Note(
+                        "Adding a NOT NULL field requires exclusive locks and table rewrites."
+                            .into(),
+                    ),
+                    ViolationMessage::Help("Make the field nullable.".into()),
+                ],
+                rule_name: RuleViolationKind::AddingNotNullableField,
+                sql: "ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;".into(),
+            }],
+        }];
+
+        let body = get_comment_body(violations);
+
+        assert_display_snapshot!(body, @r###"
+# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+
+### **1** violations across **1** file(s)
+
+## 🚛 Source SQL
+
+<details open>
+
+<summary><code>alpha.sql</code></summary>
+
+```sql
+
+SELECT 1;
+                
+```
+
+### 🚒 Rule Violations (1)
+
+
+```
+alpha.sql:1:0: warning: adding-not-nullable-field
+
+   1 | ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+
+  note: Adding a NOT NULL field requires exclusive locks and table rewrites.
+  help: Make the field nullable.
+```
+
+</details>
+
+    
+    
+---
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+"###);
+    }
+
+    /// Even when we don't have violations we still want to output the SQL for
+    /// easy human reading.
+    #[test]
+    fn test_generating_comment_no_violations() {
+        let violations = vec![
+            ViolationContent {
+                filename: "alpha.sql".into(),
+                sql: r#"
+BEGIN;
+--
+-- Create model Bar
+--
+CREATE TABLE "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "alpha" varchar(100) NOT NULL
+);
+                "#
+                .into(),
+                violations: vec![],
+            },
+            ViolationContent {
+                filename: "bravo.sql".into(),
+                sql: r#"
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+                "#
+                .into(),
+                violations: vec![],
+            },
+        ];
+
+        let body = get_comment_body(violations);
+
+        assert_display_snapshot!(body, @r###"
+# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+
+### **0** violations across **2** file(s)
+
+## 🚛 Source SQL
+
+<details open>
+
+<summary><code>alpha.sql</code></summary>
+
+```sql
+
+BEGIN;
+--
+-- Create model Bar
+--
+CREATE TABLE "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "alpha" varchar(100) NOT NULL
+);
+                
+```
+
+### 🚒 Rule Violations (0)
+
+None found.
+
+</details>
+
+    
+    
+
+<details open>
+
+<summary><code>bravo.sql</code></summary>
+
+```sql
+
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+                
+```
+
+### 🚒 Rule Violations (0)
+
+None found.
+
+</details>
+
+    
+    
+---
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+        "###);
+    }
+
+    /// Ideally the logic won't leave a comment when there are no migrations but
+    /// better safe than sorry
+    #[test]
+    fn test_generating_no_violations_no_files() {
+        let violations = vec![];
+
+        let body = get_comment_body(violations);
+
+        assert_display_snapshot!(body, @r###"
+# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+
+### **0** violations across **0** file(s)
+
+## 🚛 Source SQL
+
+---
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+        "###);
+    }
+}
+
 #[cfg(test)]
 mod test_reporter {
     use super::*;
 
     use crate::rules::check_sql;
-    use console::strip_ansi_codes;
     use insta::{assert_debug_snapshot, assert_display_snapshot};
 
     #[test]
@@ -362,7 +646,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, sql, filename),
+            vec![pretty_violations(violations, sql, filename)],
             &Reporter::Gcc,
         );
         assert!(res.is_ok());
@@ -386,7 +670,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, sql, filename),
+            vec![pretty_violations(violations, sql, filename)],
             &Reporter::Tty,
         );
 
@@ -407,7 +691,7 @@ SELECT 1;
 
         let res = print_violations(
             &mut buff,
-            &pretty_violations(violations, sql, filename),
+            vec![pretty_violations(violations, sql, filename)],
             &Reporter::Json,
         );
 
@@ -461,24 +745,28 @@ SELECT 1;
 
         let filename = "main.sql";
         assert_debug_snapshot!(pretty_violations(violations, sql, filename), @r###"
-        [
-            ReportViolation {
-                file: "main.sql",
-                line: 1,
-                column: 0,
-                level: Warning,
-                messages: [
-                    Note(
-                        "Adding a NOT NULL field requires exclusive locks and table rewrites.",
-                    ),
-                    Help(
-                        "Make the field nullable.",
-                    ),
-                ],
-                rule_name: AddingNotNullableField,
-                sql: "ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;",
-            },
-        ]
+        ViolationContent {
+            filename: "main.sql",
+            sql: "ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;",
+            violations: [
+                ReportViolation {
+                    file: "main.sql",
+                    line: 1,
+                    column: 0,
+                    level: Warning,
+                    messages: [
+                        Note(
+                            "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                        ),
+                        Help(
+                            "Make the field nullable.",
+                        ),
+                    ],
+                    rule_name: AddingNotNullableField,
+                    sql: "ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;",
+                },
+            ],
+        }
         "###);
     }
 }

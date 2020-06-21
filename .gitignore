@@ -2,3 +2,4 @@
 **/*.rs.bk
 *.pending-snap
 *.tgz
+*.pem

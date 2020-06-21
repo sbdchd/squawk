@@ -22,6 +22,8 @@ structopt = "0.3"
 console = "0.11.3"
 lazy_static = "1.4.0"
 atty = "0.2"
+reqwest = "0.9.18"
+jsonwebtoken = "7"
 
 [dev-dependencies]
 insta = "0.16.0"

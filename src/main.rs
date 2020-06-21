@@ -1,13 +1,17 @@
 mod ast;
 mod error;
+mod github;
 mod parse;
 mod reporter;
 mod rules;
+mod subcommand;
 #[macro_use]
 extern crate lazy_static;
 use crate::reporter::{
-    check_files, dump_ast_for_paths, explain_rule, list_rules, DumpAstOption, Reporter,
+    check_files, dump_ast_for_paths, explain_rule, list_rules, print_violations, DumpAstOption,
+    Reporter,
 };
+use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
 use std::io;
 use std::process;
@@ -46,6 +50,8 @@ struct Opt {
     /// Style of error reporting
     #[structopt(long, possible_values = &Reporter::variants(), case_insensitive = true)]
     reporter: Option<Reporter>,
+    #[structopt(subcommand)]
+    cmd: Option<Command>,
 }
 
 fn main() {
@@ -55,7 +61,17 @@ fn main() {
     let mut handle = stdout.lock();
 
     let is_stdin = !atty::is(Stream::Stdin);
-    if !opts.paths.is_empty() || is_stdin {
+    if let Some(subcommand) = opts.cmd {
+        match check_and_comment_on_pr(subcommand, is_stdin) {
+            Ok(exit_code) => {
+                process::exit(exit_code);
+            }
+            Err(err) => {
+                eprintln!("{:#?}", err);
+                process::exit(1);
+            }
+        }
+    } else if !opts.paths.is_empty() || is_stdin {
         if let Some(dump_ast_kind) = opts.dump_ast {
             handle_exit_err(dump_ast_for_paths(
                 &mut handle,
@@ -64,18 +80,23 @@ fn main() {
                 dump_ast_kind,
             ));
         } else {
-            let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-            match check_files(&mut handle, &opts.paths, is_stdin, reporter, opts.exclude) {
-                Ok(found_errors) => {
-                    if found_errors {
-                        process::exit(1);
-                    } else {
-                        process::exit(0);
+            match check_files(&opts.paths, is_stdin, opts.exclude) {
+                Ok(violations) => {
+                    let reporter = opts.reporter.unwrap_or(Reporter::Tty);
+                    let exit_code = if !violations.is_empty() { 1 } else { 0 };
+                    match print_violations(&mut handle, violations, &reporter) {
+                        Ok(_) => {
+                            process::exit(exit_code);
+                        }
+                        Err(e) => {
+                            eprintln!("{:#?}", e);
+                            process::exit(1);
+                        }
                     }
                 }
-                Err(e) => {
+                e => {
                     eprintln!("{:#?}", e);
-                    process::exit(1);
+                    process::exit(1)
                 }
             }
         }
