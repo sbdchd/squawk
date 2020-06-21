@@ -27,7 +27,7 @@ pub struct GithubAccessToken {
 }
 
 /// https://developer.github.com/v3/apps/#create-an-installation-access-token-for-an-app
-fn create_access_token(jwt: &str, install_id: &str) -> Result<GithubAccessToken, GithubError> {
+fn create_access_token(jwt: &str, install_id: i64) -> Result<GithubAccessToken, GithubError> {
     reqwest::Client::new()
         .post(&format!(
             "https://api.github.com/app/installations/{install_id}/access_tokens",
@@ -106,7 +106,7 @@ struct Claim {
 /// This is different from authenticating as an installation
 fn generate_jwt(
     private_key: &str,
-    app_identifier: &str,
+    app_identifier: i64,
 ) -> Result<String, jsonwebtoken::errors::Error> {
     let now_unix_time = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -114,7 +114,7 @@ fn generate_jwt(
     let claim = Claim {
         iat: now_unix_time.as_secs(),
         exp: (now_unix_time + Duration::from_secs(10 * 60)).as_secs(),
-        iss: app_identifier.into(),
+        iss: app_identifier.to_string(),
     };
 
     jsonwebtoken::encode(
@@ -172,9 +172,9 @@ pub struct PullRequest {
 
 pub fn comment_on_pr(
     private_key: &str,
-    app_id: &str,
-    install_id: &str,
-    bot_id: &str,
+    app_id: i64,
+    install_id: i64,
+    bot_id: i64,
     pr: PullRequest,
     comment_body: String,
 ) -> Result<Value, GithubError> {
@@ -182,7 +182,7 @@ pub fn comment_on_pr(
     let access_token = create_access_token(&jwt, install_id)?;
     let comments = list_comments(&pr, &access_token.token)?;
 
-    match comments.iter().find(|x| x.user.id.to_string() == bot_id) {
+    match comments.iter().find(|x| x.user.id == bot_id) {
         Some(prev_comment) => update_comment(
             &pr.owner,
             &pr.repo,
