@@ -35,10 +35,9 @@ fn create_access_token(jwt: &str, install_id: &str) -> Result<GithubAccessToken,
         ))
         .header(AUTHORIZATION, format!("Bearer {}", jwt))
         .header(ACCEPT, "application/vnd.github.machine-man-preview+json")
-        .send()
-        .map_err(|_| GithubError::Unknown)?
+        .send()?
         .json::<GithubAccessToken>()
-        .map_err(|_| GithubError::Unknown)
+        .map_err(|e| e.into())
 }
 
 /// https://developer.github.com/v3/issues/comments/#create-an-issue-comment
@@ -53,10 +52,9 @@ fn create_comment(comment: CommentArgs, secret: &str) -> Result<Value, GithubErr
         ))
         .header(AUTHORIZATION, format!("Bearer {}", secret))
         .json(&comment_body)
-        .send()
-        .map_err(|_| GithubError::Unknown)?
+        .send()?
         .json::<Value>()
-        .map_err(|_| GithubError::Unknown)
+        .map_err(|e| e.into())
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -77,7 +75,20 @@ pub struct Comment {
 
 #[derive(Debug)]
 pub enum GithubError {
-    Unknown,
+    JsonWebTokenCreation(jsonwebtoken::errors::Error),
+    HttpError(reqwest::Error),
+}
+
+impl std::convert::From<reqwest::Error> for GithubError {
+    fn from(e: reqwest::Error) -> Self {
+        Self::HttpError(e)
+    }
+}
+
+impl std::convert::From<jsonwebtoken::errors::Error> for GithubError {
+    fn from(e: jsonwebtoken::errors::Error) -> Self {
+        Self::JsonWebTokenCreation(e)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -126,10 +137,9 @@ fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubE
         ))
         .query(&[("per_page", 100)])
         .header(AUTHORIZATION, format!("Bearer {}", secret))
-        .send()
-        .map_err(|_| GithubError::Unknown)?
+        .send()?
         .json::<Vec<Comment>>()
-        .map_err(|_| GithubError::Unknown)
+        .map_err(|e| e.into())
 }
 
 /// https://developer.github.com/v3/issues/comments/#update-an-issue-comment
@@ -149,10 +159,9 @@ fn update_comment(
         ))
         .header(AUTHORIZATION, format!("Bearer {}", secret))
         .json(&CommentBody { body })
-        .send()
-        .map_err(|_| GithubError::Unknown)?
+        .send()?
         .json::<Value>()
-        .map_err(|_| GithubError::Unknown)
+        .map_err(|e| e.into())
 }
 
 pub struct PullRequest {
@@ -169,7 +178,7 @@ pub fn comment_on_pr(
     pr: PullRequest,
     comment_body: String,
 ) -> Result<Value, GithubError> {
-    let jwt = generate_jwt(private_key, app_id).expect("successfully generated jwt");
+    let jwt = generate_jwt(private_key, app_id)?;
     let access_token = create_access_token(&jwt, install_id)?;
     let comments = list_comments(&pr, &access_token.token)?;
 

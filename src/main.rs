@@ -4,12 +4,14 @@ mod github;
 mod parse;
 mod reporter;
 mod rules;
+mod subcommand;
 #[macro_use]
 extern crate lazy_static;
 use crate::reporter::{
-    check_files, dump_ast_for_paths, explain_rule, get_comment_body, list_rules, print_violations,
-    DumpAstOption, Reporter,
+    check_files, dump_ast_for_paths, explain_rule, list_rules, print_violations, DumpAstOption,
+    Reporter,
 };
+use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
 use std::io;
 use std::process;
@@ -48,35 +50,8 @@ struct Opt {
     /// Style of error reporting
     #[structopt(long, possible_values = &Reporter::variants(), case_insensitive = true)]
     reporter: Option<Reporter>,
-
-    // TODO(sbdchd): consider subcommand & refactor ids to parse as `i64` instead of String
-    /// Output SQL and Errors in a GitHub comment
-    #[structopt(long)]
-    upload_to_github: bool,
-    /// GitHub Private Key.
-    #[structopt(long, env = "GITHUB_PRIVATE_KEY")]
-    github_private_key: Option<String>,
-    /// GitHub App Id.
-    #[structopt(long, env = "GITHUB_APP_ID")]
-    github_app_id: Option<String>,
-    /// GitHub Install Id. The installation that squawk is acting on.
-    #[structopt(long, env = "GITHUB_INSTALL_ID")]
-    github_install_id: Option<String>,
-    /// GitHub Bot Id. The User id of the bot.
-    #[structopt(long, env = "GITHUB_BOT_ID")]
-    github_bot_id: Option<String>,
-    /// GitHub Repo Owner
-    /// github.com/sbdchd/squawk, sbdchd is the owner
-    #[structopt(long, env = "GITHUB_REPO_OWNER")]
-    github_repo_owner: Option<String>,
-    /// GitHub Repo Name
-    /// github.com/sbdchd/squawk, squawk is the name
-    #[structopt(long, env = "GITHUB_REPO_NAME")]
-    github_repo_name: Option<String>,
-    /// GitHub Pull Request Number
-    /// github.com/sbdchd/squawk/pull/10, 10 is the PR number
-    #[structopt(long, env = "GITHUB_PR_NUMBER")]
-    github_pr_number: Option<i64>,
+    #[structopt(subcommand)]
+    cmd: Option<Command>,
 }
 
 fn main() {
@@ -86,7 +61,17 @@ fn main() {
     let mut handle = stdout.lock();
 
     let is_stdin = !atty::is(Stream::Stdin);
-    if !opts.paths.is_empty() || is_stdin {
+    if let Some(subcommand) = opts.cmd {
+        match check_and_comment_on_pr(subcommand, is_stdin) {
+            Ok(exit_code) => {
+                process::exit(exit_code);
+            }
+            Err(err) => {
+                eprintln!("{:#?}", err);
+                process::exit(1);
+            }
+        }
+    } else if !opts.paths.is_empty() || is_stdin {
         if let Some(dump_ast_kind) = opts.dump_ast {
             handle_exit_err(dump_ast_for_paths(
                 &mut handle,
@@ -97,49 +82,6 @@ fn main() {
         } else {
             match check_files(&opts.paths, is_stdin, opts.exclude) {
                 Ok(violations) => {
-                    if opts.upload_to_github {
-                        match (
-                            opts.github_private_key,
-                            opts.github_app_id,
-                            opts.github_install_id,
-                            opts.github_bot_id,
-                            opts.github_repo_owner,
-                            opts.github_repo_name,
-                            opts.github_pr_number,
-                        ) {
-                            (
-                                Some(private_key),
-                                Some(app_id),
-                                Some(install_id),
-                                Some(bot_id),
-                                Some(repo_owner),
-                                Some(repo_name),
-                                Some(pr_number),
-                            ) => {
-                                let comment_body = get_comment_body(violations);
-                                let pr = github::PullRequest {
-                                    issue: pr_number,
-                                    owner: repo_owner,
-                                    repo: repo_name,
-                                };
-                                let res = github::comment_on_pr(
-                                    &private_key,
-                                    &app_id,
-                                    &install_id,
-                                    &bot_id,
-                                    pr,
-                                    comment_body,
-                                );
-                                println!("{:#?}", res);
-                                process::exit(1)
-                            }
-
-                            values => {
-                                eprintln!("missing github argument {:#?}", values);
-                                process::exit(1);
-                            }
-                        }
-                    }
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
                     let exit_code = if !violations.is_empty() { 1 } else { 0 };
                     match print_violations(&mut handle, violations, &reporter) {
