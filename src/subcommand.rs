@@ -40,9 +40,9 @@ pub enum Command {
         /// GitHub Install Id. The installation that squawk is acting on.
         #[structopt(long, env = "GITHUB_INSTALL_ID")]
         github_install_id: i64,
-        /// GitHub Bot Id. The User id of the bot.
-        #[structopt(long, env = "GITHUB_BOT_ID")]
-        github_bot_id: i64,
+        /// GitHub Bot Name.
+        #[structopt(long, env = "GITHUB_BOT_NAME")]
+        github_bot_name: String,
         /// GitHub Repo Owner
         /// github.com/sbdchd/squawk, sbdchd is the owner
         #[structopt(long, env = "GITHUB_REPO_OWNER")]
@@ -65,7 +65,7 @@ pub fn check_and_comment_on_pr(cmd: Command, is_stdin: bool) -> Result<i32, Squa
         github_private_key,
         github_app_id,
         github_install_id,
-        github_bot_id,
+        github_bot_name,
         github_repo_owner,
         github_repo_name,
         github_pr_number,
@@ -82,7 +82,7 @@ pub fn check_and_comment_on_pr(cmd: Command, is_stdin: bool) -> Result<i32, Squa
         &github_private_key,
         github_app_id,
         github_install_id,
-        github_bot_id,
+        &github_bot_name,
         pr,
         comment_body,
     )?;
