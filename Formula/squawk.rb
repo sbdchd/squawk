@@ -2,8 +2,8 @@
 class Squawk < Formula
   desc ""
   homepage ""
-  url "https://github.com/sbdchd/squawk/archive/0.1.0.tar.gz"
-  sha256 "385a02eac30d931b525342ad3ffb21676c31c352bf336db02705db5db050dfbd"
+  url "https://github.com/sbdchd/squawk/archive/0.1.4.tar.gz"
+  sha256 :no_check
 
   depends_on "rust" => :build
 
