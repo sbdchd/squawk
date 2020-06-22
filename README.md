@@ -331,10 +331,11 @@ cargo run
 
 ### releasing a new version
 
-1. bump version in `Cargo.toml` and follow the `cargo` release steps
-2. bump version in `package.json` and follow the `npm` steps
-3. bump version in `Formula/squawk.rb` and update the SHA
-4. create a new release on github - CI will attach the binaries automatically
+1. create a new release on github - CI will attach the binaries automatically
+2. update the CHANGELOG.md
+3. bump version in `Cargo.toml` and follow the `cargo` release steps
+4. bump version in `package.json` and follow the `npm` steps
+5. bump version in `Formula/squawk.rb`
 
 ## how it works
 
