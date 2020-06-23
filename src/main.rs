@@ -63,9 +63,7 @@ fn main() {
     let is_stdin = !atty::is(Stream::Stdin);
     if let Some(subcommand) = opts.cmd {
         match check_and_comment_on_pr(subcommand, is_stdin) {
-            Ok(exit_code) => {
-                process::exit(exit_code);
-            }
+            Ok(_) => process::exit(0),
             Err(err) => {
                 eprintln!("{:#?}", err);
                 process::exit(1);
