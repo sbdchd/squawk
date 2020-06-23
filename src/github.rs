@@ -36,6 +36,7 @@ fn create_access_token(jwt: &str, install_id: i64) -> Result<GithubAccessToken, 
         .header(AUTHORIZATION, format!("Bearer {}", jwt))
         .header(ACCEPT, "application/vnd.github.machine-man-preview+json")
         .send()?
+        .error_for_status()?
         .json::<GithubAccessToken>()
         .map_err(|e| e.into())
 }
@@ -53,6 +54,7 @@ fn create_comment(comment: CommentArgs, secret: &str) -> Result<Value, GithubErr
         .header(AUTHORIZATION, format!("Bearer {}", secret))
         .json(&comment_body)
         .send()?
+        .error_for_status()?
         .json::<Value>()
         .map_err(|e| e.into())
 }
@@ -138,6 +140,7 @@ fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubE
         .query(&[("per_page", 100)])
         .header(AUTHORIZATION, format!("Bearer {}", secret))
         .send()?
+        .error_for_status()?
         .json::<Vec<Comment>>()
         .map_err(|e| e.into())
 }
@@ -160,6 +163,7 @@ fn update_comment(
         .header(AUTHORIZATION, format!("Bearer {}", secret))
         .json(&CommentBody { body })
         .send()?
+        .error_for_status()?
         .json::<Value>()
         .map_err(|e| e.into())
 }

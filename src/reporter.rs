@@ -409,7 +409,7 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
     let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
     format!(
         r#"
-# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+# [Squawk](https://github.com/sbdchd/squawk) Report
 
 ### **{violation_count}** violations across **{file_count}** file(s)
 
@@ -469,7 +469,7 @@ SELECT 1;
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
-# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+# [Squawk](https://github.com/sbdchd/squawk) Report
 
 ### **1** violations across **1** file(s)
 
@@ -542,7 +542,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
-# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+# [Squawk](https://github.com/sbdchd/squawk) Report
 
 ### **0** violations across **2** file(s)
 
@@ -609,7 +609,7 @@ None found.
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
-# [Squawk](https://github.com/sbdchd/squawk) Report 🦉
+# [Squawk](https://github.com/sbdchd/squawk) Report
 
 ### **0** violations across **0** file(s)
 

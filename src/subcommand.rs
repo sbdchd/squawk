@@ -1,5 +1,6 @@
 use crate::github::{comment_on_pr, GithubError, PullRequest};
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
+use serde_json::Value;
 use structopt::StructOpt;
 
 #[derive(Debug)]
@@ -58,7 +59,7 @@ pub enum Command {
     },
 }
 
-pub fn check_and_comment_on_pr(cmd: Command, is_stdin: bool) -> Result<i32, SquawkError> {
+pub fn check_and_comment_on_pr(cmd: Command, is_stdin: bool) -> Result<Value, SquawkError> {
     let Command::UploadToGithub {
         paths,
         exclude,
@@ -71,7 +72,6 @@ pub fn check_and_comment_on_pr(cmd: Command, is_stdin: bool) -> Result<i32, Squa
         github_pr_number,
     } = cmd;
     let violations = check_files(&paths, is_stdin, exclude)?;
-    let exit_code = if !violations.is_empty() { 1 } else { 0 };
     let comment_body = get_comment_body(violations);
     let pr = PullRequest {
         issue: github_pr_number,
@@ -85,6 +85,6 @@ pub fn check_and_comment_on_pr(cmd: Command, is_stdin: bool) -> Result<i32, Squa
         &github_bot_name,
         pr,
         comment_body,
-    )?;
-    Ok(exit_code)
+    )
+    .map_err(|e| e.into())
 }
