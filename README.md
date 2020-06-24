@@ -19,9 +19,6 @@ npm install -g squawk-cli
 
 cargo install squawk
 
-# macOS
-brew install https://raw.githubusercontent.com/sbdchd/squawk/master/Formula/squawk.rb
-
 # or install binaries directly via the releases page
 https://github.com/sbdchd/squawk/releases
 ```
@@ -341,7 +338,6 @@ cargo run
 2. update the CHANGELOG.md
 3. bump version in `Cargo.toml` and follow the `cargo` release steps
 4. bump version in `package.json` and follow the `npm` steps
-5. bump version in `Formula/squawk.rb`
 
 ## how it works
 
