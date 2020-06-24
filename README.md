@@ -72,7 +72,7 @@ squawk
 Find problems in your SQL
 
 USAGE:
-    squawk [FLAGS] [OPTIONS] [--] [paths]...
+    squawk [FLAGS] [OPTIONS] [paths]... [SUBCOMMAND]
 
 FLAGS:
     -h, --help
@@ -103,6 +103,11 @@ OPTIONS:
 ARGS:
     <paths>...
             Paths to search
+
+
+SUBCOMMANDS:
+    help                Prints this message or the help of the given subcommand(s)
+    upload-to-github    Comment on a PR with Squawk's results
 ```
 
 ## Rules
@@ -231,11 +236,11 @@ Squawk needs a corresponding GitHub App so it can talk to GitHub.
 
    Save this ID for later.
 
-   Now we have our `GITHUB_APP_ID`, `GITHUB_PRIVATE_KEY`,
-   `GITHUB_INSTALL_ID`, and `GITHUB_BOT_NAME`.
+   Now we have our `SQUAWK_GITHUB_APP_ID`, `SQUAWK_GITHUB_PRIVATE_KEY`,
+   `SQUAWK_GITHUB_INSTALL_ID`, and `SQUAWK_GITHUB_BOT_NAME`.
 
-   Squawk needs the pull request related values: `GITHUB_REPO_NAME`,
-   `GITHUB_REPO_OWNER`, and `GITHUB_PR_NUMBER`.
+   Squawk needs the pull request related values: `SQUAWK_GITHUB_REPO_NAME`,
+   `SQUAWK_GITHUB_REPO_OWNER`, and `SQUAWK_GITHUB_PR_NUMBER`.
 
    Where to find these varies depending how you're running squawk, but for the
    next step I'm assuming you're running Squawk as a CircleCI job.
@@ -262,9 +267,9 @@ Squawk needs a corresponding GitHub App so it can talk to GitHub.
    ```
 
    ```sh
-   GITHUB_REPO_OWNER=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $4}')
-   GITHUB_REPO_NAME=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $5}')
-   GITHUB_PR_NUMBER=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $7}')
+   SQUAWK_GITHUB_REPO_OWNER=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $4}')
+   SQUAWK_GITHUB_REPO_NAME=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $5}')
+   SQUAWK_GITHUB_PR_NUMBER=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $7}')
    ```
 
 5. Conclusion
@@ -272,14 +277,15 @@ Squawk needs a corresponding GitHub App so it can talk to GitHub.
    Wrapping it all up we should have the following env vars:
 
    ```sh
-   GITHUB_APP_ID= # fill in with id found in step 5
-   GITHUB_INSTALL_ID= # fill in with id found in step 7
-   GITHUB_BOT_NAME= # fill in with your bot name from step 2
+   SQUAWK_GITHUB_APP_ID= # fill in with id found in step 5
+   SQUAWK_GITHUB_INSTALL_ID= # fill in with id found in step 7
+   SQUAWK_GITHUB_BOT_NAME= # fill in with your bot name from step 2
    # downloaded via step 6, your key will have a different name
-   GITHUB_PRIVATE_KEY=$(cat ./cool-bot-name.private-key.pem)
-   GITHUB_REPO_OWNER=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $4}')
-   GITHUB_REPO_NAME=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $5}')
-   GITHUB_PR_NUMBER=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $7}')
+   SQUAWK_GITHUB_PRIVATE_KEY=$(cat ./cool-bot-name.private-key.pem)
+   # can also use the SQUAWK_GITHUB_PRIVATE_KEY_BASE64 instead ^
+   SQUAWK_GITHUB_REPO_OWNER=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $4}')
+   SQUAWK_GITHUB_REPO_NAME=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $5}')
+   SQUAWK_GITHUB_PR_NUMBER=$(echo $CIRCLE_PULL_REQUEST | awk -F/ '{print $7}')
    ```
 
    We can pass this into the env before running squawk or we can translate
