@@ -1402,6 +1402,7 @@ name = "squawk"
 version = "0.1.4"
 dependencies = [
  "atty 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
+ "base64 0.12.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "console 0.11.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "insta 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "jsonwebtoken 7.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
