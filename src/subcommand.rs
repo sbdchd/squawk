@@ -1,7 +1,6 @@
 use crate::github::{comment_on_pr, GithubError, PullRequest};
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
 use serde_json::Value;
-use std::process;
 use structopt::StructOpt;
 
 #[derive(Debug)]
@@ -10,6 +9,7 @@ pub enum SquawkError {
     GithubError(GithubError),
     Base64DecodeError(base64::DecodeError),
     ByteDecodeError(std::string::FromUtf8Error),
+    GithubPrivateKeyMissing,
 }
 
 impl std::convert::From<GithubError> for SquawkError {
@@ -83,10 +83,7 @@ fn get_github_private_key(
     match github_private_key {
         Some(private_key) => Ok(private_key),
         None => {
-            let key = github_private_key_base64.unwrap_or_else(|| {
-                eprintln!("Either github_private_key or github_private_key_base64 must be set.");
-                process::exit(1)
-            });
+            let key = github_private_key_base64.ok_or(SquawkError::GithubPrivateKeyMissing)?;
             let bytes = base64::decode(key)?;
             Ok(String::from_utf8(bytes)?)
         }
