@@ -25,6 +25,8 @@ atty = "0.2"
 reqwest = "0.9.18"
 jsonwebtoken = "7"
 base64 = "0.12.2"
+simplelog = "0.8.0"
+log = "0.4.8"
 
 [dev-dependencies]
 insta = "0.16.0"

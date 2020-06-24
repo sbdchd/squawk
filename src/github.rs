@@ -1,4 +1,5 @@
 use jsonwebtoken::{Algorithm, EncodingKey, Header};
+use log::info;
 use reqwest::header::{ACCEPT, AUTHORIZATION};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -178,31 +179,41 @@ pub fn comment_on_pr(
     pr: PullRequest,
     comment_body: String,
 ) -> Result<Value, GithubError> {
+    info!("generating jwt");
     let jwt = generate_jwt(private_key, app_id)?;
+    info!("creating access token");
     let access_token = create_access_token(&jwt, install_id)?;
+    info!("fetching comments for PR");
     let comments = list_comments(&pr, &access_token.token)?;
 
     let bot_name = format!("{}[bot]", bot_name);
 
+    info!("checking for existing comment");
     match comments
         .iter()
         .find(|x| x.user.r#type == "Bot" && x.user.login == bot_name)
     {
-        Some(prev_comment) => update_comment(
-            &pr.owner,
-            &pr.repo,
-            prev_comment.id,
-            comment_body,
-            &access_token.token,
-        ),
-        None => create_comment(
-            CommentArgs {
-                owner: pr.owner,
-                repo: pr.repo,
-                issue: pr.issue,
-                body: comment_body,
-            },
-            &access_token.token,
-        ),
+        Some(prev_comment) => {
+            info!("updating comment");
+            update_comment(
+                &pr.owner,
+                &pr.repo,
+                prev_comment.id,
+                comment_body,
+                &access_token.token,
+            )
+        }
+        None => {
+            info!("creating comment");
+            create_comment(
+                CommentArgs {
+                    owner: pr.owner,
+                    repo: pr.repo,
+                    issue: pr.issue,
+                    body: comment_body,
+                },
+                &access_token.token,
+            )
+        }
     }
 }

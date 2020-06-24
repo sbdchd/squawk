@@ -1,5 +1,6 @@
 use crate::github::{comment_on_pr, GithubError, PullRequest};
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
+use log::info;
 use serde_json::Value;
 use structopt::StructOpt;
 
@@ -107,7 +108,9 @@ pub fn check_and_comment_on_pr(
         github_pr_number,
         github_private_key_base64,
     } = cmd;
+    info!("checking files");
     let violations = check_files(&paths, is_stdin, stdin_path, exclude)?;
+    info!("generating github comment body");
     let comment_body = get_comment_body(violations);
     let pr = PullRequest {
         issue: github_pr_number,
@@ -117,6 +120,7 @@ pub fn check_and_comment_on_pr(
 
     let gh_private_key = get_github_private_key(github_private_key, github_private_key_base64)?;
 
+    info!("commenting on PR");
     Ok(comment_on_pr(
         &gh_private_key,
         github_app_id,
