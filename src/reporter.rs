@@ -108,6 +108,7 @@ impl std::convert::From<CheckSQLError> for CheckFilesError {
 pub fn check_files(
     paths: &[String],
     is_stdin: bool,
+    stdin_path: Option<String>,
     excluded_rules: Option<Vec<String>>,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let excluded_rules = excluded_rules.unwrap_or_else(|| vec![]);
@@ -122,7 +123,8 @@ pub fn check_files(
 
     if is_stdin {
         let sql = get_sql_from_stdin()?;
-        process_violations(&sql, "stdin")?;
+        let path = stdin_path.unwrap_or_else(|| "stdin".into());
+        process_violations(&sql, &path)?;
     }
 
     for path in paths {

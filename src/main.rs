@@ -50,6 +50,9 @@ struct Opt {
     /// Style of error reporting
     #[structopt(long, possible_values = &Reporter::variants(), case_insensitive = true)]
     reporter: Option<Reporter>,
+    #[structopt(long)]
+    /// Path to use in reporting for stdin
+    stdin_filepath: Option<String>,
     #[structopt(subcommand)]
     cmd: Option<Command>,
 }
@@ -62,7 +65,7 @@ fn main() {
 
     let is_stdin = !atty::is(Stream::Stdin);
     if let Some(subcommand) = opts.cmd {
-        match check_and_comment_on_pr(subcommand, is_stdin) {
+        match check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath) {
             Ok(_) => process::exit(0),
             Err(err) => {
                 eprintln!("{:#?}", err);
@@ -78,7 +81,7 @@ fn main() {
                 dump_ast_kind,
             ));
         } else {
-            match check_files(&opts.paths, is_stdin, opts.exclude) {
+            match check_files(&opts.paths, is_stdin, opts.stdin_filepath, opts.exclude) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
                     let total_violations = file_reports
