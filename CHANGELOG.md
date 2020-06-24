@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## 0.1.4 - 2020-06-28
+## v0.2.0 - 2020-06-23
+
+### Added
+
+- logging, mainly around upload-to-github (#24)
+- `--stdin-filepath` argument (#23)
+- output a success message for CLI tty reporter (#22)
+
+### Changed
+
+- prefix env vars with SQUAWK\_ (#21)
+
+### Fixed
+
+- error level HTTP status codes not being errors (#20)
+
+## v0.1.4 - 2020-06-21
 
 ### Added
 
@@ -20,7 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - off by one error in slicing problem SQL for the tty reporter
 
-## 0.1.3 - 2020-06-12
+## v0.1.3 - 2020-06-12
 
 ### Added
 
@@ -28,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - release binaries
 - CI
 
-## 0.1.0 - 2020-06-05
+## v0.1.0 - 2020-06-05
 
 ### Added
 
