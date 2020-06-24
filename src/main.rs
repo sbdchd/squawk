@@ -13,6 +13,7 @@ use crate::reporter::{
 };
 use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
+use simplelog::CombinedLogger;
 use std::io;
 use std::process;
 use structopt::StructOpt;
@@ -55,10 +56,22 @@ struct Opt {
     stdin_filepath: Option<String>,
     #[structopt(subcommand)]
     cmd: Option<Command>,
+    /// Enable debug logging output
+    #[structopt(long)]
+    verbose: bool,
 }
 
 fn main() {
     let opts = Opt::from_args();
+    if opts.verbose {
+        CombinedLogger::init(vec![simplelog::TermLogger::new(
+            simplelog::LevelFilter::Info,
+            simplelog::Config::default(),
+            simplelog::TerminalMode::Mixed,
+        )])
+        .expect("problem creating logger");
+    }
+
     let mut clap_app = Opt::clap();
     let stdout = io::stdout();
     let mut handle = stdout.lock();

@@ -6,6 +6,7 @@ use crate::rules::{
 };
 use console::strip_ansi_codes;
 use console::style;
+use log::info;
 use serde::Serialize;
 use std::convert::TryFrom;
 use std::fs::File;
@@ -122,12 +123,14 @@ pub fn check_files(
     };
 
     if is_stdin {
+        info!("reading content from stdin");
         let sql = get_sql_from_stdin()?;
         let path = stdin_path.unwrap_or_else(|| "stdin".into());
         process_violations(&sql, &path)?;
     }
 
     for path in paths {
+        info!("checking file path: {}", path);
         let sql = get_sql_from_path(path)?;
         process_violations(&sql, path)?;
     }
