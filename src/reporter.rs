@@ -250,6 +250,16 @@ pub fn fmt_tty<W: io::Write>(f: &mut W, files: &[ViolationContent]) -> Result<()
             fmt_tty_violation(f, violation)?;
         }
     }
+    let total_violations = files.iter().map(|f| f.violations.len()).sum::<usize>();
+    let files_checked = files.len();
+    if total_violations == 0 {
+        writeln!(
+            f,
+            "Found 0 issues in {files_checked} {files} 🎉",
+            files_checked = files_checked,
+            files = if files_checked == 1 { "file" } else { "files" }
+        )?;
+    }
     Ok(())
 }
 
@@ -320,13 +330,13 @@ pub fn pretty_violations(
 
 pub fn print_violations<W: io::Write>(
     writer: &mut W,
-    violations: Vec<ViolationContent>,
+    file_reports: Vec<ViolationContent>,
     reporter: &Reporter,
 ) -> Result<(), std::io::Error> {
     match reporter {
-        Reporter::Gcc => fmt_gcc(writer, &violations),
-        Reporter::Json => fmt_json(writer, violations),
-        Reporter::Tty => fmt_tty(writer, &violations),
+        Reporter::Gcc => fmt_gcc(writer, &file_reports),
+        Reporter::Json => fmt_json(writer, file_reports),
+        Reporter::Tty => fmt_tty(writer, &file_reports),
     }
 }
 
@@ -678,6 +688,21 @@ SELECT 1;
         // remove the color codes so tests behave in CI as they do locally
         assert_display_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
     }
+    #[test]
+    fn test_display_no_violations_tty() {
+        let mut buff = Vec::new();
+
+        let res = print_violations(
+            &mut buff,
+            vec![pretty_violations(vec![], "", "main.sql")],
+            &Reporter::Tty,
+        );
+
+        assert!(res.is_ok());
+        // remove the color codes so tests behave in CI as they do locally
+        assert_display_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
+    }
+
     #[test]
     fn test_display_violations_json() {
         let sql = r#" 

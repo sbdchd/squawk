@@ -79,11 +79,15 @@ fn main() {
             ));
         } else {
             match check_files(&opts.paths, is_stdin, opts.exclude) {
-                Ok(violations) => {
+                Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-                    let exit_code = if !violations.is_empty() { 1 } else { 0 };
-                    match print_violations(&mut handle, violations, &reporter) {
+                    let total_violations = file_reports
+                        .iter()
+                        .map(|f| f.violations.len())
+                        .sum::<usize>();
+                    match print_violations(&mut handle, file_reports, &reporter) {
                         Ok(_) => {
+                            let exit_code = if total_violations > 0 { 1 } else { 0 };
                             process::exit(exit_code);
                         }
                         Err(e) => {
