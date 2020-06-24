@@ -90,7 +90,11 @@ fn get_github_private_key(
     }
 }
 
-pub fn check_and_comment_on_pr(cmd: Command, is_stdin: bool) -> Result<Value, SquawkError> {
+pub fn check_and_comment_on_pr(
+    cmd: Command,
+    is_stdin: bool,
+    stdin_path: Option<String>,
+) -> Result<Value, SquawkError> {
     let Command::UploadToGithub {
         paths,
         exclude,
@@ -103,7 +107,7 @@ pub fn check_and_comment_on_pr(cmd: Command, is_stdin: bool) -> Result<Value, Sq
         github_pr_number,
         github_private_key_base64,
     } = cmd;
-    let violations = check_files(&paths, is_stdin, exclude)?;
+    let violations = check_files(&paths, is_stdin, stdin_path, exclude)?;
     let comment_body = get_comment_body(violations);
     let pr = PullRequest {
         issue: github_pr_number,
