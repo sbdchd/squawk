@@ -28,7 +28,7 @@ pub struct GithubAccessToken {
 
 /// https://developer.github.com/v3/apps/#create-an-installation-access-token-for-an-app
 fn create_access_token(jwt: &str, install_id: i64) -> Result<GithubAccessToken, GithubError> {
-    reqwest::Client::new()
+    Ok(reqwest::Client::new()
         .post(&format!(
             "https://api.github.com/app/installations/{install_id}/access_tokens",
             install_id = install_id
@@ -37,14 +37,13 @@ fn create_access_token(jwt: &str, install_id: i64) -> Result<GithubAccessToken, 
         .header(ACCEPT, "application/vnd.github.machine-man-preview+json")
         .send()?
         .error_for_status()?
-        .json::<GithubAccessToken>()
-        .map_err(|e| e.into())
+        .json::<GithubAccessToken>()?)
 }
 
 /// https://developer.github.com/v3/issues/comments/#create-an-issue-comment
 fn create_comment(comment: CommentArgs, secret: &str) -> Result<Value, GithubError> {
     let comment_body = CommentBody { body: comment.body };
-    reqwest::Client::new()
+    Ok(reqwest::Client::new()
         .post(&format!(
             "https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/comments",
             owner = comment.owner,
@@ -55,8 +54,7 @@ fn create_comment(comment: CommentArgs, secret: &str) -> Result<Value, GithubErr
         .json(&comment_body)
         .send()?
         .error_for_status()?
-        .json::<Value>()
-        .map_err(|e| e.into())
+        .json::<Value>()?)
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -130,7 +128,7 @@ fn generate_jwt(
 fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubError> {
     // TODO(sbdchd): use the next links to get _all_ the comments
     // see: https://developer.github.com/v3/guides/traversing-with-pagination/
-    reqwest::Client::new()
+    Ok(reqwest::Client::new()
         .get(&format!(
             "https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/comments",
             owner = pr.owner,
@@ -141,8 +139,7 @@ fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubE
         .header(AUTHORIZATION, format!("Bearer {}", secret))
         .send()?
         .error_for_status()?
-        .json::<Vec<Comment>>()
-        .map_err(|e| e.into())
+        .json::<Vec<Comment>>()?)
 }
 
 /// https://developer.github.com/v3/issues/comments/#update-an-issue-comment
@@ -153,7 +150,7 @@ fn update_comment(
     body: String,
     secret: &str,
 ) -> Result<Value, GithubError> {
-    reqwest::Client::new()
+    Ok(reqwest::Client::new()
         .patch(&format!(
             "https://api.github.com/repos/{owner}/{repo}/issues/comments/{comment_id}",
             owner = owner,
@@ -164,8 +161,7 @@ fn update_comment(
         .json(&CommentBody { body })
         .send()?
         .error_for_status()?
-        .json::<Value>()
-        .map_err(|e| e.into())
+        .json::<Value>()?)
 }
 
 pub struct PullRequest {

@@ -24,6 +24,7 @@ lazy_static = "1.4.0"
 atty = "0.2"
 reqwest = "0.9.18"
 jsonwebtoken = "7"
+base64 = "0.12.2"
 
 [dev-dependencies]
 insta = "0.16.0"
