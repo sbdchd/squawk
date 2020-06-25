@@ -58,6 +58,22 @@ fn create_comment(comment: CommentArgs, secret: &str) -> Result<Value, GithubErr
         .json::<Value>()?)
 }
 
+#[derive(Debug, Deserialize)]
+pub struct AppInfo {
+    pub id: i64,
+    pub slug: String,
+}
+
+/// Get the bot name for finding existing comments on a PR
+pub fn get_app_info(jwt: &str) -> Result<AppInfo, GithubError> {
+    Ok(reqwest::Client::new()
+        .get("https://api.github.com/app")
+        .header(AUTHORIZATION, format!("Bearer {}", jwt))
+        .send()?
+        .error_for_status()?
+        .json::<AppInfo>()?)
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct User {
     pub id: i64,
@@ -175,18 +191,19 @@ pub fn comment_on_pr(
     private_key: &str,
     app_id: i64,
     install_id: i64,
-    bot_name: &str,
     pr: PullRequest,
     comment_body: String,
 ) -> Result<Value, GithubError> {
     info!("generating jwt");
     let jwt = generate_jwt(private_key, app_id)?;
+    info!("getting app info");
+    let app_info = get_app_info(&jwt)?;
     info!("creating access token");
     let access_token = create_access_token(&jwt, install_id)?;
     info!("fetching comments for PR");
     let comments = list_comments(&pr, &access_token.token)?;
 
-    let bot_name = format!("{}[bot]", bot_name);
+    let bot_name = format!("{}[bot]", app_info.slug);
 
     info!("checking for existing comment");
     match comments
