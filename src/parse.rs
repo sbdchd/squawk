@@ -178,6 +178,16 @@ COMMIT;
         assert_debug_snapshot!(res);
     }
     #[test]
+    fn test_parse_sql_create_unique_index_safe() {
+        let sql = r#"
+ALTER TABLE "legacy_questiongrouppg" 
+    ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE 
+    USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+    #[test]
     fn test_parse_delete_stmt() {
         let sql = r#"DELETE FROM "table_name";"#;
         let res = parse_sql_query(sql);
