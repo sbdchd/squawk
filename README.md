@@ -237,7 +237,7 @@ Squawk needs a corresponding GitHub App so it can talk to GitHub.
    Save this ID for later.
 
    Now we have our `SQUAWK_GITHUB_APP_ID`, `SQUAWK_GITHUB_PRIVATE_KEY`,
-   `SQUAWK_GITHUB_INSTALL_ID`, and `SQUAWK_GITHUB_BOT_NAME`.
+   `SQUAWK_GITHUB_INSTALL_ID`.
 
    Squawk needs the pull request related values: `SQUAWK_GITHUB_REPO_NAME`,
    `SQUAWK_GITHUB_REPO_OWNER`, and `SQUAWK_GITHUB_PR_NUMBER`.
@@ -279,7 +279,6 @@ Squawk needs a corresponding GitHub App so it can talk to GitHub.
    ```sh
    SQUAWK_GITHUB_APP_ID= # fill in with id found in step 5
    SQUAWK_GITHUB_INSTALL_ID= # fill in with id found in step 7
-   SQUAWK_GITHUB_BOT_NAME= # fill in with your bot name from step 2
    # downloaded via step 6, your key will have a different name
    SQUAWK_GITHUB_PRIVATE_KEY=$(cat ./cool-bot-name.private-key.pem)
    # can also use the SQUAWK_GITHUB_PRIVATE_KEY_BASE64 instead ^
