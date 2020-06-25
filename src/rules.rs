@@ -259,6 +259,7 @@ pub fn disallow_unique_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                         Some(AlterTableDef::Constraint(constraint)) => {
                             if !tables_created.contains(tbl_name)
                                 && constraint.contype == ConstrType::Unique
+                                && constraint.indexname.is_none()
                             {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::DisallowedUniqueConstraint,
@@ -696,6 +697,18 @@ ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
 
         assert_debug_snapshot!(check_sql(bad_sql, &[]));
         assert_debug_snapshot!(check_sql(ok_sql, &[]));
+    }
+
+    /// Creating a UNQIUE constraint from an existing index should be considered
+    /// safe
+    #[test]
+    fn test_unique_constraint_ok() {
+        let sql = r#"
+CREATE UNIQUE INDEX CONCURRENTLY "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx" 
+    ON "legacy_questiongrouppg" ("mongo_id");
+ALTER TABLE "legacy_questiongrouppg" ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
+        "#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
     }
 
     ///

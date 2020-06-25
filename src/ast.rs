@@ -612,24 +612,26 @@ pub struct Constraint {
     // bool		deferrable;		/* DEFERRABLE? */
     // bool		initdeferred;	/* INITIALLY DEFERRED? */
     /// token location, or -1 if unknown
-    location: i32,
+    pub location: i32,
 
     /* Fields used for constraints with expressions (CHECK and DEFAULT): */
     // bool		is_no_inherit;	/* is constraint non-inheritable? */
     /// expr, as untransformed parse tree
-    raw_expr: Option<Value>,
+    pub raw_expr: Option<Value>,
     // char	   *cooked_expr;	/* expr, as nodeToString representation */
     // char		generated_when;
 
-    /* Fields used for unique constraints (UNIQUE and PRIMARY KEY): */
-    // List	   *keys;			/* String nodes naming referenced column(s) */
+    // Fields used for unique constraints (UNIQUE and PRIMARY KEY): */
+    /// String nodes naming referenced column(s)
+    pub keys: Option<Value>,
 
     /* Fields used for EXCLUSION constraints: */
     // List	   *exclusions;		/* list of (IndexElem, operator name) pairs */
 
     /* Fields used for index constraints (UNIQUE, PRIMARY KEY, EXCLUSION): */
     // List	   *options;		/* options from WITH clause */
-    // char	   *indexname;		/* existing index to use; otherwise NULL */
+    /// existing index to use; otherwise NULL
+    pub indexname: Option<String>,
     // char	   *indexspace;		/* index tablespace; NULL for default */
     /* These could be, but currently are not, used for UNIQUE/PKEY: */
     // char	   *access_method;	/* index access method; NULL for default */
