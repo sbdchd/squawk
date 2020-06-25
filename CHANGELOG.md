@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.2.1 - 2020-06-25
+
+### Changed
+
+- remove `SQUAWK_GITHUB_BOT_NAME` env var for github upload, no longer needed (#27)
+
+### Fixed
+
+- false positive in unique constraint rule (#28)
+
 ## v0.2.0 - 2020-06-23
 
 ### Added
