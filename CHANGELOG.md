@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.2.2 - 2020-06-25
+
+### Fixed
+
+- upload-to-github commenting on PRs when no files provided (#30)
+
 ## v0.2.1 - 2020-06-25
 
 ### Changed
