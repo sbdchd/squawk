@@ -105,9 +105,13 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     } = cmd;
     info!("checking files");
-    let violations = check_files(&paths, is_stdin, stdin_path, exclude)?;
+    let file_results = check_files(&paths, is_stdin, stdin_path, exclude)?;
+    if file_results.is_empty() {
+        info!("no files checked, exiting");
+        return Ok(Value::Null);
+    }
     info!("generating github comment body");
-    let comment_body = get_comment_body(violations);
+    let comment_body = get_comment_body(file_results);
     let pr = PullRequest {
         issue: github_pr_number,
         owner: github_repo_owner,
