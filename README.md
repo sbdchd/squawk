@@ -333,9 +333,9 @@ cargo run
 
 ### releasing a new version
 
-1. create a new release on github - CI will attach the binaries automatically
-2. update the CHANGELOG.md
-3. bump version in `Cargo.toml` and follow the `cargo` release steps
+1. update the CHANGELOG.md
+2. bump version in `Cargo.toml` and follow the `cargo` release steps
+3. create a new release on github - CI will attach the binaries automatically
 4. bump version in `package.json` and follow the `npm` steps
 
 ## how it works
