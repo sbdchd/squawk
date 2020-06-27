@@ -117,5 +117,6 @@ fn main() {
         handle_exit_err(explain_rule(&mut handle, &rule_name));
     } else {
         clap_app.print_long_help().expect("problem printing help");
+        println!();
     }
 }
