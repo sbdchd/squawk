@@ -1,0 +1,63 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterTSDictionaryStmt(
+                    Object({
+                        "dictname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "my_dict",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                52,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "newrussian",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "stopwords",
+                                    ),
+                                    "location": Number(
+                                        40,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    64,
+                ),
+            },
+        ),
+    ],
+)

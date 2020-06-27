@@ -1,0 +1,90 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CreateStatsStmt(
+                    Object({
+                        "defnames": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "s1",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "exprs": Array([
+                            Object({
+                                "ColumnRef": Object({
+                                    "fields": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "a",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "location": Number(
+                                        40,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "ColumnRef": Object({
+                                    "fields": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "b",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "location": Number(
+                                        43,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "relations": Array([
+                            Object({
+                                "RangeVar": Object({
+                                    "inh": Bool(
+                                        true,
+                                    ),
+                                    "location": Number(
+                                        50,
+                                    ),
+                                    "relname": String(
+                                        "t1",
+                                    ),
+                                    "relpersistence": String(
+                                        "p",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "stat_types": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "dependencies",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    52,
+                ),
+            },
+        ),
+    ],
+)

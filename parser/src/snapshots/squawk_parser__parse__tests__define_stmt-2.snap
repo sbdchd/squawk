@@ -1,0 +1,264 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: DefineStmt(
+                    Object({
+                        "definition": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                37,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "box",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "leftarg",
+                                    ),
+                                    "location": Number(
+                                        27,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                57,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "box",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "rightarg",
+                                    ),
+                                    "location": Number(
+                                        46,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                78,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "area_equal_procedure",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "procedure",
+                                    ),
+                                    "location": Number(
+                                        66,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "===",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "commutator",
+                                    ),
+                                    "location": Number(
+                                        104,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "!==",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "negator",
+                                    ),
+                                    "location": Number(
+                                        126,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                156,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "area_restriction_procedure",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "restrict",
+                                    ),
+                                    "location": Number(
+                                        145,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                195,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "area_join_procedure",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "join",
+                                    ),
+                                    "location": Number(
+                                        188,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "hashes",
+                                    ),
+                                    "location": Number(
+                                        220,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "merges",
+                                    ),
+                                    "location": Number(
+                                        228,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "defnames": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "===",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "kind": Number(
+                            25,
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    236,
+                ),
+            },
+        ),
+    ],
+)

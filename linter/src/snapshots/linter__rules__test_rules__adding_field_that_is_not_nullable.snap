@@ -1,0 +1,42 @@
+---
+source: linter/src/rules.rs
+expression: "check_sql(bad_sql, &[])"
+---
+Ok(
+    [
+        RuleViolation {
+            kind: AddingNotNullableField,
+            span: Span {
+                start: 7,
+                len: Some(
+                    104,
+                ),
+            },
+            messages: [
+                Note(
+                    "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                ),
+                Help(
+                    "Make the field nullable.",
+                ),
+            ],
+        },
+        RuleViolation {
+            kind: AddingFieldWithDefault,
+            span: Span {
+                start: 7,
+                len: Some(
+                    104,
+                ),
+            },
+            messages: [
+                Note(
+                    "In Postgres versions <11 adding a field with a DEFAULT requires a table rewrite with an ACCESS EXCLUSIVE lock.",
+                ),
+                Help(
+                    "Add the field as nullable, then set a default, backfill, and remove nullabilty.",
+                ),
+            ],
+        },
+    ],
+)

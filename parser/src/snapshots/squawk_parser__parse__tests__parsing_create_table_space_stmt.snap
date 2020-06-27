@@ -1,0 +1,26 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CreateTableSpaceStmt(
+                    Object({
+                        "location": String(
+                            "/data/dbs",
+                        ),
+                        "tablespacename": String(
+                            "dbspace",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    46,
+                ),
+            },
+        ),
+    ],
+)

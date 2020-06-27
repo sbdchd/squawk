@@ -1,0 +1,113 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CompositeTypeStmt(
+                    Object({
+                        "coldeflist": Array([
+                            Object({
+                                "ColumnDef": Object({
+                                    "colname": String(
+                                        "r",
+                                    ),
+                                    "is_local": Bool(
+                                        true,
+                                    ),
+                                    "location": Number(
+                                        30,
+                                    ),
+                                    "typeName": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                38,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "pg_catalog",
+                                                        ),
+                                                    }),
+                                                }),
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "float8",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                            Object({
+                                "ColumnDef": Object({
+                                    "colname": String(
+                                        "i",
+                                    ),
+                                    "is_local": Bool(
+                                        true,
+                                    ),
+                                    "location": Number(
+                                        60,
+                                    ),
+                                    "typeName": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                68,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "pg_catalog",
+                                                        ),
+                                                    }),
+                                                }),
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "float8",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                        ]),
+                        "typevar": Object({
+                            "RangeVar": Object({
+                                "location": Number(
+                                    13,
+                                ),
+                                "relname": String(
+                                    "complex",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    86,
+                ),
+            },
+        ),
+    ],
+)

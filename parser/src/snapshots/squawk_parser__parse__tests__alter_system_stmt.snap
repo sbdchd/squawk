@@ -1,0 +1,68 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterSystemStmt(
+                    Object({
+                        "setstmt": Object({
+                            "VariableSetStmt": Object({
+                                "args": Array([
+                                    Object({
+                                        "A_Const": Object({
+                                            "location": Number(
+                                                30,
+                                            ),
+                                            "val": Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "hot_standby",
+                                                    ),
+                                                }),
+                                            }),
+                                        }),
+                                    }),
+                                ]),
+                                "kind": Number(
+                                    0,
+                                ),
+                                "name": String(
+                                    "wal_level",
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    41,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: AlterSystemStmt(
+                    Object({
+                        "setstmt": Object({
+                            "VariableSetStmt": Object({
+                                "kind": Number(
+                                    4,
+                                ),
+                                "name": String(
+                                    "wal_level",
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 42,
+                stmt_len: Some(
+                    29,
+                ),
+            },
+        ),
+    ],
+)

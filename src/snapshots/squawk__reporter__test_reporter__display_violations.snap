@@ -1,5 +1,0 @@
----
-source: src/reporter.rs
-expression: "String::from_utf8_lossy(&buff)"
----
-"main.sql:1:4: error: adding-not-nullable-field Adding a NOT NULL field requires exclusive locks and table rewrites. Consider making the field nullable.main.sql:3:0: error: adding-not-nullable-field Adding a NOT NULL field requires exclusive locks and table rewrites. Consider making the field nullable."

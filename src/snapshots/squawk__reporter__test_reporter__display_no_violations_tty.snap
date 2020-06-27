@@ -1,6 +1,0 @@
----
-source: src/reporter.rs
-expression: "strip_ansi_codes(&String::from_utf8_lossy(&buff))"
----
-Found 0 issues in 1 file 🎉
-

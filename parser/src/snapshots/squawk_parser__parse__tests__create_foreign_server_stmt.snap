@@ -1,0 +1,88 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CreateForeignServerStmt(
+                    Object({
+                        "fdwname": String(
+                            "postgres_fdw",
+                        ),
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "foo",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "host",
+                                    ),
+                                    "location": Number(
+                                        66,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "foodb",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "dbname",
+                                    ),
+                                    "location": Number(
+                                        78,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "5432",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "port",
+                                    ),
+                                    "location": Number(
+                                        94,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "servername": String(
+                            "myserver",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    106,
+                ),
+            },
+        ),
+    ],
+)

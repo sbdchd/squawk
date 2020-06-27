@@ -1,0 +1,92 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: InsertStmt(
+                    Object({
+                        "override": Number(
+                            0,
+                        ),
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    12,
+                                ),
+                                "relname": String(
+                                    "table_name",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                        "selectStmt": Object({
+                            "SelectStmt": Object({
+                                "op": Number(
+                                    0,
+                                ),
+                                "valuesLists": Array([
+                                    Array([
+                                        Object({
+                                            "A_Const": Object({
+                                                "location": Number(
+                                                    31,
+                                                ),
+                                                "val": Object({
+                                                    "Integer": Object({
+                                                        "ival": Number(
+                                                            1,
+                                                        ),
+                                                    }),
+                                                }),
+                                            }),
+                                        }),
+                                        Object({
+                                            "A_Const": Object({
+                                                "location": Number(
+                                                    34,
+                                                ),
+                                                "val": Object({
+                                                    "Integer": Object({
+                                                        "ival": Number(
+                                                            2,
+                                                        ),
+                                                    }),
+                                                }),
+                                            }),
+                                        }),
+                                        Object({
+                                            "A_Const": Object({
+                                                "location": Number(
+                                                    37,
+                                                ),
+                                                "val": Object({
+                                                    "Integer": Object({
+                                                        "ival": Number(
+                                                            3,
+                                                        ),
+                                                    }),
+                                                }),
+                                            }),
+                                        }),
+                                    ]),
+                                ]),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    39,
+                ),
+            },
+        ),
+    ],
+)

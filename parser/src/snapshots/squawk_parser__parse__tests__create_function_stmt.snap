@@ -1,0 +1,99 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: CreateFunctionStmt(
+                    Object({
+                        "funcname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "populate",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "\nDECLARE\n    -- declarations\nBEGIN\n    PERFORM my_function();\nEND;\n",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "as",
+                                    ),
+                                    "location": Number(
+                                        44,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "plpgsql",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "language",
+                                    ),
+                                    "location": Number(
+                                        119,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "returnType": Object({
+                            "TypeName": Object({
+                                "location": Number(
+                                    36,
+                                ),
+                                "names": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "pg_catalog",
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "int4",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "typemod": Number(
+                                    -1,
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    135,
+                ),
+            },
+        ),
+    ],
+)
