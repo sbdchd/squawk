@@ -1,0 +1,25 @@
+---
+source: linter/src/rules.rs
+expression: "check_sql(bad_sql, &[])"
+---
+Ok(
+    [
+        RuleViolation {
+            kind: DisallowedUniqueConstraint,
+            span: Span {
+                start: 0,
+                len: Some(
+                    80,
+                ),
+            },
+            messages: [
+                Note(
+                    "Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.",
+                ),
+                Help(
+                    "Create an index CONCURRENTLY and create the constraint using the index.",
+                ),
+            ],
+        },
+    ],
+)

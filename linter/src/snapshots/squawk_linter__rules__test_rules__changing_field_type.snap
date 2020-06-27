@@ -1,0 +1,25 @@
+---
+source: linter/src/rules.rs
+expression: "check_sql(bad_sql, &[])"
+---
+Ok(
+    [
+        RuleViolation {
+            kind: ChangingColumnType,
+            span: Span {
+                start: 7,
+                len: Some(
+                    114,
+                ),
+            },
+            messages: [
+                Note(
+                    "Requires an ACCESS EXCLUSIVE lock on the table which blocks reads.",
+                ),
+                Note(
+                    "Changing the type may break existing clients.",
+                ),
+            ],
+        },
+    ],
+)

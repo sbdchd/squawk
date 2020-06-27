@@ -1,0 +1,136 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: RuleStmt(
+                    Object({
+                        "actions": Array([
+                            Object({
+                                "SelectStmt": Object({
+                                    "fromClause": Array([
+                                        Object({
+                                            "RangeVar": Object({
+                                                "inh": Bool(
+                                                    true,
+                                                ),
+                                                "location": Number(
+                                                    83,
+                                                ),
+                                                "relname": String(
+                                                    "t2",
+                                                ),
+                                                "relpersistence": String(
+                                                    "p",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "op": Number(
+                                        0,
+                                    ),
+                                    "targetList": Array([
+                                        Object({
+                                            "ResTarget": Object({
+                                                "location": Number(
+                                                    76,
+                                                ),
+                                                "val": Object({
+                                                    "ColumnRef": Object({
+                                                        "fields": Array([
+                                                            Object({
+                                                                "A_Star": Object({}),
+                                                            }),
+                                                        ]),
+                                                        "location": Number(
+                                                            76,
+                                                        ),
+                                                    }),
+                                                }),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                            }),
+                        ]),
+                        "event": Number(
+                            1,
+                        ),
+                        "instead": Bool(
+                            true,
+                        ),
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    43,
+                                ),
+                                "relname": String(
+                                    "t1",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                        "rulename": String(
+                            "_RETURN",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    85,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: RuleStmt(
+                    Object({
+                        "actions": Array([
+                            Object({
+                                "NotifyStmt": Object({
+                                    "conditionname": String(
+                                        "mytable",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "event": Number(
+                            2,
+                        ),
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    126,
+                                ),
+                                "relname": String(
+                                    "mytable",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                        "rulename": String(
+                            "notify_me",
+                        ),
+                    }),
+                ),
+                stmt_location: 86,
+                stmt_len: Some(
+                    70,
+                ),
+            },
+        ),
+    ],
+)

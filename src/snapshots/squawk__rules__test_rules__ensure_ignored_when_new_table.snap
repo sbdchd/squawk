@@ -1,7 +1,0 @@
----
-source: src/rules.rs
-expression: "check_sql(&sql, &[])"
----
-Ok(
-    [],
-)

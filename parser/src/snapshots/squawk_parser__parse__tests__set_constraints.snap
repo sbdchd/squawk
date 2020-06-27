@@ -1,0 +1,64 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: ConstraintsSetStmt(
+                    Object({
+                        "deferred": Bool(
+                            true,
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    29,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: ConstraintsSetStmt(
+                    Object({}),
+                ),
+                stmt_location: 30,
+                stmt_len: Some(
+                    30,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: ConstraintsSetStmt(
+                    Object({
+                        "constraints": Array([
+                            Object({
+                                "RangeVar": Object({
+                                    "inh": Bool(
+                                        true,
+                                    ),
+                                    "location": Number(
+                                        78,
+                                    ),
+                                    "relname": String(
+                                        "foo",
+                                    ),
+                                    "relpersistence": String(
+                                        "p",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                ),
+                stmt_location: 61,
+                stmt_len: Some(
+                    30,
+                ),
+            },
+        ),
+    ],
+)

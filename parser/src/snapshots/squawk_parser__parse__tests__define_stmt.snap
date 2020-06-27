@@ -1,0 +1,155 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: DefineStmt(
+                    Object({
+                        "args": Array([
+                            Array([
+                                Object({
+                                    "FunctionParameter": Object({
+                                        "argType": Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    23,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "complex",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        "mode": Number(
+                                            105,
+                                        ),
+                                    }),
+                                }),
+                            ]),
+                            Object({
+                                "Integer": Object({
+                                    "ival": Number(
+                                        -1,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "definition": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                46,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "complex_add",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "sfunc",
+                                    ),
+                                    "location": Number(
+                                        38,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "TypeName": Object({
+                                            "location": Number(
+                                                71,
+                                            ),
+                                            "names": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "complex",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "typemod": Number(
+                                                -1,
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "stype",
+                                    ),
+                                    "location": Number(
+                                        63,
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "DefElem": Object({
+                                    "arg": Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "(0,0)",
+                                            ),
+                                        }),
+                                    }),
+                                    "defaction": Number(
+                                        0,
+                                    ),
+                                    "defname": String(
+                                        "initcond",
+                                    ),
+                                    "location": Number(
+                                        84,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "defnames": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "sum",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "kind": Number(
+                            1,
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    104,
+                ),
+            },
+        ),
+    ],
+)

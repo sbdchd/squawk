@@ -1,0 +1,22 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Err(
+    PGParseError(
+        ParseError {
+            message: Some(
+                "syntax error at or near \"PROCEDURE\"",
+            ),
+            funcname: Some(
+                "scanner_yyerror",
+            ),
+            filename: Some(
+                "scan.l",
+            ),
+            lineno: 1121,
+            cursorpos: 9,
+            context: None,
+        },
+    ),
+)

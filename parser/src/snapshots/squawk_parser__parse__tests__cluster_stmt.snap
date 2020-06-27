@@ -1,0 +1,78 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: ClusterStmt(
+                    Object({
+                        "indexname": String(
+                            "employees_ind",
+                        ),
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    9,
+                                ),
+                                "relname": String(
+                                    "employees",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    38,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: ClusterStmt(
+                    Object({
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    48,
+                                ),
+                                "relname": String(
+                                    "employees",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 39,
+                stmt_len: Some(
+                    18,
+                ),
+            },
+        ),
+        RawStmt(
+            RawStmt {
+                stmt: ClusterStmt(
+                    Object({}),
+                ),
+                stmt_location: 58,
+                stmt_len: Some(
+                    8,
+                ),
+            },
+        ),
+    ],
+)

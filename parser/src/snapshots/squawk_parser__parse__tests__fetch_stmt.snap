@@ -1,0 +1,29 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: FetchStmt(
+                    Object({
+                        "direction": Number(
+                            0,
+                        ),
+                        "howMany": Number(
+                            5,
+                        ),
+                        "portalname": String(
+                            "foo",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    25,
+                ),
+            },
+        ),
+    ],
+)

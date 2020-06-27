@@ -1,0 +1,85 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: DeleteStmt(
+                    Object({
+                        "relation": Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    12,
+                                ),
+                                "relname": String(
+                                    "table_name",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                        "whereClause": Object({
+                            "A_Expr": Object({
+                                "kind": Number(
+                                    0,
+                                ),
+                                "lexpr": Object({
+                                    "ColumnRef": Object({
+                                        "fields": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "account_age",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                        "location": Number(
+                                            31,
+                                        ),
+                                    }),
+                                }),
+                                "location": Number(
+                                    43,
+                                ),
+                                "name": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                ">",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "rexpr": Object({
+                                    "A_Const": Object({
+                                        "location": Number(
+                                            45,
+                                        ),
+                                        "val": Object({
+                                            "Integer": Object({
+                                                "ival": Number(
+                                                    10,
+                                                ),
+                                            }),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                        }),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    47,
+                ),
+            },
+        ),
+    ],
+)

@@ -1,0 +1,38 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: SecLabelStmt(
+                    Object({
+                        "label": String(
+                            "system_u:object_r:sepgsql_table_t:s0",
+                        ),
+                        "object": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "mytable",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "objtype": Number(
+                            37,
+                        ),
+                        "provider": String(
+                            "selinux",
+                        ),
+                    }),
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    86,
+                ),
+            },
+        ),
+    ],
+)
