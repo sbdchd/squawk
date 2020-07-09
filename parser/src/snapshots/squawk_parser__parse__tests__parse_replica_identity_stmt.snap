@@ -23,6 +23,7 @@ Ok(
                                         ),
                                     ),
                                     behavior: Restrict,
+                                    missing_ok: false,
                                 },
                             ),
                         ],
