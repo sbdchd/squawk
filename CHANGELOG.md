@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.3.0 - 2020-07-10
+
+### Changed
+
+- upload-to-github comment formatting to hopefully be more clear
+- docs on crates.io for sub crates
+
 ## v0.2.3 - 2020-07-09
 
 ### Added
