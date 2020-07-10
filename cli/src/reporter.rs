@@ -112,7 +112,7 @@ pub fn check_files(
     stdin_path: Option<String>,
     excluded_rules: Option<Vec<String>>,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
-    let excluded_rules = excluded_rules.unwrap_or_else(|| vec![]);
+    let excluded_rules = excluded_rules.unwrap_or_else(Vec::new);
 
     let mut output_violations = vec![];
 
