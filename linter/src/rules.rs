@@ -652,7 +652,7 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        let res = check_sql(sql, &[]).expect("valid parsing of SQL");
+        let res = check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid parsing of SQL");
         let mut prev_span_start = -1;
         for violation in res.iter() {
             assert!(violation.span.start > prev_span_start);
@@ -673,13 +673,13 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
 
         let ok_sql = r#"
   -- use CONCURRENTLY
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     /// ```sql
@@ -696,14 +696,14 @@ mod test_rules {
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
 
         let ok_sql = r#"
 -- use `NOT VALID`
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
    "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     ///
@@ -728,9 +728,9 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
 
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     /// ```sql
@@ -755,8 +755,8 @@ ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
 ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     /// Creating a UNQIUE constraint from an existing index should be considered
@@ -768,7 +768,7 @@ CREATE UNIQUE INDEX CONCURRENTLY "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_
     ON "legacy_questiongrouppg" ("mongo_id");
 ALTER TABLE "legacy_questiongrouppg" ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
         "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &["prefer-robust-stmts".into()]), Ok(vec![]));
     }
 
     ///
@@ -796,8 +796,8 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     #[test]
@@ -837,14 +837,14 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
 
         let bad_sql = r#"
 -- not sure how this would ever work, but might as well test it
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
     }
 
     #[test]
