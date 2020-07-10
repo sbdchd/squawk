@@ -438,6 +438,7 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
 
 ### **{violations_emoji} {violation_count}** violations across **{file_count}** file(s)
 
+---
 {sql_file_content}
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
@@ -497,6 +498,7 @@ SELECT 1;
 
 ### **🚒 1** violations across **1** file(s)
 
+---
 
 <h3><code>alpha.sql</code></h3>
 
@@ -564,6 +566,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
 ### **✅ 0** violations across **2** file(s)
 
+---
 
 <h3><code>alpha.sql</code></h3>
 
@@ -621,6 +624,7 @@ No violations found.
 
 ### **✅ 0** violations across **0** file(s)
 
+---
 
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
