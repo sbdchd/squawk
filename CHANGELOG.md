@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.2.3 - 2020-07-09
+
+### Added
+
+- new rule `prefer-robust-stmts`
+
 ## v0.2.2 - 2020-06-25
 
 ### Fixed
