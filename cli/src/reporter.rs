@@ -397,21 +397,17 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
 
     Ok(format!(
         r#"
-<details open>
-
-<summary><code>{filename}</code></summary>
+<h3><code>{filename}</code></h3>
 
 ```sql
 {sql}
 ```
 
-### 🚒 Rule Violations ({violation_count})
+<h4>🚒 Rule Violations ({violation_count})</h4>
 
 {violation_content}
-
-</details>
-
     
+---
     "#,
         filename = violation.filename,
         sql = sql,
@@ -424,17 +420,15 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
     let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
     format!(
         r#"
-# [Squawk](https://github.com/sbdchd/squawk) Report
+# Squawk Report
 
 ### **{violation_count}** violations across **{file_count}** file(s)
 
-## 🚛 Source SQL
 {sql_file_content}
----
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
 "#,
         violation_count = violations_count,
         file_count = files.len(),
