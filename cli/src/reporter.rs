@@ -373,6 +373,14 @@ pub fn explain_rule<W: io::Write>(writer: &mut W, name: &str) -> Result<(), std:
     Ok(())
 }
 
+fn get_violations_emoji(count: usize) -> &'static str {
+    if count > 0 {
+        "🚒"
+    } else {
+        "✅"
+    }
+}
+
 fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::Error> {
     let sql = violation.sql;
     let mut buff = Vec::new();
@@ -392,8 +400,10 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
             violations_text.trim_matches('\n')
         )
     } else {
-        "None found.".to_string()
+        "No violations found.".to_string()
     };
+
+    let violations_emoji = get_violations_emoji(violation_count);
 
     Ok(format!(
         r#"
@@ -403,12 +413,13 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
 {sql}
 ```
 
-<h4>🚒 Rule Violations ({violation_count})</h4>
+<h4>{violations_emoji} Rule Violations ({violation_count})</h4>
 
 {violation_content}
     
 ---
     "#,
+        violations_emoji = violations_emoji,
         filename = violation.filename,
         sql = sql,
         violation_count = violation_count,
@@ -418,11 +429,14 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
 
 pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
     let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
+
+    let violations_emoji = get_violations_emoji(violations_count);
+
     format!(
         r#"
 # Squawk Report
 
-### **{violation_count}** violations across **{file_count}** file(s)
+### **{violations_emoji} {violation_count}** violations across **{file_count}** file(s)
 
 {sql_file_content}
 
@@ -430,6 +444,7 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
 
 ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
 "#,
+        violations_emoji = violations_emoji,
         violation_count = violations_count,
         file_count = files.len(),
         sql_file_content = files
