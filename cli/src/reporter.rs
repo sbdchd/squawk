@@ -493,15 +493,12 @@ SELECT 1;
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
-# [Squawk](https://github.com/sbdchd/squawk) Report
+# Squawk Report
 
-### **1** violations across **1** file(s)
+### **🚒 1** violations across **1** file(s)
 
-## 🚛 Source SQL
 
-<details open>
-
-<summary><code>alpha.sql</code></summary>
+<h3><code>alpha.sql</code></h3>
 
 ```sql
 
@@ -509,7 +506,7 @@ SELECT 1;
                 
 ```
 
-### 🚒 Rule Violations (1)
+<h4>🚒 Rule Violations (1)</h4>
 
 
 ```
@@ -520,16 +517,13 @@ alpha.sql:1:0: warning: adding-not-nullable-field
   note: Adding a NOT NULL field requires exclusive locks and table rewrites.
   help: Make the field nullable.
 ```
-
-</details>
-
-    
     
 ---
+    
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
 "###);
     }
 
@@ -566,15 +560,12 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
-# [Squawk](https://github.com/sbdchd/squawk) Report
+# Squawk Report
 
-### **0** violations across **2** file(s)
+### **✅ 0** violations across **2** file(s)
 
-## 🚛 Source SQL
 
-<details open>
-
-<summary><code>alpha.sql</code></summary>
+<h3><code>alpha.sql</code></h3>
 
 ```sql
 
@@ -589,18 +580,14 @@ CREATE TABLE "core_bar" (
                 
 ```
 
-### 🚒 Rule Violations (0)
+<h4>✅ Rule Violations (0)</h4>
 
-None found.
-
-</details>
-
+No violations found.
     
+---
     
 
-<details open>
-
-<summary><code>bravo.sql</code></summary>
+<h3><code>bravo.sql</code></h3>
 
 ```sql
 
@@ -608,20 +595,17 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
                 
 ```
 
-### 🚒 Rule Violations (0)
+<h4>✅ Rule Violations (0)</h4>
 
-None found.
-
-</details>
-
-    
+No violations found.
     
 ---
+    
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
-        "###);
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
+"###);
     }
 
     /// Ideally the logic won't leave a comment when there are no migrations but
@@ -633,18 +617,16 @@ None found.
         let body = get_comment_body(violations);
 
         assert_display_snapshot!(body, @r###"
-# [Squawk](https://github.com/sbdchd/squawk) Report
+# Squawk Report
 
-### **0** violations across **0** file(s)
+### **✅ 0** violations across **0** file(s)
 
-## 🚛 Source SQL
 
----
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-> ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk)
-        "###);
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
+"###);
     }
 }
 
