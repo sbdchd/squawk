@@ -359,7 +359,7 @@ cargo run
 ## how it works
 
 squawk wraps calls to [libpg_query-sys](https://github.com/tdbgamer/libpg_query-sys) in a safe
-interface and parses the JSON into eaiser to work with structures.
+interface and parses the JSON into easier to work with structures.
 libpg_query-sys in turn uses [bindgen](https://rust-lang.github.io/rust-bindgen/) to bind to
 [libpg_query](https://github.com/lfittl/libpg_query), which itself wraps Postgres' SQL
 parser in a bit of C code that outputs the parsed AST into a JSON string.

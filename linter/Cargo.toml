@@ -5,8 +5,7 @@ authors = ["Steve Dignam <steve@dignam.xyz>"]
 edition = "2018"
 license = "GPL-3.0"
 description = "Postgres SQL linter used in squawk"
-documentation = "https://github.com/sbdchd/squawk/blob/master/README.md"
-readme = "../README.md"
+readme = "README.md"
 keywords = ["postgres", "sql", "linter"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
