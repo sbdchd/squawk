@@ -5,6 +5,7 @@ authors = ["Steve Dignam <steve@dignam.xyz>"]
 edition = "2018"
 license = "GPL-3.0"
 description = "Postgres SQL parser used in squawk"
+repository = "https://github.com/sbdchd/squawk"
 readme = "README.md"
 keywords = ["postgres", "sql", "parser"]
 
