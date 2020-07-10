@@ -7,7 +7,7 @@ license = "GPL-3.0"
 description = "Linter for Postgresql focused on database migrations."
 repository = "https://github.com/sbdchd/squawk"
 documentation = "https://github.com/sbdchd/squawk/blob/master/README.md"
-readme = "README.md"
+readme = "../README.md"
 keywords = ["postgres", "postgresql", "linter"]
 categories = ["command-line-utilities", "development-tools"]
 
