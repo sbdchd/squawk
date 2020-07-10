@@ -7,7 +7,7 @@ license = "GPL-3.0"
 description = "Linter for Postgresql focused on database migrations."
 repository = "https://github.com/sbdchd/squawk"
 documentation = "https://github.com/sbdchd/squawk/blob/master/README.md"
-readme = "README.md"
+readme = "../README.md"
 keywords = ["postgres", "postgresql", "linter"]
 categories = ["command-line-utilities", "development-tools"]
 
@@ -22,9 +22,9 @@ atty = "0.2"
 base64 = "0.12.2"
 simplelog = "0.8.0"
 log = "0.4.8"
-squawk-parser = { path = "../parser" }
-squawk-linter = { path = "../linter" }
-squawk-github = { path = "../github" }
+squawk-parser = { version = "0.2.3", path = "../parser" }
+squawk-linter = { version = "0.2.3", path = "../linter" }
+squawk-github = { version = "0.2.3", path = "../github" }
 
 [dev-dependencies]
 insta = "0.16.0"
