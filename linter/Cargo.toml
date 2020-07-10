@@ -1,6 +1,6 @@
 [package]
 name = "squawk-linter"
-version = "0.1.0"
+version = "0.2.3"
 authors = ["Steve Dignam <steve@dignam.xyz>"]
 edition = "2018"
 
@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
-squawk-parser = { version = "0.1.0", path = "../parser" }
+squawk-parser = { path = "../parser" }
 lazy_static = "1.4.0"
 
 [dev-dependencies]
