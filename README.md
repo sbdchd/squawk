@@ -351,9 +351,10 @@ cargo run
 ### releasing a new version
 
 1. update the CHANGELOG.md
-2. bump version in `Cargo.toml` and follow the `cargo` release steps
+2. bump version in all the dependency `Cargo.toml` as well as the CLI `Cargo.toml`
 3. create a new release on github - CI will attach the binaries automatically
 4. bump version in `package.json` and follow the `npm` steps
+5. publish each crate to cargo in a DAG fashion
 
 ## how it works
 
