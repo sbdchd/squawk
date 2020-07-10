@@ -190,6 +190,23 @@ Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock.
 Using a text field with a `CHECK CONSTRAINT` makes it easier to change the
 max length. See the `constraint-missing-not-valid` rule.
 
+### `prefer-robust-stmts`
+
+Goal of this rule is to make migrations more robust when they fail part way through.
+
+For instance, you may have a migration with two steps. First, the migration
+adds a field to a table, then it creates an index concurrently.
+
+Since this second part is concurrent, it can't run in a transaction so the
+first part of the migration can succeed, and second part can fail meaning the
+first part won't be rolled back.
+
+Then when the migration is run again, it will fail at adding the field since
+it already exists.
+
+To appease this rule you can use guards like `IF NOT EXISTS` or wrap all your
+statements in a transaction.
+
 ## Bot Setup
 
 Squawk works as a CLI tool but can also create comments on GitHub Pull

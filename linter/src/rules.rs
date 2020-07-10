@@ -23,6 +23,7 @@ pub enum RuleViolationKind {
     DisallowedUniqueConstraint,
     BanDropDatabase,
     PreferTextField,
+    PreferRobustStmts,
 }
 
 impl std::fmt::Display for RuleViolationKind {
@@ -38,6 +39,7 @@ impl std::fmt::Display for RuleViolationKind {
             Self::DisallowedUniqueConstraint => "disallowed-unique-constraint",
             Self::BanDropDatabase => "ban-drop-database",
             Self::PreferTextField => "prefer-text-field",
+            Self::PreferRobustStmts => "prefer-robust-stmts",
         };
         write!(f, "{}", str_value)
     }
@@ -57,6 +59,7 @@ impl std::convert::TryFrom<&str> for RuleViolationKind {
             "disallowed-unique-constraint" => Ok(Self::DisallowedUniqueConstraint),
             "ban-drop-database" => Ok(Self::BanDropDatabase),
             "prefer-text-field" => Ok(Self::PreferTextField),
+            "prefer-robust-stmts" => Ok(Self::PreferRobustStmts),
             _ => Err(()),
         }
     }
@@ -373,6 +376,54 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
     errs
 }
 
+/// If a migration is running in a transaction, then we skip the statements
+/// because if it fails part way through, it will revert.
+/// For the cases where statements aren't running in a transaction, for instance,
+/// when we CREATE INDEX CONCURRENTLY, we should try and make those migrations
+/// more robust by using guards like `IF NOT EXISTS`. So if the migration fails
+/// halfway through, it can be rerun without human intervention.
+pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
+    let mut errs = vec![];
+    let mut inside_transaction = false;
+    for RootStmt::RawStmt(raw_stmt) in tree {
+        match &raw_stmt.stmt {
+            Stmt::TransactionStmt(stmt) => match stmt.kind {
+                TransactionStmtKind::Begin => inside_transaction = true,
+                TransactionStmtKind::Commit => inside_transaction = false,
+                _ => continue,
+            },
+            Stmt::AlterTableStmt(stmt) => {
+                for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
+                    if cmd.missing_ok || inside_transaction {
+                        continue;
+                    }
+                    errs.push(RuleViolation::new(
+                        RuleViolationKind::PreferRobustStmts,
+                        raw_stmt,
+                        None,
+                    ));
+                }
+            }
+            Stmt::IndexStmt(stmt) if !stmt.if_not_exists && !inside_transaction => {
+                errs.push(RuleViolation::new(
+                    RuleViolationKind::PreferRobustStmts,
+                    raw_stmt,
+                    None,
+                ));
+            }
+            Stmt::CreateStmt(stmt) if !stmt.if_not_exists && !inside_transaction => {
+                errs.push(RuleViolation::new(
+                    RuleViolationKind::PreferRobustStmts,
+                    raw_stmt,
+                    None,
+                ));
+            }
+            _ => continue,
+        }
+    }
+    errs
+}
+
 #[derive(Debug, PartialEq)]
 pub enum CheckSQLError {
     ParsingSQL(PGQueryError),
@@ -541,6 +592,15 @@ lazy_static! {
                     "Use a text field with a check constraint.".into()
                 ),
             ]
+        },
+        SquawkRule {
+            name: RuleViolationKind::PreferRobustStmts,
+            func: prefer_robust_stmts,
+            messages: vec![
+                ViolationMessage::Help(
+                    "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.".into()
+                ),
+            ]
         }
     ];
 }
@@ -592,7 +652,7 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        let res = check_sql(sql, &[]).expect("valid parsing of SQL");
+        let res = check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid parsing of SQL");
         let mut prev_span_start = -1;
         for violation in res.iter() {
             assert!(violation.span.start > prev_span_start);
@@ -613,13 +673,13 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
 
         let ok_sql = r#"
   -- use CONCURRENTLY
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     /// ```sql
@@ -636,14 +696,14 @@ mod test_rules {
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
 
         let ok_sql = r#"
 -- use `NOT VALID`
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
    "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     ///
@@ -668,9 +728,9 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
 
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     /// ```sql
@@ -695,8 +755,8 @@ ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
 ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     /// Creating a UNQIUE constraint from an existing index should be considered
@@ -708,7 +768,7 @@ CREATE UNIQUE INDEX CONCURRENTLY "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_
     ON "legacy_questiongrouppg" ("mongo_id");
 ALTER TABLE "legacy_questiongrouppg" ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
         "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &["prefer-robust-stmts".into()]), Ok(vec![]));
     }
 
     ///
@@ -736,8 +796,8 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
-        assert_debug_snapshot!(check_sql(ok_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
     }
 
     #[test]
@@ -777,14 +837,14 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
 
         let bad_sql = r#"
 -- not sure how this would ever work, but might as well test it
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
     }
 
     #[test]
@@ -937,6 +997,162 @@ COMMIT;"#;
         assert_debug_snapshot!(check_sql(ok_sql, &[]), @r###"
         Ok(
             [],
+        )
+        "###);
+    }
+
+    /// If the statement is in a transaction, or it has a guard like IF NOT
+    /// EXISTS, then it is considered valid by the `prefer-robust-stmt` rule.
+    #[test]
+    fn test_prefer_robust_stmt_okay_cases() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
+COMMIT;
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+ALTER TABLE "core_foo" ADD COLUMN IF NOT EXISTS "answer_id" integer NULL;
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+CREATE INDEX CONCURRENTLY IF NOT EXISTS "core_foo_idx" ON "core_foo" ("answer_id");
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+BEGIN;
+CREATE TABLE "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "bravo" text NOT NULL
+);
+COMMIT;
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+CREATE TABLE IF NOT EXISTS "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "bravo" text NOT NULL
+);
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        // select is fine, we're only interested in modifications to the tables
+        let sql = r#"
+SELECT 1;
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        // inserts are also okay
+        let sql = r#"
+INSERT INTO tbl VALUES (a);
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
+        "#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+
+    #[test]
+    fn test_prefer_robust_stmt_failure_cases() {
+        let sql = r#"
+ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
+"#;
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        Ok(
+            [
+                RuleViolation {
+                    kind: PreferRobustStmts,
+                    span: Span {
+                        start: 0,
+                        len: Some(
+                            59,
+                        ),
+                    },
+                    messages: [
+                        Help(
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                        ),
+                    ],
+                },
+            ],
+        )
+        "###);
+
+        let sql = r#"
+CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
+"#;
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        Ok(
+            [
+                RuleViolation {
+                    kind: PreferRobustStmts,
+                    span: Span {
+                        start: 0,
+                        len: Some(
+                            69,
+                        ),
+                    },
+                    messages: [
+                        Help(
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                        ),
+                    ],
+                },
+            ],
+        )
+        "###);
+
+        let sql = r#"
+CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
+"#;
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        Ok(
+            [
+                RuleViolation {
+                    kind: PreferRobustStmts,
+                    span: Span {
+                        start: 0,
+                        len: Some(
+                            83,
+                        ),
+                    },
+                    messages: [
+                        Help(
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                        ),
+                    ],
+                },
+            ],
+        )
+        "###);
+
+        let sql = r#"
+ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
+        "#;
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        Ok(
+            [
+                RuleViolation {
+                    kind: PreferRobustStmts,
+                    span: Span {
+                        start: 0,
+                        len: Some(
+                            54,
+                        ),
+                    },
+                    messages: [
+                        Help(
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                        ),
+                    ],
+                },
+            ],
         )
         "###);
     }

@@ -578,9 +578,14 @@ pub struct AlterTableCmd {
     pub subtype: AlterTableType,
     /// column, constraint, or trigger to act on, or tablespace
     pub name: Option<String>,
+    /// definition of new column, index, constraint, or parent table
     pub def: Option<AlterTableDef>,
     #[serde(default)]
     pub behavior: DropBehavior,
+    // RoleSpec   *newowner;
+    /// skip error if missing?
+    #[serde(default)]
+    pub missing_ok: bool,
 }
 
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]

@@ -652,7 +652,8 @@ mod test_reporter {
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(sql, &[]).expect("valid sql should parse");
+        let violations =
+            check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid sql should parse");
 
         let filename = "main.sql";
 
@@ -678,7 +679,8 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(sql, &[]).expect("valid sql should parse");
+        let violations =
+            check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid sql should parse");
         let filename = "main.sql";
         let mut buff = Vec::new();
 
@@ -714,7 +716,8 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(sql, &[]).expect("valid sql should parse");
+        let violations =
+            check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid sql should parse");
         let filename = "main.sql";
         let mut buff = Vec::new();
 
@@ -737,7 +740,8 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(sql, &[]).expect("valid sql should parse");
+        let violations =
+            check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid sql should parse");
 
         let filename = "main.sql";
         assert_debug_snapshot!(pretty_violations(violations, sql, filename));
@@ -748,7 +752,8 @@ SELECT 1;
     #[test]
     fn test_trimming_sql_newlines() {
         let sql = r#"ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;"#;
-        let violations = check_sql(sql, &[]).expect("valid sql should parse");
+        let violations =
+            check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid sql should parse");
 
         assert_debug_snapshot!(violations, @r###"
         [
