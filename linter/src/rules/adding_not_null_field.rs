@@ -31,3 +31,31 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
     }
     errs
 }
+
+#[cfg(test)]
+mod test_rules {
+    use crate::check_sql;
+    use insta::assert_debug_snapshot;
+
+    #[test]
+    fn test_adding_field_that_is_not_nullable() {
+        let bad_sql = r#"
+BEGIN;
+--
+-- Add field foo to recipe
+--
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
+ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
+COMMIT;
+        "#;
+
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+
+        let bad_sql = r#"
+-- not sure how this would ever work, but might as well test it
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+        "#;
+
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+    }
+}

@@ -1,23 +1,23 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/constraint_missing_not_valid.rs
 expression: "check_sql(bad_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(
     [
         RuleViolation {
-            kind: AddingFieldWithDefault,
+            kind: ConstraintMissingNotValid,
             span: Span {
                 start: 0,
                 len: Some(
-                    76,
+                    94,
                 ),
             },
             messages: [
                 Note(
-                    "In Postgres versions <11 adding a field with a DEFAULT requires a table rewrite with an ACCESS EXCLUSIVE lock.",
+                    "Requires a table scan to verify constraint and an ACCESS EXCLUSIVE lock which blocks reads.",
                 ),
                 Help(
-                    "Add the field as nullable, then set a default, backfill, and remove nullabilty.",
+                    "Add NOT VALID to the constraint and then VALIDATE the constraint.",
                 ),
             ],
         },

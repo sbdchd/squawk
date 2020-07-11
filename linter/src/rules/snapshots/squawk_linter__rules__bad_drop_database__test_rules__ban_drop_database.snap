@@ -1,5 +1,5 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/bad_drop_database.rs
 expression: "check_sql(sql, &[])"
 ---
 Ok(

@@ -1,20 +1,20 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/renaming_table.rs
 expression: "check_sql(sql, &[])"
 ---
 Ok(
     [
         RuleViolation {
-            kind: RenamingColumn,
+            kind: RenamingTable,
             span: Span {
                 start: 0,
                 len: Some(
-                    74,
+                    52,
                 ),
             },
             messages: [
                 Note(
-                    "Renaming a column may break existing clients.",
+                    "Renaming a table may break existing clients.",
                 ),
             ],
         },

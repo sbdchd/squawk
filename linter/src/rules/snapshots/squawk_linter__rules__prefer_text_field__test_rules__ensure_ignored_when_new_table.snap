@@ -1,5 +1,5 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/prefer_text_field.rs
 expression: "check_sql(sql, &[RuleViolationKind::PreferTextField.to_string()])"
 ---
 Ok(

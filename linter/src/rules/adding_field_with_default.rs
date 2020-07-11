@@ -30,3 +30,38 @@ pub fn adding_field_with_default(tree: &[RootStmt]) -> Vec<RuleViolation> {
     }
     errs
 }
+
+#[cfg(test)]
+mod test_rules {
+    use crate::check_sql;
+    use insta::assert_debug_snapshot;
+
+    ///
+    /// ```sql
+    /// -- instead of
+    /// ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+    /// -- use
+    /// ALTER TABLE "core_recipe" ADD COLUMN "foo" integer;
+    /// ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
+    /// -- backfill
+    /// -- remove nullability
+    /// ```
+    #[test]
+    fn test_adding_field_with_default() {
+        let bad_sql = r#"
+-- instead of
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+"#;
+
+        let ok_sql = r#"
+-- use
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer;
+ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
+-- backfill
+-- remove nullability
+        "#;
+
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+    }
+}

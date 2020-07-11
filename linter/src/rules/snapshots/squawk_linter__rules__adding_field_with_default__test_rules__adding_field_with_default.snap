@@ -1,32 +1,15 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/adding_field_with_default.rs
 expression: "check_sql(bad_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(
     [
         RuleViolation {
-            kind: AddingNotNullableField,
-            span: Span {
-                start: 7,
-                len: Some(
-                    104,
-                ),
-            },
-            messages: [
-                Note(
-                    "Adding a NOT NULL field requires exclusive locks and table rewrites.",
-                ),
-                Help(
-                    "Make the field nullable.",
-                ),
-            ],
-        },
-        RuleViolation {
             kind: AddingFieldWithDefault,
             span: Span {
-                start: 7,
+                start: 0,
                 len: Some(
-                    104,
+                    76,
                 ),
             },
             messages: [

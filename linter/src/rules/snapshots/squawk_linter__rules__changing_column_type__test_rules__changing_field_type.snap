@@ -1,5 +1,5 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/changing_column_type.rs
 expression: "check_sql(bad_sql, &[])"
 ---
 Ok(

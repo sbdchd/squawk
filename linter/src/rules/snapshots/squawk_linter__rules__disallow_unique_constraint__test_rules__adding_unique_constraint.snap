@@ -1,23 +1,23 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/disallow_unique_constraint.rs
 expression: "check_sql(bad_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(
     [
         RuleViolation {
-            kind: AddingNotNullableField,
+            kind: DisallowedUniqueConstraint,
             span: Span {
                 start: 0,
                 len: Some(
-                    124,
+                    80,
                 ),
             },
             messages: [
                 Note(
-                    "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                    "Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.",
                 ),
                 Help(
-                    "Make the field nullable.",
+                    "Create an index CONCURRENTLY and create the constraint using the index.",
                 ),
             ],
         },
