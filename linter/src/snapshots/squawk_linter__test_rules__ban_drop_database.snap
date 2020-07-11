@@ -1,5 +1,5 @@
 ---
-source: linter/src/rules.rs
+source: linter/src/lib.rs
 expression: "check_sql(sql, &[])"
 ---
 Ok(

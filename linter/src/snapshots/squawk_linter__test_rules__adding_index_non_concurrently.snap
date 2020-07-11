@@ -1,23 +1,23 @@
 ---
-source: linter/src/rules.rs
-expression: "check_sql(bad_sql, &[])"
+source: linter/src/lib.rs
+expression: "check_sql(bad_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(
     [
         RuleViolation {
-            kind: AddingNotNullableField,
+            kind: RequireConcurrentIndexCreation,
             span: Span {
                 start: 0,
                 len: Some(
-                    124,
+                    79,
                 ),
             },
             messages: [
                 Note(
-                    "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                    "Creating an index blocks writes.",
                 ),
                 Help(
-                    "Make the field nullable.",
+                    "Create the index CONCURRENTLY.",
                 ),
             ],
         },

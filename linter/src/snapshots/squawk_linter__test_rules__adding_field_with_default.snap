@@ -1,6 +1,6 @@
 ---
-source: linter/src/rules.rs
-expression: "check_sql(bad_sql, &[])"
+source: linter/src/lib.rs
+expression: "check_sql(bad_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(
     [
