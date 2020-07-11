@@ -2,10 +2,9 @@ use console::strip_ansi_codes;
 use console::style;
 use log::info;
 use serde::Serialize;
-use squawk_linter::rules::{
-    check_sql, CheckSQLError, RuleViolation, RuleViolationKind, Span, SquawkRule, ViolationMessage,
-    RULES,
-};
+use squawk_linter::errors::CheckSQLError;
+use squawk_linter::violations::{RuleViolation, RuleViolationKind, Span, ViolationMessage};
+use squawk_linter::{check_sql, SquawkRule, RULES};
 use squawk_parser::error::PGQueryError;
 use squawk_parser::parse::{parse_sql_query, parse_sql_query_json};
 use std::convert::TryFrom;

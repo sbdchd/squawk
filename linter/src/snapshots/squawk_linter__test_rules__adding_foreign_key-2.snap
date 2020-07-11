@@ -1,0 +1,7 @@
+---
+source: linter/src/lib.rs
+expression: "check_sql(ok_sql, &[\"prefer-robust-stmts\".into()])"
+---
+Ok(
+    [],
+)
