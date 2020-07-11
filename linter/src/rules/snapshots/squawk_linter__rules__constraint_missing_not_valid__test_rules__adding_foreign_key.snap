@@ -1,5 +1,5 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/constraint_missing_not_valid.rs
 expression: "check_sql(bad_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(

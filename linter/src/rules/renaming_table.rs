@@ -20,3 +20,18 @@ pub fn renaming_table(tree: &[RootStmt]) -> Vec<RuleViolation> {
     }
     errs
 }
+
+#[cfg(test)]
+mod test_rules {
+    use crate::check_sql;
+    use insta::assert_debug_snapshot;
+
+    #[test]
+    fn test_renaming_table() {
+        let sql = r#"
+ALTER TABLE "table_name" RENAME TO "new_table_name";
+        "#;
+
+        assert_debug_snapshot!(check_sql(sql, &[]));
+    }
+}

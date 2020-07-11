@@ -30,3 +30,60 @@ pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
     }
     errs
 }
+
+#[cfg(test)]
+mod test_rules {
+    use crate::check_sql;
+    use insta::assert_debug_snapshot;
+
+    /// ```sql
+    /// -- instead of
+    /// ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
+    /// -- use `NOT VALID`
+    /// ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
+    /// ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
+    /// ```
+    #[test]
+    fn test_adding_foreign_key() {
+        let bad_sql = r#"
+-- instead of
+ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
+   "#;
+
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+
+        let ok_sql = r#"
+-- use `NOT VALID`
+ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
+ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
+   "#;
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+    }
+
+    ///
+    /// ```sql
+    /// -- instead of
+    /// ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
+    ///
+    /// -- use `NOT VALID`
+    /// ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) NOT VALID;
+    /// ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
+    /// ```
+    #[test]
+    fn test_adding_check_constraint() {
+        let bad_sql = r#"
+-- instead of
+ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
+   "#;
+
+        let ok_sql = r#"
+-- use `NOT VALID`
+ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) NOT VALID;
+ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
+   "#;
+
+        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+
+        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+    }
+}

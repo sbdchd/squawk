@@ -20,3 +20,18 @@ pub fn renaming_column(tree: &[RootStmt]) -> Vec<RuleViolation> {
     }
     errs
 }
+
+#[cfg(test)]
+mod test_rules {
+    use crate::check_sql;
+    use insta::assert_debug_snapshot;
+
+    #[test]
+    fn test_renaming_column() {
+        let sql = r#"
+ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
+        "#;
+
+        assert_debug_snapshot!(check_sql(sql, &[]));
+    }
+}

@@ -1,23 +1,23 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/require_concurrent_index_creation.rs
 expression: "check_sql(bad_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(
     [
         RuleViolation {
-            kind: ConstraintMissingNotValid,
+            kind: RequireConcurrentIndexCreation,
             span: Span {
                 start: 0,
                 len: Some(
-                    94,
+                    79,
                 ),
             },
             messages: [
                 Note(
-                    "Requires a table scan to verify constraint and an ACCESS EXCLUSIVE lock which blocks reads.",
+                    "Creating an index blocks writes.",
                 ),
                 Help(
-                    "Add NOT VALID to the constraint and then VALIDATE the constraint.",
+                    "Create the index CONCURRENTLY.",
                 ),
             ],
         },

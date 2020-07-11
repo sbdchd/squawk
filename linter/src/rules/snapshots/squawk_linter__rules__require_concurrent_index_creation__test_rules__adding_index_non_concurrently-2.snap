@@ -1,5 +1,5 @@
 ---
-source: linter/src/lib.rs
+source: linter/src/rules/require_concurrent_index_creation.rs
 expression: "check_sql(ok_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(

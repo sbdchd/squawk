@@ -48,3 +48,164 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
     }
     errs
 }
+
+#[cfg(test)]
+mod test_rules {
+    use crate::check_sql;
+    use insta::assert_debug_snapshot;
+    /// If the statement is in a transaction, or it has a guard like IF NOT
+    /// EXISTS, then it is considered valid by the `prefer-robust-stmt` rule.
+    #[test]
+    fn test_prefer_robust_stmt_okay_cases() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
+COMMIT;
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+ALTER TABLE "core_foo" ADD COLUMN IF NOT EXISTS "answer_id" integer NULL;
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+CREATE INDEX CONCURRENTLY IF NOT EXISTS "core_foo_idx" ON "core_foo" ("answer_id");
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+BEGIN;
+CREATE TABLE "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "bravo" text NOT NULL
+);
+COMMIT;
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+CREATE TABLE IF NOT EXISTS "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "bravo" text NOT NULL
+);
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        // select is fine, we're only interested in modifications to the tables
+        let sql = r#"
+SELECT 1;
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        // inserts are also okay
+        let sql = r#"
+INSERT INTO tbl VALUES (a);
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+
+        let sql = r#"
+ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
+        "#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+
+    #[test]
+    fn test_prefer_robust_stmt_failure_cases() {
+        let sql = r#"
+ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
+"#;
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        Ok(
+            [
+                RuleViolation {
+                    kind: PreferRobustStmts,
+                    span: Span {
+                        start: 0,
+                        len: Some(
+                            59,
+                        ),
+                    },
+                    messages: [
+                        Help(
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                        ),
+                    ],
+                },
+            ],
+        )
+        "###);
+
+        let sql = r#"
+CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
+"#;
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        Ok(
+            [
+                RuleViolation {
+                    kind: PreferRobustStmts,
+                    span: Span {
+                        start: 0,
+                        len: Some(
+                            69,
+                        ),
+                    },
+                    messages: [
+                        Help(
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                        ),
+                    ],
+                },
+            ],
+        )
+        "###);
+
+        let sql = r#"
+CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
+"#;
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        Ok(
+            [
+                RuleViolation {
+                    kind: PreferRobustStmts,
+                    span: Span {
+                        start: 0,
+                        len: Some(
+                            83,
+                        ),
+                    },
+                    messages: [
+                        Help(
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                        ),
+                    ],
+                },
+            ],
+        )
+        "###);
+
+        let sql = r#"
+ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
+        "#;
+        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        Ok(
+            [
+                RuleViolation {
+                    kind: PreferRobustStmts,
+                    span: Span {
+                        start: 0,
+                        len: Some(
+                            54,
+                        ),
+                    },
+                    messages: [
+                        Help(
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                        ),
+                    ],
+                },
+            ],
+        )
+        "###);
+    }
+}
