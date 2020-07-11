@@ -1,7 +1,0 @@
----
-source: linter/src/rules.rs
-expression: "check_sql(sql, &[RuleViolationKind::PreferTextField.to_string()])"
----
-Ok(
-    [],
-)
