@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.4.0 - 2020-07-19
+
+### Added
+
+- new rule `ban-char-type`
+
 ## v0.3.0 - 2020-07-10
 
 ### Changed
