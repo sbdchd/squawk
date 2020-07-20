@@ -32,7 +32,7 @@ impl std::fmt::Display for RuleViolationKind {
             Self::BanDropDatabase => "ban-drop-database",
             Self::PreferTextField => "prefer-text-field",
             Self::PreferRobustStmts => "prefer-robust-stmts",
-            Self::BanCharField => "ban-char-filed",
+            Self::BanCharField => "ban-char-field",
         };
         write!(f, "{}", str_value)
     }
