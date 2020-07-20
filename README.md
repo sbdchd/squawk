@@ -4,7 +4,8 @@
 
 ## Why?
 
-Prevent unexpected downtime caused by database migrations.
+Prevent unexpected downtime caused by database migrations and encourage best
+practices around Postgres schemas and SQL.
 
 Also it seemed like a nice project to spend more time with Rust.
 
@@ -206,6 +207,24 @@ it already exists.
 
 To appease this rule you can use guards like `IF NOT EXISTS` or wrap all your
 statements in a transaction.
+
+### `ban-char-field`
+
+Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
+
+From the postgres docs:
+
+> There is no performance difference among these three types, apart from
+> increased storage space when using the blank-padded type, and a few extra CPU
+> cycles to check the length when storing into a length-constrained column.
+> While character(n) has performance advantages in some other database systems,
+> there is no such advantage in PostgreSQL; in fact character(n) is usually the
+> slowest of the three because of its additional storage costs. In most
+> situations text or character varying should be used instead.
+
+<https://www.postgresql.org/docs/10/datatype-character.html>
+
+See the `prefer-text-field` rule for info on the advantages of `text` over `varchar`.
 
 ## Bot Setup
 

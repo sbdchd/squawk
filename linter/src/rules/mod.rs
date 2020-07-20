@@ -20,4 +20,6 @@ pub mod renaming_table;
 pub use renaming_table::*;
 pub mod require_concurrent_index_creation;
 pub use require_concurrent_index_creation::*;
+pub mod ban_char_field;
+pub use ban_char_field::*;
 mod utils;

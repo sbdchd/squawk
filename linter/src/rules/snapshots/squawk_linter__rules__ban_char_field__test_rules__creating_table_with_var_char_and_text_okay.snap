@@ -1,0 +1,7 @@
+---
+source: linter/src/rules/ban_char_field.rs
+expression: "check_sql(sql, &[\"prefer-text-field\".into()])"
+---
+Ok(
+    [],
+)

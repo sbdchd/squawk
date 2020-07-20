@@ -15,6 +15,7 @@ pub enum RuleViolationKind {
     BanDropDatabase,
     PreferTextField,
     PreferRobustStmts,
+    BanCharField,
 }
 
 impl std::fmt::Display for RuleViolationKind {
@@ -31,6 +32,7 @@ impl std::fmt::Display for RuleViolationKind {
             Self::BanDropDatabase => "ban-drop-database",
             Self::PreferTextField => "prefer-text-field",
             Self::PreferRobustStmts => "prefer-robust-stmts",
+            Self::BanCharField => "ban-char-field",
         };
         write!(f, "{}", str_value)
     }
@@ -51,6 +53,7 @@ impl std::convert::TryFrom<&str> for RuleViolationKind {
             "ban-drop-database" => Ok(Self::BanDropDatabase),
             "prefer-text-field" => Ok(Self::PreferTextField),
             "prefer-robust-stmts" => Ok(Self::PreferRobustStmts),
+            "ban-char-field" => Ok(Self::BanCharField),
             _ => Err(()),
         }
     }
