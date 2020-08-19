@@ -1161,6 +1161,14 @@ ALTER PUBLICATION name RENAME TO new_name
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
+    #[test]
+    fn test_parse_func_call() {
+        let sql = r#"
+ALTER TABLE foobar ALTER COLUMN value SET DEFAULT TO_JSON(false);
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
 
     #[test]
     fn test_create_subscription_stmt() {
