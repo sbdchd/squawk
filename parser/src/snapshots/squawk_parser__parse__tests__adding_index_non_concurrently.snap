@@ -13,7 +13,9 @@ Ok(
                         index_params: [
                             IndexElem(
                                 IndexElem {
-                                    name: "field_name",
+                                    name: Some(
+                                        "field_name",
+                                    ),
                                     expr: None,
                                     indexcolname: None,
                                     collation: None,
@@ -60,7 +62,9 @@ Ok(
                         index_params: [
                             IndexElem(
                                 IndexElem {
-                                    name: "field_name",
+                                    name: Some(
+                                        "field_name",
+                                    ),
                                     expr: None,
                                     indexcolname: None,
                                     collation: None,

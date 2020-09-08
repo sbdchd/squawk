@@ -164,9 +164,9 @@ impl Default for SortByNulls {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct IndexElem {
     /// name of attribute to index, or NULL
-    name: String,
+    name: Option<String>,
     /// expression to index, or NULL
-    expr: Option<String>,
+    expr: Option<Value>,
     /// name for index column; NULL = default
     indexcolname: Option<String>,
     /// name of collation; NIL = default
