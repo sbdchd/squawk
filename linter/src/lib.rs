@@ -1,3 +1,5 @@
+#![allow(clippy::shadow_unrelated)]
+#![allow(clippy::missing_errors_doc)]
 pub mod errors;
 pub mod rules;
 pub mod violations;
@@ -221,7 +223,7 @@ pub fn check_sql(
 mod test_rules {
     use super::*;
 
-    /// Ensure we handle both serializing and deserializing RuleViolationKind
+    /// Ensure we handle both serializing and deserializing `RuleViolationKind`
     #[test]
     fn test_parsing_rule_kind() {
         let rule_names = RULES.iter().map(|r| r.name.clone());
@@ -243,7 +245,7 @@ mod test_rules {
 
         let res = check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid parsing of SQL");
         let mut prev_span_start = -1;
-        for violation in res.iter() {
+        for violation in &res {
             assert!(violation.span.start > prev_span_start);
             prev_span_start = violation.span.start;
         }

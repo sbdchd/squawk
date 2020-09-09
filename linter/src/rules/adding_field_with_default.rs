@@ -3,6 +3,7 @@ use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, RootStmt, Stmt,
 };
 
+#[must_use]
 pub fn adding_field_with_default(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for RootStmt::RawStmt(raw_stmt) in tree {

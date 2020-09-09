@@ -79,6 +79,7 @@ pub struct RuleViolation {
 }
 
 impl RuleViolation {
+    #[must_use]
     pub fn new(
         kind: RuleViolationKind,
         node: &RawStmt,
