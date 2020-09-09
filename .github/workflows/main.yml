@@ -76,6 +76,9 @@ jobs:
       - name: Install Rust Fmt
         run: rustup component add rustfmt
 
+      - name: Install Clippy
+        run: rustup component add clippy
+
       - name: Lint
         run: ./s/lint
 
