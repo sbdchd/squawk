@@ -457,6 +457,7 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
     .into()
 }
 
+#[allow(clippy::non_ascii_literal)]
 #[cfg(test)]
 mod test_github_comment {
     use super::*;
@@ -741,7 +742,7 @@ SELECT 1;
         assert_debug_snapshot!(pretty_violations(violations, sql, filename));
     }
 
-    /// pretty_violations was slicing the SQL improperly, trimming off the first
+    /// `pretty_violations` was slicing the SQL improperly, trimming off the first
     /// letter.
     #[test]
     fn test_trimming_sql_newlines() {

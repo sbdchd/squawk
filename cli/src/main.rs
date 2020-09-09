@@ -1,3 +1,4 @@
+#![allow(clippy::match_wildcard_for_single_variants)]
 mod reporter;
 mod subcommand;
 use crate::reporter::{
