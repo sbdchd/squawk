@@ -8,10 +8,10 @@ extern crate lazy_static;
 
 use crate::errors::CheckSQLError;
 use crate::rules::{
-    adding_field_with_default, adding_not_nullable_field, ban_char_type, ban_drop_database,
-    changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
-    prefer_robust_stmts, prefer_text_field, renaming_column, renaming_table,
-    require_concurrent_index_creation,
+    adding_field_with_default, adding_not_nullable_field, adding_serial_primary_key_field,
+    ban_char_type, ban_drop_database, changing_column_type, constraint_missing_not_valid,
+    disallow_unique_constraint, prefer_robust_stmts, prefer_text_field, renaming_column,
+    renaming_table, require_concurrent_index_creation,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RootStmt;
@@ -93,6 +93,13 @@ lazy_static! {
                     "Adding a NOT NULL field requires exclusive locks and table rewrites.".into(),
                 ),
                 ViolationMessage::Help("Make the field nullable.".into())
+            ],
+        },
+        SquawkRule {
+            name: RuleViolationKind::AddingSerialPrimaryKeyField,
+            func: adding_serial_primary_key_field,
+            messages: vec![
+              // TODO(sbdchd)
             ],
         },
         // see ChangingColumnType

@@ -2,6 +2,8 @@ pub mod adding_field_with_default;
 pub use adding_field_with_default::*;
 pub mod adding_not_null_field;
 pub use adding_not_null_field::*;
+pub mod adding_serial_field;
+pub use adding_serial_field::*;
 pub mod bad_drop_database;
 pub use bad_drop_database::*;
 pub mod changing_column_type;
