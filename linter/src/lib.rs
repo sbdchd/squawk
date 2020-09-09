@@ -1,3 +1,5 @@
+#![allow(clippy::shadow_unrelated)]
+#![allow(clippy::missing_errors_doc)]
 pub mod errors;
 pub mod rules;
 pub mod violations;
@@ -6,10 +8,10 @@ extern crate lazy_static;
 
 use crate::errors::CheckSQLError;
 use crate::rules::{
-    adding_field_with_default, adding_not_nullable_field, ban_char_type, ban_drop_database,
-    changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
-    prefer_robust_stmts, prefer_text_field, renaming_column, renaming_table,
-    require_concurrent_index_creation,
+    adding_field_with_default, adding_not_nullable_field, adding_primary_key_constraint,
+    ban_char_type, ban_drop_database, changing_column_type, constraint_missing_not_valid,
+    disallow_unique_constraint, prefer_robust_stmts, prefer_text_field, renaming_column,
+    renaming_table, require_concurrent_index_creation,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RootStmt;
@@ -91,6 +93,19 @@ lazy_static! {
                     "Adding a NOT NULL field requires exclusive locks and table rewrites.".into(),
                 ),
                 ViolationMessage::Help("Make the field nullable.".into())
+            ],
+        },
+        SquawkRule {
+            name: RuleViolationKind::AddingSerialPrimaryKeyField,
+            func: adding_primary_key_constraint,
+            messages: vec![
+                ViolationMessage::Note(
+                    "Adding a PRIMARY KEY constraint results in locks and table rewrites".into(),
+                ),
+                ViolationMessage::Help(
+                    "Add the PRIMARY KEY constraint USING an index.".into(),
+                ),
+
             ],
         },
         // see ChangingColumnType
@@ -221,7 +236,7 @@ pub fn check_sql(
 mod test_rules {
     use super::*;
 
-    /// Ensure we handle both serializing and deserializing RuleViolationKind
+    /// Ensure we handle both serializing and deserializing `RuleViolationKind`
     #[test]
     fn test_parsing_rule_kind() {
         let rule_names = RULES.iter().map(|r| r.name.clone());
@@ -243,7 +258,7 @@ mod test_rules {
 
         let res = check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid parsing of SQL");
         let mut prev_span_start = -1;
-        for violation in res.iter() {
+        for violation in &res {
             assert!(violation.span.start > prev_span_start);
             prev_span_start = violation.span.start;
         }

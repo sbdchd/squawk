@@ -9,6 +9,7 @@ pub enum RuleViolationKind {
     AddingFieldWithDefault,
     ChangingColumnType,
     AddingNotNullableField,
+    AddingSerialPrimaryKeyField,
     RenamingColumn,
     RenamingTable,
     DisallowedUniqueConstraint,
@@ -29,6 +30,7 @@ impl std::fmt::Display for RuleViolationKind {
             Self::RenamingColumn => "renaming-column",
             Self::RenamingTable => "renaming-table",
             Self::DisallowedUniqueConstraint => "disallowed-unique-constraint",
+            Self::AddingSerialPrimaryKeyField => "adding-serial-primary-key-field",
             Self::BanDropDatabase => "ban-drop-database",
             Self::PreferTextField => "prefer-text-field",
             Self::PreferRobustStmts => "prefer-robust-stmts",
@@ -47,6 +49,7 @@ impl std::convert::TryFrom<&str> for RuleViolationKind {
             "adding-field-with-default" => Ok(Self::AddingFieldWithDefault),
             "changing-column-type" => Ok(Self::ChangingColumnType),
             "adding-not-nullable-field" => Ok(Self::AddingNotNullableField),
+            "adding-serial-primary-key-field" => Ok(Self::AddingSerialPrimaryKeyField),
             "renaming-column" => Ok(Self::RenamingColumn),
             "renaming-table" => Ok(Self::RenamingTable),
             "disallowed-unique-constraint" => Ok(Self::DisallowedUniqueConstraint),
@@ -79,6 +82,7 @@ pub struct RuleViolation {
 }
 
 impl RuleViolation {
+    #[must_use]
     pub fn new(
         kind: RuleViolationKind,
         node: &RawStmt,

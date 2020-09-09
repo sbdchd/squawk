@@ -12,7 +12,7 @@ fn c_ptr_to_string(str_ptr: *mut ::std::os::raw::c_char) -> Option<String> {
         unsafe { CStr::from_ptr(str_ptr) }
             .to_str()
             .ok()
-            .map(|s| s.to_owned())
+            .map(ToOwned::to_owned)
     }
 }
 
@@ -1157,6 +1157,23 @@ CREATE PUBLICATION insert_only FOR TABLE mydata
 ALTER PUBLICATION noinsert SET (publish = 'update, delete');
 ALTER PUBLICATION mypublication ADD TABLE users, departments;
 ALTER PUBLICATION name RENAME TO new_name
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+    #[test]
+    fn test_parse_func_call() {
+        let sql = r#"
+ALTER TABLE foobar ALTER COLUMN value SET DEFAULT TO_JSON(false);
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
+    fn test_json_index_operator() {
+        let sql = r#"
+CREATE INDEX CONCURRENTLY IF NOT EXISTS "idx_a_foo_bar" ON "a" ((foo->>'bar'));
 "#;
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);

@@ -502,7 +502,9 @@ Ok(
                         index_params: [
                             IndexElem(
                                 IndexElem {
-                                    name: "age",
+                                    name: Some(
+                                        "age",
+                                    ),
                                     expr: None,
                                     indexcolname: None,
                                     collation: None,

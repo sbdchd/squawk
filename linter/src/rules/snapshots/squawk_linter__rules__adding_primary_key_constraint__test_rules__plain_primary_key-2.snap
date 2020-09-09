@@ -1,5 +1,5 @@
 ---
-source: linter/src/rules/disallow_unique_constraint.rs
+source: linter/src/rules/adding_primary_key_constraint.rs
 expression: "check_sql(ok_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(
@@ -7,9 +7,9 @@ Ok(
         RuleViolation {
             kind: AddingSerialPrimaryKeyField,
             span: Span {
-                start: 77,
+                start: 0,
                 len: Some(
-                    134,
+                    75,
                 ),
             },
             messages: [

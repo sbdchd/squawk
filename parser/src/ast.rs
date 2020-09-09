@@ -164,9 +164,9 @@ impl Default for SortByNulls {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct IndexElem {
     /// name of attribute to index, or NULL
-    name: String,
+    name: Option<String>,
     /// expression to index, or NULL
-    expr: Option<String>,
+    expr: Option<Value>,
     /// name for index column; NULL = default
     indexcolname: Option<String>,
     /// name of collation; NIL = default
@@ -494,16 +494,16 @@ pub enum QualifiedName {
 }
 
 ///
-/// TypeName - specifies a type in definitions
+/// `TypeName` - specifies a type in definitions
 ///
-/// For TypeName structures generated internally, it is often easier to
-/// specify the type by OID than by name.  If "names" is NIL then the
-/// actual type OID is given by typeOid, otherwise typeOid is unused.
-/// Similarly, if "typmods" is NIL then the actual typmod is expected to
+/// For `TypeName` structures generated internally, it is often easier to
+/// specify the type by OID than by name.  If `names` is NIL then the
+/// actual type OID is given by `type_oid`, otherwise `type_oid` is unused.
+/// Similarly, if `typmods` is NIL then the actual typmod is expected to
 /// be prespecified in typemod, otherwise typemod is unused.
 ///
-/// If pct_type is true, then names is actually a field name and we look up
-/// the type of that field.  Otherwise (the normal case), names is a type
+/// If `pct_type` is true, then `names` is actually a field name and we look up
+/// the type of that field.  Otherwise (the normal case), `names` is a type
 /// name possibly qualified with schema and database name.
 ///
 #[derive(Debug, Deserialize, Serialize)]
@@ -565,6 +565,7 @@ pub struct ColumnDef {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum AlterTableDef {
+    FuncCall(Value),
     Constraint(Constraint),
     ColumnDef(ColumnDef),
     #[serde(rename = "A_Const")]
@@ -733,7 +734,7 @@ pub enum RootStmt {
 }
 
 /// case for each node type found in Postgres' parsenodes.h
-/// https://github.com/lfittl/libpg_query/blob/6b1c3a582d38701593c5cadd260445737b9f7043/src/postgres/include/nodes/parsenodes.h
+/// <https://github.com/lfittl/libpg_query/blob/6b1c3a582d38701593c5cadd260445737b9f7043/src/postgres/include/nodes/parsenodes.h>
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Deserialize, Serialize)]
 pub enum Stmt {

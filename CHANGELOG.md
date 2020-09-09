@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.5.0 - 2020-09-08
+
+### Added
+
+- new rule `adding-primary-key-field`
+
+### Fixed
+
+- parsing `->>` operator
+
+## v0.4.1 - 2020-08-19
+
+### Fixed
+
+- parse function calls in alter table statements
+
 ## v0.4.0 - 2020-07-19
 
 ### Added

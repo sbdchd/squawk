@@ -78,13 +78,12 @@ fn get_github_private_key(
     github_private_key: Option<String>,
     github_private_key_base64: Option<String>,
 ) -> Result<String, SquawkError> {
-    match github_private_key {
-        Some(private_key) => Ok(private_key),
-        None => {
-            let key = github_private_key_base64.ok_or(SquawkError::GithubPrivateKeyMissing)?;
-            let bytes = base64::decode(key)?;
-            Ok(String::from_utf8(bytes)?)
-        }
+    if let Some(private_key) = github_private_key {
+        Ok(private_key)
+    } else {
+        let key = github_private_key_base64.ok_or(SquawkError::GithubPrivateKeyMissing)?;
+        let bytes = base64::decode(key)?;
+        Ok(String::from_utf8(bytes)?)
     }
 }
 

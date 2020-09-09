@@ -2,6 +2,7 @@ use crate::rules::utils::tables_created_in_transaction;
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{AlterTableCmds, AlterTableDef, RelationKind, RootStmt, Stmt};
 
+#[must_use]
 pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let tables_created = tables_created_in_transaction(tree);

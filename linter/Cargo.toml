@@ -1,6 +1,6 @@
 [package]
 name = "squawk-linter"
-version = "0.4.0"
+version = "0.5.0"
 authors = ["Steve Dignam <steve@dignam.xyz>"]
 edition = "2018"
 license = "GPL-3.0"
@@ -13,7 +13,7 @@ keywords = ["postgres", "sql", "linter"]
 
 [dependencies]
 serde = { version = "1.0", features = ["derive"] }
-squawk-parser = { version = "0.4.0", path = "../parser" }
+squawk-parser = { version = "0.5.0", path = "../parser" }
 lazy_static = "1.4.0"
 
 [dev-dependencies]

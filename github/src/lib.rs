@@ -1,3 +1,6 @@
+#![allow(clippy::doc_markdown)]
+#![allow(clippy::missing_errors_doc)]
+#![allow(clippy::single_match_else)]
 use jsonwebtoken::{Algorithm, EncodingKey, Header};
 use log::info;
 use reqwest::header::{ACCEPT, AUTHORIZATION};

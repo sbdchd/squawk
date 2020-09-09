@@ -2,6 +2,7 @@ use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{RootStmt, Stmt};
 
 /// Brad's Rule aka ban dropping database statements.
+#[must_use]
 pub fn ban_drop_database(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for RootStmt::RawStmt(raw_stmt) in tree {
