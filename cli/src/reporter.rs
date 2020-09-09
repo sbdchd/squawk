@@ -372,7 +372,7 @@ pub fn explain_rule<W: io::Write>(writer: &mut W, name: &str) -> Result<(), std:
     Ok(())
 }
 
-fn get_violations_emoji(count: usize) -> &'static str {
+const fn get_violations_emoji(count: usize) -> &'static str {
     if count > 0 {
         "🚒"
     } else {
