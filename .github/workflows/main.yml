@@ -73,6 +73,9 @@ jobs:
           default: true
           override: true
 
+      - name: Install Rust Fmt
+        run: rustup component add rustfmt
+
       - name: Lint
         run: ./s/lint
 
