@@ -57,7 +57,7 @@ pub fn dump_ast_for_paths<W: io::Write>(
     f: &mut W,
     paths: &[String],
     is_stdin: bool,
-    dump_ast: DumpAstOption,
+    dump_ast: &DumpAstOption,
 ) -> Result<(), DumpAstError> {
     let mut process_dump_ast = |sql: &str| -> Result<(), DumpAstError> {
         match dump_ast {
@@ -193,8 +193,7 @@ fn fmt_gcc<W: io::Write>(
                 .iter()
                 .map(|v| {
                     match v {
-                        ViolationMessage::Note(s) => s,
-                        ViolationMessage::Help(s) => s,
+                        ViolationMessage::Note(s) | ViolationMessage::Help(s) => s,
                     }
                     .to_string()
                 })
@@ -308,7 +307,7 @@ pub fn pretty_violations(
                 // 1-indexed
                 let lineno = sql[..start].lines().count() + 1;
 
-                let content = &sql[start..start + len + 1];
+                let content = &sql[start..=start + len];
 
                 // TODO(sbdchd): could remove the leading whitespace and comments to
                 // get cleaner reports
@@ -457,7 +456,6 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
     .into()
 }
 
-#[allow(clippy::non_ascii_literal)]
 #[cfg(test)]
 mod test_github_comment {
     use super::*;
