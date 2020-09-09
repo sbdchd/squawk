@@ -4,7 +4,7 @@ use squawk_parser::ast::{
 };
 
 #[must_use]
-pub fn adding_serial_primary_key_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn adding_primary_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
@@ -46,10 +46,6 @@ mod test_rules {
     use crate::check_sql;
     use insta::assert_debug_snapshot;
 
-    ///
-    /// ```sql
-    /// ALTER TABLE a ADD COLUMN IF NOT EXISTS b SERIAL PRIMARY KEY;
-    /// ```
     #[test]
     fn test_serial_primary_key() {
         let bad_sql = r#"
