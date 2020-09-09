@@ -30,26 +30,26 @@ arg_enum! {
 
 #[derive(Debug)]
 pub enum DumpAstError {
-    PGQueryError(PGQueryError),
-    IoError(std::io::Error),
-    JsonError(serde_json::error::Error),
+    PGQuery(PGQueryError),
+    Io(std::io::Error),
+    Json(serde_json::error::Error),
 }
 
 impl std::convert::From<PGQueryError> for DumpAstError {
     fn from(e: PGQueryError) -> Self {
-        Self::PGQueryError(e)
+        Self::PGQuery(e)
     }
 }
 
 impl std::convert::From<std::io::Error> for DumpAstError {
     fn from(e: std::io::Error) -> Self {
-        Self::IoError(e)
+        Self::Io(e)
     }
 }
 
 impl std::convert::From<serde_json::error::Error> for DumpAstError {
     fn from(e: serde_json::error::Error) -> Self {
-        Self::JsonError(e)
+        Self::Json(e)
     }
 }
 

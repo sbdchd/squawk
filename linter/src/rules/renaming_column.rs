@@ -1,6 +1,7 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{ObjectType, RootStmt, Stmt};
 
+#[must_use]
 pub fn renaming_column(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for RootStmt::RawStmt(raw_stmt) in tree {

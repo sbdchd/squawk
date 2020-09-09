@@ -4,6 +4,7 @@ use squawk_parser::ast::{ColumnDefTypeName, QualifiedName, RootStmt, Stmt, Table
 /// It's easier to update the check constraint on a text field than a varchar()
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
 /// call.
+#[must_use]
 pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for RootStmt::RawStmt(raw_stmt) in tree {
