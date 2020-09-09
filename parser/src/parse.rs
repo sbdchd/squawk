@@ -12,7 +12,7 @@ fn c_ptr_to_string(str_ptr: *mut ::std::os::raw::c_char) -> Option<String> {
         unsafe { CStr::from_ptr(str_ptr) }
             .to_str()
             .ok()
-            .map(|s| s.to_owned())
+            .map(ToOwned::to_owned)
     }
 }
 

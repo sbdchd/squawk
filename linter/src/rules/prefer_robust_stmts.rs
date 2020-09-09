@@ -7,6 +7,7 @@ use squawk_parser::ast::{AlterTableCmds, RootStmt, Stmt, TransactionStmtKind};
 /// when we CREATE INDEX CONCURRENTLY, we should try and make those migrations
 /// more robust by using guards like `IF NOT EXISTS`. So if the migration fails
 /// halfway through, it can be rerun without human intervention.
+#[must_use]
 pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let mut inside_transaction = false;
