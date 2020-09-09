@@ -79,6 +79,9 @@ jobs:
       - name: Install Clippy
         run: rustup component add clippy
 
+      - name: Get Clippy Version
+        run: cargo clippy --version
+
       - name: Lint
         run: ./s/lint
 

@@ -1171,6 +1171,15 @@ ALTER TABLE foobar ALTER COLUMN value SET DEFAULT TO_JSON(false);
     }
 
     #[test]
+    fn test_json_index_operator() {
+        let sql = r#"
+CREATE INDEX CONCURRENTLY IF NOT EXISTS "idx_a_foo_bar" ON "a" ((foo->>'bar'));
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
     fn test_create_subscription_stmt() {
         let sql = r#"
 CREATE SUBSCRIPTION mysub

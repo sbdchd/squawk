@@ -1,3 +1,6 @@
+#![allow(clippy::match_wildcard_for_single_variants)]
+#[allow(clippy::non_ascii_literal)]
+#[allow(clippy::cast_sign_loss)]
 mod reporter;
 mod subcommand;
 use crate::reporter::{
@@ -84,7 +87,7 @@ fn main() {
                 &mut handle,
                 &opts.paths,
                 is_stdin,
-                dump_ast_kind,
+                &dump_ast_kind,
             ));
         } else {
             match check_files(&opts.paths, is_stdin, opts.stdin_filepath, opts.exclude) {
