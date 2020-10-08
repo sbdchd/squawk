@@ -1410,7 +1410,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "squawk"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "atty 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "base64 0.12.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1420,15 +1420,15 @@ dependencies = [
  "serde 1.0.114 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.55 (registry+https://github.com/rust-lang/crates.io-index)",
  "simplelog 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "squawk-github 0.5.0",
- "squawk-linter 0.5.0",
- "squawk-parser 0.5.0",
+ "squawk-github 0.5.1",
+ "squawk-linter 0.5.1",
+ "squawk-parser 0.5.1",
  "structopt 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
 name = "squawk-github"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "jsonwebtoken 7.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1439,17 +1439,17 @@ dependencies = [
 
 [[package]]
 name = "squawk-linter"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "insta 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.114 (registry+https://github.com/rust-lang/crates.io-index)",
- "squawk-parser 0.5.0",
+ "squawk-parser 0.5.1",
 ]
 
 [[package]]
 name = "squawk-parser"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "insta 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libpg_query-sys 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
