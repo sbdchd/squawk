@@ -1420,9 +1420,9 @@ dependencies = [
  "serde 1.0.114 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_json 1.0.55 (registry+https://github.com/rust-lang/crates.io-index)",
  "simplelog 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "squawk-github 0.5.0",
- "squawk-linter 0.5.0",
- "squawk-parser 0.5.0",
+ "squawk-github 0.5.1",
+ "squawk-linter 0.5.1",
+ "squawk-parser 0.5.1",
  "structopt 0.3.15 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -1444,7 +1444,7 @@ dependencies = [
  "insta 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.114 (registry+https://github.com/rust-lang/crates.io-index)",
- "squawk-parser 0.5.0",
+ "squawk-parser 0.5.1",
 ]
 
 [[package]]
@@ -1505,7 +1505,7 @@ dependencies = [
 
 [[package]]
 name = "syn-mid"
-version = "0.5.1"
+version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 1.0.18 (registry+https://github.com/rust-lang/crates.io-index)",
