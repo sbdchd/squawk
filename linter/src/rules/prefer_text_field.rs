@@ -1,5 +1,8 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{ColumnDefTypeName, QualifiedName, RootStmt, Stmt, TableElt};
+use squawk_parser::ast::{
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDef, ColumnDefTypeName, QualifiedName,
+    RawStmt, RootStmt, Stmt, TableElt,
+};
 
 /// It's easier to update the check constraint on a text field than a varchar()
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
@@ -11,14 +14,16 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
         match &raw_stmt.stmt {
             Stmt::CreateStmt(stmt) => {
                 for TableElt::ColumnDef(column_def) in &stmt.table_elts {
-                    let ColumnDefTypeName::TypeName(type_name) = &column_def.type_name;
-                    for QualifiedName::String(field_type_name) in &type_name.names {
-                        if field_type_name.str == "varchar" {
-                            errs.push(RuleViolation::new(
-                                RuleViolationKind::PreferTextField,
-                                raw_stmt,
-                                None,
-                            ));
+                    check_column_def(&mut errs, raw_stmt, column_def)
+                }
+            }
+            Stmt::AlterTableStmt(stmt) => {
+                for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
+                    if cmd.subtype == AlterTableType::AddColumn {
+                        if let Some(def) = &cmd.def {
+                            if let AlterTableDef::ColumnDef(column_def) = def {
+                                check_column_def(&mut errs, raw_stmt, column_def)
+                            }
                         }
                     }
                 }
@@ -27,6 +32,19 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
         }
     }
     errs
+}
+
+fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
+    let ColumnDefTypeName::TypeName(type_name) = &column_def.type_name;
+    for QualifiedName::String(field_type_name) in &type_name.names {
+        if field_type_name.str == "varchar" {
+            errs.push(RuleViolation::new(
+                RuleViolationKind::PreferTextField,
+                raw_stmt,
+                None,
+            ));
+        }
+    }
 }
 
 #[cfg(test)]
@@ -158,5 +176,20 @@ COMMIT;"#;
             [],
         )
         "###);
+    }
+
+    #[test]
+    fn test_adding_column_non_text() {
+        let bad_sql = r#"
+BEGIN;
+ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
+COMMIT;
+"#;
+
+        let res = check_sql(bad_sql, &[]);
+        assert!(res.is_ok());
+        let data = res.unwrap_or(vec![]);
+        assert!(data.len() > 0);
+        assert_debug_snapshot!(data);
     }
 }
