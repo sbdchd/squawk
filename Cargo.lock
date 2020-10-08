@@ -1410,7 +1410,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "squawk"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "atty 0.2.14 (registry+https://github.com/rust-lang/crates.io-index)",
  "base64 0.12.3 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1428,7 +1428,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-github"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "jsonwebtoken 7.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1439,7 +1439,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-linter"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "insta 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "lazy_static 1.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1449,7 +1449,7 @@ dependencies = [
 
 [[package]]
 name = "squawk-parser"
-version = "0.5.0"
+version = "0.5.1"
 dependencies = [
  "insta 0.16.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libpg_query-sys 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1505,7 +1505,7 @@ dependencies = [
 
 [[package]]
 name = "syn-mid"
-version = "0.5.0"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "proc-macro2 1.0.18 (registry+https://github.com/rust-lang/crates.io-index)",
