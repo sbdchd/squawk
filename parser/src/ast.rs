@@ -679,6 +679,7 @@ pub struct RenameStmt {
 #[derive(Debug, Deserialize, Serialize)]
 pub enum TableElt {
     ColumnDef(ColumnDef),
+    Constraint(Constraint),
 }
 
 /// What to do at commit time for temporary relations

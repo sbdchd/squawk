@@ -13,8 +13,10 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
             Stmt::CreateStmt(stmt) => {
-                for TableElt::ColumnDef(column_def) in &stmt.table_elts {
-                    check_column_def(&mut errs, raw_stmt, column_def)
+                for column_def in &stmt.table_elts {
+                    if let TableElt::ColumnDef(column_def) = column_def {
+                        check_column_def(&mut errs, raw_stmt, column_def)
+                    }
                 }
             }
             Stmt::AlterTableStmt(stmt) => {

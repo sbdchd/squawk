@@ -7,15 +7,17 @@ pub fn ban_char_type(tree: &[RootStmt]) -> Vec<RuleViolation> {
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
             Stmt::CreateStmt(stmt) => {
-                for TableElt::ColumnDef(column_def) in &stmt.table_elts {
-                    let ColumnDefTypeName::TypeName(type_name) = &column_def.type_name;
-                    for QualifiedName::String(field_type_name) in &type_name.names {
-                        if field_type_name.str == "bpchar" {
-                            errs.push(RuleViolation::new(
-                                RuleViolationKind::BanCharField,
-                                raw_stmt,
-                                None,
-                            ));
+                for column_def in &stmt.table_elts {
+                    if let TableElt::ColumnDef(column_def) = column_def {
+                        let ColumnDefTypeName::TypeName(type_name) = &column_def.type_name;
+                        for QualifiedName::String(field_type_name) in &type_name.names {
+                            if field_type_name.str == "bpchar" {
+                                errs.push(RuleViolation::new(
+                                    RuleViolationKind::BanCharField,
+                                    raw_stmt,
+                                    None,
+                                ));
+                            }
                         }
                     }
                 }
