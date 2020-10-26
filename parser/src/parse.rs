@@ -1208,4 +1208,18 @@ DROP SUBSCRIPTION mysub;
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
+
+    #[test]
+    fn test_parse_create_table_regression() {
+        let sql = r#"
+CREATE TABLE example (
+    a integer,
+    b integer,
+    c integer,
+    PRIMARY KEY (a, c)
+);
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
 }
