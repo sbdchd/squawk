@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.5.2 - 2020-10-26
+
+### Fixed
+
+- parsing of create table with primary key constraint on two fields
+
 ## v0.5.1 - 2020-10-07
 
 ### Fixed
