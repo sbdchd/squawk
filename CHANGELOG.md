@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.5.3 - 2021-01-04
+
+### Fixed
+
+- parsing of alter table with type cast
+
 ## v0.5.2 - 2020-10-26
 
 ### Fixed
