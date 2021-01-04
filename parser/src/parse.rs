@@ -1064,6 +1064,16 @@ CREATE CAST (bigint AS int4) WITH FUNCTION int4(bigint) AS ASSIGNMENT;
     }
 
     #[test]
+    fn regression_update_table() {
+        let sql = r#"
+        ALTER TABLE "table_name" ALTER COLUMN "column_name" SET DEFAULT false;
+        "#;
+        let res = parse_sql_query(sql);
+        assert!(matches!(res, Ok(_)));
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
     fn test_create_transform_stmt() {
         let sql = r#"
 CREATE TRANSFORM FOR hstore LANGUAGE plpythonu (

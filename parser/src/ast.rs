@@ -565,6 +565,7 @@ pub struct ColumnDef {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub enum AlterTableDef {
+    TypeCast(Value),
     FuncCall(Value),
     Constraint(Constraint),
     ColumnDef(ColumnDef),
