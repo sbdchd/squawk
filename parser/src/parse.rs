@@ -1220,6 +1220,22 @@ DROP SUBSCRIPTION mysub;
     }
 
     #[test]
+    fn parse_inh() {
+        let sql = r#"
+ALTER TABLE ONLY public.tasks
+    DROP CONSTRAINT tasks_fk,
+    ADD CONSTRAINT tasks_fk
+        FOREIGN KEY (job_id) REFERENCES public.jobs(external_id)
+            ON DELETE CASCADE NOT VALID;
+
+ALTER TABLE public.tasks VALIDATE CONSTRAINT tasks_fk;
+"#;
+        let res = parse_sql_query(sql);
+        assert!(res.is_ok());
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
     fn test_parse_create_table_regression() {
         let sql = r#"
 CREATE TABLE example (
