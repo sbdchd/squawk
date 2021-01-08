@@ -1,4 +1,4 @@
-# squawk [![cargo-badge](https://img.shields.io/crates/v/squawk.svg)](https://crates.io/crates/squawk) ![Rust CI](https://github.com/sbdchd/squawk/workflows/Rust%20CI/badge.svg)
+# squawk [![cargo-badge](https://img.shields.io/crates/v/squawk.svg)](https://crates.io/crates/squawk) ![npm](https://img.shields.io/npm/v/squawk-cli) ![Rust CI](https://github.com/sbdchd/squawk/workflows/Rust%20CI/badge.svg)
 
 > linter for Postgres migrations
 
