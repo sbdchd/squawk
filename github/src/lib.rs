@@ -99,6 +99,19 @@ pub enum GithubError {
     HttpError(reqwest::Error),
 }
 
+impl std::fmt::Display for GithubError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            Self::JsonWebTokenCreation(ref err) => {
+                write!(f, "{}", format!("Could not create JWT: {}", err))
+            }
+            Self::HttpError(ref err) => {
+                write!(f, "{}", format!("Problem calling GitHub API: {}", err))
+            }
+        }
+    }
+}
+
 impl std::convert::From<reqwest::Error> for GithubError {
     fn from(e: reqwest::Error) -> Self {
         Self::HttpError(e)

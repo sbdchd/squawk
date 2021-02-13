@@ -38,9 +38,9 @@ pub enum DumpAstError {
 impl std::fmt::Display for DumpAstError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::PGQuery(ref err) => write!(f, "{}", format!("Failed to dump AST: {}", err)),
-            Self::Io(ref err) => write!(f, "{}", format!("Failed to dump AST: {}", err)),
-            Self::Json(ref err) => write!(f, "{}", format!("Failed to dump AST: {}", err)),
+            Self::PGQuery(ref err) => err.fmt(f),
+            Self::Io(ref err) => err.fmt(f),
+            Self::Json(ref err) => err.fmt(f),
         }
     }
 }
@@ -106,9 +106,7 @@ pub enum CheckFilesError {
 impl std::fmt::Display for CheckFilesError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::CheckSQL(ref err) => {
-                write!(f, "{}", format!("Problem linting SQL files: {}", err))
-            }
+            Self::CheckSQL(ref err) => err.fmt(f),
             Self::IoError(ref err) => err.fmt(f),
         }
     }
