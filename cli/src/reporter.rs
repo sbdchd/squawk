@@ -93,6 +93,16 @@ pub enum CheckFilesError {
     IoError(std::io::Error),
 }
 
+impl std::fmt::Display for CheckFilesError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            Self::CheckSQL(ref err) => {
+                write!(f, "{}", format!("Problem linting SQL files: {}", err))
+            }
+            Self::IoError(ref err) => err.fmt(f),
+        }
+    }
+}
 impl std::convert::From<std::io::Error> for CheckFilesError {
     fn from(e: std::io::Error) -> Self {
         Self::IoError(e)
