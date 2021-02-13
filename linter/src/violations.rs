@@ -7,6 +7,7 @@ pub enum RuleViolationKind {
     RequireConcurrentIndexCreation,
     ConstraintMissingNotValid,
     AddingFieldWithDefault,
+    AddingForeignKeyConstraint,
     ChangingColumnType,
     AddingNotNullableField,
     AddingSerialPrimaryKeyField,
@@ -35,6 +36,7 @@ impl std::fmt::Display for RuleViolationKind {
             Self::PreferTextField => "prefer-text-field",
             Self::PreferRobustStmts => "prefer-robust-stmts",
             Self::BanCharField => "ban-char-field",
+            Self::AddingForeignKeyConstraint => "adding-foreign-key-constraint",
         };
         write!(f, "{}", str_value)
     }
@@ -57,6 +59,7 @@ impl std::convert::TryFrom<&str> for RuleViolationKind {
             "prefer-text-field" => Ok(Self::PreferTextField),
             "prefer-robust-stmts" => Ok(Self::PreferRobustStmts),
             "ban-char-field" => Ok(Self::BanCharField),
+            "adding-foreign-key-constraint" => Ok(Self::AddingForeignKeyConstraint),
             _ => Err(()),
         }
     }

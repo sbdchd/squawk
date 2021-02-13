@@ -8,10 +8,10 @@ extern crate lazy_static;
 
 use crate::errors::CheckSQLError;
 use crate::rules::{
-    adding_field_with_default, adding_not_nullable_field, adding_primary_key_constraint,
-    ban_char_type, ban_drop_database, changing_column_type, constraint_missing_not_valid,
-    disallow_unique_constraint, prefer_robust_stmts, prefer_text_field, renaming_column,
-    renaming_table, require_concurrent_index_creation,
+    adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
+    adding_primary_key_constraint, ban_char_type, ban_drop_database, changing_column_type,
+    constraint_missing_not_valid, disallow_unique_constraint, prefer_robust_stmts,
+    prefer_text_field, renaming_column, renaming_table, require_concurrent_index_creation,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RootStmt;
@@ -205,6 +205,15 @@ lazy_static! {
             messages: vec![
                 ViolationMessage::Help(
                     "Use text or varchar instead.".into()
+                ),
+            ]
+        },
+        SquawkRule {
+            name: RuleViolationKind::AddingForeignKeyConstraint,
+            func: adding_foreign_key_constraint,
+            messages: vec![
+                ViolationMessage::Help(
+                    "Adding a FOREIGN KEY CONSTRAINT requires a SHARE ROW EXCLUSIVE lock on the referenced table. Consider ...".into()
                 ),
             ]
         }

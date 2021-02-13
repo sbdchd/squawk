@@ -1,0 +1,99 @@
+use crate::violations::{RuleViolation, RuleViolationKind};
+use squawk_parser::ast::{ConstrType, ObjectType, RootStmt, Stmt, TableElt};
+
+#[must_use]
+pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
+    let mut errs = vec![];
+    for RootStmt::RawStmt(raw_stmt) in tree {
+        match &raw_stmt.stmt {
+            Stmt::CreateStmt(stmt) => {
+                for elt in &stmt.table_elts {
+                    match elt {
+                        TableElt::Constraint(constraint) => match constraint.contype {
+                            ConstrType::Foreign => {
+                                errs.push(RuleViolation::new(
+                                    RuleViolationKind::AddingForeignKeyConstraint,
+                                    raw_stmt,
+                                    None,
+                                ));
+                            }
+                            _ => {}
+                        },
+                        _ => {}
+                    }
+                }
+            }
+            _ => continue,
+        }
+    }
+    errs
+}
+
+#[cfg(test)]
+mod test_rules {
+    use crate::{
+        check_sql,
+        violations::{RuleViolation, RuleViolationKind},
+    };
+    use insta::assert_debug_snapshot;
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql(sql, &[])
+            .unwrap()
+            .into_iter()
+            .filter(|x| x.kind == RuleViolationKind::AddingForeignKeyConstraint)
+            .collect()
+    }
+    #[test]
+    fn test_create_table_with_foreign_key_constraint() {
+        let sql = r#"
+BEGIN;
+CREATE TABLE email (
+    id BIGINT GENERATED ALWAYS AS IDENTITY,
+    user_id BIGINT,
+    email TEXT,
+    PRIMARY KEY(id),
+    CONSTRAINT fk_user
+        FOREIGN KEY ("user_id") 
+        REFERENCES "user" ("id")
+);
+COMMIT;
+        "#;
+
+        let violations = lint_sql(sql);
+        assert_eq!(violations.len(), 1);
+        assert_eq!(
+            violations[0].kind,
+            RuleViolationKind::AddingForeignKeyConstraint
+        );
+    }
+    #[test]
+    fn test_add_foreign_key_constraint_not_valid_validate() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE "email" ADD COLUMN "user_id" INT;
+ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "user" ("id") NOT VALID;
+ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
+COMMIT;
+        "#;
+
+        let violations = lint_sql(sql);
+        assert_eq!(violations.len(), 0);
+    }
+    #[test]
+    fn test_add_foreign_key_constraint_lock() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE "email" ADD COLUMN "user_id" INT;
+ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+COMMIT;
+        "#;
+
+        let violations = lint_sql(sql);
+        assert_eq!(violations.len(), 1);
+        assert_eq!(
+            violations[0].kind,
+            RuleViolationKind::AddingForeignKeyConstraint
+        );
+    }
+}

@@ -24,4 +24,6 @@ pub mod require_concurrent_index_creation;
 pub use require_concurrent_index_creation::*;
 pub mod ban_char_field;
 pub use ban_char_field::*;
+pub mod adding_foreign_key_constraint;
+pub use adding_foreign_key_constraint::*;
 mod utils;
