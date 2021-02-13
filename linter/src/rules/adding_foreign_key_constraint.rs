@@ -25,27 +25,22 @@ pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                 for cmd in &stmt.cmds {
                     match cmd {
                         AlterTableCmds::AlterTableCmd(ref command) => {
-                            match command.subtype {
-                                AlterTableType::AddConstraint => {
-                                    if let Some(def) = &command.def {
-                                        match def {
-                                            AlterTableDef::Constraint(constraint) => {
-                                                // Adding foreign key is okay when NOT VALID is specified.
-                                                if constraint.skip_validation {
-                                                    continue;
-                                                }
-                                                match constraint.contype {
-                                                ConstrType::Foreign => {
-                                                    errs.push(RuleViolation::new(RuleViolationKind::AddingForeignKeyConstraint, raw_stmt,None))
-                                                },
-                                                _ => {}
-                                            }
-                                            }
-                                            _ => {}
+                            if let AlterTableType::AddConstraint = command.subtype {
+                                if let Some(def) = &command.def {
+                                    if let AlterTableDef::Constraint(constraint) = def {
+                                        // Adding foreign key is okay when NOT VALID is specified.
+                                        if constraint.skip_validation {
+                                            continue;
+                                        }
+                                        if constraint.contype == ConstrType::Foreign {
+                                            errs.push(RuleViolation::new(
+                                                RuleViolationKind::AddingForeignKeyConstraint,
+                                                raw_stmt,
+                                                None,
+                                            ))
                                         }
                                     }
                                 }
-                                _ => {}
                             }
                         }
                     }
