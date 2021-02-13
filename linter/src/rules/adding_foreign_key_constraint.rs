@@ -1,5 +1,7 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{ConstrType, ObjectType, RootStmt, Stmt, TableElt};
+use squawk_parser::ast::{
+    AlterTableCmds, AlterTableDef, AlterTableType, ConstrType, RootStmt, Stmt, TableElt,
+};
 
 #[must_use]
 pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
@@ -23,6 +25,36 @@ pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     }
                 }
             }
+            Stmt::AlterTableStmt(stmt) => {
+                for cmd in &stmt.cmds {
+                    match cmd {
+                        AlterTableCmds::AlterTableCmd(ref command) => {
+                            match command.subtype {
+                                AlterTableType::AddConstraint => {
+                                    if let Some(def) = &command.def {
+                                        match def {
+                                            AlterTableDef::Constraint(constraint) => {
+                                                // Adding foreign key is okay when NOT VALID is specified.
+                                                if constraint.skip_validation {
+                                                    continue;
+                                                }
+                                                match constraint.contype {
+                                                ConstrType::Foreign => {
+                                                    errs.push(RuleViolation::new(RuleViolationKind::AddingForeignKeyConstraint, raw_stmt,None))
+                                                },
+                                                _ => {}
+                                            }
+                                            }
+                                            _ => {}
+                                        }
+                                    }
+                                }
+                                _ => {}
+                            }
+                        }
+                    }
+                }
+            }
             _ => continue,
         }
     }
@@ -35,7 +67,6 @@ mod test_rules {
         check_sql,
         violations::{RuleViolation, RuleViolationKind},
     };
-    use insta::assert_debug_snapshot;
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql(sql, &[])
