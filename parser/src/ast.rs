@@ -196,6 +196,7 @@ pub struct RangeVar {
     /// the relation/sequence name
     pub relname: String,
     /// expand rel by inheritance? recursively act on children?
+    #[serde(default)]
     pub inh: bool,
     /// see RELPERSISTENCE_* in pg_class.h
     pub relpersistence: String,

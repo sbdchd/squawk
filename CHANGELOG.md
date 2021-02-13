@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.5.4 - 2021-01-08
+
+### Fixed
+
+- parsing of RangeVar with missing inh field
+
 ## v0.5.3 - 2021-01-04
 
 ### Fixed
