@@ -14,11 +14,11 @@ use std::io;
 use std::process;
 use structopt::StructOpt;
 
-fn handle_exit_err<E: std::fmt::Debug>(res: Result<(), E>) -> ! {
+fn exit<E: std::fmt::Display, T>(res: Result<T, E>, msg: &str) -> ! {
     match res {
         Ok(_) => process::exit(0),
         Err(err) => {
-            eprintln!("{:#?}", err);
+            eprintln!("{}: {}", msg, err);
             process::exit(1)
         }
     }
@@ -74,21 +74,16 @@ fn main() {
 
     let is_stdin = !atty::is(Stream::Stdin);
     if let Some(subcommand) = opts.cmd {
-        match check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath) {
-            Ok(_) => process::exit(0),
-            Err(err) => {
-                eprintln!("{:#?}", err);
-                process::exit(1);
-            }
-        }
+        exit(
+            check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath),
+            "Upload to GitHub failed",
+        );
     } else if !opts.paths.is_empty() || is_stdin {
         if let Some(dump_ast_kind) = opts.dump_ast {
-            handle_exit_err(dump_ast_for_paths(
-                &mut handle,
-                &opts.paths,
-                is_stdin,
-                &dump_ast_kind,
-            ));
+            exit(
+                dump_ast_for_paths(&mut handle, &opts.paths, is_stdin, &dump_ast_kind),
+                "Failed to dump AST",
+            );
         } else {
             match check_files(&opts.paths, is_stdin, opts.stdin_filepath, opts.exclude) {
                 Ok(file_reports) => {
@@ -103,21 +98,24 @@ fn main() {
                             process::exit(exit_code);
                         }
                         Err(e) => {
-                            eprintln!("{:#?}", e);
+                            eprintln!("Problem reporting violations: {}", e);
                             process::exit(1);
                         }
                     }
                 }
                 Err(e) => {
-                    eprintln!("{}", e);
+                    eprintln!("Problem linting SQL files: {}", e);
                     process::exit(1)
                 }
             }
         }
     } else if opts.list_rules {
-        handle_exit_err(list_rules(&mut handle));
+        exit(list_rules(&mut handle), "Could not list rules");
     } else if let Some(rule_name) = opts.explain {
-        handle_exit_err(explain_rule(&mut handle, &rule_name));
+        exit(
+            explain_rule(&mut handle, &rule_name),
+            "Could not explain rules",
+        );
     } else {
         clap_app.print_long_help().expect("problem printing help");
         println!();

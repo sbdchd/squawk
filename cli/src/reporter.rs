@@ -35,6 +35,16 @@ pub enum DumpAstError {
     Json(serde_json::error::Error),
 }
 
+impl std::fmt::Display for DumpAstError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            Self::PGQuery(ref err) => err.fmt(f),
+            Self::Io(ref err) => err.fmt(f),
+            Self::Json(ref err) => err.fmt(f),
+        }
+    }
+}
+
 impl std::convert::From<PGQueryError> for DumpAstError {
     fn from(e: PGQueryError) -> Self {
         Self::PGQuery(e)
@@ -96,9 +106,7 @@ pub enum CheckFilesError {
 impl std::fmt::Display for CheckFilesError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::CheckSQL(ref err) => {
-                write!(f, "{}", format!("Problem linting SQL files: {}", err))
-            }
+            Self::CheckSQL(ref err) => err.fmt(f),
             Self::IoError(ref err) => err.fmt(f),
         }
     }

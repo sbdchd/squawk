@@ -8,9 +8,34 @@ use structopt::StructOpt;
 pub enum SquawkError {
     CheckFilesError(CheckFilesError),
     GithubError(GithubError),
-    Base64DecodeError(base64::DecodeError),
-    ByteDecodeError(std::string::FromUtf8Error),
+    GithubPrivateKeyBase64DecodeError(base64::DecodeError),
+    GithubPrivateKeyDecodeError(std::string::FromUtf8Error),
     GithubPrivateKeyMissing,
+}
+
+impl std::fmt::Display for SquawkError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            Self::CheckFilesError(ref err) => {
+                write!(f, "{}", format!("Failed to dump AST: {}", err))
+            }
+            Self::GithubError(ref err) => err.fmt(f),
+            Self::GithubPrivateKeyBase64DecodeError(ref err) => write!(
+                f,
+                "{}",
+                format!(
+                    "Failed to decode GitHub private key from base64 encoding: {}",
+                    err
+                )
+            ),
+            Self::GithubPrivateKeyDecodeError(ref err) => write!(
+                f,
+                "{}",
+                format!("Could not decode GitHub private key to string: {}", err)
+            ),
+            Self::GithubPrivateKeyMissing => write!(f, "Missing GitHub private key"),
+        }
+    }
 }
 
 impl std::convert::From<GithubError> for SquawkError {
@@ -22,18 +47,6 @@ impl std::convert::From<GithubError> for SquawkError {
 impl std::convert::From<CheckFilesError> for SquawkError {
     fn from(e: CheckFilesError) -> Self {
         Self::CheckFilesError(e)
-    }
-}
-
-impl std::convert::From<base64::DecodeError> for SquawkError {
-    fn from(e: base64::DecodeError) -> Self {
-        Self::Base64DecodeError(e)
-    }
-}
-
-impl std::convert::From<std::string::FromUtf8Error> for SquawkError {
-    fn from(e: std::string::FromUtf8Error) -> Self {
-        Self::ByteDecodeError(e)
     }
 }
 
@@ -82,8 +95,9 @@ fn get_github_private_key(
         Ok(private_key)
     } else {
         let key = github_private_key_base64.ok_or(SquawkError::GithubPrivateKeyMissing)?;
-        let bytes = base64::decode(key)?;
-        Ok(String::from_utf8(bytes)?)
+        let bytes =
+            base64::decode(key).map_err(|e| SquawkError::GithubPrivateKeyBase64DecodeError(e))?;
+        Ok(String::from_utf8(bytes).map_err(|e| SquawkError::GithubPrivateKeyDecodeError(e))?)
     }
 }
 
