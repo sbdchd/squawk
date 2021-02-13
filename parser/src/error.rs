@@ -36,12 +36,6 @@ impl std::convert::From<serde_json::error::Error> for PGQueryError {
     }
 }
 
-impl std::convert::From<std::ffi::IntoStringError> for PGQueryError {
-    fn from(_: std::ffi::IntoStringError) -> Self {
-        Self::ParsingCString
-    }
-}
-
 impl std::convert::From<std::str::Utf8Error> for PGQueryError {
     fn from(_: std::str::Utf8Error) -> Self {
         Self::ParsingCString
