@@ -1,20 +1,9 @@
 use crate::ast::RootStmt;
-use crate::error::{PGQueryError, ParseError};
+use crate::error::PGQueryError;
 use libpg_query::{pg_query_free_parse_result, pg_query_parse};
 use serde::Deserialize;
 use serde_json::Value;
 use std::ffi::{CStr, CString};
-
-fn c_ptr_to_string(str_ptr: *mut ::std::os::raw::c_char) -> Option<String> {
-    if str_ptr.is_null() {
-        None
-    } else {
-        unsafe { CStr::from_ptr(str_ptr) }
-            .to_str()
-            .ok()
-            .map(ToOwned::to_owned)
-    }
-}
 
 fn parse_sql_query_base<'a, T>(query: &'a str) -> Result<Vec<T>, PGQueryError>
 where
@@ -24,16 +13,7 @@ where
     let pg_parse_result = unsafe { pg_query_parse(c_str.as_ptr()) };
 
     if !pg_parse_result.error.is_null() {
-        let err = unsafe { *pg_parse_result.error };
-        let parse_error = ParseError {
-            message: c_ptr_to_string(err.message),
-            funcname: c_ptr_to_string(err.funcname),
-            filename: c_ptr_to_string(err.filename),
-            lineno: err.lineno,
-            cursorpos: err.cursorpos,
-            context: c_ptr_to_string(err.context),
-        };
-        return Err(PGQueryError::PGParseError(parse_error));
+        return Err(PGQueryError::PGParseError);
     }
 
     // not sure if this is ever null, but might as well check

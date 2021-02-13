@@ -108,8 +108,8 @@ fn main() {
                         }
                     }
                 }
-                e => {
-                    eprintln!("{:#?}", e);
+                Err(e) => {
+                    eprintln!("{}", e);
                     process::exit(1)
                 }
             }

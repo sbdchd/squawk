@@ -1,21 +1,27 @@
-use serde::Serialize;
-
-#[derive(Debug, PartialEq, Serialize)]
-pub struct ParseError {
-    pub message: Option<String>,
-    pub funcname: Option<String>,
-    pub filename: Option<String>,
-    pub lineno: i32,
-    pub cursorpos: i32,
-    pub context: Option<String>,
-}
-
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, PartialEq)]
 pub enum PGQueryError {
     ParsingCString,
     JsonParse(String),
     QueryToCString,
-    PGParseError(ParseError),
+    PGParseError,
+}
+
+impl std::fmt::Display for PGQueryError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            Self::ParsingCString => write!(
+                f,
+                "Could not convert Postgres response from CString to String"
+            ),
+            Self::JsonParse(ref err) => write!(
+                f,
+                "{}",
+                format!("Squawk schema failed to parse Postgres response: {}", err)
+            ),
+            Self::QueryToCString => write!(f, "Could not encode query into CString"),
+            Self::PGParseError => write!(f, "Postgres failed to parse query"),
+        }
+    }
 }
 
 impl std::convert::From<std::ffi::NulError> for PGQueryError {
@@ -27,12 +33,6 @@ impl std::convert::From<std::ffi::NulError> for PGQueryError {
 impl std::convert::From<serde_json::error::Error> for PGQueryError {
     fn from(e: serde_json::error::Error) -> Self {
         Self::JsonParse(e.to_string())
-    }
-}
-
-impl std::convert::From<std::ffi::IntoStringError> for PGQueryError {
-    fn from(_: std::ffi::IntoStringError) -> Self {
-        Self::ParsingCString
     }
 }
 
