@@ -10,18 +10,14 @@ pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
         match &raw_stmt.stmt {
             Stmt::CreateStmt(stmt) => {
                 for elt in &stmt.table_elts {
-                    match elt {
-                        TableElt::Constraint(constraint) => match constraint.contype {
-                            ConstrType::Foreign => {
-                                errs.push(RuleViolation::new(
-                                    RuleViolationKind::AddingForeignKeyConstraint,
-                                    raw_stmt,
-                                    None,
-                                ));
-                            }
-                            _ => {}
-                        },
-                        _ => {}
+                    if let TableElt::Constraint(constraint) = elt {
+                        if constraint.contype == ConstrType::Foreign {
+                            errs.push(RuleViolation::new(
+                                RuleViolationKind::AddingForeignKeyConstraint,
+                                raw_stmt,
+                                None,
+                            ));
+                        }
                     }
                 }
             }
