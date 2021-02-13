@@ -9,7 +9,10 @@ pub enum PGQueryError {
 impl std::fmt::Display for PGQueryError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::ParsingCString => write!(f, "Could not convert API response from CString"),
+            Self::ParsingCString => write!(
+                f,
+                "Could not convert Postgres response from CString to String"
+            ),
             Self::JsonParse(ref err) => write!(
                 f,
                 "{}",

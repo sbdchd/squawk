@@ -8,7 +8,7 @@ pub enum CheckSQLError {
 impl std::fmt::Display for CheckSQLError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::ParsingSQL(ref err) => write!(f, "{}", format!("Failed to parse query: {}", err)),
+            Self::ParsingSQL(ref err) => err.fmt(f),
         }
     }
 }
