@@ -35,6 +35,16 @@ pub enum DumpAstError {
     Json(serde_json::error::Error),
 }
 
+impl std::fmt::Display for DumpAstError {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match *self {
+            Self::PGQuery(ref err) => write!(f, "{}", format!("Failed to dump AST: {}", err)),
+            Self::Io(ref err) => write!(f, "{}", format!("Failed to dump AST: {}", err)),
+            Self::Json(ref err) => write!(f, "{}", format!("Failed to dump AST: {}", err)),
+        }
+    }
+}
+
 impl std::convert::From<PGQueryError> for DumpAstError {
     fn from(e: PGQueryError) -> Self {
         Self::PGQuery(e)
