@@ -22,10 +22,8 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     if cmd.subtype == AlterTableType::AddColumn {
-                        if let Some(def) = &cmd.def {
-                            if let AlterTableDef::ColumnDef(column_def) = def {
-                                check_column_def(&mut errs, raw_stmt, column_def)
-                            }
+                        if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
+                            check_column_def(&mut errs, raw_stmt, column_def)
                         }
                     }
                 }
@@ -190,8 +188,8 @@ COMMIT;
 
         let res = check_sql(bad_sql, &[]);
         assert!(res.is_ok());
-        let data = res.unwrap_or(vec![]);
-        assert!(data.len() > 0);
+        let data = res.unwrap_or_default();
+        assert!(!data.is_empty());
         assert_debug_snapshot!(data);
     }
 }
