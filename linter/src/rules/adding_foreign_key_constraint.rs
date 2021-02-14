@@ -26,19 +26,17 @@ pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     match cmd {
                         AlterTableCmds::AlterTableCmd(ref command) => {
                             if let AlterTableType::AddConstraint = command.subtype {
-                                if let Some(def) = &command.def {
-                                    if let AlterTableDef::Constraint(constraint) = def {
-                                        // Adding foreign key is okay when NOT VALID is specified.
-                                        if constraint.skip_validation {
-                                            continue;
-                                        }
-                                        if constraint.contype == ConstrType::Foreign {
-                                            errs.push(RuleViolation::new(
-                                                RuleViolationKind::AddingForeignKeyConstraint,
-                                                raw_stmt,
-                                                None,
-                                            ))
-                                        }
+                                if let Some(AlterTableDef::Constraint(constraint)) = &command.def {
+                                    // Adding foreign key is okay when NOT VALID is specified.
+                                    if constraint.skip_validation {
+                                        continue;
+                                    }
+                                    if constraint.contype == ConstrType::Foreign {
+                                        errs.push(RuleViolation::new(
+                                            RuleViolationKind::AddingForeignKeyConstraint,
+                                            raw_stmt,
+                                            None,
+                                        ))
                                     }
                                 }
                             }
