@@ -21,5 +21,19 @@ Ok(
                 ),
             ],
         },
+        RuleViolation {
+            kind: AddingForeignKeyConstraint,
+            span: Span {
+                start: 0,
+                len: Some(
+                    114,
+                ),
+            },
+            messages: [
+                Help(
+                    "Adding a FOREIGN KEY CONSTRAINT requires a SHARE ROW EXCLUSIVE lock on the referenced table. Consider ...",
+                ),
+            ],
+        },
     ],
 )

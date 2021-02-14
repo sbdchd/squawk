@@ -3,5 +3,20 @@ source: linter/src/rules/prefer_text_field.rs
 expression: "check_sql(sql, &[RuleViolationKind::PreferTextField.to_string()])"
 ---
 Ok(
-    [],
+    [
+        RuleViolation {
+            kind: AddingForeignKeyConstraint,
+            span: Span {
+                start: 488,
+                len: Some(
+                    184,
+                ),
+            },
+            messages: [
+                Help(
+                    "Adding a FOREIGN KEY CONSTRAINT requires a SHARE ROW EXCLUSIVE lock on the referenced table. Consider ...",
+                ),
+            ],
+        },
+    ],
 )
