@@ -95,9 +95,8 @@ fn get_github_private_key(
         Ok(private_key)
     } else {
         let key = github_private_key_base64.ok_or(SquawkError::GithubPrivateKeyMissing)?;
-        let bytes =
-            base64::decode(key).map_err(|e| SquawkError::GithubPrivateKeyBase64DecodeError(e))?;
-        Ok(String::from_utf8(bytes).map_err(|e| SquawkError::GithubPrivateKeyDecodeError(e))?)
+        let bytes = base64::decode(key).map_err(SquawkError::GithubPrivateKeyBase64DecodeError)?;
+        Ok(String::from_utf8(bytes).map_err(SquawkError::GithubPrivateKeyDecodeError)?)
     }
 }
 
