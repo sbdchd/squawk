@@ -1,0 +1,12 @@
+---
+source: linter/src/rules/constraint_missing_not_valid.rs
+expression: "res[0].messages"
+---
+[
+    Note(
+        "Using NOT VALID and VALIDATE CONSTRAINT in the same transaction will block all reads while the constraint is validated.",
+    ),
+    Help(
+        "Add constraint as NOT VALID in one transaction and VALIDATE CONSTRAINT in a separate transaction.",
+    ),
+]

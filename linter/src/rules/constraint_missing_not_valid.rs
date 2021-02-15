@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use crate::{rules::utils::tables_created_in_transaction, violations::Span};
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, RelationKind, RootStmt, Stmt,
@@ -72,7 +72,9 @@ pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
             errs.push(RuleViolation::new(
                 RuleViolationKind::ConstraintMissingNotValid,
                 span,
-                None,
+                Some(vec![
+                    ViolationMessage::Note("Using NOT VALID and VALIDATE CONSTRAINT in the same transaction will block all reads while the constraint is validated.".into()), ViolationMessage::Help("Add constraint as NOT VALID in one transaction and VALIDATE CONSTRAINT in a separate transaction.".into())
+                ]),
             ));
         });
     for RootStmt::RawStmt(raw_stmt) in tree {
@@ -123,6 +125,9 @@ COMMIT;
             "it's unsafe to run NOT VALID with VALIDATE in a transaction."
         );
         assert_eq!(res[0].kind, RuleViolationKind::ConstraintMissingNotValid);
+        assert_eq!(res[0].kind, RuleViolationKind::ConstraintMissingNotValid);
+        // We have a custom error message for this case.
+        assert_debug_snapshot!(res[0].messages);
     }
     /// ```sql
     /// -- instead of
