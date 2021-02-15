@@ -195,7 +195,7 @@ lazy_static! {
             func: prefer_robust_stmts,
             messages: vec![
                 ViolationMessage::Help(
-                    "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.".into()
+                    "Consider wrapping in a transaction or adding a IF NOT EXISTS clause if your statment supports it.".into()
                 ),
             ]
         },
