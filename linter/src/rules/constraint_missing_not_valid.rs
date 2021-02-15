@@ -11,6 +11,7 @@ use squawk_parser::ast::{
 /// the end of COMMIT.
 fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
     let mut not_valid_names = HashSet::new();
+    let mut in_transaction = false;
     let mut in_bad_index = false;
     let mut begin_span_start = 0;
     let mut bad_spans = vec![];
@@ -18,12 +19,14 @@ fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => {
                 if stmt.kind == TransactionStmtKind::Begin {
-                    in_bad_index = false;
-                    begin_span_start = raw_stmt.stmt_location
+                    if !in_transaction {
+                        in_transaction = true;
+                        in_bad_index = false;
+                        begin_span_start = raw_stmt.stmt_location;
+                    }
                 }
                 if stmt.kind == TransactionStmtKind::Commit {
-                    not_valid_names.clear();
-                    if in_bad_index {
+                    if in_bad_index && in_transaction {
                         bad_spans.push(Span {
                             start: begin_span_start,
                             len: Some(
@@ -31,6 +34,7 @@ fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
                             ),
                         })
                     }
+                    in_transaction = false;
                 }
             }
             Stmt::AlterTableStmt(stmt) => {
