@@ -20,7 +20,7 @@ pub fn disallow_unique_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                             {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::DisallowedUniqueConstraint,
-                                    raw_stmt,
+                                    raw_stmt.into(),
                                     None,
                                 ));
                             }

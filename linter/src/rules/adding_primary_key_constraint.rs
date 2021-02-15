@@ -16,7 +16,7 @@ pub fn adding_primary_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                                 if constraint.contype == ConstrType::Primary {
                                     errs.push(RuleViolation::new(
                                         RuleViolationKind::AddingSerialPrimaryKeyField,
-                                        raw_stmt,
+                                        raw_stmt.into(),
                                         None,
                                     ));
                                 }
@@ -26,7 +26,7 @@ pub fn adding_primary_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                             if constraint.contype == ConstrType::Primary {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::AddingSerialPrimaryKeyField,
-                                    raw_stmt,
+                                    raw_stmt.into(),
                                     None,
                                 ));
                             }

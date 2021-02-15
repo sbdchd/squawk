@@ -22,6 +22,11 @@ pub enum TransactionStmtKind {
 pub struct TransactionStmt {
     pub kind: TransactionStmtKind,
 }
+#[derive(Debug, PartialEq)]
+pub struct Span {
+    pub start: i32,
+    pub len: Option<i32>,
+}
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct RawStmt {
@@ -30,6 +35,24 @@ pub struct RawStmt {
     pub stmt_location: i32,
     /// None when the statement doesn't have a closing semicolon
     pub stmt_len: Option<i32>,
+}
+
+impl std::convert::From<&RawStmt> for Span {
+    fn from(stmt: &RawStmt) -> Self {
+        Self {
+            start: stmt.stmt_location,
+            len: stmt.stmt_len,
+        }
+    }
+}
+
+impl RawStmt {
+    pub fn span(&self) -> Span {
+        Span {
+            start: self.stmt_location,
+            len: self.stmt_len,
+        }
+    }
 }
 
 #[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]

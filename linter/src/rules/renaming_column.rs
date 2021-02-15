@@ -10,7 +10,7 @@ pub fn renaming_column(tree: &[RootStmt]) -> Vec<RuleViolation> {
                 ObjectType::Column => {
                     errs.push(RuleViolation::new(
                         RuleViolationKind::RenamingColumn,
-                        raw_stmt,
+                        raw_stmt.into(),
                         None,
                     ));
                 }

@@ -14,7 +14,7 @@ pub fn ban_char_type(tree: &[RootStmt]) -> Vec<RuleViolation> {
                             if field_type_name.str == "bpchar" {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::BanCharField,
-                                    raw_stmt,
+                                    raw_stmt.into(),
                                     None,
                                 ));
                             }

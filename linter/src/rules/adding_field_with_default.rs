@@ -16,7 +16,7 @@ pub fn adding_field_with_default(tree: &[RootStmt]) -> Vec<RuleViolation> {
                                 if constraint.contype == ConstrType::Default {
                                     errs.push(RuleViolation::new(
                                         RuleViolationKind::AddingFieldWithDefault,
-                                        raw_stmt,
+                                        raw_stmt.into(),
                                         None,
                                     ));
                                 }
