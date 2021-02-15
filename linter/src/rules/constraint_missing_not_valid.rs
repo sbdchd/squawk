@@ -11,7 +11,6 @@ use squawk_parser::ast::{
 /// the end of COMMIT.
 fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
     let mut not_valid_names = HashSet::new();
-    let mut bad_indexes: Vec<String> = vec![];
     let mut in_bad_index = false;
     let mut begin_span_start = 0;
     let mut bad_spans = vec![];
@@ -39,7 +38,6 @@ fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
                     if cmd.subtype == AlterTableType::ValidateConstraint {
                         if let Some(constraint_name) = &cmd.name {
                             if not_valid_names.get(constraint_name).is_some() {
-                                bad_indexes.push(constraint_name.clone());
                                 in_bad_index = true;
                             }
                         }
