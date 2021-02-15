@@ -54,6 +54,26 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
 mod test_rules {
     use crate::check_sql;
     use insta::assert_debug_snapshot;
+
+    /// If we drop the cosntraint before adding we don't need the IF EXISTS or transaction.
+    #[test]
+    fn drop_before_add() {
+        let sql = r#"
+ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
+ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+    #[test]
+    fn drop_before_add_foreign_key() {
+        let sql = r#"
+ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "fk_user";
+ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "app_user" ("id") DEFERRABLE INITIALLY DEFERRED NOT VALID;
+ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+
     /// If the statement is in a transaction, or it has a guard like IF NOT
     /// EXISTS, then it is considered valid by the `prefer-robust-stmt` rule.
     #[test]
