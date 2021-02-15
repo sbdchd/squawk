@@ -47,6 +47,7 @@ impl std::convert::From<&RawStmt> for Span {
 }
 
 impl RawStmt {
+    #[must_use]
     pub fn span(&self) -> Span {
         Span {
             start: self.stmt_location,
