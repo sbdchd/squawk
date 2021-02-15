@@ -10,7 +10,7 @@ pub fn ban_drop_database(tree: &[RootStmt]) -> Vec<RuleViolation> {
             Stmt::DropdbStmt(_) => {
                 errs.push(RuleViolation::new(
                     RuleViolationKind::BanDropDatabase,
-                    raw_stmt,
+                    raw_stmt.into(),
                     None,
                 ));
             }

@@ -10,7 +10,7 @@ pub fn renaming_table(tree: &[RootStmt]) -> Vec<RuleViolation> {
                 ObjectType::Table => {
                     errs.push(RuleViolation::new(
                         RuleViolationKind::RenamingTable,
-                        raw_stmt,
+                        raw_stmt.into(),
                         None,
                     ));
                 }

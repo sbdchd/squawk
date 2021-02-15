@@ -11,7 +11,7 @@ pub fn changing_column_type(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     if cmd.subtype == AlterTableType::AlterColumnType {
                         errs.push(RuleViolation::new(
                             RuleViolationKind::ChangingColumnType,
-                            raw_stmt,
+                            raw_stmt.into(),
                             None,
                         ));
                     }

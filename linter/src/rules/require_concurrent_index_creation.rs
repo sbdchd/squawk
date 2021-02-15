@@ -14,7 +14,7 @@ pub fn require_concurrent_index_creation(tree: &[RootStmt]) -> Vec<RuleViolation
                 if !stmt.concurrent && !tables_created.contains(tbl_name) {
                     errs.push(RuleViolation::new(
                         RuleViolationKind::RequireConcurrentIndexCreation,
-                        raw_stmt,
+                        raw_stmt.into(),
                         None,
                     ));
                 }

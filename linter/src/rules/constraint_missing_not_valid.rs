@@ -17,7 +17,7 @@ pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
                             if !tables_created.contains(tbl_name) && constraint.initially_valid {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::ConstraintMissingNotValid,
-                                    raw_stmt,
+                                    raw_stmt.into(),
                                     None,
                                 ));
                             }
