@@ -6,8 +6,9 @@ use squawk_parser::ast::{
 /// Adding a foreign key constraint requires a table scan and a
 /// SHARE ROW EXCLUSIVE lock on both tables, which blocks writes.
 ///
-/// Adding the constraint as NOT VALID and then using VALIDATE will allow writes
-/// when adding the constraint.
+/// Adding the constraint as NOT VALID in one transaction and then using
+/// VALIDATE in another transaction will allow writes when adding the
+/// constraint.
 #[must_use]
 pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
