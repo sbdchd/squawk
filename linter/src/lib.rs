@@ -213,7 +213,7 @@ lazy_static! {
             func: adding_foreign_key_constraint,
             messages: vec![
                 ViolationMessage::Note(
-                    "Requires a table scan and a SHARE ROW EXCLUSIVE lock on both tables, which blocks writes while the table is scanned.".into()
+                    "Requires a table scan of the table you're altering and a SHARE ROW EXCLUSIVE lock on both tables, which blocks writes to both tables while your table is scanned.".into()
                 ),
                 ViolationMessage::Help("Add NOT VALID to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.".into()),
             ]
