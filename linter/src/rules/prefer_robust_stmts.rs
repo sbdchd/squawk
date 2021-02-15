@@ -129,7 +129,7 @@ ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
                     },
                     messages: [
                         Help(
-                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause if the statment supports it.",
                         ),
                     ],
                 },
@@ -153,7 +153,7 @@ CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
                     },
                     messages: [
                         Help(
-                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause if the statment supports it.",
                         ),
                     ],
                 },
@@ -177,7 +177,7 @@ CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NUL
                     },
                     messages: [
                         Help(
-                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause if the statment supports it.",
                         ),
                     ],
                 },
@@ -201,7 +201,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
                     },
                     messages: [
                         Help(
-                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause.",
+                            "Consider wrapping in a transaction or adding a IF NOT EXISTS clause if the statment supports it.",
                         ),
                     ],
                 },
