@@ -165,7 +165,7 @@ lazy_static! {
             func: constraint_missing_not_valid,
             messages: vec![
                 ViolationMessage::Note("Requires a table scan to verify constraint and an ACCESS EXCLUSIVE lock which blocks reads.".into()),
-                ViolationMessage::Help("Add NOT VALID to the constraint and then VALIDATE the constraint.".into()),
+                ViolationMessage::Help("Add NOT VALID to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.".into()),
             ],
         },
         SquawkRule {
