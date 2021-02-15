@@ -59,6 +59,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: NotNull,
                                                 location: 48,
                                                 raw_expr: None,
@@ -70,6 +71,7 @@ Ok(
                                         ),
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: Primary,
                                                 location: 57,
                                                 raw_expr: None,
@@ -115,6 +117,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: NotNull,
                                                 location: 108,
                                                 raw_expr: None,
@@ -160,6 +163,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: NotNull,
                                                 location: 157,
                                                 raw_expr: None,
@@ -220,6 +224,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: NotNull,
                                                 location: 194,
                                                 raw_expr: None,
@@ -231,6 +236,7 @@ Ok(
                                         ),
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: Unique,
                                                 location: 203,
                                                 raw_expr: None,
@@ -271,6 +277,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: NotNull,
                                                 location: 233,
                                                 raw_expr: None,
@@ -311,6 +318,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: NotNull,
                                                 location: 263,
                                                 raw_expr: None,
@@ -371,6 +379,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: NotNull,
                                                 location: 296,
                                                 raw_expr: None,
@@ -416,6 +425,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: NotNull,
                                                 location: 323,
                                                 raw_expr: None,
@@ -461,6 +471,7 @@ Ok(
                                     constraints: [
                                         Constraint(
                                             Constraint {
+                                                conname: None,
                                                 contype: Null,
                                                 location: 356,
                                                 raw_expr: None,
