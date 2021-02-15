@@ -145,6 +145,20 @@ table rewrite with an `ACCESS EXCLUSIVE` lock.
 
 <https://www.postgresql.org/docs/10/sql-altertable.html#SQL-ALTERTABLE-NOTES>
 
+### `adding-foreign-key-constraint`
+
+Check that a foreign key constraint is added with `NOT VALID`.
+
+By default adding a foreign key constraint requires a table scan of the table
+you're altering (to validate the foreign key) and a `SHARE ROW EXCLUSIVE` lock
+on both tables referenced in the constraint. This means no updates will be
+allowed to either table while the table you're altering is scanned.
+
+Using `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in another
+prevents blocking row updates. `NOT VALID` prevents row updates while running,
+but commits instantly. `VALIDATE CONSTRAINT` allows row updates while it scans
+the table.
+
 ### `changing-column-type`
 
 Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads.
