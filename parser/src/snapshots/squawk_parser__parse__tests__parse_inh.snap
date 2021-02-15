@@ -27,6 +27,9 @@ Ok(
                                     def: Some(
                                         Constraint(
                                             Constraint {
+                                                conname: Some(
+                                                    "tasks_fk",
+                                                ),
                                                 contype: Foreign,
                                                 location: 69,
                                                 raw_expr: None,
