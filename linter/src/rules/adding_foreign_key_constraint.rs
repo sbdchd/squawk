@@ -20,7 +20,7 @@ pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                         if constraint.contype == ConstrType::Foreign {
                             errs.push(RuleViolation::new(
                                 RuleViolationKind::AddingForeignKeyConstraint,
-                                raw_stmt,
+                                raw_stmt.into(),
                                 None,
                             ));
                         }
@@ -40,7 +40,7 @@ pub fn adding_foreign_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                                     if constraint.contype == ConstrType::Foreign {
                                         errs.push(RuleViolation::new(
                                             RuleViolationKind::AddingForeignKeyConstraint,
-                                            raw_stmt,
+                                            raw_stmt.into(),
                                             None,
                                         ))
                                     }
