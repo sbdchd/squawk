@@ -40,7 +40,7 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
 
                     if let Some(AlterTableDef::Constraint(constraint)) = &cmd.def {
                         if let Some(constraint_name) = &constraint.conname {
-                            if constraint_names.contains(constraint_name) {
+                            if constraint_names.remove(constraint_name) {
                                 continue;
                             }
                         }
@@ -77,7 +77,7 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
     /// If we drop the cosntraint before adding we don't need the IF EXISTS or transaction.
@@ -97,6 +97,18 @@ ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFEREN
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 "#;
         assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+    #[test]
+    fn double_add_after_drop() {
+        let sql = r#"
+ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
+ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+-- this second add constraint should error because it's not robust
+ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+        "#;
+        let res = check_sql(sql, &[]).unwrap();
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
     }
 
     /// If the statement is in a transaction, or it has a guard like IF NOT
