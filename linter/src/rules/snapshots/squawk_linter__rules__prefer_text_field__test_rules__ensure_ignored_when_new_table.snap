@@ -13,8 +13,11 @@ Ok(
                 ),
             },
             messages: [
+                Note(
+                    "Requires a table scan and a SHARE ROW EXCLUSIVE lock on both tables, which blocks writes while the table is scanned.",
+                ),
                 Help(
-                    "Adding a FOREIGN KEY CONSTRAINT requires a SHARE ROW EXCLUSIVE lock on the referenced table. Consider ...",
+                    "Add NOT VALID to the constraint and then VALIDATE the constraint.",
                 ),
             ],
         },
