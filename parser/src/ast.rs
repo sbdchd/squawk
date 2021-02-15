@@ -613,6 +613,8 @@ pub enum ConstrType {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Constraint {
+    #[serde(default)]
+    pub conname: Option<String>,
     pub contype: ConstrType,
 
     /* Fields used for most/all constraint types: */
