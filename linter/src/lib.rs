@@ -215,7 +215,7 @@ lazy_static! {
                 ViolationMessage::Note(
                     "Requires a table scan and a SHARE ROW EXCLUSIVE lock on both tables, which blocks writes while the table is scanned.".into()
                 ),
-                ViolationMessage::Help("Add NOT VALID to the constraint and then VALIDATE the constraint.".into()),
+                ViolationMessage::Help("Add NOT VALID to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.".into()),
             ]
         }
     ];
