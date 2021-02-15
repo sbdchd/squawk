@@ -25,6 +25,7 @@ arg_enum! {
     pub enum DumpAstOption {
         Raw,
         Parsed,
+        Debug
     }
 }
 
@@ -80,6 +81,10 @@ pub fn dump_ast_for_paths<W: io::Write>(
                 let ast = parse_sql_query(sql)?;
                 let ast_str = serde_json::to_string(&ast)?;
                 writeln!(f, "{}", ast_str)?;
+            }
+            DumpAstOption::Debug => {
+                let ast = parse_sql_query(sql)?;
+                writeln!(f, "{:#?}", ast)?;
             }
         }
         Ok(())
