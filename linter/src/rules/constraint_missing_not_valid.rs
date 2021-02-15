@@ -1,24 +1,37 @@
 use std::collections::HashSet;
 
-use crate::rules::utils::tables_created_in_transaction;
 use crate::violations::{RuleViolation, RuleViolationKind};
-use serde_json::Value;
+use crate::{rules::utils::tables_created_in_transaction, violations::Span};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, RawStmt, RelationKind, RootStmt, Stmt,
+    AlterTableCmds, AlterTableDef, AlterTableType, RelationKind, RootStmt, Stmt,
     TransactionStmtKind,
 };
 
-fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<String> {
+/// Return list of spans for offending transactions. From the start of BEGIN to
+/// the end of COMMIT.
+fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
     let mut not_valid_names = HashSet::new();
     let mut bad_indexes: Vec<String> = vec![];
+    let mut in_bad_index = false;
+    let mut begin_span_start = 0;
+    let mut bad_spans = vec![];
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => {
-                // if stmt.kind == TransactionStmtKind::Begin {
-                //     in_transaction = true;
-                // }
+                if stmt.kind == TransactionStmtKind::Begin {
+                    in_bad_index = false;
+                    begin_span_start = raw_stmt.stmt_location
+                }
                 if stmt.kind == TransactionStmtKind::Commit {
                     not_valid_names.clear();
+                    if in_bad_index {
+                        bad_spans.push(Span {
+                            start: begin_span_start,
+                            len: Some(
+                                raw_stmt.stmt_location + raw_stmt.stmt_len.unwrap_or_default(),
+                            ),
+                        })
+                    }
                 }
             }
             Stmt::AlterTableStmt(stmt) => {
@@ -27,6 +40,7 @@ fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<String> {
                         if let Some(constraint_name) = &cmd.name {
                             if not_valid_names.get(constraint_name).is_some() {
                                 bad_indexes.push(constraint_name.clone());
+                                in_bad_index = true;
                             }
                         }
                     }
@@ -45,7 +59,7 @@ fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<String> {
             _ => continue,
         }
     }
-    bad_indexes
+    bad_spans
 }
 
 #[must_use]
@@ -53,16 +67,11 @@ pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let tables_created = tables_created_in_transaction(tree);
     not_valid_validate_in_transaction(tree)
-        .iter()
-        .for_each(|index| {
-            println!("{}", index);
+        .into_iter()
+        .for_each(|span| {
             errs.push(RuleViolation::new(
                 RuleViolationKind::ConstraintMissingNotValid,
-                &RawStmt {
-                    stmt: Stmt::DropStmt(Value::Null),
-                    stmt_location: 123,
-                    stmt_len: None,
-                },
+                span,
                 None,
             ));
         });
@@ -77,7 +86,7 @@ pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
                             if !tables_created.contains(tbl_name) && constraint.initially_valid {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::ConstraintMissingNotValid,
-                                    raw_stmt,
+                                    raw_stmt.into(),
                                     None,
                                 ));
                             }

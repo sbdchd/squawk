@@ -18,7 +18,7 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
                                 if constraint.contype == ConstrType::NotNull {
                                     errs.push(RuleViolation::new(
                                         RuleViolationKind::AddingNotNullableField,
-                                        raw_stmt,
+                                        raw_stmt.into(),
                                         None,
                                     ));
                                 }

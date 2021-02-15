@@ -15,7 +15,6 @@ keywords = ["postgres", "sql", "linter"]
 serde = { version = "1.0", features = ["derive"] }
 squawk-parser = { version = "0.5.4", path = "../parser" }
 lazy_static = "1.4.0"
-serde_json = "1.0.62"
 
 [dev-dependencies]
 insta = "0.16.0"

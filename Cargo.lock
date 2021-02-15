@@ -1603,7 +1603,6 @@ dependencies = [
  "insta",
  "lazy_static",
  "serde",
- "serde_json",
  "squawk-parser",
 ]
 

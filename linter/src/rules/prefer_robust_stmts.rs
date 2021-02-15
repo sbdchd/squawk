@@ -25,7 +25,7 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     }
                     errs.push(RuleViolation::new(
                         RuleViolationKind::PreferRobustStmts,
-                        raw_stmt,
+                        raw_stmt.into(),
                         None,
                     ));
                 }
@@ -33,14 +33,14 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
             Stmt::IndexStmt(stmt) if !stmt.if_not_exists && !inside_transaction => {
                 errs.push(RuleViolation::new(
                     RuleViolationKind::PreferRobustStmts,
-                    raw_stmt,
+                    raw_stmt.into(),
                     None,
                 ));
             }
             Stmt::CreateStmt(stmt) if !stmt.if_not_exists && !inside_transaction => {
                 errs.push(RuleViolation::new(
                     RuleViolationKind::PreferRobustStmts,
-                    raw_stmt,
+                    raw_stmt.into(),
                     None,
                 ));
             }

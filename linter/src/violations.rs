@@ -1,6 +1,6 @@
 use crate::RULES;
 use serde::Serialize;
-use squawk_parser::ast::RawStmt;
+pub use squawk_parser::ast::Span;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq)]
 pub enum RuleViolationKind {
@@ -62,12 +62,6 @@ impl std::convert::TryFrom<&str> for RuleViolationKind {
     }
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Span {
-    pub start: i32,
-    pub len: Option<i32>,
-}
-
 #[derive(Debug, PartialEq, Serialize, Clone)]
 pub enum ViolationMessage {
     Note(String),
@@ -85,7 +79,7 @@ impl RuleViolation {
     #[must_use]
     pub fn new(
         kind: RuleViolationKind,
-        node: &RawStmt,
+        span: Span,
         messages: Option<Vec<ViolationMessage>>,
     ) -> Self {
         let messages = messages.unwrap_or_else(|| {
@@ -98,10 +92,7 @@ impl RuleViolation {
         });
         Self {
             kind,
-            span: Span {
-                start: node.stmt_location,
-                len: node.stmt_len,
-            },
+            span,
             messages,
         }
     }
