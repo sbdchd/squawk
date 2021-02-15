@@ -212,9 +212,10 @@ lazy_static! {
             name: RuleViolationKind::AddingForeignKeyConstraint,
             func: adding_foreign_key_constraint,
             messages: vec![
-                ViolationMessage::Help(
-                    "Adding a FOREIGN KEY CONSTRAINT requires a SHARE ROW EXCLUSIVE lock on the referenced table. Consider ...".into()
+                ViolationMessage::Note(
+                    "Requires a table scan and a SHARE ROW EXCLUSIVE lock on both tables, which blocks writes while the table is scanned.".into()
                 ),
+                ViolationMessage::Help("Add NOT VALID to the constraint and then VALIDATE the constraint.".into()),
             ]
         }
     ];
