@@ -127,7 +127,6 @@ COMMIT;
             "it's unsafe to run NOT VALID with VALIDATE in a transaction."
         );
         assert_eq!(res[0].kind, RuleViolationKind::ConstraintMissingNotValid);
-        assert_eq!(res[0].kind, RuleViolationKind::ConstraintMissingNotValid);
         // We have a custom error message for this case.
         assert_debug_snapshot!(res[0].messages);
     }
