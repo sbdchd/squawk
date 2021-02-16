@@ -5,7 +5,7 @@ module.exports = {
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/owl.png",
   organizationName: "sbdchd", // Usually your GitHub org/user name.
   projectName: "squawk", // Usually your repo name.
   themeConfig: {
@@ -18,14 +18,20 @@ module.exports = {
     navbar: {
       title: "Squawk",
       logo: {
-        alt: "My Site Logo",
-        src: "img/logo.svg",
+        alt: "Squawk Logo",
+        src: "img/owl.png",
       },
       items: [
         {
           to: "docs/",
           activeBasePath: "docs",
           label: "Docs",
+          position: "left",
+        },
+        {
+          to: "docs/rules/",
+          activeBasePath: "rules",
+          label: "Rules",
           position: "left",
         },
         {
