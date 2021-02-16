@@ -1,9 +1,14 @@
-use std::collections::HashSet;
+use std::collections::HashMap;
 
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, RootStmt, Stmt, TransactionStmtKind,
 };
+
+#[derive(Default)]
+struct Constraint {
+    added: bool,
+}
 
 /// If a migration is running in a transaction, then we skip the statements
 /// because if it fails part way through, it will revert.
@@ -15,7 +20,7 @@ use squawk_parser::ast::{
 pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let mut inside_transaction = false;
-    let mut constraint_names: HashSet<String> = HashSet::new();
+    let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => match stmt.kind {
@@ -27,12 +32,12 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     if let Some(constraint_name) = &cmd.name {
                         if cmd.subtype == AlterTableType::DropConstraint {
-                            constraint_names.insert(constraint_name.clone());
+                            constraint_names.insert(constraint_name.clone(), Constraint::default());
                         }
                         if cmd.subtype == AlterTableType::AddConstraint
                             || cmd.subtype == AlterTableType::ValidateConstraint
                         {
-                            if constraint_names.contains(constraint_name) {
+                            if constraint_names.contains_key(constraint_name) {
                                 continue;
                             }
                         }
@@ -40,8 +45,11 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
 
                     if let Some(AlterTableDef::Constraint(constraint)) = &cmd.def {
                         if let Some(constraint_name) = &constraint.conname {
-                            if constraint_names.remove(constraint_name) {
-                                continue;
+                            if let Some(constraint) = constraint_names.get_mut(constraint_name) {
+                                if !constraint.added {
+                                    constraint.added = true;
+                                    continue;
+                                }
                             }
                         }
                     }
