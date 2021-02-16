@@ -34,12 +34,11 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                         if cmd.subtype == AlterTableType::DropConstraint {
                             constraint_names.insert(constraint_name.clone(), Constraint::Dropped);
                         }
-                        if cmd.subtype == AlterTableType::AddConstraint
-                            || cmd.subtype == AlterTableType::ValidateConstraint
+                        if (cmd.subtype == AlterTableType::AddConstraint
+                            || cmd.subtype == AlterTableType::ValidateConstraint)
+                            && constraint_names.contains_key(constraint_name)
                         {
-                            if constraint_names.contains_key(constraint_name) {
-                                continue;
-                            }
+                            continue;
                         }
                     }
 
