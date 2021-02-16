@@ -4,10 +4,10 @@ use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, RootStmt, Stmt, TransactionStmtKind,
 };
-
-#[derive(Default)]
-struct Constraint {
-    added: bool,
+#[derive(PartialEq)]
+enum Constraint {
+    Dropped,
+    Added,
 }
 
 /// If a migration is running in a transaction, then we skip the statements
@@ -32,7 +32,7 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     if let Some(constraint_name) = &cmd.name {
                         if cmd.subtype == AlterTableType::DropConstraint {
-                            constraint_names.insert(constraint_name.clone(), Constraint::default());
+                            constraint_names.insert(constraint_name.clone(), Constraint::Dropped);
                         }
                         if cmd.subtype == AlterTableType::AddConstraint
                             || cmd.subtype == AlterTableType::ValidateConstraint
@@ -46,8 +46,8 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     if let Some(AlterTableDef::Constraint(constraint)) = &cmd.def {
                         if let Some(constraint_name) = &constraint.conname {
                             if let Some(constraint) = constraint_names.get_mut(constraint_name) {
-                                if !constraint.added {
-                                    constraint.added = true;
+                                if *constraint == Constraint::Dropped {
+                                    *constraint = Constraint::Added;
                                     continue;
                                 }
                             }
