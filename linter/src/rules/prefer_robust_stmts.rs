@@ -88,8 +88,8 @@ mod test_rules {
     use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
-    /// If we drop the cosntraint before adding we don't need the IF EXISTS or transaction.
     #[test]
+    /// If we drop the constraint before adding it, we don't need the IF EXISTS or a transaction.
     fn drop_before_add() {
         let sql = r#"
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
@@ -98,6 +98,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_id
         assert_eq!(check_sql(sql, &[]), Ok(vec![]));
     }
     #[test]
+    /// DROP CONSTRAINT and then ADD CONSTRAINT is safe. We can also safely run VALIDATE CONSTRAINT.
     fn drop_before_add_foreign_key() {
         let sql = r#"
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "fk_user";
@@ -107,6 +108,7 @@ ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
         assert_eq!(check_sql(sql, &[]), Ok(vec![]));
     }
     #[test]
+    /// We can only use the dropped constraint in one ADD CONSTRAINT statement.
     fn double_add_after_drop() {
         let sql = r#"
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
