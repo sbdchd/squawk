@@ -1,5 +1,14 @@
+use std::collections::HashMap;
+
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{AlterTableCmds, RootStmt, Stmt, TransactionStmtKind};
+use squawk_parser::ast::{
+    AlterTableCmds, AlterTableDef, AlterTableType, RootStmt, Stmt, TransactionStmtKind,
+};
+#[derive(PartialEq)]
+enum Constraint {
+    Dropped,
+    Added,
+}
 
 /// If a migration is running in a transaction, then we skip the statements
 /// because if it fails part way through, it will revert.
@@ -11,6 +20,7 @@ use squawk_parser::ast::{AlterTableCmds, RootStmt, Stmt, TransactionStmtKind};
 pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let mut inside_transaction = false;
+    let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => match stmt.kind {
@@ -20,6 +30,28 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
             },
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
+                    if let Some(constraint_name) = &cmd.name {
+                        if cmd.subtype == AlterTableType::DropConstraint {
+                            constraint_names.insert(constraint_name.clone(), Constraint::Dropped);
+                        }
+                        if (cmd.subtype == AlterTableType::AddConstraint
+                            || cmd.subtype == AlterTableType::ValidateConstraint)
+                            && constraint_names.contains_key(constraint_name)
+                        {
+                            continue;
+                        }
+                    }
+
+                    if let Some(AlterTableDef::Constraint(constraint)) = &cmd.def {
+                        if let Some(constraint_name) = &constraint.conname {
+                            if let Some(constraint) = constraint_names.get_mut(constraint_name) {
+                                if *constraint == Constraint::Dropped {
+                                    *constraint = Constraint::Added;
+                                    continue;
+                                }
+                            }
+                        }
+                    }
                     if cmd.missing_ok || inside_transaction {
                         continue;
                     }
@@ -52,8 +84,42 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
+
+    #[test]
+    /// If we drop the constraint before adding it, we don't need the IF EXISTS or a transaction.
+    fn drop_before_add() {
+        let sql = r#"
+ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
+ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+    #[test]
+    /// DROP CONSTRAINT and then ADD CONSTRAINT is safe. We can also safely run VALIDATE CONSTRAINT.
+    fn drop_before_add_foreign_key() {
+        let sql = r#"
+ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "fk_user";
+ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "app_user" ("id") DEFERRABLE INITIALLY DEFERRED NOT VALID;
+ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+    #[test]
+    /// We can only use the dropped constraint in one ADD CONSTRAINT statement.
+    fn double_add_after_drop() {
+        let sql = r#"
+ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
+ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+-- this second add constraint should error because it's not robust
+ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+        "#;
+        let res = check_sql(sql, &[]).unwrap();
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
+    }
+
     /// If the statement is in a transaction, or it has a guard like IF NOT
     /// EXISTS, then it is considered valid by the `prefer-robust-stmt` rule.
     #[test]
