@@ -34,10 +34,11 @@ impl std::fmt::Display for RuleViolationKind {
 impl std::convert::TryFrom<&str> for RuleViolationKind {
     type Error = ();
     fn try_from(s: &str) -> Result<Self, Self::Error> {
-        match RULES.iter().find(|rule| rule.id == s) {
-            Some(rule) => Ok(rule.name.clone()),
-            None => Err(()),
-        }
+        RULES
+            .iter()
+            .find(|rule| rule.id == s)
+            .map(|rule| rule.name.clone())
+            .ok_or(())
     }
 }
 
