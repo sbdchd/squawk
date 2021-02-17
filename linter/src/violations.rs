@@ -2,7 +2,7 @@ use crate::RULES;
 use serde::Serialize;
 pub use squawk_parser::ast::Span;
 
-#[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq)]
+#[derive(Debug, PartialEq, PartialOrd, Ord, Clone, Serialize, Hash, Eq)]
 pub enum RuleViolationKind {
     RequireConcurrentIndexCreation,
     ConstraintMissingNotValid,
@@ -22,45 +22,21 @@ pub enum RuleViolationKind {
 
 impl std::fmt::Display for RuleViolationKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let str_value = match self {
-            Self::RequireConcurrentIndexCreation => "require-concurrent-index-creation",
-            Self::ConstraintMissingNotValid => "constraint-missing-not-valid",
-            Self::AddingFieldWithDefault => "adding-field-with-default",
-            Self::ChangingColumnType => "changing-column-type",
-            Self::AddingNotNullableField => "adding-not-nullable-field",
-            Self::RenamingColumn => "renaming-column",
-            Self::RenamingTable => "renaming-table",
-            Self::DisallowedUniqueConstraint => "disallowed-unique-constraint",
-            Self::AddingSerialPrimaryKeyField => "adding-serial-primary-key-field",
-            Self::BanDropDatabase => "ban-drop-database",
-            Self::PreferTextField => "prefer-text-field",
-            Self::PreferRobustStmts => "prefer-robust-stmts",
-            Self::BanCharField => "ban-char-field",
-            Self::AddingForeignKeyConstraint => "adding-foreign-key-constraint",
-        };
-        write!(f, "{}", str_value)
+        let rule = RULES
+            .iter()
+            .find(|rule| rule.name == *self)
+            .expect("We should always find ourself");
+
+        write!(f, "{}", rule.id)
     }
 }
 
 impl std::convert::TryFrom<&str> for RuleViolationKind {
     type Error = ();
     fn try_from(s: &str) -> Result<Self, Self::Error> {
-        match s {
-            "require-concurrent-index-creation" => Ok(Self::RequireConcurrentIndexCreation),
-            "constraint-missing-not-valid" => Ok(Self::ConstraintMissingNotValid),
-            "adding-field-with-default" => Ok(Self::AddingFieldWithDefault),
-            "changing-column-type" => Ok(Self::ChangingColumnType),
-            "adding-not-nullable-field" => Ok(Self::AddingNotNullableField),
-            "adding-serial-primary-key-field" => Ok(Self::AddingSerialPrimaryKeyField),
-            "renaming-column" => Ok(Self::RenamingColumn),
-            "renaming-table" => Ok(Self::RenamingTable),
-            "disallowed-unique-constraint" => Ok(Self::DisallowedUniqueConstraint),
-            "ban-drop-database" => Ok(Self::BanDropDatabase),
-            "prefer-text-field" => Ok(Self::PreferTextField),
-            "prefer-robust-stmts" => Ok(Self::PreferRobustStmts),
-            "ban-char-field" => Ok(Self::BanCharField),
-            "adding-foreign-key-constraint" => Ok(Self::AddingForeignKeyConstraint),
-            _ => Err(()),
+        match RULES.iter().find(|rule| rule.id == s) {
+            Some(rule) => Ok(rule.name.clone()),
+            None => Err(()),
         }
     }
 }
