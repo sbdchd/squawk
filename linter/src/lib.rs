@@ -27,16 +27,6 @@ pub struct SquawkRule {
     pub messages: Vec<ViolationMessage>,
 }
 
-impl std::fmt::Debug for SquawkRule {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        f.debug_struct("SquawkRule")
-            .field("id", &self.id)
-            .field("name", &self.name)
-            .field("messages", &self.messages)
-            .finish()
-    }
-}
-
 lazy_static! {
     pub static ref RULES: Vec<SquawkRule> = vec![
     // see ChangingColumnType
