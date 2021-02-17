@@ -36,8 +36,13 @@ impl std::convert::TryFrom<&str> for RuleViolationKind {
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         RULES
             .iter()
-            .find(|rule| rule.id == s)
-            .map(|rule| rule.name.clone())
+            .find_map(|rule| {
+                if rule.id == s {
+                    Some(rule.name.clone())
+                } else {
+                    None
+                }
+            })
             .ok_or(())
     }
 }

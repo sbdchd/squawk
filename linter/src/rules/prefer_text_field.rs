@@ -15,7 +15,7 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
             Stmt::CreateStmt(stmt) => {
                 for column_def in &stmt.table_elts {
                     if let TableElt::ColumnDef(column_def) = column_def {
-                        check_column_def(&mut errs, raw_stmt.into(), column_def)
+                        check_column_def(&mut errs, raw_stmt, column_def)
                     }
                 }
             }
@@ -23,7 +23,7 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     if cmd.subtype == AlterTableType::AddColumn {
                         if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
-                            check_column_def(&mut errs, raw_stmt.into(), column_def)
+                            check_column_def(&mut errs, raw_stmt, column_def)
                         }
                     }
                 }
