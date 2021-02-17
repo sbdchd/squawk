@@ -35,8 +35,8 @@ module.exports = {
           position: "left",
         },
         {
-          href: "https://github.com/sbdchd/squawk",
-          label: "Install",
+          to: "docs/",
+          label: "Quick Start",
           position: "right",
         },
         {

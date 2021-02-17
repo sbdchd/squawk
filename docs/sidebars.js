@@ -1,6 +1,6 @@
 module.exports = {
   someSidebar: {
-    General: ["quick_start", "install", "safe_migrations", "cli", "github_app"],
+    General: ["quick_start", "safe_migrations", "cli", "github_app"],
     Rules: [
       "adding-field-with-default",
       "adding-foreign-key-constraint",
