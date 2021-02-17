@@ -2,7 +2,7 @@ use crate::RULES;
 use serde::Serialize;
 pub use squawk_parser::ast::Span;
 
-#[derive(Debug, PartialEq, PartialOrd, Ord, Clone, Serialize, Hash, Eq)]
+#[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq)]
 pub enum RuleViolationKind {
     RequireConcurrentIndexCreation,
     ConstraintMissingNotValid,
