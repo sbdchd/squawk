@@ -5,44 +5,61 @@ sidebar_label: Quick Start
 slug: /
 ---
 
-1. install via NPM
+## Install
 
-   ```bash
-   npm install squawk-cli
-   ```
+Note: due to `squawk`'s dependency on
+[`libpg_query`](https://github.com/lfittl/libpg_query/issues/44), `squawk`
+only supports Linux and macOS
 
-   Squawk can also be downloaded from the [GitHub Release page](https://github.com/sbdchd/squawk/releases).
+```shell
+npm install -g squawk-cli
 
-2. lint a Postgres SQL migration
+# or install binaries directly via the releases page
+https://github.com/sbdchd/squawk/releases
+```
 
-   ```bash
-   # create a fake migration
-   echo 'ALTER TABLE app_user
-   ADD CONSTRAINT app_user_uniq_email UNIQUE (email);' > bad_migration.sql
+## Usage
 
-   # lint migration with squawk
-   squawk bad_migration.sql
+```shell
+❯ squawk example.sql
+example.sql:2:1: warning: prefer-text-field
 
-   # squawk will print the following output:
+   2 | --
+   3 | -- Create model Bar
+   4 | --
+   5 | CREATE TABLE "core_bar" (
+   6 |     "id" serial NOT NULL PRIMARY KEY,
+   7 |     "alpha" varchar(100) NOT NULL
+   8 | );
 
-   # bad_migration.sql:1:0: warning: disallowed-unique-constraint
+  note: Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.
+  help: Use a text field with a check constraint.
 
-   #    1 | ALTER TABLE app_user
-   #    2 |    ADD CONSTRAINT app_user_uniq_email UNIQUE (email);
+example.sql:9:2: warning: require-concurrent-index-creation
 
-   #   note: Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.
-   #   help: Create an index CONCURRENTLY and create the constraint using the index.
-   ```
+   9 |
+  10 | CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
 
-   Each rule has documentation with more examples and reasoning if you have any questions (see the left sidebar).
+  note: Creating an index blocks writes.
+  note: Create the index CONCURRENTLY.
 
-3. Update your migration to address Squawk's suggestions.
+example.sql:11:2: warning: disallowed-unique-constraint
 
-   ```
-   ❯ squawk fixed_migration.sql
-   Found 0 issues in 1 file 🎉
-   ```
+  11 |
+  12 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
 
-4. Your migration is now ready to be applied! See ["Running Migrations"](./safe_migrations.md#safety-requirements) for safety information about applying migrations in Postgres.
+  note: Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.
+  help: Create an index CONCURRENTLY and create the constraint using the index.
+
+example.sql:13:2: warning: adding-field-with-default
+
+  13 |
+  14 | ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+
+  note: In Postgres versions <11 adding a field with a DEFAULT requires a table rewrite with an ACCESS EXCLUSIVE lock.
+  help: Add the field as nullable, then set a default, backfill, and remove nullabilty.
+```
+
+See ["Running Migrations"](./safe_migrations.md#safety-requirements) for information about safely applying migrations in Postgres.
 
 The [CLI docs](./cli.md) have more information about the `squawk` CLI tool and the [GitHub Integration docs](./github_app.md) outline configuring Squawk to work with GitHub pull requests.
