@@ -3,15 +3,23 @@ id: require-concurrent-index-creation
 title: require-concurrent-index-creation
 ---
 
-You can write JSX and use React components within your Markdown thanks to [MDX](https://mdxjs.com/).
+Ensure all index creations use the `CONCURRENTLY` option.
 
-export const Highlight = ({children, color}) => ( <span style={{
-      backgroundColor: color,
-      borderRadius: '2px',
-      color: '#fff',
-      padding: '0.2rem',
-    }}>{children}</span> );
+This rule ignores indexes added to tables created in the same transaction.
 
-<Highlight color="#25c2a0">Docusaurus green</Highlight> and <Highlight color="#1877F2">Facebook blue</Highlight> are my favorite colors.
+During a normal index creation updates are blocked. `CONCURRENTLY` avoids the
+issue of blocking.
 
-I can write **Markdown** alongside my _JSX_!
+<https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY>
+
+Instead of:
+
+```sql
+CREATE INDEX "email_idx" ON "app_user" ("email");
+```
+
+Use:
+
+```sql
+CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
+```
