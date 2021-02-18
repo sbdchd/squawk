@@ -53,16 +53,12 @@ module.exports = {
           title: "Docs",
           items: [
             {
-              label: "Install",
-              to: "docs/",
-            },
-            {
               label: "Quick Start",
               to: "docs/",
             },
             {
               label: "Rules",
-              to: "docs/doc2/",
+              to: "docs/adding-field-with-default",
             },
           ],
         },
@@ -71,15 +67,15 @@ module.exports = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/facebook/docusaurus",
+              href: "https://github.com/sbdchd/squawk",
             },
             {
               label: "Changelog",
-              href: "https://github.com/facebook/docusaurus",
+              href: "https://github.com/sbdchd/squawk/blob/master/CHANGELOG.md",
             },
             {
               label: "Help",
-              href: "https://github.com/facebook/docusaurus",
+              href: "https://github.com/sbdchd/squawk/issues/new",
             },
           ],
         },
