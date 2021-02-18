@@ -3,7 +3,7 @@ id: safe_migrations
 title: Running migrations
 ---
 
-A migration that passes Squawk is not automatically safe to run.
+A migration that passes Squawk's lint is not automatically safe to run.
 
 To safely apply a migration you must set a `lock_timeout` in Postgres. See below for more information.
 
@@ -32,7 +32,9 @@ SET lock_timeout = '1s';
 PGOPTIONS='-c lock_timeout=10s' ./migrate_db
 ```
 
-#### example statement
+With a short `lock_timeout` of 1 second, queries will be blocked for up to 1 second. If your migration hits the lock timeout, it will be cancelled and error, allowing the waiting queries to proceed. You should retry a migration that hits the lock timeout until it succeeds.
+
+### example
 
 This statement requires an `AccessExclusiveLock` lock on `"accounts"`. Reads and writes to `"accounts"` will be blocked while this statement is running.
 
