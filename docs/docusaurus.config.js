@@ -29,12 +29,6 @@ module.exports = {
           position: "left",
         },
         {
-          to: "docs/rules/",
-          activeBasePath: "rules",
-          label: "Rules",
-          position: "left",
-        },
-        {
           to: "docs/",
           label: "Quick Start",
           position: "right",
