@@ -17,7 +17,7 @@ From the postgres docs:
 
 <https://www.postgresql.org/docs/10/datatype-character.html>
 
-See the `prefer-text-field` rule for info on the advantages of `text` over `varchar`.
+See the [`prefer-text-field`](./prefer-text-field.md) rule for info on the advantages of `text` over `varchar`.
 
 Instead of:
 
