@@ -1,6 +1,6 @@
 ---
 id: github_app
-title: GitHub App
+title: GitHub Integration
 ---
 
 - screenshot and link to real example
