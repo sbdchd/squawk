@@ -35,8 +35,18 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
+
+    #[test]
+    fn set_null() {
+        let sql = r#"
+ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
+        "#;
+        let res = check_sql(sql, &["prefer-robust-stmts".into()]).unwrap();
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].kind, RuleViolationKind::AddingNotNullableField);
+    }
 
     #[test]
     fn test_adding_field_that_is_not_nullable() {
