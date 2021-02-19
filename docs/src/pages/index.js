@@ -17,7 +17,7 @@ const features = [
     title: "GitHub Integration",
     description: (
       <>
-        Use the <a href="/docs/github_app">Squawk GitHub App</a> to lint your pull requests.
+        Use the <Link to={useBaseUrl("docs/github_app")}>Squawk GitHub App</Link> to lint your pull requests.
       </>
     ),
   },
