@@ -1,7 +1,7 @@
 module.exports = {
   title: "Squawk",
   tagline: "A linter for Postgres migrations",
-  url: "https://your-docusaurus-test-site.com",
+  url: "https://squawkhq.netlify.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
