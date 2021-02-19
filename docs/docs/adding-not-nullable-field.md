@@ -12,7 +12,7 @@ an `ACCESS EXCLUSIVE` lock. Reads and writes will be disabled while this stateme
 
 ## solution
 
-Add a column as nullable and use a check constraint to verify integrity. The check constraint should be added as NOT NULL and then validated.
+Add a column as nullable and use a check constraint to verify integrity. The check constraint should be added as `NOT NULL` and then validated.
 
 Instead of:
 
@@ -30,4 +30,4 @@ ALTER TABLE "core_recipe" ADD CONSTRAINT foo_not_null
 ALTER TABLE "core_recipe" VALIDATE CONSTRAINT foo_not_null;
 ```
 
-Add the column as nullable, add a check constraint as NOT VALID that verifies the column is not null, backfill the column so it no longer contains null values, validate the constraint to verify existing rows are valid.
+Add the column as nullable, add a check constraint as `NOT VALID` that verifies the column is not null, backfill the column so it no longer contains null values, validate the constraint to verify existing rows are valid.

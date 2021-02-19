@@ -5,7 +5,7 @@ title: adding-serial-primary-key-field
 
 Outlined in [Citus' 2018 post on tips for Postgres
 locking](https://www.citusdata.com/blog/2018/02/22/seven-tips-for-dealing-with-postgres-locks/)
-as well as the Postgres docs, adding a primary key constraint is a blocking
+as well as [the Postgres docs](https://www.postgresql.org/docs/current/sql-altertable.html), adding a primary key constraint is a blocking
 operation.
 
 Instead of creating the constraint directly, consider creating the
