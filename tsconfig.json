@@ -17,5 +17,5 @@
     "noEmit": true
   },
   "include": ["**/*.js"],
-  "exclude": ["build", "node_modules"]
+  "exclude": ["build", "node_modules", "docs"]
 }
