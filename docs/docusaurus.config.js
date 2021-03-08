@@ -1,7 +1,7 @@
 module.exports = {
   title: "Squawk",
   tagline: "A linter for Postgres migrations",
-  url: "https://squawkhq.netlify.com",
+  url: "https://squawkhq.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -9,6 +9,10 @@ module.exports = {
   organizationName: "sbdchd", // Usually your GitHub org/user name.
   projectName: "squawk", // Usually your repo name.
   themeConfig: {
+    algolia: {
+      apiKey: process.env.ALGOLIA_API_KEY,
+      indexName: process.env.ALGOLIA_INDEX_NAME,
+    },
     sidebarCollapsible: false,
     colorMode: {
       defaultMode: "light",
