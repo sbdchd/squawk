@@ -1,6 +1,6 @@
 module.exports = {
-  title: "Squawk",
-  tagline: "A linter for Postgres migrations",
+  title: "Squawk — a linter for Postgres migrations",
+  tagline: "Reveal blocking schema changes with the Squawk CLI and GitHub App.",
   url: "https://squawkhq.com",
   baseUrl: "/",
   onBrokenLinks: "throw",
@@ -19,6 +19,17 @@ module.exports = {
       disableSwitch: true,
       respectPrefersColorScheme: false,
     },
+    image: 'img/squawk-wordmark.png',
+    metadatas: [
+      {
+        name: 'title',
+        content: 'Squawk — a linter for Postgres migrations'
+      },
+      {
+        name: 'description',
+        content: 'Reveal blocking schema changes with the Squawk CLI and GitHub App.'
+      },
+    ],
     navbar: {
       title: "Squawk",
       logo: {
