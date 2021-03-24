@@ -9,6 +9,9 @@ module.exports = {
   organizationName: "sbdchd", // Usually your GitHub org/user name.
   projectName: "squawk", // Usually your repo name.
   themeConfig: {
+    prism: {
+      theme: require('prism-react-renderer/themes/oceanicNext'),
+    },
     algolia: {
       apiKey: process.env.ALGOLIA_API_KEY,
       indexName: process.env.ALGOLIA_INDEX_NAME,
