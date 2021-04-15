@@ -23,13 +23,64 @@ statements in a transaction.
 Instead of:
 
 ```sql
+-- add table
+CREATE TABLE "foo_tbl" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "modified" timestamp with time zone NOT NULL, 
+    "created" timestamp with time zone NOT NULL
+);
+
+-- add column
 ALTER TABLE "app_user" ADD COLUMN "email" integer NULL;
+
+-- add constraint
+ALTER TABLE "app_user" ADD "email_constraint";
+
+-- add index
 CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
+
+-- remove table
+DROP TABLE IF EXISTS "foo_tbl";
+
+-- remove column
+ALTER TABLE DROP "col_name";
+
+-- remove constraint
+ALTER TABLE "foo_tbl" DROP CONSTRAINT "foo_constraint";
+
+-- remove index
+DROP INDEX "foo_idx";
 ```
 
 Use:
 
 ```sql
-ALTER TABLE "app_user" ADD COLUMN IF NOT EXISTS "email" integer NULL;
+-- add table
+CREATE TABLE IF NOT EXISTS "foo_tbl" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "modified" timestamp with time zone NOT NULL, 
+    "created" timestamp with time zone NOT NULL
+);
+
+-- add column
+ALTER TABLE "app_user" ADD COLUMN "email" IF NOT EXISTS integer NULL;
+
+-- add constraint
+ALTER TABLE "app_user" DROP CONSTRAINT IF EXISTS "email_constraint";
+ALTER TABLE "app_user" ADD "email_constraint";
+
+-- add index
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "email_idx" ON "app_user" ("email");
+
+-- remove table
+DROP TABLE IF EXISTS "foo_tbl";
+
+-- remove column
+ALTER TABLE DROP "col_name" IF EXISTS;
+
+-- remove constraint
+ALTER TABLE "foo_tbl" DROP CONSTRAINT IF EXISTS "foo_constraint";
+
+-- remove index
+DROP INDEX "foo_idx" IF EXISTS;
 ```
