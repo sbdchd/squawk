@@ -22,19 +22,15 @@ statements in a transaction.
 
 ### add table
 
-Instead of `CREATE TABLE`:
-
 ```sql
+-- instead of:
 CREATE TABLE "foo_tbl" (
     "id" serial NOT NULL PRIMARY KEY,
     "modified" timestamp with time zone NOT NULL,
     "created" timestamp with time zone NOT NULL
 );
-```
 
-Use, `CREATE TABLE IF NOT EXISTS`:
-
-```sql
+-- use:
 CREATE TABLE IF NOT EXISTS "foo_tbl" (
     "id" serial NOT NULL PRIMARY KEY,
     "modified" timestamp with time zone NOT NULL,
@@ -44,100 +40,71 @@ CREATE TABLE IF NOT EXISTS "foo_tbl" (
 
 ### add column
 
-Instead of `ADD COLUMN "email"`:
-
 ```sql
+-- instead of:
 ALTER TABLE "app_user" ADD COLUMN "email" integer NULL;
-```
 
-Use `ADD COLUMN "email" IF NOT EXISTS`:
-
-```sql
+-- use:
 ALTER TABLE "app_user" ADD COLUMN "email" IF NOT EXISTS integer NULL;
 ```
 
 ### add constraint
 
-Instead of:
-
 ```sql
+-- instead of:
 ALTER TABLE "app_user" ADD "email_constraint";
-```
 
-Use:
-
-```sql
-
+-- use:
 ALTER TABLE "app_user" DROP CONSTRAINT IF EXISTS "email_constraint";
 ALTER TABLE "app_user" ADD "email_constraint";
 ```
 
 ### add index
 
-Instead of:
-
 ```sql
+-- instead of:
 CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
-```
 
-Use:
-
-```sql
+-- use:
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "email_idx" ON "app_user" ("email");
 ```
 
 ### remove table
 
-Instead of:
-
 ```sql
+-- instead of:
 DROP TABLE "foo_tbl";
-```
 
-Use:
-
-```sql
+-- use:
 DROP TABLE IF EXISTS "foo_tbl";
 ```
 
 ### remove column
 
-Instead of:
-
 ```sql
+-- instead of:
 ALTER TABLE DROP "col_name";
-```
 
-Use:
-
-```sql
+-- use:
 DROP TABLE IF EXISTS "foo_tbl";
 ```
 
 ### remove constraint
 
-Instead of:
-
 ```sql
+-- instead of:
 ALTER TABLE "foo_tbl" DROP CONSTRAINT "foo_constraint";
-```
 
-Use:
-
-```sql
+-- use:
 ALTER TABLE "foo_tbl" DROP CONSTRAINT IF EXISTS "foo_constraint";
 ```
 
 ### remove index
 
-Instead of:
-
 ```sql
+-- instead of:
 DROP INDEX "foo_idx";
-```
 
-Use:
-
-```sql
+-- use:
 DROP INDEX "foo_idx" IF EXISTS;
 ```
