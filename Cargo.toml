@@ -3,5 +3,9 @@ members = [
     "cli",
     "parser",
     "linter",
-    "github",
+    "github"
 ]
+
+[profile.dev]
+# disable debug symbols to improve compile times.
+debug = false
