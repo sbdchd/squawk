@@ -32,7 +32,7 @@ ALTER TABLE "core_recipe" ADD CONSTRAINT foo_not_null
 ALTER TABLE "core_recipe" VALIDATE CONSTRAINT foo_not_null;
 ```
 
-Add the column as nullable, add a check constraint as `NOT VALID` that verifies the column is not null, backfill the column so it no longer contains null values, validate the constraint to verify existing rows are valid.
+Add the column as nullable, add a check constraint as `NOT VALID` to verify new rows and updates are, backfill the column so it no longer contains null values, validate the constraint to verify existing rows are valid.
 
 See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
 
@@ -53,6 +53,6 @@ ALTER TABLE "core_recipe" ADD CONSTRAINT foo_not_null
 ALTER TABLE "core_recipe" VALIDATE CONSTRAINT foo_not_null;
 ```
 
-Add a check constraint as `NOT VALID` that verifies the column is not null, backfill the column so it no longer contains null values, validate the constraint to verify existing rows are valid.
+Add a check constraint as `NOT VALID` to verify new rows and updates are, backfill the column so it no longer contains null values, validate the constraint to verify existing rows are valid.
 
 See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
