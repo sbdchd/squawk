@@ -42,8 +42,13 @@ module.exports = {
       items: [
         {
           to: "docs/",
-          activeBasePath: "docs",
           label: "Docs",
+          position: "left",
+        },
+        {
+          to: "docs/rules",
+          activeBasePath: "docs/rules",
+          label: "Rules",
           position: "left",
         },
         {
@@ -70,7 +75,7 @@ module.exports = {
             },
             {
               label: "Rules",
-              to: "docs/adding-field-with-default",
+              to: "docs/rules",
             },
           ],
         },
