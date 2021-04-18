@@ -37,3 +37,5 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
 ```
 
 We add our column as nullable, set a default for new rows, backfill our column (ideally done in batches to limit locking), and finally remove nullability.
+
+See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
