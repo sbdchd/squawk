@@ -1,4 +1,5 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::ViolationMessage;
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RootStmt, Stmt,
 };
@@ -14,7 +15,10 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
                         errs.push(RuleViolation::new(
                             RuleViolationKind::AddingNotNullableField,
                             raw_stmt.into(),
-                            None,
+                            Some(vec![
+                                ViolationMessage::Note("Setting a column NOT NULL blocks reads while the table is scanned.".into()),
+                                ViolationMessage::Help("Use a check constraint instead.".into())
+                            ]),
                         ))
                     }
                     if cmd.subtype == AlterTableType::AddColumn {
@@ -42,7 +46,7 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{check_sql, violations::RuleViolationKind, ViolationMessage};
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -53,6 +57,15 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         let res = check_sql(sql, &["prefer-robust-stmts".into()]).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::AddingNotNullableField);
+        assert_eq!(
+            res[0].messages,
+            vec![
+                ViolationMessage::Note(
+                    "Setting a column NOT NULL blocks reads while the table is scanned.".into()
+                ),
+                ViolationMessage::Help("Use a check constraint instead.".into())
+            ]
+        )
     }
 
     #[test]
