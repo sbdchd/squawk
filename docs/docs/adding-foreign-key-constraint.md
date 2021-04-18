@@ -24,6 +24,8 @@ To prevent blocking writes to tables, add the constraint as `NOT VALID` in one t
 While `NOT VALID` prevents row updates while running, it commits instantly if it can get a lock (see ["Safety requirements"](./safe_migrations.md#safety-requirements)). `VALIDATE CONSTRAINT` allows row updates while it scans
 the table.
 
+See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
+
 ### adding constraint to existing table
 
 Instead of:

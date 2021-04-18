@@ -1,4 +1,5 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::ViolationMessage;
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RootStmt, Stmt,
 };
@@ -10,6 +11,16 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
+                    if cmd.subtype == AlterTableType::SetNotNull {
+                        errs.push(RuleViolation::new(
+                            RuleViolationKind::AddingNotNullableField,
+                            raw_stmt.into(),
+                            Some(vec![
+                                ViolationMessage::Note("Setting a column NOT NULL blocks reads while the table is scanned.".into()),
+                                ViolationMessage::Help("Use a check constraint instead.".into())
+                            ]),
+                        ))
+                    }
                     if cmd.subtype == AlterTableType::AddColumn {
                         if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
                             for ColumnDefConstraint::Constraint(constraint) in
@@ -35,8 +46,27 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind, ViolationMessage};
     use insta::assert_debug_snapshot;
+
+    #[test]
+    fn set_null() {
+        let sql = r#"
+ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
+        "#;
+        let res = check_sql(sql, &["prefer-robust-stmts".into()]).unwrap();
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].kind, RuleViolationKind::AddingNotNullableField);
+        assert_eq!(
+            res[0].messages,
+            vec![
+                ViolationMessage::Note(
+                    "Setting a column NOT NULL blocks reads while the table is scanned.".into()
+                ),
+                ViolationMessage::Help("Use a check constraint instead.".into())
+            ]
+        )
+    }
 
     #[test]
     fn test_adding_field_that_is_not_nullable() {
