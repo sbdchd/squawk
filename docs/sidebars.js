@@ -2,6 +2,7 @@ module.exports = {
   someSidebar: {
     General: ["quick_start", "safe_migrations", "cli", "github_app"],
     Rules: [
+      "rules",
       "adding-field-with-default",
       "adding-foreign-key-constraint",
       "adding-not-nullable-field",
