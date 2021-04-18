@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.6.0 - 2021-02-19
+
+### Added
+
+- added "debug" option for `--dump-ast` to print out tree using Rust's `Debug` formatter (#92)
+- added new rule, "adding-foreign-key-constraint", to provide suggestions for safely adding foreign key constraints (#91)
+
+### Changed
+
+- updated "robust-stmts" suggestions with caveat about `IF NOT EXISTS` (#95)
+- updated "constraint-missing-not-valid" to warn about adding a constraint as NOT VALID and then using "VALIDATE CONSTRAINT" in the same transaction (#97)
+- updated "prefer-robust-stmts" with exception for using `DROP CONSTRAINT IF EXISTS` before `ADD CONSTRAINT` (#99)
+
+### Fixed
+
+- error reporting is more user friendly (#89, #90)
+
 ## v0.5.4 - 2021-01-08
 
 ### Fixed
