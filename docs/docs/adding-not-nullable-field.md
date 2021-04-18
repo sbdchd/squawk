@@ -35,7 +35,10 @@ ALTER TABLE "core_recipe" VALIDATE CONSTRAINT foo_not_null;
 Add the column as nullable, add a check constraint as `NOT VALID` that verifies the column is not null, backfill the column so it no longer contains null values, validate the constraint to verify existing rows are valid.
 
 
-### setting an existing column as NOT NULL
+See ["constraint-missing-not-valid"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
+
+
+### setting an existing column as non-nullable
 
 Instead of:
 
@@ -53,3 +56,5 @@ ALTER TABLE "core_recipe" VALIDATE CONSTRAINT foo_not_null;
 ```
 
 Add a check constraint as `NOT VALID` that verifies the column is not null, backfill the column so it no longer contains null values, validate the constraint to verify existing rows are valid.
+
+See ["constraint-missing-not-valid"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
