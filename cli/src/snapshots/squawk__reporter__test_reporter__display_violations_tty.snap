@@ -17,4 +17,5 @@ main.sql:3:1: warning: adding-not-nullable-field
   note: Adding a NOT NULL field requires exclusive locks and table rewrites.
   help: Make the field nullable.
 
+find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
 

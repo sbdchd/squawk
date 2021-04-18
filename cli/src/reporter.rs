@@ -285,6 +285,12 @@ pub fn fmt_tty<W: io::Write>(f: &mut W, files: &[ViolationContent]) -> Result<()
             files_checked = files_checked,
             files = if files_checked == 1 { "file" } else { "files" }
         )?;
+    } else {
+        writeln!(
+            f,
+            "find detailed examples and solutions for each rule at {}",
+            style("https://squawkhq.com/docs/rules").underlined()
+        )?;
     }
     Ok(())
 }
