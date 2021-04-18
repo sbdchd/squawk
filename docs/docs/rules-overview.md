@@ -12,3 +12,10 @@ The rule docs should provide actionable, user friendly error messages. If you fi
 
 Read ["Running Migrations](./safe_migrations.md) to learn about safely applying migrations after linting.
 :::
+
+## Index
+import sidebar from '../sidebars.js'
+
+<ul>
+{sidebar.someSidebar.Rules.map(ruleName => <li key={ruleName}><a href={`/docs/${ruleName}`}>{ruleName}</a></li>)}
+</ul>
