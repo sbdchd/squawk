@@ -10,6 +10,13 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
+                    if cmd.subtype == AlterTableType::SetNotNull {
+                        errs.push(RuleViolation::new(
+                            RuleViolationKind::AddingNotNullableField,
+                            raw_stmt.into(),
+                            None,
+                        ))
+                    }
                     if cmd.subtype == AlterTableType::AddColumn {
                         if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
                             for ColumnDefConstraint::Constraint(constraint) in
