@@ -18,12 +18,10 @@ fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => {
-                if stmt.kind == TransactionStmtKind::Begin {
-                    if !in_transaction {
-                        in_transaction = true;
-                        in_bad_index = false;
-                        begin_span_start = raw_stmt.stmt_location;
-                    }
+                if stmt.kind == TransactionStmtKind::Begin && !in_transaction {
+                    in_transaction = true;
+                    in_bad_index = false;
+                    begin_span_start = raw_stmt.stmt_location;
                 }
                 if stmt.kind == TransactionStmtKind::Commit {
                     if in_bad_index && in_transaction {
