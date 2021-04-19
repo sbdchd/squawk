@@ -27,11 +27,9 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
 ```
 
-
 ## how "not valid, validate" works
 
 When we add this constraint, writes to the `accounts` table will be blocked while the table is scanned to verify all `positive_balance` column entries match the check constraint `"balance" >= 0`.
-
 
 ```sql
 ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);

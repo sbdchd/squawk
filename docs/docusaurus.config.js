@@ -10,7 +10,7 @@ module.exports = {
   projectName: "squawk", // Usually your repo name.
   themeConfig: {
     prism: {
-      theme: require('prism-react-renderer/themes/oceanicNext'),
+      theme: require("prism-react-renderer/themes/oceanicNext"),
     },
     algolia: {
       apiKey: process.env.ALGOLIA_API_KEY,
@@ -22,15 +22,16 @@ module.exports = {
       disableSwitch: true,
       respectPrefersColorScheme: false,
     },
-    image: 'img/squawk-wordmark.png',
+    image: "img/squawk-wordmark.png",
     metadatas: [
       {
-        name: 'title',
-        content: 'Squawk — a linter for Postgres migrations'
+        name: "title",
+        content: "Squawk — a linter for Postgres migrations",
       },
       {
-        name: 'description',
-        content: 'Reveal blocking schema changes with the Squawk CLI and GitHub App.'
+        name: "description",
+        content:
+          "Reveal blocking schema changes with the Squawk CLI and GitHub App.",
       },
     ],
     navbar: {
