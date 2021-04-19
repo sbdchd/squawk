@@ -76,6 +76,11 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     None,
                 ));
             }
+            Stmt::DropStmt(stmt) if !stmt.missing_ok => errs.push(RuleViolation::new(
+                RuleViolationKind::PreferRobustStmts,
+                raw_stmt.into(),
+                None,
+            )),
             _ => continue,
         }
     }
@@ -93,6 +98,22 @@ mod test_rules {
         let sql = r#"
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+"#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+    #[test]
+    fn drop_index() {
+        let sql = r#"
+DROP INDEX CONCURRENTLY "email_idx";
+"#;
+        let res = check_sql(sql, &[]).unwrap();
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
+    }
+    #[test]
+    fn drop_index_if_exists() {
+        let sql = r#"
+DROP INDEX CONCURRENTLY IF EXISTS "email_idx";
 "#;
         assert_eq!(check_sql(sql, &[]), Ok(vec![]));
     }
