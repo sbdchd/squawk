@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - link to website for tty reporter when there are lint errors. (#120)
+- `DROP INDEX` support for "require-concurrent-index-creation" and "prefer-robust-stmts". (#124)
 
 ### Changed
 
