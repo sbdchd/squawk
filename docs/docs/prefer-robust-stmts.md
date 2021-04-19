@@ -68,16 +68,6 @@ ALTER TABLE "accounts" DROP CONSTRAINT IF EXISTS "positive_balance";
 ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
 ```
 
-### validate constraint
-
-```sql
--- instead of:
-ALTER TABLE "accounts" VALIDATE CONSTRAINT "positive_balance";
-
--- use:
-ALTER TABLE "accounts" VALIDATE CONSTRAINT "positive_balance";
-```
-
 ### add index
 
 ```sql
