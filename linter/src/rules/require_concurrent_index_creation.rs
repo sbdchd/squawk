@@ -28,6 +28,7 @@ pub fn require_concurrent_index_creation(tree: &[RootStmt]) -> Vec<RuleViolation
 #[cfg(test)]
 mod test_rules {
     use crate::check_sql;
+    use crate::violations::RuleViolationKind;
     use insta::assert_debug_snapshot;
 
     /// ```sql
@@ -50,5 +51,21 @@ mod test_rules {
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
         assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+    }
+
+    #[test]
+    fn test_drop_index_concurrently() {
+        let bad_sql = r#"
+  -- instead of
+  DROP INDEX IF EXISTS "field_name_idx";
+  "#;
+        let res = check_sql(bad_sql, &[]).unwrap();
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
+
+        let ok_sql = r#"
+  DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
+  "#;
+        assert_eq!(check_sql(ok_sql, &[]), Ok(vec![]));
     }
 }
