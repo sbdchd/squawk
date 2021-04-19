@@ -66,7 +66,10 @@ mod test_rules {
   "#;
         let res = check_sql(bad_sql, &[]).unwrap();
         assert_eq!(res.len(), 1);
-        assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
+        assert_eq!(
+            res[0].kind,
+            RuleViolationKind::RequireConcurrentIndexCreation
+        );
 
         let ok_sql = r#"
   DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
