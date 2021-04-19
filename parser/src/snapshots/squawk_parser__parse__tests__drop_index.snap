@@ -11,15 +11,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: false,
                         missing_ok: false,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -36,15 +27,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: false,
                         missing_ok: true,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -61,15 +43,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: true,
                         missing_ok: false,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -86,15 +59,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: true,
                         missing_ok: false,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -111,15 +75,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: true,
                         missing_ok: false,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -136,22 +91,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: false,
                         missing_ok: false,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -168,22 +107,6 @@ Ok(
                         behavior: DropCascade,
                         concurrent: false,
                         missing_ok: false,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -200,22 +123,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: false,
                         missing_ok: false,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -232,22 +139,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: false,
                         missing_ok: true,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -264,22 +155,6 @@ Ok(
                         behavior: DropCascade,
                         concurrent: false,
                         missing_ok: true,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -296,22 +171,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: false,
                         missing_ok: true,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -328,22 +187,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: true,
                         missing_ok: true,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -360,22 +203,6 @@ Ok(
                         behavior: DropCascade,
                         concurrent: true,
                         missing_ok: true,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),
@@ -392,22 +219,6 @@ Ok(
                         behavior: Restrict,
                         concurrent: true,
                         missing_ok: true,
-                        objects: [
-                            [
-                                String(
-                                    PGString {
-                                        str: "email_idx",
-                                    },
-                                ),
-                            ],
-                            [
-                                String(
-                                    PGString {
-                                        str: "name_idx",
-                                    },
-                                ),
-                            ],
-                        ],
                         remove_type: Index,
                     },
                 ),

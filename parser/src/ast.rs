@@ -764,7 +764,6 @@ pub struct DropStmt {
     pub concurrent: bool,
     #[serde(default)]
     pub missing_ok: bool,
-    pub objects: Vec<Vec<QualifiedName>>,
     #[serde(rename = "removeType")]
     pub remove_type: ObjectType,
 }
