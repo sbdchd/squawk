@@ -1228,4 +1228,28 @@ CREATE TABLE example (
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
+    #[test]
+    fn test_drop_index() {
+        let sql = r#"
+DROP INDEX "email_idx";
+DROP INDEX IF EXISTS "email_idx";
+DROP INDEX CONCURRENTLY "email_idx";
+DROP INDEX CONCURRENTLY "email_idx";
+DROP INDEX CONCURRENTLY "email_idx" RESTRICT;
+
+DROP INDEX "email_idx", "name_idx";
+DROP INDEX "email_idx", "name_idx" CASCADE;
+DROP INDEX "email_idx", "name_idx" RESTRICT;
+
+DROP INDEX IF EXISTS "email_idx", "name_idx";
+DROP INDEX IF EXISTS "email_idx", "name_idx" CASCADE;
+DROP INDEX IF EXISTS "email_idx", "name_idx" RESTRICT;
+
+DROP INDEX CONCURRENTLY IF EXISTS "email_idx", "name_idx";
+DROP INDEX CONCURRENTLY IF EXISTS "email_idx", "name_idx" CASCADE;
+DROP INDEX CONCURRENTLY IF EXISTS "email_idx", "name_idx" RESTRICT;
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
 }

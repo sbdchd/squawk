@@ -19,6 +19,11 @@ pub fn require_concurrent_index_creation(tree: &[RootStmt]) -> Vec<RuleViolation
                     ));
                 }
             }
+            Stmt::DropStmt(stmt) if !stmt.concurrent => errs.push(RuleViolation::new(
+                RuleViolationKind::RequireConcurrentIndexCreation,
+                raw_stmt.into(),
+                None,
+            )),
             _ => continue,
         }
     }

@@ -758,6 +758,18 @@ pub struct CreateStmt {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct DropStmt {
+    pub behavior: DropBehavior,
+    #[serde(default)]
+    pub concurrent: bool,
+    #[serde(default)]
+    pub missing_ok: bool,
+    pub objects: Vec<Vec<QualifiedName>>,
+    #[serde(rename = "removeType")]
+    pub remove_type: ObjectType,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub enum RootStmt {
     RawStmt(RawStmt),
 }
@@ -788,7 +800,7 @@ pub enum Stmt {
     DropTableSpaceStmt(Value),
     CreateExtensionStmt(Value),
     AlterExtensionStmt(Value),
-    DropStmt(Value),
+    DropStmt(DropStmt),
     AlterObjectSchemaStmt(Value),
     AlterExtensionContentsStmt(Value),
     CreateFdwStmt(Value),

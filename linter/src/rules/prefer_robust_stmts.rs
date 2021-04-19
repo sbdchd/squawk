@@ -76,6 +76,11 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     None,
                 ));
             }
+            Stmt::DropStmt(stmt) if !stmt.missing_ok => errs.push(RuleViolation::new(
+                RuleViolationKind::PreferRobustStmts,
+                raw_stmt.into(),
+                None,
+            )),
             _ => continue,
         }
     }
