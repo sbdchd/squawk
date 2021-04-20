@@ -92,10 +92,10 @@ DROP TABLE IF EXISTS "foo_tbl";
 
 ```sql
 -- instead of:
-ALTER TABLE DROP "col_name";
+ALTER TABLE "app_user" DROP COLUMN "col_name";
 
 -- use:
-DROP TABLE IF EXISTS "foo_tbl";
+ALTER TABLE "app_user" DROP COLUMN IF EXISTS "col_name";
 ```
 
 ### remove constraint
@@ -115,5 +115,5 @@ ALTER TABLE "foo_tbl" DROP CONSTRAINT IF EXISTS "foo_constraint";
 DROP INDEX "foo_idx";
 
 -- use:
-DROP INDEX "foo_idx" IF EXISTS;
+DROP INDEX IF EXISTS "foo_idx";
 ```
