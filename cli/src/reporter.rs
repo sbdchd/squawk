@@ -520,40 +520,7 @@ SELECT 1;
 
         let body = get_comment_body(violations);
 
-        assert_display_snapshot!(body, @r###"
-# Squawk Report
-
-### **🚒 1** violations across **1** file(s)
-
----
-
-<h3><code>alpha.sql</code></h3>
-
-```sql
-
-SELECT 1;
-                
-```
-
-<h4>🚒 Rule Violations (1)</h4>
-
-
-```
-alpha.sql:1:0: warning: adding-not-nullable-field
-
-   1 | ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
-
-  note: Adding a NOT NULL field requires exclusive locks and table rewrites.
-  help: Make the field nullable.
-```
-    
----
-    
-
-[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
-"###);
+        assert_display_snapshot!(body);
     }
 
     /// Even when we don't have violations we still want to output the SQL for
@@ -588,54 +555,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
         let body = get_comment_body(violations);
 
-        assert_display_snapshot!(body, @r###"
-# Squawk Report
-
-### **✅ 0** violations across **2** file(s)
-
----
-
-<h3><code>alpha.sql</code></h3>
-
-```sql
-
-BEGIN;
---
--- Create model Bar
---
-CREATE TABLE "core_bar" (
-    "id" serial NOT NULL PRIMARY KEY,
-    "alpha" varchar(100) NOT NULL
-);
-                
-```
-
-<h4>✅ Rule Violations (0)</h4>
-
-No violations found.
-    
----
-    
-
-<h3><code>bravo.sql</code></h3>
-
-```sql
-
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
-                
-```
-
-<h4>✅ Rule Violations (0)</h4>
-
-No violations found.
-    
----
-    
-
-[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
-"###);
+        assert_display_snapshot!(body);
     }
 
     /// Ideally the logic won't leave a comment when there are no migrations but
@@ -646,18 +566,7 @@ No violations found.
 
         let body = get_comment_body(violations);
 
-        assert_display_snapshot!(body, @r###"
-# Squawk Report
-
-### **✅ 0** violations across **0** file(s)
-
----
-
-
-[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
-"###);
+        assert_display_snapshot!(body);
     }
 }
 
