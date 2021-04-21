@@ -20,6 +20,8 @@ pub mod renaming_column;
 pub use renaming_column::*;
 pub mod renaming_table;
 pub use renaming_table::*;
+pub mod ban_drop_column;
+pub use ban_drop_column::*;
 pub mod require_concurrent_index_creation;
 pub use require_concurrent_index_creation::*;
 pub mod ban_char_field;

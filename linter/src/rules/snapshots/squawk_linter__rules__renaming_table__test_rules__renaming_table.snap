@@ -18,5 +18,19 @@ Ok(
                 ),
             ],
         },
+        RuleViolation {
+            kind: RenamingTable,
+            span: Span {
+                start: 0,
+                len: Some(
+                    52,
+                ),
+            },
+            messages: [
+                Note(
+                    "Renaming a table may break existing clients.",
+                ),
+            ],
+        },
     ],
 )
