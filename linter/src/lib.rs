@@ -94,6 +94,16 @@ lazy_static! {
         ]
     },
     SquawkRule {
+        id: "ban-drop-column".into(),
+        name: RuleViolationKind::BanDropColumn,
+        func: ban_drop_column,
+        messages: vec![
+            ViolationMessage::Note(
+                "Dropping a column may break existing clients.".into()
+            ),
+        ],
+    },
+    SquawkRule {
         id: "ban-drop-database".into(),
         name: RuleViolationKind::BanDropDatabase,
         func: ban_drop_database,
@@ -235,18 +245,7 @@ lazy_static! {
                 "Create the index CONCURRENTLY.".into()
             ),
         ],
-    },
-    // https://www.postgresql.org/docs/10/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY
-    SquawkRule {
-        id: "ban-drop-column".into(),
-        name: RuleViolationKind::BanDropColumn,
-        func: ban_drop_column,
-        messages: vec![
-            ViolationMessage::Note(
-                "Dropping a column may break existing clients.".into()
-            ),
-        ],
-    },
+    }
     ];
 
 }
