@@ -11,4 +11,4 @@ expression: body
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) (0.2.3), a linter for PostgreSQL, focused on migrations
