@@ -18,6 +18,7 @@ pub enum RuleViolationKind {
     PreferTextField,
     PreferRobustStmts,
     BanCharField,
+    BanDropColumn,
 }
 
 impl std::fmt::Display for RuleViolationKind {
