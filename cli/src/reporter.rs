@@ -454,7 +454,7 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
     ))
 }
 
-pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
+pub fn get_comment_body(files: Vec<ViolationContent>, version: &str) -> String {
     let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
 
     let violations_emoji = get_violations_emoji(violations_count);
@@ -470,7 +470,7 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) ({version}), a linter for PostgreSQL, focused on migrations
 "#,
         violations_emoji = violations_emoji,
         violation_count = violations_count,
@@ -479,7 +479,8 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
             .into_iter()
             .flat_map(|x| get_sql_file_content(x).ok())
             .collect::<Vec<String>>()
-            .join("\n")
+            .join("\n"),
+        version = version
     )
     .trim_matches('\n')
     .into()
@@ -518,7 +519,7 @@ SELECT 1;
             }],
         }];
 
-        let body = get_comment_body(violations);
+        let body = get_comment_body(violations, "0.2.3");
 
         assert_display_snapshot!(body);
     }
@@ -553,7 +554,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
             },
         ];
 
-        let body = get_comment_body(violations);
+        let body = get_comment_body(violations, "0.2.3");
 
         assert_display_snapshot!(body);
     }
@@ -564,7 +565,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
     fn test_generating_no_violations_no_files() {
         let violations = vec![];
 
-        let body = get_comment_body(violations);
+        let body = get_comment_body(violations, "0.2.3");
 
         assert_display_snapshot!(body);
     }

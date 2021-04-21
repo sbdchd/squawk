@@ -4,6 +4,8 @@ use serde_json::Value;
 use squawk_github::{comment_on_pr, GithubError, PullRequest};
 use structopt::StructOpt;
 
+const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+
 #[derive(Debug)]
 pub enum SquawkError {
     CheckFilesError(CheckFilesError),
@@ -123,7 +125,7 @@ pub fn check_and_comment_on_pr(
         return Ok(Value::Null);
     }
     info!("generating github comment body");
-    let comment_body = get_comment_body(file_results);
+    let comment_body = get_comment_body(file_results, VERSION);
     let pr = PullRequest {
         issue: github_pr_number,
         owner: github_repo_owner,
