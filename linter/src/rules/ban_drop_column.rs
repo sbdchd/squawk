@@ -18,14 +18,13 @@ pub fn ban_drop_column(tree: &[RootStmt]) -> Vec<RuleViolation> {
             },
             Stmt::AlterTableStmt(stmt) => {
                 for cmd in &stmt.cmds {
-                    if let AlterTableCmds::AlterTableCmd(cmd) = cmd {
-                        if cmd.subtype == AlterTableType::DropColumn {
-                            errs.push(RuleViolation::new(
-                                RuleViolationKind::BanDropColumn,
-                                raw_stmt.into(),
-                                None,
-                            ))
-                        }
+                    let AlterTableCmds::AlterTableCmd(cmd) = cmd;
+                    if cmd.subtype == AlterTableType::DropColumn {
+                        errs.push(RuleViolation::new(
+                            RuleViolationKind::BanDropColumn,
+                            raw_stmt.into(),
+                            None,
+                        ))
                     }
                 }
             }
