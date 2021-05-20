@@ -158,7 +158,7 @@ cargo run
 ### releasing a new version
 
 1. update the CHANGELOG.md and bump version in all the dependency
-   `Cargo.toml` as well as the CLI `Cargo.toml`
+   `Cargo.toml` as well as the CLI `Cargo.toml` and commit the changes
 2. create a new release on github - CI will attach the binaries automatically
 3. bump version in `package.json` and follow the `npm` steps
 
