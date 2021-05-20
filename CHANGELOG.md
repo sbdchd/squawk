@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### v0.7.0 - 2021-05-19
+
 ### Added
 
 - link to website for tty reporter when there are lint errors. (#120)
@@ -17,6 +19,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - updated "adding-not-null-field" to warn about making a column non-nullable with `NOT NULL`. See the ["adding-not-null-field" docs](https://squawkhq.com/docs/adding-not-nullable-field) for more information. (#101)
+
+### Fixed
+
+- false positive with `prefer-text-field` that wasn't allowing `varchar`
+  without a length specified
 
 ## v0.6.0 - 2021-02-19
 
