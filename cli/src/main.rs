@@ -75,7 +75,12 @@ fn main() {
     let is_stdin = !atty::is(Stream::Stdin);
     if let Some(subcommand) = opts.cmd {
         exit(
-            check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath),
+            check_and_comment_on_pr(
+                subcommand,
+                is_stdin,
+                opts.stdin_filepath,
+                opts.exclude.unwrap_or_else(Vec::new),
+            ),
             "Upload to GitHub failed",
         );
     } else if !opts.paths.is_empty() || is_stdin {

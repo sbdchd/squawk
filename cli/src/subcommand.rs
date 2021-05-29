@@ -102,10 +102,16 @@ fn get_github_private_key(
     }
 }
 
+fn concat(a: &[String], b: &[String]) -> Vec<String> {
+    // from: https://stackoverflow.com/a/53476705/3720597
+    [a, b].concat()
+}
+
 pub fn check_and_comment_on_pr(
     cmd: Command,
     is_stdin: bool,
     stdin_path: Option<String>,
+    base_file_paths: Vec<String>,
 ) -> Result<Value, SquawkError> {
     let Command::UploadToGithub {
         paths,
@@ -119,7 +125,12 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     } = cmd;
     info!("checking files");
-    let file_results = check_files(&paths, is_stdin, stdin_path, exclude)?;
+    let file_results = check_files(
+        &concat(&paths, &base_file_paths),
+        is_stdin,
+        stdin_path,
+        exclude,
+    )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");
         return Ok(Value::Null);
