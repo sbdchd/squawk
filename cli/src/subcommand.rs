@@ -111,7 +111,7 @@ pub fn check_and_comment_on_pr(
     cmd: Command,
     is_stdin: bool,
     stdin_path: Option<String>,
-    base_file_paths: Vec<String>,
+    root_cmd_exclude: Vec<String>,
 ) -> Result<Value, SquawkError> {
     let Command::UploadToGithub {
         paths,
@@ -126,10 +126,10 @@ pub fn check_and_comment_on_pr(
     } = cmd;
     info!("checking files");
     let file_results = check_files(
-        &concat(&paths, &base_file_paths),
+        &paths,
         is_stdin,
         stdin_path,
-        exclude,
+        exclude.map(|x| concat(x.as_ref(), &root_cmd_exclude)),
     )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");
