@@ -4,6 +4,20 @@ use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RootStmt, Stmt,
 };
 
+fn has_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bool {
+    let mut has_null = false;
+    let mut has_default = false;
+    for ColumnDefConstraint::Constraint(constraint) in constraints {
+        if constraint.contype == ConstrType::NotNull {
+            has_null = true;
+        }
+        if constraint.contype == ConstrType::Default {
+            has_default = true;
+        }
+    }
+    return has_null && !has_default;
+}
+
 #[must_use]
 pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
@@ -23,16 +37,12 @@ pub fn adding_not_nullable_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     }
                     if cmd.subtype == AlterTableType::AddColumn {
                         if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
-                            for ColumnDefConstraint::Constraint(constraint) in
-                                &column_def.constraints
-                            {
-                                if constraint.contype == ConstrType::NotNull {
-                                    errs.push(RuleViolation::new(
-                                        RuleViolationKind::AddingNotNullableField,
-                                        raw_stmt.into(),
-                                        None,
-                                    ));
-                                }
+                            if has_null_and_no_default_constraint(&column_def.constraints) {
+                                errs.push(RuleViolation::new(
+                                    RuleViolationKind::AddingNotNullableField,
+                                    raw_stmt.into(),
+                                    None,
+                                ));
                             }
                         }
                     }
@@ -88,5 +98,16 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
 
         assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+    }
+
+    #[test]
+    fn allow_not_null_field_with_default() {
+        let ok_sql = r#"
+ALTER TABLE "foo_tbl" ADD COLUMN IF NOT EXISTS "bar_col" TEXT DEFAULT 'buzz' NOT NULL;
+"#;
+        assert_eq!(
+            check_sql(ok_sql, &["adding-field-with-default".into()]),
+            Ok(vec![])
+        );
     }
 }
