@@ -4,7 +4,7 @@ use serde_json::Value;
 use squawk_github::{comment_on_pr, GithubError, PullRequest};
 use structopt::StructOpt;
 
-const VERSION: &'static str = env!("CARGO_PKG_VERSION");
+const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[derive(Debug)]
 pub enum SquawkError {

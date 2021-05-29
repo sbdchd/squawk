@@ -2,10 +2,10 @@ use console::strip_ansi_codes;
 use console::style;
 use log::info;
 use serde::Serialize;
-use squawk_linter::errors::CheckSQLError;
+use squawk_linter::errors::CheckSqlError;
 use squawk_linter::violations::{RuleViolation, RuleViolationKind, Span, ViolationMessage};
 use squawk_linter::{check_sql, SquawkRule, RULES};
-use squawk_parser::error::PGQueryError;
+use squawk_parser::error::PgQueryError;
 use squawk_parser::parse::{parse_sql_query, parse_sql_query_json};
 use std::convert::TryFrom;
 use std::fs::File;
@@ -31,7 +31,7 @@ arg_enum! {
 
 #[derive(Debug)]
 pub enum DumpAstError {
-    PGQuery(PGQueryError),
+    PgQuery(PgQueryError),
     Io(std::io::Error),
     Json(serde_json::error::Error),
 }
@@ -39,16 +39,16 @@ pub enum DumpAstError {
 impl std::fmt::Display for DumpAstError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::PGQuery(ref err) => err.fmt(f),
+            Self::PgQuery(ref err) => err.fmt(f),
             Self::Io(ref err) => err.fmt(f),
             Self::Json(ref err) => err.fmt(f),
         }
     }
 }
 
-impl std::convert::From<PGQueryError> for DumpAstError {
-    fn from(e: PGQueryError) -> Self {
-        Self::PGQuery(e)
+impl std::convert::From<PgQueryError> for DumpAstError {
+    fn from(e: PgQueryError) -> Self {
+        Self::PgQuery(e)
     }
 }
 
@@ -104,14 +104,14 @@ pub fn dump_ast_for_paths<W: io::Write>(
 
 #[derive(Debug)]
 pub enum CheckFilesError {
-    CheckSQL(CheckSQLError),
+    CheckSql(CheckSqlError),
     IoError(std::io::Error),
 }
 
 impl std::fmt::Display for CheckFilesError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::CheckSQL(ref err) => err.fmt(f),
+            Self::CheckSql(ref err) => err.fmt(f),
             Self::IoError(ref err) => err.fmt(f),
         }
     }
@@ -122,9 +122,9 @@ impl std::convert::From<std::io::Error> for CheckFilesError {
     }
 }
 
-impl std::convert::From<CheckSQLError> for CheckFilesError {
-    fn from(e: CheckSQLError) -> Self {
-        Self::CheckSQL(e)
+impl std::convert::From<CheckSqlError> for CheckFilesError {
+    fn from(e: CheckSqlError) -> Self {
+        Self::CheckSql(e)
     }
 }
 
@@ -176,14 +176,12 @@ arg_enum! {
 
 #[derive(Debug, Serialize)]
 pub enum ViolationLevel {
-    Error,
     Warning,
 }
 
 impl std::fmt::Display for ViolationLevel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let val = match self {
-            Self::Error => "error",
             Self::Warning => "warning",
         };
         write!(f, "{}", val)

@@ -1,20 +1,20 @@
-use squawk_parser::error::PGQueryError;
+use squawk_parser::error::PgQueryError;
 
 #[derive(Debug, PartialEq)]
-pub enum CheckSQLError {
-    ParsingSQL(PGQueryError),
+pub enum CheckSqlError {
+    ParsingSql(PgQueryError),
 }
 
-impl std::fmt::Display for CheckSQLError {
+impl std::fmt::Display for CheckSqlError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::ParsingSQL(ref err) => err.fmt(f),
+            Self::ParsingSql(ref err) => err.fmt(f),
         }
     }
 }
 
-impl std::convert::From<PGQueryError> for CheckSQLError {
-    fn from(err: PGQueryError) -> Self {
-        Self::ParsingSQL(err)
+impl std::convert::From<PgQueryError> for CheckSqlError {
+    fn from(err: PgQueryError) -> Self {
+        Self::ParsingSql(err)
     }
 }

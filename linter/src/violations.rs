@@ -72,9 +72,7 @@ impl RuleViolation {
             RULES
                 .iter()
                 .find(|r| r.name == kind)
-                .unwrap()
-                .messages
-                .clone()
+                .map_or_else(Vec::new, |x| x.messages.clone())
         });
         Self {
             kind,
