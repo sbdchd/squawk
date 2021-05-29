@@ -132,10 +132,8 @@ pub fn check_files(
     paths: &[String],
     is_stdin: bool,
     stdin_path: Option<String>,
-    excluded_rules: Option<Vec<String>>,
+    excluded_rules: Vec<String>,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
-    let excluded_rules = excluded_rules.unwrap_or_else(Vec::new);
-
     let mut output_violations = vec![];
 
     let mut process_violations = |sql: &str, path: &str| -> Result<(), CheckFilesError> {

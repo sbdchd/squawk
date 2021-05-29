@@ -90,7 +90,12 @@ fn main() {
                 "Failed to dump AST",
             );
         } else {
-            match check_files(&opts.paths, is_stdin, opts.stdin_filepath, opts.exclude) {
+            match check_files(
+                &opts.paths,
+                is_stdin,
+                opts.stdin_filepath,
+                opts.exclude.unwrap_or_else(Vec::new),
+            ) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
                     let total_violations = file_reports

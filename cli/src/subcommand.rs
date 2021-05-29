@@ -129,7 +129,7 @@ pub fn check_and_comment_on_pr(
         &paths,
         is_stdin,
         stdin_path,
-        exclude.map(|x| concat(x.as_ref(), &root_cmd_exclude)),
+        concat(&exclude.unwrap_or_else(Vec::new), &root_cmd_exclude),
     )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");
