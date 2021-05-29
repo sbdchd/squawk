@@ -1,11 +1,11 @@
 use crate::ast::RootStmt;
-use crate::error::PGQueryError;
+use crate::error::PgQueryError;
 use libpg_query::{pg_query_free_parse_result, pg_query_parse};
 use serde::Deserialize;
 use serde_json::Value;
 use std::ffi::{CStr, CString};
 
-fn parse_sql_query_base<'a, T>(query: &'a str) -> Result<Vec<T>, PGQueryError>
+fn parse_sql_query_base<'a, T>(query: &'a str) -> Result<Vec<T>, PgQueryError>
 where
     T: Deserialize<'a>,
 {
@@ -13,17 +13,17 @@ where
     let pg_parse_result = unsafe { pg_query_parse(c_str.as_ptr()) };
 
     if !pg_parse_result.error.is_null() {
-        return Err(PGQueryError::PGParseError);
+        return Err(PgQueryError::PgParseError);
     }
 
     // not sure if this is ever null, but might as well check
     if pg_parse_result.parse_tree.is_null() {
-        return Err(PGQueryError::ParsingCString);
+        return Err(PgQueryError::ParsingCString);
     }
 
     let parse_tree = unsafe { CStr::from_ptr(pg_parse_result.parse_tree) }.to_str()?;
     let output =
-        serde_json::from_str(parse_tree).map_err(|e| PGQueryError::JsonParse(e.to_string()));
+        serde_json::from_str(parse_tree).map_err(|e| PgQueryError::JsonParse(e.to_string()));
 
     unsafe {
         pg_query_free_parse_result(pg_parse_result);
@@ -32,11 +32,11 @@ where
     output
 }
 
-pub fn parse_sql_query_json(query: &str) -> Result<Vec<Value>, PGQueryError> {
+pub fn parse_sql_query_json(query: &str) -> Result<Vec<Value>, PgQueryError> {
     parse_sql_query_base(query)
 }
 
-pub fn parse_sql_query(query: &str) -> Result<Vec<RootStmt>, PGQueryError> {
+pub fn parse_sql_query(query: &str) -> Result<Vec<RootStmt>, PgQueryError> {
     parse_sql_query_base(query)
 }
 
