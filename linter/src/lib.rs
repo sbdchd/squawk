@@ -6,7 +6,7 @@ pub mod violations;
 #[macro_use]
 extern crate lazy_static;
 
-use crate::errors::CheckSQLError;
+use crate::errors::CheckSqlError;
 use crate::rules::{
     adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
     adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
@@ -253,7 +253,7 @@ lazy_static! {
 pub fn check_sql(
     sql: &str,
     excluded_rules: &[String],
-) -> Result<Vec<RuleViolation>, CheckSQLError> {
+) -> Result<Vec<RuleViolation>, CheckSqlError> {
     let tree = parse_sql_query(sql)?;
 
     let excluded_rules: HashSet<RuleViolationKind> = excluded_rules

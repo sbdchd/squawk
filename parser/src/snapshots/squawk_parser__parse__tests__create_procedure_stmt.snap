@@ -3,5 +3,5 @@ source: parser/src/parse.rs
 expression: res
 ---
 Err(
-    PGParseError,
+    PgParseError,
 )
