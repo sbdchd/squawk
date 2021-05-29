@@ -79,7 +79,7 @@ fn main() {
                 subcommand,
                 is_stdin,
                 opts.stdin_filepath,
-                opts.exclude.unwrap_or_else(Vec::new),
+                &opts.exclude.unwrap_or_else(Vec::new),
             ),
             "Upload to GitHub failed",
         );
@@ -94,7 +94,7 @@ fn main() {
                 &opts.paths,
                 is_stdin,
                 opts.stdin_filepath,
-                opts.exclude.unwrap_or_else(Vec::new),
+                &opts.exclude.unwrap_or_else(Vec::new),
             ) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);

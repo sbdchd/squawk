@@ -132,7 +132,7 @@ pub fn check_files(
     paths: &[String],
     is_stdin: bool,
     stdin_path: Option<String>,
-    excluded_rules: Vec<String>,
+    excluded_rules: &[String],
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 
