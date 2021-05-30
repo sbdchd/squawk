@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# This script requires fastmod to be installed
+# fastmod: https://github.com/facebookincubator/fastmod
+
+
+function main {
+    NEW_VERSION="$1"
+    echo "updating version to '$NEW_VERSION'..."
+    fastmod '^version = ".*"' 'version = "'$NEW_VERSION'"' -g 'Cargo.toml'
+    fastmod '"version": ".*"' '"version": "'$NEW_VERSION'"' -g 'package.json'
+}
+
+
+main $@
+
+
