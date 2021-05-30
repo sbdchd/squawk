@@ -6,4 +6,4 @@ coverage/
 .terraform/
 .pytest_cache/
 target/
-docs
+docs/.docusaurus

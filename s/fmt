@@ -2,3 +2,4 @@
 set -eu
 
 cargo fmt
+yarn run prettier --write .

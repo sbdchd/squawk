@@ -7,13 +7,13 @@ Squawk's rules focus on ensuring safe migrations and warn about statements that 
 
 The rule docs should provide actionable, user friendly error messages. If you find a rule, error message, or docs page lacking, please [open an issue](https://github.com/sbdchd/squawk/issues/new).
 
-
 :::note Reminder
 
 Read ["Running Migrations](./safe_migrations.md) to learn about safely applying migrations after linting.
 :::
 
 ## Index
+
 import sidebar from '../sidebars.js'
 
 <ul>
