@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::collections::HashSet;
 
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
@@ -21,6 +22,7 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let mut inside_transaction = false;
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
+    let mut warned_constraints: HashSet<String> = HashSet::new();
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => match stmt.kind {
@@ -36,7 +38,8 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                         }
                         if (cmd.subtype == AlterTableType::AddConstraint
                             || cmd.subtype == AlterTableType::ValidateConstraint)
-                            && constraint_names.contains_key(constraint_name)
+                            && (constraint_names.contains_key(constraint_name)
+                                || warned_constraints.contains(constraint_name))
                         {
                             continue;
                         }
@@ -54,6 +57,14 @@ pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
                     }
                     if cmd.missing_ok || inside_transaction {
                         continue;
+                    }
+                    if let Some(AlterTableDef::Constraint(constraint)) = &cmd.def {
+                        if let Some(constraint_name) = &constraint.conname {
+                            if warned_constraints.contains(constraint_name) {
+                                continue;
+                            }
+                            warned_constraints.insert(constraint_name.clone());
+                        }
                     }
                     errs.push(RuleViolation::new(
                         RuleViolationKind::PreferRobustStmts,
@@ -137,6 +148,18 @@ ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_id
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
         let res = check_sql(sql, &[]).unwrap();
+        assert_eq!(res.len(), 1);
+        assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
+    }
+
+    #[test]
+    /// We should only warn about the first
+    fn dont_warn_validate_with_add() {
+        let sql = r#"
+ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) NOT VALID;
+ALTER TABLE "app_user" VALIDATE CONSTRAINT "positive_balance";
+        "#;
+        let res = check_sql(sql, &["require-concurrent-index-creation".into()]).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
     }

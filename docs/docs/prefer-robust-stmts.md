@@ -61,11 +61,11 @@ ALTER TABLE "app_user" ADD COLUMN "email" IF NOT EXISTS integer NULL;
 
 ```sql
 -- instead of:
-ALTER TABLE "app_user" ADD "email_constraint";
+ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
 
 -- use:
-ALTER TABLE "app_user" DROP CONSTRAINT IF EXISTS "email_constraint";
-ALTER TABLE "app_user" ADD "email_constraint";
+ALTER TABLE "accounts" DROP CONSTRAINT IF EXISTS "positive_balance";
+ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
 ```
 
 ### add index
