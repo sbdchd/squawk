@@ -159,11 +159,12 @@ cargo run
 
 1. update the CHANGELOG.md and bump version in all the dependency
    `Cargo.toml` as well as the CLI `Cargo.toml` and commit the changes
-   
+
    ```bash
    # update version in Cargo.toml files and package.json to 4.5.3
    s/update-version 4.5.3
    ```
+
 2. create a new release on github - CI will attach the binaries automatically
 3. bump version in `package.json` and follow the `npm` steps
 
