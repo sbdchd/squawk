@@ -166,7 +166,13 @@ cargo run
    ```
 
 2. create a new release on github - CI will attach the binaries automatically
-3. bump version in `package.json` and follow the `npm` steps
+3. wait for build artifacts to be attached to release.
+4. login to `npm` and publish new version.
+
+   ```bash
+   npm login
+   npm publish
+   ```
 
 ## how it works
 
