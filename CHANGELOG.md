@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - incorrect internal schema for "create partition" statements. (#146)
 - `upload-to-github` command not obeying top level `--exclude`s. (#142)
 
+### Changed
+
+- allowing adding not null column with default for `adding-not-null-field`. (#144)
+
 ## v0.7.0 - 2021-05-19
 
 ### Added
