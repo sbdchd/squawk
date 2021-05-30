@@ -1228,6 +1228,16 @@ CREATE TABLE example (
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
+
+    #[test]
+    fn test_parse_create_table_partition() {
+        let sql = r#"
+CREATE TABLE measurement_y2006m02 PARTITION OF measurement
+    FOR VALUES FROM ('2006-02-01') TO ('2006-03-01');
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
     #[test]
     fn test_drop_index() {
         let sql = r#"

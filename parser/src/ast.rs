@@ -729,7 +729,7 @@ pub struct CreateStmt {
     /// relation to create
     pub relation: RelationKind,
     /// column definitions (list of ColumnDef)
-    #[serde(rename = "tableElts")]
+    #[serde(rename = "tableElts", default)]
     pub table_elts: Vec<TableElt>,
     /// relations to inherit from (list of inhRelation)
     #[serde(rename = "inhRelations")]
