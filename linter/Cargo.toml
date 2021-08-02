@@ -1,6 +1,6 @@
 [package]
 name = "squawk-linter"
-version = "0.7.1"
+version = "0.7.2"
 authors = ["Steve Dignam <steve@dignam.xyz>"]
 edition = "2018"
 license = "GPL-3.0"
