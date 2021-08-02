@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.7.2 - 2021-08-02
+
+### Fixed
+
+- incorrect internal schema for "alter table" statements with function calls. Thanks @qoelet! (#154)
+
 ## v0.7.1 - 2021-05-30
 
 ### Fixed
