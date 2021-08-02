@@ -597,6 +597,7 @@ pub enum AlterTableDef {
     #[serde(rename = "A_Const")]
     Constant(Value),
     ReplicaIdentityStmt(Value),
+    SQLValueFunction(Value),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
