@@ -1,6 +1,6 @@
 use crate::rules::utils::tables_created_in_transaction;
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{RelationKind, RootStmt, Stmt};
+use squawk_parser::ast::{ObjectType, RelationKind, RootStmt, Stmt};
 
 #[must_use]
 pub fn require_concurrent_index_creation(tree: &[RootStmt]) -> Vec<RuleViolation> {
@@ -19,11 +19,13 @@ pub fn require_concurrent_index_creation(tree: &[RootStmt]) -> Vec<RuleViolation
                     ));
                 }
             }
-            Stmt::DropStmt(stmt) if !stmt.concurrent => errs.push(RuleViolation::new(
-                RuleViolationKind::RequireConcurrentIndexCreation,
-                raw_stmt.into(),
-                None,
-            )),
+            Stmt::DropStmt(stmt) if !stmt.concurrent && stmt.remove_type == ObjectType::Index => {
+                errs.push(RuleViolation::new(
+                    RuleViolationKind::RequireConcurrentIndexCreation,
+                    raw_stmt.into(),
+                    None,
+                ))
+            }
             _ => continue,
         }
     }
@@ -75,5 +77,29 @@ mod test_rules {
   DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
   "#;
         assert_eq!(check_sql(ok_sql, &[]), Ok(vec![]));
+    }
+
+    #[test]
+    fn regression_false_positive_drop_type() {
+        let sql = r#"
+  DROP TYPE IF EXISTS foo;
+  "#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+
+    #[test]
+    fn regression_false_positive_drop_table() {
+        let sql = r#"
+  DROP TABLE IF EXISTS some_table;
+  "#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+    }
+
+    #[test]
+    fn regression_false_positive_drop_trigger() {
+        let sql = r#"
+  DROP TRIGGER IF EXISTS trigger on foo_table;
+  "#;
+        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
     }
 }
