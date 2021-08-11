@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.7.3 - 2021-08-11
+
+### Fixed
+
+- false positives with require-concurrent-index rule (#157)
+
 ## v0.7.2 - 2021-08-02
 
 ### Fixed
