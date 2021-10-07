@@ -144,6 +144,7 @@ See the ["GitHub Integration" docs](https://squawkhq.com/docs/github_app) for mo
 - <https://www.postgresql.org/docs/10/sql-altertable.html#SQL-ALTERTABLE-NOTES>
 - <https://www.postgresql.org/docs/current/explicit-locking.html>
 - <https://benchling.engineering/move-fast-and-migrate-things-how-we-automated-migrations-in-postgres-d60aba0fc3d4>
+- <https://medium.com/paypal-tech/postgresql-at-scale-database-schema-changes-without-downtime-20d3749ed680>
 
 ## dev
 
