@@ -3,23 +3,5 @@ source: linter/src/rules/adding_primary_key_constraint.rs
 expression: "check_sql(ok_sql, &[\"prefer-robust-stmts\".into()])"
 ---
 Ok(
-    [
-        RuleViolation {
-            kind: AddingSerialPrimaryKeyField,
-            span: Span {
-                start: 0,
-                len: Some(
-                    75,
-                ),
-            },
-            messages: [
-                Note(
-                    "Adding a PRIMARY KEY constraint results in locks and table rewrites",
-                ),
-                Help(
-                    "Add the PRIMARY KEY constraint USING an index.",
-                ),
-            ],
-        },
-    ],
+    [],
 )
