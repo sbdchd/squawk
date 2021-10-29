@@ -11,9 +11,13 @@ pub fn adding_primary_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     match (&cmd.def, &cmd.subtype) {
-                        (Some(AlterTableDef::Constraint(constraint)), AlterTableType::AddConstraint) => {
+                        (
+                            Some(AlterTableDef::Constraint(constraint)),
+                            AlterTableType::AddConstraint,
+                        ) => {
                             if constraint.contype == ConstrType::Primary
-                                    && constraint.indexname.is_none() {
+                                && constraint.indexname.is_none()
+                            {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::AddingSerialPrimaryKeyField,
                                     raw_stmt.into(),
@@ -24,7 +28,8 @@ pub fn adding_primary_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                         (Some(AlterTableDef::ColumnDef(def)), _) => {
                             for ColumnDefConstraint::Constraint(constraint) in &def.constraints {
                                 if constraint.contype == ConstrType::Primary
-                                    && constraint.indexname.is_none() {
+                                    && constraint.indexname.is_none()
+                                {
                                     errs.push(RuleViolation::new(
                                         RuleViolationKind::AddingSerialPrimaryKeyField,
                                         raw_stmt.into(),

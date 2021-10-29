@@ -1,6 +1,8 @@
 use crate::rules::utils::tables_created_in_transaction;
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{AlterTableCmds, AlterTableDef, AlterTableType, ConstrType, RelationKind, RootStmt, Stmt};
+use squawk_parser::ast::{
+    AlterTableCmds, AlterTableDef, AlterTableType, ConstrType, RelationKind, RootStmt, Stmt,
+};
 
 #[must_use]
 pub fn disallow_unique_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
@@ -13,7 +15,10 @@ pub fn disallow_unique_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
                 let tbl_name = &range.relname;
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     match (&cmd.def, &cmd.subtype) {
-                        (Some(AlterTableDef::Constraint(constraint)), AlterTableType::AddConstraint) => {
+                        (
+                            Some(AlterTableDef::Constraint(constraint)),
+                            AlterTableType::AddConstraint,
+                        ) => {
                             if !tables_created.contains(tbl_name)
                                 && constraint.contype == ConstrType::Unique
                                 && constraint.indexname.is_none()
