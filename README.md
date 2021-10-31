@@ -158,8 +158,8 @@ cargo run
 
 ### releasing a new version
 
-1. update the CHANGELOG.md and bump version in all the dependency
-   `Cargo.toml` as well as the CLI `Cargo.toml` and commit the changes
+1. update the CHANGELOG.md and bump version in the cli `Cargo.toml`, ensure the
+   lock file is updated, and update `package.json` and commit the changes
 
    ```bash
    # update version in Cargo.toml files and package.json to 4.5.3
