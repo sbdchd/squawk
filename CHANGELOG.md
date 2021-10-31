@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.8.0 - 2021-10-31
+
+### Fixed
+
+- false positives with disallowed-unique-constraint and adding-serial-primary-key-field. Thanks @qoelet! (#161)
+
 ## v0.7.3 - 2021-08-11
 
 ### Fixed
