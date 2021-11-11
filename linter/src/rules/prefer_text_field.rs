@@ -37,7 +37,7 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
     let ColumnDefTypeName::TypeName(type_name) = &column_def.type_name;
     for QualifiedName::String(field_type_name) in &type_name.names {
-        if field_type_name.str == "varchar" {
+        if field_type_name.str == "varchar" && !type_name.typmods.is_empty() {
             errs.push(RuleViolation::new(
                 RuleViolationKind::PreferTextField,
                 raw_stmt.into(),
@@ -191,5 +191,14 @@ COMMIT;
         let data = res.unwrap_or_default();
         assert!(!data.is_empty());
         assert_debug_snapshot!(data);
+    }
+
+    #[test]
+    fn allow_varchar_without_specified_limit() {
+        let ok_sql = r#"
+    CREATE TABLE IF NOT EXISTS foo_table(bar_col varchar);
+    "#;
+        let res = check_sql(ok_sql, &[]);
+        assert_eq!(res, Ok(vec![]));
     }
 }

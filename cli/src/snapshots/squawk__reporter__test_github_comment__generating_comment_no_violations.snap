@@ -1,0 +1,50 @@
+---
+source: cli/src/reporter.rs
+expression: body
+---
+# Squawk Report
+
+### **✅ 0** violations across **2** file(s)
+
+---
+
+<h3><code>alpha.sql</code></h3>
+
+```sql
+
+BEGIN;
+--
+-- Create model Bar
+--
+CREATE TABLE "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "alpha" varchar(100) NOT NULL
+);
+                
+```
+
+<h4>✅ Rule Violations (0)</h4>
+
+No violations found.
+    
+---
+    
+
+<h3><code>bravo.sql</code></h3>
+
+```sql
+
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+                
+```
+
+<h4>✅ Rule Violations (0)</h4>
+
+No violations found.
+    
+---
+    
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) (0.2.3), a linter for PostgreSQL, focused on migrations

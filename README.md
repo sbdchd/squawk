@@ -144,6 +144,7 @@ See the ["GitHub Integration" docs](https://squawkhq.com/docs/github_app) for mo
 - <https://www.postgresql.org/docs/10/sql-altertable.html#SQL-ALTERTABLE-NOTES>
 - <https://www.postgresql.org/docs/current/explicit-locking.html>
 - <https://benchling.engineering/move-fast-and-migrate-things-how-we-automated-migrations-in-postgres-d60aba0fc3d4>
+- <https://medium.com/paypal-tech/postgresql-at-scale-database-schema-changes-without-downtime-20d3749ed680>
 
 ## dev
 
@@ -157,10 +158,22 @@ cargo run
 
 ### releasing a new version
 
-1. update the CHANGELOG.md and bump version in all the dependency
-   `Cargo.toml` as well as the CLI `Cargo.toml`
+1. update the CHANGELOG.md and bump version in the cli `Cargo.toml`, ensure the
+   lock file is updated, and update `package.json` and commit the changes
+
+   ```bash
+   # update version in Cargo.toml files and package.json to 4.5.3
+   s/update-version 4.5.3
+   ```
+
 2. create a new release on github - CI will attach the binaries automatically
-3. bump version in `package.json` and follow the `npm` steps
+3. wait for build artifacts to be attached to release.
+4. login to `npm` and publish new version.
+
+   ```bash
+   npm login
+   npm publish
+   ```
 
 ## how it works
 

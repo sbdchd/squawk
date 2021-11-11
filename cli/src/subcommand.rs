@@ -4,6 +4,8 @@ use serde_json::Value;
 use squawk_github::{comment_on_pr, GithubError, PullRequest};
 use structopt::StructOpt;
 
+const VERSION: &str = env!("CARGO_PKG_VERSION");
+
 #[derive(Debug)]
 pub enum SquawkError {
     CheckFilesError(CheckFilesError),
@@ -100,10 +102,16 @@ fn get_github_private_key(
     }
 }
 
+fn concat(a: &[String], b: &[String]) -> Vec<String> {
+    // from: https://stackoverflow.com/a/53476705/3720597
+    [a, b].concat()
+}
+
 pub fn check_and_comment_on_pr(
     cmd: Command,
     is_stdin: bool,
     stdin_path: Option<String>,
+    root_cmd_exclude: &[String],
 ) -> Result<Value, SquawkError> {
     let Command::UploadToGithub {
         paths,
@@ -117,13 +125,18 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     } = cmd;
     info!("checking files");
-    let file_results = check_files(&paths, is_stdin, stdin_path, exclude)?;
+    let file_results = check_files(
+        &paths,
+        is_stdin,
+        stdin_path,
+        &concat(&exclude.unwrap_or_else(Vec::new), &root_cmd_exclude),
+    )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");
         return Ok(Value::Null);
     }
     info!("generating github comment body");
-    let comment_body = get_comment_body(file_results);
+    let comment_body = get_comment_body(file_results, VERSION);
     let pr = PullRequest {
         issue: github_pr_number,
         owner: github_repo_owner,

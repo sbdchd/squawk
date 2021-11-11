@@ -2,10 +2,10 @@ use console::strip_ansi_codes;
 use console::style;
 use log::info;
 use serde::Serialize;
-use squawk_linter::errors::CheckSQLError;
+use squawk_linter::errors::CheckSqlError;
 use squawk_linter::violations::{RuleViolation, RuleViolationKind, Span, ViolationMessage};
 use squawk_linter::{check_sql, SquawkRule, RULES};
-use squawk_parser::error::PGQueryError;
+use squawk_parser::error::PgQueryError;
 use squawk_parser::parse::{parse_sql_query, parse_sql_query_json};
 use std::convert::TryFrom;
 use std::fs::File;
@@ -31,7 +31,7 @@ arg_enum! {
 
 #[derive(Debug)]
 pub enum DumpAstError {
-    PGQuery(PGQueryError),
+    PgQuery(PgQueryError),
     Io(std::io::Error),
     Json(serde_json::error::Error),
 }
@@ -39,16 +39,16 @@ pub enum DumpAstError {
 impl std::fmt::Display for DumpAstError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::PGQuery(ref err) => err.fmt(f),
+            Self::PgQuery(ref err) => err.fmt(f),
             Self::Io(ref err) => err.fmt(f),
             Self::Json(ref err) => err.fmt(f),
         }
     }
 }
 
-impl std::convert::From<PGQueryError> for DumpAstError {
-    fn from(e: PGQueryError) -> Self {
-        Self::PGQuery(e)
+impl std::convert::From<PgQueryError> for DumpAstError {
+    fn from(e: PgQueryError) -> Self {
+        Self::PgQuery(e)
     }
 }
 
@@ -104,14 +104,14 @@ pub fn dump_ast_for_paths<W: io::Write>(
 
 #[derive(Debug)]
 pub enum CheckFilesError {
-    CheckSQL(CheckSQLError),
+    CheckSql(CheckSqlError),
     IoError(std::io::Error),
 }
 
 impl std::fmt::Display for CheckFilesError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
-            Self::CheckSQL(ref err) => err.fmt(f),
+            Self::CheckSql(ref err) => err.fmt(f),
             Self::IoError(ref err) => err.fmt(f),
         }
     }
@@ -122,9 +122,9 @@ impl std::convert::From<std::io::Error> for CheckFilesError {
     }
 }
 
-impl std::convert::From<CheckSQLError> for CheckFilesError {
-    fn from(e: CheckSQLError) -> Self {
-        Self::CheckSQL(e)
+impl std::convert::From<CheckSqlError> for CheckFilesError {
+    fn from(e: CheckSqlError) -> Self {
+        Self::CheckSql(e)
     }
 }
 
@@ -132,10 +132,8 @@ pub fn check_files(
     paths: &[String],
     is_stdin: bool,
     stdin_path: Option<String>,
-    excluded_rules: Option<Vec<String>>,
+    excluded_rules: &[String],
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
-    let excluded_rules = excluded_rules.unwrap_or_else(Vec::new);
-
     let mut output_violations = vec![];
 
     let mut process_violations = |sql: &str, path: &str| -> Result<(), CheckFilesError> {
@@ -178,14 +176,12 @@ arg_enum! {
 
 #[derive(Debug, Serialize)]
 pub enum ViolationLevel {
-    Error,
     Warning,
 }
 
 impl std::fmt::Display for ViolationLevel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let val = match self {
-            Self::Error => "error",
             Self::Warning => "warning",
         };
         write!(f, "{}", val)
@@ -454,7 +450,7 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
     ))
 }
 
-pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
+pub fn get_comment_body(files: Vec<ViolationContent>, version: &str) -> String {
     let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
 
     let violations_emoji = get_violations_emoji(violations_count);
@@ -470,7 +466,7 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
 
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) ({version}), a linter for PostgreSQL, focused on migrations
 "#,
         violations_emoji = violations_emoji,
         violation_count = violations_count,
@@ -479,7 +475,8 @@ pub fn get_comment_body(files: Vec<ViolationContent>) -> String {
             .into_iter()
             .flat_map(|x| get_sql_file_content(x).ok())
             .collect::<Vec<String>>()
-            .join("\n")
+            .join("\n"),
+        version = version
     )
     .trim_matches('\n')
     .into()
@@ -518,42 +515,9 @@ SELECT 1;
             }],
         }];
 
-        let body = get_comment_body(violations);
+        let body = get_comment_body(violations, "0.2.3");
 
-        assert_display_snapshot!(body, @r###"
-# Squawk Report
-
-### **🚒 1** violations across **1** file(s)
-
----
-
-<h3><code>alpha.sql</code></h3>
-
-```sql
-
-SELECT 1;
-                
-```
-
-<h4>🚒 Rule Violations (1)</h4>
-
-
-```
-alpha.sql:1:0: warning: adding-not-nullable-field
-
-   1 | ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
-
-  note: Adding a NOT NULL field requires exclusive locks and table rewrites.
-  help: Make the field nullable.
-```
-    
----
-    
-
-[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
-"###);
+        assert_display_snapshot!(body);
     }
 
     /// Even when we don't have violations we still want to output the SQL for
@@ -586,56 +550,9 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
             },
         ];
 
-        let body = get_comment_body(violations);
+        let body = get_comment_body(violations, "0.2.3");
 
-        assert_display_snapshot!(body, @r###"
-# Squawk Report
-
-### **✅ 0** violations across **2** file(s)
-
----
-
-<h3><code>alpha.sql</code></h3>
-
-```sql
-
-BEGIN;
---
--- Create model Bar
---
-CREATE TABLE "core_bar" (
-    "id" serial NOT NULL PRIMARY KEY,
-    "alpha" varchar(100) NOT NULL
-);
-                
-```
-
-<h4>✅ Rule Violations (0)</h4>
-
-No violations found.
-    
----
-    
-
-<h3><code>bravo.sql</code></h3>
-
-```sql
-
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
-                
-```
-
-<h4>✅ Rule Violations (0)</h4>
-
-No violations found.
-    
----
-    
-
-[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
-"###);
+        assert_display_snapshot!(body);
     }
 
     /// Ideally the logic won't leave a comment when there are no migrations but
@@ -644,20 +561,9 @@ No violations found.
     fn test_generating_no_violations_no_files() {
         let violations = vec![];
 
-        let body = get_comment_body(violations);
+        let body = get_comment_body(violations, "0.2.3");
 
-        assert_display_snapshot!(body, @r###"
-# Squawk Report
-
-### **✅ 0** violations across **0** file(s)
-
----
-
-
-[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk), a linter for PostgreSQL, focused on migrations
-"###);
+        assert_display_snapshot!(body);
     }
 }
 

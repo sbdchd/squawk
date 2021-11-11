@@ -1,0 +1,14 @@
+---
+source: cli/src/reporter.rs
+expression: body
+---
+# Squawk Report
+
+### **✅ 0** violations across **0** file(s)
+
+---
+
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) (0.2.3), a linter for PostgreSQL, focused on migrations

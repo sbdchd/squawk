@@ -18,6 +18,7 @@ pub enum RuleViolationKind {
     PreferTextField,
     PreferRobustStmts,
     BanCharField,
+    BanDropColumn,
 }
 
 impl std::fmt::Display for RuleViolationKind {
@@ -71,9 +72,7 @@ impl RuleViolation {
             RULES
                 .iter()
                 .find(|r| r.name == kind)
-                .unwrap()
-                .messages
-                .clone()
+                .map_or_else(Vec::new, |x| x.messages.clone())
         });
         Self {
             kind,

@@ -6,12 +6,13 @@ pub mod violations;
 #[macro_use]
 extern crate lazy_static;
 
-use crate::errors::CheckSQLError;
+use crate::errors::CheckSqlError;
 use crate::rules::{
     adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
-    adding_primary_key_constraint, ban_char_type, ban_drop_database, changing_column_type,
-    constraint_missing_not_valid, disallow_unique_constraint, prefer_robust_stmts,
-    prefer_text_field, renaming_column, renaming_table, require_concurrent_index_creation,
+    adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
+    changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
+    prefer_robust_stmts, prefer_text_field, renaming_column, renaming_table,
+    require_concurrent_index_creation,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RootStmt;
@@ -91,6 +92,16 @@ lazy_static! {
                 "Use text or varchar instead.".into()
             ),
         ]
+    },
+    SquawkRule {
+        id: "ban-drop-column".into(),
+        name: RuleViolationKind::BanDropColumn,
+        func: ban_drop_column,
+        messages: vec![
+            ViolationMessage::Note(
+                "Dropping a column may break existing clients.".into()
+            ),
+        ],
     },
     SquawkRule {
         id: "ban-drop-database".into(),
@@ -177,7 +188,7 @@ lazy_static! {
         func: prefer_robust_stmts,
         messages: vec![
             ViolationMessage::Help(
-                "Consider wrapping in a transaction or adding a IF NOT EXISTS clause if the statment supports it.".into()
+                "Consider wrapping in a transaction or adding a IF NOT EXISTS clause if the statement supports it.".into()
             ),
         ]
     },
@@ -234,7 +245,7 @@ lazy_static! {
                 "Create the index CONCURRENTLY.".into()
             ),
         ],
-    },
+    }
     ];
 
 }
@@ -242,7 +253,7 @@ lazy_static! {
 pub fn check_sql(
     sql: &str,
     excluded_rules: &[String],
-) -> Result<Vec<RuleViolation>, CheckSQLError> {
+) -> Result<Vec<RuleViolation>, CheckSqlError> {
     let tree = parse_sql_query(sql)?;
 
     let excluded_rules: HashSet<RuleViolationKind> = excluded_rules

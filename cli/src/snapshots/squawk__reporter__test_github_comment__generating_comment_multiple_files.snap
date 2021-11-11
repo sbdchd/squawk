@@ -1,0 +1,36 @@
+---
+source: cli/src/reporter.rs
+expression: body
+---
+# Squawk Report
+
+### **🚒 1** violations across **1** file(s)
+
+---
+
+<h3><code>alpha.sql</code></h3>
+
+```sql
+
+SELECT 1;
+                
+```
+
+<h4>🚒 Rule Violations (1)</h4>
+
+
+```
+alpha.sql:1:0: warning: adding-not-nullable-field
+
+   1 | ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+
+  note: Adding a NOT NULL field requires exclusive locks and table rewrites.
+  help: Make the field nullable.
+```
+    
+---
+    
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) (0.2.3), a linter for PostgreSQL, focused on migrations

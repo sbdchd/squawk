@@ -1,6 +1,6 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, RootStmt, Stmt,
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RootStmt, Stmt,
 };
 
 #[must_use]
@@ -10,25 +10,32 @@ pub fn adding_primary_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
-                    match &cmd.def {
-                        Some(AlterTableDef::ColumnDef(def)) => {
+                    match (&cmd.def, &cmd.subtype) {
+                        (
+                            Some(AlterTableDef::Constraint(constraint)),
+                            AlterTableType::AddConstraint,
+                        ) => {
+                            if constraint.contype == ConstrType::Primary
+                                && constraint.indexname.is_none()
+                            {
+                                errs.push(RuleViolation::new(
+                                    RuleViolationKind::AddingSerialPrimaryKeyField,
+                                    raw_stmt.into(),
+                                    None,
+                                ));
+                            }
+                        }
+                        (Some(AlterTableDef::ColumnDef(def)), _) => {
                             for ColumnDefConstraint::Constraint(constraint) in &def.constraints {
-                                if constraint.contype == ConstrType::Primary {
+                                if constraint.contype == ConstrType::Primary
+                                    && constraint.indexname.is_none()
+                                {
                                     errs.push(RuleViolation::new(
                                         RuleViolationKind::AddingSerialPrimaryKeyField,
                                         raw_stmt.into(),
                                         None,
                                     ));
                                 }
-                            }
-                        }
-                        Some(AlterTableDef::Constraint(constraint)) => {
-                            if constraint.contype == ConstrType::Primary {
-                                errs.push(RuleViolation::new(
-                                    RuleViolationKind::AddingSerialPrimaryKeyField,
-                                    raw_stmt.into(),
-                                    None,
-                                ));
                             }
                         }
                         _ => continue,

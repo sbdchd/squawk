@@ -6,6 +6,7 @@ module.exports = {
       "cli",
       "github_app",
       "web-frameworks",
+      "troubleshooting",
     ],
     Rules: [
       "rules",
