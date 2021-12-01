@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.8.1 - 2021-11-30
+
+### Fixed
+
+- copy pasta of rename-table into the ban-drop-column rule (#168)
+- parsing an index without a name specified (#169)
+
 ## v0.8.0 - 2021-10-31
 
 ### Fixed
