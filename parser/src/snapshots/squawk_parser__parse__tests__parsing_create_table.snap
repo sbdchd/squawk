@@ -509,7 +509,9 @@ Ok(
                 stmt: IndexStmt(
                     IndexStmt {
                         access_method: "btree",
-                        idxname: "age_index",
+                        idxname: Some(
+                            "age_index",
+                        ),
                         index_params: [
                             IndexElem(
                                 IndexElem {
