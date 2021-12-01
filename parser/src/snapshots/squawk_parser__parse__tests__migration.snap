@@ -22,7 +22,9 @@ Ok(
                 stmt: IndexStmt(
                     IndexStmt {
                         access_method: "btree",
-                        idxname: "table_name_field_name_idx",
+                        idxname: Some(
+                            "table_name_field_name_idx",
+                        ),
                         index_params: [
                             IndexElem(
                                 IndexElem {
@@ -71,7 +73,9 @@ Ok(
                 stmt: IndexStmt(
                     IndexStmt {
                         access_method: "btree",
-                        idxname: "table_name_field_name_idx",
+                        idxname: Some(
+                            "table_name_field_name_idx",
+                        ),
                         index_params: [
                             IndexElem(
                                 IndexElem {

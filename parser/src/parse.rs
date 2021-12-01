@@ -77,6 +77,14 @@ mod tests {
     }
 
     #[test]
+    fn create_index_without_index_name() {
+        let sql = "CREATE INDEX ON FOO(BAR);";
+        let res = parse_sql_query(sql);
+        assert!(res.is_ok());
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
     fn test_error_paths() {
         let sql = r#"lsakdjf;asdlfkjasd;lfj"#;
         let res = parse_sql_query(sql);

@@ -9,7 +9,9 @@ Ok(
                 stmt: IndexStmt(
                     IndexStmt {
                         access_method: "btree",
-                        idxname: "idx_a_foo_bar",
+                        idxname: Some(
+                            "idx_a_foo_bar",
+                        ),
                         index_params: [
                             IndexElem(
                                 IndexElem {
