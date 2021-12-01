@@ -1,21 +1,11 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{AlterTableCmds, AlterTableType, ObjectType, RootStmt, Stmt};
+use squawk_parser::ast::{AlterTableCmds, AlterTableType, RootStmt, Stmt};
 
 #[must_use]
 pub fn ban_drop_column(tree: &[RootStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
-            Stmt::RenameStmt(stmt) => match stmt.rename_type {
-                ObjectType::Table => {
-                    errs.push(RuleViolation::new(
-                        RuleViolationKind::RenamingTable,
-                        raw_stmt.into(),
-                        None,
-                    ));
-                }
-                _ => continue,
-            },
             Stmt::AlterTableStmt(stmt) => {
                 for cmd in &stmt.cmds {
                     let AlterTableCmds::AlterTableCmd(cmd) = cmd;
