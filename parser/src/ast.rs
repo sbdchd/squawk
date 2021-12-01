@@ -241,7 +241,8 @@ pub struct IndexStmt {
     #[serde(rename = "accessMethod")]
     pub access_method: String,
     /// name of new index, or NULL for default
-    pub idxname: String,
+    #[serde(default)]
+    pub idxname: Option<String>,
     #[serde(rename = "indexParams")]
     pub index_params: Vec<IndexParams>,
     /// relation to build index on
