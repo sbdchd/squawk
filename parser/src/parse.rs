@@ -1234,6 +1234,16 @@ ALTER TABLE public.tasks VALIDATE CONSTRAINT tasks_fk;
     }
 
     #[test]
+    fn parse_generated_column() {
+        let sql = r#"
+ALTER TABLE table_c ADD column c boolean GENERATED ALWAYS AS (p IS NOT NULL) STORED NOT NULL;
+"#;
+        let res = parse_sql_query(sql);
+        assert!(res.is_ok());
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
     fn test_parse_create_table_regression() {
         let sql = r#"
 CREATE TABLE example (
