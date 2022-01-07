@@ -11,33 +11,20 @@ Ok(
                         cmds: [
                             AlterTableCmd(
                                 AlterTableCmd {
-                                    subtype: DropConstraint,
-                                    name: Some(
-                                        "tasks_fk",
-                                    ),
-                                    def: None,
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: AddConstraint,
+                                    subtype: AlterConstraint,
                                     name: None,
                                     def: Some(
                                         Constraint(
                                             Constraint {
                                                 conname: Some(
-                                                    "tasks_fk",
+                                                    "constraint",
                                                 ),
                                                 contype: Foreign,
-                                                location: Some(
-                                                    69,
-                                                ),
+                                                location: None,
                                                 raw_expr: None,
                                                 keys: None,
                                                 indexname: None,
-                                                skip_validation: true,
+                                                skip_validation: false,
                                                 initially_valid: false,
                                             },
                                         ),
@@ -50,14 +37,12 @@ Ok(
                         relation: RangeVar(
                             RangeVar {
                                 catalogname: None,
-                                schemaname: Some(
-                                    "public",
-                                ),
-                                relname: "tasks",
-                                inh: false,
+                                schemaname: None,
+                                relname: "table",
+                                inh: true,
                                 relpersistence: "p",
                                 alias: None,
-                                location: 18,
+                                location: 13,
                             },
                         ),
                         relkind: Table,
@@ -66,7 +51,7 @@ Ok(
                 ),
                 stmt_location: 0,
                 stmt_len: Some(
-                    193,
+                    81,
                 ),
             },
         ),
@@ -77,11 +62,24 @@ Ok(
                         cmds: [
                             AlterTableCmd(
                                 AlterTableCmd {
-                                    subtype: ValidateConstraint,
-                                    name: Some(
-                                        "tasks_fk",
+                                    subtype: AlterConstraint,
+                                    name: None,
+                                    def: Some(
+                                        Constraint(
+                                            Constraint {
+                                                conname: Some(
+                                                    "constraint",
+                                                ),
+                                                contype: Foreign,
+                                                location: None,
+                                                raw_expr: None,
+                                                keys: None,
+                                                indexname: None,
+                                                skip_validation: false,
+                                                initially_valid: false,
+                                            },
+                                        ),
                                     ),
-                                    def: None,
                                     behavior: Restrict,
                                     missing_ok: false,
                                 },
@@ -90,23 +88,21 @@ Ok(
                         relation: RangeVar(
                             RangeVar {
                                 catalogname: None,
-                                schemaname: Some(
-                                    "public",
-                                ),
-                                relname: "tasks",
+                                schemaname: None,
+                                relname: "table",
                                 inh: true,
                                 relpersistence: "p",
                                 alias: None,
-                                location: 208,
+                                location: 96,
                             },
                         ),
                         relkind: Table,
                         missing_ok: false,
                     },
                 ),
-                stmt_location: 194,
+                stmt_location: 82,
                 stmt_len: Some(
-                    55,
+                    66,
                 ),
             },
         ),
