@@ -31,7 +31,9 @@ Ok(
                                                     "tasks_fk",
                                                 ),
                                                 contype: Foreign,
-                                                location: 69,
+                                                location: Some(
+                                                    69,
+                                                ),
                                                 raw_expr: None,
                                                 keys: None,
                                                 indexname: None,
