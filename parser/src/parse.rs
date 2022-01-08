@@ -38,7 +38,7 @@ pub fn parse_sql_query_json(query: &str) -> Result<Value, PgQueryError> {
 
 pub fn parse_sql_query(query: &str) -> Result<Vec<RawStmt>, PgQueryError> {
     let parsed: StmtRoot = parse_sql_query_base(query)?;
-    return Ok(parsed.stmts);
+    Ok(parsed.stmts)
 }
 
 #[cfg(test)]

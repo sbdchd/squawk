@@ -1,6 +1,6 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, Stmt, RawStmt,
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
 
 #[must_use]

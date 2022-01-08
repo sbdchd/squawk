@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+/// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L428-L444>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum TransactionStmtKind {
     #[serde(rename = "TRANS_STMT_BEGIN")]
@@ -63,6 +64,7 @@ impl RawStmt {
     }
 }
 
+/// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L179-L189>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum SetOperation {
     #[serde(rename = "SETOP_NONE")]
@@ -165,6 +167,8 @@ pub struct SelectStmt {
 }
 
 /// Sort ordering options for ORDER BY and CREATE INDEX
+///
+/// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L27-L37>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum SortByDir {
     #[serde(rename = "SORTBY_DEFAULT")]
@@ -183,6 +187,7 @@ impl Default for SortByDir {
     }
 }
 
+/// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L39-L48>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum SortByNulls {
     #[serde(rename = "SORTBY_NULLS_DEFAULT")]
@@ -288,6 +293,8 @@ pub struct IndexStmt {
 /// When a command can act on several kinds of objects with only one
 /// parse structure required, use these constants to designate the
 /// object type.  Note that commands typically don't support all the types.
+///
+/// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L191-L247>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum ObjectType {
     #[serde(rename = "OBJECT_ACCESS_METHOD")]
@@ -412,6 +419,7 @@ pub struct AlterTableStmt {
     pub missing_ok: bool,
 }
 
+/// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L249-L257>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum DropBehavior {
     #[serde(rename = "DROP_RESTRICT")]
@@ -425,6 +433,7 @@ impl Default for DropBehavior {
     }
 }
 
+/// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L259-L332>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum AlterTableType {
     #[serde(rename = "AT_AddColumn")]
@@ -671,7 +680,7 @@ pub struct AlterTableCmd {
     pub missing_ok: bool,
 }
 
-/// Documented: https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L360
+/// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L359-L379>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum ConstrType {
     /// not standard SQL, but a lot of people expect it
