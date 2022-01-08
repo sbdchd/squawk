@@ -38,6 +38,7 @@ pub fn parse_sql_query_json(query: &str) -> Result<Value, PgQueryError> {
 
 pub fn parse_sql_query(query: &str) -> Result<Vec<RootStmt>, PgQueryError> {
     let parsed: StmtRoot = parse_sql_query_base(query)?;
+    // HACK(chdsbd): To avoid updating every call site from RootStmt to StmtRoot, we convert to RawStmt.
     let root_stmts: Vec<RootStmt> = parsed
         .stmts
         .into_iter()
