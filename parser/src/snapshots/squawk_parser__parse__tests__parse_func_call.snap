@@ -39,30 +39,28 @@ Ok(
                                                                 -1,
                                                             ),
                                                             "typeName": Object({
-                                                                "TypeName": Object({
-                                                                    "location": Number(
-                                                                        -1,
-                                                                    ),
-                                                                    "names": Array([
-                                                                        Object({
-                                                                            "String": Object({
-                                                                                "str": String(
-                                                                                    "pg_catalog",
-                                                                                ),
-                                                                            }),
+                                                                "location": Number(
+                                                                    -1,
+                                                                ),
+                                                                "names": Array([
+                                                                    Object({
+                                                                        "String": Object({
+                                                                            "str": String(
+                                                                                "pg_catalog",
+                                                                            ),
                                                                         }),
-                                                                        Object({
-                                                                            "String": Object({
-                                                                                "str": String(
-                                                                                    "bool",
-                                                                                ),
-                                                                            }),
+                                                                    }),
+                                                                    Object({
+                                                                        "String": Object({
+                                                                            "str": String(
+                                                                                "bool",
+                                                                            ),
                                                                         }),
-                                                                    ]),
-                                                                    "typemod": Number(
-                                                                        -1,
-                                                                    ),
-                                                                }),
+                                                                    }),
+                                                                ]),
+                                                                "typemod": Number(
+                                                                    -1,
+                                                                ),
                                                             }),
                                                         }),
                                                     }),
@@ -87,17 +85,15 @@ Ok(
                                 },
                             ),
                         ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "foobar",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 13,
-                            },
-                        ),
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: None,
+                            relname: "foobar",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 13,
+                        },
                         relkind: Table,
                         missing_ok: false,
                     },

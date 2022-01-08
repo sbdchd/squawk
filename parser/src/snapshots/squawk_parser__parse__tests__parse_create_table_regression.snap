@@ -8,46 +8,42 @@ Ok(
             RawStmt {
                 stmt: CreateStmt(
                     CreateStmt {
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "example",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 14,
-                            },
-                        ),
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: None,
+                            relname: "example",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 14,
+                        },
                         table_elts: [
                             ColumnDef(
                                 ColumnDef {
                                     colname: Some(
                                         "a",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "int4",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 30,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "int4",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 30,
+                                    },
                                     constraints: [],
                                     is_local: true,
                                     location: 28,
@@ -58,29 +54,27 @@ Ok(
                                     colname: Some(
                                         "b",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "int4",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 45,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "int4",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 45,
+                                    },
                                     constraints: [],
                                     is_local: true,
                                     location: 43,
@@ -91,29 +85,27 @@ Ok(
                                     colname: Some(
                                         "c",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "int4",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 60,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "int4",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 60,
+                                    },
                                     constraints: [],
                                     is_local: true,
                                     location: 58,

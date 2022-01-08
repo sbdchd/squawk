@@ -29,17 +29,15 @@ Ok(
                 stmt: AlterOwnerStmt(
                     Object({
                         "newowner": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    70,
-                                ),
-                                "rolename": String(
-                                    "new_owner",
-                                ),
-                                "roletype": Number(
-                                    0,
-                                ),
-                            }),
+                            "location": Number(
+                                70,
+                            ),
+                            "rolename": String(
+                                "new_owner",
+                            ),
+                            "roletype": String(
+                                "ROLESPEC_CSTRING",
+                            ),
                         }),
                         "object": Object({
                             "String": Object({
@@ -48,8 +46,8 @@ Ok(
                                 ),
                             }),
                         }),
-                        "objectType": Number(
-                            9,
+                        "objectType": String(
+                            "OBJECT_DATABASE",
                         ),
                     }),
                 ),
@@ -76,8 +74,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "tablespace",
@@ -104,14 +102,12 @@ Ok(
                             "name",
                         ),
                         "setstmt": Object({
-                            "VariableSetStmt": Object({
-                                "kind": Number(
-                                    4,
-                                ),
-                                "name": String(
-                                    "configuration_parameter",
-                                ),
-                            }),
+                            "kind": String(
+                                "VAR_RESET",
+                            ),
+                            "name": String(
+                                "configuration_parameter",
+                            ),
                         }),
                     }),
                 ),
@@ -129,11 +125,9 @@ Ok(
                             "name",
                         ),
                         "setstmt": Object({
-                            "VariableSetStmt": Object({
-                                "kind": Number(
-                                    5,
-                                ),
-                            }),
+                            "kind": String(
+                                "VAR_RESET_ALL",
+                            ),
                         }),
                     }),
                 ),

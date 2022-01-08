@@ -21,20 +21,18 @@ Ok(
                             }),
                         ]),
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    50,
-                                ),
-                                "relname": String(
-                                    "accounts",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                50,
+                            ),
+                            "relname": String(
+                                "accounts",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                         "row": Bool(
                             true,

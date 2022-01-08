@@ -15,17 +15,15 @@ Ok(
                             "foo",
                         ),
                         "user": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    32,
-                                ),
-                                "rolename": String(
-                                    "bob",
-                                ),
-                                "roletype": Number(
-                                    0,
-                                ),
-                            }),
+                            "location": Number(
+                                32,
+                            ),
+                            "rolename": String(
+                                "bob",
+                            ),
+                            "roletype": String(
+                                "ROLESPEC_CSTRING",
+                            ),
                         }),
                     }),
                 ),

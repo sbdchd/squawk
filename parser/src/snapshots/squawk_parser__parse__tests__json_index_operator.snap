@@ -19,8 +19,8 @@ Ok(
                                     expr: Some(
                                         Object({
                                             "A_Expr": Object({
-                                                "kind": Number(
-                                                    0,
+                                                "kind": String(
+                                                    "AEXPR_OP",
                                                 ),
                                                 "lexpr": Object({
                                                     "ColumnRef": Object({
@@ -75,17 +75,15 @@ Ok(
                                 },
                             ),
                         ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "a",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 60,
-                            },
-                        ),
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: None,
+                            relname: "a",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 60,
+                        },
                         concurrent: true,
                         unique: false,
                         primary: false,

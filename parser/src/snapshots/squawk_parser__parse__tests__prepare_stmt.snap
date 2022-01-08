@@ -105,73 +105,78 @@ Ok(
                         ),
                         "query": Object({
                             "InsertStmt": Object({
-                                "override": Number(
-                                    0,
+                                "override": String(
+                                    "OVERRIDING_NOT_SET",
                                 ),
                                 "relation": Object({
-                                    "RangeVar": Object({
-                                        "inh": Bool(
-                                            true,
-                                        ),
-                                        "location": Number(
-                                            63,
-                                        ),
-                                        "relname": String(
-                                            "foo",
-                                        ),
-                                        "relpersistence": String(
-                                            "p",
-                                        ),
-                                    }),
+                                    "inh": Bool(
+                                        true,
+                                    ),
+                                    "location": Number(
+                                        63,
+                                    ),
+                                    "relname": String(
+                                        "foo",
+                                    ),
+                                    "relpersistence": String(
+                                        "p",
+                                    ),
                                 }),
                                 "selectStmt": Object({
                                     "SelectStmt": Object({
-                                        "op": Number(
-                                            0,
+                                        "limitOption": String(
+                                            "LIMIT_OPTION_DEFAULT",
+                                        ),
+                                        "op": String(
+                                            "SETOP_NONE",
                                         ),
                                         "valuesLists": Array([
-                                            Array([
-                                                Object({
-                                                    "ParamRef": Object({
-                                                        "location": Number(
-                                                            74,
-                                                        ),
-                                                        "number": Number(
-                                                            1,
-                                                        ),
-                                                    }),
+                                            Object({
+                                                "List": Object({
+                                                    "items": Array([
+                                                        Object({
+                                                            "ParamRef": Object({
+                                                                "location": Number(
+                                                                    74,
+                                                                ),
+                                                                "number": Number(
+                                                                    1,
+                                                                ),
+                                                            }),
+                                                        }),
+                                                        Object({
+                                                            "ParamRef": Object({
+                                                                "location": Number(
+                                                                    78,
+                                                                ),
+                                                                "number": Number(
+                                                                    2,
+                                                                ),
+                                                            }),
+                                                        }),
+                                                        Object({
+                                                            "ParamRef": Object({
+                                                                "location": Number(
+                                                                    82,
+                                                                ),
+                                                                "number": Number(
+                                                                    3,
+                                                                ),
+                                                            }),
+                                                        }),
+                                                        Object({
+                                                            "ParamRef": Object({
+                                                                "location": Number(
+                                                                    86,
+                                                                ),
+                                                                "number": Number(
+                                                                    4,
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
                                                 }),
-                                                Object({
-                                                    "ParamRef": Object({
-                                                        "location": Number(
-                                                            78,
-                                                        ),
-                                                        "number": Number(
-                                                            2,
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "ParamRef": Object({
-                                                        "location": Number(
-                                                            82,
-                                                        ),
-                                                        "number": Number(
-                                                            3,
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "ParamRef": Object({
-                                                        "location": Number(
-                                                            86,
-                                                        ),
-                                                        "number": Number(
-                                                            4,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                            }),
                                         ]),
                                     }),
                                 }),

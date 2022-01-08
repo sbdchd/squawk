@@ -27,17 +27,15 @@ Ok(
                 stmt: AlterOwnerStmt(
                     Object({
                         "newowner": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    91,
-                                ),
-                                "rolename": String(
-                                    "joe",
-                                ),
-                                "roletype": Number(
-                                    0,
-                                ),
-                            }),
+                            "location": Number(
+                                91,
+                            ),
+                            "rolename": String(
+                                "joe",
+                            ),
+                            "roletype": String(
+                                "ROLESPEC_CSTRING",
+                            ),
                         }),
                         "object": Object({
                             "ObjectWithArgs": Object({
@@ -80,8 +78,8 @@ Ok(
                                 ]),
                             }),
                         }),
-                        "objectType": Number(
-                            19,
+                        "objectType": String(
+                            "OBJECT_FUNCTION",
                         ),
                     }),
                 ),
@@ -139,8 +137,8 @@ Ok(
                                 ]),
                             }),
                         }),
-                        "objectType": Number(
-                            19,
+                        "objectType": String(
+                            "OBJECT_FUNCTION",
                         ),
                     }),
                 ),
@@ -189,16 +187,16 @@ Ok(
                                                     }),
                                                 }),
                                             ]),
-                                            "kind": Number(
-                                                0,
+                                            "kind": String(
+                                                "VAR_SET_VALUE",
                                             ),
                                             "name": String(
                                                 "search_path",
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "set",
@@ -210,39 +208,40 @@ Ok(
                             }),
                         ]),
                         "func": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                173,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "text",
-                                                        ),
-                                                    }),
+                            "objargs": Array([
+                                Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            173,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "text",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "check_password",
-                                            ),
-                                        }),
+                                }),
+                            ]),
+                            "objname": Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "check_password",
+                                        ),
                                     }),
-                                ]),
-                            }),
+                                }),
+                            ]),
                         }),
+                        "objtype": String(
+                            "OBJECT_FUNCTION",
+                        ),
                     }),
                 ),
                 stmt_location: 142,
@@ -260,16 +259,16 @@ Ok(
                                 "DefElem": Object({
                                     "arg": Object({
                                         "VariableSetStmt": Object({
-                                            "kind": Number(
-                                                4,
+                                            "kind": String(
+                                                "VAR_RESET",
                                             ),
                                             "name": String(
                                                 "search_path",
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "set",
@@ -281,39 +280,40 @@ Ok(
                             }),
                         ]),
                         "func": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                243,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "text",
-                                                        ),
-                                                    }),
+                            "objargs": Array([
+                                Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            243,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "text",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "check_password",
-                                            ),
-                                        }),
+                                }),
+                            ]),
+                            "objname": Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "check_password",
+                                        ),
                                     }),
-                                ]),
-                            }),
+                                }),
+                            ]),
                         }),
+                        "objtype": String(
+                            "OBJECT_FUNCTION",
+                        ),
                     }),
                 ),
                 stmt_location: 212,

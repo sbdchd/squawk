@@ -1,5 +1,5 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{ColumnDefTypeName, QualifiedName, RootStmt, Stmt, TableElt};
+use squawk_parser::ast::{QualifiedName, RootStmt, Stmt, TableElt};
 
 #[must_use]
 pub fn ban_char_type(tree: &[RootStmt]) -> Vec<RuleViolation> {
@@ -9,7 +9,7 @@ pub fn ban_char_type(tree: &[RootStmt]) -> Vec<RuleViolation> {
             Stmt::CreateStmt(stmt) => {
                 for column_def in &stmt.table_elts {
                     if let TableElt::ColumnDef(column_def) = column_def {
-                        let ColumnDefTypeName::TypeName(type_name) = &column_def.type_name;
+                        let type_name = &column_def.type_name;
                         for QualifiedName::String(field_type_name) in &type_name.names {
                             if field_type_name.str == "bpchar" {
                                 errs.push(RuleViolation::new(

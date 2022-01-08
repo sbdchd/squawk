@@ -9,17 +9,15 @@ Ok(
                 stmt: AlterOwnerStmt(
                     Object({
                         "newowner": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    41,
-                                ),
-                                "rolename": String(
-                                    "joe",
-                                ),
-                                "roletype": Number(
-                                    0,
-                                ),
-                            }),
+                            "location": Number(
+                                41,
+                            ),
+                            "rolename": String(
+                                "joe",
+                            ),
+                            "roletype": String(
+                                "ROLESPEC_CSTRING",
+                            ),
                         }),
                         "object": Object({
                             "ObjectWithArgs": Object({
@@ -74,8 +72,8 @@ Ok(
                                 ]),
                             }),
                         }),
-                        "objectType": Number(
-                            25,
+                        "objectType": String(
+                            "OBJECT_OPERATOR",
                         ),
                     }),
                 ),
@@ -145,8 +143,8 @@ Ok(
                                 ]),
                             }),
                         }),
-                        "objectType": Number(
-                            25,
+                        "objectType": String(
+                            "OBJECT_OPERATOR",
                         ),
                     }),
                 ),
@@ -161,57 +159,55 @@ Ok(
                 stmt: AlterOperatorStmt(
                     Object({
                         "opername": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                112,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "_int4",
-                                                        ),
-                                                    }),
+                            "objargs": Array([
+                                Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            112,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "_int4",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                119,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "_int4",
-                                                        ),
-                                                    }),
+                                }),
+                                Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            119,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "_int4",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "&&",
-                                            ),
-                                        }),
+                                }),
+                            ]),
+                            "objname": Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "&&",
+                                        ),
                                     }),
-                                ]),
-                            }),
+                                }),
+                            ]),
                         }),
                         "options": Array([
                             Object({
@@ -235,8 +231,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "restrict",
@@ -267,8 +263,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "join",

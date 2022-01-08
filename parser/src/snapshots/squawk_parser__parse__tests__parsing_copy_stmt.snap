@@ -15,20 +15,18 @@ Ok(
                             true,
                         ),
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    5,
-                                ),
-                                "relname": String(
-                                    "country",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                5,
+                            ),
+                            "relname": String(
+                                "country",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                     }),
                 ),

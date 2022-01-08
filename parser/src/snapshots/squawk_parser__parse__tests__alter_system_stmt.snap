@@ -9,30 +9,28 @@ Ok(
                 stmt: AlterSystemStmt(
                     Object({
                         "setstmt": Object({
-                            "VariableSetStmt": Object({
-                                "args": Array([
-                                    Object({
-                                        "A_Const": Object({
-                                            "location": Number(
-                                                30,
-                                            ),
-                                            "val": Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "hot_standby",
-                                                    ),
-                                                }),
+                            "args": Array([
+                                Object({
+                                    "A_Const": Object({
+                                        "location": Number(
+                                            30,
+                                        ),
+                                        "val": Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "hot_standby",
+                                                ),
                                             }),
                                         }),
                                     }),
-                                ]),
-                                "kind": Number(
-                                    0,
-                                ),
-                                "name": String(
-                                    "wal_level",
-                                ),
-                            }),
+                                }),
+                            ]),
+                            "kind": String(
+                                "VAR_SET_VALUE",
+                            ),
+                            "name": String(
+                                "wal_level",
+                            ),
                         }),
                     }),
                 ),
@@ -47,14 +45,12 @@ Ok(
                 stmt: AlterSystemStmt(
                     Object({
                         "setstmt": Object({
-                            "VariableSetStmt": Object({
-                                "kind": Number(
-                                    4,
-                                ),
-                                "name": String(
-                                    "wal_level",
-                                ),
-                            }),
+                            "kind": String(
+                                "VAR_RESET",
+                            ),
+                            "name": String(
+                                "wal_level",
+                            ),
                         }),
                     }),
                 ),

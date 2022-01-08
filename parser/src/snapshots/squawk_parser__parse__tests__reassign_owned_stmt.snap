@@ -9,17 +9,15 @@ Ok(
                 stmt: ReassignOwnedStmt(
                     Object({
                         "newrole": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    31,
-                                ),
-                                "rolename": String(
-                                    "new_role",
-                                ),
-                                "roletype": Number(
-                                    0,
-                                ),
-                            }),
+                            "location": Number(
+                                31,
+                            ),
+                            "rolename": String(
+                                "new_role",
+                            ),
+                            "roletype": String(
+                                "ROLESPEC_CSTRING",
+                            ),
                         }),
                         "roles": Array([
                             Object({
@@ -30,8 +28,8 @@ Ok(
                                     "rolename": String(
                                         "old_role",
                                     ),
-                                    "roletype": Number(
-                                        0,
+                                    "roletype": String(
+                                        "ROLESPEC_CSTRING",
                                     ),
                                 }),
                             }),

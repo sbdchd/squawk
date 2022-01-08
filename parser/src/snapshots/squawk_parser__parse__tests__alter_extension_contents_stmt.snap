@@ -18,8 +18,8 @@ Ok(
                                 ),
                             }),
                         }),
-                        "objectType": Number(
-                            15,
+                        "objectType": String(
+                            "OBJECT_EXTENSION",
                         ),
                     }),
                 ),

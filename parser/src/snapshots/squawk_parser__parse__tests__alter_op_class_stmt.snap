@@ -27,33 +27,35 @@ Ok(
                 stmt: AlterOwnerStmt(
                     Object({
                         "newowner": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    124,
-                                ),
-                                "roletype": Number(
-                                    1,
-                                ),
+                            "location": Number(
+                                124,
+                            ),
+                            "roletype": String(
+                                "ROLESPEC_CURRENT_USER",
+                            ),
+                        }),
+                        "object": Object({
+                            "List": Object({
+                                "items": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "index_method",
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "name",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
                             }),
                         }),
-                        "object": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "index_method",
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "name",
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "objectType": Number(
-                            24,
+                        "objectType": String(
+                            "OBJECT_OPCLASS",
                         ),
                     }),
                 ),
@@ -70,24 +72,28 @@ Ok(
                         "newschema": String(
                             "new_schema",
                         ),
-                        "object": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "index_method",
-                                    ),
-                                }),
+                        "object": Object({
+                            "List": Object({
+                                "items": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "index_method",
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "name",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
                             }),
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "name",
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "objectType": Number(
-                            24,
+                        }),
+                        "objectType": String(
+                            "OBJECT_OPCLASS",
                         ),
                     }),
                 ),

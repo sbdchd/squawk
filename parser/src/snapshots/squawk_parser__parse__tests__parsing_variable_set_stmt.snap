@@ -24,8 +24,8 @@ Ok(
                                 }),
                             }),
                         ]),
-                        "kind": Number(
-                            0,
+                        "kind": String(
+                            "VAR_SET_VALUE",
                         ),
                         "name": String(
                             "my.vars.id",

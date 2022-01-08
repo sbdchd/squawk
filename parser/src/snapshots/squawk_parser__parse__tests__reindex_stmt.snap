@@ -8,24 +8,22 @@ Ok(
             RawStmt {
                 stmt: ReindexStmt(
                     Object({
-                        "kind": Number(
-                            0,
+                        "kind": String(
+                            "REINDEX_OBJECT_INDEX",
                         ),
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    15,
-                                ),
-                                "relname": String(
-                                    "my_index",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                15,
+                            ),
+                            "relname": String(
+                                "my_index",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                     }),
                 ),
@@ -39,24 +37,22 @@ Ok(
             RawStmt {
                 stmt: ReindexStmt(
                     Object({
-                        "kind": Number(
-                            1,
+                        "kind": String(
+                            "REINDEX_OBJECT_TABLE",
                         ),
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    39,
-                                ),
-                                "relname": String(
-                                    "table_name",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                39,
+                            ),
+                            "relname": String(
+                                "table_name",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                     }),
                 ),
@@ -70,8 +66,8 @@ Ok(
             RawStmt {
                 stmt: ReindexStmt(
                     Object({
-                        "kind": Number(
-                            4,
+                        "kind": String(
+                            "REINDEX_OBJECT_DATABASE",
                         ),
                         "name": String(
                             "table_name",
@@ -88,8 +84,8 @@ Ok(
             RawStmt {
                 stmt: ReindexStmt(
                     Object({
-                        "kind": Number(
-                            3,
+                        "kind": String(
+                            "REINDEX_OBJECT_SYSTEM",
                         ),
                         "name": String(
                             "table_name",

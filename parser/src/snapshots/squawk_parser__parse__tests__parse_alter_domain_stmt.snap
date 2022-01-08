@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: AlterDomainStmt(
                     Object({
-                        "behavior": Number(
-                            0,
+                        "behavior": String(
+                            "DROP_RESTRICT",
                         ),
                         "subtype": String(
                             "O",

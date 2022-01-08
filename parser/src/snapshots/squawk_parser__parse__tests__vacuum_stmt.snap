@@ -8,25 +8,57 @@ Ok(
             RawStmt {
                 stmt: VacuumStmt(
                     Object({
-                        "options": Number(
-                            7,
+                        "is_vacuumcmd": Bool(
+                            true,
                         ),
-                        "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    27,
-                                ),
-                                "relname": String(
-                                    "foo",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
+                        "options": Array([
+                            Object({
+                                "DefElem": Object({
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
+                                    ),
+                                    "defname": String(
+                                        "verbose",
+                                    ),
+                                    "location": Number(
+                                        9,
+                                    ),
+                                }),
                             }),
-                        }),
+                            Object({
+                                "DefElem": Object({
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
+                                    ),
+                                    "defname": String(
+                                        "analyze",
+                                    ),
+                                    "location": Number(
+                                        18,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "rels": Array([
+                            Object({
+                                "VacuumRelation": Object({
+                                    "relation": Object({
+                                        "inh": Bool(
+                                            true,
+                                        ),
+                                        "location": Number(
+                                            27,
+                                        ),
+                                        "relname": String(
+                                            "foo",
+                                        ),
+                                        "relpersistence": String(
+                                            "p",
+                                        ),
+                                    }),
+                                }),
+                            }),
+                        ]),
                     }),
                 ),
                 stmt_location: 0,

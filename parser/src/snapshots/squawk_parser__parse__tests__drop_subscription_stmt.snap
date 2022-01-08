@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: DropSubscriptionStmt(
                     Object({
-                        "behavior": Number(
-                            0,
+                        "behavior": String(
+                            "DROP_RESTRICT",
                         ),
                         "subname": String(
                             "mysub",

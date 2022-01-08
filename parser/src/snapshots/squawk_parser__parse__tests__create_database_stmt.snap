@@ -36,8 +36,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "owner",
@@ -56,8 +56,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "tablespace",
@@ -93,8 +93,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "encoding",
@@ -113,8 +113,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "template",

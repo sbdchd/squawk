@@ -1,0 +1,126 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt(
+            RawStmt {
+                stmt: AlterTableStmt(
+                    AlterTableStmt {
+                        cmds: [
+                            AlterTableCmd(
+                                AlterTableCmd {
+                                    subtype: AddColumn,
+                                    name: None,
+                                    def: Some(
+                                        ColumnDef(
+                                            ColumnDef {
+                                                colname: Some(
+                                                    "c",
+                                                ),
+                                                type_name: TypeName {
+                                                    names: [
+                                                        String(
+                                                            PGString {
+                                                                str: "pg_catalog",
+                                                            },
+                                                        ),
+                                                        String(
+                                                            PGString {
+                                                                str: "bool",
+                                                            },
+                                                        ),
+                                                    ],
+                                                    type_oid: None,
+                                                    setof: false,
+                                                    pct_type: false,
+                                                    typmods: [],
+                                                    typemod: -1,
+                                                    array_bounds: [],
+                                                    location: 34,
+                                                },
+                                                constraints: [
+                                                    Constraint(
+                                                        Constraint {
+                                                            conname: None,
+                                                            contype: Generated,
+                                                            location: 42,
+                                                            raw_expr: Some(
+                                                                Object({
+                                                                    "NullTest": Object({
+                                                                        "arg": Object({
+                                                                            "ColumnRef": Object({
+                                                                                "fields": Array([
+                                                                                    Object({
+                                                                                        "String": Object({
+                                                                                            "str": String(
+                                                                                                "p",
+                                                                                            ),
+                                                                                        }),
+                                                                                    }),
+                                                                                ]),
+                                                                                "location": Number(
+                                                                                    63,
+                                                                                ),
+                                                                            }),
+                                                                        }),
+                                                                        "location": Number(
+                                                                            65,
+                                                                        ),
+                                                                        "nulltesttype": String(
+                                                                            "IS_NOT_NULL",
+                                                                        ),
+                                                                    }),
+                                                                }),
+                                                            ),
+                                                            keys: None,
+                                                            indexname: None,
+                                                            skip_validation: false,
+                                                            initially_valid: false,
+                                                        },
+                                                    ),
+                                                    Constraint(
+                                                        Constraint {
+                                                            conname: None,
+                                                            contype: NotNull,
+                                                            location: 85,
+                                                            raw_expr: None,
+                                                            keys: None,
+                                                            indexname: None,
+                                                            skip_validation: false,
+                                                            initially_valid: false,
+                                                        },
+                                                    ),
+                                                ],
+                                                is_local: true,
+                                                location: 32,
+                                            },
+                                        ),
+                                    ),
+                                    behavior: Restrict,
+                                    missing_ok: false,
+                                },
+                            ),
+                        ],
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: None,
+                            relname: "table_c",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 13,
+                        },
+                        relkind: Table,
+                        missing_ok: false,
+                    },
+                ),
+                stmt_location: 0,
+                stmt_len: Some(
+                    93,
+                ),
+            },
+        ),
+    ],
+)

@@ -29,8 +29,11 @@ Ok(
                                             }),
                                         }),
                                     ]),
-                                    "op": Number(
-                                        0,
+                                    "limitOption": String(
+                                        "LIMIT_OPTION_DEFAULT",
+                                    ),
+                                    "op": String(
+                                        "SETOP_NONE",
                                     ),
                                     "targetList": Array([
                                         Object({
@@ -56,27 +59,25 @@ Ok(
                                 }),
                             }),
                         ]),
-                        "event": Number(
-                            1,
+                        "event": String(
+                            "CMD_SELECT",
                         ),
                         "instead": Bool(
                             true,
                         ),
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    43,
-                                ),
-                                "relname": String(
-                                    "t1",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                43,
+                            ),
+                            "relname": String(
+                                "t1",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                         "rulename": String(
                             "_RETURN",
@@ -102,24 +103,22 @@ Ok(
                                 }),
                             }),
                         ]),
-                        "event": Number(
-                            2,
+                        "event": String(
+                            "CMD_UPDATE",
                         ),
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    126,
-                                ),
-                                "relname": String(
-                                    "mytable",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                126,
+                            ),
+                            "relname": String(
+                                "mytable",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                         "rulename": String(
                             "notify_me",

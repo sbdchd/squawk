@@ -10,8 +10,11 @@ Ok(
                     Object({
                         "query": Object({
                             "SelectStmt": Object({
-                                "op": Number(
-                                    0,
+                                "limitOption": String(
+                                    "LIMIT_OPTION_DEFAULT",
+                                ),
+                                "op": String(
+                                    "SETOP_NONE",
                                 ),
                                 "targetList": Array([
                                     Object({
@@ -39,23 +42,21 @@ Ok(
                             }),
                         }),
                         "view": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    13,
-                                ),
-                                "relname": String(
-                                    "vista",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                13,
+                            ),
+                            "relname": String(
+                                "vista",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
-                        "withCheckOption": Number(
-                            0,
+                        "withCheckOption": String(
+                            "NO_CHECK_OPTION",
                         ),
                     }),
                 ),
@@ -89,8 +90,11 @@ Ok(
                                         }),
                                     }),
                                 ]),
-                                "op": Number(
-                                    0,
+                                "limitOption": String(
+                                    "LIMIT_OPTION_DEFAULT",
+                                ),
+                                "op": String(
+                                    "SETOP_NONE",
                                 ),
                                 "targetList": Array([
                                     Object({
@@ -115,8 +119,8 @@ Ok(
                                 ]),
                                 "whereClause": Object({
                                     "A_Expr": Object({
-                                        "kind": Number(
-                                            0,
+                                        "kind": String(
+                                            "AEXPR_OP",
                                         ),
                                         "lexpr": Object({
                                             "ColumnRef": Object({
@@ -165,23 +169,21 @@ Ok(
                             }),
                         }),
                         "view": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    56,
-                                ),
-                                "relname": String(
-                                    "comedies",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                56,
+                            ),
+                            "relname": String(
+                                "comedies",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
-                        "withCheckOption": Number(
-                            0,
+                        "withCheckOption": String(
+                            "NO_CHECK_OPTION",
                         ),
                     }),
                 ),

@@ -3,8 +3,7 @@ use std::collections::HashSet;
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use crate::{rules::utils::tables_created_in_transaction, violations::Span};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, RelationKind, RootStmt, Stmt,
-    TransactionStmtKind,
+    AlterTableCmds, AlterTableDef, AlterTableType, RootStmt, Stmt, TransactionStmtKind,
 };
 
 /// Return list of spans for offending transactions. From the start of BEGIN to
@@ -82,7 +81,7 @@ pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
     for RootStmt::RawStmt(raw_stmt) in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
-                let RelationKind::RangeVar(range) = &stmt.relation;
+                let range = &stmt.relation;
                 let tbl_name = &range.relname;
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     match &cmd.def {

@@ -9,56 +9,58 @@ Ok(
                 stmt: AlterDefaultPrivilegesStmt(
                     Object({
                         "action": Object({
-                            "GrantStmt": Object({
-                                "behavior": Number(
-                                    0,
-                                ),
-                                "grantees": Array([
-                                    Object({
-                                        "RoleSpec": Object({
-                                            "location": Number(
-                                                70,
-                                            ),
-                                            "roletype": Number(
-                                                3,
-                                            ),
-                                        }),
+                            "behavior": String(
+                                "DROP_RESTRICT",
+                            ),
+                            "grantees": Array([
+                                Object({
+                                    "RoleSpec": Object({
+                                        "location": Number(
+                                            70,
+                                        ),
+                                        "roletype": String(
+                                            "ROLESPEC_PUBLIC",
+                                        ),
                                     }),
-                                ]),
-                                "is_grant": Bool(
-                                    true,
-                                ),
-                                "objtype": Number(
-                                    1,
-                                ),
-                                "privileges": Array([
-                                    Object({
-                                        "AccessPriv": Object({
-                                            "priv_name": String(
-                                                "select",
-                                            ),
-                                        }),
+                                }),
+                            ]),
+                            "is_grant": Bool(
+                                true,
+                            ),
+                            "objtype": String(
+                                "OBJECT_TABLE",
+                            ),
+                            "privileges": Array([
+                                Object({
+                                    "AccessPriv": Object({
+                                        "priv_name": String(
+                                            "select",
+                                        ),
                                     }),
-                                ]),
-                                "targtype": Number(
-                                    2,
-                                ),
-                            }),
+                                }),
+                            ]),
+                            "targtype": String(
+                                "ACL_TARGET_DEFAULTS",
+                            ),
                         }),
                         "options": Array([
                             Object({
                                 "DefElem": Object({
-                                    "arg": Array([
-                                        Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "myschema",
-                                                ),
-                                            }),
+                                    "arg": Object({
+                                        "List": Object({
+                                            "items": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "myschema",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
                                         }),
-                                    ]),
-                                    "defaction": Number(
-                                        0,
+                                    }),
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "schemas",

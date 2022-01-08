@@ -20,17 +20,21 @@ Ok(
                         "options": Array([
                             Object({
                                 "DefElem": Object({
-                                    "arg": Array([
-                                        Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "\nDECLARE\n    -- declarations\nBEGIN\n    PERFORM my_function();\nEND;\n",
-                                                ),
-                                            }),
+                                    "arg": Object({
+                                        "List": Object({
+                                            "items": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "\nDECLARE\n    -- declarations\nBEGIN\n    PERFORM my_function();\nEND;\n",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
                                         }),
-                                    ]),
-                                    "defaction": Number(
-                                        0,
+                                    }),
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "as",
@@ -49,8 +53,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "language",
@@ -62,30 +66,28 @@ Ok(
                             }),
                         ]),
                         "returnType": Object({
-                            "TypeName": Object({
-                                "location": Number(
-                                    36,
-                                ),
-                                "names": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "pg_catalog",
-                                            ),
-                                        }),
+                            "location": Number(
+                                36,
+                            ),
+                            "names": Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "pg_catalog",
+                                        ),
                                     }),
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "int4",
-                                            ),
-                                        }),
+                                }),
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "int4",
+                                        ),
                                     }),
-                                ]),
-                                "typemod": Number(
-                                    -1,
-                                ),
-                            }),
+                                }),
+                            ]),
+                            "typemod": Number(
+                                -1,
+                            ),
                         }),
                     }),
                 ),

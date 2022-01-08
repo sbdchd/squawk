@@ -45,19 +45,17 @@ Ok(
                                 },
                             ),
                         ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: Some(
-                                    "public",
-                                ),
-                                relname: "tasks",
-                                inh: false,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 18,
-                            },
-                        ),
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: Some(
+                                "public",
+                            ),
+                            relname: "tasks",
+                            inh: false,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 18,
+                        },
                         relkind: Table,
                         missing_ok: false,
                     },
@@ -85,19 +83,17 @@ Ok(
                                 },
                             ),
                         ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: Some(
-                                    "public",
-                                ),
-                                relname: "tasks",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 208,
-                            },
-                        ),
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: Some(
+                                "public",
+                            ),
+                            relname: "tasks",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 208,
+                        },
                         relkind: Table,
                         missing_ok: false,
                     },

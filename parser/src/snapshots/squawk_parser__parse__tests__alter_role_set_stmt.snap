@@ -9,43 +9,39 @@ Ok(
                 stmt: AlterRoleSetStmt(
                     Object({
                         "role": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    12,
-                                ),
-                                "rolename": String(
-                                    "worker_bee",
-                                ),
-                                "roletype": Number(
-                                    0,
-                                ),
-                            }),
+                            "location": Number(
+                                12,
+                            ),
+                            "rolename": String(
+                                "worker_bee",
+                            ),
+                            "roletype": String(
+                                "ROLESPEC_CSTRING",
+                            ),
                         }),
                         "setstmt": Object({
-                            "VariableSetStmt": Object({
-                                "args": Array([
-                                    Object({
-                                        "A_Const": Object({
-                                            "location": Number(
-                                                50,
-                                            ),
-                                            "val": Object({
-                                                "Integer": Object({
-                                                    "ival": Number(
-                                                        100000,
-                                                    ),
-                                                }),
+                            "args": Array([
+                                Object({
+                                    "A_Const": Object({
+                                        "location": Number(
+                                            50,
+                                        ),
+                                        "val": Object({
+                                            "Integer": Object({
+                                                "ival": Number(
+                                                    100000,
+                                                ),
                                             }),
                                         }),
                                     }),
-                                ]),
-                                "kind": Number(
-                                    0,
-                                ),
-                                "name": String(
-                                    "maintenance_work_mem",
-                                ),
-                            }),
+                                }),
+                            ]),
+                            "kind": String(
+                                "VAR_SET_VALUE",
+                            ),
+                            "name": String(
+                                "maintenance_work_mem",
+                            ),
                         }),
                     }),
                 ),

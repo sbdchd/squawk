@@ -11,8 +11,8 @@ Ok(
                         "options": Array([
                             Object({
                                 "DefElem": Object({
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "analyze",
@@ -43,8 +43,11 @@ Ok(
                                         }),
                                     }),
                                 ]),
-                                "op": Number(
-                                    0,
+                                "limitOption": String(
+                                    "LIMIT_OPTION_DEFAULT",
+                                ),
+                                "op": String(
+                                    "SETOP_NONE",
                                 ),
                                 "targetList": Array([
                                     Object({
@@ -72,8 +75,8 @@ Ok(
                                         "args": Array([
                                             Object({
                                                 "A_Expr": Object({
-                                                    "kind": Number(
-                                                        0,
+                                                    "kind": String(
+                                                        "AEXPR_OP",
                                                     ),
                                                     "lexpr": Object({
                                                         "ColumnRef": Object({
@@ -121,8 +124,8 @@ Ok(
                                             }),
                                             Object({
                                                 "A_Expr": Object({
-                                                    "kind": Number(
-                                                        0,
+                                                    "kind": String(
+                                                        "AEXPR_OP",
                                                     ),
                                                     "lexpr": Object({
                                                         "ColumnRef": Object({
@@ -169,8 +172,8 @@ Ok(
                                                 }),
                                             }),
                                         ]),
-                                        "boolop": Number(
-                                            0,
+                                        "boolop": String(
+                                            "AND_EXPR",
                                         ),
                                         "location": Number(
                                             48,

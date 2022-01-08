@@ -21,30 +21,28 @@ Ok(
                                         30,
                                     ),
                                     "typeName": Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                38,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "pg_catalog",
-                                                        ),
-                                                    }),
+                                        "location": Number(
+                                            38,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "pg_catalog",
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "float8",
-                                                        ),
-                                                    }),
+                                            }),
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "float8",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
                                 }),
                             }),
@@ -60,46 +58,42 @@ Ok(
                                         60,
                                     ),
                                     "typeName": Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                68,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "pg_catalog",
-                                                        ),
-                                                    }),
+                                        "location": Number(
+                                            68,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "pg_catalog",
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "float8",
-                                                        ),
-                                                    }),
+                                            }),
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "float8",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
                                 }),
                             }),
                         ]),
                         "typevar": Object({
-                            "RangeVar": Object({
-                                "location": Number(
-                                    13,
-                                ),
-                                "relname": String(
-                                    "complex",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "location": Number(
+                                13,
+                            ),
+                            "relname": String(
+                                "complex",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                     }),
                 ),

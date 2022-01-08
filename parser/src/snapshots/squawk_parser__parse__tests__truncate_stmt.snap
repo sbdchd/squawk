@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: TruncateStmt(
                     Object({
-                        "behavior": Number(
-                            0,
+                        "behavior": String(
+                            "DROP_RESTRICT",
                         ),
                         "relations": Array([
                             Object({
@@ -76,8 +76,8 @@ Ok(
             RawStmt {
                 stmt: TruncateStmt(
                     Object({
-                        "behavior": Number(
-                            1,
+                        "behavior": String(
+                            "DROP_CASCADE",
                         ),
                         "relations": Array([
                             Object({

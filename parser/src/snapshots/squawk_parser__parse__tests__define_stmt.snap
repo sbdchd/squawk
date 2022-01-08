@@ -9,34 +9,36 @@ Ok(
                 stmt: DefineStmt(
                     Object({
                         "args": Array([
-                            Array([
-                                Object({
-                                    "FunctionParameter": Object({
-                                        "argType": Object({
-                                            "TypeName": Object({
-                                                "location": Number(
-                                                    23,
-                                                ),
-                                                "names": Array([
-                                                    Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "complex",
-                                                            ),
+                            Object({
+                                "List": Object({
+                                    "items": Array([
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        23,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "complex",
+                                                                ),
+                                                            }),
                                                         }),
-                                                    }),
-                                                ]),
-                                                "typemod": Number(
-                                                    -1,
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_IN",
                                                 ),
                                             }),
                                         }),
-                                        "mode": Number(
-                                            105,
-                                        ),
-                                    }),
+                                    ]),
                                 }),
-                            ]),
+                            }),
                             Object({
                                 "Integer": Object({
                                     "ival": Number(
@@ -67,8 +69,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "sfunc",
@@ -99,8 +101,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "stype",
@@ -119,8 +121,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "initcond",
@@ -140,8 +142,8 @@ Ok(
                                 }),
                             }),
                         ]),
-                        "kind": Number(
-                            1,
+                        "kind": String(
+                            "OBJECT_AGGREGATE",
                         ),
                     }),
                 ),

@@ -15,33 +15,35 @@ Ok(
                                 ),
                             }),
                         }),
-                        "object": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "name",
-                                    ),
-                                }),
+                        "object": Object({
+                            "List": Object({
+                                "items": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "name",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
                             }),
-                        ]),
-                        "objectType": Number(
-                            40,
+                        }),
+                        "objectType": String(
+                            "OBJECT_TRIGGER",
                         ),
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    23,
-                                ),
-                                "relname": String(
-                                    "table_name",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                23,
+                            ),
+                            "relname": String(
+                                "table_name",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                     }),
                 ),
@@ -103,8 +105,8 @@ Ok(
                                 ]),
                             }),
                         }),
-                        "objectType": Number(
-                            19,
+                        "objectType": String(
+                            "OBJECT_FUNCTION",
                         ),
                     }),
                 ),

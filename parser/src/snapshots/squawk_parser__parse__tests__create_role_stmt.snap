@@ -18,8 +18,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "canlogin",
@@ -32,21 +32,14 @@ Ok(
                             Object({
                                 "DefElem": Object({
                                     "arg": Object({
-                                        "A_Const": Object({
-                                            "location": Number(
-                                                45,
+                                        "String": Object({
+                                            "str": String(
+                                                "jw8s0F4",
                                             ),
-                                            "val": Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "jw8s0F4",
-                                                    ),
-                                                }),
-                                            }),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "password",
@@ -65,8 +58,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "validUntil",
@@ -80,8 +73,8 @@ Ok(
                         "role": String(
                             "miriam",
                         ),
-                        "stmt_type": Number(
-                            0,
+                        "stmt_type": String(
+                            "ROLESTMT_ROLE",
                         ),
                     }),
                 ),

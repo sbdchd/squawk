@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: AlterSubscriptionStmt(
                     Object({
-                        "kind": Number(
-                            2,
+                        "kind": String(
+                            "ALTER_SUBSCRIPTION_PUBLICATION",
                         ),
                         "publication": Array([
                             Object({
@@ -35,8 +35,8 @@ Ok(
             RawStmt {
                 stmt: AlterSubscriptionStmt(
                     Object({
-                        "kind": Number(
-                            4,
+                        "kind": String(
+                            "ALTER_SUBSCRIPTION_ENABLED",
                         ),
                         "options": Array([
                             Object({
@@ -48,8 +48,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "enabled",

@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: FetchStmt(
                     Object({
-                        "direction": Number(
-                            0,
+                        "direction": String(
+                            "FETCH_FORWARD",
                         ),
                         "howMany": Number(
                             5,

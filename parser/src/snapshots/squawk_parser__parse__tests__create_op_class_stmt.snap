@@ -12,23 +12,21 @@ Ok(
                             "gist",
                         ),
                         "datatype": Object({
-                            "TypeName": Object({
-                                "location": Number(
-                                    58,
-                                ),
-                                "names": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "_int4",
-                                            ),
-                                        }),
+                            "location": Number(
+                                58,
+                            ),
+                            "names": Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "_int4",
+                                        ),
                                     }),
-                                ]),
-                                "typemod": Number(
-                                    -1,
-                                ),
-                            }),
+                                }),
+                            ]),
+                            "typemod": Number(
+                                -1,
+                            ),
                         }),
                         "isDefault": Bool(
                             true,
@@ -40,17 +38,15 @@ Ok(
                                         1,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "&&",
-                                                        ),
-                                                    }),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "&&",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         3,
@@ -63,57 +59,55 @@ Ok(
                                         1,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            149,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "anyarray",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        149,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "anyarray",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            159,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "anyarray",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        159,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "anyarray",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "=",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "=",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         6,
@@ -126,17 +120,15 @@ Ok(
                                         1,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "@>",
-                                                        ),
-                                                    }),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "@>",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         7,
@@ -149,17 +141,15 @@ Ok(
                                         1,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "<@",
-                                                        ),
-                                                    }),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "<@",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         8,
@@ -172,57 +162,55 @@ Ok(
                                         1,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            278,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "_int4",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        278,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "_int4",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            285,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "query_int",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        285,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "query_int",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "@@",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "@@",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         20,
@@ -235,121 +223,119 @@ Ok(
                                         2,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            347,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        347,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            357,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "_int4",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        357,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "_int4",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            364,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "pg_catalog",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        364,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "pg_catalog",
+                                                                ),
                                                             }),
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
+                                                        }),
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "int4",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            369,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "oid",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        369,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "oid",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            374,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        374,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "g_int_consistent",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "g_int_consistent",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         1,
@@ -362,57 +348,55 @@ Ok(
                                         2,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            430,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        430,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            440,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        440,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "g_int_union",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "g_int_union",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         2,
@@ -425,38 +409,36 @@ Ok(
                                         2,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            499,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        499,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "g_int_compress",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "g_int_compress",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         3,
@@ -469,38 +451,36 @@ Ok(
                                         2,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            560,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        560,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "g_int_decompress",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "g_int_decompress",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         4,
@@ -513,76 +493,74 @@ Ok(
                                         2,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            618,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        618,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            628,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        628,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            638,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        638,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "g_int_penalty",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "g_int_penalty",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         5,
@@ -595,57 +573,55 @@ Ok(
                                         2,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            698,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        698,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            708,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        708,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "g_int_picksplit",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "g_int_picksplit",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         6,
@@ -658,76 +634,74 @@ Ok(
                                         2,
                                     ),
                                     "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            763,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "_int4",
-                                                                    ),
-                                                                }),
+                                        "objargs": Array([
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        763,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "_int4",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            770,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "_int4",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        770,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "_int4",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            777,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "internal",
-                                                                    ),
-                                                                }),
+                                            }),
+                                            Object({
+                                                "TypeName": Object({
+                                                    "location": Number(
+                                                        777,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "internal",
+                                                                ),
                                                             }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
                                                 }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "g_int_same",
-                                                        ),
-                                                    }),
+                                            }),
+                                        ]),
+                                        "objname": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "g_int_same",
+                                                    ),
                                                 }),
-                                            ]),
-                                        }),
+                                            }),
+                                        ]),
                                     }),
                                     "number": Number(
                                         7,

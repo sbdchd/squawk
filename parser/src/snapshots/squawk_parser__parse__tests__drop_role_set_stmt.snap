@@ -17,8 +17,8 @@ Ok(
                                     "rolename": String(
                                         "jonathan",
                                     ),
-                                    "roletype": Number(
-                                        0,
+                                    "roletype": String(
+                                        "ROLESPEC_CSTRING",
                                     ),
                                 }),
                             }),

@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: ImportForeignSchemaStmt(
                     Object({
-                        "list_type": Number(
-                            0,
+                        "list_type": String(
+                            "FDW_IMPORT_SCHEMA_ALL",
                         ),
                         "local_schema": String(
                             "films",

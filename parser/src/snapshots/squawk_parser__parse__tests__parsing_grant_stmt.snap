@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: GrantStmt(
                     Object({
-                        "behavior": Number(
-                            0,
+                        "behavior": String(
+                            "DROP_RESTRICT",
                         ),
                         "grantees": Array([
                             Object({
@@ -17,8 +17,8 @@ Ok(
                                     "location": Number(
                                         25,
                                     ),
-                                    "roletype": Number(
-                                        3,
+                                    "roletype": String(
+                                        "ROLESPEC_PUBLIC",
                                     ),
                                 }),
                             }),
@@ -44,8 +44,8 @@ Ok(
                                 }),
                             }),
                         ]),
-                        "objtype": Number(
-                            1,
+                        "objtype": String(
+                            "OBJECT_TABLE",
                         ),
                         "privileges": Array([
                             Object({
@@ -56,8 +56,8 @@ Ok(
                                 }),
                             }),
                         ]),
-                        "targtype": Number(
-                            0,
+                        "targtype": String(
+                            "ACL_TARGET_OBJECT",
                         ),
                     }),
                 ),

@@ -12,20 +12,18 @@ Ok(
                             "employees_ind",
                         ),
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    9,
-                                ),
-                                "relname": String(
-                                    "employees",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                9,
+                            ),
+                            "relname": String(
+                                "employees",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                     }),
                 ),
@@ -40,20 +38,18 @@ Ok(
                 stmt: ClusterStmt(
                     Object({
                         "relation": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
-                                "location": Number(
-                                    48,
-                                ),
-                                "relname": String(
-                                    "employees",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
-                            }),
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                48,
+                            ),
+                            "relname": String(
+                                "employees",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
                         }),
                     }),
                 ),

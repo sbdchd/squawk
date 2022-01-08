@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: DiscardStmt(
                     Object({
-                        "target": Number(
-                            1,
+                        "target": String(
+                            "DISCARD_PLANS",
                         ),
                     }),
                 ),
@@ -23,8 +23,8 @@ Ok(
             RawStmt {
                 stmt: DiscardStmt(
                     Object({
-                        "target": Number(
-                            2,
+                        "target": String(
+                            "DISCARD_SEQUENCES",
                         ),
                     }),
                 ),
@@ -38,8 +38,8 @@ Ok(
             RawStmt {
                 stmt: DiscardStmt(
                     Object({
-                        "target": Number(
-                            3,
+                        "target": String(
+                            "DISCARD_TEMP",
                         ),
                     }),
                 ),

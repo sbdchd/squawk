@@ -1,20 +1,27 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
-use serde_repr::{Deserialize_repr, Serialize_repr};
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum TransactionStmtKind {
+    #[serde(rename = "TRANS_STMT_BEGIN")]
     Begin,
-    /// semantically identical to BEGIN
+    #[serde(rename = "TRANS_STMT_START")]
     Start,
+    #[serde(rename = "TRANS_STMT_COMMIT")]
     Commit,
+    #[serde(rename = "TRANS_STMT_ROLLBACK")]
     Rollback,
+    #[serde(rename = "TRANS_STMT_SAVEPOINT")]
     Savepoint,
+    #[serde(rename = "TRANS_STMT_RELEASE")]
     Release,
+    #[serde(rename = "TRANS_STMT_ROLLBACK_TO")]
     RollbackTo,
+    #[serde(rename = "TRANS_STMT_PREPARE")]
     Prepare,
+    #[serde(rename = "TRANS_STMT_COMMIT_PREPARED")]
     CommitPrepared,
+    #[serde(rename = "TRANS_STMT_ROLLBACK_PREPARED")]
     RollbackPrepared,
 }
 
@@ -56,12 +63,15 @@ impl RawStmt {
     }
 }
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum SetOperation {
+    #[serde(rename = "SETOP_NONE")]
     None,
+    #[serde(rename = "SETOP_UNION")]
     Union,
+    #[serde(rename = "SETOP_INTERSECT")]
     Intersect,
+    #[serde(rename = "SETOP_EXCEPT")]
     Except,
 }
 
@@ -155,13 +165,15 @@ pub struct SelectStmt {
 }
 
 /// Sort ordering options for ORDER BY and CREATE INDEX
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum SortByDir {
+    #[serde(rename = "SORTBY_DEFAULT")]
     Default,
+    #[serde(rename = "SORTBY_ASC")]
     Asc,
+    #[serde(rename = "SORTBY_DESC")]
     Desc,
-    /// not allowed in CREATE INDEX ...
+    #[serde(rename = "SORTBY_USING")]
     Using,
 }
 
@@ -171,11 +183,13 @@ impl Default for SortByDir {
     }
 }
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum SortByNulls {
+    #[serde(rename = "SORTBY_NULLS_DEFAULT")]
     Default,
+    #[serde(rename = "SORTBY_NULLS_FIRST")]
     First,
+    #[serde(rename = "SORTBY_NULLS_LAST")]
     Last,
 }
 
@@ -231,11 +245,6 @@ pub struct RangeVar {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum RelationKind {
-    RangeVar(RangeVar),
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct IndexStmt {
     /// name of access method (eg. btree)
     #[serde(rename = "accessMethod")]
@@ -246,7 +255,7 @@ pub struct IndexStmt {
     #[serde(rename = "indexParams")]
     pub index_params: Vec<IndexParams>,
     /// relation to build index on
-    pub relation: RelationKind,
+    pub relation: RangeVar,
     #[serde(default)]
     pub concurrent: bool,
     /// is index unique
@@ -279,57 +288,107 @@ pub struct IndexStmt {
 /// When a command can act on several kinds of objects with only one
 /// parse structure required, use these constants to designate the
 /// object type.  Note that commands typically don't support all the types.
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum ObjectType {
+    #[serde(rename = "OBJECT_ACCESS_METHOD")]
     AccessMethod,
+    #[serde(rename = "OBJECT_AGGREGATE")]
     Aggregate,
+    #[serde(rename = "OBJECT_AMOP")]
     Amop,
+    #[serde(rename = "OBJECT_AMPROC")]
     Amproc,
-    /// type's attribute, when distinct from column
+    #[serde(rename = "OBJECT_ATTRIBUTE")]
     Attribute,
+    #[serde(rename = "OBJECT_CAST")]
     Cast,
+    #[serde(rename = "OBJECT_COLUMN")]
     Column,
+    #[serde(rename = "OBJECT_COLLATION")]
     Collation,
+    #[serde(rename = "OBJECT_CONVERSION")]
     Conversion,
+    #[serde(rename = "OBJECT_DATABASE")]
     Database,
+    #[serde(rename = "OBJECT_DEFAULT")]
     Default,
+    #[serde(rename = "OBJECT_DEFACL")]
     Defacl,
+    #[serde(rename = "OBJECT_DOMAIN")]
     Domain,
+    #[serde(rename = "OBJECT_DOMCONSTRAINT")]
     Domconstraint,
+    #[serde(rename = "OBJECT_EVENT_TRIGGER")]
     EventTrigger,
+    #[serde(rename = "OBJECT_EXTENSION")]
     Extension,
+    #[serde(rename = "OBJECT_FDW")]
     Fdw,
+    #[serde(rename = "OBJECT_FOREIGN_SERVER")]
     ForeignServer,
+    #[serde(rename = "OBJECT_FOREIGN_TABLE")]
     ForeignTable,
+    #[serde(rename = "OBJECT_FUNCTION")]
     Function,
+    #[serde(rename = "OBJECT_INDEX")]
     Index,
+    #[serde(rename = "OBJECT_LANGUAGE")]
     Language,
+    #[serde(rename = "OBJECT_LARGEOBJECT")]
     Largeobject,
+    #[serde(rename = "OBJECT_MATVIEW")]
     Matview,
+    #[serde(rename = "OBJECT_OPCLASS")]
     Opclass,
+    #[serde(rename = "OBJECT_OPERATOR")]
     Operator,
+    #[serde(rename = "OBJECT_OPFAMILY")]
     Opfamily,
+    #[serde(rename = "OBJECT_POLICY")]
     Policy,
+    #[serde(rename = "OBJECT_PROCEDURE")]
+    Procedure,
+    #[serde(rename = "OBJECT_PUBLICATION")]
     Publication,
+    #[serde(rename = "OBJECT_PUBLICATION_REL")]
     PublicationRel,
+    #[serde(rename = "OBJECT_ROLE")]
     Role,
+    #[serde(rename = "OBJECT_ROUTINE")]
+    Routine,
+    #[serde(rename = "OBJECT_RULE")]
     Rule,
+    #[serde(rename = "OBJECT_SCHEMA")]
     Schema,
+    #[serde(rename = "OBJECT_SEQUENCE")]
     Sequence,
+    #[serde(rename = "OBJECT_SUBSCRIPTION")]
     Subscription,
+    #[serde(rename = "OBJECT_STATISTIC_EXT")]
     StatisticExt,
-    TabConstraint,
+    #[serde(rename = "OBJECT_TABCONSTRAINT")]
+    Tabconstraint,
+    #[serde(rename = "OBJECT_TABLE")]
     Table,
+    #[serde(rename = "OBJECT_TABLESPACE")]
     Tablespace,
+    #[serde(rename = "OBJECT_TRANSFORM")]
     Transform,
+    #[serde(rename = "OBJECT_TRIGGER")]
     Trigger,
-    TsConfiguration,
-    TsDictionary,
-    TsParser,
-    TsTemplate,
+    #[serde(rename = "OBJECT_TSCONFIGURATION")]
+    Tsconfiguration,
+    #[serde(rename = "OBJECT_TSDICTIONARY")]
+    Tsdictionary,
+    #[serde(rename = "OBJECT_TSPARSER")]
+    Tsparser,
+    #[serde(rename = "OBJECT_TSTEMPLATE")]
+    Tstemplate,
+    #[serde(rename = "OBJECT_TYPE")]
     Type,
+    #[serde(rename = "OBJECT_USER_MAPPING")]
     UserMapping,
+    #[serde(rename = "OBJECT_VIEW")]
     View,
 }
 
@@ -347,18 +406,17 @@ pub enum AlterTableCmds {
 #[derive(Debug, Deserialize, Serialize)]
 pub struct AlterTableStmt {
     pub cmds: Vec<AlterTableCmds>,
-    pub relation: RelationKind,
+    pub relation: RangeVar,
     pub relkind: ObjectType,
     #[serde(default)]
     pub missing_ok: bool,
 }
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum DropBehavior {
-    /// drop fails if any dependent objects
+    #[serde(rename = "DROP_RESTRICT")]
     Restrict,
-    /// remove dependent objects too
+    #[serde(rename = "DROP_CASCADE")]
     DropCascade,
 }
 impl Default for DropBehavior {
@@ -367,140 +425,141 @@ impl Default for DropBehavior {
     }
 }
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum AlterTableType {
-    /// add column
+    #[serde(rename = "AT_AddColumn")]
     AddColumn,
-    /// internal to commands/tablecmds.c
+    #[serde(rename = "AT_AddColumnRecurse")]
     AddColumnRecurse,
-    /// implicitly via CREATE OR REPLACE VIEW
+    #[serde(rename = "AT_AddColumnToView")]
     AddColumnToView,
-    /// alter column default
+    #[serde(rename = "AT_ColumnDefault")]
     ColumnDefault,
-    /// alter column drop not null
+    #[serde(rename = "AT_CookedColumnDefault")]
+    CookedColumnDefault,
+    #[serde(rename = "AT_DropNotNull")]
     DropNotNull,
-    /// alter column set not null
+    #[serde(rename = "AT_SetNotNull")]
     SetNotNull,
-    /// alter column set statistics
+    #[serde(rename = "AT_DropExpression")]
+    DropExpression,
+    #[serde(rename = "AT_CheckNotNull")]
+    CheckNotNull,
+    #[serde(rename = "AT_SetStatistics")]
     SetStatistics,
-    /// alter column set ( options )
+    #[serde(rename = "AT_SetOptions")]
     SetOptions,
-    /// alter column reset ( options )
+    #[serde(rename = "AT_ResetOptions")]
     ResetOptions,
-    /// alter column set storage
+    #[serde(rename = "AT_SetStorage")]
     SetStorage,
-    /// drop column
+    #[serde(rename = "AT_DropColumn")]
     DropColumn,
-    /// internal to commands/tablecmds.c
+    #[serde(rename = "AT_DropColumnRecurse")]
     DropColumnRecurse,
-    /// add index
+    #[serde(rename = "AT_AddIndex")]
     AddIndex,
-    /// internal to commands/tablecmds.c
+    #[serde(rename = "AT_ReAddIndex")]
     ReAddIndex,
-    /// add constraint
+    #[serde(rename = "AT_AddConstraint")]
     AddConstraint,
-    /// internal to commands/tablecmds.c
+    #[serde(rename = "AT_AddConstraintRecurse")]
     AddConstraintRecurse,
-    /// internal to commands/tablecmds.c
+    #[serde(rename = "AT_ReAddConstraint")]
     ReAddConstraint,
-    /// alter constraint
+    #[serde(rename = "AT_ReAddDomainConstraint")]
+    ReAddDomainConstraint,
+    #[serde(rename = "AT_AlterConstraint")]
     AlterConstraint,
-    /// validate constraint
+    #[serde(rename = "AT_ValidateConstraint")]
     ValidateConstraint,
-    /// internal to commands/tablecmds.c
+    #[serde(rename = "AT_ValidateConstraintRecurse")]
     ValidateConstraintRecurse,
-    /// pre-processed add constraint (local in parser/parse_utilcmd.c)
-    ProcessedConstraint,
-    /// add constraint using existing index
+    #[serde(rename = "AT_AddIndexConstraint")]
     AddIndexConstraint,
-    /// drop constraint
+    #[serde(rename = "AT_DropConstraint")]
     DropConstraint,
-    /// internal to commands/tablecmds.c
+    #[serde(rename = "AT_DropConstraintRecurse")]
     DropConstraintRecurse,
-    /// internal to commands/tablecmds.c
+    #[serde(rename = "AT_ReAddComment")]
     ReAddComment,
-    /// alter column type
+    #[serde(rename = "AT_AlterColumnType")]
     AlterColumnType,
-    /// alter column OPTIONS (...)
+    #[serde(rename = "AT_AlterColumnGenericOptions")]
     AlterColumnGenericOptions,
-    /// change owner
+    #[serde(rename = "AT_ChangeOwner")]
     ChangeOwner,
-    /// CLUSTER ON
+    #[serde(rename = "AT_ClusterOn")]
     ClusterOn,
-    /// SET WITHOUT CLUSTER
+    #[serde(rename = "AT_DropCluster")]
     DropCluster,
-    /// SET LOGGED
+    #[serde(rename = "AT_SetLogged")]
     SetLogged,
-    /// SET UNLOGGED
+    #[serde(rename = "AT_SetUnLogged")]
     SetUnLogged,
-    /// SET WITH OIDS
-    AddOids,
-    /// internal to commands/tablecmds.c
-    AddOidsRecurse,
-    /// SET WITHOUT OIDS
+    #[serde(rename = "AT_DropOids")]
     DropOids,
-    /// SET TABLESPACE
+    #[serde(rename = "AT_SetTableSpace")]
     SetTableSpace,
-    /// SET (...) -- AM specific parameters
+    #[serde(rename = "AT_SetRelOptions")]
     SetRelOptions,
-    /// RESET (...) -- AM specific parameters
+    #[serde(rename = "AT_ResetRelOptions")]
     ResetRelOptions,
-    /// replace reloption list in its entirety
+    #[serde(rename = "AT_ReplaceRelOptions")]
     ReplaceRelOptions,
-    /// ENABLE TRIGGER name
+    #[serde(rename = "AT_EnableTrig")]
     EnableTrig,
-    /// ENABLE ALWAYS TRIGGER name
+    #[serde(rename = "AT_EnableAlwaysTrig")]
     EnableAlwaysTrig,
-    /// ENABLE REPLICA TRIGGER name
+    #[serde(rename = "AT_EnableReplicaTrig")]
     EnableReplicaTrig,
-    /// DISABLE TRIGGER name
+    #[serde(rename = "AT_DisableTrig")]
     DisableTrig,
-    /// ENABLE TRIGGER ALL
+    #[serde(rename = "AT_EnableTrigAll")]
     EnableTrigAll,
-    /// DISABLE TRIGGER ALL
+    #[serde(rename = "AT_DisableTrigAll")]
     DisableTrigAll,
-    /// ENABLE TRIGGER USER
+    #[serde(rename = "AT_EnableTrigUser")]
     EnableTrigUser,
-    /// DISABLE TRIGGER USER
+    #[serde(rename = "AT_DisableTrigUser")]
     DisableTrigUser,
-    /// ENABLE RULE name
+    #[serde(rename = "AT_EnableRule")]
     EnableRule,
-    /// ENABLE ALWAYS RULE name
+    #[serde(rename = "AT_EnableAlwaysRule")]
     EnableAlwaysRule,
-    /// ENABLE REPLICA RULE name
+    #[serde(rename = "AT_EnableReplicaRule")]
     EnableReplicaRule,
-    /// DISABLE RULE name
+    #[serde(rename = "AT_DisableRule")]
     DisableRule,
-    /// INHERIT parent
+    #[serde(rename = "AT_AddInherit")]
     AddInherit,
-    /// NO INHERIT parent
+    #[serde(rename = "AT_DropInherit")]
     DropInherit,
-    /// OF <type_name>
+    #[serde(rename = "AT_AddOf")]
     AddOf,
-    /// NOT OF
+    #[serde(rename = "AT_DropOf")]
     DropOf,
-    /// REPLICA IDENTITY
+    #[serde(rename = "AT_ReplicaIdentity")]
     ReplicaIdentity,
-    /// ENABLE ROW SECURITY
+    #[serde(rename = "AT_EnableRowSecurity")]
     EnableRowSecurity,
-    /// DISABLE ROW SECURITY
+    #[serde(rename = "AT_DisableRowSecurity")]
     DisableRowSecurity,
-    /// FORCE ROW SECURITY
+    #[serde(rename = "AT_ForceRowSecurity")]
     ForceRowSecurity,
-    /// NO FORCE ROW SECURITY
+    #[serde(rename = "AT_NoForceRowSecurity")]
     NoForceRowSecurity,
-    /// OPTIONS (...)
+    #[serde(rename = "AT_GenericOptions")]
     GenericOptions,
-    /// ATTACH PARTITION
+    #[serde(rename = "AT_AttachPartition")]
     AttachPartition,
-    /// DETACH PARTITION
+    #[serde(rename = "AT_DetachPartition")]
     DetachPartition,
-    /// ADD IDENTITY
+    #[serde(rename = "AT_AddIdentity")]
     AddIdentity,
-    /// SET identity column options
+    #[serde(rename = "AT_SetIdentity")]
     SetIdentity,
-    /// DROP IDENTITY
+    #[serde(rename = "AT_DropIdentity")]
     DropIdentity,
 }
 
@@ -558,11 +617,6 @@ pub struct TypeName {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum ColumnDefTypeName {
-    TypeName(TypeName),
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct ColumnDef {
     // int			inhcount;		/* number of times column is inherited */
     // bool		is_not_null;	/* NOT NULL constraint specified? */
@@ -580,7 +634,7 @@ pub struct ColumnDef {
     // List	   *fdwoptions;		/* per-column FDW options */
     pub colname: Option<String>,
     #[serde(rename = "typeName")]
-    pub type_name: ColumnDefTypeName,
+    pub type_name: TypeName,
     #[serde(default)]
     pub constraints: Vec<ColumnDefConstraint>,
     /// column has local (non-inherited) def'n
@@ -617,23 +671,38 @@ pub struct AlterTableCmd {
     pub missing_ok: bool,
 }
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+/// Documented: https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L360
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum ConstrType {
     /// not standard SQL, but a lot of people expect it
+    #[serde(rename = "CONSTR_NULL")]
     Null,
+    #[serde(rename = "CONSTR_NOTNULL")]
     NotNull,
+    #[serde(rename = "CONSTR_DEFAULT")]
     Default,
+    #[serde(rename = "CONSTR_IDENTITY")]
     Identity,
+    #[serde(rename = "CONSTR_GENERATED")]
+    Generated,
+    #[serde(rename = "CONSTR_CHECK")]
     Check,
+    #[serde(rename = "CONSTR_PRIMARY")]
     Primary,
+    #[serde(rename = "CONSTR_UNIQUE")]
     Unique,
+    #[serde(rename = "CONSTR_EXCLUSION")]
     Exclusion,
+    #[serde(rename = "CONSTR_FOREIGN")]
     Foreign,
-    /// attributes for previous constraint node
+    #[serde(rename = "CONSTR_ATTR_DEFERRABLE")]
     AttrDeferrable,
+    /// attributes for previous constraint node
+    #[serde(rename = "CONSTR_ATTR_NOT_DEFERRABLE")]
     AttrNotDeferrable,
+    #[serde(rename = "CONSTR_ATTR_DEFERRED")]
     AttrDeferred,
+    #[serde(rename = "CONSTR_ATTR_IMMEDIATE")]
     AttrImmediate,
 }
 
@@ -696,7 +765,7 @@ pub struct RenameStmt {
     pub newname: String,
     pub behavior: DropBehavior,
     // in case it's a table
-    pub relation: Option<RelationKind>,
+    pub relation: Option<RangeVar>,
     #[serde(rename = "relationType")]
     pub relation_type: ObjectType,
     #[serde(rename = "renameType")]
@@ -713,23 +782,22 @@ pub enum TableElt {
 }
 
 /// What to do at commit time for temporary relations
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
-#[repr(u8)]
+#[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum OnCommitAction {
-    /// No ON COMMIT clause (do nothing)
+    #[serde(rename = "ONCOMMIT_NOOP")]
     Noop,
-    /// ON COMMIT PRESERVE ROWS (do nothing)
+    #[serde(rename = "ONCOMMIT_PRESERVE_ROWS")]
     PreserveRows,
-    /// ON COMMIT DELETE ROWS
+    #[serde(rename = "ONCOMMIT_DELETE_ROWS")]
     DeleteRows,
-    /// ON COMMIT DROP
+    #[serde(rename = "ONCOMMIT_DROP")]
     Drop,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CreateStmt {
     /// relation to create
-    pub relation: RelationKind,
+    pub relation: RangeVar,
     /// column definitions (list of ColumnDef)
     #[serde(rename = "tableElts", default)]
     pub table_elts: Vec<TableElt>,

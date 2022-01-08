@@ -21,8 +21,8 @@ Ok(
                                                 "location": Number(
                                                     73,
                                                 ),
-                                                "op": Number(
-                                                    3,
+                                                "op": String(
+                                                    "SVFOP_CURRENT_TIMESTAMP",
                                                 ),
                                                 "typmod": Number(
                                                     -1,
@@ -35,17 +35,15 @@ Ok(
                                 },
                             ),
                         ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "table_name",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 21,
-                            },
-                        ),
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: None,
+                            relname: "table_name",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 21,
+                        },
                         relkind: Table,
                         missing_ok: false,
                     },

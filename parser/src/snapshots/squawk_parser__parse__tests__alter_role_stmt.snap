@@ -21,8 +21,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "createrole",
@@ -41,8 +41,8 @@ Ok(
                                             ),
                                         }),
                                     }),
-                                    "defaction": Number(
-                                        0,
+                                    "defaction": String(
+                                        "DEFELEM_UNSPEC",
                                     ),
                                     "defname": String(
                                         "createdb",
@@ -54,17 +54,15 @@ Ok(
                             }),
                         ]),
                         "role": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    12,
-                                ),
-                                "rolename": String(
-                                    "miriam",
-                                ),
-                                "roletype": Number(
-                                    0,
-                                ),
-                            }),
+                            "location": Number(
+                                12,
+                            ),
+                            "rolename": String(
+                                "miriam",
+                            ),
+                            "roletype": String(
+                                "ROLESPEC_CSTRING",
+                            ),
                         }),
                     }),
                 ),

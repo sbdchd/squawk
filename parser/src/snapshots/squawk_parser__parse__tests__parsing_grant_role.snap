@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: GrantRoleStmt(
                     Object({
-                        "behavior": Number(
-                            0,
+                        "behavior": String(
+                            "DROP_RESTRICT",
                         ),
                         "granted_roles": Array([
                             Object({
@@ -29,8 +29,8 @@ Ok(
                                     "rolename": String(
                                         "joe",
                                     ),
-                                    "roletype": Number(
-                                        0,
+                                    "roletype": String(
+                                        "ROLESPEC_CSTRING",
                                     ),
                                 }),
                             }),

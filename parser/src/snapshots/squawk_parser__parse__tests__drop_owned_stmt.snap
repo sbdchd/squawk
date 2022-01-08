@@ -8,8 +8,8 @@ Ok(
             RawStmt {
                 stmt: DropOwnedStmt(
                     Object({
-                        "behavior": Number(
-                            1,
+                        "behavior": String(
+                            "DROP_CASCADE",
                         ),
                         "roles": Array([
                             Object({
@@ -20,8 +20,8 @@ Ok(
                                     "rolename": String(
                                         "foo",
                                     ),
-                                    "roletype": Number(
-                                        0,
+                                    "roletype": String(
+                                        "ROLESPEC_CSTRING",
                                     ),
                                 }),
                             }),

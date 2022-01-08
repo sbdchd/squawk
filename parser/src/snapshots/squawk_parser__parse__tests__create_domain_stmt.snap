@@ -11,8 +11,8 @@ Ok(
                         "constraints": Array([
                             Object({
                                 "Constraint": Object({
-                                    "contype": Number(
-                                        4,
+                                    "contype": String(
+                                        "CONSTR_CHECK",
                                     ),
                                     "initially_valid": Bool(
                                         true,
@@ -25,8 +25,8 @@ Ok(
                                             "args": Array([
                                                 Object({
                                                     "A_Expr": Object({
-                                                        "kind": Number(
-                                                            0,
+                                                        "kind": String(
+                                                            "AEXPR_OP",
                                                         ),
                                                         "lexpr": Object({
                                                             "ColumnRef": Object({
@@ -74,8 +74,8 @@ Ok(
                                                 }),
                                                 Object({
                                                     "A_Expr": Object({
-                                                        "kind": Number(
-                                                            0,
+                                                        "kind": String(
+                                                            "AEXPR_OP",
                                                         ),
                                                         "lexpr": Object({
                                                             "ColumnRef": Object({
@@ -122,8 +122,8 @@ Ok(
                                                     }),
                                                 }),
                                             ]),
-                                            "boolop": Number(
-                                                1,
+                                            "boolop": String(
+                                                "OR_EXPR",
                                             ),
                                             "location": Number(
                                                 66,
@@ -143,23 +143,21 @@ Ok(
                             }),
                         ]),
                         "typeName": Object({
-                            "TypeName": Object({
-                                "location": Number(
-                                    33,
-                                ),
-                                "names": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "text",
-                                            ),
-                                        }),
+                            "location": Number(
+                                33,
+                            ),
+                            "names": Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "text",
+                                        ),
                                     }),
-                                ]),
-                                "typemod": Number(
-                                    -1,
-                                ),
-                            }),
+                                }),
+                            ]),
+                            "typemod": Number(
+                                -1,
+                            ),
                         }),
                     }),
                 ),

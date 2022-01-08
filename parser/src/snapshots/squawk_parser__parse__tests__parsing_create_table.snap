@@ -21,41 +21,37 @@ Ok(
             RawStmt {
                 stmt: CreateStmt(
                     CreateStmt {
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "core_foo",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 21,
-                            },
-                        ),
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: None,
+                            relname: "core_foo",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 21,
+                        },
                         table_elts: [
                             ColumnDef(
                                 ColumnDef {
                                     colname: Some(
                                         "id",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "serial",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 41,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "serial",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 41,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -91,29 +87,27 @@ Ok(
                                     colname: Some(
                                         "created",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "timestamptz",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 83,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "timestamptz",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 83,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -137,29 +131,27 @@ Ok(
                                     colname: Some(
                                         "modified",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "timestamptz",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 132,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "timestamptz",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 132,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -183,44 +175,42 @@ Ok(
                                     colname: Some(
                                         "mongo_id",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "varchar",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [
-                                                Object({
-                                                    "A_Const": Object({
-                                                        "location": Number(
-                                                            189,
-                                                        ),
-                                                        "val": Object({
-                                                            "Integer": Object({
-                                                                "ival": Number(
-                                                                    255,
-                                                                ),
-                                                            }),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "varchar",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [
+                                            Object({
+                                                "A_Const": Object({
+                                                    "location": Number(
+                                                        189,
+                                                    ),
+                                                    "val": Object({
+                                                        "Integer": Object({
+                                                            "ival": Number(
+                                                                255,
+                                                            ),
                                                         }),
                                                     }),
                                                 }),
-                                            ],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 181,
-                                        },
-                                    ),
+                                            }),
+                                        ],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 181,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -256,24 +246,22 @@ Ok(
                                     colname: Some(
                                         "description",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "text",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 228,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "text",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 228,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -297,24 +285,22 @@ Ok(
                                     colname: Some(
                                         "metadata",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "jsonb",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 257,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "jsonb",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 257,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -338,44 +324,42 @@ Ok(
                                     colname: Some(
                                         "kind",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "varchar",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [
-                                                Object({
-                                                    "A_Const": Object({
-                                                        "location": Number(
-                                                            291,
-                                                        ),
-                                                        "val": Object({
-                                                            "Integer": Object({
-                                                                "ival": Number(
-                                                                    255,
-                                                                ),
-                                                            }),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "varchar",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [
+                                            Object({
+                                                "A_Const": Object({
+                                                    "location": Number(
+                                                        291,
+                                                    ),
+                                                    "val": Object({
+                                                        "Integer": Object({
+                                                            "ival": Number(
+                                                                255,
+                                                            ),
                                                         }),
                                                     }),
                                                 }),
-                                            ],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 283,
-                                        },
-                                    ),
+                                            }),
+                                        ],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 283,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -399,29 +383,27 @@ Ok(
                                     colname: Some(
                                         "age",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "int4",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 315,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "int4",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 315,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -445,29 +427,27 @@ Ok(
                                     colname: Some(
                                         "tenant_id",
                                     ),
-                                    type_name: TypeName(
-                                        TypeName {
-                                            names: [
-                                                String(
-                                                    PGString {
-                                                        str: "pg_catalog",
-                                                    },
-                                                ),
-                                                String(
-                                                    PGString {
-                                                        str: "int4",
-                                                    },
-                                                ),
-                                            ],
-                                            type_oid: None,
-                                            setof: false,
-                                            pct_type: false,
-                                            typmods: [],
-                                            typemod: -1,
-                                            array_bounds: [],
-                                            location: 348,
-                                        },
-                                    ),
+                                    type_name: TypeName {
+                                        names: [
+                                            String(
+                                                PGString {
+                                                    str: "pg_catalog",
+                                                },
+                                            ),
+                                            String(
+                                                PGString {
+                                                    str: "int4",
+                                                },
+                                            ),
+                                        ],
+                                        type_oid: None,
+                                        setof: false,
+                                        pct_type: false,
+                                        typmods: [],
+                                        typemod: -1,
+                                        array_bounds: [],
+                                        location: 348,
+                                    },
                                     constraints: [
                                         Constraint(
                                             Constraint {
@@ -527,17 +507,15 @@ Ok(
                                 },
                             ),
                         ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "core_foo",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 392,
-                            },
-                        ),
+                        relation: RangeVar {
+                            catalogname: None,
+                            schemaname: None,
+                            relname: "core_foo",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 392,
+                        },
                         concurrent: false,
                         unique: false,
                         primary: false,
