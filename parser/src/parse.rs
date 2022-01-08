@@ -1,4 +1,4 @@
-use crate::ast::RootStmt;
+use crate::ast::{RootStmt, StmtRoot};
 use crate::error::PgQueryError;
 use libpg_query::{pg_query_free_parse_result, pg_query_parse};
 use serde::Deserialize;
@@ -37,7 +37,13 @@ pub fn parse_sql_query_json(query: &str) -> Result<Value, PgQueryError> {
 }
 
 pub fn parse_sql_query(query: &str) -> Result<Vec<RootStmt>, PgQueryError> {
-    parse_sql_query_base(query)
+    let parsed: StmtRoot = parse_sql_query_base(query)?;
+    let root_stmts: Vec<RootStmt> = parsed
+        .stmts
+        .into_iter()
+        .map(|x| RootStmt::RawStmt(x))
+        .collect();
+    return Ok(root_stmts);
 }
 
 #[cfg(test)]

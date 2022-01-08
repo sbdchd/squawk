@@ -775,6 +775,11 @@ pub enum RootStmt {
     RawStmt(RawStmt),
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct StmtRoot {
+    pub stmts: Vec<RawStmt>,
+}
+
 /// case for each node type found in Postgres' parsenodes.h
 /// <https://github.com/lfittl/libpg_query/blob/6b1c3a582d38701593c5cadd260445737b9f7043/src/postgres/include/nodes/parsenodes.h>
 #[allow(clippy::large_enum_variant)]
