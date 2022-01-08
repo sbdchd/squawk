@@ -4,147 +4,145 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: DefineStmt(
-                    Object({
-                        "definition": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "Integer": Object({
-                                            "ival": Number(
-                                                16,
-                                            ),
-                                        }),
+        RawStmt {
+            stmt: DefineStmt(
+                Object({
+                    "definition": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "Integer": Object({
+                                        "ival": Number(
+                                            16,
+                                        ),
                                     }),
-                                    "defaction": Number(
-                                        0,
-                                    ),
-                                    "defname": String(
-                                        "internallength",
-                                    ),
-                                    "location": Number(
-                                        23,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "internallength",
+                                ),
+                                "location": Number(
+                                    23,
+                                ),
                             }),
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                56,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "my_box_in_function",
-                                                        ),
-                                                    }),
+                        }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            56,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "my_box_in_function",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                    "defaction": Number(
-                                        0,
-                                    ),
-                                    "defname": String(
-                                        "input",
-                                    ),
-                                    "location": Number(
-                                        48,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "input",
+                                ),
+                                "location": Number(
+                                    48,
+                                ),
                             }),
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                89,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "my_box_out_function",
-                                                        ),
-                                                    }),
+                        }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            89,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "my_box_out_function",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                    "defaction": Number(
-                                        0,
-                                    ),
-                                    "defname": String(
-                                        "output",
-                                    ),
-                                    "location": Number(
-                                        80,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "output",
+                                ),
+                                "location": Number(
+                                    80,
+                                ),
                             }),
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                124,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "float4",
-                                                        ),
-                                                    }),
+                        }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            124,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "float4",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                    "defaction": Number(
-                                        0,
-                                    ),
-                                    "defname": String(
-                                        "element",
-                                    ),
-                                    "location": Number(
-                                        114,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "element",
+                                ),
+                                "location": Number(
+                                    114,
+                                ),
                             }),
-                        ]),
-                        "defnames": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "box",
-                                    ),
-                                }),
+                        }),
+                    ]),
+                    "defnames": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "box",
+                                ),
                             }),
-                        ]),
-                        "kind": Number(
-                            45,
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    132,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                    "kind": String(
+                        "OBJECT_TYPE",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                132,
+            ),
+        },
     ],
 )
