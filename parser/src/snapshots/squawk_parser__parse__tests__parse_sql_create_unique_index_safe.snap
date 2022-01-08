@@ -19,7 +19,9 @@ Ok(
                                                 "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq",
                                             ),
                                             contype: Unique,
-                                            location: 47,
+                                            location: Some(
+                                                47,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: Some(

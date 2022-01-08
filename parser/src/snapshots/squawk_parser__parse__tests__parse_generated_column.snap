@@ -44,7 +44,9 @@ Ok(
                                                     Constraint {
                                                         conname: None,
                                                         contype: Generated,
-                                                        location: 42,
+                                                        location: Some(
+                                                            42,
+                                                        ),
                                                         raw_expr: Some(
                                                             Object({
                                                                 "NullTest": Object({
@@ -83,7 +85,9 @@ Ok(
                                                     Constraint {
                                                         conname: None,
                                                         contype: NotNull,
-                                                        location: 85,
+                                                        location: Some(
+                                                            85,
+                                                        ),
                                                         raw_expr: None,
                                                         keys: None,
                                                         indexname: None,

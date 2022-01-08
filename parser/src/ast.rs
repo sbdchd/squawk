@@ -717,7 +717,8 @@ pub struct Constraint {
     // bool		deferrable;		/* DEFERRABLE? */
     // bool		initdeferred;	/* INITIALLY DEFERRED? */
     /// token location, or -1 if unknown
-    pub location: i32,
+    #[serde(default)]
+    pub location: Option<i32>,
 
     /* Fields used for constraints with expressions (CHECK and DEFAULT): */
     // bool		is_no_inherit;	/* is constraint non-inheritable? */

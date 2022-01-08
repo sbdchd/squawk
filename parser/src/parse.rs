@@ -1240,6 +1240,17 @@ ALTER TABLE public.tasks VALIDATE CONSTRAINT tasks_fk;
         assert!(res.is_ok());
         assert_debug_snapshot!(res);
     }
+    #[test]
+    fn parse_alter_constraint_regression() {
+        let sql = r#"
+ALTER TABLE "table" ALTER CONSTRAINT "constraint" DEFERRABLE INITIALLY IMMEDIATE;
+
+ALTER TABLE "table" ALTER CONSTRAINT "constraint" NOT DEFERRABLE;
+"#;
+        let res = parse_sql_query(sql);
+        assert!(res.is_ok());
+        assert_debug_snapshot!(res);
+    }
 
     #[test]
     fn parse_generated_column() {

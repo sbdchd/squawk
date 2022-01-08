@@ -114,7 +114,9 @@ Ok(
                             Constraint {
                                 conname: None,
                                 contype: Primary,
-                                location: 73,
+                                location: Some(
+                                    73,
+                                ),
                                 raw_expr: None,
                                 keys: Some(
                                     Array([

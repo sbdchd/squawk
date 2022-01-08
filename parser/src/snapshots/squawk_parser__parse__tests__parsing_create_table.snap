@@ -54,7 +54,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: NotNull,
-                                            location: 48,
+                                            location: Some(
+                                                48,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -66,7 +68,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: Primary,
-                                            location: 57,
+                                            location: Some(
+                                                57,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -110,7 +114,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: NotNull,
-                                            location: 108,
+                                            location: Some(
+                                                108,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -154,7 +160,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: NotNull,
-                                            location: 157,
+                                            location: Some(
+                                                157,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -213,7 +221,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: NotNull,
-                                            location: 194,
+                                            location: Some(
+                                                194,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -225,7 +235,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: Unique,
-                                            location: 203,
+                                            location: Some(
+                                                203,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -264,7 +276,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: NotNull,
-                                            location: 233,
+                                            location: Some(
+                                                233,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -303,7 +317,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: NotNull,
-                                            location: 263,
+                                            location: Some(
+                                                263,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -362,7 +378,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: NotNull,
-                                            location: 296,
+                                            location: Some(
+                                                296,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -406,7 +424,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: NotNull,
-                                            location: 323,
+                                            location: Some(
+                                                323,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
@@ -450,7 +470,9 @@ Ok(
                                         Constraint {
                                             conname: None,
                                             contype: Null,
-                                            location: 356,
+                                            location: Some(
+                                                356,
+                                            ),
                                             raw_expr: None,
                                             keys: None,
                                             indexname: None,
