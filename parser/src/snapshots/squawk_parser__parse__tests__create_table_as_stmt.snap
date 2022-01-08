@@ -4,89 +4,86 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateTableAsStmt(
-                    Object({
-                        "into": Object({
-                            "IntoClause": Object({
-                                "onCommit": Number(
-                                    0,
-                                ),
-                                "rel": Object({
+        RawStmt {
+            stmt: CreateTableAsStmt(
+                Object({
+                    "into": Object({
+                        "onCommit": String(
+                            "ONCOMMIT_NOOP",
+                        ),
+                        "rel": Object({
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                14,
+                            ),
+                            "relname": String(
+                                "films2",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
+                        }),
+                    }),
+                    "query": Object({
+                        "SelectStmt": Object({
+                            "fromClause": Array([
+                                Object({
                                     "RangeVar": Object({
                                         "inh": Bool(
                                             true,
                                         ),
                                         "location": Number(
-                                            14,
+                                            32,
                                         ),
                                         "relname": String(
-                                            "films2",
+                                            "films",
                                         ),
                                         "relpersistence": String(
                                             "p",
                                         ),
                                     }),
                                 }),
-                            }),
-                        }),
-                        "query": Object({
-                            "SelectStmt": Object({
-                                "fromClause": Array([
-                                    Object({
-                                        "RangeVar": Object({
-                                            "inh": Bool(
-                                                true,
-                                            ),
-                                            "location": Number(
-                                                32,
-                                            ),
-                                            "relname": String(
-                                                "films",
-                                            ),
-                                            "relpersistence": String(
-                                                "p",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "op": Number(
-                                    0,
-                                ),
-                                "targetList": Array([
-                                    Object({
-                                        "ResTarget": Object({
-                                            "location": Number(
-                                                -1,
-                                            ),
-                                            "val": Object({
-                                                "ColumnRef": Object({
-                                                    "fields": Array([
-                                                        Object({
-                                                            "A_Star": Object({}),
-                                                        }),
-                                                    ]),
-                                                    "location": Number(
-                                                        -1,
-                                                    ),
-                                                }),
+                            ]),
+                            "limitOption": String(
+                                "LIMIT_OPTION_DEFAULT",
+                            ),
+                            "op": String(
+                                "SETOP_NONE",
+                            ),
+                            "targetList": Array([
+                                Object({
+                                    "ResTarget": Object({
+                                        "location": Number(
+                                            -1,
+                                        ),
+                                        "val": Object({
+                                            "ColumnRef": Object({
+                                                "fields": Array([
+                                                    Object({
+                                                        "A_Star": Object({}),
+                                                    }),
+                                                ]),
+                                                "location": Number(
+                                                    -1,
+                                                ),
                                             }),
                                         }),
                                     }),
-                                ]),
-                            }),
+                                }),
+                            ]),
                         }),
-                        "relkind": Number(
-                            37,
-                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    37,
-                ),
-            },
-        ),
+                    "relkind": String(
+                        "OBJECT_TABLE",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                37,
+            ),
+        },
     ],
 )

@@ -4,144 +4,128 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: RenameStmt(
-                    RenameStmt {
-                        newname: "new_name",
-                        behavior: Restrict,
-                        relation: None,
-                        relation_type: AccessMethod,
-                        rename_type: Database,
-                        subname: Some(
-                            "name",
+        RawStmt {
+            stmt: RenameStmt(
+                RenameStmt {
+                    newname: "new_name",
+                    behavior: Restrict,
+                    relation: None,
+                    relation_type: AccessMethod,
+                    rename_type: Database,
+                    subname: Some(
+                        "name",
+                    ),
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                39,
+            ),
+        },
+        RawStmt {
+            stmt: AlterOwnerStmt(
+                Object({
+                    "newowner": Object({
+                        "location": Number(
+                            70,
                         ),
-                    },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    39,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterOwnerStmt(
-                    Object({
-                        "newowner": Object({
-                            "RoleSpec": Object({
-                                "location": Number(
-                                    70,
-                                ),
-                                "rolename": String(
-                                    "new_owner",
-                                ),
-                                "roletype": Number(
-                                    0,
-                                ),
-                            }),
-                        }),
-                        "object": Object({
-                            "String": Object({
-                                "str": String(
-                                    "name",
-                                ),
-                            }),
-                        }),
-                        "objectType": Number(
-                            9,
+                        "rolename": String(
+                            "new_owner",
+                        ),
+                        "roletype": String(
+                            "ROLESPEC_CSTRING",
                         ),
                     }),
-                ),
-                stmt_location: 40,
-                stmt_len: Some(
-                    39,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterDatabaseStmt(
-                    Object({
-                        "dbname": String(
-                            "name",
-                        ),
-                        "options": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "new_tablespace",
-                                            ),
-                                        }),
+                    "object": Object({
+                        "String": Object({
+                            "str": String(
+                                "name",
+                            ),
+                        }),
+                    }),
+                    "objectType": String(
+                        "OBJECT_DATABASE",
+                    ),
+                }),
+            ),
+            stmt_location: 40,
+            stmt_len: Some(
+                39,
+            ),
+        },
+        RawStmt {
+            stmt: AlterDatabaseStmt(
+                Object({
+                    "dbname": String(
+                        "name",
+                    ),
+                    "options": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "new_tablespace",
+                                        ),
                                     }),
-                                    "defaction": Number(
-                                        0,
-                                    ),
-                                    "defname": String(
-                                        "tablespace",
-                                    ),
-                                    "location": Number(
-                                        116,
-                                    ),
                                 }),
-                            }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 80,
-                stmt_len: Some(
-                    50,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterDatabaseSetStmt(
-                    Object({
-                        "dbname": String(
-                            "name",
-                        ),
-                        "setstmt": Object({
-                            "VariableSetStmt": Object({
-                                "kind": Number(
-                                    4,
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
                                 ),
-                                "name": String(
-                                    "configuration_parameter",
+                                "defname": String(
+                                    "tablespace",
+                                ),
+                                "location": Number(
+                                    116,
                                 ),
                             }),
                         }),
-                    }),
-                ),
-                stmt_location: 131,
-                stmt_len: Some(
-                    50,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterDatabaseSetStmt(
-                    Object({
-                        "dbname": String(
-                            "name",
+                    ]),
+                }),
+            ),
+            stmt_location: 80,
+            stmt_len: Some(
+                50,
+            ),
+        },
+        RawStmt {
+            stmt: AlterDatabaseSetStmt(
+                Object({
+                    "dbname": String(
+                        "name",
+                    ),
+                    "setstmt": Object({
+                        "kind": String(
+                            "VAR_RESET",
                         ),
-                        "setstmt": Object({
-                            "VariableSetStmt": Object({
-                                "kind": Number(
-                                    5,
-                                ),
-                            }),
-                        }),
+                        "name": String(
+                            "configuration_parameter",
+                        ),
                     }),
-                ),
-                stmt_location: 182,
-                stmt_len: Some(
-                    30,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 131,
+            stmt_len: Some(
+                50,
+            ),
+        },
+        RawStmt {
+            stmt: AlterDatabaseSetStmt(
+                Object({
+                    "dbname": String(
+                        "name",
+                    ),
+                    "setstmt": Object({
+                        "kind": String(
+                            "VAR_RESET_ALL",
+                        ),
+                    }),
+                }),
+            ),
+            stmt_location: 182,
+            stmt_len: Some(
+                30,
+            ),
+        },
     ],
 )

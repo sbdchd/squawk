@@ -4,55 +4,51 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateSeqStmt(
-                    Object({
-                        "options": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "Integer": Object({
-                                            "ival": Number(
-                                                101,
-                                            ),
-                                        }),
+        RawStmt {
+            stmt: CreateSeqStmt(
+                Object({
+                    "options": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "Integer": Object({
+                                        "ival": Number(
+                                            101,
+                                        ),
                                     }),
-                                    "defaction": Number(
-                                        0,
-                                    ),
-                                    "defname": String(
-                                        "start",
-                                    ),
-                                    "location": Number(
-                                        24,
-                                    ),
                                 }),
-                            }),
-                        ]),
-                        "sequence": Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "start",
                                 ),
                                 "location": Number(
-                                    17,
-                                ),
-                                "relname": String(
-                                    "serial",
-                                ),
-                                "relpersistence": String(
-                                    "p",
+                                    24,
                                 ),
                             }),
                         }),
+                    ]),
+                    "sequence": Object({
+                        "inh": Bool(
+                            true,
+                        ),
+                        "location": Number(
+                            17,
+                        ),
+                        "relname": String(
+                            "serial",
+                        ),
+                        "relpersistence": String(
+                            "p",
+                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    33,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                33,
+            ),
+        },
     ],
 )

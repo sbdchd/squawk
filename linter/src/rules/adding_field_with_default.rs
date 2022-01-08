@@ -1,12 +1,12 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, RootStmt, Stmt,
+    AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
 
 #[must_use]
-pub fn adding_field_with_default(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn adding_field_with_default(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {

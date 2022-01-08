@@ -4,107 +4,99 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateTransformStmt(
-                    Object({
-                        "fromsql": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                96,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "internal",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
+        RawStmt {
+            stmt: CreateTransformStmt(
+                Object({
+                    "fromsql": Object({
+                        "objargs": Array([
+                            Object({
+                                "TypeName": Object({
+                                    "location": Number(
+                                        96,
+                                    ),
+                                    "names": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "internal",
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "hstore_to_plpython",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
+                                    ]),
+                                    "typemod": Number(
+                                        -1,
+                                    ),
+                                }),
                             }),
-                        }),
-                        "lang": String(
-                            "plpythonu",
-                        ),
-                        "tosql": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                151,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "internal",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "plpython_to_hstore",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
+                        ]),
+                        "objname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "hstore_to_plpython",
+                                    ),
+                                }),
                             }),
-                        }),
-                        "type_name": Object({
-                            "TypeName": Object({
-                                "location": Number(
-                                    22,
-                                ),
-                                "names": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "hstore",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "typemod": Number(
-                                    -1,
-                                ),
-                            }),
-                        }),
+                        ]),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    162,
-                ),
-            },
-        ),
+                    "lang": String(
+                        "plpythonu",
+                    ),
+                    "tosql": Object({
+                        "objargs": Array([
+                            Object({
+                                "TypeName": Object({
+                                    "location": Number(
+                                        151,
+                                    ),
+                                    "names": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "internal",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "typemod": Number(
+                                        -1,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "objname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "plpython_to_hstore",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                    "type_name": Object({
+                        "location": Number(
+                            22,
+                        ),
+                        "names": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "hstore",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "typemod": Number(
+                            -1,
+                        ),
+                    }),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                162,
+            ),
+        },
     ],
 )

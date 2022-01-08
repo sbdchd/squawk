@@ -1,12 +1,12 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RootStmt, Stmt,
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
 
 #[must_use]
-pub fn adding_primary_key_constraint(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn adding_primary_key_constraint(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {

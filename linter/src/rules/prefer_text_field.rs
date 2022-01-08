@@ -1,16 +1,16 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDef, ColumnDefTypeName, QualifiedName,
-    RawStmt, RootStmt, Stmt, TableElt,
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDef, QualifiedName, RawStmt, Stmt,
+    TableElt,
 };
 
 /// It's easier to update the check constraint on a text field than a varchar()
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
 /// call.
 #[must_use]
-pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn prefer_text_field(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::CreateStmt(stmt) => {
                 for column_def in &stmt.table_elts {
@@ -35,7 +35,7 @@ pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
 }
 
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
-    let ColumnDefTypeName::TypeName(type_name) = &column_def.type_name;
+    let type_name = &column_def.type_name;
     for QualifiedName::String(field_type_name) in &type_name.names {
         if field_type_name.str == "varchar" && !type_name.typmods.is_empty() {
             errs.push(RuleViolation::new(

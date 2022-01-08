@@ -4,41 +4,39 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreatePLangStmt(
-                    Object({
-                        "plhandler": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "plpgsql_call_handler",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: CreatePLangStmt(
+                Object({
+                    "plhandler": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "plpgsql_call_handler",
+                                ),
                             }),
-                        ]),
-                        "plname": String(
-                            "plpgsql",
-                        ),
-                        "pltrusted": Bool(
-                            true,
-                        ),
-                        "plvalidator": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "plpgsql_validator",
-                                    ),
-                                }),
+                        }),
+                    ]),
+                    "plname": String(
+                        "plpgsql",
+                    ),
+                    "pltrusted": Bool(
+                        true,
+                    ),
+                    "plvalidator": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "plpgsql_validator",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    108,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                108,
+            ),
+        },
     ],
 )

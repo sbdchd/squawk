@@ -4,45 +4,41 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: ReassignOwnedStmt(
-                    Object({
-                        "newrole": Object({
+        RawStmt {
+            stmt: ReassignOwnedStmt(
+                Object({
+                    "newrole": Object({
+                        "location": Number(
+                            31,
+                        ),
+                        "rolename": String(
+                            "new_role",
+                        ),
+                        "roletype": String(
+                            "ROLESPEC_CSTRING",
+                        ),
+                    }),
+                    "roles": Array([
+                        Object({
                             "RoleSpec": Object({
                                 "location": Number(
-                                    31,
+                                    19,
                                 ),
                                 "rolename": String(
-                                    "new_role",
+                                    "old_role",
                                 ),
-                                "roletype": Number(
-                                    0,
+                                "roletype": String(
+                                    "ROLESPEC_CSTRING",
                                 ),
                             }),
                         }),
-                        "roles": Array([
-                            Object({
-                                "RoleSpec": Object({
-                                    "location": Number(
-                                        19,
-                                    ),
-                                    "rolename": String(
-                                        "old_role",
-                                    ),
-                                    "roletype": Number(
-                                        0,
-                                    ),
-                                }),
-                            }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    39,
-                ),
-            },
-        ),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                39,
+            ),
+        },
     ],
 )

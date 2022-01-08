@@ -4,49 +4,47 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateEnumStmt(
-                    Object({
-                        "typeName": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "happiness",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: CreateEnumStmt(
+                Object({
+                    "typeName": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "happiness",
+                                ),
                             }),
-                        ]),
-                        "vals": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "happy",
-                                    ),
-                                }),
+                        }),
+                    ]),
+                    "vals": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "happy",
+                                ),
                             }),
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "very happy",
-                                    ),
-                                }),
+                        }),
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "very happy",
+                                ),
                             }),
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "ecstatic",
-                                    ),
-                                }),
+                        }),
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "ecstatic",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    66,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                66,
+            ),
+        },
     ],
 )

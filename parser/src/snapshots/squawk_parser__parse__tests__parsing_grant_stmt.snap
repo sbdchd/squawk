@@ -4,68 +4,66 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: GrantStmt(
-                    Object({
-                        "behavior": Number(
-                            0,
-                        ),
-                        "grantees": Array([
-                            Object({
-                                "RoleSpec": Object({
-                                    "location": Number(
-                                        25,
-                                    ),
-                                    "roletype": Number(
-                                        3,
-                                    ),
-                                }),
+        RawStmt {
+            stmt: GrantStmt(
+                Object({
+                    "behavior": String(
+                        "DROP_RESTRICT",
+                    ),
+                    "grantees": Array([
+                        Object({
+                            "RoleSpec": Object({
+                                "location": Number(
+                                    25,
+                                ),
+                                "roletype": String(
+                                    "ROLESPEC_PUBLIC",
+                                ),
                             }),
-                        ]),
-                        "is_grant": Bool(
-                            true,
-                        ),
-                        "objects": Array([
-                            Object({
-                                "RangeVar": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        16,
-                                    ),
-                                    "relname": String(
-                                        "films",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
+                        }),
+                    ]),
+                    "is_grant": Bool(
+                        true,
+                    ),
+                    "objects": Array([
+                        Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    16,
+                                ),
+                                "relname": String(
+                                    "films",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
                             }),
-                        ]),
-                        "objtype": Number(
-                            1,
-                        ),
-                        "privileges": Array([
-                            Object({
-                                "AccessPriv": Object({
-                                    "priv_name": String(
-                                        "insert",
-                                    ),
-                                }),
+                        }),
+                    ]),
+                    "objtype": String(
+                        "OBJECT_TABLE",
+                    ),
+                    "privileges": Array([
+                        Object({
+                            "AccessPriv": Object({
+                                "priv_name": String(
+                                    "insert",
+                                ),
                             }),
-                        ]),
-                        "targtype": Number(
-                            0,
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    31,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                    "targtype": String(
+                        "ACL_TARGET_OBJECT",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                31,
+            ),
+        },
     ],
 )

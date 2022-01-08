@@ -4,62 +4,60 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterFdwStmt(
-                    Object({
-                        "fdwname": String(
-                            "dbi",
-                        ),
-                        "options": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "1",
-                                            ),
-                                        }),
+        RawStmt {
+            stmt: AlterFdwStmt(
+                Object({
+                    "fdwname": String(
+                        "dbi",
+                    ),
+                    "options": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "1",
+                                        ),
                                     }),
-                                    "defaction": Number(
-                                        2,
-                                    ),
-                                    "defname": String(
-                                        "foo",
-                                    ),
-                                    "location": Number(
-                                        44,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_ADD",
+                                ),
+                                "defname": String(
+                                    "foo",
+                                ),
+                                "location": Number(
+                                    44,
+                                ),
                             }),
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "bar",
-                                            ),
-                                        }),
+                        }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "bar",
+                                        ),
                                     }),
-                                    "defaction": Number(
-                                        0,
-                                    ),
-                                    "defname": String(
-                                        "drop",
-                                    ),
-                                    "location": Number(
-                                        53,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "drop",
+                                ),
+                                "location": Number(
+                                    53,
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    64,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                64,
+            ),
+        },
     ],
 )

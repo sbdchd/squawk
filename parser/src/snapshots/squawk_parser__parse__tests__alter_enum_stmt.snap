@@ -4,35 +4,33 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterEnumStmt(
-                    Object({
-                        "newVal": String(
-                            "orange",
-                        ),
-                        "newValIsAfter": Bool(
-                            true,
-                        ),
-                        "newValNeighbor": String(
-                            "red",
-                        ),
-                        "typeName": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "colors",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: AlterEnumStmt(
+                Object({
+                    "newVal": String(
+                        "orange",
+                    ),
+                    "newValIsAfter": Bool(
+                        true,
+                    ),
+                    "newValNeighbor": String(
+                        "red",
+                    ),
+                    "typeName": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "colors",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    49,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                49,
+            ),
+        },
     ],
 )

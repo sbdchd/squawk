@@ -4,25 +4,23 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: RenameStmt(
-                    RenameStmt {
-                        newname: "fast_raid",
-                        behavior: Restrict,
-                        relation: None,
-                        relation_type: AccessMethod,
-                        rename_type: Tablespace,
-                        subname: Some(
-                            "index_space",
-                        ),
-                    },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    48,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: RenameStmt(
+                RenameStmt {
+                    newname: "fast_raid",
+                    behavior: Restrict,
+                    relation: None,
+                    relation_type: AccessMethod,
+                    rename_type: Tablespace,
+                    subname: Some(
+                        "index_space",
+                    ),
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                48,
+            ),
+        },
     ],
 )

@@ -4,106 +4,102 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: TruncateStmt(
-                    Object({
-                        "behavior": Number(
-                            0,
-                        ),
-                        "relations": Array([
-                            Object({
-                                "RangeVar": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        10,
-                                    ),
-                                    "relname": String(
-                                        "bigtable",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: TruncateStmt(
+                Object({
+                    "behavior": String(
+                        "DROP_RESTRICT",
+                    ),
+                    "relations": Array([
+                        Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    10,
+                                ),
+                                "relname": String(
+                                    "bigtable",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
                             }),
-                            Object({
-                                "RangeVar": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        20,
-                                    ),
-                                    "relname": String(
-                                        "fattable",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
+                        }),
+                        Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    20,
+                                ),
+                                "relname": String(
+                                    "fattable",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
                             }),
-                            Object({
-                                "RangeVar": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        30,
-                                    ),
-                                    "relname": String(
-                                        "bar",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
+                        }),
+                        Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    30,
+                                ),
+                                "relname": String(
+                                    "bar",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
                             }),
-                        ]),
-                        "restart_seqs": Bool(
-                            true,
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    50,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: TruncateStmt(
-                    Object({
-                        "behavior": Number(
-                            1,
-                        ),
-                        "relations": Array([
-                            Object({
-                                "RangeVar": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        61,
-                                    ),
-                                    "relname": String(
-                                        "foo",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
+                        }),
+                    ]),
+                    "restart_seqs": Bool(
+                        true,
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                50,
+            ),
+        },
+        RawStmt {
+            stmt: TruncateStmt(
+                Object({
+                    "behavior": String(
+                        "DROP_CASCADE",
+                    ),
+                    "relations": Array([
+                        Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    61,
+                                ),
+                                "relname": String(
+                                    "foo",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 51,
-                stmt_len: Some(
-                    21,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 51,
+            stmt_len: Some(
+                21,
+            ),
+        },
     ],
 )

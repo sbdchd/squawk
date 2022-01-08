@@ -4,71 +4,67 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: LockStmt(
-                    Object({
-                        "mode": Number(
-                            5,
-                        ),
-                        "relations": Array([
-                            Object({
-                                "RangeVar": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        12,
-                                    ),
-                                    "relname": String(
-                                        "films",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: LockStmt(
+                Object({
+                    "mode": Number(
+                        5,
+                    ),
+                    "relations": Array([
+                        Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    12,
+                                ),
+                                "relname": String(
+                                    "films",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    31,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: LockStmt(
-                    Object({
-                        "mode": Number(
-                            6,
-                        ),
-                        "relations": Array([
-                            Object({
-                                "RangeVar": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        44,
-                                    ),
-                                    "relname": String(
-                                        "films",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                31,
+            ),
+        },
+        RawStmt {
+            stmt: LockStmt(
+                Object({
+                    "mode": Number(
+                        6,
+                    ),
+                    "relations": Array([
+                        Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    44,
+                                ),
+                                "relname": String(
+                                    "films",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 32,
-                stmt_len: Some(
-                    45,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 32,
+            stmt_len: Some(
+                45,
+            ),
+        },
     ],
 )

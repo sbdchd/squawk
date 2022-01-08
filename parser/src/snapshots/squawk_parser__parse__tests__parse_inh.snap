@@ -4,111 +4,103 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterTableStmt(
-                    AlterTableStmt {
-                        cmds: [
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: DropConstraint,
-                                    name: Some(
-                                        "tasks_fk",
-                                    ),
-                                    def: None,
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: AddConstraint,
-                                    name: None,
-                                    def: Some(
-                                        Constraint(
-                                            Constraint {
-                                                conname: Some(
-                                                    "tasks_fk",
-                                                ),
-                                                contype: Foreign,
-                                                location: Some(
-                                                    69,
-                                                ),
-                                                raw_expr: None,
-                                                keys: None,
-                                                indexname: None,
-                                                skip_validation: true,
-                                                initially_valid: false,
-                                            },
-                                        ),
-                                    ),
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                        ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: Some(
-                                    "public",
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: DropConstraint,
+                                name: Some(
+                                    "tasks_fk",
                                 ),
-                                relname: "tasks",
-                                inh: false,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 18,
+                                def: None,
+                                behavior: Restrict,
+                                missing_ok: false,
                             },
                         ),
-                        relkind: Table,
-                        missing_ok: false,
-                    },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    193,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterTableStmt(
-                    AlterTableStmt {
-                        cmds: [
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: ValidateConstraint,
-                                    name: Some(
-                                        "tasks_fk",
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: AddConstraint,
+                                name: None,
+                                def: Some(
+                                    Constraint(
+                                        Constraint {
+                                            conname: Some(
+                                                "tasks_fk",
+                                            ),
+                                            contype: Foreign,
+                                            location: Some(
+                                                69,
+                                            ),
+                                            raw_expr: None,
+                                            keys: None,
+                                            indexname: None,
+                                            skip_validation: true,
+                                            initially_valid: false,
+                                        },
                                     ),
-                                    def: None,
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                        ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: Some(
-                                    "public",
                                 ),
-                                relname: "tasks",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 208,
+                                behavior: Restrict,
+                                missing_ok: false,
                             },
                         ),
-                        relkind: Table,
-                        missing_ok: false,
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: Some(
+                            "public",
+                        ),
+                        relname: "tasks",
+                        inh: false,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 18,
                     },
-                ),
-                stmt_location: 194,
-                stmt_len: Some(
-                    55,
-                ),
-            },
-        ),
+                    relkind: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                193,
+            ),
+        },
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: ValidateConstraint,
+                                name: Some(
+                                    "tasks_fk",
+                                ),
+                                def: None,
+                                behavior: Restrict,
+                                missing_ok: false,
+                            },
+                        ),
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: Some(
+                            "public",
+                        ),
+                        relname: "tasks",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 208,
+                    },
+                    relkind: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 194,
+            stmt_len: Some(
+                55,
+            ),
+        },
     ],
 )

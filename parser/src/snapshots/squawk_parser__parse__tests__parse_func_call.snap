@@ -4,109 +4,103 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterTableStmt(
-                    AlterTableStmt {
-                        cmds: [
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: ColumnDefault,
-                                    name: Some(
-                                        "value",
-                                    ),
-                                    def: Some(
-                                        FuncCall(
-                                            Object({
-                                                "args": Array([
-                                                    Object({
-                                                        "TypeCast": Object({
-                                                            "arg": Object({
-                                                                "A_Const": Object({
-                                                                    "location": Number(
-                                                                        59,
-                                                                    ),
-                                                                    "val": Object({
-                                                                        "String": Object({
-                                                                            "str": String(
-                                                                                "f",
-                                                                            ),
-                                                                        }),
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: ColumnDefault,
+                                name: Some(
+                                    "value",
+                                ),
+                                def: Some(
+                                    FuncCall(
+                                        Object({
+                                            "args": Array([
+                                                Object({
+                                                    "TypeCast": Object({
+                                                        "arg": Object({
+                                                            "A_Const": Object({
+                                                                "location": Number(
+                                                                    59,
+                                                                ),
+                                                                "val": Object({
+                                                                    "String": Object({
+                                                                        "str": String(
+                                                                            "f",
+                                                                        ),
                                                                     }),
                                                                 }),
                                                             }),
+                                                        }),
+                                                        "location": Number(
+                                                            -1,
+                                                        ),
+                                                        "typeName": Object({
                                                             "location": Number(
                                                                 -1,
                                                             ),
-                                                            "typeName": Object({
-                                                                "TypeName": Object({
-                                                                    "location": Number(
-                                                                        -1,
-                                                                    ),
-                                                                    "names": Array([
-                                                                        Object({
-                                                                            "String": Object({
-                                                                                "str": String(
-                                                                                    "pg_catalog",
-                                                                                ),
-                                                                            }),
-                                                                        }),
-                                                                        Object({
-                                                                            "String": Object({
-                                                                                "str": String(
-                                                                                    "bool",
-                                                                                ),
-                                                                            }),
-                                                                        }),
-                                                                    ]),
-                                                                    "typemod": Number(
-                                                                        -1,
-                                                                    ),
+                                                            "names": Array([
+                                                                Object({
+                                                                    "String": Object({
+                                                                        "str": String(
+                                                                            "pg_catalog",
+                                                                        ),
+                                                                    }),
                                                                 }),
-                                                            }),
-                                                        }),
-                                                    }),
-                                                ]),
-                                                "funcname": Array([
-                                                    Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "to_json",
+                                                                Object({
+                                                                    "String": Object({
+                                                                        "str": String(
+                                                                            "bool",
+                                                                        ),
+                                                                    }),
+                                                                }),
+                                                            ]),
+                                                            "typemod": Number(
+                                                                -1,
                                                             ),
                                                         }),
                                                     }),
-                                                ]),
-                                                "location": Number(
-                                                    51,
-                                                ),
-                                            }),
-                                        ),
+                                                }),
+                                            ]),
+                                            "funcname": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "to_json",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "location": Number(
+                                                51,
+                                            ),
+                                        }),
                                     ),
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                        ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "foobar",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 13,
+                                ),
+                                behavior: Restrict,
+                                missing_ok: false,
                             },
                         ),
-                        relkind: Table,
-                        missing_ok: false,
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "foobar",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 13,
                     },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    65,
-                ),
-            },
-        ),
+                    relkind: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                65,
+            ),
+        },
     ],
 )

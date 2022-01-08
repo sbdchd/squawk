@@ -4,50 +4,44 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: DiscardStmt(
-                    Object({
-                        "target": Number(
-                            1,
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    14,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DiscardStmt(
-                    Object({
-                        "target": Number(
-                            2,
-                        ),
-                    }),
-                ),
-                stmt_location: 15,
-                stmt_len: Some(
-                    18,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DiscardStmt(
-                    Object({
-                        "target": Number(
-                            3,
-                        ),
-                    }),
-                ),
-                stmt_location: 34,
-                stmt_len: Some(
-                    13,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: DiscardStmt(
+                Object({
+                    "target": String(
+                        "DISCARD_PLANS",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                14,
+            ),
+        },
+        RawStmt {
+            stmt: DiscardStmt(
+                Object({
+                    "target": String(
+                        "DISCARD_SEQUENCES",
+                    ),
+                }),
+            ),
+            stmt_location: 15,
+            stmt_len: Some(
+                18,
+            ),
+        },
+        RawStmt {
+            stmt: DiscardStmt(
+                Object({
+                    "target": String(
+                        "DISCARD_TEMP",
+                    ),
+                }),
+            ),
+            stmt_location: 34,
+            stmt_len: Some(
+                13,
+            ),
+        },
     ],
 )

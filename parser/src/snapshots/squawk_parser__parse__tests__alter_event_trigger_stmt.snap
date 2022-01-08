@@ -4,23 +4,21 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterEventTrigStmt(
-                    Object({
-                        "tgenabled": String(
-                            "D",
-                        ),
-                        "trigname": String(
-                            "name",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    33,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: AlterEventTrigStmt(
+                Object({
+                    "tgenabled": String(
+                        "D",
+                    ),
+                    "trigname": String(
+                        "name",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                33,
+            ),
+        },
     ],
 )

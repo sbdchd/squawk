@@ -4,39 +4,37 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateSubscriptionStmt(
-                    Object({
-                        "conninfo": String(
-                            "host=192.168.1.50 port=5432 user=foo dbname=foodb",
-                        ),
-                        "publication": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "mypublication",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: CreateSubscriptionStmt(
+                Object({
+                    "conninfo": String(
+                        "host=192.168.1.50 port=5432 user=foo dbname=foodb",
+                    ),
+                    "publication": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "mypublication",
+                                ),
                             }),
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "insert_only",
-                                    ),
-                                }),
+                        }),
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "insert_only",
+                                ),
                             }),
-                        ]),
-                        "subname": String(
-                            "mysub",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    145,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                    "subname": String(
+                        "mysub",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                145,
+            ),
+        },
     ],
 )

@@ -4,787 +4,761 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterOpFamilyStmt(
-                    Object({
-                        "amname": String(
-                            "btree",
-                        ),
-                        "items": Array([
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            86,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
+        RawStmt {
+            stmt: AlterOpFamilyStmt(
+                Object({
+                    "amname": String(
+                        "btree",
+                    ),
+                    "items": Array([
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    86,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
                                                     }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            92,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "<",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        1,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            117,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    92,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
                                                     }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            123,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "<=",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        2,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            147,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            153,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "=",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "<",
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        3,
-                                    ),
+                                    ]),
                                 }),
+                                "number": Number(
+                                    1,
+                                ),
                             }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            178,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    117,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
                                                     }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            184,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            ">=",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        4,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            208,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    123,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
                                                     }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            214,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            ">",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        5,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        2,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            246,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            252,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "btint42cmp",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "<=",
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        1,
-                                    ),
+                                    ]),
                                 }),
+                                "number": Number(
+                                    2,
+                                ),
                             }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            295,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    147,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
                                                     }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            301,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "<",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        1,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            326,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    153,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
                                                     }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            332,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "<=",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        2,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            356,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            362,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "=",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "=",
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        3,
-                                    ),
+                                    ]),
                                 }),
+                                "number": Number(
+                                    3,
+                                ),
                             }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            387,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    178,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
                                                     }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            393,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            ">=",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        4,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        1,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            417,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    184,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
                                                     }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            423,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            ">",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        5,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "CreateOpClassItem": Object({
-                                    "itemtype": Number(
-                                        2,
-                                    ),
-                                    "name": Object({
-                                        "ObjectWithArgs": Object({
-                                            "objargs": Array([
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            455,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int2",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "TypeName": Object({
-                                                        "location": Number(
-                                                            461,
-                                                        ),
-                                                        "names": Array([
-                                                            Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "int4",
-                                                                    ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "typemod": Number(
-                                                            -1,
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "objname": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "btint24cmp",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    ">=",
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                    "number": Number(
-                                        1,
-                                    ),
+                                    ]),
                                 }),
+                                "number": Number(
+                                    4,
+                                ),
                             }),
-                        ]),
-                        "opfamilyname": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "integer_ops",
-                                    ),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    208,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    214,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    ">",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
                                 }),
+                                "number": Number(
+                                    5,
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    467,
-                ),
-            },
-        ),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    2,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    246,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    252,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "btint42cmp",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                                "number": Number(
+                                    1,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    295,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    301,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "<",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                                "number": Number(
+                                    1,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    326,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    332,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "<=",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                                "number": Number(
+                                    2,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    356,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    362,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "=",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                                "number": Number(
+                                    3,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    387,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    393,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    ">=",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                                "number": Number(
+                                    4,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    1,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    417,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    423,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    ">",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                                "number": Number(
+                                    5,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "CreateOpClassItem": Object({
+                                "itemtype": Number(
+                                    2,
+                                ),
+                                "name": Object({
+                                    "objargs": Array([
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    455,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int2",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "TypeName": Object({
+                                                "location": Number(
+                                                    461,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "int4",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objname": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "btint24cmp",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                                "number": Number(
+                                    1,
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "opfamilyname": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "integer_ops",
+                                ),
+                            }),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                467,
+            ),
+        },
     ],
 )

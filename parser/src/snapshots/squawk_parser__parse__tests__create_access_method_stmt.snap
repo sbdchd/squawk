@@ -4,32 +4,30 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateAmStmt(
-                    Object({
-                        "amname": String(
-                            "heptree",
-                        ),
-                        "amtype": String(
-                            "i",
-                        ),
-                        "handler_name": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "heptree_handler",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: CreateAmStmt(
+                Object({
+                    "amname": String(
+                        "heptree",
+                    ),
+                    "amtype": String(
+                        "i",
+                    ),
+                    "handler_name": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "heptree_handler",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    63,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                63,
+            ),
+        },
     ],
 )

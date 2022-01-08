@@ -4,18 +4,16 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: VariableShowStmt(
-                    Object({
-                        "name": String(
-                            "name",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: None,
-            },
-        ),
+        RawStmt {
+            stmt: VariableShowStmt(
+                Object({
+                    "name": String(
+                        "name",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: None,
+        },
     ],
 )

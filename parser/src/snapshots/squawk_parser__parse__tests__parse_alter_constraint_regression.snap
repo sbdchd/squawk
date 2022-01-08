@@ -4,107 +4,99 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterTableStmt(
-                    AlterTableStmt {
-                        cmds: [
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: AlterConstraint,
-                                    name: None,
-                                    def: Some(
-                                        Constraint(
-                                            Constraint {
-                                                conname: Some(
-                                                    "constraint",
-                                                ),
-                                                contype: Foreign,
-                                                location: None,
-                                                raw_expr: None,
-                                                keys: None,
-                                                indexname: None,
-                                                skip_validation: false,
-                                                initially_valid: false,
-                                            },
-                                        ),
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: AlterConstraint,
+                                name: None,
+                                def: Some(
+                                    Constraint(
+                                        Constraint {
+                                            conname: Some(
+                                                "constraint",
+                                            ),
+                                            contype: Foreign,
+                                            location: None,
+                                            raw_expr: None,
+                                            keys: None,
+                                            indexname: None,
+                                            skip_validation: false,
+                                            initially_valid: false,
+                                        },
                                     ),
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                        ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "table",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 13,
+                                ),
+                                behavior: Restrict,
+                                missing_ok: false,
                             },
                         ),
-                        relkind: Table,
-                        missing_ok: false,
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "table",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 13,
                     },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    81,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterTableStmt(
-                    AlterTableStmt {
-                        cmds: [
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: AlterConstraint,
-                                    name: None,
-                                    def: Some(
-                                        Constraint(
-                                            Constraint {
-                                                conname: Some(
-                                                    "constraint",
-                                                ),
-                                                contype: Foreign,
-                                                location: None,
-                                                raw_expr: None,
-                                                keys: None,
-                                                indexname: None,
-                                                skip_validation: false,
-                                                initially_valid: false,
-                                            },
-                                        ),
+                    relkind: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                81,
+            ),
+        },
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: AlterConstraint,
+                                name: None,
+                                def: Some(
+                                    Constraint(
+                                        Constraint {
+                                            conname: Some(
+                                                "constraint",
+                                            ),
+                                            contype: Foreign,
+                                            location: None,
+                                            raw_expr: None,
+                                            keys: None,
+                                            indexname: None,
+                                            skip_validation: false,
+                                            initially_valid: false,
+                                        },
                                     ),
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                        ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "table",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 96,
+                                ),
+                                behavior: Restrict,
+                                missing_ok: false,
                             },
                         ),
-                        relkind: Table,
-                        missing_ok: false,
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "table",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 96,
                     },
-                ),
-                stmt_location: 82,
-                stmt_len: Some(
-                    66,
-                ),
-            },
-        ),
+                    relkind: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 82,
+            stmt_len: Some(
+                66,
+            ),
+        },
     ],
 )

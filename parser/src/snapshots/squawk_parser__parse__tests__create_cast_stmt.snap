@@ -4,106 +4,98 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateCastStmt(
-                    Object({
-                        "context": Number(
-                            1,
-                        ),
-                        "func": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                49,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "pg_catalog",
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "int8",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
+        RawStmt {
+            stmt: CreateCastStmt(
+                Object({
+                    "context": String(
+                        "COERCION_ASSIGNMENT",
+                    ),
+                    "func": Object({
+                        "objargs": Array([
+                            Object({
+                                "TypeName": Object({
+                                    "location": Number(
+                                        49,
+                                    ),
+                                    "names": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "pg_catalog",
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "int4",
-                                            ),
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "int8",
+                                                ),
+                                            }),
                                         }),
-                                    }),
-                                ]),
+                                    ]),
+                                    "typemod": Number(
+                                        -1,
+                                    ),
+                                }),
                             }),
-                        }),
-                        "sourcetype": Object({
-                            "TypeName": Object({
-                                "location": Number(
-                                    14,
-                                ),
-                                "names": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "pg_catalog",
-                                            ),
-                                        }),
-                                    }),
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "int8",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "typemod": Number(
-                                    -1,
-                                ),
+                        ]),
+                        "objname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "int4",
+                                    ),
+                                }),
                             }),
-                        }),
-                        "targettype": Object({
-                            "TypeName": Object({
-                                "location": Number(
-                                    24,
-                                ),
-                                "names": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "int4",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "typemod": Number(
-                                    -1,
-                                ),
-                            }),
-                        }),
+                        ]),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    70,
-                ),
-            },
-        ),
+                    "sourcetype": Object({
+                        "location": Number(
+                            14,
+                        ),
+                        "names": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "pg_catalog",
+                                    ),
+                                }),
+                            }),
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "int8",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "typemod": Number(
+                            -1,
+                        ),
+                    }),
+                    "targettype": Object({
+                        "location": Number(
+                            24,
+                        ),
+                        "names": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "int4",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "typemod": Number(
+                            -1,
+                        ),
+                    }),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                70,
+            ),
+        },
     ],
 )

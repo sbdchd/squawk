@@ -4,67 +4,77 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterTSConfigurationStmt(
-                    Object({
-                        "cfgname": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "astro_en",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: AlterTSConfigurationStmt(
+                Object({
+                    "cfgname": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "astro_en",
+                                ),
                             }),
-                        ]),
-                        "dicts": Array([
-                            Array([
-                                Object({
-                                    "String": Object({
-                                        "str": String(
-                                            "astrosyn",
-                                        ),
+                        }),
+                    ]),
+                    "dicts": Array([
+                        Object({
+                            "List": Object({
+                                "items": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "astrosyn",
+                                            ),
+                                        }),
                                     }),
-                                }),
-                            ]),
-                            Array([
-                                Object({
-                                    "String": Object({
-                                        "str": String(
-                                            "english_ispell",
-                                        ),
-                                    }),
-                                }),
-                            ]),
-                            Array([
-                                Object({
-                                    "String": Object({
-                                        "str": String(
-                                            "english_stem",
-                                        ),
-                                    }),
-                                }),
-                            ]),
-                        ]),
-                        "kind": Number(
-                            0,
-                        ),
-                        "tokentype": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "asciiword",
-                                    ),
-                                }),
+                                ]),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    115,
-                ),
-            },
-        ),
+                        }),
+                        Object({
+                            "List": Object({
+                                "items": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "english_ispell",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                            }),
+                        }),
+                        Object({
+                            "List": Object({
+                                "items": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "english_stem",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                            }),
+                        }),
+                    ]),
+                    "kind": String(
+                        "ALTER_TSCONFIG_ADD_MAPPING",
+                    ),
+                    "tokentype": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "asciiword",
+                                ),
+                            }),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                115,
+            ),
+        },
     ],
 )

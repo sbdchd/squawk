@@ -4,30 +4,28 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterObjectSchemaStmt(
-                    Object({
-                        "newschema": String(
-                            "utils",
-                        ),
-                        "object": Object({
-                            "String": Object({
-                                "str": String(
-                                    "hstore",
-                                ),
-                            }),
+        RawStmt {
+            stmt: AlterObjectSchemaStmt(
+                Object({
+                    "newschema": String(
+                        "utils",
+                    ),
+                    "object": Object({
+                        "String": Object({
+                            "str": String(
+                                "hstore",
+                            ),
                         }),
-                        "objectType": Number(
-                            15,
-                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    39,
-                ),
-            },
-        ),
+                    "objectType": String(
+                        "OBJECT_EXTENSION",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                39,
+            ),
+        },
     ],
 )

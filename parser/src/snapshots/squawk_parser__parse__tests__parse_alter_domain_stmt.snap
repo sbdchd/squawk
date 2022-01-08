@@ -4,32 +4,30 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterDomainStmt(
-                    Object({
-                        "behavior": Number(
-                            0,
-                        ),
-                        "subtype": String(
-                            "O",
-                        ),
-                        "typeName": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "zipcode",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: AlterDomainStmt(
+                Object({
+                    "behavior": String(
+                        "DROP_RESTRICT",
+                    ),
+                    "subtype": String(
+                        "O",
+                    ),
+                    "typeName": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "zipcode",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    33,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                33,
+            ),
+        },
     ],
 )

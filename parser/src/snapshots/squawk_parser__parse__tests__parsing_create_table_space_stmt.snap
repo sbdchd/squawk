@@ -4,23 +4,21 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateTableSpaceStmt(
-                    Object({
-                        "location": String(
-                            "/data/dbs",
-                        ),
-                        "tablespacename": String(
-                            "dbspace",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    46,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: CreateTableSpaceStmt(
+                Object({
+                    "location": String(
+                        "/data/dbs",
+                    ),
+                    "tablespacename": String(
+                        "dbspace",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                46,
+            ),
+        },
     ],
 )

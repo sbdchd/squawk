@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.8.2 - 2022-01-07
+
+### Fixed
+
+- errors parsing PG12 and later query syntax by upgrading to PG13 parser (#174)
+- parsing alter constraint statement (#173)
+
 ## v0.8.1 - 2021-11-30
 
 ### Fixed

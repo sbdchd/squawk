@@ -4,49 +4,45 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterTableStmt(
-                    AlterTableStmt {
-                        cmds: [
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: ReplicaIdentity,
-                                    name: None,
-                                    def: Some(
-                                        ReplicaIdentityStmt(
-                                            Object({
-                                                "identity_type": String(
-                                                    "f",
-                                                ),
-                                            }),
-                                        ),
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: ReplicaIdentity,
+                                name: None,
+                                def: Some(
+                                    ReplicaIdentityStmt(
+                                        Object({
+                                            "identity_type": String(
+                                                "f",
+                                            ),
+                                        }),
                                     ),
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                        ],
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "aa",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 12,
+                                ),
+                                behavior: Restrict,
+                                missing_ok: false,
                             },
                         ),
-                        relkind: Table,
-                        missing_ok: false,
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "aa",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 12,
                     },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    36,
-                ),
-            },
-        ),
+                    relkind: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                36,
+            ),
+        },
     ],
 )

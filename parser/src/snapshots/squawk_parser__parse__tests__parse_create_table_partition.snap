@@ -4,118 +4,92 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateStmt(
-                    CreateStmt {
-                        relation: RangeVar(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "measurement_y2006m02",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 14,
-                            },
-                        ),
-                        table_elts: [],
-                        inh_relations: [
-                            Object({
-                                "RangeVar": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        48,
-                                    ),
-                                    "relname": String(
-                                        "measurement",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
-                            }),
-                        ],
-                        partbound: Some(
-                            Object({
-                                "PartitionBoundSpec": Object({
-                                    "location": Number(
-                                        75,
-                                    ),
-                                    "lowerdatums": Array([
-                                        Object({
-                                            "PartitionRangeDatum": Object({
-                                                "kind": Number(
-                                                    0,
-                                                ),
-                                                "location": Number(
-                                                    81,
-                                                ),
-                                                "value": Object({
-                                                    "A_Const": Object({
-                                                        "location": Number(
-                                                            81,
-                                                        ),
-                                                        "val": Object({
-                                                            "String": Object({
-                                                                "str": String(
-                                                                    "2006-02-01",
-                                                                ),
-                                                            }),
-                                                        }),
-                                                    }),
-                                                }),
-                                            }),
-                                        }),
-                                    ]),
-                                    "strategy": String(
-                                        "r",
-                                    ),
-                                    "upperdatums": Array([
-                                        Object({
-                                            "PartitionRangeDatum": Object({
-                                                "kind": Number(
-                                                    0,
-                                                ),
-                                                "location": Number(
-                                                    99,
-                                                ),
-                                                "value": Object({
-                                                    "A_Const": Object({
-                                                        "location": Number(
-                                                            99,
-                                                        ),
-                                                        "val": Object({
-                                                            "String": Object({
-                                                                "str": String(
-                                                                    "2006-03-01",
-                                                                ),
-                                                            }),
-                                                        }),
-                                                    }),
-                                                }),
-                                            }),
-                                        }),
-                                    ]),
-                                }),
-                            }),
-                        ),
-                        partspec: None,
-                        of_typename: None,
-                        constraints: [],
-                        options: [],
-                        oncommit: Noop,
-                        tablespacename: None,
-                        if_not_exists: false,
+        RawStmt {
+            stmt: CreateStmt(
+                CreateStmt {
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "measurement_y2006m02",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 14,
                     },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    112,
-                ),
-            },
-        ),
+                    table_elts: [],
+                    inh_relations: [
+                        Object({
+                            "RangeVar": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    48,
+                                ),
+                                "relname": String(
+                                    "measurement",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                        }),
+                    ],
+                    partbound: Some(
+                        Object({
+                            "location": Number(
+                                75,
+                            ),
+                            "lowerdatums": Array([
+                                Object({
+                                    "A_Const": Object({
+                                        "location": Number(
+                                            81,
+                                        ),
+                                        "val": Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "2006-02-01",
+                                                ),
+                                            }),
+                                        }),
+                                    }),
+                                }),
+                            ]),
+                            "strategy": String(
+                                "r",
+                            ),
+                            "upperdatums": Array([
+                                Object({
+                                    "A_Const": Object({
+                                        "location": Number(
+                                            99,
+                                        ),
+                                        "val": Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "2006-03-01",
+                                                ),
+                                            }),
+                                        }),
+                                    }),
+                                }),
+                            ]),
+                        }),
+                    ),
+                    partspec: None,
+                    of_typename: None,
+                    constraints: [],
+                    options: [],
+                    oncommit: Noop,
+                    tablespacename: None,
+                    if_not_exists: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                112,
+            ),
+        },
     ],
 )
