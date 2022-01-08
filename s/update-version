@@ -6,8 +6,8 @@
 function main {
     NEW_VERSION="$1"
     echo "updating version to '$NEW_VERSION'..."
-    fastmod '^version = ".*"' 'version = "'$NEW_VERSION'"' -g 'Cargo.toml'
-    fastmod '"version": ".*"' '"version": "'$NEW_VERSION'"' -g 'package.json'
+    fastmod '^version = ".*"' 'version = "'$NEW_VERSION'"' cli/Cargo.toml
+    fastmod '"version": ".*"' '"version": "'$NEW_VERSION'"' package.json
 }
 
 
