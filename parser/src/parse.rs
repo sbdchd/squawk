@@ -5,7 +5,7 @@ use serde::Deserialize;
 use serde_json::Value;
 use std::ffi::{CStr, CString};
 
-fn parse_sql_query_base<'a, T>(query: &'a str) -> Result<Vec<T>, PgQueryError>
+fn parse_sql_query_base<'a, T>(query: &'a str) -> Result<T, PgQueryError>
 where
     T: Deserialize<'a>,
 {
@@ -32,7 +32,7 @@ where
     output
 }
 
-pub fn parse_sql_query_json(query: &str) -> Result<Vec<Value>, PgQueryError> {
+pub fn parse_sql_query_json(query: &str) -> Result<Value, PgQueryError> {
     parse_sql_query_base(query)
 }
 
@@ -45,6 +45,13 @@ mod tests {
     use super::*;
 
     use insta::assert_debug_snapshot;
+
+    #[test]
+    fn test_parse_sql_query_json() {
+        let sql = r#"ALTER TABLE table_c ADD column c boolean GENERATED ALWAYS AS (p IS NOT NULL) STORED NOT NULL;"#;
+        let res = parse_sql_query_json(sql);
+        assert_debug_snapshot!(res);
+    }
 
     #[test]
     fn test_span_with_indent() {
