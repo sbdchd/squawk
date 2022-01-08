@@ -4,229 +4,201 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: false,
-                        missing_ok: false,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    23,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: false,
-                        missing_ok: true,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 24,
-                stmt_len: Some(
-                    33,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: true,
-                        missing_ok: false,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 58,
-                stmt_len: Some(
-                    36,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: true,
-                        missing_ok: false,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 95,
-                stmt_len: Some(
-                    36,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: true,
-                        missing_ok: false,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 132,
-                stmt_len: Some(
-                    45,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: false,
-                        missing_ok: false,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 178,
-                stmt_len: Some(
-                    36,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: DropCascade,
-                        concurrent: false,
-                        missing_ok: false,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 215,
-                stmt_len: Some(
-                    43,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: false,
-                        missing_ok: false,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 259,
-                stmt_len: Some(
-                    44,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: false,
-                        missing_ok: true,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 304,
-                stmt_len: Some(
-                    46,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: DropCascade,
-                        concurrent: false,
-                        missing_ok: true,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 351,
-                stmt_len: Some(
-                    53,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: false,
-                        missing_ok: true,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 405,
-                stmt_len: Some(
-                    54,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: true,
-                        missing_ok: true,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 460,
-                stmt_len: Some(
-                    59,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: DropCascade,
-                        concurrent: true,
-                        missing_ok: true,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 520,
-                stmt_len: Some(
-                    66,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: true,
-                        missing_ok: true,
-                        remove_type: Index,
-                    },
-                ),
-                stmt_location: 587,
-                stmt_len: Some(
-                    67,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: false,
+                    missing_ok: false,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                23,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: false,
+                    missing_ok: true,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 24,
+            stmt_len: Some(
+                33,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: true,
+                    missing_ok: false,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 58,
+            stmt_len: Some(
+                36,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: true,
+                    missing_ok: false,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 95,
+            stmt_len: Some(
+                36,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: true,
+                    missing_ok: false,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 132,
+            stmt_len: Some(
+                45,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: false,
+                    missing_ok: false,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 178,
+            stmt_len: Some(
+                36,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: DropCascade,
+                    concurrent: false,
+                    missing_ok: false,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 215,
+            stmt_len: Some(
+                43,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: false,
+                    missing_ok: false,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 259,
+            stmt_len: Some(
+                44,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: false,
+                    missing_ok: true,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 304,
+            stmt_len: Some(
+                46,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: DropCascade,
+                    concurrent: false,
+                    missing_ok: true,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 351,
+            stmt_len: Some(
+                53,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: false,
+                    missing_ok: true,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 405,
+            stmt_len: Some(
+                54,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: true,
+                    missing_ok: true,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 460,
+            stmt_len: Some(
+                59,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: DropCascade,
+                    concurrent: true,
+                    missing_ok: true,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 520,
+            stmt_len: Some(
+                66,
+            ),
+        },
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: true,
+                    missing_ok: true,
+                    remove_type: Index,
+                },
+            ),
+            stmt_location: 587,
+            stmt_len: Some(
+                67,
+            ),
+        },
     ],
 )

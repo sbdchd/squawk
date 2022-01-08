@@ -1,10 +1,10 @@
-use squawk_parser::ast::{RootStmt, Stmt, TransactionStmtKind};
+use squawk_parser::ast::{RawStmt, Stmt, TransactionStmtKind};
 use std::collections::HashSet;
 
-pub fn tables_created_in_transaction(tree: &[RootStmt]) -> HashSet<String> {
+pub fn tables_created_in_transaction(tree: &[RawStmt]) -> HashSet<String> {
     let mut created_table_names = HashSet::new();
     let mut inside_transaction = false;
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => match stmt.kind {
                 TransactionStmtKind::Begin => inside_transaction = true,

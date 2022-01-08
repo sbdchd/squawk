@@ -4,62 +4,60 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterForeignServerStmt(
-                    Object({
-                        "options": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "foo",
-                                            ),
-                                        }),
+        RawStmt {
+            stmt: AlterForeignServerStmt(
+                Object({
+                    "options": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "foo",
+                                        ),
                                     }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "host",
-                                    ),
-                                    "location": Number(
-                                        26,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "host",
+                                ),
+                                "location": Number(
+                                    26,
+                                ),
                             }),
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "foodb",
-                                            ),
-                                        }),
+                        }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "foodb",
+                                        ),
                                     }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "dbname",
-                                    ),
-                                    "location": Number(
-                                        38,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "dbname",
+                                ),
+                                "location": Number(
+                                    38,
+                                ),
                             }),
-                        ]),
-                        "servername": String(
-                            "foo",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    53,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                    "servername": String(
+                        "foo",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                53,
+            ),
+        },
     ],
 )

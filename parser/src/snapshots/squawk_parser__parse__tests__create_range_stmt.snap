@@ -4,92 +4,90 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateRangeStmt(
-                    Object({
-                        "params": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                49,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "float8",
-                                                        ),
-                                                    }),
+        RawStmt {
+            stmt: CreateRangeStmt(
+                Object({
+                    "params": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            49,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "float8",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "subtype",
-                                    ),
-                                    "location": Number(
-                                        39,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "subtype",
+                                ),
+                                "location": Number(
+                                    39,
+                                ),
                             }),
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                76,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "float8mi",
-                                                        ),
-                                                    }),
+                        }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            76,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "float8mi",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "subtype_diff",
-                                    ),
-                                    "location": Number(
-                                        61,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "subtype_diff",
+                                ),
+                                "location": Number(
+                                    61,
+                                ),
                             }),
-                        ]),
-                        "typeName": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "floatrange",
-                                    ),
-                                }),
+                        }),
+                    ]),
+                    "typeName": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "floatrange",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    86,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                86,
+            ),
+        },
     ],
 )

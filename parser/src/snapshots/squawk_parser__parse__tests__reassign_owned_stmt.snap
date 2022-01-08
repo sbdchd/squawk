@@ -4,43 +4,41 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: ReassignOwnedStmt(
-                    Object({
-                        "newrole": Object({
-                            "location": Number(
-                                31,
-                            ),
-                            "rolename": String(
-                                "new_role",
-                            ),
-                            "roletype": String(
-                                "ROLESPEC_CSTRING",
-                            ),
-                        }),
-                        "roles": Array([
-                            Object({
-                                "RoleSpec": Object({
-                                    "location": Number(
-                                        19,
-                                    ),
-                                    "rolename": String(
-                                        "old_role",
-                                    ),
-                                    "roletype": String(
-                                        "ROLESPEC_CSTRING",
-                                    ),
-                                }),
-                            }),
-                        ]),
+        RawStmt {
+            stmt: ReassignOwnedStmt(
+                Object({
+                    "newrole": Object({
+                        "location": Number(
+                            31,
+                        ),
+                        "rolename": String(
+                            "new_role",
+                        ),
+                        "roletype": String(
+                            "ROLESPEC_CSTRING",
+                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    39,
-                ),
-            },
-        ),
+                    "roles": Array([
+                        Object({
+                            "RoleSpec": Object({
+                                "location": Number(
+                                    19,
+                                ),
+                                "rolename": String(
+                                    "old_role",
+                                ),
+                                "roletype": String(
+                                    "ROLESPEC_CSTRING",
+                                ),
+                            }),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                39,
+            ),
+        },
     ],
 )

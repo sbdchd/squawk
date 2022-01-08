@@ -4,92 +4,41 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: UpdateStmt(
-                    Object({
-                        "relation": Object({
-                            "inh": Bool(
-                                true,
-                            ),
-                            "location": Number(
-                                7,
-                            ),
-                            "relname": String(
-                                "table_name",
-                            ),
-                            "relpersistence": String(
-                                "p",
-                            ),
-                        }),
-                        "targetList": Array([
-                            Object({
-                                "ResTarget": Object({
-                                    "location": Number(
-                                        22,
-                                    ),
-                                    "name": String(
-                                        "foo",
-                                    ),
-                                    "val": Object({
-                                        "A_Const": Object({
-                                            "location": Number(
-                                                28,
-                                            ),
-                                            "val": Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "bar",
-                                                    ),
-                                                }),
-                                            }),
-                                        }),
-                                    }),
-                                }),
-                            }),
-                        ]),
-                        "whereClause": Object({
-                            "A_Expr": Object({
-                                "kind": String(
-                                    "AEXPR_OP",
-                                ),
-                                "lexpr": Object({
-                                    "ColumnRef": Object({
-                                        "fields": Array([
-                                            Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "buzz",
-                                                    ),
-                                                }),
-                                            }),
-                                        ]),
-                                        "location": Number(
-                                            40,
-                                        ),
-                                    }),
-                                }),
+        RawStmt {
+            stmt: UpdateStmt(
+                Object({
+                    "relation": Object({
+                        "inh": Bool(
+                            true,
+                        ),
+                        "location": Number(
+                            7,
+                        ),
+                        "relname": String(
+                            "table_name",
+                        ),
+                        "relpersistence": String(
+                            "p",
+                        ),
+                    }),
+                    "targetList": Array([
+                        Object({
+                            "ResTarget": Object({
                                 "location": Number(
-                                    45,
+                                    22,
                                 ),
-                                "name": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                ">",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "rexpr": Object({
+                                "name": String(
+                                    "foo",
+                                ),
+                                "val": Object({
                                     "A_Const": Object({
                                         "location": Number(
-                                            47,
+                                            28,
                                         ),
                                         "val": Object({
-                                            "Integer": Object({
-                                                "ival": Number(
-                                                    10,
+                                            "String": Object({
+                                                "str": String(
+                                                    "bar",
                                                 ),
                                             }),
                                         }),
@@ -97,13 +46,62 @@ Ok(
                                 }),
                             }),
                         }),
+                    ]),
+                    "whereClause": Object({
+                        "A_Expr": Object({
+                            "kind": String(
+                                "AEXPR_OP",
+                            ),
+                            "lexpr": Object({
+                                "ColumnRef": Object({
+                                    "fields": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "buzz",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "location": Number(
+                                        40,
+                                    ),
+                                }),
+                            }),
+                            "location": Number(
+                                45,
+                            ),
+                            "name": Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            ">",
+                                        ),
+                                    }),
+                                }),
+                            ]),
+                            "rexpr": Object({
+                                "A_Const": Object({
+                                    "location": Number(
+                                        47,
+                                    ),
+                                    "val": Object({
+                                        "Integer": Object({
+                                            "ival": Number(
+                                                10,
+                                            ),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                        }),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    49,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                49,
+            ),
+        },
     ],
 )

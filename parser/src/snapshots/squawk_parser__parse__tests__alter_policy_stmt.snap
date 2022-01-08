@@ -4,35 +4,33 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: RenameStmt(
-                    RenameStmt {
-                        newname: "new_name",
-                        behavior: Restrict,
-                        relation: Some(
-                            RangeVar {
-                                catalogname: None,
-                                schemaname: None,
-                                relname: "table_name",
-                                inh: true,
-                                relpersistence: "p",
-                                alias: None,
-                                location: 21,
-                            },
-                        ),
-                        relation_type: AccessMethod,
-                        rename_type: Policy,
-                        subname: Some(
-                            "name",
-                        ),
-                    },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    50,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: RenameStmt(
+                RenameStmt {
+                    newname: "new_name",
+                    behavior: Restrict,
+                    relation: Some(
+                        RangeVar {
+                            catalogname: None,
+                            schemaname: None,
+                            relname: "table_name",
+                            inh: true,
+                            relpersistence: "p",
+                            alias: None,
+                            location: 21,
+                        },
+                    ),
+                    relation_type: AccessMethod,
+                    rename_type: Policy,
+                    subname: Some(
+                        "name",
+                    ),
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                50,
+            ),
+        },
     ],
 )

@@ -4,52 +4,50 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreatePolicyStmt(
-                    Object({
-                        "cmd_name": String(
-                            "all",
-                        ),
-                        "permissive": Bool(
+        RawStmt {
+            stmt: CreatePolicyStmt(
+                Object({
+                    "cmd_name": String(
+                        "all",
+                    ),
+                    "permissive": Bool(
+                        true,
+                    ),
+                    "policy_name": String(
+                        "name",
+                    ),
+                    "roles": Array([
+                        Object({
+                            "RoleSpec": Object({
+                                "location": Number(
+                                    -1,
+                                ),
+                                "roletype": String(
+                                    "ROLESPEC_PUBLIC",
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "table": Object({
+                        "inh": Bool(
                             true,
                         ),
-                        "policy_name": String(
-                            "name",
+                        "location": Number(
+                            22,
                         ),
-                        "roles": Array([
-                            Object({
-                                "RoleSpec": Object({
-                                    "location": Number(
-                                        -1,
-                                    ),
-                                    "roletype": String(
-                                        "ROLESPEC_PUBLIC",
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "table": Object({
-                            "inh": Bool(
-                                true,
-                            ),
-                            "location": Number(
-                                22,
-                            ),
-                            "relname": String(
-                                "table_name",
-                            ),
-                            "relpersistence": String(
-                                "p",
-                            ),
-                        }),
+                        "relname": String(
+                            "table_name",
+                        ),
+                        "relpersistence": String(
+                            "p",
+                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    40,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                40,
+            ),
+        },
     ],
 )

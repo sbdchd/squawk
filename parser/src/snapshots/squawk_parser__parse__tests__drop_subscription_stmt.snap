@@ -4,23 +4,21 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: DropSubscriptionStmt(
-                    Object({
-                        "behavior": String(
-                            "DROP_RESTRICT",
-                        ),
-                        "subname": String(
-                            "mysub",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    24,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: DropSubscriptionStmt(
+                Object({
+                    "behavior": String(
+                        "DROP_RESTRICT",
+                    ),
+                    "subname": String(
+                        "mysub",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                24,
+            ),
+        },
     ],
 )

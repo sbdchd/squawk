@@ -4,87 +4,85 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterTableStmt(
-                    AlterTableStmt {
-                        cmds: [
-                            AlterTableCmd(
-                                AlterTableCmd {
-                                    subtype: ColumnDefault,
-                                    name: Some(
-                                        "column_name",
-                                    ),
-                                    def: Some(
-                                        TypeCast(
-                                            Object({
-                                                "arg": Object({
-                                                    "A_Const": Object({
-                                                        "location": Number(
-                                                            73,
-                                                        ),
-                                                        "val": Object({
-                                                            "String": Object({
-                                                                "str": String(
-                                                                    "f",
-                                                                ),
-                                                            }),
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: ColumnDefault,
+                                name: Some(
+                                    "column_name",
+                                ),
+                                def: Some(
+                                    TypeCast(
+                                        Object({
+                                            "arg": Object({
+                                                "A_Const": Object({
+                                                    "location": Number(
+                                                        73,
+                                                    ),
+                                                    "val": Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "f",
+                                                            ),
                                                         }),
                                                     }),
                                                 }),
+                                            }),
+                                            "location": Number(
+                                                -1,
+                                            ),
+                                            "typeName": Object({
                                                 "location": Number(
                                                     -1,
                                                 ),
-                                                "typeName": Object({
-                                                    "location": Number(
-                                                        -1,
-                                                    ),
-                                                    "names": Array([
-                                                        Object({
-                                                            "String": Object({
-                                                                "str": String(
-                                                                    "pg_catalog",
-                                                                ),
-                                                            }),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "pg_catalog",
+                                                            ),
                                                         }),
-                                                        Object({
-                                                            "String": Object({
-                                                                "str": String(
-                                                                    "bool",
-                                                                ),
-                                                            }),
+                                                    }),
+                                                    Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "bool",
+                                                            ),
                                                         }),
-                                                    ]),
-                                                    "typemod": Number(
-                                                        -1,
-                                                    ),
-                                                }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
                                             }),
-                                        ),
+                                        }),
                                     ),
-                                    behavior: Restrict,
-                                    missing_ok: false,
-                                },
-                            ),
-                        ],
-                        relation: RangeVar {
-                            catalogname: None,
-                            schemaname: None,
-                            relname: "table_name",
-                            inh: true,
-                            relpersistence: "p",
-                            alias: None,
-                            location: 21,
-                        },
-                        relkind: Table,
-                        missing_ok: false,
+                                ),
+                                behavior: Restrict,
+                                missing_ok: false,
+                            },
+                        ),
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "table_name",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 21,
                     },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    78,
-                ),
-            },
-        ),
+                    relkind: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                78,
+            ),
+        },
     ],
 )

@@ -4,52 +4,50 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateTrigStmt(
-                    Object({
-                        "events": Number(
-                            16,
-                        ),
-                        "funcname": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "check_account_update",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: CreateTrigStmt(
+                Object({
+                    "events": Number(
+                        16,
+                    ),
+                    "funcname": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "check_account_update",
+                                ),
                             }),
-                        ]),
-                        "relation": Object({
-                            "inh": Bool(
-                                true,
-                            ),
-                            "location": Number(
-                                50,
-                            ),
-                            "relname": String(
-                                "accounts",
-                            ),
-                            "relpersistence": String(
-                                "p",
-                            ),
                         }),
-                        "row": Bool(
+                    ]),
+                    "relation": Object({
+                        "inh": Bool(
                             true,
                         ),
-                        "timing": Number(
-                            2,
+                        "location": Number(
+                            50,
                         ),
-                        "trigname": String(
-                            "check_update",
+                        "relname": String(
+                            "accounts",
+                        ),
+                        "relpersistence": String(
+                            "p",
                         ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    120,
-                ),
-            },
-        ),
+                    "row": Bool(
+                        true,
+                    ),
+                    "timing": Number(
+                        2,
+                    ),
+                    "trigname": String(
+                        "check_update",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                120,
+            ),
+        },
     ],
 )

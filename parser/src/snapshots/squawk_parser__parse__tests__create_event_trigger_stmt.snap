@@ -4,32 +4,30 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateEventTrigStmt(
-                    Object({
-                        "eventname": String(
-                            "ddl_command_start",
-                        ),
-                        "funcname": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "abort_any_command",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: CreateEventTrigStmt(
+                Object({
+                    "eventname": String(
+                        "ddl_command_start",
+                    ),
+                    "funcname": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "abort_any_command",
+                                ),
                             }),
-                        ]),
-                        "trigname": String(
-                            "abort_ddl",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    93,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                    "trigname": String(
+                        "abort_ddl",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                93,
+            ),
+        },
     ],
 )

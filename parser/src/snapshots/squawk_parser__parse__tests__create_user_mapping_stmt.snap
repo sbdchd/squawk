@@ -4,73 +4,71 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateUserMappingStmt(
-                    Object({
-                        "options": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "bob",
-                                            ),
-                                        }),
+        RawStmt {
+            stmt: CreateUserMappingStmt(
+                Object({
+                    "options": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "bob",
+                                        ),
                                     }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "user",
-                                    ),
-                                    "location": Number(
-                                        48,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "user",
+                                ),
+                                "location": Number(
+                                    48,
+                                ),
                             }),
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "secret",
-                                            ),
-                                        }),
-                                    }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "password",
-                                    ),
-                                    "location": Number(
-                                        60,
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "servername": String(
-                            "foo",
-                        ),
-                        "user": Object({
-                            "location": Number(
-                                24,
-                            ),
-                            "rolename": String(
-                                "bob",
-                            ),
-                            "roletype": String(
-                                "ROLESPEC_CSTRING",
-                            ),
                         }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "secret",
+                                        ),
+                                    }),
+                                }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "password",
+                                ),
+                                "location": Number(
+                                    60,
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "servername": String(
+                        "foo",
+                    ),
+                    "user": Object({
+                        "location": Number(
+                            24,
+                        ),
+                        "rolename": String(
+                            "bob",
+                        ),
+                        "roletype": String(
+                            "ROLESPEC_CSTRING",
+                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    78,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                78,
+            ),
+        },
     ],
 )

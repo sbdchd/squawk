@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, RootStmt, Stmt, TransactionStmtKind,
+    AlterTableCmds, AlterTableDef, AlterTableType, RawStmt, Stmt, TransactionStmtKind,
 };
 #[derive(PartialEq)]
 enum Constraint {
@@ -17,11 +17,11 @@ enum Constraint {
 /// more robust by using guards like `IF NOT EXISTS`. So if the migration fails
 /// halfway through, it can be rerun without human intervention.
 #[must_use]
-pub fn prefer_robust_stmts(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn prefer_robust_stmts(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let mut inside_transaction = false;
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => match stmt.kind {
                 TransactionStmtKind::Begin => inside_transaction = true,

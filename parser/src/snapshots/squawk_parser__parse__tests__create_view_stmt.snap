@@ -4,161 +4,32 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: ViewStmt(
-                    Object({
-                        "query": Object({
-                            "SelectStmt": Object({
-                                "limitOption": String(
-                                    "LIMIT_OPTION_DEFAULT",
-                                ),
-                                "op": String(
-                                    "SETOP_NONE",
-                                ),
-                                "targetList": Array([
-                                    Object({
-                                        "ResTarget": Object({
-                                            "location": Number(
-                                                29,
-                                            ),
-                                            "val": Object({
-                                                "A_Const": Object({
-                                                    "location": Number(
-                                                        29,
-                                                    ),
-                                                    "val": Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "Hello World",
-                                                            ),
-                                                        }),
-                                                    }),
-                                                }),
-                                            }),
-                                        }),
-                                    }),
-                                ]),
-                            }),
-                        }),
-                        "view": Object({
-                            "inh": Bool(
-                                true,
+        RawStmt {
+            stmt: ViewStmt(
+                Object({
+                    "query": Object({
+                        "SelectStmt": Object({
+                            "limitOption": String(
+                                "LIMIT_OPTION_DEFAULT",
                             ),
-                            "location": Number(
-                                13,
+                            "op": String(
+                                "SETOP_NONE",
                             ),
-                            "relname": String(
-                                "vista",
-                            ),
-                            "relpersistence": String(
-                                "p",
-                            ),
-                        }),
-                        "withCheckOption": String(
-                            "NO_CHECK_OPTION",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    42,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: ViewStmt(
-                    Object({
-                        "query": Object({
-                            "SelectStmt": Object({
-                                "fromClause": Array([
-                                    Object({
-                                        "RangeVar": Object({
-                                            "inh": Bool(
-                                                true,
-                                            ),
-                                            "location": Number(
-                                                90,
-                                            ),
-                                            "relname": String(
-                                                "films",
-                                            ),
-                                            "relpersistence": String(
-                                                "p",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "limitOption": String(
-                                    "LIMIT_OPTION_DEFAULT",
-                                ),
-                                "op": String(
-                                    "SETOP_NONE",
-                                ),
-                                "targetList": Array([
-                                    Object({
-                                        "ResTarget": Object({
-                                            "location": Number(
-                                                79,
-                                            ),
-                                            "val": Object({
-                                                "ColumnRef": Object({
-                                                    "fields": Array([
-                                                        Object({
-                                                            "A_Star": Object({}),
-                                                        }),
-                                                    ]),
-                                                    "location": Number(
-                                                        79,
-                                                    ),
-                                                }),
-                                            }),
-                                        }),
-                                    }),
-                                ]),
-                                "whereClause": Object({
-                                    "A_Expr": Object({
-                                        "kind": String(
-                                            "AEXPR_OP",
-                                        ),
-                                        "lexpr": Object({
-                                            "ColumnRef": Object({
-                                                "fields": Array([
-                                                    Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "kind",
-                                                            ),
-                                                        }),
-                                                    }),
-                                                ]),
-                                                "location": Number(
-                                                    106,
-                                                ),
-                                            }),
-                                        }),
+                            "targetList": Array([
+                                Object({
+                                    "ResTarget": Object({
                                         "location": Number(
-                                            111,
+                                            29,
                                         ),
-                                        "name": Array([
-                                            Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "=",
-                                                    ),
-                                                }),
-                                            }),
-                                        ]),
-                                        "rexpr": Object({
+                                        "val": Object({
                                             "A_Const": Object({
                                                 "location": Number(
-                                                    113,
+                                                    29,
                                                 ),
                                                 "val": Object({
                                                     "String": Object({
                                                         "str": String(
-                                                            "Comedy",
+                                                            "Hello World",
                                                         ),
                                                     }),
                                                 }),
@@ -166,32 +37,157 @@ Ok(
                                         }),
                                     }),
                                 }),
-                            }),
+                            ]),
                         }),
-                        "view": Object({
-                            "inh": Bool(
-                                true,
-                            ),
-                            "location": Number(
-                                56,
-                            ),
-                            "relname": String(
-                                "comedies",
-                            ),
-                            "relpersistence": String(
-                                "p",
-                            ),
-                        }),
-                        "withCheckOption": String(
-                            "NO_CHECK_OPTION",
+                    }),
+                    "view": Object({
+                        "inh": Bool(
+                            true,
+                        ),
+                        "location": Number(
+                            13,
+                        ),
+                        "relname": String(
+                            "vista",
+                        ),
+                        "relpersistence": String(
+                            "p",
                         ),
                     }),
-                ),
-                stmt_location: 43,
-                stmt_len: Some(
-                    78,
-                ),
-            },
-        ),
+                    "withCheckOption": String(
+                        "NO_CHECK_OPTION",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                42,
+            ),
+        },
+        RawStmt {
+            stmt: ViewStmt(
+                Object({
+                    "query": Object({
+                        "SelectStmt": Object({
+                            "fromClause": Array([
+                                Object({
+                                    "RangeVar": Object({
+                                        "inh": Bool(
+                                            true,
+                                        ),
+                                        "location": Number(
+                                            90,
+                                        ),
+                                        "relname": String(
+                                            "films",
+                                        ),
+                                        "relpersistence": String(
+                                            "p",
+                                        ),
+                                    }),
+                                }),
+                            ]),
+                            "limitOption": String(
+                                "LIMIT_OPTION_DEFAULT",
+                            ),
+                            "op": String(
+                                "SETOP_NONE",
+                            ),
+                            "targetList": Array([
+                                Object({
+                                    "ResTarget": Object({
+                                        "location": Number(
+                                            79,
+                                        ),
+                                        "val": Object({
+                                            "ColumnRef": Object({
+                                                "fields": Array([
+                                                    Object({
+                                                        "A_Star": Object({}),
+                                                    }),
+                                                ]),
+                                                "location": Number(
+                                                    79,
+                                                ),
+                                            }),
+                                        }),
+                                    }),
+                                }),
+                            ]),
+                            "whereClause": Object({
+                                "A_Expr": Object({
+                                    "kind": String(
+                                        "AEXPR_OP",
+                                    ),
+                                    "lexpr": Object({
+                                        "ColumnRef": Object({
+                                            "fields": Array([
+                                                Object({
+                                                    "String": Object({
+                                                        "str": String(
+                                                            "kind",
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "location": Number(
+                                                106,
+                                            ),
+                                        }),
+                                    }),
+                                    "location": Number(
+                                        111,
+                                    ),
+                                    "name": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "=",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "rexpr": Object({
+                                        "A_Const": Object({
+                                            "location": Number(
+                                                113,
+                                            ),
+                                            "val": Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "Comedy",
+                                                    ),
+                                                }),
+                                            }),
+                                        }),
+                                    }),
+                                }),
+                            }),
+                        }),
+                    }),
+                    "view": Object({
+                        "inh": Bool(
+                            true,
+                        ),
+                        "location": Number(
+                            56,
+                        ),
+                        "relname": String(
+                            "comedies",
+                        ),
+                        "relpersistence": String(
+                            "p",
+                        ),
+                    }),
+                    "withCheckOption": String(
+                        "NO_CHECK_OPTION",
+                    ),
+                }),
+            ),
+            stmt_location: 43,
+            stmt_len: Some(
+                78,
+            ),
+        },
     ],
 )

@@ -4,191 +4,189 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: PrepareStmt(
-                    Object({
-                        "argtypes": Array([
-                            Object({
-                                "TypeName": Object({
-                                    "location": Number(
-                                        18,
-                                    ),
-                                    "names": Array([
-                                        Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "pg_catalog",
-                                                ),
-                                            }),
-                                        }),
-                                        Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "int4",
-                                                ),
-                                            }),
-                                        }),
-                                    ]),
-                                    "typemod": Number(
-                                        -1,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "TypeName": Object({
-                                    "location": Number(
-                                        23,
-                                    ),
-                                    "names": Array([
-                                        Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "text",
-                                                ),
-                                            }),
-                                        }),
-                                    ]),
-                                    "typemod": Number(
-                                        -1,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "TypeName": Object({
-                                    "location": Number(
-                                        29,
-                                    ),
-                                    "names": Array([
-                                        Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "bool",
-                                                ),
-                                            }),
-                                        }),
-                                    ]),
-                                    "typemod": Number(
-                                        -1,
-                                    ),
-                                }),
-                            }),
-                            Object({
-                                "TypeName": Object({
-                                    "location": Number(
-                                        35,
-                                    ),
-                                    "names": Array([
-                                        Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "pg_catalog",
-                                                ),
-                                            }),
-                                        }),
-                                        Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "numeric",
-                                                ),
-                                            }),
-                                        }),
-                                    ]),
-                                    "typemod": Number(
-                                        -1,
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "name": String(
-                            "fooplan",
-                        ),
-                        "query": Object({
-                            "InsertStmt": Object({
-                                "override": String(
-                                    "OVERRIDING_NOT_SET",
+        RawStmt {
+            stmt: PrepareStmt(
+                Object({
+                    "argtypes": Array([
+                        Object({
+                            "TypeName": Object({
+                                "location": Number(
+                                    18,
                                 ),
-                                "relation": Object({
-                                    "inh": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        63,
-                                    ),
-                                    "relname": String(
-                                        "foo",
-                                    ),
-                                    "relpersistence": String(
-                                        "p",
-                                    ),
-                                }),
-                                "selectStmt": Object({
-                                    "SelectStmt": Object({
-                                        "limitOption": String(
-                                            "LIMIT_OPTION_DEFAULT",
-                                        ),
-                                        "op": String(
-                                            "SETOP_NONE",
-                                        ),
-                                        "valuesLists": Array([
-                                            Object({
-                                                "List": Object({
-                                                    "items": Array([
-                                                        Object({
-                                                            "ParamRef": Object({
-                                                                "location": Number(
-                                                                    74,
-                                                                ),
-                                                                "number": Number(
-                                                                    1,
-                                                                ),
-                                                            }),
-                                                        }),
-                                                        Object({
-                                                            "ParamRef": Object({
-                                                                "location": Number(
-                                                                    78,
-                                                                ),
-                                                                "number": Number(
-                                                                    2,
-                                                                ),
-                                                            }),
-                                                        }),
-                                                        Object({
-                                                            "ParamRef": Object({
-                                                                "location": Number(
-                                                                    82,
-                                                                ),
-                                                                "number": Number(
-                                                                    3,
-                                                                ),
-                                                            }),
-                                                        }),
-                                                        Object({
-                                                            "ParamRef": Object({
-                                                                "location": Number(
-                                                                    86,
-                                                                ),
-                                                                "number": Number(
-                                                                    4,
-                                                                ),
-                                                            }),
-                                                        }),
-                                                    ]),
-                                                }),
-                                            }),
-                                        ]),
+                                "names": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "pg_catalog",
+                                            ),
+                                        }),
                                     }),
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "int4",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "typemod": Number(
+                                    -1,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "TypeName": Object({
+                                "location": Number(
+                                    23,
+                                ),
+                                "names": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "text",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "typemod": Number(
+                                    -1,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "TypeName": Object({
+                                "location": Number(
+                                    29,
+                                ),
+                                "names": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "bool",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "typemod": Number(
+                                    -1,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "TypeName": Object({
+                                "location": Number(
+                                    35,
+                                ),
+                                "names": Array([
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "pg_catalog",
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "String": Object({
+                                            "str": String(
+                                                "numeric",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "typemod": Number(
+                                    -1,
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "name": String(
+                        "fooplan",
+                    ),
+                    "query": Object({
+                        "InsertStmt": Object({
+                            "override": String(
+                                "OVERRIDING_NOT_SET",
+                            ),
+                            "relation": Object({
+                                "inh": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    63,
+                                ),
+                                "relname": String(
+                                    "foo",
+                                ),
+                                "relpersistence": String(
+                                    "p",
+                                ),
+                            }),
+                            "selectStmt": Object({
+                                "SelectStmt": Object({
+                                    "limitOption": String(
+                                        "LIMIT_OPTION_DEFAULT",
+                                    ),
+                                    "op": String(
+                                        "SETOP_NONE",
+                                    ),
+                                    "valuesLists": Array([
+                                        Object({
+                                            "List": Object({
+                                                "items": Array([
+                                                    Object({
+                                                        "ParamRef": Object({
+                                                            "location": Number(
+                                                                74,
+                                                            ),
+                                                            "number": Number(
+                                                                1,
+                                                            ),
+                                                        }),
+                                                    }),
+                                                    Object({
+                                                        "ParamRef": Object({
+                                                            "location": Number(
+                                                                78,
+                                                            ),
+                                                            "number": Number(
+                                                                2,
+                                                            ),
+                                                        }),
+                                                    }),
+                                                    Object({
+                                                        "ParamRef": Object({
+                                                            "location": Number(
+                                                                82,
+                                                            ),
+                                                            "number": Number(
+                                                                3,
+                                                            ),
+                                                        }),
+                                                    }),
+                                                    Object({
+                                                        "ParamRef": Object({
+                                                            "location": Number(
+                                                                86,
+                                                            ),
+                                                            "number": Number(
+                                                                4,
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                            }),
+                                        }),
+                                    ]),
                                 }),
                             }),
                         }),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    89,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                89,
+            ),
+        },
     ],
 )

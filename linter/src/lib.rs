@@ -15,7 +15,7 @@ use crate::rules::{
     require_concurrent_index_creation,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
-use squawk_parser::ast::RootStmt;
+use squawk_parser::ast::RawStmt;
 use squawk_parser::parse::parse_sql_query;
 use std::collections::HashSet;
 use std::convert::TryFrom;
@@ -24,7 +24,7 @@ use std::convert::TryFrom;
 pub struct SquawkRule {
     pub id: String,
     pub name: RuleViolationKind,
-    func: fn(&[RootStmt]) -> Vec<RuleViolation>,
+    func: fn(&[RawStmt]) -> Vec<RuleViolation>,
     pub messages: Vec<ViolationMessage>,
 }
 

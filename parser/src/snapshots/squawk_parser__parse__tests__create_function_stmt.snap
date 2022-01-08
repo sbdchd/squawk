@@ -4,98 +4,96 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateFunctionStmt(
-                    Object({
-                        "funcname": Array([
+        RawStmt {
+            stmt: CreateFunctionStmt(
+                Object({
+                    "funcname": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "populate",
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "options": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "List": Object({
+                                        "items": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "\nDECLARE\n    -- declarations\nBEGIN\n    PERFORM my_function();\nEND;\n",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                    }),
+                                }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "as",
+                                ),
+                                "location": Number(
+                                    44,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "plpgsql",
+                                        ),
+                                    }),
+                                }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "language",
+                                ),
+                                "location": Number(
+                                    119,
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "returnType": Object({
+                        "location": Number(
+                            36,
+                        ),
+                        "names": Array([
                             Object({
                                 "String": Object({
                                     "str": String(
-                                        "populate",
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "options": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "List": Object({
-                                            "items": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "\nDECLARE\n    -- declarations\nBEGIN\n    PERFORM my_function();\nEND;\n",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                        }),
-                                    }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "as",
-                                    ),
-                                    "location": Number(
-                                        44,
+                                        "pg_catalog",
                                     ),
                                 }),
                             }),
                             Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "plpgsql",
-                                            ),
-                                        }),
-                                    }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "language",
-                                    ),
-                                    "location": Number(
-                                        119,
+                                "String": Object({
+                                    "str": String(
+                                        "int4",
                                     ),
                                 }),
                             }),
                         ]),
-                        "returnType": Object({
-                            "location": Number(
-                                36,
-                            ),
-                            "names": Array([
-                                Object({
-                                    "String": Object({
-                                        "str": String(
-                                            "pg_catalog",
-                                        ),
-                                    }),
-                                }),
-                                Object({
-                                    "String": Object({
-                                        "str": String(
-                                            "int4",
-                                        ),
-                                    }),
-                                }),
-                            ]),
-                            "typemod": Number(
-                                -1,
-                            ),
-                        }),
+                        "typemod": Number(
+                            -1,
+                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    135,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                135,
+            ),
+        },
     ],
 )

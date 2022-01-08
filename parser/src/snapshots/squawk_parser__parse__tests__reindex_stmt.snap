@@ -4,99 +4,91 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: ReindexStmt(
-                    Object({
-                        "kind": String(
-                            "REINDEX_OBJECT_INDEX",
+        RawStmt {
+            stmt: ReindexStmt(
+                Object({
+                    "kind": String(
+                        "REINDEX_OBJECT_INDEX",
+                    ),
+                    "relation": Object({
+                        "inh": Bool(
+                            true,
                         ),
-                        "relation": Object({
-                            "inh": Bool(
-                                true,
-                            ),
-                            "location": Number(
-                                15,
-                            ),
-                            "relname": String(
-                                "my_index",
-                            ),
-                            "relpersistence": String(
-                                "p",
-                            ),
-                        }),
+                        "location": Number(
+                            15,
+                        ),
+                        "relname": String(
+                            "my_index",
+                        ),
+                        "relpersistence": String(
+                            "p",
+                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    23,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: ReindexStmt(
-                    Object({
-                        "kind": String(
-                            "REINDEX_OBJECT_TABLE",
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                23,
+            ),
+        },
+        RawStmt {
+            stmt: ReindexStmt(
+                Object({
+                    "kind": String(
+                        "REINDEX_OBJECT_TABLE",
+                    ),
+                    "relation": Object({
+                        "inh": Bool(
+                            true,
                         ),
-                        "relation": Object({
-                            "inh": Bool(
-                                true,
-                            ),
-                            "location": Number(
-                                39,
-                            ),
-                            "relname": String(
-                                "table_name",
-                            ),
-                            "relpersistence": String(
-                                "p",
-                            ),
-                        }),
-                    }),
-                ),
-                stmt_location: 24,
-                stmt_len: Some(
-                    25,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: ReindexStmt(
-                    Object({
-                        "kind": String(
-                            "REINDEX_OBJECT_DATABASE",
+                        "location": Number(
+                            39,
                         ),
-                        "name": String(
+                        "relname": String(
                             "table_name",
                         ),
-                    }),
-                ),
-                stmt_location: 50,
-                stmt_len: Some(
-                    28,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: ReindexStmt(
-                    Object({
-                        "kind": String(
-                            "REINDEX_OBJECT_SYSTEM",
-                        ),
-                        "name": String(
-                            "table_name",
+                        "relpersistence": String(
+                            "p",
                         ),
                     }),
-                ),
-                stmt_location: 79,
-                stmt_len: Some(
-                    26,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 24,
+            stmt_len: Some(
+                25,
+            ),
+        },
+        RawStmt {
+            stmt: ReindexStmt(
+                Object({
+                    "kind": String(
+                        "REINDEX_OBJECT_DATABASE",
+                    ),
+                    "name": String(
+                        "table_name",
+                    ),
+                }),
+            ),
+            stmt_location: 50,
+            stmt_len: Some(
+                28,
+            ),
+        },
+        RawStmt {
+            stmt: ReindexStmt(
+                Object({
+                    "kind": String(
+                        "REINDEX_OBJECT_SYSTEM",
+                    ),
+                    "name": String(
+                        "table_name",
+                    ),
+                }),
+            ),
+            stmt_location: 79,
+            stmt_len: Some(
+                26,
+            ),
+        },
     ],
 )

@@ -1,4 +1,4 @@
-use crate::ast::{RootStmt, StmtRoot};
+use crate::ast::{RawStmt, StmtRoot};
 use crate::error::PgQueryError;
 use libpg_query::{pg_query_free_parse_result, pg_query_parse};
 use serde::Deserialize;
@@ -36,15 +36,9 @@ pub fn parse_sql_query_json(query: &str) -> Result<Value, PgQueryError> {
     parse_sql_query_base(query)
 }
 
-pub fn parse_sql_query(query: &str) -> Result<Vec<RootStmt>, PgQueryError> {
+pub fn parse_sql_query(query: &str) -> Result<Vec<RawStmt>, PgQueryError> {
     let parsed: StmtRoot = parse_sql_query_base(query)?;
-    // HACK(chdsbd): To avoid updating every call site from RootStmt to StmtRoot, we convert to RawStmt.
-    let root_stmts: Vec<RootStmt> = parsed
-        .stmts
-        .into_iter()
-        .map(|x| RootStmt::RawStmt(x))
-        .collect();
-    return Ok(root_stmts);
+    return Ok(parsed.stmts);
 }
 
 #[cfg(test)]

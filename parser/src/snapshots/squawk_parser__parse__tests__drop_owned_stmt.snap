@@ -4,35 +4,33 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: DropOwnedStmt(
-                    Object({
-                        "behavior": String(
-                            "DROP_CASCADE",
-                        ),
-                        "roles": Array([
-                            Object({
-                                "RoleSpec": Object({
-                                    "location": Number(
-                                        15,
-                                    ),
-                                    "rolename": String(
-                                        "foo",
-                                    ),
-                                    "roletype": String(
-                                        "ROLESPEC_CSTRING",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: DropOwnedStmt(
+                Object({
+                    "behavior": String(
+                        "DROP_CASCADE",
+                    ),
+                    "roles": Array([
+                        Object({
+                            "RoleSpec": Object({
+                                "location": Number(
+                                    15,
+                                ),
+                                "rolename": String(
+                                    "foo",
+                                ),
+                                "roletype": String(
+                                    "ROLESPEC_CSTRING",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    26,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                26,
+            ),
+        },
     ],
 )

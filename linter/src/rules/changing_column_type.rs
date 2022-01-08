@@ -1,10 +1,10 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{AlterTableCmds, AlterTableType, RootStmt, Stmt};
+use squawk_parser::ast::{AlterTableCmds, AlterTableType, RawStmt, Stmt};
 
 #[must_use]
-pub fn changing_column_type(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn changing_column_type(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {

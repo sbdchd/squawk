@@ -839,11 +839,6 @@ pub struct DropStmt {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub enum RootStmt {
-    RawStmt(RawStmt),
-}
-
-#[derive(Debug, Deserialize, Serialize)]
 pub struct StmtRoot {
     pub stmts: Vec<RawStmt>,
 }

@@ -4,221 +4,56 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: RenameStmt(
-                    RenameStmt {
-                        newname: "square_root",
-                        behavior: Restrict,
-                        relation: None,
-                        relation_type: AccessMethod,
-                        rename_type: Function,
-                        subname: None,
-                    },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    51,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterOwnerStmt(
-                    Object({
-                        "newowner": Object({
-                            "location": Number(
-                                91,
-                            ),
-                            "rolename": String(
-                                "joe",
-                            ),
-                            "roletype": String(
-                                "ROLESPEC_CSTRING",
-                            ),
-                        }),
-                        "object": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                73,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "pg_catalog",
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "int4",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "sqrt",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                            }),
-                        }),
-                        "objectType": String(
-                            "OBJECT_FUNCTION",
+        RawStmt {
+            stmt: RenameStmt(
+                RenameStmt {
+                    newname: "square_root",
+                    behavior: Restrict,
+                    relation: None,
+                    relation_type: AccessMethod,
+                    rename_type: Function,
+                    subname: None,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                51,
+            ),
+        },
+        RawStmt {
+            stmt: AlterOwnerStmt(
+                Object({
+                    "newowner": Object({
+                        "location": Number(
+                            91,
+                        ),
+                        "rolename": String(
+                            "joe",
+                        ),
+                        "roletype": String(
+                            "ROLESPEC_CSTRING",
                         ),
                     }),
-                ),
-                stmt_location: 52,
-                stmt_len: Some(
-                    42,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterObjectSchemaStmt(
-                    Object({
-                        "newschema": String(
-                            "maths",
-                        ),
-                        "object": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                116,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "pg_catalog",
-                                                        ),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "int4",
-                                                        ),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "sqrt",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                            }),
-                        }),
-                        "objectType": String(
-                            "OBJECT_FUNCTION",
-                        ),
-                    }),
-                ),
-                stmt_location: 95,
-                stmt_len: Some(
-                    46,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterFunctionStmt(
-                    Object({
-                        "actions": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "VariableSetStmt": Object({
-                                            "args": Array([
-                                                Object({
-                                                    "A_Const": Object({
-                                                        "location": Number(
-                                                            197,
-                                                        ),
-                                                        "val": Object({
-                                                            "String": Object({
-                                                                "str": String(
-                                                                    "admin",
-                                                                ),
-                                                            }),
-                                                        }),
-                                                    }),
-                                                }),
-                                                Object({
-                                                    "A_Const": Object({
-                                                        "location": Number(
-                                                            204,
-                                                        ),
-                                                        "val": Object({
-                                                            "String": Object({
-                                                                "str": String(
-                                                                    "pg_temp",
-                                                                ),
-                                                            }),
-                                                        }),
-                                                    }),
-                                                }),
-                                            ]),
-                                            "kind": String(
-                                                "VAR_SET_VALUE",
-                                            ),
-                                            "name": String(
-                                                "search_path",
-                                            ),
-                                        }),
-                                    }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "set",
-                                    ),
-                                    "location": Number(
-                                        179,
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "func": Object({
+                    "object": Object({
+                        "ObjectWithArgs": Object({
                             "objargs": Array([
                                 Object({
                                     "TypeName": Object({
                                         "location": Number(
-                                            173,
+                                            73,
                                         ),
                                         "names": Array([
                                             Object({
                                                 "String": Object({
                                                     "str": String(
-                                                        "text",
+                                                        "pg_catalog",
+                                                    ),
+                                                }),
+                                            }),
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "int4",
                                                     ),
                                                 }),
                                             }),
@@ -233,64 +68,49 @@ Ok(
                                 Object({
                                     "String": Object({
                                         "str": String(
-                                            "check_password",
+                                            "sqrt",
                                         ),
                                     }),
                                 }),
                             ]),
                         }),
-                        "objtype": String(
-                            "OBJECT_FUNCTION",
-                        ),
                     }),
-                ),
-                stmt_location: 142,
-                stmt_len: Some(
-                    69,
-                ),
-            },
-        ),
-        RawStmt(
-            RawStmt {
-                stmt: AlterFunctionStmt(
-                    Object({
-                        "actions": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "VariableSetStmt": Object({
-                                            "kind": String(
-                                                "VAR_RESET",
-                                            ),
-                                            "name": String(
-                                                "search_path",
-                                            ),
-                                        }),
-                                    }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "set",
-                                    ),
-                                    "location": Number(
-                                        249,
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "func": Object({
+                    "objectType": String(
+                        "OBJECT_FUNCTION",
+                    ),
+                }),
+            ),
+            stmt_location: 52,
+            stmt_len: Some(
+                42,
+            ),
+        },
+        RawStmt {
+            stmt: AlterObjectSchemaStmt(
+                Object({
+                    "newschema": String(
+                        "maths",
+                    ),
+                    "object": Object({
+                        "ObjectWithArgs": Object({
                             "objargs": Array([
                                 Object({
                                     "TypeName": Object({
                                         "location": Number(
-                                            243,
+                                            116,
                                         ),
                                         "names": Array([
                                             Object({
                                                 "String": Object({
                                                     "str": String(
-                                                        "text",
+                                                        "pg_catalog",
+                                                    ),
+                                                }),
+                                            }),
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "int4",
                                                     ),
                                                 }),
                                             }),
@@ -305,22 +125,192 @@ Ok(
                                 Object({
                                     "String": Object({
                                         "str": String(
-                                            "check_password",
+                                            "sqrt",
                                         ),
                                     }),
                                 }),
                             ]),
                         }),
-                        "objtype": String(
-                            "OBJECT_FUNCTION",
-                        ),
                     }),
-                ),
-                stmt_location: 212,
-                stmt_len: Some(
-                    54,
-                ),
-            },
-        ),
+                    "objectType": String(
+                        "OBJECT_FUNCTION",
+                    ),
+                }),
+            ),
+            stmt_location: 95,
+            stmt_len: Some(
+                46,
+            ),
+        },
+        RawStmt {
+            stmt: AlterFunctionStmt(
+                Object({
+                    "actions": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "VariableSetStmt": Object({
+                                        "args": Array([
+                                            Object({
+                                                "A_Const": Object({
+                                                    "location": Number(
+                                                        197,
+                                                    ),
+                                                    "val": Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "admin",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                }),
+                                            }),
+                                            Object({
+                                                "A_Const": Object({
+                                                    "location": Number(
+                                                        204,
+                                                    ),
+                                                    "val": Object({
+                                                        "String": Object({
+                                                            "str": String(
+                                                                "pg_temp",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                }),
+                                            }),
+                                        ]),
+                                        "kind": String(
+                                            "VAR_SET_VALUE",
+                                        ),
+                                        "name": String(
+                                            "search_path",
+                                        ),
+                                    }),
+                                }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "set",
+                                ),
+                                "location": Number(
+                                    179,
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "func": Object({
+                        "objargs": Array([
+                            Object({
+                                "TypeName": Object({
+                                    "location": Number(
+                                        173,
+                                    ),
+                                    "names": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "text",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "typemod": Number(
+                                        -1,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "objname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "check_password",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                    "objtype": String(
+                        "OBJECT_FUNCTION",
+                    ),
+                }),
+            ),
+            stmt_location: 142,
+            stmt_len: Some(
+                69,
+            ),
+        },
+        RawStmt {
+            stmt: AlterFunctionStmt(
+                Object({
+                    "actions": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "VariableSetStmt": Object({
+                                        "kind": String(
+                                            "VAR_RESET",
+                                        ),
+                                        "name": String(
+                                            "search_path",
+                                        ),
+                                    }),
+                                }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "set",
+                                ),
+                                "location": Number(
+                                    249,
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "func": Object({
+                        "objargs": Array([
+                            Object({
+                                "TypeName": Object({
+                                    "location": Number(
+                                        243,
+                                    ),
+                                    "names": Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "text",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "typemod": Number(
+                                        -1,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "objname": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "check_password",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                    }),
+                    "objtype": String(
+                        "OBJECT_FUNCTION",
+                    ),
+                }),
+            ),
+            stmt_location: 212,
+            stmt_len: Some(
+                54,
+            ),
+        },
     ],
 )

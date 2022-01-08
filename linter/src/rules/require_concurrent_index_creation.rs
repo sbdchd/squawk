@@ -1,12 +1,12 @@
 use crate::rules::utils::tables_created_in_transaction;
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{ObjectType, RootStmt, Stmt};
+use squawk_parser::ast::{ObjectType, RawStmt, Stmt};
 
 #[must_use]
-pub fn require_concurrent_index_creation(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn require_concurrent_index_creation(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let tables_created = tables_created_in_transaction(tree);
     let mut errs = vec![];
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::IndexStmt(stmt) => {
                 let range = &stmt.relation;

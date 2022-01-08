@@ -4,159 +4,157 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateStmt(
-                    CreateStmt {
-                        relation: RangeVar {
-                            catalogname: None,
-                            schemaname: None,
-                            relname: "example",
-                            inh: true,
-                            relpersistence: "p",
-                            alias: None,
-                            location: 14,
-                        },
-                        table_elts: [
-                            ColumnDef(
-                                ColumnDef {
-                                    colname: Some(
-                                        "a",
-                                    ),
-                                    type_name: TypeName {
-                                        names: [
-                                            String(
-                                                PGString {
-                                                    str: "pg_catalog",
-                                                },
-                                            ),
-                                            String(
-                                                PGString {
-                                                    str: "int4",
-                                                },
-                                            ),
-                                        ],
-                                        type_oid: None,
-                                        setof: false,
-                                        pct_type: false,
-                                        typmods: [],
-                                        typemod: -1,
-                                        array_bounds: [],
-                                        location: 30,
-                                    },
-                                    constraints: [],
-                                    is_local: true,
-                                    location: 28,
-                                },
-                            ),
-                            ColumnDef(
-                                ColumnDef {
-                                    colname: Some(
-                                        "b",
-                                    ),
-                                    type_name: TypeName {
-                                        names: [
-                                            String(
-                                                PGString {
-                                                    str: "pg_catalog",
-                                                },
-                                            ),
-                                            String(
-                                                PGString {
-                                                    str: "int4",
-                                                },
-                                            ),
-                                        ],
-                                        type_oid: None,
-                                        setof: false,
-                                        pct_type: false,
-                                        typmods: [],
-                                        typemod: -1,
-                                        array_bounds: [],
-                                        location: 45,
-                                    },
-                                    constraints: [],
-                                    is_local: true,
-                                    location: 43,
-                                },
-                            ),
-                            ColumnDef(
-                                ColumnDef {
-                                    colname: Some(
-                                        "c",
-                                    ),
-                                    type_name: TypeName {
-                                        names: [
-                                            String(
-                                                PGString {
-                                                    str: "pg_catalog",
-                                                },
-                                            ),
-                                            String(
-                                                PGString {
-                                                    str: "int4",
-                                                },
-                                            ),
-                                        ],
-                                        type_oid: None,
-                                        setof: false,
-                                        pct_type: false,
-                                        typmods: [],
-                                        typemod: -1,
-                                        array_bounds: [],
-                                        location: 60,
-                                    },
-                                    constraints: [],
-                                    is_local: true,
-                                    location: 58,
-                                },
-                            ),
-                            Constraint(
-                                Constraint {
-                                    conname: None,
-                                    contype: Primary,
-                                    location: 73,
-                                    raw_expr: None,
-                                    keys: Some(
-                                        Array([
-                                            Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "a",
-                                                    ),
-                                                }),
-                                            }),
-                                            Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "c",
-                                                    ),
-                                                }),
-                                            }),
-                                        ]),
-                                    ),
-                                    indexname: None,
-                                    skip_validation: false,
-                                    initially_valid: false,
-                                },
-                            ),
-                        ],
-                        inh_relations: [],
-                        partbound: None,
-                        partspec: None,
-                        of_typename: None,
-                        constraints: [],
-                        options: [],
-                        oncommit: Noop,
-                        tablespacename: None,
-                        if_not_exists: false,
+        RawStmt {
+            stmt: CreateStmt(
+                CreateStmt {
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "example",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 14,
                     },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    93,
-                ),
-            },
-        ),
+                    table_elts: [
+                        ColumnDef(
+                            ColumnDef {
+                                colname: Some(
+                                    "a",
+                                ),
+                                type_name: TypeName {
+                                    names: [
+                                        String(
+                                            PGString {
+                                                str: "pg_catalog",
+                                            },
+                                        ),
+                                        String(
+                                            PGString {
+                                                str: "int4",
+                                            },
+                                        ),
+                                    ],
+                                    type_oid: None,
+                                    setof: false,
+                                    pct_type: false,
+                                    typmods: [],
+                                    typemod: -1,
+                                    array_bounds: [],
+                                    location: 30,
+                                },
+                                constraints: [],
+                                is_local: true,
+                                location: 28,
+                            },
+                        ),
+                        ColumnDef(
+                            ColumnDef {
+                                colname: Some(
+                                    "b",
+                                ),
+                                type_name: TypeName {
+                                    names: [
+                                        String(
+                                            PGString {
+                                                str: "pg_catalog",
+                                            },
+                                        ),
+                                        String(
+                                            PGString {
+                                                str: "int4",
+                                            },
+                                        ),
+                                    ],
+                                    type_oid: None,
+                                    setof: false,
+                                    pct_type: false,
+                                    typmods: [],
+                                    typemod: -1,
+                                    array_bounds: [],
+                                    location: 45,
+                                },
+                                constraints: [],
+                                is_local: true,
+                                location: 43,
+                            },
+                        ),
+                        ColumnDef(
+                            ColumnDef {
+                                colname: Some(
+                                    "c",
+                                ),
+                                type_name: TypeName {
+                                    names: [
+                                        String(
+                                            PGString {
+                                                str: "pg_catalog",
+                                            },
+                                        ),
+                                        String(
+                                            PGString {
+                                                str: "int4",
+                                            },
+                                        ),
+                                    ],
+                                    type_oid: None,
+                                    setof: false,
+                                    pct_type: false,
+                                    typmods: [],
+                                    typemod: -1,
+                                    array_bounds: [],
+                                    location: 60,
+                                },
+                                constraints: [],
+                                is_local: true,
+                                location: 58,
+                            },
+                        ),
+                        Constraint(
+                            Constraint {
+                                conname: None,
+                                contype: Primary,
+                                location: 73,
+                                raw_expr: None,
+                                keys: Some(
+                                    Array([
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "a",
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "String": Object({
+                                                "str": String(
+                                                    "c",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                ),
+                                indexname: None,
+                                skip_validation: false,
+                                initially_valid: false,
+                            },
+                        ),
+                    ],
+                    inh_relations: [],
+                    partbound: None,
+                    partspec: None,
+                    of_typename: None,
+                    constraints: [],
+                    options: [],
+                    oncommit: Noop,
+                    tablespacename: None,
+                    if_not_exists: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                93,
+            ),
+        },
     ],
 )

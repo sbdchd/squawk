@@ -4,29 +4,27 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: ImportForeignSchemaStmt(
-                    Object({
-                        "list_type": String(
-                            "FDW_IMPORT_SCHEMA_ALL",
-                        ),
-                        "local_schema": String(
-                            "films",
-                        ),
-                        "remote_schema": String(
-                            "foreign_films",
-                        ),
-                        "server_name": String(
-                            "film_server",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    75,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: ImportForeignSchemaStmt(
+                Object({
+                    "list_type": String(
+                        "FDW_IMPORT_SCHEMA_ALL",
+                    ),
+                    "local_schema": String(
+                        "films",
+                    ),
+                    "remote_schema": String(
+                        "foreign_films",
+                    ),
+                    "server_name": String(
+                        "film_server",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                75,
+            ),
+        },
     ],
 )

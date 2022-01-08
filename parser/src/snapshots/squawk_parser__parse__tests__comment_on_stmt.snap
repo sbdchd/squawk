@@ -4,64 +4,62 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CommentStmt(
-                    Object({
-                        "comment": String(
-                            "Computes sample variance",
-                        ),
-                        "object": Object({
-                            "ObjectWithArgs": Object({
-                                "objargs": Array([
-                                    Object({
-                                        "TypeName": Object({
-                                            "location": Number(
-                                                36,
-                                            ),
-                                            "names": Array([
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "pg_catalog",
-                                                        ),
-                                                    }),
+        RawStmt {
+            stmt: CommentStmt(
+                Object({
+                    "comment": String(
+                        "Computes sample variance",
+                    ),
+                    "object": Object({
+                        "ObjectWithArgs": Object({
+                            "objargs": Array([
+                                Object({
+                                    "TypeName": Object({
+                                        "location": Number(
+                                            36,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "pg_catalog",
+                                                    ),
                                                 }),
-                                                Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "float8",
-                                                        ),
-                                                    }),
+                                            }),
+                                            Object({
+                                                "String": Object({
+                                                    "str": String(
+                                                        "float8",
+                                                    ),
                                                 }),
-                                            ]),
-                                            "typemod": Number(
-                                                -1,
-                                            ),
-                                        }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
                                     }),
-                                ]),
-                                "objname": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "my_aggregate",
-                                            ),
-                                        }),
+                                }),
+                            ]),
+                            "objname": Array([
+                                Object({
+                                    "String": Object({
+                                        "str": String(
+                                            "my_aggregate",
+                                        ),
                                     }),
-                                ]),
-                            }),
+                                }),
+                            ]),
                         }),
-                        "objtype": String(
-                            "OBJECT_AGGREGATE",
-                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    83,
-                ),
-            },
-        ),
+                    "objtype": String(
+                        "OBJECT_AGGREGATE",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                83,
+            ),
+        },
     ],
 )

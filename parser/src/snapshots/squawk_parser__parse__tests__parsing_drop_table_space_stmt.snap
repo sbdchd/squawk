@@ -4,20 +4,18 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: DropTableSpaceStmt(
-                    Object({
-                        "tablespacename": String(
-                            "dbspace",
-                        ),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    23,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: DropTableSpaceStmt(
+                Object({
+                    "tablespacename": String(
+                        "dbspace",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                23,
+            ),
+        },
     ],
 )

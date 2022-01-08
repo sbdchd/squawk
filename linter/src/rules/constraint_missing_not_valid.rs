@@ -3,18 +3,18 @@ use std::collections::HashSet;
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use crate::{rules::utils::tables_created_in_transaction, violations::Span};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, RootStmt, Stmt, TransactionStmtKind,
+    AlterTableCmds, AlterTableDef, AlterTableType, RawStmt, Stmt, TransactionStmtKind,
 };
 
 /// Return list of spans for offending transactions. From the start of BEGIN to
 /// the end of COMMIT.
-fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
+fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
     let mut not_valid_names = HashSet::new();
     let mut in_transaction = false;
     let mut in_bad_index = false;
     let mut begin_span_start = 0;
     let mut bad_spans = vec![];
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => {
                 if stmt.kind == TransactionStmtKind::Begin {
@@ -64,7 +64,7 @@ fn not_valid_validate_in_transaction(tree: &[RootStmt]) -> Vec<Span> {
 }
 
 #[must_use]
-pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn constraint_missing_not_valid(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let tables_created = tables_created_in_transaction(tree);
     not_valid_validate_in_transaction(tree)
@@ -78,7 +78,7 @@ pub fn constraint_missing_not_valid(tree: &[RootStmt]) -> Vec<RuleViolation> {
                 ]),
             ));
         });
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
                 let range = &stmt.relation;

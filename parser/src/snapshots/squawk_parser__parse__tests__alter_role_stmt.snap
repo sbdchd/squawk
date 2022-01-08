@@ -4,73 +4,71 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: AlterRoleStmt(
-                    Object({
-                        "action": Number(
-                            1,
-                        ),
-                        "options": Array([
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "Integer": Object({
-                                            "ival": Number(
-                                                1,
-                                            ),
-                                        }),
+        RawStmt {
+            stmt: AlterRoleStmt(
+                Object({
+                    "action": Number(
+                        1,
+                    ),
+                    "options": Array([
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "Integer": Object({
+                                        "ival": Number(
+                                            1,
+                                        ),
                                     }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "createrole",
-                                    ),
-                                    "location": Number(
-                                        19,
-                                    ),
                                 }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "createrole",
+                                ),
+                                "location": Number(
+                                    19,
+                                ),
                             }),
-                            Object({
-                                "DefElem": Object({
-                                    "arg": Object({
-                                        "Integer": Object({
-                                            "ival": Number(
-                                                1,
-                                            ),
-                                        }),
-                                    }),
-                                    "defaction": String(
-                                        "DEFELEM_UNSPEC",
-                                    ),
-                                    "defname": String(
-                                        "createdb",
-                                    ),
-                                    "location": Number(
-                                        30,
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "role": Object({
-                            "location": Number(
-                                12,
-                            ),
-                            "rolename": String(
-                                "miriam",
-                            ),
-                            "roletype": String(
-                                "ROLESPEC_CSTRING",
-                            ),
                         }),
+                        Object({
+                            "DefElem": Object({
+                                "arg": Object({
+                                    "Integer": Object({
+                                        "ival": Number(
+                                            1,
+                                        ),
+                                    }),
+                                }),
+                                "defaction": String(
+                                    "DEFELEM_UNSPEC",
+                                ),
+                                "defname": String(
+                                    "createdb",
+                                ),
+                                "location": Number(
+                                    30,
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "role": Object({
+                        "location": Number(
+                            12,
+                        ),
+                        "rolename": String(
+                            "miriam",
+                        ),
+                        "roletype": String(
+                            "ROLESPEC_CSTRING",
+                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    38,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                38,
+            ),
+        },
     ],
 )

@@ -4,21 +4,19 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: DropStmt(
-                    DropStmt {
-                        behavior: Restrict,
-                        concurrent: false,
-                        missing_ok: false,
-                        remove_type: Extension,
-                    },
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    21,
-                ),
-            },
-        ),
+        RawStmt {
+            stmt: DropStmt(
+                DropStmt {
+                    behavior: Restrict,
+                    concurrent: false,
+                    missing_ok: false,
+                    remove_type: Extension,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                21,
+            ),
+        },
     ],
 )

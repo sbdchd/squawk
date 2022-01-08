@@ -4,32 +4,30 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: DropRoleStmt(
-                    Object({
-                        "roles": Array([
-                            Object({
-                                "RoleSpec": Object({
-                                    "location": Number(
-                                        11,
-                                    ),
-                                    "rolename": String(
-                                        "jonathan",
-                                    ),
-                                    "roletype": String(
-                                        "ROLESPEC_CSTRING",
-                                    ),
-                                }),
+        RawStmt {
+            stmt: DropRoleStmt(
+                Object({
+                    "roles": Array([
+                        Object({
+                            "RoleSpec": Object({
+                                "location": Number(
+                                    11,
+                                ),
+                                "rolename": String(
+                                    "jonathan",
+                                ),
+                                "roletype": String(
+                                    "ROLESPEC_CSTRING",
+                                ),
                             }),
-                        ]),
-                    }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    19,
-                ),
-            },
-        ),
+                        }),
+                    ]),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                19,
+            ),
+        },
     ],
 )

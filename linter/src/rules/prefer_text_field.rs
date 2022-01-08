@@ -1,16 +1,16 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDef, QualifiedName, RawStmt, RootStmt,
-    Stmt, TableElt,
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDef, QualifiedName, RawStmt, Stmt,
+    TableElt,
 };
 
 /// It's easier to update the check constraint on a text field than a varchar()
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
 /// call.
 #[must_use]
-pub fn prefer_text_field(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn prefer_text_field(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::CreateStmt(stmt) => {
                 for column_def in &stmt.table_elts {

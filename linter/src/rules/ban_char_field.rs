@@ -1,10 +1,10 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
-use squawk_parser::ast::{QualifiedName, RootStmt, Stmt, TableElt};
+use squawk_parser::ast::{QualifiedName, RawStmt, Stmt, TableElt};
 
 #[must_use]
-pub fn ban_char_type(tree: &[RootStmt]) -> Vec<RuleViolation> {
+pub fn ban_char_type(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    for RootStmt::RawStmt(raw_stmt) in tree {
+    for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::CreateStmt(stmt) => {
                 for column_def in &stmt.table_elts {

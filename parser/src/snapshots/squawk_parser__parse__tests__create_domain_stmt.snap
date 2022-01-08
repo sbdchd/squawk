@@ -4,168 +4,166 @@ expression: res
 ---
 Ok(
     [
-        RawStmt(
-            RawStmt {
-                stmt: CreateDomainStmt(
-                    Object({
-                        "constraints": Array([
-                            Object({
-                                "Constraint": Object({
-                                    "contype": String(
-                                        "CONSTR_CHECK",
-                                    ),
-                                    "initially_valid": Bool(
-                                        true,
-                                    ),
-                                    "location": Number(
-                                        38,
-                                    ),
-                                    "raw_expr": Object({
-                                        "BoolExpr": Object({
-                                            "args": Array([
-                                                Object({
-                                                    "A_Expr": Object({
-                                                        "kind": String(
-                                                            "AEXPR_OP",
-                                                        ),
-                                                        "lexpr": Object({
-                                                            "ColumnRef": Object({
-                                                                "fields": Array([
-                                                                    Object({
-                                                                        "String": Object({
-                                                                            "str": String(
-                                                                                "value",
-                                                                            ),
-                                                                        }),
+        RawStmt {
+            stmt: CreateDomainStmt(
+                Object({
+                    "constraints": Array([
+                        Object({
+                            "Constraint": Object({
+                                "contype": String(
+                                    "CONSTR_CHECK",
+                                ),
+                                "initially_valid": Bool(
+                                    true,
+                                ),
+                                "location": Number(
+                                    38,
+                                ),
+                                "raw_expr": Object({
+                                    "BoolExpr": Object({
+                                        "args": Array([
+                                            Object({
+                                                "A_Expr": Object({
+                                                    "kind": String(
+                                                        "AEXPR_OP",
+                                                    ),
+                                                    "lexpr": Object({
+                                                        "ColumnRef": Object({
+                                                            "fields": Array([
+                                                                Object({
+                                                                    "String": Object({
+                                                                        "str": String(
+                                                                            "value",
+                                                                        ),
                                                                     }),
-                                                                ]),
-                                                                "location": Number(
-                                                                    48,
+                                                                }),
+                                                            ]),
+                                                            "location": Number(
+                                                                48,
+                                                            ),
+                                                        }),
+                                                    }),
+                                                    "location": Number(
+                                                        54,
+                                                    ),
+                                                    "name": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "~",
                                                                 ),
                                                             }),
                                                         }),
-                                                        "location": Number(
-                                                            54,
-                                                        ),
-                                                        "name": Array([
-                                                            Object({
+                                                    ]),
+                                                    "rexpr": Object({
+                                                        "A_Const": Object({
+                                                            "location": Number(
+                                                                56,
+                                                            ),
+                                                            "val": Object({
                                                                 "String": Object({
                                                                     "str": String(
-                                                                        "~",
+                                                                        "^\\d{5}$",
                                                                     ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "rexpr": Object({
-                                                            "A_Const": Object({
-                                                                "location": Number(
-                                                                    56,
-                                                                ),
-                                                                "val": Object({
-                                                                    "String": Object({
-                                                                        "str": String(
-                                                                            "^\\d{5}$",
-                                                                        ),
-                                                                    }),
                                                                 }),
                                                             }),
                                                         }),
                                                     }),
                                                 }),
-                                                Object({
-                                                    "A_Expr": Object({
-                                                        "kind": String(
-                                                            "AEXPR_OP",
-                                                        ),
-                                                        "lexpr": Object({
-                                                            "ColumnRef": Object({
-                                                                "fields": Array([
-                                                                    Object({
-                                                                        "String": Object({
-                                                                            "str": String(
-                                                                                "value",
-                                                                            ),
-                                                                        }),
+                                            }),
+                                            Object({
+                                                "A_Expr": Object({
+                                                    "kind": String(
+                                                        "AEXPR_OP",
+                                                    ),
+                                                    "lexpr": Object({
+                                                        "ColumnRef": Object({
+                                                            "fields": Array([
+                                                                Object({
+                                                                    "String": Object({
+                                                                        "str": String(
+                                                                            "value",
+                                                                        ),
                                                                     }),
-                                                                ]),
-                                                                "location": Number(
-                                                                    69,
+                                                                }),
+                                                            ]),
+                                                            "location": Number(
+                                                                69,
+                                                            ),
+                                                        }),
+                                                    }),
+                                                    "location": Number(
+                                                        75,
+                                                    ),
+                                                    "name": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "str": String(
+                                                                    "~",
                                                                 ),
                                                             }),
                                                         }),
-                                                        "location": Number(
-                                                            75,
-                                                        ),
-                                                        "name": Array([
-                                                            Object({
+                                                    ]),
+                                                    "rexpr": Object({
+                                                        "A_Const": Object({
+                                                            "location": Number(
+                                                                77,
+                                                            ),
+                                                            "val": Object({
                                                                 "String": Object({
                                                                     "str": String(
-                                                                        "~",
+                                                                        "^\\d{5}-\\d{4}$",
                                                                     ),
-                                                                }),
-                                                            }),
-                                                        ]),
-                                                        "rexpr": Object({
-                                                            "A_Const": Object({
-                                                                "location": Number(
-                                                                    77,
-                                                                ),
-                                                                "val": Object({
-                                                                    "String": Object({
-                                                                        "str": String(
-                                                                            "^\\d{5}-\\d{4}$",
-                                                                        ),
-                                                                    }),
                                                                 }),
                                                             }),
                                                         }),
                                                     }),
                                                 }),
-                                            ]),
-                                            "boolop": String(
-                                                "OR_EXPR",
-                                            ),
-                                            "location": Number(
-                                                66,
-                                            ),
-                                        }),
-                                    }),
-                                }),
-                            }),
-                        ]),
-                        "domainname": Array([
-                            Object({
-                                "String": Object({
-                                    "str": String(
-                                        "us_postal_code",
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "typeName": Object({
-                            "location": Number(
-                                33,
-                            ),
-                            "names": Array([
-                                Object({
-                                    "String": Object({
-                                        "str": String(
-                                            "text",
+                                            }),
+                                        ]),
+                                        "boolop": String(
+                                            "OR_EXPR",
+                                        ),
+                                        "location": Number(
+                                            66,
                                         ),
                                     }),
                                 }),
-                            ]),
-                            "typemod": Number(
-                                -1,
-                            ),
+                            }),
                         }),
+                    ]),
+                    "domainname": Array([
+                        Object({
+                            "String": Object({
+                                "str": String(
+                                    "us_postal_code",
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "typeName": Object({
+                        "location": Number(
+                            33,
+                        ),
+                        "names": Array([
+                            Object({
+                                "String": Object({
+                                    "str": String(
+                                        "text",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "typemod": Number(
+                            -1,
+                        ),
                     }),
-                ),
-                stmt_location: 0,
-                stmt_len: Some(
-                    94,
-                ),
-            },
-        ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                94,
+            ),
+        },
     ],
 )
