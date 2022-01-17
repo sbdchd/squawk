@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "ALGOLIA_API_KEY=empty ALGOLIA_INDEX_NAME=empty docusaurus start",
+    "start": "ALGOLIA_APP_ID=empty ALGOLIA_API_KEY=empty ALGOLIA_INDEX_NAME=empty docusaurus start",
     "build": "docusaurus build",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",
