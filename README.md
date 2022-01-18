@@ -133,6 +133,7 @@ See the ["GitHub Integration" docs](https://squawkhq.com/docs/github_app) for mo
 - <https://github.com/yandex/zero-downtime-migrations>
 - <https://github.com/tbicr/django-pg-zero-downtime-migrations>
 - <https://github.com/3YOURMIND/django-migration-linter>
+- <https://github.com/ankane/strong_migrations>
 
 ## related blog posts / SE Posts / PG Docs
 
