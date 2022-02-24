@@ -5,6 +5,7 @@ pub use squawk_parser::ast::Span;
 #[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq)]
 pub enum RuleViolationKind {
     RequireConcurrentIndexCreation,
+    RequireConcurrentIndexDeletion,
     ConstraintMissingNotValid,
     AddingFieldWithDefault,
     AddingForeignKeyConstraint,

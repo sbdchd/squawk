@@ -12,7 +12,7 @@ use crate::rules::{
     adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
     changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
     prefer_robust_stmts, prefer_text_field, renaming_column, renaming_table,
-    require_concurrent_index_creation,
+    require_concurrent_index_creation, require_concurrent_index_deletion,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RawStmt;
@@ -243,6 +243,20 @@ lazy_static! {
             ),
             ViolationMessage::Help(
                 "Create the index CONCURRENTLY.".into()
+            ),
+        ],
+    },
+    // https://www.postgresql.org/docs/10/sql-dropindex.html
+    SquawkRule {
+        id: "require-concurrent-index-deletion".into(),
+        name: RuleViolationKind::RequireConcurrentIndexDeletion,
+        func: require_concurrent_index_deletion,
+        messages: vec![
+            ViolationMessage::Note(
+                "Deleting an index blocks selects, inserts, updates, and deletes on the index's table.".into()
+            ),
+            ViolationMessage::Help(
+                "Delete the index CONCURRENTLY.".into()
             ),
         ],
     }

@@ -17,6 +17,7 @@ module.exports = {
       "renaming-column",
       "renaming-table",
       "require-concurrent-index-creation",
+      "require-concurrent-index-deletion",
     ],
   },
 }

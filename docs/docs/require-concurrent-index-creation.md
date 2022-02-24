@@ -27,17 +27,3 @@ Use:
 ```sql
 CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
 ```
-
-### drop index
-
-Instead of:
-
-```sql
-DROP INDEX "email_idx" ON "app_user" ("email");
-```
-
-Use:
-
-```sql
-DROP INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
-```
