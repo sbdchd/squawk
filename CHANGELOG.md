@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.9.0 - 2022-02-26
+
+## Added
+
+- require-concurrent-index-deletion rule and removed deletion warnings from
+  require-concurrency-index-creation. Thanks @K-Phoen! (#177)
+
 ## v0.8.2 - 2022-01-07
 
 ### Fixed
