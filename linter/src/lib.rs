@@ -11,8 +11,8 @@ use crate::rules::{
     adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
     adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
     changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
-    prefer_robust_stmts, prefer_text_field, renaming_column, renaming_table,
-    require_concurrent_index_creation, require_concurrent_index_deletion,
+    prefer_robust_stmts, prefer_text_field, removing_existing_index, renaming_column,
+    renaming_table, require_concurrent_index_creation, require_concurrent_index_deletion,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RawStmt;
@@ -205,6 +205,20 @@ lazy_static! {
                 "Use a text field with a check constraint.".into()
             ),
         ]
+    },
+    SquawkRule {
+        id: "removing-existing-index".into(),
+        name: RuleViolationKind::RemovingExistingIndex,
+        func: removing_existing_index,
+        messages: vec![
+            ViolationMessage::Note(
+              "Removing an existing index can lead to downtime if the index is heavily used."
+                .into(),
+            ),
+            ViolationMessage::Help(
+              "Ensure that query patterns do not rely on this index before removing.".into(),
+            ),
+        ],
     },
     // > The RENAME forms change the name of a table (or an index, sequence,
     // > view, materialized view, or foreign table), the name of an individual

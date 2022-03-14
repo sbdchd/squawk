@@ -12,6 +12,7 @@ pub enum RuleViolationKind {
     ChangingColumnType,
     AddingNotNullableField,
     AddingSerialPrimaryKeyField,
+    RemovingExistingIndex,
     RenamingColumn,
     RenamingTable,
     DisallowedUniqueConstraint,

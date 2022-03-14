@@ -16,6 +16,8 @@ pub mod prefer_robust_stmts;
 pub use prefer_robust_stmts::*;
 pub mod prefer_text_field;
 pub use prefer_text_field::*;
+pub mod removing_existing_index;
+pub use removing_existing_index::*;
 pub mod renaming_column;
 pub use renaming_column::*;
 pub mod renaming_table;
