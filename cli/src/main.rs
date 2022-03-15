@@ -35,6 +35,12 @@ struct Opt {
     /// --exclude=require-concurrent-index-creation,ban-drop-database
     #[structopt(short, long, use_delimiter = true)]
     exclude: Option<Vec<String>>,
+    /// Specify postgres version
+    ///
+    /// For example:
+    /// --pg_version=13.0
+    #[structopt(long)]
+    pg_version: Option<String>,
     /// List all available rules
     #[structopt(long)]
     list_rules: bool,
@@ -73,14 +79,18 @@ fn main() {
     let mut handle = stdout.lock();
 
     let is_stdin = !atty::is(Stream::Stdin);
+    let mut excluded_rules = opts.exclude.unwrap_or_else(Vec::new);
+    let pg_version = opts.pg_version.unwrap_or_else(|| '9'.to_string());
+    let farce: Vec<&str> = pg_version.split(".").collect();
+    let pg_major_version = farce[0].parse::<i32>().unwrap();
+    // Skip checks for newer versions
+    if pg_major_version > 12 {
+        excluded_rules.push("adding-not-null-with-default".to_string());
+    }
+
     if let Some(subcommand) = opts.cmd {
         exit(
-            check_and_comment_on_pr(
-                subcommand,
-                is_stdin,
-                opts.stdin_filepath,
-                &opts.exclude.unwrap_or_else(Vec::new),
-            ),
+            check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath, &excluded_rules),
             "Upload to GitHub failed",
         );
     } else if !opts.paths.is_empty() || is_stdin {
@@ -90,12 +100,7 @@ fn main() {
                 "Failed to dump AST",
             );
         } else {
-            match check_files(
-                &opts.paths,
-                is_stdin,
-                opts.stdin_filepath,
-                &opts.exclude.unwrap_or_else(Vec::new),
-            ) {
+            match check_files(&opts.paths, is_stdin, opts.stdin_filepath, &excluded_rules) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
                     let total_violations = file_reports

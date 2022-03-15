@@ -64,7 +64,14 @@ mod test_rules {
         let sql = r#"
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
-        let res = check_sql(sql, &["prefer-robust-stmts".into()]).unwrap();
+        let res = check_sql(
+            sql,
+            &[
+                "prefer-robust-stmts".into(),
+                "adding-not-null-with-default".into(),
+            ],
+        )
+        .unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::AddingNotNullableField);
         assert_eq!(
@@ -90,14 +97,26 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[
+                "prefer-robust-stmts".into(),
+                "adding-not-null-with-default".into()
+            ]
+        ));
 
         let bad_sql = r#"
 -- not sure how this would ever work, but might as well test it
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[
+                "prefer-robust-stmts".into(),
+                "adding-not-null-with-default".into()
+            ]
+        ));
     }
 
     #[test]
@@ -106,7 +125,13 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 ALTER TABLE "foo_tbl" ADD COLUMN IF NOT EXISTS "bar_col" TEXT DEFAULT 'buzz' NOT NULL;
 "#;
         assert_eq!(
-            check_sql(ok_sql, &["adding-field-with-default".into()]),
+            check_sql(
+                ok_sql,
+                &[
+                    "adding-field-with-default".into(),
+                    "adding-not-null-with-default".into()
+                ]
+            ),
             Ok(vec![])
         );
     }

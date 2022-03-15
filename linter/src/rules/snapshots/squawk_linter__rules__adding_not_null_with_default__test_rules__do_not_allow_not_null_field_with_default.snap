@@ -1,0 +1,25 @@
+---
+source: linter/src/rules/adding_not_null_with_default.rs
+expression: "check_sql(bad_sql, &[\"adding-field-with-default\".into()])"
+---
+Ok(
+    [
+        RuleViolation {
+            kind: AddingNotNullWithDefault,
+            span: Span {
+                start: 0,
+                len: Some(
+                    86,
+                ),
+            },
+            messages: [
+                Note(
+                    "Adding a column with a not null default is only safe in PG versions > 11.",
+                ),
+                Help(
+                    "For older versions first add the column, then change the default.",
+                ),
+            ],
+        },
+    ],
+)

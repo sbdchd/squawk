@@ -11,6 +11,7 @@ pub enum RuleViolationKind {
     AddingForeignKeyConstraint,
     ChangingColumnType,
     AddingNotNullableField,
+    AddingNotNullWithDefault,
     AddingSerialPrimaryKeyField,
     RenamingColumn,
     RenamingTable,

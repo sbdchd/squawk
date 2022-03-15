@@ -8,11 +8,11 @@ extern crate lazy_static;
 
 use crate::errors::CheckSqlError;
 use crate::rules::{
-    adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
-    adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
-    changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
-    prefer_robust_stmts, prefer_text_field, renaming_column, renaming_table,
-    require_concurrent_index_creation, require_concurrent_index_deletion,
+    adding_field_with_default, adding_foreign_key_constraint, adding_not_null_with_default,
+    adding_not_nullable_field, adding_primary_key_constraint, ban_char_type, ban_drop_column,
+    ban_drop_database, changing_column_type, constraint_missing_not_valid,
+    disallow_unique_constraint, prefer_robust_stmts, prefer_text_field, renaming_column,
+    renaming_table, require_concurrent_index_creation, require_concurrent_index_deletion,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RawStmt;
@@ -55,6 +55,18 @@ lazy_static! {
             ),
             ViolationMessage::Help("Add NOT VALID to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.".into()),
         ]
+    },
+    SquawkRule {
+        id: "adding-not-null-with-default".into(),
+        name: RuleViolationKind::AddingNotNullWithDefault,
+        func: adding_not_null_with_default,
+        messages: vec![
+            // https://www.postgresql.org/docs/10/sql-altertable.html
+            ViolationMessage::Note(
+                "Adding a NOT NULL field requires exclusive locks and table rewrites.".into(),
+            ),
+            ViolationMessage::Help("Make the field nullable.".into())
+        ],
     },
     // usually paired with a DEFAULT
     SquawkRule {
