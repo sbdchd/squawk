@@ -84,7 +84,7 @@ fn main() {
     let farce: Vec<&str> = pg_version.split(".").collect();
     let pg_major_version = farce[0].parse::<i32>().unwrap();
     // Skip checks for newer versions
-    if pg_major_version > 12 {
+    if pg_major_version > 11 {
         excluded_rules.push("adding-not-null-with-default".to_string());
     }
 

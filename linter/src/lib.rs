@@ -63,9 +63,9 @@ lazy_static! {
         messages: vec![
             // https://www.postgresql.org/docs/10/sql-altertable.html
             ViolationMessage::Note(
-                "Adding a NOT NULL field requires exclusive locks and table rewrites.".into(),
+                "Adding a column with a not null default is only safe in PG versions > 11.".into(),
             ),
-            ViolationMessage::Help("Make the field nullable.".into())
+            ViolationMessage::Help("For older versions first add the column, then change the default.".into())
         ],
     },
     // usually paired with a DEFAULT
