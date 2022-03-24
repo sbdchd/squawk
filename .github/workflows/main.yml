@@ -29,6 +29,35 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  # build binaries for Linux on Apple M1s - often devcontainers
+  build-linux-arm64:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+
+      - name: Install latest rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: 1.51.0
+          target: aarch64-unknown-linux-gnu
+          default: true
+          override: true
+
+      - name: Build
+        run: cargo build --all --release && mv target/release/squawk target/release/squawk-linux-aarch64
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            target/release/squawk-linux-aarch64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
   # windows isn't supported by libpg_query
   # https://github.com/lfittl/libpg_query/issues/44
 
