@@ -12,7 +12,7 @@ Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will bl
 Instead of creating the constraint directly, create the
 `CONSTRAINT` `USING` an index.
 
-The index will be created in the background and an `ACCESS EXCLUSIVE` lock will only be acquired momentarily to update the table metadata. See ["require-concurrent"](./require-concurrent.md) for more examples.
+The index will be created in the background and an `ACCESS EXCLUSIVE` lock will only be acquired when updating the table metadata with the `ADD CONSTRAINT ... USING` statement. See ["require-concurrent"](./require-concurrent.md) for more examples.
 
 Instead of:
 
