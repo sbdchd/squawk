@@ -1,21 +1,20 @@
 name: Javascript
 
-on: 
+on:
   push:
     paths-ignore:
-      - 'cli/**'
-      - 'github/**'
-      - 'linter/**'
-      - 'parser/**'
+      - "cli/**"
+      - "github/**"
+      - "linter/**"
+      - "parser/**"
   pull_request:
     paths-ignore:
-      - 'cli/**'
-      - 'github/**'
-      - 'linter/**'
-      - 'parser/**'
+      - "cli/**"
+      - "github/**"
+      - "linter/**"
+      - "parser/**"
 
 jobs:
-
   typescript:
     runs-on: ubuntu-latest
     steps:
