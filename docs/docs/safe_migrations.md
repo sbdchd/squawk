@@ -1,6 +1,6 @@
 ---
 id: safe_migrations
-title: Running migrations
+title: Applying migrations safely
 ---
 
 A migration that passes Squawk's lint is not automatically safe to run.
