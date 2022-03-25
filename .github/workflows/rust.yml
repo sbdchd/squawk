@@ -1,6 +1,14 @@
 name: Rust CI
 
-on: [push, pull_request]
+on: 
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '*.md'
 
 jobs:
   build-linux:
@@ -101,42 +109,3 @@ jobs:
 
       - name: Test
         run: ./s/test
-
-  typescript:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "12.x"
-      - name: Install dependencies
-        run: ./s/ci-install
-      - name: Typescript
-        run: ./s/tsc
-
-  eslint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "12.x"
-      - name: Install dependencies
-        run: ./s/ci-install
-      - name: Lint JS
-        run: ./s/eslint
-
-  prettier:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: "12.x"
-      - name: Install dependencies
-        run: ./s/ci-install
-      - name: Check Formatting
-        run: ./s/prettier
