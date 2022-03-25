@@ -5,7 +5,7 @@ title: prefer-robust-stmts
 
 ## problem
 
-A non-robust migration that fails part way through may not be safely run retried.
+A non-robust migration that fails after partially applying may fail again when retried.
 
 ### example
 
