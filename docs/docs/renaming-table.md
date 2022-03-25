@@ -7,7 +7,7 @@ title: renaming-table
 
 Renaming a table may break existing clients that depend on the old table name.
 
-During deployments, you can have multiple versions of your app running at the same time. If you rename a table that the old version of your app depends on, you'll
+During deployments, you can have multiple versions of your app running at the same time. If you rename a table that the old version of your app depends on, your app will likely error.
 
 ## solutions
 
