@@ -1,6 +1,6 @@
 module.exports = {
   someSidebar: {
-    General: ["quick_start", "safe_migrations", "cli", "github_app", "web-frameworks", "troubleshooting"],
+    General: ["quick_start", "safe_migrations", "cli", "github_app", "web-frameworks", "locks", "troubleshooting"],
     Rules: [
       "rules",
       "adding-field-with-default",
