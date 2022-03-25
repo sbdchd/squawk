@@ -26,27 +26,14 @@ An `INT` (4 bytes wide) cannot be converted to a `BIGINT` (8 bytes wide) without
 
 Consider a `user_email` table with a column `user_id` that we want to convert from `INT` to `BIGINT`.
 
+The general process is to add a new column, `new_user_id`. Dual write with triggers. Backfill.
 
-Add a new column, `new_user_id`. Dual write with triggers. Backfill.
+See ["Postgres Tips: How to convert 2 Billion Rows to Bigint with Citus"](https://techcommunity.microsoft.com/t5/azure-database-for-postgresql/postgres-tips-how-to-convert-2-billion-rows-to-bigint-with-citus/ba-p/1490128) for a detailed example.
 
-
-```sql
-ALTER TABLE users ADD COLUMN new_id BIGINT;
-
-
-BEGIN;
-LOCK users;
-ALTER TABLE users RENAME COLUMN
-
-
-```
-
-
-https://techcommunity.microsoft.com/t5/azure-database-for-postgresql/postgres-tips-how-to-convert-2-billion-rows-to-bigint-with-citus/ba-p/1490128
-
+_This section may be expanded upon in the future._
 
 ### convert an `INT` primary key to `BIGINT`
 
-For primary keys and columns with foreign key relations, we must update all related tables pointing to our primary key before making our change.
+It's a complicated, multi-step process to convert columns that are primary keys or columns that have foreign key relations.
 
-TODO\
+_This section may be expanded upon in the future._
