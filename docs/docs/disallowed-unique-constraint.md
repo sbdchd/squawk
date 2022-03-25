@@ -5,7 +5,7 @@ title: disallowed-unique-constraint
 
 ## problem
 
-Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads.
+Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
 
 
 ## solution
