@@ -3,16 +3,17 @@ id: require-concurrent-index-creation
 title: require-concurrent-index-creation
 ---
 
-Ensure all index creations use the `CONCURRENTLY` option.
+## problem
 
-This rule ignores indexes added to tables created in the same transaction.
-
-During a normal index creation updates are blocked. `CONCURRENTLY` avoids the
-issue of blocking.
+During a normal index creation, table updates are blocked, but reads are still allowed. `CONCURRENTLY` avoids locking the table against writes during index creation.
 
 <https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY>
 
-## solutions
+## solution
+
+Ensure all index creations use the `CONCURRENTLY` option.
+
+This rule ignores indexes added to tables created in the same transaction.
 
 ### create index
 

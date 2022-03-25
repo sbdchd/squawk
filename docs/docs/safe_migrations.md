@@ -7,7 +7,7 @@ A migration that passes Squawk's lint is not automatically safe to run.
 
 To safely apply a migration you must set a `lock_timeout` in Postgres. See below for more information.
 
-## Safety requirements
+## safety requirements
 
 1. Use Squawk to lint your migrations. Follow the advice.
 2. Set a short `lock_timeout` (e.g. 2 seconds) within Postgres when running your migrations. If you hit the `lock_timeout`, great, retry your migration until it succeeds.
@@ -45,3 +45,8 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 If there is a long running query or open transaction, this `ALTER TABLE` statement could be blocked while it waits for an `AccessExclusiveLock` lock. While the statement waits for a lock, all other reads and writes sent after will wait for this statement too, bringing your application to a halt.
 
 With a short `lock_timeout` of 1 second, queries will be blocked for up to 1 second. If your migration hits the lock timeout, it will be cancelled and error, allowing the waiting queries to proceed. You should retry a migration that hits the lock timeout until it succeeds.
+
+
+## further reading
+
+Benchling's ["Move fast and migrate things: how we automated migrations in Postgres"](https://benchling.engineering/move-fast-and-migrate-things-how-we-automated-migrations-in-postgres-d60aba0fc3d4) and GoCardless's ["Zero-downtime Postgres migrations - the hard parts"](https://gocardless.com/blog/zero-downtime-postgres-migrations-the-hard-parts/) provide more background on `lock_timeout` and `statement_timeout` in a production environment.
