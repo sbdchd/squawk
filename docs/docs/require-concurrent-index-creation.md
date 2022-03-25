@@ -5,8 +5,7 @@ title: require-concurrent-index-creation
 
 ## problem
 
-During a normal index creation, table updates are blocked. `CONCURRENTLY` avoids the
-issue of locking.
+During a normal index creation, table updates are blocked, but reads are still allowed. `CONCURRENTLY` avoids locking the table against writes during index creation.
 
 <https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY>
 
