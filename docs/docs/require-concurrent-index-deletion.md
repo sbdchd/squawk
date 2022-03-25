@@ -9,9 +9,7 @@ A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking
 
 ## solution
 
-`CONCURRENTLY` waits until conflicting transactions have completed.
-
-Ensure all index deletions use the `CONCURRENTLY` option.
+Ensure all index deletions use the `CONCURRENTLY` option. `CONCURRENTLY` waits until conflicting transactions have completed.
 
 <https://www.postgresql.org/docs/10/sql-dropindex.html>
 
