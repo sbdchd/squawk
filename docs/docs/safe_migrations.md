@@ -49,4 +49,4 @@ With a short `lock_timeout` of 1 second, queries will be blocked for up to 1 sec
 
 ## further reading
 
-Benchling's ["Move fast and migrate things: how we automated migrations in Postgres"](https://benchling.engineering/move-fast-and-migrate-things-how-we-automated-migrations-in-postgres-d60aba0fc3d4) provides further background on `lock_timeout` and `statement_timeout` in a production environment.
+Benchling's ["Move fast and migrate things: how we automated migrations in Postgres"](https://benchling.engineering/move-fast-and-migrate-things-how-we-automated-migrations-in-postgres-d60aba0fc3d4) and GoCardless's ["Zero-downtime Postgres migrations - the hard parts"](https://gocardless.com/blog/zero-downtime-postgres-migrations-the-hard-parts/) provide more background on `lock_timeout` and `statement_timeout` in a production environment.
