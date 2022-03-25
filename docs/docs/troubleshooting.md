@@ -6,9 +6,9 @@ title: Troubleshooting
 If you encounter an issue using Squawk that can't be resolved with these docs, please [open an issue](https://github.com/sbdchd/squawk/issues/new).
 
 
-## Common error messages
+## common error messages
 
-### Postgres failed to parse query
+### postgres failed to parse query
 
 Squawk was unable to parse the query using the PostgreSQL parser.
 

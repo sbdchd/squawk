@@ -3,12 +3,11 @@ id: prefer-robust-stmts
 title: prefer-robust-stmts
 ---
 
-The goal of this rule is to make migrations more robust when they fail part way through.
+## problem
 
-To appease this rule you can use guards like `IF NOT EXISTS` or wrap all your
-statements in a transaction.
+A non-robust migration that fails part way through may not be safely run retried.
 
-## examples
+### example
 
 You may have a migration with two steps:
 
@@ -28,6 +27,11 @@ To make this change robust, we can follow the ["add column"](#add-column) and
 adding our column and index.
 
 With this change, we can run our migration multiple times without erroring.
+
+## solutions
+
+To appease this rule you can use guards like `IF NOT EXISTS` or wrap all your
+statements in a transaction.
 
 ### add table
 

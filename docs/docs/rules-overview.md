@@ -13,7 +13,7 @@ The rule docs should provide actionable, user friendly error messages. If you fi
 Read ["Running Migrations](./safe_migrations.md) to learn about safely applying migrations after linting.
 :::
 
-## Index
+## index
 import sidebar from '../sidebars.js'
 
 <ul>

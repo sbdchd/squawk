@@ -3,9 +3,13 @@ id: prefer-text-field
 title: prefer-text-field
 ---
 
+## problem
+
 Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock.
 
-Using a text field with a `CHECK CONSTRAINT` makes it easier to change the
+## solution
+
+Use a text field with a `CHECK CONSTRAINT` makes it easier to change the
 max length. See the [`constraint-missing-not-valid` rule](./constraint-missing-not-valid.md).
 
 Instead of:

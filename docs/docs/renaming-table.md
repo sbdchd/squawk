@@ -3,15 +3,19 @@ id: renaming-table
 title: renaming-table
 ---
 
-Renaming a table may break existing clients.
+## problem
 
-## Solutions for renaming tables
+Renaming a table may break existing clients that depend on the old table name.
 
-### Don't rename the table
+During deployments, you can have multiple versions of your app running at the same time. If you rename a table that the old version of your app depends on, you'll
+
+## solutions
+
+### don't rename the table
 
 This is the simplest solution. If you're using an ORM (Object Relational Mapper), you can rename the object in your code, but leave the SQL table name as is.
 
-### Rename with minor locking via database views
+### rename with minor locking via database views
 
 We have a table with the name `user_stars` that we want to rename to `user_favorites`. Database [views](https://www.postgresql.org/docs/devel/sql-createview.html) allow us to rename a table with temporary locking during the rename.
 
@@ -34,6 +38,6 @@ COMMIT;
 
 This transaction will acquire an `ACCESS EXCLUSIVE` lock on the `user_stars` table, blocking all reads and writes to the table while the table is renamed. This should effectively be instantaneous.
 
-### Use a shadow table for zero locking
+### use a shadow table for zero locking
 
 A complicated solution that eliminates the need for locking is to create a new table with triggers to keep both tables in sync. Backfill the new table from the old table and then transition reads/writes to the new table. Once all reads/writes are transitioned, delete the old table. See ["Hot Swapping Production Tables for Safe Database Backfills"](https://doordash.engineering/2020/10/21/hot-swapping-production-data-tables/) for more information.

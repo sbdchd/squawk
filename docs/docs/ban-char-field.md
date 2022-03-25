@@ -3,6 +3,8 @@ id: ban-char-field
 title: ban-char-field
 ---
 
+## problem
+
 Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.
 
 From the postgres docs:
@@ -18,6 +20,10 @@ From the postgres docs:
 <https://www.postgresql.org/docs/10/datatype-character.html>
 
 See the [`prefer-text-field`](./prefer-text-field.md) rule for info on the advantages of `text` over `varchar`.
+
+## solution
+
+Use `text` or `varchar` instad of `character`.
 
 Instead of:
 

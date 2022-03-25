@@ -3,7 +3,12 @@ id: disallowed-unique-constraint
 title: disallowed-unique-constraint
 ---
 
+## problem
+
 Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads.
+
+
+## solution
 
 Instead create an index `CONCURRENTLY` and create the `CONSTRAINT` `USING` the index.
 

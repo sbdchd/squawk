@@ -3,23 +3,31 @@ id: adding-serial-primary-key-field
 title: adding-serial-primary-key-field
 ---
 
-Outlined in [Citus' 2018 post on tips for Postgres
-locking](https://www.citusdata.com/blog/2018/02/22/seven-tips-for-dealing-with-postgres-locks/)
-as well as [the Postgres docs](https://www.postgresql.org/docs/current/sql-altertable.html), adding a primary key constraint is a blocking
-operation.
+## problem
 
-Instead of creating the constraint directly, consider creating the
+Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.
+
+## solution
+
+Instead of creating the constraint directly, create the
 `CONSTRAINT` `USING` an index.
 
-From the Postgres docs:
+The index will be created in the background and an `ACCESS EXCLUSIVE` lock will only be acquired momentarily to update the table metadata. See ["require-concurrent"](./require-concurrent.md) for more examples.
 
-> To recreate a primary key constraint, without blocking updates while the
-> index is rebuilt:
+Instead of:
 
 ```sql
-CREATE UNIQUE INDEX CONCURRENTLY dist_id_temp_idx ON distributors (dist_id);
-ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
-    ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
+ALTER TABLE items ADD PRIMARY KEY (id);
 ```
 
-<https://www.postgresql.org/docs/current/sql-altertable.html>
+Use:
+
+```sql
+CREATE UNIQUE INDEX CONCURRENTLY items_pk_idx ON items (id);
+ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
+```
+
+## further reading
+
+[Citus' 2018 post on tips for Postgres
+locking](https://www.citusdata.com/blog/2018/02/22/seven-tips-for-dealing-with-postgres-locks/) and [the Postgres "ALTER TABLE" docs](https://www.postgresql.org/docs/current/sql-altertable.html). 

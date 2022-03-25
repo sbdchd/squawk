@@ -14,7 +14,7 @@ Here's a screenshot of an example comment created by `squawk` using the `example
 
 This document provides instructions for setting up a Squawk GitHub App.
 
-### Create a GitHub App
+## create a GitHub App
 
 Squawk needs a corresponding GitHub App so it can talk to GitHub.
 
