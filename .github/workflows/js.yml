@@ -1,21 +1,23 @@
 name: Javascript
 
-on:
-  push:
-    paths-ignore:
-      - "cli/**"
-      - "github/**"
-      - "linter/**"
-      - "parser/**"
-  pull_request:
-    paths-ignore:
-      - "cli/**"
-      - "github/**"
-      - "linter/**"
-      - "parser/**"
+on: [push, pull_request]
 
 jobs:
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+      paths_result: ${{ steps.skip_check.outputs.paths_result }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@c449d86cf33a2a6c7a4193264cc2578e2c3266d4
+        with:
+          paths_ignore: '["cli/**", "github/**", "linter/**","parser/**"]'
+
   typescript:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -29,6 +31,9 @@ jobs:
         run: ./s/tsc
 
   eslint:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -42,6 +47,9 @@ jobs:
         run: ./s/eslint
 
   prettier:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
