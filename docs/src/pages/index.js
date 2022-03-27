@@ -163,41 +163,48 @@ function Home() {
                   <Feature key={idx} {...props} />
                 ))}
               </div>
-                <div className="row"/>
-             <div className="row">
+              <div className="row" />
+              <div className="row">
                 <div className="col">
-                <a href="/docs/rules">
-                 <h3 style={{color: 'var(--ifm-font-color-base)'}}>Rules</h3>
-                </a>
-
-         {/*        <p>
-                 Make your migrations safe with Squawk's rules.
-
-</p>*/}
-              {[
-                {title:"Prevent schema mistakes", tags: ["schema"]},
-                {title:"Make backwards compatible schema changes", tags: ["backwards compatibility"]},
-                {title:"Apply schema changes safely", tags: ["locking"]},
-                ].map(sec => 
-                   <> <h4>{sec.title}</h4>
-                  <table>
-                    <tr>
-                      <th>rule name</th>
-                      <th>description</th>
-                    </tr>
-                    {rules.filter(rule => sec.tags.some(tag => rule.tags.includes(tag)) ).map((rule) => (
-                      <tr key={rule.name}>
-                        <td style={{ wordBreak: "keep-all" }}>
-                          <a href={"/docs/" + rule.name}>{rule.name}</a>
-                        </td>
-                        <td>{rule.description}</td>
-                      </tr>
-                    ))}
-                  </table></>
-              )}
-                  </div>
+                  <a href="/docs/rules">
+                    <h3 style={{ color: "var(--ifm-font-color-base)" }}>
+                      Rules
+                    </h3>
+                  </a>
+                  {[
+                    { title: "Prevent schema mistakes", tags: ["schema"] },
+                    {
+                      title: "Make backwards compatible schema changes",
+                      tags: ["backwards compatibility"],
+                    },
+                    { title: "Apply schema changes safely", tags: ["locking"] },
+                  ].map((sec) => (
+                    <>
+                      {" "}
+                      <h4>{sec.title}</h4>
+                      <table>
+                        <tr>
+                          <th>rule name</th>
+                          <th>description</th>
+                        </tr>
+                        {rules
+                          .filter((rule) =>
+                            sec.tags.some((tag) => rule.tags.includes(tag))
+                          )
+                          .map((rule) => (
+                            <tr key={rule.name}>
+                              <td style={{ wordBreak: "keep-all" }}>
+                                <a href={"/docs/" + rule.name}>{rule.name}</a>
+                              </td>
+                              <td>{rule.description}</td>
+                            </tr>
+                          ))}
+                      </table>
+                    </>
+                  ))}
+                </div>
               </div>
-              </div>
+            </div>
           </section>
         )}
       </main>
