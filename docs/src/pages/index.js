@@ -180,9 +180,8 @@ function Home() {
                     { title: "Apply schema changes safely", tags: ["locking"] },
                   ].map((sec) => (
                     <>
-                      {" "}
-                      <h4>{sec.title}</h4>
-                      <table>
+                      <h4 style={{marginBottom: '0.5rem'}}>{sec.title}</h4>
+                      <table style={{marginBottom: '2rem'}}>
                         <tr>
                           <th>rule name</th>
                           <th>description</th>
