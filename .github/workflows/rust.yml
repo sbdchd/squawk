@@ -11,7 +11,21 @@ on:
       - "*.md"
 
 jobs:
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+      paths_result: ${{ steps.skip_check.outputs.paths_result }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@c449d86cf33a2a6c7a4193264cc2578e2c3266d4
+        with:
+          paths_ignore: '["docs/**", "*.md"]'
+
   build-linux:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+    
     runs-on: ubuntu-latest
 
     steps:
@@ -41,6 +55,9 @@ jobs:
   # https://github.com/lfittl/libpg_query/issues/44
 
   build-mac:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+    
     runs-on: macos-latest
 
     steps:
@@ -68,6 +85,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   lint:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+    
     runs-on: ubuntu-latest
 
     steps:
@@ -94,6 +114,9 @@ jobs:
         run: ./s/lint
 
   test:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+    
     runs-on: ubuntu-latest
 
     steps:
