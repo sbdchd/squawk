@@ -17,7 +17,8 @@ const features = [
     title: "GitHub Integration",
     description: (
       <>
-        Use the <Link to={"/docs/github_app"}>Squawk GitHub App</Link> to lint your pull requests.
+        Use the <Link to={"/docs/github_app"}>Squawk GitHub App</Link> to lint
+        your pull requests.
       </>
     ),
   },
@@ -46,6 +47,91 @@ function Feature({ imageUrl, title, description }) {
     </div>
   )
 }
+
+const rules = [
+  {
+    name: "adding-field-with-default",
+    tags: ["locking"],
+    description:
+      "Prevent blocking reads/writes to table while table is rewritten on PG < 11.",
+  },
+  {
+    name: "adding-foreign-key-constraint",
+    tags: ["locking"],
+    description:
+      "Prevent blocking writes to tables while verifying foreign key constraint.",
+  },
+  {
+    name: "adding-not-nullable-field",
+    tags: ["locking"],
+    description:
+      "Prevent blocking reads/writes to table while table is scanned on PG < 11.",
+  },
+  {
+    name: "adding-serial-primary-key-field",
+    tags: ["locking"],
+    description: "Prevent blocking reads/writes to table while index is built.",
+  },
+  {
+    name: "ban-char-field",
+    tags: ["schema"],
+    description: "Prevent mistaken use of character type in schema.",
+  },
+  {
+    name: "ban-drop-database",
+    tags: ["backwards compatibility"],
+    description:
+      "Prevent breaking existing clients that depend on the database.",
+  },
+  {
+    name: "changing-column-type",
+    tags: ["backwards compatibility", "locking"],
+    description:
+      "Prevent breaking existing clients that depend on column type. Prevent blocking reads/writes to table while table is rewritten.",
+  },
+  {
+    name: "constraint-missing-not-valid",
+    tags: ["locking"],
+    description: "Prevent blocking writes to the table while the scan occurs.",
+  },
+  {
+    name: "disallowed-unique-constraint",
+    tags: ["locking"],
+    description: "Prevent blocking reads/writes to table while index is built.",
+  },
+  {
+    name: "prefer-robust-stmts",
+    tags: ["migrations safety"],
+    description: "Ensure migrations are atomic or retriable.",
+  },
+  {
+    name: "prefer-text-field",
+    tags: ["locking"],
+    description:
+      "Prevent blocking reads and writes to table while table metadata is updated.",
+  },
+  {
+    name: "renaming-column",
+    tags: ["backwards compatibility"],
+    description: "Prevent breaking existing clients that depend on column.",
+  },
+  {
+    name: "renaming-table",
+    tags: ["backwards compatibility"],
+    description: "Prevent breaking existing clients that depend on table.",
+  },
+  {
+    name: "require-concurrent-index-creation",
+    tags: ["locking"],
+    description: "Prevent blocking writes to table while index is created.",
+  },
+  {
+    name: "require-concurrent-index-deletion",
+    tags: ["locking"],
+    description:
+      "Prevent blocking reads/writes to table while index is dropped.",
+  },
+]
 
 function Home() {
   const context = useDocusaurusContext()
@@ -88,182 +174,17 @@ function Home() {
                       <th>kind</th>
                       <th>description</th>
                     </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/adding-field-with-default">
-                          adding-field-with-default
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        {
-                          "Prevent blocking reads/writes to table while table is rewritten on PG < 11."
-                        }
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/adding-foreign-key-constraint">
-                          adding-foreign-key-constraint
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        Prevent blocking writes to tables while verifying
-                        foreign key constraint.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/adding-not-nullable-field">
-                          adding-not-nullable-field
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        {
-                          "Prevent blocking reads/writes to table while table is scanned on PG < 11."
-                        }
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/adding-serial-primary-key-field">
-                          adding-serial-primary-key-field
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        Prevent blocking reads/writes to table while index is
-                        built.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/ban-char-field ">ban-char-field</a>
-                      </td>
-                      <td>schema</td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        Prevent mistaken use of character type in schema.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/ban-drop-database">ban-drop-database</a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        backwards compatability
-                      </td>
-                      <td>
-                        Prevent breaking existing clients that depend on the
-                        database.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/changing-column-type">
-                          changing-column-type
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        backwards compatability, locking
-                      </td>
-                      <td>
-                        Prevent breaking existing clients that depend on column
-                        type. Prevent blocking reads/writes to table while table
-                        is rewritten.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/constraint-missing-not-valid">
-                          constraint-missing-not-valid
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        Prevent blocking writes to the table while the scan
-                        occurs.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/disallowed-unique-constraint">
-                          disallowed-unique-constraint
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        Prevent blocking reads/writes to table while index is
-                        built.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/prefer-robust-stmts migrations safety">
-                          prefer-robust-stmts
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        migrations safety
-                      </td>
-                      <td>Ensure migrations are atomic or retriable.</td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/prefer-text-field">prefer-text-field</a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        Prevent blocking reads and writes to table while table
-                        metadata is updated.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/renaming-column">renaming-column</a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        backwards compatability
-                      </td>
-                      <td>
-                        Prevent breaking existing clients that depend on column.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/renaming-table">renaming-table</a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>
-                        backwards compatability
-                      </td>
-                      <td>
-                        Prevent breaking existing clients that depend on table.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/require-concurrent-index-creation">
-                          require-concurrent-index-creation
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        Prevent blocking writes to table while index is created.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td style={{ wordBreak: "keep-all" }}>
-                        <a href="/docs/require-concurrent-index-deletion">
-                          require-concurrent-index-deletion
-                        </a>
-                      </td>
-                      <td style={{ whiteSpace: "nowrap" }}>locking</td>
-                      <td>
-                        Prevent blocking reads/writes to table while index is
-                        dropped.
-                      </td>
-                    </tr>
+                    {rules.map((rule) => (
+                      <tr key={rule.name}>
+                        <td style={{ wordBreak: "keep-all" }}>
+                          <a href={"/docs/" + rule.name}>{rule.name}</a>
+                        </td>
+                        <td style={{ whiteSpace: "nowrap" }}>
+                          {rule.tags.join(", ")}
+                        </td>
+                        <td>{rule.description}</td>
+                      </tr>
+                    ))}
                   </table>
                 </div>
               </div>
@@ -276,3 +197,4 @@ function Home() {
 }
 
 export default Home
+
