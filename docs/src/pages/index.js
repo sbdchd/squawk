@@ -158,7 +158,7 @@ function Home() {
         {features && features.length > 0 && (
           <section className={styles.features}>
             <div className="container">
-              <div className="row">
+              <div className="row" style={{paddingBottom: '2rem'}}>
                 {features.map((props, idx) => (
                   <Feature key={idx} {...props} />
                 ))}
