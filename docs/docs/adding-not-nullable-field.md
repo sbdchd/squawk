@@ -5,7 +5,6 @@ title: adding-not-nullable-field
 
 Use a check constraint instead of setting a column as `NOT NULL`.
 
-:::note Postgres Version
 
 In Postgres versions 11 of later, adding a non-null column with a default will complete without a table scan.
 :::
