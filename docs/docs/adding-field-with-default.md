@@ -3,21 +3,25 @@ id: adding-field-with-default
 title: adding-field-with-default
 ---
 
-:::note Postgres Version
-
-This lint only applies to Postgres versions less than 11.
-:::
-
 ## problem
 
-On Postgres versions less than 11, adding a field with a `DEFAULT` requires a
-table rewrite with an `ACCESS EXCLUSIVE` lock.
+Adding a field with a default can cause table rewrites, which will take an [`ACCESS EXCLUSIVE`](https://www.postgresql.org/docs/10/sql-altertable.html#SQL-ALTERTABLE-NOTES) lock on the table, blocking reads / writes while the statement is running.
 
-<https://www.postgresql.org/docs/10/sql-altertable.html#SQL-ALTERTABLE-NOTES>
+In Postgres version 11 and later, adding a field with a non-`VOLATILE` `DEFAULT`will not require a table rewrite. Adding a field with a [`VOLATILE` `DEFAULT` will cause a table rewrite](https://www.postgresql.org/docs/14/sql-altertable.html#SQL-ALTERTABLE-NOTES).
 
-An `ACCESS EXCLUSIVE` lock blocks reads / writes while the statement is running.
+## solutions
 
-## solution
+### adding a non-volatile default in Postgres 11+
+
+:::note
+This statement is only safe when your default is non-volatile.
+:::
+
+```sql
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
+```
+
+### adding a volatile default
 
 Add the field as nullable, then set a default, backfill, and remove nullabilty.
 
