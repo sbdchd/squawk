@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.10.0 - 2022-04-25
+
+## Changed
+
+- differentiate between `VOLATILE` and non-`VOLATILE` defaults in `adding-field-with-default` documentation (#201)
+
 ## v0.9.0 - 2022-02-26
 
 ## Added
