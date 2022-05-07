@@ -1,0 +1,9 @@
+- id: squawk
+  name: squawk
+  description: 'Linter for Postgres migrations'
+  entry: squawk
+  language: node
+  types: 
+    - text
+  additional_dependencies: 
+    - squawk-cli
