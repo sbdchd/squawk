@@ -3,14 +3,6 @@ id: adding-foreign-key-constraint
 title: adding-foreign-key-constraint
 ---
 
-A foreign key constraint should be added with `NOT VALID`.
-
-Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes.
-
-Adding the constraint as `NOT VALID` in one transaction and then using
-`VALIDATE` in another transaction will allow writes when adding the
-constraint.
-
 ## problem
 
 Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.

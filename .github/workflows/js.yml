@@ -1,0 +1,63 @@
+name: Javascript
+
+on: [push, pull_request]
+
+jobs:
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+      paths_result: ${{ steps.skip_check.outputs.paths_result }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@c449d86cf33a2a6c7a4193264cc2578e2c3266d4
+        with:
+          paths_ignore: '["cli/**", "github/**", "linter/**","parser/**"]'
+
+  typescript:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: Install dependencies
+        run: ./s/ci-install
+      - name: Typescript
+        run: ./s/tsc
+
+  eslint:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: Install dependencies
+        run: ./s/ci-install
+      - name: Lint JS
+        run: ./s/eslint
+
+  prettier:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: "12.x"
+      - name: Install dependencies
+        run: ./s/ci-install
+      - name: Check Formatting
+        run: ./s/prettier

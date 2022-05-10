@@ -5,7 +5,7 @@ title: prefer-text-field
 
 ## problem
 
-Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock.
+Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
 
 ## solution
 
