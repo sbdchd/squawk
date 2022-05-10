@@ -69,14 +69,14 @@ pub enum Command {
         github_private_key_base64: Option<String>,
         /// GitHub App Id.
         #[structopt(long, env = "SQUAWK_GITHUB_APP_ID")]
-        github_app_id: i64,
+        github_app_id: Option<i64>,
         /// GitHub Install Id. The installation that squawk is acting on.
         #[structopt(long, env = "SQUAWK_GITHUB_INSTALL_ID")]
-        github_install_id: i64,
+        github_install_id: Option<i64>,
         /// GitHub Repo Owner
         /// github.com/sbdchd/squawk, sbdchd is the owner
         #[structopt(long, env = "SQUAWK_GITHUB_REPO_OWNER")]
-        github_repo_owner: String,
+        github_repo_owner: Option<String>,
         /// GitHub Repo Name
         /// github.com/sbdchd/squawk, squawk is the name
         #[structopt(long, env = "SQUAWK_GITHUB_REPO_NAME")]
@@ -139,13 +139,20 @@ pub fn check_and_comment_on_pr(
 
     let gh_private_key = get_github_private_key(github_private_key, github_private_key_base64)?;
 
-    let gh = GitHubApp::new(&gh_private_key, github_app_id, github_install_id)?;
+    if let Some(github_install_id) = github_install_id {
+        if let Some(github_app_id) = github_app_id {
+            if let Some(github_repo_owner) = github_repo_owner {
+                let gh = GitHubApp::new(&gh_private_key, github_app_id, github_install_id)?;
 
-    Ok(comment_on_pr(
-        &gh,
-        &github_repo_owner,
-        &github_repo_name,
-        github_pr_number,
-        &comment_body,
-    )?)
+                return Ok(comment_on_pr(
+                    &gh,
+                    &github_repo_owner,
+                    &github_repo_name,
+                    github_pr_number,
+                    &comment_body,
+                )?);
+            }
+        }
+    }
+    Ok(())
 }
