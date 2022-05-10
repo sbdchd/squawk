@@ -1,7 +1,6 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
 use log::info;
-use serde_json::Value;
-use squawk_github::{comment_on_pr, GithubError, PullRequest};
+use squawk_github::{comment_on_pr, GitHubApp, GithubError};
 use structopt::StructOpt;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -112,7 +111,7 @@ pub fn check_and_comment_on_pr(
     is_stdin: bool,
     stdin_path: Option<String>,
     root_cmd_exclude: &[String],
-) -> Result<Value, SquawkError> {
+) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,
         exclude,
@@ -133,23 +132,20 @@ pub fn check_and_comment_on_pr(
     )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");
-        return Ok(Value::Null);
+        return Ok(());
     }
     info!("generating github comment body");
     let comment_body = get_comment_body(file_results, VERSION);
-    let pr = PullRequest {
-        issue: github_pr_number,
-        owner: github_repo_owner,
-        repo: github_repo_name,
-    };
 
     let gh_private_key = get_github_private_key(github_private_key, github_private_key_base64)?;
 
+    let gh = GitHubApp::new(&gh_private_key, github_app_id, github_install_id)?;
+
     Ok(comment_on_pr(
-        &gh_private_key,
-        github_app_id,
-        github_install_id,
-        pr,
-        comment_body,
+        &gh,
+        &github_repo_owner,
+        &github_repo_name,
+        github_pr_number,
+        &comment_body,
     )?)
 }

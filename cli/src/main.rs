@@ -64,6 +64,7 @@ fn main() {
             simplelog::LevelFilter::Info,
             simplelog::Config::default(),
             simplelog::TerminalMode::Mixed,
+            simplelog::ColorChoice::Auto,
         )])
         .expect("problem creating logger");
     }
