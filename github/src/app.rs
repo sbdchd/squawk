@@ -46,7 +46,7 @@ fn create_access_token(jwt: &str, install_id: i64) -> Result<GithubAccessToken, 
 }
 
 /// https://developer.github.com/v3/issues/comments/#create-an-issue-comment
-fn create_comment(comment: CommentArgs, secret: &str) -> Result<(), GithubError> {
+pub(crate) fn create_comment(comment: CommentArgs, secret: &str) -> Result<(), GithubError> {
     let comment_body = CommentBody { body: comment.body };
     reqwest::Client::new()
         .post(&format!(
@@ -143,7 +143,7 @@ pub struct PullRequest {
 }
 
 /// https://developer.github.com/v3/issues/comments/#list-issue-comments
-fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubError> {
+pub(crate) fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubError> {
     // TODO(sbdchd): use the next links to get _all_ the comments
     // see: https://developer.github.com/v3/guides/traversing-with-pagination/
     Ok(reqwest::Client::new()
@@ -161,7 +161,7 @@ fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubE
 }
 
 /// https://developer.github.com/v3/issues/comments/#update-an-issue-comment
-fn update_comment(
+pub(crate) fn update_comment(
     owner: &str,
     repo: &str,
     comment_id: i64,

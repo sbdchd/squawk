@@ -1,6 +1,6 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
 use log::info;
-use squawk_github::{comment_on_pr, GitHubApp, GithubError};
+use squawk_github::{comment_on_pr, GitHubActions, GitHubApp, GithubError};
 use structopt::StructOpt;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -67,6 +67,8 @@ pub enum Command {
         github_private_key: Option<String>,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
         github_private_key_base64: Option<String>,
+        #[structopt(long, env = "SQUAWK_GITHUB_TOKEN")]
+        github_token: Option<String>,
         /// GitHub App Id.
         #[structopt(long, env = "SQUAWK_GITHUB_APP_ID")]
         github_app_id: Option<i64>,
@@ -76,7 +78,7 @@ pub enum Command {
         /// GitHub Repo Owner
         /// github.com/sbdchd/squawk, sbdchd is the owner
         #[structopt(long, env = "SQUAWK_GITHUB_REPO_OWNER")]
-        github_repo_owner: Option<String>,
+        github_repo_owner: String,
         /// GitHub Repo Name
         /// github.com/sbdchd/squawk, squawk is the name
         #[structopt(long, env = "SQUAWK_GITHUB_REPO_NAME")]
@@ -116,6 +118,7 @@ pub fn check_and_comment_on_pr(
         paths,
         exclude,
         github_private_key,
+        github_token,
         github_app_id,
         github_install_id,
         github_repo_owner,
@@ -137,22 +140,32 @@ pub fn check_and_comment_on_pr(
     info!("generating github comment body");
     let comment_body = get_comment_body(file_results, VERSION);
 
-    let gh_private_key = get_github_private_key(github_private_key, github_private_key_base64)?;
-
     if let Some(github_install_id) = github_install_id {
         if let Some(github_app_id) = github_app_id {
-            if let Some(github_repo_owner) = github_repo_owner {
-                let gh = GitHubApp::new(&gh_private_key, github_app_id, github_install_id)?;
+            info!("using github app client");
+            let gh_private_key =
+                get_github_private_key(github_private_key, github_private_key_base64)?;
+            let gh = GitHubApp::new(&gh_private_key, github_app_id, github_install_id)?;
 
-                return Ok(comment_on_pr(
-                    &gh,
-                    &github_repo_owner,
-                    &github_repo_name,
-                    github_pr_number,
-                    &comment_body,
-                )?);
-            }
+            return Ok(comment_on_pr(
+                &gh,
+                &github_repo_owner,
+                &github_repo_name,
+                github_pr_number,
+                &comment_body,
+            )?);
         }
+    }
+    if let Some(github_token) = github_token {
+        info!("using github actions client");
+        let gh = GitHubActions::new(&github_token);
+        comment_on_pr(
+            &gh,
+            &github_repo_owner,
+            &github_repo_name,
+            github_pr_number,
+            &comment_body,
+        )?;
     }
     Ok(())
 }

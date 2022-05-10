@@ -1,6 +1,16 @@
+use crate::app;
 use crate::{Comment, GitHubApi, GithubError};
 
-struct GitHubActions {}
+pub struct GitHubActions {
+    github_token: String,
+}
+impl GitHubActions {
+    pub fn new(github_token: &str) -> Self {
+        GitHubActions {
+            github_token: github_token.to_string(),
+        }
+    }
+}
 impl GitHubApi for GitHubActions {
     fn app_slug(&self) -> String {
         "github-actions[bot]".to_string()
@@ -12,7 +22,15 @@ impl GitHubApi for GitHubActions {
         issue_id: i64,
         body: &str,
     ) -> Result<(), GithubError> {
-        unimplemented!()
+        app::create_comment(
+            app::CommentArgs {
+                owner: owner.to_string(),
+                repo: repo.to_string(),
+                issue: issue_id,
+                body: body.to_string(),
+            },
+            &self.github_token,
+        )
     }
     fn list_issue_comments(
         &self,
@@ -20,7 +38,14 @@ impl GitHubApi for GitHubActions {
         repo: &str,
         issue_id: i64,
     ) -> Result<Vec<Comment>, GithubError> {
-        unimplemented!()
+        app::list_comments(
+            &app::PullRequest {
+                issue: issue_id,
+                owner: owner.to_string(),
+                repo: repo.to_string(),
+            },
+            &self.github_token,
+        )
     }
     fn update_issue_comment(
         &self,
@@ -29,6 +54,12 @@ impl GitHubApi for GitHubActions {
         comment_id: i64,
         body: &str,
     ) -> Result<(), GithubError> {
-        unimplemented!()
+        app::update_comment(
+            owner,
+            repo,
+            comment_id,
+            body.to_string(),
+            &self.github_token,
+        )
     }
 }
