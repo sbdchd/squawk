@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.11.2 - 2022-05-11
+
+## Fixed
+
+- silence stdin if it's empty (#210)
+
 ## v0.11.1 - 2022-05-11
 
 ## Fixed
