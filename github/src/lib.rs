@@ -61,7 +61,7 @@ pub fn comment_on_pr(
 ) -> Result<(), GithubError> {
     let comments = gh.list_issue_comments(owner, repo, issue)?;
 
-    let bot_name = format!("{}[bot]", gh.app_slug());
+    let bot_name = gh.app_slug();
 
     info!("checking for existing comment");
     match comments

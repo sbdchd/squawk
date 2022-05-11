@@ -196,7 +196,7 @@ impl GitHub {
         let access_token = create_access_token(&jwt, installation_id)?;
 
         Ok(GitHub {
-            slug_name: app_info.slug,
+            slug_name: format!("{}[bot]", app_info.slug),
             installation_access_token: access_token.token,
         })
     }
