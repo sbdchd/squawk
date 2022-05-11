@@ -7,11 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.11.1 - 2022-05-11
+
+## Fixed
+
+- duplicate messages being written when using GitHub Actions token authentication. (#209)
+
 ## v0.11.0 - 2022-05-11
 
 ## Added
 
-- Support GitHub API authentication via GitHub Actions tokens.
+- Support GitHub API authentication via GitHub Actions tokens. (#207)
 
 ## v0.10.0 - 2022-04-25
 
