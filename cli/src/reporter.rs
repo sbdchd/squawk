@@ -147,10 +147,10 @@ pub fn check_files(
         let sql = get_sql_from_stdin()?;
         // ignore stdin if it's empty.
         if sql.trim().is_empty() {
+            info!("ignoring empty stdin");
+        } else {
             let path = stdin_path.unwrap_or_else(|| "stdin".into());
             process_violations(&sql, &path)?;
-        } else {
-            info!("ignoring empty stdin");
         }
     }
 
