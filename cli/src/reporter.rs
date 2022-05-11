@@ -146,11 +146,11 @@ pub fn check_files(
         info!("reading content from stdin");
         let sql = get_sql_from_stdin()?;
         // ignore stdin if it's empty.
-        if sql.trim() != "" {
+        if sql.trim().is_empty() {
             let path = stdin_path.unwrap_or_else(|| "stdin".into());
             process_violations(&sql, &path)?;
         } else {
-            info!("ignoring empty stdin")
+            info!("ignoring empty stdin");
         }
     }
 
