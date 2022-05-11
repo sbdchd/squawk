@@ -1,6 +1,6 @@
 {
   "name": "squawk-cli",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "linter for PostgreSQL, focused on migrations",
   "repository": "git@github.com:sbdchd/squawk.git",
   "author": "Steve Dignam <steve@dignam.xyz>",
