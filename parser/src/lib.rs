@@ -1,5 +1,4 @@
 #[allow(clippy::module_name_repetitions)]
-#[allow(clippy::pub_enum_variant_names)]
 #[allow(clippy::struct_excessive_bools)]
 pub mod ast;
 #[allow(clippy::module_name_repetitions)]

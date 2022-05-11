@@ -14,7 +14,7 @@ pub fn tables_created_in_transaction(tree: &[RawStmt]) -> HashSet<String> {
             Stmt::CreateStmt(stmt) if inside_transaction => {
                 let stmt = &stmt.relation;
                 let table_name = &stmt.relname;
-                created_table_names.insert(table_name.to_owned());
+                created_table_names.insert(table_name.clone());
             }
             _ => continue,
         }

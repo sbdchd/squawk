@@ -1,6 +1,6 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
 use log::info;
-use squawk_github::{comment_on_pr, GitHubActions, GitHubApp, GithubError};
+use squawk_github::{actions, app, comment_on_pr, GithubError};
 use structopt::StructOpt;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -18,22 +18,17 @@ impl std::fmt::Display for SquawkError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             Self::CheckFilesError(ref err) => {
-                write!(f, "{}", format!("Failed to dump AST: {}", err))
+                write!(f, "Failed to dump AST: {}", err)
             }
             Self::GithubError(ref err) => err.fmt(f),
             Self::GithubPrivateKeyBase64DecodeError(ref err) => write!(
                 f,
-                "{}",
-                format!(
-                    "Failed to decode GitHub private key from base64 encoding: {}",
-                    err
-                )
+                "Failed to decode GitHub private key from base64 encoding: {}",
+                err
             ),
-            Self::GithubPrivateKeyDecodeError(ref err) => write!(
-                f,
-                "{}",
-                format!("Could not decode GitHub private key to string: {}", err)
-            ),
+            Self::GithubPrivateKeyDecodeError(ref err) => {
+                write!(f, "Could not decode GitHub private key to string: {}", err)
+            }
             Self::GithubPrivateKeyMissing => write!(f, "Missing GitHub private key"),
         }
     }
@@ -131,7 +126,7 @@ pub fn check_and_comment_on_pr(
         &paths,
         is_stdin,
         stdin_path,
-        &concat(&exclude.unwrap_or_else(Vec::new), &root_cmd_exclude),
+        &concat(&exclude.unwrap_or_default(), root_cmd_exclude),
     )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");
@@ -145,7 +140,7 @@ pub fn check_and_comment_on_pr(
             info!("using github app client");
             let gh_private_key =
                 get_github_private_key(github_private_key, github_private_key_base64)?;
-            let gh = GitHubApp::new(&gh_private_key, github_app_id, github_install_id)?;
+            let gh = app::GitHub::new(&gh_private_key, github_app_id, github_install_id)?;
 
             return Ok(comment_on_pr(
                 &gh,
@@ -158,7 +153,7 @@ pub fn check_and_comment_on_pr(
     }
     if let Some(github_token) = github_token {
         info!("using github actions client");
-        let gh = GitHubActions::new(&github_token);
+        let gh = actions::GitHub::new(&github_token);
         comment_on_pr(
             &gh,
             &github_repo_owner,

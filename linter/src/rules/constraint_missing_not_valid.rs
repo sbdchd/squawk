@@ -17,12 +17,10 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => {
-                if stmt.kind == TransactionStmtKind::Begin {
-                    if !in_transaction {
-                        in_transaction = true;
-                        in_bad_index = false;
-                        begin_span_start = raw_stmt.stmt_location;
-                    }
+                if stmt.kind == TransactionStmtKind::Begin && !in_transaction {
+                    in_transaction = true;
+                    in_bad_index = false;
+                    begin_span_start = raw_stmt.stmt_location;
                 }
                 if stmt.kind == TransactionStmtKind::Commit {
                     if in_bad_index && in_transaction {
@@ -31,7 +29,7 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
                             len: Some(
                                 raw_stmt.stmt_location + raw_stmt.stmt_len.unwrap_or_default(),
                             ),
-                        })
+                        });
                     }
                     in_transaction = false;
                 }
@@ -67,17 +65,15 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
 pub fn constraint_missing_not_valid(tree: &[RawStmt]) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let tables_created = tables_created_in_transaction(tree);
-    not_valid_validate_in_transaction(tree)
-        .into_iter()
-        .for_each(|span| {
-            errs.push(RuleViolation::new(
+    for span in not_valid_validate_in_transaction(tree) {
+        errs.push(RuleViolation::new(
                 RuleViolationKind::ConstraintMissingNotValid,
                 span,
                 Some(vec![
                     ViolationMessage::Note("Using NOT VALID and VALIDATE CONSTRAINT in the same transaction will block all reads while the constraint is validated.".into()), ViolationMessage::Help("Add constraint as NOT VALID in one transaction and VALIDATE CONSTRAINT in a separate transaction.".into())
                 ]),
             ));
-        });
+    }
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {

@@ -3,8 +3,6 @@
 #![allow(clippy::single_match_else)]
 pub mod actions;
 pub mod app;
-pub use actions::GitHubActions;
-pub use app::GitHubApp;
 use log::info;
 use serde::{Deserialize, Serialize};
 

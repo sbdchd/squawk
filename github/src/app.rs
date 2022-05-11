@@ -63,29 +63,29 @@ pub(crate) fn create_comment(comment: CommentArgs, secret: &str) -> Result<(), G
 }
 
 #[derive(Debug, Deserialize)]
-pub struct AppInfo {
+pub struct GitHubAppInfo {
     pub id: i64,
     pub slug: String,
 }
 
 /// Get the bot name for finding existing comments on a PR
-pub fn get_app_info(jwt: &str) -> Result<AppInfo, GithubError> {
+pub fn get_app_info(jwt: &str) -> Result<GitHubAppInfo, GithubError> {
     Ok(reqwest::Client::new()
         .get("https://api.github.com/app")
         .header(AUTHORIZATION, format!("Bearer {}", jwt))
         .send()?
         .error_for_status()?
-        .json::<AppInfo>()?)
+        .json::<GitHubAppInfo>()?)
 }
 
 impl std::fmt::Display for GithubError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             Self::JsonWebTokenCreation(ref err) => {
-                write!(f, "{}", format!("Could not create JWT: {}", err))
+                write!(f, "Could not create JWT: {}", err)
             }
             Self::HttpError(ref err) => {
-                write!(f, "{}", format!("Problem calling GitHub API: {}", err))
+                write!(f, "Problem calling GitHub API: {}", err)
             }
         }
     }
@@ -182,12 +182,12 @@ pub(crate) fn update_comment(
     Ok(())
 }
 
-pub struct GitHubApp {
+pub struct GitHub {
     slug_name: String,
     installation_access_token: String,
 }
 
-impl GitHubApp {
+impl GitHub {
     pub fn new(private_key: &str, app_id: i64, installation_id: i64) -> Result<Self, GithubError> {
         info!("generating jwt");
         let jwt = generate_jwt(private_key, app_id)?;
@@ -195,14 +195,14 @@ impl GitHubApp {
         let app_info = get_app_info(&jwt)?;
         let access_token = create_access_token(&jwt, installation_id)?;
 
-        Ok(GitHubApp {
+        Ok(GitHub {
             slug_name: app_info.slug,
             installation_access_token: access_token.token,
         })
     }
 }
 
-impl GitHubApi for GitHubApp {
+impl GitHubApi for GitHub {
     fn app_slug(&self) -> String {
         self.slug_name.clone()
     }

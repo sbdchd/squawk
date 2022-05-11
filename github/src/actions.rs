@@ -1,17 +1,18 @@
 use crate::app;
 use crate::{Comment, GitHubApi, GithubError};
 
-pub struct GitHubActions {
+pub struct GitHub {
     github_token: String,
 }
-impl GitHubActions {
+impl GitHub {
+    #[must_use]
     pub fn new(github_token: &str) -> Self {
-        GitHubActions {
+        GitHub {
             github_token: github_token.to_string(),
         }
     }
 }
-impl GitHubApi for GitHubActions {
+impl GitHubApi for GitHub {
     fn app_slug(&self) -> String {
         "github-actions[bot]".to_string()
     }
