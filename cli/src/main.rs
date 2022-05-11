@@ -64,6 +64,7 @@ fn main() {
             simplelog::LevelFilter::Info,
             simplelog::Config::default(),
             simplelog::TerminalMode::Mixed,
+            simplelog::ColorChoice::Auto,
         )])
         .expect("problem creating logger");
     }
@@ -79,7 +80,7 @@ fn main() {
                 subcommand,
                 is_stdin,
                 opts.stdin_filepath,
-                &opts.exclude.unwrap_or_else(Vec::new),
+                &opts.exclude.unwrap_or_default(),
             ),
             "Upload to GitHub failed",
         );
@@ -94,7 +95,7 @@ fn main() {
                 &opts.paths,
                 is_stdin,
                 opts.stdin_filepath,
-                &opts.exclude.unwrap_or_else(Vec::new),
+                &opts.exclude.unwrap_or_default(),
             ) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);

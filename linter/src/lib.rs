@@ -272,7 +272,7 @@ pub fn check_sql(
 
     let excluded_rules: HashSet<RuleViolationKind> = excluded_rules
         .iter()
-        .flat_map(|s| RuleViolationKind::try_from(s.as_ref()).ok())
+        .filter_map(|s| RuleViolationKind::try_from(s.as_ref()).ok())
         .collect();
 
     let mut errs = vec![];

@@ -42,7 +42,7 @@ pub fn adding_foreign_key_constraint(tree: &[RawStmt]) -> Vec<RuleViolation> {
                                             RuleViolationKind::AddingForeignKeyConstraint,
                                             raw_stmt.into(),
                                             None,
-                                        ))
+                                        ));
                                     }
                                 }
                             }

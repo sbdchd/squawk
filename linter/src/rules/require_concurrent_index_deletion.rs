@@ -11,7 +11,7 @@ pub fn require_concurrent_index_deletion(tree: &[RawStmt]) -> Vec<RuleViolation>
                     RuleViolationKind::RequireConcurrentIndexDeletion,
                     raw_stmt.into(),
                     None,
-                ))
+                ));
             }
             _ => continue,
         }

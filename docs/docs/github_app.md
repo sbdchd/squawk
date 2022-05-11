@@ -114,3 +114,15 @@ Squawk needs a corresponding GitHub App so it can talk to GitHub.
    which creates a comment like the following:
 
    <https://github.com/sbdchd/squawk/pull/14#issuecomment-647009446>
+
+## GitHub Actions authentication
+
+An alternative way to authenticate with GitHub is via a GitHub Actions token.
+
+```
+SQUAWK_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+SQUAWK_GITHUB_REPO_OWNER=$(echo $GITHUB_REPOSITORY | awk -F/ '{print $1}')
+SQUAWK_GITHUB_REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F/ '{print $2}')
+SQUAWK_GITHUB_PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+squawk upload-to-github example.sql
+```

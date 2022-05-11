@@ -135,14 +135,14 @@ COMMIT;
     fn test_parsing_insert_stmt() {
         let sql = r#"INSERT INTO table_name VALUES (1, 2, 3);"#;
         let res = parse_sql_query(sql);
-        assert_debug_snapshot!(res)
+        assert_debug_snapshot!(res);
     }
 
     #[test]
     fn test_parsing_update_stmt() {
         let sql = r#"UPDATE table_name SET foo = 'bar' WHERE buzz > 10;"#;
         let res = parse_sql_query(sql);
-        assert_debug_snapshot!(res)
+        assert_debug_snapshot!(res);
     }
 
     #[test]
@@ -164,7 +164,7 @@ CREATE INDEX "age_index" ON "core_foo" ("age");
 COMMIT;
 "#;
         let res = parse_sql_query(sql);
-        assert_debug_snapshot!(res)
+        assert_debug_snapshot!(res);
     }
 
     #[test]

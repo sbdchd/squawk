@@ -14,7 +14,7 @@ pub fn ban_drop_column(tree: &[RawStmt]) -> Vec<RuleViolation> {
                             RuleViolationKind::BanDropColumn,
                             raw_stmt.into(),
                             None,
-                        ))
+                        ));
                     }
                 }
             }

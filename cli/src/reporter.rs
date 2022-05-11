@@ -137,7 +137,7 @@ pub fn check_files(
     let mut output_violations = vec![];
 
     let mut process_violations = |sql: &str, path: &str| -> Result<(), CheckFilesError> {
-        let violations = check_sql(sql, &excluded_rules)?;
+        let violations = check_sql(sql, excluded_rules)?;
         output_violations.push(pretty_violations(violations, sql, path));
         Ok(())
     };
@@ -473,7 +473,7 @@ pub fn get_comment_body(files: Vec<ViolationContent>, version: &str) -> String {
         file_count = files.len(),
         sql_file_content = files
             .into_iter()
-            .flat_map(|x| get_sql_file_content(x).ok())
+            .filter_map(|x| get_sql_file_content(x).ok())
             .collect::<Vec<String>>()
             .join("\n"),
         version = version

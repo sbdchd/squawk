@@ -1,7 +1,6 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
 use log::info;
-use serde_json::Value;
-use squawk_github::{comment_on_pr, GithubError, PullRequest};
+use squawk_github::{actions, app, comment_on_pr, GithubError};
 use structopt::StructOpt;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -19,22 +18,17 @@ impl std::fmt::Display for SquawkError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             Self::CheckFilesError(ref err) => {
-                write!(f, "{}", format!("Failed to dump AST: {}", err))
+                write!(f, "Failed to dump AST: {}", err)
             }
             Self::GithubError(ref err) => err.fmt(f),
             Self::GithubPrivateKeyBase64DecodeError(ref err) => write!(
                 f,
-                "{}",
-                format!(
-                    "Failed to decode GitHub private key from base64 encoding: {}",
-                    err
-                )
+                "Failed to decode GitHub private key from base64 encoding: {}",
+                err
             ),
-            Self::GithubPrivateKeyDecodeError(ref err) => write!(
-                f,
-                "{}",
-                format!("Could not decode GitHub private key to string: {}", err)
-            ),
+            Self::GithubPrivateKeyDecodeError(ref err) => {
+                write!(f, "Could not decode GitHub private key to string: {}", err)
+            }
             Self::GithubPrivateKeyMissing => write!(f, "Missing GitHub private key"),
         }
     }
@@ -68,12 +62,14 @@ pub enum Command {
         github_private_key: Option<String>,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
         github_private_key_base64: Option<String>,
+        #[structopt(long, env = "SQUAWK_GITHUB_TOKEN")]
+        github_token: Option<String>,
         /// GitHub App Id.
         #[structopt(long, env = "SQUAWK_GITHUB_APP_ID")]
-        github_app_id: i64,
+        github_app_id: Option<i64>,
         /// GitHub Install Id. The installation that squawk is acting on.
         #[structopt(long, env = "SQUAWK_GITHUB_INSTALL_ID")]
-        github_install_id: i64,
+        github_install_id: Option<i64>,
         /// GitHub Repo Owner
         /// github.com/sbdchd/squawk, sbdchd is the owner
         #[structopt(long, env = "SQUAWK_GITHUB_REPO_OWNER")]
@@ -112,11 +108,12 @@ pub fn check_and_comment_on_pr(
     is_stdin: bool,
     stdin_path: Option<String>,
     root_cmd_exclude: &[String],
-) -> Result<Value, SquawkError> {
+) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,
         exclude,
         github_private_key,
+        github_token,
         github_app_id,
         github_install_id,
         github_repo_owner,
@@ -129,27 +126,41 @@ pub fn check_and_comment_on_pr(
         &paths,
         is_stdin,
         stdin_path,
-        &concat(&exclude.unwrap_or_else(Vec::new), &root_cmd_exclude),
+        &concat(&exclude.unwrap_or_default(), root_cmd_exclude),
     )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");
-        return Ok(Value::Null);
+        return Ok(());
     }
     info!("generating github comment body");
     let comment_body = get_comment_body(file_results, VERSION);
-    let pr = PullRequest {
-        issue: github_pr_number,
-        owner: github_repo_owner,
-        repo: github_repo_name,
-    };
 
-    let gh_private_key = get_github_private_key(github_private_key, github_private_key_base64)?;
+    if let Some(github_install_id) = github_install_id {
+        if let Some(github_app_id) = github_app_id {
+            info!("using github app client");
+            let gh_private_key =
+                get_github_private_key(github_private_key, github_private_key_base64)?;
+            let gh = app::GitHub::new(&gh_private_key, github_app_id, github_install_id)?;
 
-    Ok(comment_on_pr(
-        &gh_private_key,
-        github_app_id,
-        github_install_id,
-        pr,
-        comment_body,
-    )?)
+            return Ok(comment_on_pr(
+                &gh,
+                &github_repo_owner,
+                &github_repo_name,
+                github_pr_number,
+                &comment_body,
+            )?);
+        }
+    }
+    if let Some(github_token) = github_token {
+        info!("using github actions client");
+        let gh = actions::GitHub::new(&github_token);
+        comment_on_pr(
+            &gh,
+            &github_repo_owner,
+            &github_repo_name,
+            github_pr_number,
+            &comment_body,
+        )?;
+    }
+    Ok(())
 }

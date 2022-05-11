@@ -15,7 +15,7 @@ fn has_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bo
             has_default = true;
         }
     }
-    return has_null && !has_default;
+    has_null && !has_default
 }
 
 #[must_use]
@@ -33,7 +33,7 @@ pub fn adding_not_nullable_field(tree: &[RawStmt]) -> Vec<RuleViolation> {
                                 ViolationMessage::Note("Setting a column NOT NULL blocks reads while the table is scanned.".into()),
                                 ViolationMessage::Help("Use a check constraint instead.".into())
                             ]),
-                        ))
+                        ));
                     }
                     if cmd.subtype == AlterTableType::AddColumn {
                         if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
@@ -75,7 +75,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
                 ),
                 ViolationMessage::Help("Use a check constraint instead.".into())
             ]
-        )
+        );
     }
 
     #[test]
