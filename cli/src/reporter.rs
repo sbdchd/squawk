@@ -145,8 +145,13 @@ pub fn check_files(
     if is_stdin {
         info!("reading content from stdin");
         let sql = get_sql_from_stdin()?;
-        let path = stdin_path.unwrap_or_else(|| "stdin".into());
-        process_violations(&sql, &path)?;
+        // ignore stdin if it's empty.
+        if sql.trim() != "" {
+            let path = stdin_path.unwrap_or_else(|| "stdin".into());
+            process_violations(&sql, &path)?;
+        } else {
+            info!("ignoring empty stdin")
+        }
     }
 
     for path in paths {
