@@ -1622,6 +1622,7 @@ dependencies = [
  "base64 0.12.3",
  "console 0.11.3",
  "insta",
+ "lazy_static",
  "log",
  "serde",
  "serde_json",
@@ -1630,6 +1631,7 @@ dependencies = [
  "squawk-linter",
  "squawk-parser",
  "structopt",
+ "toml",
 ]
 
 [[package]]
@@ -1983,6 +1985,15 @@ dependencies = [
  "futures",
  "slab",
  "tokio-executor",
+]
+
+[[package]]
+name = "toml"
+version = "0.5.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d82e1a7758622a465f8cee077614c73484dac5b836c02ff6a40d5d1010324d7"
+dependencies = [
+ "serde",
 ]
 
 [[package]]
