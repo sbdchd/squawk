@@ -111,6 +111,26 @@ Individual rules can be disabled via the `--exclude` flag
 squawk --exclude=adding-field-with-default,disallowed-unique-constraint example.sql
 ```
 
+### Configuration file
+
+Rules can also be disabled by using a configuration file, which can be used via the `-c` or `--config` flag
+
+```shell
+squawk --config=~/.squawk.toml example.sql
+```
+The `--exclude` flag will always be prioritized over the configuration file
+
+If the config flag it's not present or the file doesn't exist, squawk will try to look for a configuration file automatically at these locations (ordered by priority):
+
+1.  `./.squawk.toml`
+2. `$GIT_REPO_ROOT/.squawk.toml`
+3. `~/.squawk.toml`
+
+**Example `.squawk.toml`**
+```toml
+excluded_rules = ["require-concurrent-index-creation", "require-concurrent-index-deletion"]
+```
+
 See the [Squawk website](https://squawkhq.com/docs/rules) for documentation on each rule with examples and reasoning.
 
 ## Bot Setup
