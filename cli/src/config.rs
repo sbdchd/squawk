@@ -35,15 +35,15 @@ impl Config {
         let static_path = STATIC_SEARCH_PATHS
             .iter()
             .find(|p| Path::new(p).exists())
-            .map(|p| p.to_string());
+            .map(String::to_string);
 
         // Config in git root takes priority after the local directory config
         match (&static_path, get_git_root_config_path()) {
             (Some(sp), Some(git_root_config_path)) => {
-                if sp != &STATIC_SEARCH_PATHS[0] {
-                    Some(git_root_config_path)
-                } else {
+                if sp == &STATIC_SEARCH_PATHS[0] {
                     static_path
+                } else {
+                    Some(git_root_config_path)
                 }
             }
             (None, Some(git_root_config_path)) => Some(git_root_config_path),
