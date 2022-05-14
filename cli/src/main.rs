@@ -60,7 +60,7 @@ struct Opt {
     #[structopt(long)]
     verbose: bool,
     /// Path to the squawk config file (.squawk.toml)
-    #[structopt(short, long, use_delimiter = true)]
+    #[structopt(short, long)]
     config: Option<String>,
 }
 
