@@ -1,7 +1,7 @@
 use lazy_static::lazy_static;
 use log::info;
 use serde::Deserialize;
-use std::{char, path::Path, process::Command};
+use std::{fs, path::Path};
 
 const FILE_NAME: &str = ".squawk.toml";
 lazy_static! {
@@ -38,29 +38,36 @@ impl Config {
             .map(String::to_string);
 
         // Config in git root takes priority after the local directory config
-        match (&static_path, get_git_root_config_path()) {
-            (Some(sp), Some(git_root_config_path)) => {
+        match (&static_path, find_by_traversing_back()) {
+            (Some(sp), Some(alt_path)) => {
                 if sp == &STATIC_SEARCH_PATHS[0] {
                     static_path
                 } else {
-                    Some(git_root_config_path)
+                    Some(alt_path)
                 }
             }
-            (None, Some(git_root_config_path)) => Some(git_root_config_path),
+            (None, Some(alt_path)) => Some(alt_path),
             _ => static_path,
         }
     }
 }
 
-fn get_git_root_config_path() -> Option<String> {
-    let git_root_path = Command::new("git")
-        .args(["rev-parse", "--show-toplevel"])
-        .output()
-        .ok()
-        .and_then(|o| String::from_utf8(o.stdout).ok())
-        .map(|s| s.trim_end_matches(char::is_control).to_string());
+fn find_by_traversing_back() -> Option<String> {
+    for depth in 1..6 {
+        let dir = "../".repeat(depth);
+        let expected_file = format!("{}{}", dir, FILE_NAME);
 
-    git_root_path
-        .map(|grp| format!("{}/{}", grp, FILE_NAME))
-        .filter(|git_root_config_path| Path::new(git_root_config_path).exists())
+        match fs::read_dir(dir) {
+            Ok(dir_entries) => {
+                for f in dir_entries.flatten() {
+                    if f.path().display().to_string() == expected_file {
+                        return Some(expected_file);
+                    }
+                }
+            }
+            _ => return None,
+        }
+    }
+
+    None
 }
