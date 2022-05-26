@@ -37,7 +37,7 @@ impl Config {
             .find(|p| Path::new(p).exists())
             .map(String::to_string);
 
-        // Config in git root takes priority after the local directory config
+        // Config by traversing back takes priority after the local directory config
         match (&static_path, find_by_traversing_back()) {
             (Some(sp), Some(alt_path)) => {
                 if sp == &STATIC_SEARCH_PATHS[0] {

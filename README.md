@@ -124,7 +124,7 @@ The `--exclude` flag will always be prioritized over the configuration file
 If the config flag it's not present or the file doesn't exist, squawk will try to look for a configuration file automatically at these locations (ordered by priority):
 
 1.  `./.squawk.toml`
-2.  `$GIT_REPO_ROOT/.squawk.toml`
+2.  Tries to traverses back directories up to a depth of 5
 3.  `~/.squawk.toml`
 
 **Example `.squawk.toml`**
