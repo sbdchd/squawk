@@ -15,6 +15,7 @@ use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
 use std::io;
+use std::path::PathBuf;
 use std::process;
 use structopt::StructOpt;
 
@@ -60,8 +61,8 @@ struct Opt {
     #[structopt(long)]
     verbose: bool,
     /// Path to the squawk config file (.squawk.toml)
-    #[structopt(short, long)]
-    config: Option<String>,
+    #[structopt(short = "c", long = "config")]
+    config_path: Option<PathBuf>,
 }
 
 fn main() {
@@ -77,11 +78,18 @@ fn main() {
         .expect("problem creating logger");
     }
 
-    let conf = Config::parse(opts.config);
-    let excluded_rules = &opts
-        .exclude
-        .or(conf.unwrap_or_default().excluded_rules)
-        .unwrap_or_default();
+    let conf = Config::parse(opts.config_path);
+    // the --exclude flag completely overrides the configuration file.
+    let excluded_rules = if let Some(excluded_rules) = opts.exclude {
+        excluded_rules
+    } else {
+        conf.unwrap_or_else(|e| {
+            eprintln!("Configuration error: {}", e);
+            process::exit(1);
+        })
+        .unwrap_or_default()
+        .excluded_rules
+    };
     info!("excluded rules: {:?}", &excluded_rules);
 
     let mut clap_app = Opt::clap();
@@ -91,7 +99,7 @@ fn main() {
     let is_stdin = !atty::is(Stream::Stdin);
     if let Some(subcommand) = opts.cmd {
         exit(
-            check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath, excluded_rules),
+            check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath, &excluded_rules),
             "Upload to GitHub failed",
         );
     } else if !opts.paths.is_empty() || is_stdin {
@@ -101,7 +109,7 @@ fn main() {
                 "Failed to dump AST",
             );
         } else {
-            match check_files(&opts.paths, is_stdin, opts.stdin_filepath, excluded_rules) {
+            match check_files(&opts.paths, is_stdin, opts.stdin_filepath, &excluded_rules) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
                     let total_violations = file_reports
