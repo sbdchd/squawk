@@ -1,10 +1,9 @@
 use log::info;
 use serde::Deserialize;
-use std::{env, io, path::PathBuf};
+use std::{env, io, path::Path, path::PathBuf};
 
 const FILE_NAME: &str = ".squawk.toml";
 
-#[allow(clippy::enum_variant_names)]
 #[derive(Debug)]
 pub enum ConfigError {
     LookupError(io::Error),
@@ -62,10 +61,7 @@ impl Config {
     }
 }
 
-fn recurse_directory(
-    directory: PathBuf,
-    file_name: &str,
-) -> Result<Option<PathBuf>, std::io::Error> {
+fn recurse_directory(directory: &Path, file_name: &str) -> Result<Option<PathBuf>, std::io::Error> {
     for entry in directory.read_dir()? {
         let entry = entry?;
         if entry.file_name() == file_name {
@@ -73,12 +69,12 @@ fn recurse_directory(
         }
     }
     if let Some(parent) = directory.parent() {
-        recurse_directory(parent.to_path_buf(), file_name)
+        recurse_directory(parent, file_name)
     } else {
         Ok(None)
     }
 }
 
 fn find_by_traversing_back() -> Result<Option<PathBuf>, ConfigError> {
-    recurse_directory(env::current_dir()?, FILE_NAME).map_err(|e| ConfigError::LookupError(e))
+    recurse_directory(&env::current_dir()?, FILE_NAME).map_err(ConfigError::LookupError)
 }

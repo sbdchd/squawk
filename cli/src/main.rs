@@ -1,6 +1,8 @@
 #![allow(clippy::match_wildcard_for_single_variants)]
 #[allow(clippy::non_ascii_literal)]
 #[allow(clippy::cast_sign_loss)]
+#[allow(clippy::enum_variant_names)]
+#[allow(clippy::module_name_repetitions)]
 mod config;
 mod reporter;
 mod subcommand;
