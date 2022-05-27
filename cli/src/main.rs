@@ -1,16 +1,23 @@
 #![allow(clippy::match_wildcard_for_single_variants)]
 #[allow(clippy::non_ascii_literal)]
 #[allow(clippy::cast_sign_loss)]
+#[allow(clippy::enum_variant_names)]
+#[allow(clippy::module_name_repetitions)]
+mod config;
 mod reporter;
 mod subcommand;
+
 use crate::reporter::{
     check_files, dump_ast_for_paths, explain_rule, list_rules, print_violations, DumpAstOption,
     Reporter,
 };
 use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
+use config::Config;
+use log::info;
 use simplelog::CombinedLogger;
 use std::io;
+use std::path::PathBuf;
 use std::process;
 use structopt::StructOpt;
 
@@ -55,10 +62,14 @@ struct Opt {
     /// Enable debug logging output
     #[structopt(long)]
     verbose: bool,
+    /// Path to the squawk config file (.squawk.toml)
+    #[structopt(short = "c", long = "config")]
+    config_path: Option<PathBuf>,
 }
 
 fn main() {
     let opts = Opt::from_args();
+
     if opts.verbose {
         CombinedLogger::init(vec![simplelog::TermLogger::new(
             simplelog::LevelFilter::Info,
@@ -69,6 +80,20 @@ fn main() {
         .expect("problem creating logger");
     }
 
+    let conf = Config::parse(opts.config_path);
+    // the --exclude flag completely overrides the configuration file.
+    let excluded_rules = if let Some(excluded_rules) = opts.exclude {
+        excluded_rules
+    } else {
+        conf.unwrap_or_else(|e| {
+            eprintln!("Configuration error: {}", e);
+            process::exit(1);
+        })
+        .unwrap_or_default()
+        .excluded_rules
+    };
+    info!("excluded rules: {:?}", &excluded_rules);
+
     let mut clap_app = Opt::clap();
     let stdout = io::stdout();
     let mut handle = stdout.lock();
@@ -76,12 +101,7 @@ fn main() {
     let is_stdin = !atty::is(Stream::Stdin);
     if let Some(subcommand) = opts.cmd {
         exit(
-            check_and_comment_on_pr(
-                subcommand,
-                is_stdin,
-                opts.stdin_filepath,
-                &opts.exclude.unwrap_or_default(),
-            ),
+            check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath, &excluded_rules),
             "Upload to GitHub failed",
         );
     } else if !opts.paths.is_empty() || is_stdin {
@@ -91,12 +111,7 @@ fn main() {
                 "Failed to dump AST",
             );
         } else {
-            match check_files(
-                &opts.paths,
-                is_stdin,
-                opts.stdin_filepath,
-                &opts.exclude.unwrap_or_default(),
-            ) {
+            match check_files(&opts.paths, is_stdin, opts.stdin_filepath, &excluded_rules) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
                     let total_violations = file_reports

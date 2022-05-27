@@ -330,8 +330,10 @@ pub fn pretty_violations(
                 // whitespace for nodes.
                 let Span { start, len } = violation.span;
 
+                #[allow(clippy::cast_sign_loss)]
                 let start = start as usize;
 
+                #[allow(clippy::cast_sign_loss)]
                 let len = len.unwrap_or(0) as usize;
 
                 // 1-indexed

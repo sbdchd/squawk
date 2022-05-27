@@ -25,6 +25,7 @@ log = "0.4.8"
 squawk-parser = { version = "0.0.0", path = "../parser" }
 squawk-linter = { version = "0.0.0", path = "../linter" }
 squawk-github = { version = "0.0.0", path = "../github" }
+toml = "0.5.9"
 
 [dev-dependencies]
 insta = "0.16.0"
