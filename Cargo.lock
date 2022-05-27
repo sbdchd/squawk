@@ -1622,7 +1622,6 @@ dependencies = [
  "base64 0.12.3",
  "console 0.11.3",
  "insta",
- "lazy_static",
  "log",
  "serde",
  "serde_json",
