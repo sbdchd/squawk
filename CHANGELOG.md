@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.12.0 - 2022-05-27
+
+## Added
+
+- added configuration file (`.squawk.toml`) to specify excluded rules. (#213)
+
 ## v0.11.3 - 2022-05-11
 
 ## Fixed
