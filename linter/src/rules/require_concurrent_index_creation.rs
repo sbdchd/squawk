@@ -27,7 +27,7 @@ pub fn require_concurrent_index_creation(tree: &[RawStmt]) -> Vec<RuleViolation>
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
     /// ```sql
@@ -43,12 +43,12 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
 
         let ok_sql = r#"
   -- use CONCURRENTLY
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
     }
 }

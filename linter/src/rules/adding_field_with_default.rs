@@ -34,7 +34,7 @@ pub fn adding_field_with_default(tree: &[RawStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
     ///
@@ -62,7 +62,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
-        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
     }
 }

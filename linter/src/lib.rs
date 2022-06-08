@@ -18,7 +18,6 @@ use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RawStmt;
 use squawk_parser::parse::parse_sql_query;
 use std::collections::HashSet;
-use std::convert::TryFrom;
 
 #[derive(Clone)]
 pub struct SquawkRule {
@@ -266,14 +265,12 @@ lazy_static! {
 
 pub fn check_sql(
     sql: &str,
-    excluded_rules: &[String],
+    excluded_rules: &[RuleViolationKind],
 ) -> Result<Vec<RuleViolation>, CheckSqlError> {
     let tree = parse_sql_query(sql)?;
 
-    let excluded_rules: HashSet<RuleViolationKind> = excluded_rules
-        .iter()
-        .filter_map(|s| RuleViolationKind::try_from(s.as_ref()).ok())
-        .collect();
+    let excluded_rules: HashSet<RuleViolationKind> =
+        excluded_rules.iter().map(|rule| rule.clone()).collect();
 
     let mut errs = vec![];
     for rule in RULES.iter().filter(|r| !excluded_rules.contains(&r.name)) {
@@ -316,7 +313,8 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        let res = check_sql(sql, &["prefer-robust-stmts".into()]).expect("valid parsing of SQL");
+        let res =
+            check_sql(sql, &[RuleViolationKind::PreferRobustStmts]).expect("valid parsing of SQL");
         let mut prev_span_start = -1;
         for violation in &res {
             assert!(violation.span.start > prev_span_start);

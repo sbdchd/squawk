@@ -1,6 +1,7 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
 use log::info;
 use squawk_github::{actions, app, comment_on_pr, GithubError};
+use squawk_linter::violations::RuleViolationKind;
 use structopt::StructOpt;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -57,7 +58,7 @@ pub enum Command {
         /// For example:
         /// --exclude=require-concurrent-index-creation,ban-drop-database
         #[structopt(short, long, use_delimiter = true)]
-        exclude: Option<Vec<String>>,
+        exclude: Option<Vec<RuleViolationKind>>,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
         github_private_key: Option<String>,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
@@ -98,7 +99,7 @@ fn get_github_private_key(
     }
 }
 
-fn concat(a: &[String], b: &[String]) -> Vec<String> {
+fn concat(a: &[RuleViolationKind], b: &[RuleViolationKind]) -> Vec<RuleViolationKind> {
     // from: https://stackoverflow.com/a/53476705/3720597
     [a, b].concat()
 }
@@ -107,7 +108,7 @@ pub fn check_and_comment_on_pr(
     cmd: Command,
     is_stdin: bool,
     stdin_path: Option<String>,
-    root_cmd_exclude: &[String],
+    root_cmd_exclude: &[RuleViolationKind],
 ) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,
