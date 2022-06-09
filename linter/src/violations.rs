@@ -35,7 +35,7 @@ impl std::fmt::Display for RuleViolationKind {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct UnknownRuleName {
     val: String,
 }

@@ -269,8 +269,7 @@ pub fn check_sql(
 ) -> Result<Vec<RuleViolation>, CheckSqlError> {
     let tree = parse_sql_query(sql)?;
 
-    let excluded_rules: HashSet<RuleViolationKind> =
-        excluded_rules.iter().map(|rule| rule.clone()).collect();
+    let excluded_rules: HashSet<RuleViolationKind> = excluded_rules.iter().cloned().collect();
 
     let mut errs = vec![];
     for rule in RULES.iter().filter(|r| !excluded_rules.contains(&r.name)) {
@@ -285,6 +284,8 @@ pub fn check_sql(
 #[cfg(test)]
 mod test_rules {
     use super::*;
+    use std::convert::TryFrom;
+    use std::str::FromStr;
 
     #[test]
     fn rules_should_be_sorted() {
@@ -298,10 +299,9 @@ mod test_rules {
     fn test_parsing_rule_kind() {
         let rule_names = RULES.iter().map(|r| r.name.clone());
         for rule in rule_names {
-            assert_eq!(
-                RuleViolationKind::try_from(rule.to_string().as_ref()),
-                Ok(rule)
-            );
+            let rule_str = rule.to_string();
+            assert_eq!(RuleViolationKind::from_str(&rule_str), Ok(rule.clone()));
+            assert_eq!(RuleViolationKind::try_from(rule_str.as_ref()), Ok(rule));
         }
     }
 
