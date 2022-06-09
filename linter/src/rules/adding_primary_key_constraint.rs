@@ -50,7 +50,7 @@ pub fn adding_primary_key_constraint(tree: &[RawStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -60,7 +60,7 @@ ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 "#;
 
         let expected_bad_res =
-            check_sql(bad_sql, &["prefer-robust-stmts".into()]).unwrap_or_default();
+            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]).unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
     }
@@ -72,13 +72,13 @@ ALTER TABLE items ADD PRIMARY KEY (id);
 "#;
 
         let expected_bad_res =
-            check_sql(bad_sql, &["prefer-robust-stmts".into()]).unwrap_or_default();
+            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]).unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
 
         let ok_sql = r#"
 ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
 "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
     }
 }

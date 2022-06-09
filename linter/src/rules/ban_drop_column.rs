@@ -26,7 +26,7 @@ pub fn ban_drop_column(tree: &[RawStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -35,6 +35,6 @@ mod test_rules {
 ALTER TABLE "bar_tbl" DROP COLUMN "foo_col" CASCADE;
         "#;
 
-        assert_debug_snapshot!(check_sql(sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferRobustStmts]));
     }
 }

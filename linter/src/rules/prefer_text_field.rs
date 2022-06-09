@@ -77,10 +77,7 @@ CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            sql,
-            &[RuleViolationKind::PreferTextField.to_string()]
-        ));
+        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField]));
     }
 
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS

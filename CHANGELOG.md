@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.13.0 - 2022-06-06
+
+## Added
+
+- added validation for configured rules. (#216)
+
+### Changed
+
+- Change help menu value names. (#216)
+
 ## v0.12.0 - 2022-05-27
 
 ## Added

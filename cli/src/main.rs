@@ -16,6 +16,7 @@ use atty::Stream;
 use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
+use squawk_linter::violations::RuleViolationKind;
 use std::io;
 use std::path::PathBuf;
 use std::process;
@@ -35,26 +36,32 @@ fn exit<E: std::fmt::Display, T>(res: Result<T, E>, msg: &str) -> ! {
 #[derive(StructOpt, Debug)]
 struct Opt {
     /// Paths to search
+    #[structopt(value_name = "path")]
     paths: Vec<String>,
     /// Exclude specific warnings
     ///
     /// For example:
     /// --exclude=require-concurrent-index-creation,ban-drop-database
-    #[structopt(short, long, use_delimiter = true)]
-    exclude: Option<Vec<String>>,
+    #[structopt(
+        short = "e",
+        long = "exclude",
+        value_name = "rule",
+        use_delimiter = true
+    )]
+    excluded_rules: Option<Vec<RuleViolationKind>>,
     /// List all available rules
     #[structopt(long)]
     list_rules: bool,
     /// Provide documentation on the given rule
-    #[structopt(long)]
+    #[structopt(long, value_name = "rule")]
     explain: Option<String>,
     /// Output AST in JSON
-    #[structopt(long, possible_values = &DumpAstOption::variants(), case_insensitive = true)]
+    #[structopt(long,value_name ="ast-format", possible_values = &DumpAstOption::variants(), case_insensitive = true)]
     dump_ast: Option<DumpAstOption>,
     /// Style of error reporting
     #[structopt(long, possible_values = &Reporter::variants(), case_insensitive = true)]
     reporter: Option<Reporter>,
-    #[structopt(long)]
+    #[structopt(long, value_name = "filepath")]
     /// Path to use in reporting for stdin
     stdin_filepath: Option<String>,
     #[structopt(subcommand)]
@@ -82,7 +89,7 @@ fn main() {
 
     let conf = Config::parse(opts.config_path);
     // the --exclude flag completely overrides the configuration file.
-    let excluded_rules = if let Some(excluded_rules) = opts.exclude {
+    let excluded_rules = if let Some(excluded_rules) = opts.excluded_rules {
         excluded_rules
     } else {
         conf.unwrap_or_else(|e| {

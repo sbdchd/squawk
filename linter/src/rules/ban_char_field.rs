@@ -30,7 +30,7 @@ pub fn ban_char_type(tree: &[RawStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
     #[test]
     fn test_creating_table_with_char_errors() {
@@ -59,6 +59,6 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(sql, &["prefer-text-field".into()]));
+        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField]));
     }
 }

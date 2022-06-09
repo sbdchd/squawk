@@ -139,14 +139,14 @@ COMMIT;
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
 
         let ok_sql = r#"
 -- use `NOT VALID`
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
    "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
     }
 
     ///
@@ -171,8 +171,8 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
 
-        assert_debug_snapshot!(check_sql(ok_sql, &["prefer-robust-stmts".into()]));
+        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
     }
 }

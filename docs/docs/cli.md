@@ -52,7 +52,7 @@ squawk
 Find problems in your SQL
 
 USAGE:
-    squawk [FLAGS] [OPTIONS] [paths]... [SUBCOMMAND]
+    squawk [FLAGS] [OPTIONS] [path]... [SUBCOMMAND]
 
 FLAGS:
     -h, --help          
@@ -69,32 +69,32 @@ FLAGS:
 
 
 OPTIONS:
-    -c, --config <config-path>               
+    -c, --config <config-path>         
             Path to the squawk config file (.squawk.toml)
 
-        --dump-ast <dump-ast>                
+        --dump-ast <ast-format>        
             Output AST in JSON [possible values: Raw, Parsed, Debug]
 
-    -e, --exclude <exclude>...               
+    -e, --exclude <rule>...            
             Exclude specific warnings
             
             For example: --exclude=require-concurrent-index-creation,ban-drop-database
-        --explain <explain>                  
+        --explain <rule>               
             Provide documentation on the given rule
 
-        --reporter <reporter>                
+        --reporter <reporter>          
             Style of error reporting [possible values: Tty, Gcc, Json]
 
-        --stdin-filepath <stdin-filepath>    
+        --stdin-filepath <filepath>    
             Path to use in reporting for stdin
 
 
 ARGS:
-    <paths>...    
+    <path>...    
             Paths to search
 
 
 SUBCOMMANDS:
     help                Prints this message or the help of the given subcommand(s)
-    upload-to-github    Comment on a PR with Squawk's results
+    upload-to-github    Comment on a PR with Squawk's results 
 ```

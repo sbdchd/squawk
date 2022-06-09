@@ -1,8 +1,10 @@
+use std::str::FromStr;
+
 use crate::RULES;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 pub use squawk_parser::ast::Span;
 
-#[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq)]
+#[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq, Deserialize)]
 pub enum RuleViolationKind {
     RequireConcurrentIndexCreation,
     RequireConcurrentIndexDeletion,
@@ -33,9 +35,20 @@ impl std::fmt::Display for RuleViolationKind {
     }
 }
 
-impl std::convert::TryFrom<&str> for RuleViolationKind {
-    type Error = ();
-    fn try_from(s: &str) -> Result<Self, Self::Error> {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UnknownRuleName {
+    val: String,
+}
+
+impl std::fmt::Display for UnknownRuleName {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "invalid rule name {}", self.val)
+    }
+}
+
+impl std::str::FromStr for RuleViolationKind {
+    type Err = UnknownRuleName;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
         RULES
             .iter()
             .find_map(|rule| {
@@ -45,7 +58,14 @@ impl std::convert::TryFrom<&str> for RuleViolationKind {
                     None
                 }
             })
-            .ok_or(())
+            .ok_or(UnknownRuleName { val: s.to_string() })
+    }
+}
+
+impl std::convert::TryFrom<&str> for RuleViolationKind {
+    type Error = UnknownRuleName;
+    fn try_from(s: &str) -> Result<Self, Self::Error> {
+        RuleViolationKind::from_str(s)
     }
 }
 

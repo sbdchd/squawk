@@ -1,5 +1,6 @@
 use log::info;
 use serde::Deserialize;
+use squawk_linter::violations::RuleViolationKind;
 use std::{env, io, path::Path, path::PathBuf};
 
 const FILE_NAME: &str = ".squawk.toml";
@@ -38,7 +39,7 @@ impl std::fmt::Display for ConfigError {
 #[derive(Debug, Default, Deserialize)]
 pub struct Config {
     #[serde(default)]
-    pub excluded_rules: Vec<String>,
+    pub excluded_rules: Vec<RuleViolationKind>,
 }
 
 impl Config {
