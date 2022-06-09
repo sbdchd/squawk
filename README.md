@@ -65,7 +65,7 @@ squawk
 Find problems in your SQL
 
 USAGE:
-    squawk [FLAGS] [OPTIONS] [paths]... [SUBCOMMAND]
+    squawk [FLAGS] [OPTIONS] [path]... [SUBCOMMAND]
 
 FLAGS:
     -h, --help
@@ -77,24 +77,33 @@ FLAGS:
     -V, --version
             Prints version information
 
+        --verbose
+            Enable debug logging output
+
 
 OPTIONS:
-        --dump-ast <dump-ast>
-            Output AST in JSON [possible values: Raw, Parsed]
+    -c, --config <config-path>
+            Path to the squawk config file (.squawk.toml)
 
-    -e, --exclude <exclude>...
+        --dump-ast <ast-format>
+            Output AST in JSON [possible values: Raw, Parsed, Debug]
+
+    -e, --exclude <rule>...
             Exclude specific warnings
 
             For example: --exclude=require-concurrent-index-creation,ban-drop-database
-        --explain <explain>
+        --explain <rule>
             Provide documentation on the given rule
 
         --reporter <reporter>
             Style of error reporting [possible values: Tty, Gcc, Json]
 
+        --stdin-filepath <filepath>
+            Path to use in reporting for stdin
+
 
 ARGS:
-    <paths>...
+    <path>...
             Paths to search
 
 
