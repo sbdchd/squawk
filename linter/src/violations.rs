@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 pub use squawk_parser::ast::Span;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq, Deserialize)]
+#[serde(rename_all = "kebab-case")]
 pub enum RuleViolationKind {
     RequireConcurrentIndexCreation,
     RequireConcurrentIndexDeletion,
