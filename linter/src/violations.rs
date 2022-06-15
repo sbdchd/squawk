@@ -27,12 +27,7 @@ pub enum RuleViolationKind {
 
 impl std::fmt::Display for RuleViolationKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let rule = RULES
-            .iter()
-            .find(|rule| rule.name == *self)
-            .expect("We should always find ourself");
-
-        write!(f, "{}", rule.id)
+        write!(f, "{}", serde_plain::to_string(self).map_err(|_| std::fmt::Error)?)
     }
 }
 
@@ -50,16 +45,7 @@ impl std::fmt::Display for UnknownRuleName {
 impl std::str::FromStr for RuleViolationKind {
     type Err = UnknownRuleName;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        RULES
-            .iter()
-            .find_map(|rule| {
-                if rule.id == s {
-                    Some(rule.name.clone())
-                } else {
-                    None
-                }
-            })
-            .ok_or(UnknownRuleName { val: s.to_string() })
+        serde_plain::from_str(s).map_err(|_| UnknownRuleName { val: s.to_string() })
     }
 }
 
