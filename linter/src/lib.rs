@@ -272,7 +272,7 @@ mod test_rules {
 
     #[test]
     fn rules_should_be_sorted() {
-        let original_rules: Vec<String> = RULES.clone().into_iter().map(|x| x.id).collect();
+        let original_rules: Vec<String> = RULES.iter().map(|x| x.name.to_string()).collect();
         let mut sorted_rule_ids = original_rules.clone();
         sorted_rule_ids.sort();
         assert_eq!(original_rules, sorted_rule_ids);
