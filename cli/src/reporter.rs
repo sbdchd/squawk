@@ -663,7 +663,7 @@ SELECT 1;
         );
 
         assert!(res.is_ok());
-        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r###"[{"file":"main.sql","line":1,"column":0,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field requires exclusive locks and table rewrites."},{"Help":"Make the field nullable."}],"rule_name":"AddingNotNullableField"},{"file":"main.sql","line":3,"column":1,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field requires exclusive locks and table rewrites."},{"Help":"Make the field nullable."}],"rule_name":"AddingNotNullableField"}]
+        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r###"[{"file":"main.sql","line":1,"column":0,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field requires exclusive locks and table rewrites."},{"Help":"Make the field nullable."}],"rule_name":"adding-not-nullable-field"},{"file":"main.sql","line":3,"column":1,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field requires exclusive locks and table rewrites."},{"Help":"Make the field nullable."}],"rule_name":"adding-not-nullable-field"}]
 "###);
     }
 

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.13.1 - 2022-06-15
+
+## Fixed
+
+- fix parsing enum values from configuration file. (#217)
+
 ## v0.13.0 - 2022-06-06
 
 ## Added
