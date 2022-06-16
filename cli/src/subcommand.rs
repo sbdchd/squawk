@@ -1,4 +1,5 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
+use ::semver::Version;
 use log::info;
 use squawk_github::{actions, app, comment_on_pr, GithubError};
 use squawk_linter::violations::RuleViolationKind;
@@ -109,6 +110,7 @@ pub fn check_and_comment_on_pr(
     is_stdin: bool,
     stdin_path: Option<String>,
     root_cmd_exclude: &[RuleViolationKind],
+    pg_version: Version,
 ) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,
@@ -128,6 +130,7 @@ pub fn check_and_comment_on_pr(
         is_stdin,
         stdin_path,
         &concat(&exclude.unwrap_or_default(), root_cmd_exclude),
+        pg_version,
     )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");

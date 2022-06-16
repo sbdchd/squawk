@@ -1,9 +1,13 @@
 use crate::rules::utils::tables_created_in_transaction;
 use crate::violations::{RuleViolation, RuleViolationKind};
+use ::semver::Version;
 use squawk_parser::ast::{RawStmt, Stmt};
 
 #[must_use]
-pub fn require_concurrent_index_creation(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn require_concurrent_index_creation(
+    tree: &[RawStmt],
+    _pg_version: &Version,
+) -> Vec<RuleViolation> {
     let tables_created = tables_created_in_transaction(tree);
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -27,7 +31,10 @@ pub fn require_concurrent_index_creation(tree: &[RawStmt]) -> Vec<RuleViolation>
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql,
+        violations::{default_pg_version, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
 
     /// ```sql
@@ -43,12 +50,20 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
 
         let ok_sql = r#"
   -- use CONCURRENTLY
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            ok_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
     }
 }

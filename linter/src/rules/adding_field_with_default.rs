@@ -1,10 +1,11 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
+use ::semver::Version;
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
 
 #[must_use]
-pub fn adding_field_with_default(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn adding_field_with_default(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -34,7 +35,10 @@ pub fn adding_field_with_default(tree: &[RawStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql,
+        violations::{default_pg_version, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
 
     ///
@@ -62,7 +66,15 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
-        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
+        assert_debug_snapshot!(check_sql(
+            ok_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
     }
 }

@@ -4,6 +4,18 @@ use crate::RULES;
 use serde::{Deserialize, Serialize};
 pub use squawk_parser::ast::Span;
 
+use ::semver::{BuildMetadata, Prerelease, Version};
+
+pub fn default_pg_version() -> Version {
+    return Version {
+        major: 9,
+        minor: 4,
+        patch: 0,
+        pre: Prerelease::new("").unwrap(),
+        build: BuildMetadata::EMPTY,
+    };
+}
+
 #[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq, Deserialize)]
 pub enum RuleViolationKind {
     #[serde(rename = "require-concurrent-index-creation")]

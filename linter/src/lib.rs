@@ -15,6 +15,7 @@ use crate::rules::{
     require_concurrent_index_creation, require_concurrent_index_deletion,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
+use ::semver::Version;
 use squawk_parser::ast::RawStmt;
 use squawk_parser::parse::parse_sql_query;
 use std::collections::HashSet;
@@ -22,7 +23,7 @@ use std::collections::HashSet;
 #[derive(Clone)]
 pub struct SquawkRule {
     pub name: RuleViolationKind,
-    func: fn(&[RawStmt]) -> Vec<RuleViolation>,
+    func: fn(&[RawStmt], &Version) -> Vec<RuleViolation>,
     pub messages: Vec<ViolationMessage>,
 }
 
@@ -249,6 +250,7 @@ lazy_static! {
 pub fn check_sql(
     sql: &str,
     excluded_rules: &[RuleViolationKind],
+    pg_version: &Version,
 ) -> Result<Vec<RuleViolation>, CheckSqlError> {
     let tree = parse_sql_query(sql)?;
 
@@ -256,7 +258,7 @@ pub fn check_sql(
 
     let mut errs = vec![];
     for rule in RULES.iter().filter(|r| !excluded_rules.contains(&r.name)) {
-        errs.extend((rule.func)(&tree));
+        errs.extend((rule.func)(&tree, pg_version));
     }
 
     errs.sort_by_key(|v| v.span.start);
@@ -267,6 +269,7 @@ pub fn check_sql(
 #[cfg(test)]
 mod test_rules {
     use super::*;
+    use crate::violations::default_pg_version;
     use insta::{assert_debug_snapshot, assert_display_snapshot};
     use std::convert::TryFrom;
     use std::str::FromStr;
@@ -308,8 +311,12 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        let res =
-            check_sql(sql, &[RuleViolationKind::PreferRobustStmts]).expect("valid parsing of SQL");
+        let res = check_sql(
+            sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version(),
+        )
+        .expect("valid parsing of SQL");
         let mut prev_span_start = -1;
         for violation in &res {
             assert!(violation.span.start > prev_span_start);

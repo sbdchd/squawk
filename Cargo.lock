@@ -1435,7 +1435,7 @@ version = "0.2.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "138e3e0acb6c9fb258b19b67cb8abd63c00679d2851805ea151465464fe9030a"
 dependencies = [
- "semver",
+ "semver 0.9.0",
 ]
 
 [[package]]
@@ -1491,6 +1491,12 @@ checksum = "1d7eb9ef2c18661902cc47e535f9bc51b78acd254da71d375c2f6720d9a40403"
 dependencies = [
  "semver-parser",
 ]
+
+[[package]]
+name = "semver"
+version = "1.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8cb243bdfdb5936c8dc3c45762a19d12ab4550cdc753bc247637d4ec35a040fd"
 
 [[package]]
 name = "semver-parser"
@@ -1632,6 +1638,7 @@ dependencies = [
  "console 0.11.3",
  "insta",
  "log",
+ "semver 1.0.9",
  "serde",
  "serde_json",
  "simplelog",
@@ -1659,6 +1666,7 @@ version = "0.0.0"
 dependencies = [
  "insta",
  "lazy_static",
+ "semver 1.0.9",
  "serde",
  "serde_plain",
  "squawk-parser",

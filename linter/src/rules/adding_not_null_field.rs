@@ -1,5 +1,6 @@
 use crate::violations::{RuleViolation, RuleViolationKind};
 use crate::ViolationMessage;
+use ::semver::Version;
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
@@ -19,7 +20,7 @@ fn has_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bo
 }
 
 #[must_use]
-pub fn adding_not_nullable_field(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn adding_not_nullable_field(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -56,7 +57,11 @@ pub fn adding_not_nullable_field(tree: &[RawStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind, ViolationMessage};
+    use crate::{
+        check_sql,
+        violations::{default_pg_version, RuleViolationKind},
+        ViolationMessage,
+    };
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -64,7 +69,12 @@ mod test_rules {
         let sql = r#"
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
-        let res = check_sql(sql, &[RuleViolationKind::PreferRobustStmts]).unwrap();
+        let res = check_sql(
+            sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version(),
+        )
+        .unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::AddingNotNullableField);
         assert_eq!(
@@ -90,14 +100,22 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
 
         let bad_sql = r#"
 -- not sure how this would ever work, but might as well test it
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
     }
 
     #[test]
@@ -106,7 +124,11 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 ALTER TABLE "foo_tbl" ADD COLUMN IF NOT EXISTS "bar_col" TEXT DEFAULT 'buzz' NOT NULL;
 "#;
         assert_eq!(
-            check_sql(ok_sql, &[RuleViolationKind::AddingFieldWithDefault]),
+            check_sql(
+                ok_sql,
+                &[RuleViolationKind::AddingFieldWithDefault],
+                &default_pg_version()
+            ),
             Ok(vec![])
         );
     }

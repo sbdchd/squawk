@@ -1,3 +1,4 @@
+use ::semver::Version;
 use std::collections::HashMap;
 
 use crate::violations::{RuleViolation, RuleViolationKind};
@@ -17,7 +18,7 @@ enum Constraint {
 /// more robust by using guards like `IF NOT EXISTS`. So if the migration fails
 /// halfway through, it can be rerun without human intervention.
 #[must_use]
-pub fn prefer_robust_stmts(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let mut inside_transaction = false;
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
@@ -89,7 +90,10 @@ pub fn prefer_robust_stmts(tree: &[RawStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql,
+        violations::{default_pg_version, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -99,14 +103,14 @@ mod test_rules {
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
     }
     #[test]
     fn drop_index() {
         let sql = r#"
 DROP INDEX CONCURRENTLY "email_idx";
 "#;
-        let res = check_sql(sql, &[]).unwrap();
+        let res = check_sql(sql, &[], &default_pg_version()).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
     }
@@ -115,7 +119,7 @@ DROP INDEX CONCURRENTLY "email_idx";
         let sql = r#"
 DROP INDEX CONCURRENTLY IF EXISTS "email_idx";
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
     }
     #[test]
     /// DROP CONSTRAINT and then ADD CONSTRAINT is safe. We can also safely run VALIDATE CONSTRAINT.
@@ -125,7 +129,7 @@ ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "fk_user";
 ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "app_user" ("id") DEFERRABLE INITIALLY DEFERRED NOT VALID;
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
     }
     #[test]
     /// We can only use the dropped constraint in one ADD CONSTRAINT statement.
@@ -136,7 +140,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_id
 -- this second add constraint should error because it's not robust
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
-        let res = check_sql(sql, &[]).unwrap();
+        let res = check_sql(sql, &[], &default_pg_version()).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
     }
@@ -150,17 +154,17 @@ BEGIN;
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 COMMIT;
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
 
         let sql = r#"
 ALTER TABLE "core_foo" ADD COLUMN IF NOT EXISTS "answer_id" integer NULL;
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
 
         let sql = r#"
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "core_foo_idx" ON "core_foo" ("answer_id");
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
 
         let sql = r#"
 BEGIN;
@@ -170,7 +174,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
 
         let sql = r#"
 CREATE TABLE IF NOT EXISTS "core_bar" (
@@ -178,24 +182,24 @@ CREATE TABLE IF NOT EXISTS "core_bar" (
     "bravo" text NOT NULL
 );
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
 
         // select is fine, we're only interested in modifications to the tables
         let sql = r#"
 SELECT 1;
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
 
         // inserts are also okay
         let sql = r#"
 INSERT INTO tbl VALUES (a);
 "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
 
         let sql = r#"
 ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
     }
 
     #[test]
@@ -203,7 +207,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         let sql = r#"
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        assert_debug_snapshot!(check_sql(sql, &[], &default_pg_version()), @r###"
         Ok(
             [
                 RuleViolation {
@@ -227,7 +231,7 @@ ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
         let sql = r#"
 CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        assert_debug_snapshot!(check_sql(sql, &[], &default_pg_version()), @r###"
         Ok(
             [
                 RuleViolation {
@@ -251,7 +255,7 @@ CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
         let sql = r#"
 CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        assert_debug_snapshot!(check_sql(sql, &[], &default_pg_version()), @r###"
         Ok(
             [
                 RuleViolation {
@@ -275,7 +279,7 @@ CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NUL
         let sql = r#"
 ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
         "#;
-        assert_debug_snapshot!(check_sql(sql, &[]), @r###"
+        assert_debug_snapshot!(check_sql(sql, &[], &default_pg_version()), @r###"
         Ok(
             [
                 RuleViolation {

@@ -5,6 +5,7 @@
 #[allow(clippy::module_name_repetitions)]
 mod config;
 mod reporter;
+// mod semver;
 mod subcommand;
 
 use crate::reporter::{
@@ -12,11 +13,12 @@ use crate::reporter::{
     Reporter,
 };
 use crate::subcommand::{check_and_comment_on_pr, Command};
+use ::semver::Version;
 use atty::Stream;
 use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
-use squawk_linter::violations::RuleViolationKind;
+use squawk_linter::violations::{RuleViolationKind, default_pg_version};
 use std::io;
 use std::path::PathBuf;
 use std::process;
@@ -42,6 +44,7 @@ struct Opt {
     ///
     /// For example:
     /// --exclude=require-concurrent-index-creation,ban-drop-database
+<<<<<<< HEAD
     #[structopt(
         short = "e",
         long = "exclude",
@@ -49,6 +52,16 @@ struct Opt {
         use_delimiter = true
     )]
     excluded_rules: Option<Vec<RuleViolationKind>>,
+=======
+    #[structopt(short, long, use_delimiter = true)]
+    exclude: Option<Vec<String>>,
+    /// Specify postgres version
+    ///
+    /// For example:
+    /// --pg_version=13.0
+    #[structopt(long)]
+    pg_version: Option<String>,
+>>>>>>> fbaafc8 (Add version param and pass default version)
     /// List all available rules
     #[structopt(long)]
     list_rules: bool,
@@ -76,7 +89,17 @@ struct Opt {
 
 fn main() {
     let opts = Opt::from_args();
+<<<<<<< HEAD
 
+=======
+    let given_version = opts.pg_version;
+    let pg_version: Version;
+    if given_version.is_none() {
+        pg_version = default_pg_version();
+    } else {
+        pg_version = Version::parse(given_version.as_deref().unwrap_or("")).unwrap();
+    }
+>>>>>>> fbaafc8 (Add version param and pass default version)
     if opts.verbose {
         CombinedLogger::init(vec![simplelog::TermLogger::new(
             simplelog::LevelFilter::Info,
@@ -108,7 +131,17 @@ fn main() {
     let is_stdin = !atty::is(Stream::Stdin);
     if let Some(subcommand) = opts.cmd {
         exit(
+<<<<<<< HEAD
             check_and_comment_on_pr(subcommand, is_stdin, opts.stdin_filepath, &excluded_rules),
+=======
+            check_and_comment_on_pr(
+                subcommand,
+                is_stdin,
+                opts.stdin_filepath,
+                &opts.exclude.unwrap_or_else(Vec::new),
+                pg_version,
+            ),
+>>>>>>> fbaafc8 (Add version param and pass default version)
             "Upload to GitHub failed",
         );
     } else if !opts.paths.is_empty() || is_stdin {
@@ -118,7 +151,17 @@ fn main() {
                 "Failed to dump AST",
             );
         } else {
+<<<<<<< HEAD
             match check_files(&opts.paths, is_stdin, opts.stdin_filepath, &excluded_rules) {
+=======
+            match check_files(
+                &opts.paths,
+                is_stdin,
+                opts.stdin_filepath,
+                &opts.exclude.unwrap_or_else(Vec::new),
+                pg_version,
+            ) {
+>>>>>>> fbaafc8 (Add version param and pass default version)
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
                     let total_violations = file_reports

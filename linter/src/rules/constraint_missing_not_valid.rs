@@ -1,3 +1,4 @@
+use ::semver::Version;
 use std::collections::HashSet;
 
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
@@ -62,7 +63,7 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
 }
 
 #[must_use]
-pub fn constraint_missing_not_valid(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn constraint_missing_not_valid(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let tables_created = tables_created_in_transaction(tree);
     for span in not_valid_validate_in_transaction(tree) {
@@ -102,7 +103,10 @@ pub fn constraint_missing_not_valid(tree: &[RawStmt]) -> Vec<RuleViolation> {
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql,
+        violations::{default_pg_version, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
 
     /// Using NOT VALID and VALIDATE in a single transaction is equivalent to
@@ -115,7 +119,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCE
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
 "#;
-        let res = check_sql(sql, &[]).unwrap();
+        let res = check_sql(sql, &[], &default_pg_version()).unwrap();
         assert_eq!(
             res.len(),
             1,
@@ -139,14 +143,22 @@ COMMIT;
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
 
         let ok_sql = r#"
 -- use `NOT VALID`
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
    "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            ok_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
     }
 
     ///
@@ -171,8 +183,16 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
 
-        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            ok_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &default_pg_version()
+        ));
     }
 }
