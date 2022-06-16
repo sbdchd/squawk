@@ -27,7 +27,7 @@ pub enum RuleViolationKind {
 
 impl std::fmt::Display for RuleViolationKind {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self)
+        write!(f, "{}", serde_plain::to_string(self).map_err(|_| std::fmt::Error)?)
     }
 }
 
@@ -38,7 +38,7 @@ pub struct UnknownRuleName {
 
 impl std::fmt::Display for UnknownRuleName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "invalid rule name {}", self.val)
+        write!(f, "invalid rule name {}", self.val.to_string())
     }
 }
 
