@@ -38,7 +38,7 @@ pub struct UnknownRuleName {
 
 impl std::fmt::Display for UnknownRuleName {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(f, "invalid rule name {}", self.val.to_string())
+        write!(f, "invalid rule name {}", self.val)
     }
 }
 
