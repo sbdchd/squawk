@@ -17,6 +17,7 @@ squawk-parser = { version = "0.0.0", path = "../parser" }
 serde_plain = "1.0"
 lazy_static = "1.4.0"
 semver = "1.0"
+serde_json = "1.0"
 
 [dev-dependencies]
 insta = "0.16.0"

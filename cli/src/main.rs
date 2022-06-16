@@ -87,7 +87,8 @@ fn main() {
     let pg_version = if given_version.is_none() {
         default_pg_version()
     } else {
-        Version::parse(given_version.as_deref().unwrap_or("")).unwrap()
+        Version::parse(given_version.as_deref().unwrap_or(""))
+            .unwrap_or_else(|_| default_pg_version())
     };
     if opts.verbose {
         CombinedLogger::init(vec![simplelog::TermLogger::new(

@@ -1,4 +1,4 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::violations::{ok_non_null_pg_version_req, RuleViolation, RuleViolationKind};
 use crate::ViolationMessage;
 use ::semver::Version;
 use squawk_parser::ast::{
@@ -20,8 +20,11 @@ fn has_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bo
 }
 
 #[must_use]
-pub fn adding_not_nullable_field(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
+pub fn adding_not_nullable_field(tree: &[RawStmt], pg_version: &Version) -> Vec<RuleViolation> {
     let mut errs = vec![];
+    if ok_non_null_pg_version_req().matches(pg_version) {
+        return errs;
+    }
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
@@ -62,6 +65,7 @@ mod test_rules {
         violations::{default_pg_version, RuleViolationKind},
         ViolationMessage,
     };
+    use ::semver::Version;
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -115,6 +119,24 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
             bad_sql,
             &[RuleViolationKind::PreferRobustStmts],
             &default_pg_version()
+        ));
+    }
+
+    #[test]
+    fn test_adding_field_that_is_not_nullable_in_version_11() {
+        let ok_sql = r#"
+BEGIN;
+--
+-- Add field foo to recipe
+--
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+COMMIT;
+        "#;
+
+        assert_debug_snapshot!(check_sql(
+            ok_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            &Version::parse("11.0.0").unwrap(),
         ));
     }
 
