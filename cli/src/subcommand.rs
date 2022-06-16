@@ -110,7 +110,7 @@ pub fn check_and_comment_on_pr(
     is_stdin: bool,
     stdin_path: Option<String>,
     root_cmd_exclude: &[RuleViolationKind],
-    pg_version: Version,
+    pg_version: &Version,
 ) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,

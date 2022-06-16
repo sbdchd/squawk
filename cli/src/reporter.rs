@@ -134,12 +134,12 @@ pub fn check_files(
     is_stdin: bool,
     stdin_path: Option<String>,
     excluded_rules: &[RuleViolationKind],
-    pg_version: Version,
+    pg_version: &Version,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 
     let mut process_violations = |sql: &str, path: &str| -> Result<(), CheckFilesError> {
-        let violations = check_sql(sql, excluded_rules, &pg_version)?;
+        let violations = check_sql(sql, excluded_rules, pg_version)?;
         output_violations.push(pretty_violations(violations, sql, path));
         Ok(())
     };

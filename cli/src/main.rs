@@ -84,12 +84,11 @@ struct Opt {
 fn main() {
     let opts = Opt::from_args();
     let given_version = opts.pg_version;
-    let pg_version: Version;
-    if given_version.is_none() {
-        pg_version = default_pg_version();
+    let pg_version = if given_version.is_none() {
+        default_pg_version()
     } else {
-        pg_version = Version::parse(given_version.as_deref().unwrap_or("")).unwrap();
-    }
+        Version::parse(given_version.as_deref().unwrap_or("")).unwrap()
+    };
     if opts.verbose {
         CombinedLogger::init(vec![simplelog::TermLogger::new(
             simplelog::LevelFilter::Info,
@@ -126,7 +125,7 @@ fn main() {
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
-                pg_version,
+                &pg_version,
             ),
             "Upload to GitHub failed",
         );
@@ -142,7 +141,7 @@ fn main() {
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
-                pg_version,
+                &pg_version,
             ) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);

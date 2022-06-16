@@ -6,14 +6,15 @@ pub use squawk_parser::ast::Span;
 
 use ::semver::{BuildMetadata, Prerelease, Version};
 
+#[must_use]
 pub fn default_pg_version() -> Version {
-    return Version {
+    Version {
         major: 9,
         minor: 4,
         patch: 0,
-        pre: Prerelease::new("").unwrap(),
+        pre: Prerelease::EMPTY,
         build: BuildMetadata::EMPTY,
-    };
+    }
 }
 
 #[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq, Deserialize)]
