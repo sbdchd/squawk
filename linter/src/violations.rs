@@ -5,23 +5,38 @@ use serde::{Deserialize, Serialize};
 pub use squawk_parser::ast::Span;
 
 #[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq, Deserialize)]
-#[serde(rename_all = "kebab-case")]
 pub enum RuleViolationKind {
+    #[serde(rename = "require-concurrent-index-creation")]
     RequireConcurrentIndexCreation,
+    #[serde(rename = "require-concurrent-index-deletion")]
     RequireConcurrentIndexDeletion,
+    #[serde(rename = "constraint-missing-not-valid")]
     ConstraintMissingNotValid,
+    #[serde(rename = "adding-field-with-default")]
     AddingFieldWithDefault,
+    #[serde(rename = "adding-foreign-key-constraint")]
     AddingForeignKeyConstraint,
+    #[serde(rename = "changing-column-type")]
     ChangingColumnType,
+    #[serde(rename = "adding-not-nullable-field")]
     AddingNotNullableField,
+    #[serde(rename = "adding-serial-primary-key-field")]
     AddingSerialPrimaryKeyField,
+    #[serde(rename = "renaming-column")]
     RenamingColumn,
+    #[serde(rename = "renaming-table")]
     RenamingTable,
+    #[serde(rename = "disallowed-unique-constraint")]
     DisallowedUniqueConstraint,
+    #[serde(rename = "ban-drop-database")]
     BanDropDatabase,
+    #[serde(rename = "prefer-text-field")]
     PreferTextField,
+    #[serde(rename = "prefer-robust-stmts")]
     PreferRobustStmts,
+    #[serde(rename = "ban-char-field")]
     BanCharField,
+    #[serde(rename = "ban-drop-column")]
     BanDropColumn,
 }
 
