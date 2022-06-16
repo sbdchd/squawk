@@ -267,6 +267,7 @@ pub fn check_sql(
 #[cfg(test)]
 mod test_rules {
     use super::*;
+    use insta::{assert_debug_snapshot, assert_display_snapshot};
     use std::convert::TryFrom;
     use std::str::FromStr;
 
@@ -286,6 +287,17 @@ mod test_rules {
             assert_eq!(RuleViolationKind::from_str(&rule_str), Ok(rule.clone()));
             assert_eq!(RuleViolationKind::try_from(rule_str.as_ref()), Ok(rule));
         }
+    }
+    /// Ensure rule names don't change
+    #[test]
+    fn test_rule_names_debug_snap() {
+        let rule_names: Vec<String> = RULES.iter().map(|r| r.name.to_string()).collect();
+        assert_debug_snapshot!(rule_names);
+    }
+    #[test]
+    fn test_rule_names_display_snap() {
+        let rule_names: Vec<String> = RULES.iter().map(|r| r.name.to_string()).collect();
+        assert_display_snapshot!(rule_names.join("\n"));
     }
 
     /// Ensure we stort the resulting violations by where they occur in the file.
