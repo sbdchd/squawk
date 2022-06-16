@@ -5,7 +5,6 @@
 #[allow(clippy::module_name_repetitions)]
 mod config;
 mod reporter;
-// mod semver;
 mod subcommand;
 
 use crate::reporter::{
