@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.13.2 - 2022-06-16
+
+## Changed
+
+- internal: use rule IDs based on serde annotations of `RuleViolationKind` (#218)
+
 ## v0.13.1 - 2022-06-15
 
 ## Fixed

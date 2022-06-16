@@ -1530,6 +1530,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "serde_plain"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "95455e7e29fada2052e72170af226fbe368a4ca33dee847875325d9fdb133858"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "serde_repr"
 version = "0.1.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1616,7 +1625,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "squawk"
-version = "0.13.1"
+version = "0.13.2"
 dependencies = [
  "atty",
  "base64 0.12.3",
@@ -1651,6 +1660,7 @@ dependencies = [
  "insta",
  "lazy_static",
  "serde",
+ "serde_plain",
  "squawk-parser",
 ]
 

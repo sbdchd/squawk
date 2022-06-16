@@ -21,7 +21,6 @@ use std::collections::HashSet;
 
 #[derive(Clone)]
 pub struct SquawkRule {
-    pub id: String,
     pub name: RuleViolationKind,
     func: fn(&[RawStmt]) -> Vec<RuleViolation>,
     pub messages: Vec<ViolationMessage>,
@@ -31,7 +30,6 @@ lazy_static! {
     pub static ref RULES: Vec<SquawkRule> = vec![
     // see ChangingColumnType
     SquawkRule {
-        id: "adding-field-with-default".into(),
         name: RuleViolationKind::AddingFieldWithDefault,
         func: adding_field_with_default,
         messages: vec![
@@ -45,7 +43,6 @@ lazy_static! {
         ],
     },
     SquawkRule {
-        id: "adding-foreign-key-constraint".into(),
         name: RuleViolationKind::AddingForeignKeyConstraint,
         func: adding_foreign_key_constraint,
         messages: vec![
@@ -57,7 +54,6 @@ lazy_static! {
     },
     // usually paired with a DEFAULT
     SquawkRule {
-        id: "adding-not-nullable-field".into(),
         name: RuleViolationKind::AddingNotNullableField,
         func: adding_not_nullable_field,
         messages: vec![
@@ -69,7 +65,6 @@ lazy_static! {
         ],
     },
     SquawkRule {
-        id: "adding-serial-primary-key-field".into(),
         name: RuleViolationKind::AddingSerialPrimaryKeyField,
         func: adding_primary_key_constraint,
         messages: vec![
@@ -83,7 +78,6 @@ lazy_static! {
         ],
     },
     SquawkRule {
-        id: "ban-char-field".into(),
         name: RuleViolationKind::BanCharField,
         func: ban_char_type,
         messages: vec![
@@ -93,7 +87,6 @@ lazy_static! {
         ]
     },
     SquawkRule {
-        id: "ban-drop-column".into(),
         name: RuleViolationKind::BanDropColumn,
         func: ban_drop_column,
         messages: vec![
@@ -103,7 +96,6 @@ lazy_static! {
         ],
     },
     SquawkRule {
-        id: "ban-drop-database".into(),
         name: RuleViolationKind::BanDropDatabase,
         func: ban_drop_database,
         messages: vec![
@@ -124,7 +116,6 @@ lazy_static! {
     // > double the disk space.
     // https://www.postgresql.org/docs/current/sql-altertable.html
     SquawkRule {
-        id: "changing-column-type".into(),
         name: RuleViolationKind::ChangingColumnType,
         func: changing_column_type,
         messages: vec![
@@ -155,7 +146,6 @@ lazy_static! {
     // > succeeds.
     // https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-NOTES
     SquawkRule {
-        id: "constraint-missing-not-valid".into(),
         name: RuleViolationKind::ConstraintMissingNotValid,
         func: constraint_missing_not_valid,
         messages: vec![
@@ -168,7 +158,6 @@ lazy_static! {
     // > lock.
     // https://www.postgresql.org/docs/current/sql-altertable.html
     SquawkRule {
-        id: "disallowed-unique-constraint".into(),
         name: RuleViolationKind::DisallowedUniqueConstraint,
         func: disallow_unique_constraint,
         messages: vec![
@@ -182,7 +171,6 @@ lazy_static! {
         ],
     },
     SquawkRule {
-        id: "prefer-robust-stmts".into(),
         name: RuleViolationKind::PreferRobustStmts,
         func: prefer_robust_stmts,
         messages: vec![
@@ -193,7 +181,6 @@ lazy_static! {
     },
     // see ConstraintMissingNotValid for more docs
     SquawkRule {
-        id: "prefer-text-field".into(),
         name: RuleViolationKind::PreferTextField,
         func: prefer_text_field,
         messages: vec![
@@ -211,7 +198,6 @@ lazy_static! {
     // > no effect on the stored data.
     // https://www.postgresql.org/docs/10/sql-altertable.html
     SquawkRule {
-        id: "renaming-column".into(),
         name: RuleViolationKind::RenamingColumn,
         func: renaming_column,
         messages: vec![
@@ -222,7 +208,6 @@ lazy_static! {
     },
     // see RenamingColumn rule
     SquawkRule {
-        id: "renaming-table".into(),
         name: RuleViolationKind::RenamingTable,
         func: renaming_table,
         messages: vec![
@@ -233,7 +218,6 @@ lazy_static! {
     },
     // https://www.postgresql.org/docs/10/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY
     SquawkRule {
-        id: "require-concurrent-index-creation".into(),
         name: RuleViolationKind::RequireConcurrentIndexCreation,
         func: require_concurrent_index_creation,
         messages: vec![
@@ -247,7 +231,6 @@ lazy_static! {
     },
     // https://www.postgresql.org/docs/10/sql-dropindex.html
     SquawkRule {
-        id: "require-concurrent-index-deletion".into(),
         name: RuleViolationKind::RequireConcurrentIndexDeletion,
         func: require_concurrent_index_deletion,
         messages: vec![
@@ -284,12 +267,13 @@ pub fn check_sql(
 #[cfg(test)]
 mod test_rules {
     use super::*;
+    use insta::{assert_debug_snapshot, assert_display_snapshot};
     use std::convert::TryFrom;
     use std::str::FromStr;
 
     #[test]
     fn rules_should_be_sorted() {
-        let original_rules: Vec<String> = RULES.clone().into_iter().map(|x| x.id).collect();
+        let original_rules: Vec<String> = RULES.iter().map(|x| x.name.to_string()).collect();
         let mut sorted_rule_ids = original_rules.clone();
         sorted_rule_ids.sort();
         assert_eq!(original_rules, sorted_rule_ids);
@@ -303,6 +287,17 @@ mod test_rules {
             assert_eq!(RuleViolationKind::from_str(&rule_str), Ok(rule.clone()));
             assert_eq!(RuleViolationKind::try_from(rule_str.as_ref()), Ok(rule));
         }
+    }
+    /// Ensure rule names don't change
+    #[test]
+    fn test_rule_names_debug_snap() {
+        let rule_names: Vec<String> = RULES.iter().map(|r| r.name.to_string()).collect();
+        assert_debug_snapshot!(rule_names);
+    }
+    #[test]
+    fn test_rule_names_display_snap() {
+        let rule_names: Vec<String> = RULES.iter().map(|r| r.name.to_string()).collect();
+        assert_display_snapshot!(rule_names.join("\n"));
     }
 
     /// Ensure we stort the resulting violations by where they occur in the file.
