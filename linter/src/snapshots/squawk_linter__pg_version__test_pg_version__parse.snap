@@ -1,0 +1,14 @@
+---
+source: linter/src/pg_version.rs
+expression: "PgVersion::from_str(\"test\")"
+---
+Err(
+    InvalidNumber(
+        InvalidNumber {
+            version: "test",
+            e: ParseIntError {
+                kind: InvalidDigit,
+            },
+        },
+    ),
+)

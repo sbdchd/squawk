@@ -1,10 +1,13 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
-use ::semver::Version;
+use crate::{
+    pg_version::PgVersion,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{RawStmt, Stmt};
 
 /// Brad's Rule aka ban dropping database statements.
 #[must_use]
-pub fn ban_drop_database(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
+pub fn ban_drop_database(tree: &[RawStmt], _pg_version: Option<PgVersion>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -23,7 +26,7 @@ pub fn ban_drop_database(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleVio
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::default_pg_version};
+    use crate::check_sql;
     use insta::assert_debug_snapshot;
     #[test]
     fn test_ban_drop_database() {
@@ -32,6 +35,6 @@ DROP DATABASE "table_name";
 DROP DATABASE IF EXISTS "table_name";
 DROP DATABASE IF EXISTS "table_name"
         "#;
-        assert_debug_snapshot!(check_sql(sql, &[], &default_pg_version()));
+        assert_debug_snapshot!(check_sql(sql, &[], None));
     }
 }

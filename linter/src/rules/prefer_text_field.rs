@@ -1,5 +1,8 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
-use ::semver::Version;
+use crate::{
+    pg_version::PgVersion,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDef, QualifiedName, RawStmt, Stmt,
     TableElt,
@@ -9,7 +12,7 @@ use squawk_parser::ast::{
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
 /// call.
 #[must_use]
-pub fn prefer_text_field(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
+pub fn prefer_text_field(tree: &[RawStmt], _pg_version: Option<PgVersion>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -51,7 +54,7 @@ fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_de
 #[cfg(test)]
 mod test_rules {
     use crate::check_sql;
-    use crate::violations::{default_pg_version, RuleViolationKind};
+    use crate::violations::RuleViolationKind;
     use insta::assert_debug_snapshot;
     #[test]
     fn test_ensure_ignored_when_new_table() {
@@ -78,11 +81,7 @@ CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            sql,
-            &[RuleViolationKind::PreferTextField],
-            &default_pg_version()
-        ));
+        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField], None));
     }
 
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS
@@ -97,7 +96,7 @@ BEGIN;
 ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
 COMMIT;
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[], &default_pg_version()), @r###"
+        assert_debug_snapshot!(check_sql(sql, &[], None), @r###"
         Ok(
             [
                 RuleViolation {
@@ -135,7 +134,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
 "#;
-        assert_debug_snapshot!(check_sql(bad_sql, &[], &default_pg_version()), @r###"
+        assert_debug_snapshot!(check_sql(bad_sql, &[], None), @r###"
         Ok(
             [
                 RuleViolation {
@@ -173,7 +172,7 @@ CREATE TABLE "core_bar" (
 --
 ALTER TABLE "core_bar" ADD CONSTRAINT "text_size" CHECK (LENGTH("bravo") <= 100);
 COMMIT;"#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[], &default_pg_version()), @r###"
+        assert_debug_snapshot!(check_sql(ok_sql, &[], None), @r###"
         Ok(
             [],
         )
@@ -188,7 +187,7 @@ ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
 COMMIT;
 "#;
 
-        let res = check_sql(bad_sql, &[], &default_pg_version());
+        let res = check_sql(bad_sql, &[], None);
         assert!(res.is_ok());
         let data = res.unwrap_or_default();
         assert!(!data.is_empty());
@@ -200,7 +199,7 @@ COMMIT;
         let ok_sql = r#"
     CREATE TABLE IF NOT EXISTS foo_table(bar_col varchar);
     "#;
-        let res = check_sql(ok_sql, &[], &default_pg_version());
+        let res = check_sql(ok_sql, &[], None);
         assert_eq!(res, Ok(vec![]));
     }
 }

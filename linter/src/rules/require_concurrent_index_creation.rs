@@ -1,12 +1,13 @@
+use crate::pg_version::PgVersion;
 use crate::rules::utils::tables_created_in_transaction;
 use crate::violations::{RuleViolation, RuleViolationKind};
-use ::semver::Version;
+
 use squawk_parser::ast::{RawStmt, Stmt};
 
 #[must_use]
 pub fn require_concurrent_index_creation(
     tree: &[RawStmt],
-    _pg_version: &Version,
+    _pg_version: Option<PgVersion>,
 ) -> Vec<RuleViolation> {
     let tables_created = tables_created_in_transaction(tree);
     let mut errs = vec![];
@@ -31,10 +32,7 @@ pub fn require_concurrent_index_creation(
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{
-        check_sql,
-        violations::{default_pg_version, RuleViolationKind},
-    };
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
     /// ```sql
@@ -53,7 +51,7 @@ mod test_rules {
         assert_debug_snapshot!(check_sql(
             bad_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version()
+            None
         ));
 
         let ok_sql = r#"
@@ -63,7 +61,7 @@ mod test_rules {
         assert_debug_snapshot!(check_sql(
             ok_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version()
+            None
         ));
     }
 }

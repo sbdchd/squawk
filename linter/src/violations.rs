@@ -4,30 +4,6 @@ use crate::RULES;
 use serde::{Deserialize, Serialize};
 pub use squawk_parser::ast::Span;
 
-use ::semver::{BuildMetadata, Prerelease, Version, VersionReq};
-
-#[must_use]
-pub fn default_pg_version() -> Version {
-    Version {
-        major: 9,
-        minor: 4,
-        patch: 0,
-        pre: Prerelease::EMPTY,
-        build: BuildMetadata::EMPTY,
-    }
-}
-
-/// # Panics
-///
-/// Will panic if parse is passed bad value: <https://docs.rs/semver/0.10.0/semver/struct.VersionReq.html#errors>
-#[must_use]
-pub fn ok_non_null_pg_version_req() -> VersionReq {
-    match VersionReq::parse("11.0.0") {
-        Ok(version) => version,
-        Err(e) => panic!("There was a problem parsing: {}", e),
-    }
-}
-
 #[derive(Debug, PartialEq, Clone, Serialize, Hash, Eq, Deserialize)]
 pub enum RuleViolationKind {
     #[serde(rename = "require-concurrent-index-creation")]

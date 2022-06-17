@@ -1,9 +1,9 @@
-use ::semver::Version;
 use console::strip_ansi_codes;
 use console::style;
 use log::info;
 use serde::Serialize;
 use squawk_linter::errors::CheckSqlError;
+use squawk_linter::pg_version::PgVersion;
 use squawk_linter::violations::{RuleViolation, RuleViolationKind, Span, ViolationMessage};
 use squawk_linter::{check_sql, SquawkRule, RULES};
 use squawk_parser::error::PgQueryError;
@@ -134,7 +134,7 @@ pub fn check_files(
     is_stdin: bool,
     stdin_path: Option<String>,
     excluded_rules: &[RuleViolationKind],
-    pg_version: &Version,
+    pg_version: Option<PgVersion>,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 
@@ -580,7 +580,6 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 mod test_reporter {
     use super::*;
     use insta::{assert_debug_snapshot, assert_display_snapshot};
-    use squawk_linter::violations::default_pg_version;
 
     #[test]
     fn test_display_violations_gcc() {
@@ -589,12 +588,8 @@ mod test_reporter {
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(
-            sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version(),
-        )
-        .expect("valid sql should parse");
+        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
+            .expect("valid sql should parse");
 
         let filename = "main.sql";
 
@@ -620,12 +615,8 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(
-            sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version(),
-        )
-        .expect("valid sql should parse");
+        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
+            .expect("valid sql should parse");
         let filename = "main.sql";
         let mut buff = Vec::new();
 
@@ -661,12 +652,8 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(
-            sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version(),
-        )
-        .expect("valid sql should parse");
+        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
+            .expect("valid sql should parse");
         let filename = "main.sql";
         let mut buff = Vec::new();
 
@@ -689,12 +676,8 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(
-            sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version(),
-        )
-        .expect("valid sql should parse");
+        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
+            .expect("valid sql should parse");
 
         let filename = "main.sql";
         assert_debug_snapshot!(pretty_violations(violations, sql, filename));
@@ -705,12 +688,8 @@ SELECT 1;
     #[test]
     fn test_trimming_sql_newlines() {
         let sql = r#"ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;"#;
-        let violations = check_sql(
-            sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version(),
-        )
-        .expect("valid sql should parse");
+        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
+            .expect("valid sql should parse");
 
         assert_debug_snapshot!(violations, @r###"
         [

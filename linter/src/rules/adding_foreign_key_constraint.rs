@@ -1,5 +1,8 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
-use ::semver::Version;
+use crate::{
+    pg_version::PgVersion,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ConstrType, RawStmt, Stmt, TableElt,
 };
@@ -13,7 +16,7 @@ use squawk_parser::ast::{
 #[must_use]
 pub fn adding_foreign_key_constraint(
     tree: &[RawStmt],
-    _pg_version: &Version,
+    _pg_version: Option<PgVersion>,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -64,11 +67,11 @@ pub fn adding_foreign_key_constraint(
 mod test_rules {
     use crate::{
         check_sql,
-        violations::{default_pg_version, RuleViolation, RuleViolationKind},
+        violations::{RuleViolation, RuleViolationKind},
     };
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql(sql, &[], &default_pg_version())
+        check_sql(sql, &[], None)
             .unwrap()
             .into_iter()
             .filter(|x| x.kind == RuleViolationKind::AddingForeignKeyConstraint)

@@ -1,8 +1,8 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
-use ::semver::Version;
+
 use log::info;
 use squawk_github::{actions, app, comment_on_pr, GithubError};
-use squawk_linter::violations::RuleViolationKind;
+use squawk_linter::{pg_version::PgVersion, violations::RuleViolationKind};
 use structopt::StructOpt;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -110,7 +110,7 @@ pub fn check_and_comment_on_pr(
     is_stdin: bool,
     stdin_path: Option<String>,
     root_cmd_exclude: &[RuleViolationKind],
-    pg_version: &Version,
+    pg_version: Option<PgVersion>,
 ) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,

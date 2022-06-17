@@ -1,12 +1,18 @@
-use crate::violations::{ok_non_null_pg_version_req, RuleViolation, RuleViolationKind};
-use ::semver::Version;
+use crate::{
+    pg_version::PgVersion,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use serde_json::{json, Value};
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
 
 #[must_use]
-pub fn adding_field_with_default(tree: &[RawStmt], pg_version: &Version) -> Vec<RuleViolation> {
+pub fn adding_field_with_default(
+    tree: &[RawStmt],
+    pg_version: Option<PgVersion>,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -16,13 +22,15 @@ pub fn adding_field_with_default(tree: &[RawStmt], pg_version: &Version) -> Vec<
                         Some(AlterTableDef::ColumnDef(def)) => {
                             for ColumnDefConstraint::Constraint(constraint) in &def.constraints {
                                 if constraint.contype == ConstrType::Default {
-                                    if ok_non_null_pg_version_req().matches(pg_version)
-                                        && constraint.raw_expr.is_some()
-                                        && constraint.raw_expr.as_ref().unwrap_or(&json!({}))
-                                            ["A_Const"]
-                                            != Value::Null
-                                    {
-                                        continue;
+                                    if let Some(pg_version) = pg_version {
+                                        if pg_version > PgVersion::new(11, None, None)
+                                            && constraint.raw_expr.is_some()
+                                            && constraint.raw_expr.as_ref().unwrap_or(&json!({}))
+                                                ["A_Const"]
+                                                != Value::Null
+                                        {
+                                            continue;
+                                        }
                                     }
                                     errs.push(RuleViolation::new(
                                         RuleViolationKind::AddingFieldWithDefault,
@@ -44,11 +52,10 @@ pub fn adding_field_with_default(tree: &[RawStmt], pg_version: &Version) -> Vec<
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{
-        check_sql,
-        violations::{default_pg_version, RuleViolationKind},
-    };
-    use ::semver::Version;
+    use std::str::FromStr;
+
+    use crate::{check_sql, pg_version::PgVersion, violations::RuleViolationKind};
+
     use insta::assert_debug_snapshot;
 
     ///
@@ -79,12 +86,12 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
         assert_debug_snapshot!(check_sql(
             bad_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version()
+            None
         ));
         assert_debug_snapshot!(check_sql(
             ok_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version()
+            None
         ));
     }
 
@@ -103,12 +110,12 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         assert_debug_snapshot!(check_sql(
             bad_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            &Version::parse("11.0.0").unwrap(),
+            Some(PgVersion::from_str("11.0.0").unwrap()),
         ));
         assert_debug_snapshot!(check_sql(
             ok_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            &Version::parse("11.0.0").unwrap(),
+            Some(PgVersion::from_str("11.0.0").unwrap()),
         ));
     }
 }

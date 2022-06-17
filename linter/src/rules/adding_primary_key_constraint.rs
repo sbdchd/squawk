@@ -1,5 +1,8 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
-use ::semver::Version;
+use crate::{
+    pg_version::PgVersion,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
@@ -7,7 +10,7 @@ use squawk_parser::ast::{
 #[must_use]
 pub fn adding_primary_key_constraint(
     tree: &[RawStmt],
-    _pg_version: &Version,
+    _pg_version: Option<PgVersion>,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -54,10 +57,7 @@ pub fn adding_primary_key_constraint(
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{
-        check_sql,
-        violations::{default_pg_version, RuleViolationKind},
-    };
+    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -66,12 +66,8 @@ mod test_rules {
 ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 "#;
 
-        let expected_bad_res = check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version(),
-        )
-        .unwrap_or_default();
+        let expected_bad_res =
+            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
     }
@@ -82,12 +78,8 @@ ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 ALTER TABLE items ADD PRIMARY KEY (id);
 "#;
 
-        let expected_bad_res = check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version(),
-        )
-        .unwrap_or_default();
+        let expected_bad_res =
+            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
 
@@ -97,7 +89,7 @@ ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
         assert_debug_snapshot!(check_sql(
             ok_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            &default_pg_version()
+            None
         ));
     }
 }

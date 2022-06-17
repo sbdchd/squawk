@@ -12,12 +12,12 @@ use crate::reporter::{
     Reporter,
 };
 use crate::subcommand::{check_and_comment_on_pr, Command};
-use ::semver::Version;
 use atty::Stream;
 use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
-use squawk_linter::violations::{default_pg_version, RuleViolationKind};
+use squawk_linter::pg_version::PgVersion;
+use squawk_linter::violations::RuleViolationKind;
 use std::io;
 use std::path::PathBuf;
 use std::process;
@@ -53,9 +53,9 @@ struct Opt {
     /// Specify postgres version
     ///
     /// For example:
-    /// --pg_version=13.0
+    /// --pg-version=13.0
     #[structopt(long)]
-    pg_version: Option<String>,
+    pg_version: Option<PgVersion>,
     /// List all available rules
     #[structopt(long)]
     list_rules: bool,
@@ -83,13 +83,7 @@ struct Opt {
 
 fn main() {
     let opts = Opt::from_args();
-    let given_version = opts.pg_version;
-    let pg_version = if given_version.is_none() {
-        default_pg_version()
-    } else {
-        Version::parse(given_version.as_deref().unwrap_or(""))
-            .unwrap_or_else(|_| default_pg_version())
-    };
+
     if opts.verbose {
         CombinedLogger::init(vec![simplelog::TermLogger::new(
             simplelog::LevelFilter::Info,
@@ -126,7 +120,7 @@ fn main() {
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
-                &pg_version,
+                opts.pg_version,
             ),
             "Upload to GitHub failed",
         );
@@ -142,7 +136,7 @@ fn main() {
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
-                &pg_version,
+                opts.pg_version,
             ) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);

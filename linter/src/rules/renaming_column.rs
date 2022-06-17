@@ -1,9 +1,12 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
-use ::semver::Version;
+use crate::{
+    pg_version::PgVersion,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{ObjectType, RawStmt, Stmt};
 
 #[must_use]
-pub fn renaming_column(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
+pub fn renaming_column(tree: &[RawStmt], _pg_version: Option<PgVersion>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -25,7 +28,7 @@ pub fn renaming_column(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViola
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::default_pg_version};
+    use crate::check_sql;
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -34,6 +37,6 @@ mod test_rules {
 ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
         "#;
 
-        assert_debug_snapshot!(check_sql(sql, &[], &default_pg_version()));
+        assert_debug_snapshot!(check_sql(sql, &[], None));
     }
 }

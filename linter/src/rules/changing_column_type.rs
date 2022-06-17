@@ -1,9 +1,15 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
-use ::semver::Version;
+use crate::{
+    pg_version::PgVersion,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{AlterTableCmds, AlterTableType, RawStmt, Stmt};
 
 #[must_use]
-pub fn changing_column_type(tree: &[RawStmt], _pg_version: &Version) -> Vec<RuleViolation> {
+pub fn changing_column_type(
+    tree: &[RawStmt],
+    _pg_version: Option<PgVersion>,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -26,7 +32,7 @@ pub fn changing_column_type(tree: &[RawStmt], _pg_version: &Version) -> Vec<Rule
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::default_pg_version};
+    use crate::check_sql;
     use insta::assert_debug_snapshot;
     #[test]
     fn test_changing_field_type() {
@@ -38,7 +44,7 @@ BEGIN;
 ALTER TABLE "core_recipe" ALTER COLUMN "edits" TYPE text USING "edits"::text;
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(bad_sql, &[], &default_pg_version()));
+        assert_debug_snapshot!(check_sql(bad_sql, &[], None));
 
         let bad_sql = r#"
 BEGIN;
@@ -50,6 +56,6 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE text USING "foo"::text;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[], &default_pg_version()));
+        assert_debug_snapshot!(check_sql(bad_sql, &[], None));
     }
 }

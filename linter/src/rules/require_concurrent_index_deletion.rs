@@ -1,11 +1,14 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
-use ::semver::Version;
+use crate::{
+    pg_version::PgVersion,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{ObjectType, RawStmt, Stmt};
 
 #[must_use]
 pub fn require_concurrent_index_deletion(
     tree: &[RawStmt],
-    _pg_version: &Version,
+    _pg_version: Option<PgVersion>,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -26,7 +29,7 @@ pub fn require_concurrent_index_deletion(
 #[cfg(test)]
 mod test_rules {
     use crate::check_sql;
-    use crate::violations::{default_pg_version, RuleViolationKind};
+    use crate::violations::RuleViolationKind;
 
     #[test]
     fn test_drop_index_concurrently() {
@@ -34,7 +37,7 @@ mod test_rules {
   -- instead of
   DROP INDEX IF EXISTS "field_name_idx";
   "#;
-        let res = check_sql(bad_sql, &[], &default_pg_version()).unwrap();
+        let res = check_sql(bad_sql, &[], None).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(
             res[0].kind,
@@ -44,7 +47,7 @@ mod test_rules {
         let ok_sql = r#"
   DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
   "#;
-        assert_eq!(check_sql(ok_sql, &[], &default_pg_version()), Ok(vec![]));
+        assert_eq!(check_sql(ok_sql, &[], None), Ok(vec![]));
     }
 
     #[test]
@@ -52,7 +55,7 @@ mod test_rules {
         let sql = r#"
   DROP TYPE IF EXISTS foo;
   "#;
-        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
     }
 
     #[test]
@@ -60,7 +63,7 @@ mod test_rules {
         let sql = r#"
   DROP TABLE IF EXISTS some_table;
   "#;
-        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
     }
 
     #[test]
@@ -68,6 +71,6 @@ mod test_rules {
         let sql = r#"
   DROP TRIGGER IF EXISTS trigger on foo_table;
   "#;
-        assert_eq!(check_sql(sql, &[], &default_pg_version()), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
     }
 }
