@@ -1,0 +1,14 @@
+---
+source: cli/src/config.rs
+expression: "Config::parse(Some(squawk_toml.path().to_path_buf()))"
+---
+Ok(
+    Some(
+        Config {
+            excluded_rules: [
+                RequireConcurrentIndexCreation,
+            ],
+            pg_version: None,
+        },
+    ),
+)

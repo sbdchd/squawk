@@ -81,3 +81,45 @@ fn recurse_directory(directory: &Path, file_name: &str) -> Result<Option<PathBuf
 fn find_by_traversing_back() -> Result<Option<PathBuf>, ConfigError> {
     recurse_directory(&env::current_dir()?, FILE_NAME).map_err(ConfigError::LookupError)
 }
+
+#[cfg(test)]
+mod test_config {
+    use std::fs;
+    use tempfile::NamedTempFile;
+
+    use insta::assert_debug_snapshot;
+
+    use super::*;
+
+    #[test]
+    fn test_load_cfg_full() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r#"
+pg_version = "19.1"
+excluded_rules = ["require-concurrent-index-creation"]
+        
+        "#;
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+    }
+    #[test]
+    fn test_load_pg_version() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r#"
+pg_version = "19.1"
+        
+        "#;
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+    }
+    #[test]
+    fn test_load_excluded_rules() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r#"
+excluded_rules = ["require-concurrent-index-creation"]
+        
+        "#;
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+    }
+}
