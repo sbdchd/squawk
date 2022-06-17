@@ -94,18 +94,27 @@ fn main() {
         .expect("problem creating logger");
     }
 
-    let conf = Config::parse(opts.config_path);
+    let conf = Config::parse(opts.config_path)
+        .unwrap_or_else(|e| {
+            eprintln!("Configuration error: {}", e);
+            process::exit(1);
+        })
+        .unwrap_or_default();
+
     // the --exclude flag completely overrides the configuration file.
     let excluded_rules = if let Some(excluded_rules) = opts.excluded_rules {
         excluded_rules
     } else {
-        conf.unwrap_or_else(|e| {
-            eprintln!("Configuration error: {}", e);
-            process::exit(1);
-        })
-        .unwrap_or_default()
-        .excluded_rules
+        conf.excluded_rules
     };
+
+    let pg_version = if let Some(pg_version) = opts.pg_version {
+        Some(pg_version)
+    } else {
+        conf.pg_version
+    };
+
+    info!("pg version: {:?}", pg_version);
     info!("excluded rules: {:?}", &excluded_rules);
 
     let mut clap_app = Opt::clap();
@@ -120,7 +129,7 @@ fn main() {
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
-                opts.pg_version,
+                pg_version,
             ),
             "Upload to GitHub failed",
         );
@@ -136,7 +145,7 @@ fn main() {
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
-                opts.pg_version,
+                pg_version,
             ) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);

@@ -1,5 +1,7 @@
 use std::{num::ParseIntError, str::FromStr};
 
+use serde::{de::Error, Deserialize, Deserializer};
+
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
 pub struct Version {
     pub major: i32,
@@ -15,6 +17,18 @@ impl Version {
             minor,
             patch,
         }
+    }
+}
+
+// Allow us to deserialize our version from a string in .squawk.toml.
+// from https://stackoverflow.com/a/46755370/
+impl<'de> Deserialize<'de> for Version {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s: &str = Deserialize::deserialize(deserializer)?;
+        Version::from_str(s).map_err(D::Error::custom)
     }
 }
 
