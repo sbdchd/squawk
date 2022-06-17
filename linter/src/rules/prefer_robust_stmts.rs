@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use crate::{
-    pg_version::PgVersion,
+    versions::Version,
     violations::{RuleViolation, RuleViolationKind},
 };
 use squawk_parser::ast::{
@@ -20,7 +20,7 @@ enum Constraint {
 /// more robust by using guards like `IF NOT EXISTS`. So if the migration fails
 /// halfway through, it can be rerun without human intervention.
 #[must_use]
-pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: Option<PgVersion>) -> Vec<RuleViolation> {
+pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let mut inside_transaction = false;
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();

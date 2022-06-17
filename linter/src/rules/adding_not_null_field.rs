@@ -1,4 +1,4 @@
-use crate::pg_version::PgVersion;
+use crate::versions::Version;
 use crate::violations::{RuleViolation, RuleViolationKind};
 use crate::ViolationMessage;
 
@@ -23,11 +23,11 @@ fn has_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bo
 #[must_use]
 pub fn adding_not_nullable_field(
     tree: &[RawStmt],
-    pg_version: Option<PgVersion>,
+    pg_version: Option<Version>,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     if let Some(pg_version) = pg_version {
-        let pg_11 = PgVersion::new(11, Some(0), Some(0));
+        let pg_11 = Version::new(11, Some(0), Some(0));
         if pg_version >= pg_11 {
             return errs;
         }
@@ -70,9 +70,7 @@ pub fn adding_not_nullable_field(
 mod test_rules {
     use std::str::FromStr;
 
-    use crate::{
-        check_sql, pg_version::PgVersion, violations::RuleViolationKind, ViolationMessage,
-    };
+    use crate::{check_sql, versions::Version, violations::RuleViolationKind, ViolationMessage};
 
     use insta::assert_debug_snapshot;
 
@@ -139,7 +137,7 @@ COMMIT;
         assert_debug_snapshot!(check_sql(
             ok_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            Some(PgVersion::from_str("11.0.0").unwrap()),
+            Some(Version::from_str("11.0.0").unwrap()),
         ));
     }
 

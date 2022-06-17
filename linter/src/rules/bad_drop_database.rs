@@ -1,5 +1,5 @@
 use crate::{
-    pg_version::PgVersion,
+    versions::Version,
     violations::{RuleViolation, RuleViolationKind},
 };
 
@@ -7,7 +7,7 @@ use squawk_parser::ast::{RawStmt, Stmt};
 
 /// Brad's Rule aka ban dropping database statements.
 #[must_use]
-pub fn ban_drop_database(tree: &[RawStmt], _pg_version: Option<PgVersion>) -> Vec<RuleViolation> {
+pub fn ban_drop_database(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {

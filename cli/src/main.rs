@@ -16,7 +16,7 @@ use atty::Stream;
 use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
-use squawk_linter::pg_version::PgVersion;
+use squawk_linter::versions::Version;
 use squawk_linter::violations::RuleViolationKind;
 use std::io;
 use std::path::PathBuf;
@@ -55,7 +55,7 @@ struct Opt {
     /// For example:
     /// --pg-version=13.0
     #[structopt(long)]
-    pg_version: Option<PgVersion>,
+    pg_version: Option<Version>,
     /// List all available rules
     #[structopt(long)]
     list_rules: bool,

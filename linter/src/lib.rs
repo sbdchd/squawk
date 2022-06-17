@@ -1,8 +1,8 @@
 #![allow(clippy::shadow_unrelated)]
 #![allow(clippy::missing_errors_doc)]
 pub mod errors;
-pub mod pg_version;
 pub mod rules;
+pub mod versions;
 pub mod violations;
 #[macro_use]
 extern crate lazy_static;
@@ -16,15 +16,15 @@ use crate::rules::{
     require_concurrent_index_creation, require_concurrent_index_deletion,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
-use pg_version::PgVersion;
 use squawk_parser::ast::RawStmt;
 use squawk_parser::parse::parse_sql_query;
 use std::collections::HashSet;
+use versions::Version;
 
 #[derive(Clone)]
 pub struct SquawkRule {
     pub name: RuleViolationKind,
-    func: fn(&[RawStmt], Option<PgVersion>) -> Vec<RuleViolation>,
+    func: fn(&[RawStmt], Option<Version>) -> Vec<RuleViolation>,
     pub messages: Vec<ViolationMessage>,
 }
 
@@ -251,7 +251,7 @@ lazy_static! {
 pub fn check_sql(
     sql: &str,
     excluded_rules: &[RuleViolationKind],
-    pg_version: Option<PgVersion>,
+    pg_version: Option<Version>,
 ) -> Result<Vec<RuleViolation>, CheckSqlError> {
     let tree = parse_sql_query(sql)?;
 

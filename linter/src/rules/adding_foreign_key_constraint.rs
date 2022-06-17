@@ -1,5 +1,5 @@
 use crate::{
-    pg_version::PgVersion,
+    versions::Version,
     violations::{RuleViolation, RuleViolationKind},
 };
 
@@ -16,7 +16,7 @@ use squawk_parser::ast::{
 #[must_use]
 pub fn adding_foreign_key_constraint(
     tree: &[RawStmt],
-    _pg_version: Option<PgVersion>,
+    _pg_version: Option<Version>,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {

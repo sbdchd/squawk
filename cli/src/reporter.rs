@@ -3,7 +3,7 @@ use console::style;
 use log::info;
 use serde::Serialize;
 use squawk_linter::errors::CheckSqlError;
-use squawk_linter::pg_version::PgVersion;
+use squawk_linter::versions::Version;
 use squawk_linter::violations::{RuleViolation, RuleViolationKind, Span, ViolationMessage};
 use squawk_linter::{check_sql, SquawkRule, RULES};
 use squawk_parser::error::PgQueryError;
@@ -134,7 +134,7 @@ pub fn check_files(
     is_stdin: bool,
     stdin_path: Option<String>,
     excluded_rules: &[RuleViolationKind],
-    pg_version: Option<PgVersion>,
+    pg_version: Option<Version>,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 

@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use crate::pg_version::PgVersion;
+use crate::versions::Version;
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use crate::{rules::utils::tables_created_in_transaction, violations::Span};
 use squawk_parser::ast::{
@@ -65,7 +65,7 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
 #[must_use]
 pub fn constraint_missing_not_valid(
     tree: &[RawStmt],
-    _pg_version: Option<PgVersion>,
+    _pg_version: Option<Version>,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     let tables_created = tables_created_in_transaction(tree);

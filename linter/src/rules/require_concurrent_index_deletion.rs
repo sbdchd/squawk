@@ -1,5 +1,5 @@
 use crate::{
-    pg_version::PgVersion,
+    versions::Version,
     violations::{RuleViolation, RuleViolationKind},
 };
 
@@ -8,7 +8,7 @@ use squawk_parser::ast::{ObjectType, RawStmt, Stmt};
 #[must_use]
 pub fn require_concurrent_index_deletion(
     tree: &[RawStmt],
-    _pg_version: Option<PgVersion>,
+    _pg_version: Option<Version>,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {

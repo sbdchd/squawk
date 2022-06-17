@@ -1,5 +1,5 @@
 use crate::{
-    pg_version::PgVersion,
+    versions::Version,
     violations::{RuleViolation, RuleViolationKind},
 };
 
@@ -11,7 +11,7 @@ use squawk_parser::ast::{
 #[must_use]
 pub fn adding_field_with_default(
     tree: &[RawStmt],
-    pg_version: Option<PgVersion>,
+    pg_version: Option<Version>,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -23,7 +23,7 @@ pub fn adding_field_with_default(
                             for ColumnDefConstraint::Constraint(constraint) in &def.constraints {
                                 if constraint.contype == ConstrType::Default {
                                     if let Some(pg_version) = pg_version {
-                                        if pg_version > PgVersion::new(11, None, None)
+                                        if pg_version > Version::new(11, None, None)
                                             && constraint.raw_expr.is_some()
                                             && constraint.raw_expr.as_ref().unwrap_or(&json!({}))
                                                 ["A_Const"]
@@ -54,7 +54,7 @@ pub fn adding_field_with_default(
 mod test_rules {
     use std::str::FromStr;
 
-    use crate::{check_sql, pg_version::PgVersion, violations::RuleViolationKind};
+    use crate::{check_sql, versions::Version, violations::RuleViolationKind};
 
     use insta::assert_debug_snapshot;
 
@@ -110,12 +110,12 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         assert_debug_snapshot!(check_sql(
             bad_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            Some(PgVersion::from_str("11.0.0").unwrap()),
+            Some(Version::from_str("11.0.0").unwrap()),
         ));
         assert_debug_snapshot!(check_sql(
             ok_sql,
             &[RuleViolationKind::PreferRobustStmts],
-            Some(PgVersion::from_str("11.0.0").unwrap()),
+            Some(Version::from_str("11.0.0").unwrap()),
         ));
     }
 }

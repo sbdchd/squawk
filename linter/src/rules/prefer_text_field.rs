@@ -1,5 +1,5 @@
 use crate::{
-    pg_version::PgVersion,
+    versions::Version,
     violations::{RuleViolation, RuleViolationKind},
 };
 
@@ -12,7 +12,7 @@ use squawk_parser::ast::{
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
 /// call.
 #[must_use]
-pub fn prefer_text_field(tree: &[RawStmt], _pg_version: Option<PgVersion>) -> Vec<RuleViolation> {
+pub fn prefer_text_field(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {

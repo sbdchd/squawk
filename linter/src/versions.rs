@@ -1,13 +1,13 @@
 use std::{num::ParseIntError, str::FromStr};
 
 #[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
-pub struct PgVersion {
+pub struct Version {
     pub major: i32,
     pub minor: Option<i32>,
     pub patch: Option<i32>,
 }
 
-impl PgVersion {
+impl Version {
     #[must_use]
     pub fn new(major: i32, minor: Option<i32>, patch: Option<i32>) -> Self {
         Self {
@@ -61,7 +61,7 @@ fn parse_int(s: &str) -> Result<i32, ParseVersionError> {
     }))?
 }
 
-impl FromStr for PgVersion {
+impl FromStr for Version {
     type Err = ParseVersionError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -85,7 +85,7 @@ impl FromStr for PgVersion {
             None
         };
 
-        Ok(PgVersion {
+        Ok(Version {
             major,
             minor,
             patch,
@@ -101,33 +101,27 @@ mod test_pg_version {
     use super::*;
     #[test]
     fn test_eq() {
-        assert_eq!(
-            PgVersion::new(10, None, None),
-            PgVersion::new(10, None, None)
-        );
+        assert_eq!(Version::new(10, None, None), Version::new(10, None, None));
     }
     #[test]
     fn test_gt() {
-        assert!(PgVersion::new(10, Some(1), None) > PgVersion::new(10, None, None));
-        assert!(PgVersion::new(10, None, Some(1)) > PgVersion::new(10, None, None));
-        assert!(PgVersion::new(10, None, Some(1)) > PgVersion::new(9, None, None));
+        assert!(Version::new(10, Some(1), None) > Version::new(10, None, None));
+        assert!(Version::new(10, None, Some(1)) > Version::new(10, None, None));
+        assert!(Version::new(10, None, Some(1)) > Version::new(9, None, None));
 
-        assert!(!(PgVersion::new(10, None, None) > PgVersion::new(10, None, None)));
+        assert!(!(Version::new(10, None, None) > Version::new(10, None, None)));
     }
     #[test]
     fn test_parse() {
         assert_eq!(
-            PgVersion::from_str("10.1"),
-            Ok(PgVersion::new(10, Some(1), None))
+            Version::from_str("10.1"),
+            Ok(Version::new(10, Some(1), None))
         );
+        assert_eq!(Version::from_str("10"), Ok(Version::new(10, None, None)));
         assert_eq!(
-            PgVersion::from_str("10"),
-            Ok(PgVersion::new(10, None, None))
+            Version::from_str("10.2.1"),
+            Ok(Version::new(10, Some(2), Some(1)))
         );
-        assert_eq!(
-            PgVersion::from_str("10.2.1"),
-            Ok(PgVersion::new(10, Some(2), Some(1)))
-        );
-        assert_debug_snapshot!(PgVersion::from_str("test"));
+        assert_debug_snapshot!(Version::from_str("test"));
     }
 }

@@ -1,5 +1,5 @@
-use crate::pg_version::PgVersion;
 use crate::rules::utils::tables_created_in_transaction;
+use crate::versions::Version;
 use crate::violations::{RuleViolation, RuleViolationKind};
 
 use squawk_parser::ast::{
@@ -9,7 +9,7 @@ use squawk_parser::ast::{
 #[must_use]
 pub fn disallow_unique_constraint(
     tree: &[RawStmt],
-    _pg_version: Option<PgVersion>,
+    _pg_version: Option<Version>,
 ) -> Vec<RuleViolation> {
     let tables_created = tables_created_in_transaction(tree);
     let mut errs = vec![];
