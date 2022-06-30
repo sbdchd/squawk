@@ -66,6 +66,10 @@
 
         devShell = pkgs.squawk.overrideAttrs (old: {
           RUST_SRC_PATH = pkgs.rustPlatform.rustLibSrc;
+
+          nativeBuildInputs = old.nativeBuildInputs ++ (with pkgs; [
+            cargo-insta
+          ]);
         });
       });
 }
