@@ -64,6 +64,8 @@
         # for debugging
         inherit pkgs;
 
-        devShell = pkgs.squawk;
+        devShell = pkgs.squawk.overrideAttrs (old: {
+          RUST_SRC_PATH = pkgs.rustPlatform.rustLibSrc;
+        });
       });
 }
