@@ -777,8 +777,8 @@ dependencies = [
 
 [[package]]
 name = "libpg_query-sys"
-version = "0.1.3"
-source = "git+https://github.com/chdsbd/libpg_query-sys?branch=chris/bump-submodule#03b96cf6b8a7df84a62e285835d9ca08a89e4af4"
+version = "0.2.0"
+source = "git+https://github.com/lf-/libpg_query-sys?branch=system-lib#ba0697bf023b3e81d8895d890ae1c650dbd9644f"
 dependencies = [
  "bindgen",
  "make-cmd",
