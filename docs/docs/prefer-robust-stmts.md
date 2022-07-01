@@ -82,6 +82,25 @@ CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "email_idx" ON "app_user" ("email");
 ```
 
+`CREATE INDEX CONCURRENTLY` failing will leave behind `INVALID` index objects
+that still occupy their respective names. This means that if a name is not
+specified, a failing migration being run multiple times will create multiple
+duplicate indexes with consecutive names, all of which are `INVALID`.
+
+If you provide a name and `IF NOT EXISTS`, the second run will falsely succeed
+because the index exists, even though it is invalid. This is another footgun,
+albeit a checkable (see the `pg_index` catalog) one.
+
+Thus:
+
+```
+-- instead of:
+CREATE INDEX CONCURRENTLY ON "app_user" ("email");
+
+-- use:
+CREATE INDEX CONCURRENTLY IF NOT EXISTS "email_idx" ON "app_user" ("email");
+```
+
 ### remove table
 
 ```sql

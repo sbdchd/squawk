@@ -1,0 +1,22 @@
+---
+source: linter/src/rules/prefer_robust_stmts.rs
+expression: "check_sql(bad_sql, &[])"
+---
+Ok(
+    [
+        RuleViolation {
+            kind: PreferRobustStmts,
+            span: Span {
+                start: 0,
+                len: Some(
+                    59,
+                ),
+            },
+            messages: [
+                Help(
+                    "Use an explicit name for a concurrently created index",
+                ),
+            ],
+        },
+    ],
+)
