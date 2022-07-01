@@ -82,7 +82,7 @@ CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "email_idx" ON "app_user" ("email");
 ```
 
-`CREATE INDEX CONCURRENTLY` failing will leave behind `INVALID` index objects
+`CREATE INDEX CONCURRENTLY` failing will leave behind [`INVALID` index objects](https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY)
 that still occupy their respective names. This means that if a name is not
 specified, a failing migration being run multiple times will create multiple
 duplicate indexes with consecutive names, all of which are `INVALID`.
@@ -93,7 +93,7 @@ albeit a checkable (see the `pg_index` catalog) one.
 
 Thus:
 
-```
+```sql
 -- instead of:
 CREATE INDEX CONCURRENTLY ON "app_user" ("email");
 
