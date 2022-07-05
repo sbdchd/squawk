@@ -23,9 +23,6 @@
 
               cargoLock = {
                 lockFile = ./Cargo.lock;
-                outputHashes = {
-                  "libpg_query-sys-0.2.0" = "sha256-Txllwr/aZFrrRC+Me+ofX/B9l7JpX6MBLEs2NX2FFqw=";
-                };
               };
 
               src = ./.;
@@ -43,7 +40,7 @@
                 Security
               ]);
 
-              LIBPG_QUERY = final.libpg_query;
+              LIBPG_QUERY_PATH = final.libpg_query;
 
               meta = with lib; {
                 description = "Linter for PostgreSQL, focused on migrations";
