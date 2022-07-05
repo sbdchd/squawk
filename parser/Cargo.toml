@@ -12,7 +12,7 @@ keywords = ["postgres", "sql", "parser"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-libpg_query-sys = { git = "https://github.com/lf-/libpg_query-sys", branch= "system-lib" }
+libpg_query-sys = "0.2.1"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_repr = "0.1"
