@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     versions::Version,
-    violations::{RuleViolation, RuleViolationKind},
+    violations::{RuleViolation, RuleViolationKind, ViolationMessage}
 };
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, RawStmt, Stmt, TransactionStmtKind,
@@ -65,7 +65,20 @@ pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: Option<Version>) -> Ve
                     ));
                 }
             }
-            Stmt::IndexStmt(stmt) if !stmt.if_not_exists && !inside_transaction => {
+            // bad: CREATE INDEX CONCURRENTLY ON ..
+            // good: CREATE INDEX CONCURRENTLY somename ON ..
+            Stmt::IndexStmt(stmt) if stmt.concurrent && stmt.idxname.is_none() => {
+                errs.push(RuleViolation::new(
+                    RuleViolationKind::PreferRobustStmts,
+                    raw_stmt.into(),
+                    Some(vec![ViolationMessage::Help(
+                        "Use an explicit name for a concurrently created index".into(),
+                    )]),
+                ));
+            }
+            Stmt::IndexStmt(stmt)
+                if !stmt.if_not_exists && (stmt.concurrent || !inside_transaction) =>
+            {
                 errs.push(RuleViolation::new(
                     RuleViolationKind::PreferRobustStmts,
                     raw_stmt.into(),
@@ -199,6 +212,15 @@ INSERT INTO tbl VALUES (a);
 ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         "#;
         assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+    }
+
+    #[test]
+    fn test_create_index_concurrently_unnamed() {
+        let bad_sql = r#"
+  CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
+  "#;
+
+        assert_debug_snapshot!(check_sql(bad_sql, &[]));
     }
 
     #[test]

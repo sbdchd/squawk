@@ -203,6 +203,17 @@ cargo run
 ./s/fmt
 ```
 
+... or with nix:
+
+```
+$ nix develop
+[nix-shell]$ cargo run
+[nix-shell]$ cargo insta review
+[nix-shell]$ ./s/test
+[nix-shell]$ ./s/lint
+[nix-shell]$ ./s/fmt
+```
+
 ### releasing a new version
 
 1. update the CHANGELOG.md and bump version in the cli `Cargo.toml`, ensure the
