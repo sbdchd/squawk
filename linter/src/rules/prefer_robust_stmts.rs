@@ -2,7 +2,7 @@ use std::collections::HashMap;
 
 use crate::{
     versions::Version,
-    violations::{RuleViolation, RuleViolationKind, ViolationMessage}
+    violations::{RuleViolation, RuleViolationKind, ViolationMessage},
 };
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, RawStmt, Stmt, TransactionStmtKind,
@@ -220,7 +220,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[]));
+        assert_debug_snapshot!(check_sql(bad_sql, &[], None));
     }
 
     #[test]

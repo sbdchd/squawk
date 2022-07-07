@@ -1599,6 +1599,7 @@ dependencies = [
  "squawk-linter",
  "squawk-parser",
  "structopt",
+ "tempfile",
  "toml",
 ]
 
@@ -1620,6 +1621,7 @@ dependencies = [
  "insta",
  "lazy_static",
  "serde",
+ "serde_json",
  "serde_plain",
  "squawk-parser",
 ]
