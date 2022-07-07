@@ -5,8 +5,13 @@ use crate::{
 
 use serde_json::{json, Value};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
+    AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, Constraint, RawStmt, Stmt,
 };
+
+fn constraint_has_constant_expr(constraint: &Constraint) -> bool {
+    constraint.raw_expr.is_some()
+        && constraint.raw_expr.as_ref().unwrap_or(&json!({}))["A_Const"] != Value::Null
+}
 
 #[must_use]
 pub fn adding_field_with_default(
@@ -24,10 +29,7 @@ pub fn adding_field_with_default(
                                 if constraint.contype == ConstrType::Default {
                                     if let Some(pg_version) = pg_version {
                                         if pg_version > Version::new(11, None, None)
-                                            && constraint.raw_expr.is_some()
-                                            && constraint.raw_expr.as_ref().unwrap_or(&json!({}))
-                                                ["A_Const"]
-                                                != Value::Null
+                                            && constraint_has_constant_expr(constraint)
                                         {
                                             continue;
                                         }
