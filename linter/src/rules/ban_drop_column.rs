@@ -1,8 +1,12 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::{
+    versions::Version,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{AlterTableCmds, AlterTableType, RawStmt, Stmt};
 
 #[must_use]
-pub fn ban_drop_column(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn ban_drop_column(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -35,6 +39,10 @@ mod test_rules {
 ALTER TABLE "bar_tbl" DROP COLUMN "foo_col" CASCADE;
         "#;
 
-        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            None
+        ));
     }
 }

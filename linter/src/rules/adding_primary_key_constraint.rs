@@ -1,10 +1,17 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::{
+    versions::Version,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
 
 #[must_use]
-pub fn adding_primary_key_constraint(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn adding_primary_key_constraint(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -60,7 +67,7 @@ ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 "#;
 
         let expected_bad_res =
-            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]).unwrap_or_default();
+            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
     }
@@ -72,13 +79,17 @@ ALTER TABLE items ADD PRIMARY KEY (id);
 "#;
 
         let expected_bad_res =
-            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]).unwrap_or_default();
+            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
 
         let ok_sql = r#"
 ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
 "#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            ok_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            None
+        ));
     }
 }

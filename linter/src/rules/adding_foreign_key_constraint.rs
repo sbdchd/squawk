@@ -1,4 +1,8 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::{
+    versions::Version,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ConstrType, RawStmt, Stmt, TableElt,
 };
@@ -10,7 +14,10 @@ use squawk_parser::ast::{
 /// VALIDATE in another transaction will allow writes when adding the
 /// constraint.
 #[must_use]
-pub fn adding_foreign_key_constraint(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn adding_foreign_key_constraint(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -64,7 +71,7 @@ mod test_rules {
     };
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql(sql, &[])
+        check_sql(sql, &[], None)
             .unwrap()
             .into_iter()
             .filter(|x| x.kind == RuleViolationKind::AddingForeignKeyConstraint)

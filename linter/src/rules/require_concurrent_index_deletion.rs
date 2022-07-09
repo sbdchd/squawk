@@ -1,8 +1,15 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::{
+    versions::Version,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{ObjectType, RawStmt, Stmt};
 
 #[must_use]
-pub fn require_concurrent_index_deletion(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn require_concurrent_index_deletion(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -30,7 +37,7 @@ mod test_rules {
   -- instead of
   DROP INDEX IF EXISTS "field_name_idx";
   "#;
-        let res = check_sql(bad_sql, &[]).unwrap();
+        let res = check_sql(bad_sql, &[], None).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(
             res[0].kind,
@@ -40,7 +47,7 @@ mod test_rules {
         let ok_sql = r#"
   DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
   "#;
-        assert_eq!(check_sql(ok_sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(ok_sql, &[], None), Ok(vec![]));
     }
 
     #[test]
@@ -48,7 +55,7 @@ mod test_rules {
         let sql = r#"
   DROP TYPE IF EXISTS foo;
   "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
     }
 
     #[test]
@@ -56,7 +63,7 @@ mod test_rules {
         let sql = r#"
   DROP TABLE IF EXISTS some_table;
   "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
     }
 
     #[test]
@@ -64,6 +71,6 @@ mod test_rules {
         let sql = r#"
   DROP TRIGGER IF EXISTS trigger on foo_table;
   "#;
-        assert_eq!(check_sql(sql, &[]), Ok(vec![]));
+        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
     }
 }

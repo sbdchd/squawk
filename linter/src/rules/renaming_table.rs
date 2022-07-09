@@ -1,8 +1,12 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::{
+    versions::Version,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{ObjectType, RawStmt, Stmt};
 
 #[must_use]
-pub fn renaming_table(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn renaming_table(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -33,6 +37,6 @@ mod test_rules {
 ALTER TABLE "table_name" RENAME TO "new_table_name";
         "#;
 
-        assert_debug_snapshot!(check_sql(sql, &[]));
+        assert_debug_snapshot!(check_sql(sql, &[], None));
     }
 }

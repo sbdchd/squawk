@@ -1,11 +1,16 @@
 use crate::rules::utils::tables_created_in_transaction;
+use crate::versions::Version;
 use crate::violations::{RuleViolation, RuleViolationKind};
+
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ConstrType, RawStmt, Stmt,
 };
 
 #[must_use]
-pub fn disallow_unique_constraint(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn disallow_unique_constraint(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+) -> Vec<RuleViolation> {
     let tables_created = tables_created_in_transaction(tree);
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -71,12 +76,21 @@ ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
 ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
    "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            None
+        ));
         assert_debug_snapshot!(check_sql(
             ignored_sql,
-            &[RuleViolationKind::PreferRobustStmts]
+            &[RuleViolationKind::PreferRobustStmts],
+            None
         ));
-        assert_debug_snapshot!(check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts]));
+        assert_debug_snapshot!(check_sql(
+            ok_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            None
+        ));
     }
 
     /// Creating a UNIQUE constraint from an existing index should be considered
@@ -89,7 +103,7 @@ CREATE UNIQUE INDEX CONCURRENTLY "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_
 ALTER TABLE "legacy_questiongrouppg" ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
         "#;
         assert_eq!(
-            check_sql(sql, &[RuleViolationKind::PreferRobustStmts]),
+            check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None),
             Ok(vec![])
         );
     }

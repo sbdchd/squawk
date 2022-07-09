@@ -1,8 +1,12 @@
-use crate::violations::{RuleViolation, RuleViolationKind};
+use crate::{
+    versions::Version,
+    violations::{RuleViolation, RuleViolationKind},
+};
+
 use squawk_parser::ast::{QualifiedName, RawStmt, Stmt, TableElt};
 
 #[must_use]
-pub fn ban_char_type(tree: &[RawStmt]) -> Vec<RuleViolation> {
+pub fn ban_char_type(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -45,7 +49,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(sql, &[]));
+        assert_debug_snapshot!(check_sql(sql, &[], None));
     }
 
     #[test]
@@ -59,6 +63,6 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField]));
+        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField], None));
     }
 }
