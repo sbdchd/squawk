@@ -11,8 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Added
 
-- added `pg_version` configuration option to support ignoring rules by Postgres version. Thanks @adamrdavid
-  adamrdavid! (#219)
+- added `pg_version` configuration option to support ignoring rules by Postgres version. Thanks @adamrdavid! (#219)
 
 ## v0.13.2 - 2022-06-16
 
