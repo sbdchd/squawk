@@ -10,6 +10,7 @@ module.exports = {
   projectName: "squawk", // Usually your repo name.
   themeConfig: {
     prism: {
+      additionalLanguages: ['toml'],
       theme: require('prism-react-renderer/themes/oceanicNext'),
     },
     algolia: {

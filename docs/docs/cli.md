@@ -13,7 +13,7 @@ squawk migration_001.sql migration_002.sql migration_003.sql
 cat migration.sql | squawk
 ```
 
-### rules
+## rules
 
 Individual rules can be disabled via the `--exclude` flag
 
@@ -21,7 +21,7 @@ Individual rules can be disabled via the `--exclude` flag
 squawk --exclude=adding-field-with-default,disallowed-unique-constraint example.sql
 ```
 
-### `.squawk.toml` configuration file
+## `.squawk.toml` configuration file
 
 Rules can be disabled with a configuration file.
 
@@ -31,21 +31,44 @@ By default, Squawk will traverse up from the current directory to find a `.squaw
 squawk --config=~/.squawk.toml example.sql
 ```
 
-The `--exclude` flag will always be prioritized over the configuration file.
+The `--exclude` and `--pg-version` flags will always be prioritized over the configuration file.
 
-**Example `.squawk.toml`**
+
+## example `.squawk.toml` configurations
+
+### excluding rules
 
 ```toml
+# .squawk.toml
 excluded_rules = [
     "require-concurrent-index-creation",
     "require-concurrent-index-deletion",
 ]
 ```
 
+### specifying postgres version
+
+```toml
+# .squawk.toml
+pg_version = "11.0"
+```
+### using all options
+
+```toml
+# .squawk.toml
+pg_version = "11.0"
+excluded_rules = [
+    "require-concurrent-index-creation",
+    "require-concurrent-index-deletion",
+]
+```
+
+
+
 See the [Squawk website](https://squawkhq.com/docs/rules) for documentation on each rule with examples and reasoning.
 
 
-### `squawk --help`
+## `squawk --help`
 
 ```
 squawk
@@ -82,6 +105,10 @@ OPTIONS:
         --explain <rule>               
             Provide documentation on the given rule
 
+        --pg-version <pg-version>      
+            Specify postgres version
+            
+            For example: --pg-version=13.0
         --reporter <reporter>          
             Style of error reporting [possible values: Tty, Gcc, Json]
 
@@ -96,5 +123,5 @@ ARGS:
 
 SUBCOMMANDS:
     help                Prints this message or the help of the given subcommand(s)
-    upload-to-github    Comment on a PR with Squawk's results 
+    upload-to-github    Comment on a PR with Squawk's results
 ```
