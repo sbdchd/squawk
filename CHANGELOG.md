@@ -7,11 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.14.0 - 2022-07-10
+
+## Added
+
+- added `pg_version` configuration option to support ignoring rules by Postgres version. Thanks @adamrdavid! (#219)
+
 ## v0.13.2 - 2022-06-16
 
 ## Changed
 
-- internal: use rule IDs based on serde annotations of `RuleViolationKind` (#218)
+- internal: use rule IDs based on serde annotations of `RuleViolationKind`. (#218)
 
 ## v0.13.1 - 2022-06-15
 

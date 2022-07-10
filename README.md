@@ -95,6 +95,10 @@ OPTIONS:
         --explain <rule>
             Provide documentation on the given rule
 
+        --pg-version <pg-version>
+            Specify postgres version
+
+            For example: --pg-version=13.0
         --reporter <reporter>
             Style of error reporting [possible values: Tty, Gcc, Json]
 
