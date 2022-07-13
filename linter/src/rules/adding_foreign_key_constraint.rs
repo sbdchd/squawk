@@ -129,4 +129,19 @@ COMMIT;
             RuleViolationKind::AddingForeignKeyConstraint
         );
     }
+    #[test]
+    fn test_add_column_references_lock() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE "emails" ADD COLUMN "user_id" INT REFERENCES "user" ("id");
+COMMIT;
+        "#;
+
+        let violations = lint_sql(sql);
+        assert_eq!(violations.len(), 1);
+        assert_eq!(
+            violations[0].kind,
+            RuleViolationKind::AddingForeignKeyConstraint
+        );
+    }
 }
