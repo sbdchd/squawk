@@ -4,7 +4,8 @@ use crate::{
 };
 
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ConstrType, RawStmt, Stmt, TableElt,
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
+    TableElt,
 };
 
 /// Adding a foreign key constraint requires a table scan and a
@@ -50,6 +51,22 @@ pub fn adding_foreign_key_constraint(
                                             raw_stmt.into(),
                                             None,
                                         ));
+                                    }
+                                }
+                            } else if AlterTableType::AddColumn == command.subtype {
+                                if let Some(AlterTableDef::ColumnDef(column_def)) = &command.def {
+                                    for ColumnDefConstraint::Constraint(constraint) in
+                                        &column_def.constraints
+                                    {
+                                        if !constraint.skip_validation
+                                            && constraint.contype == ConstrType::Foreign
+                                        {
+                                            errs.push(RuleViolation::new(
+                                                RuleViolationKind::AddingForeignKeyConstraint,
+                                                raw_stmt.into(),
+                                                None,
+                                            ));
+                                        }
                                     }
                                 }
                             }
@@ -119,6 +136,21 @@ COMMIT;
 BEGIN;
 ALTER TABLE "email" ADD COLUMN "user_id" INT;
 ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+COMMIT;
+        "#;
+
+        let violations = lint_sql(sql);
+        assert_eq!(violations.len(), 1);
+        assert_eq!(
+            violations[0].kind,
+            RuleViolationKind::AddingForeignKeyConstraint
+        );
+    }
+    #[test]
+    fn test_add_column_references_lock() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE "emails" ADD COLUMN "user_id" INT REFERENCES "user" ("id");
 COMMIT;
         "#;
 
