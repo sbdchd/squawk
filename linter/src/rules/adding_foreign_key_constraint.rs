@@ -4,7 +4,8 @@ use crate::{
 };
 
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt, TableElt,
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
+    TableElt,
 };
 
 /// Adding a foreign key constraint requires a table scan and a
@@ -54,8 +55,12 @@ pub fn adding_foreign_key_constraint(
                                 }
                             } else if let AlterTableType::AddColumn = command.subtype {
                                 if let Some(AlterTableDef::ColumnDef(column_def)) = &command.def {
-                                    for ColumnDefConstraint::Constraint(constraint) in &column_def.constraints {
-                                        if !constraint.skip_validation && constraint.contype == ConstrType::Foreign {
+                                    for ColumnDefConstraint::Constraint(constraint) in
+                                        &column_def.constraints
+                                    {
+                                        if !constraint.skip_validation
+                                            && constraint.contype == ConstrType::Foreign
+                                        {
                                             errs.push(RuleViolation::new(
                                                 RuleViolationKind::AddingForeignKeyConstraint,
                                                 raw_stmt.into(),
