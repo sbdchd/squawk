@@ -53,7 +53,7 @@ pub fn adding_foreign_key_constraint(
                                         ));
                                     }
                                 }
-                            } else if let AlterTableType::AddColumn = command.subtype {
+                            } else if AlterTableType::AddColumn == command.subtype {
                                 if let Some(AlterTableDef::ColumnDef(column_def)) = &command.def {
                                     for ColumnDefConstraint::Constraint(constraint) in
                                         &column_def.constraints
