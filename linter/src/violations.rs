@@ -40,7 +40,7 @@ pub enum RuleViolationKind {
     BanCharField,
     #[serde(rename = "ban-drop-column")]
     BanDropColumn,
-    // new-rule-above
+    // generator::new-rule-above
 }
 
 impl std::fmt::Display for RuleViolationKind {
