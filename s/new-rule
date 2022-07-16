@@ -1,3 +1,8 @@
 #!/bin/bash
-
+# generate a new rule using plop and our plopfile.js configuration
+#
+# install plop via `npm install -g plop`
+#
+# https://github.com/plopjs/plop
+echo "$@"
 plop rule
