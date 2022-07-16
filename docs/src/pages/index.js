@@ -137,6 +137,7 @@ const rules = [
     description:
       "Prevent blocking reads/writes to table while index is dropped.",
   },
+  // generator::new-rule-above
 ]
 
 function Home() {

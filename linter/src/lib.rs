@@ -255,7 +255,8 @@ lazy_static! {
                 "Delete the index CONCURRENTLY.".into()
             ),
         ],
-    }
+    },
+    // generator::new-rule-above
     ];
 
 }
