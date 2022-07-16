@@ -1,5 +1,5 @@
-mod utils;
 pub mod adding_field_with_default;
+mod utils;
 pub use adding_field_with_default::*;
 pub mod adding_not_null_field;
 pub use adding_not_null_field::*;
