@@ -1,6 +1,17 @@
 # linter/src/rules
 
-## Adding a new rule
+## Adding a new rule (automated)
+
+1. Install [plop](https://github.com/plopjs/plop)
+   ```
+   npm install -g plop
+   ```
+2. Generate a new rule
+   ```
+   s/new-rule 'my-rule-name'
+   ```
+
+## Adding a new rule (manually)
 
 1. Create a new file in `squawk/linter/src/rules/my_new_rule.rs`. Use an existing rule as a template.
 2. Add your module to `squawk/linter/src/rules/mod.rs`.
