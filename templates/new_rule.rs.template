@@ -7,7 +7,7 @@ use squawk_parser::ast::RawStmt;
 
 
 #[must_use]
-pub fn prefer_timestamptz(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
+pub fn {{RuleNameSnake}}(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     errs
 }
