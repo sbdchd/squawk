@@ -26,42 +26,44 @@ module.exports = function (plop) {
         {
           type: 'modify',
           path: 'linter/src/rules/mod.rs',
-          template: `
+          pattern: /$/,
+          template: 
+`
 pub mod {{RuleNameSnake}};
-pub use {{RuleNameSnake}}::*;
-          `,
+pub use {{RuleNameSnake}}::*;`,
         },        
         {
           type: 'modify',
           path: 'linter/src/violations.rs',
+          pattern: /^\s+\/\/\s\|\|new-rule-above-here$/gm,
           template: `
     #[serde(rename = "{{RuleNameKebab}}")]
     {{RuleNameCamel}},
           `,
         },
-        {
-          type: 'modify',
-          path: 'linter/src/lib.rs',
-          template: `
-    SquawkRule {
-        name: RuleViolationKind::{{RuleNameCamel}},
-        func: {{RuleNameSnake}},
-        messages: vec![
-            ViolationMessage::Note(
-                "TODO".into()
-            ),
-            ViolationMessage::Help(
-                "TODO".into()
-            ),
-        ],
-    }
-`,
-        },
-        {
-          type: 'modify',
-          path: 'docs/sidebar.js',
-          template: `"{{RuleNameKebab}}"`,
-        },
+//         {
+//           type: 'modify',
+//           path: 'linter/src/lib.rs',
+//           template: `
+//     SquawkRule {
+//         name: RuleViolationKind::{{RuleNameCamel}},
+//         func: {{RuleNameSnake}},
+//         messages: vec![
+//             ViolationMessage::Note(
+//                 "TODO".into()
+//             ),
+//             ViolationMessage::Help(
+//                 "TODO".into()
+//             ),
+//         ],
+//     }
+// `,
+//         },
+//         {
+//           type: 'modify',
+//           path: 'docs/sidebar.js',
+//           template: `"{{RuleNameKebab}}"`,
+//         },
       ]
     },
   })
