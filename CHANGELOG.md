@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.15.0 - 2022-07-17
+
+## Added
+
+- added `prefer-timestamptz` rule to warn about using `timestamp` instead of `timestamptz`. (#230)
+
+## Changed
+
+- only apply `prefer-robust-stmts` to files with more than one SQL statement. (#231)
+
+## Fixed
+
+- catch another way to add foreign keys for `adding-foreign-key-constraint`. Thanks @adamrdavid! (#228)
+
 ## v0.14.0 - 2022-07-10
 
 ## Added

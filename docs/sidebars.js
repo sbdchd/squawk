@@ -14,6 +14,7 @@ module.exports = {
       "disallowed-unique-constraint",
       "prefer-robust-stmts",
       "prefer-text-field",
+      "prefer-timestamptz",
       "renaming-column",
       "renaming-table",
       "require-concurrent-index-creation",
