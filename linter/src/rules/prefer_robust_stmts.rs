@@ -24,6 +24,12 @@ pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: Option<Version>) -> Ve
     let mut errs = vec![];
     let mut inside_transaction = false;
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
+    // if we only have one statement in our file, Postgres will run that
+    // statement in an implicit transaction, so we don't need to worry about
+    // wrapping with `BEGIN;COMMIT;`.
+    if tree.len() == 1 {
+        return errs;
+    }
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => match stmt.kind {
@@ -105,8 +111,23 @@ pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: Option<Version>) -> Ve
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql,
+        errors::CheckSqlError,
+        violations::{RuleViolation, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
+    use squawk_parser::parse::parse_sql_query;
+
+    use super::prefer_robust_stmts;
+
+    fn lint_sql(sql: &str) -> Result<Vec<RuleViolation>, CheckSqlError> {
+        let mut sql = sql.to_owned();
+        // our check ignores single statement queries, so we add an extra statement to ensure we check that case
+        sql.push_str(";\nSELECT 1;");
+        let tree = parse_sql_query(&sql)?;
+        Ok(prefer_robust_stmts(&tree, None))
+    }
 
     #[test]
     /// If we drop the constraint before adding it, we don't need the IF EXISTS or a transaction.
@@ -115,14 +136,14 @@ mod test_rules {
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
     }
     #[test]
     fn drop_index() {
         let sql = r#"
 DROP INDEX CONCURRENTLY "email_idx";
 "#;
-        let res = check_sql(sql, &[], None).unwrap();
+        let res = lint_sql(sql).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
     }
@@ -131,7 +152,7 @@ DROP INDEX CONCURRENTLY "email_idx";
         let sql = r#"
 DROP INDEX CONCURRENTLY IF EXISTS "email_idx";
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
     }
     #[test]
     /// DROP CONSTRAINT and then ADD CONSTRAINT is safe. We can also safely run VALIDATE CONSTRAINT.
@@ -141,7 +162,7 @@ ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "fk_user";
 ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "app_user" ("id") DEFERRABLE INITIALLY DEFERRED NOT VALID;
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
     }
     #[test]
     /// We can only use the dropped constraint in one ADD CONSTRAINT statement.
@@ -152,7 +173,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_id
 -- this second add constraint should error because it's not robust
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
-        let res = check_sql(sql, &[], None).unwrap();
+        let res = lint_sql(sql).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::PreferRobustStmts);
     }
@@ -166,17 +187,17 @@ BEGIN;
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 COMMIT;
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
 
         let sql = r#"
 ALTER TABLE "core_foo" ADD COLUMN IF NOT EXISTS "answer_id" integer NULL;
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
 
         let sql = r#"
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "core_foo_idx" ON "core_foo" ("answer_id");
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
 
         let sql = r#"
 BEGIN;
@@ -186,7 +207,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
 
         let sql = r#"
 CREATE TABLE IF NOT EXISTS "core_bar" (
@@ -194,24 +215,24 @@ CREATE TABLE IF NOT EXISTS "core_bar" (
     "bravo" text NOT NULL
 );
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
 
         // select is fine, we're only interested in modifications to the tables
         let sql = r#"
 SELECT 1;
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
 
         // inserts are also okay
         let sql = r#"
 INSERT INTO tbl VALUES (a);
 "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
 
         let sql = r#"
 ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), Ok(vec![]));
     }
 
     #[test]
@@ -220,7 +241,36 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &[], None));
+        assert_debug_snapshot!(lint_sql(bad_sql));
+    }
+
+    fn violations(
+        res: Result<Vec<RuleViolation>, CheckSqlError>,
+    ) -> Result<Vec<RuleViolationKind>, CheckSqlError> {
+        match res {
+            Ok(res) => Ok(res.into_iter().map(|x| x.kind).collect()),
+            Err(err) => Err(err),
+        }
+    }
+
+    #[test]
+    fn test_ignore_single_stmts() {
+        let bad_sql = r#"
+  CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
+  "#;
+        assert_eq!(check_sql(bad_sql, &[], None), Ok(vec![]));
+        let bad_sql = r#"
+  CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
+  CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
+  "#;
+
+        assert_eq!(
+            violations(check_sql(bad_sql, &[], None)),
+            Ok(vec![
+                RuleViolationKind::PreferRobustStmts,
+                RuleViolationKind::PreferRobustStmts
+            ])
+        );
     }
 
     #[test]
@@ -228,7 +278,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         let sql = r#"
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[], None), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r###"
         Ok(
             [
                 RuleViolation {
@@ -252,7 +302,7 @@ ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
         let sql = r#"
 CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[], None), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r###"
         Ok(
             [
                 RuleViolation {
@@ -276,7 +326,7 @@ CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
         let sql = r#"
 CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[], None), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r###"
         Ok(
             [
                 RuleViolation {
@@ -300,7 +350,7 @@ CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NUL
         let sql = r#"
 ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
         "#;
-        assert_debug_snapshot!(check_sql(sql, &[], None), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r###"
         Ok(
             [
                 RuleViolation {
