@@ -19,7 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Fixed
 
-- catch another way to add foreign keys for `adding-foreign-key-constraint`. (#228)
+- catch another way to add foreign keys for `adding-foreign-key-constraint`. Thanks @adamrdavid! (#228)
 
 ## v0.14.0 - 2022-07-10
 
