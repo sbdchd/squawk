@@ -67,6 +67,14 @@ pub use {{RuleNameSnake}}::*;`,
         },
         {
           type: 'modify',
+          path: 'linter/src/lib.rs',
+          pattern: /use crate::rules/,
+          template: 
+`use crate::rules::{{RuleNameSnake}};
+use crate::rules`,
+        },
+        {
+          type: 'modify',
           path: 'docs/sidebars.js',
           pattern: /\/\/\sgenerator::new-rule-above/,
           template: `"{{RuleNameKebab}}",
