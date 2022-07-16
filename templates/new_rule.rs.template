@@ -21,6 +21,6 @@ mod test_rules {
         let ok_sql = r#"
 SELECT 1;
   "#;
-        assert_eq!(check_sql(ok_sql, &EXCLUDED_RULES, None), Ok(vec![]));
+        assert_eq!(check_sql(ok_sql, &[], None), Ok(vec![]));
     }
 }
