@@ -29,8 +29,7 @@ module.exports = function (plop) {
           path: 'linter/src/rules/mod.rs',
           pattern: /$/,
           template: 
-`
-pub mod {{RuleNameSnake}};
+`pub mod {{RuleNameSnake}};
 pub use {{RuleNameSnake}}::*;`,
         },        
         {
