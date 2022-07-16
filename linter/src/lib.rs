@@ -12,7 +12,7 @@ use crate::rules::{
     adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
     adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
     changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
-    prefer_robust_stmts, prefer_text_field, renaming_column, renaming_table,
+    prefer_robust_stmts, prefer_text_field, prefer_timestamptz, renaming_column, renaming_table,
     require_concurrent_index_creation, require_concurrent_index_deletion,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
@@ -191,6 +191,18 @@ lazy_static! {
             ),
             ViolationMessage::Help(
                 "Use a text field with a check constraint.".into()
+            ),
+        ]
+    },
+    SquawkRule {
+        name: RuleViolationKind::PreferTimestampTz,
+        func: prefer_timestamptz,
+        messages: vec![
+            ViolationMessage::Note(
+                "A timestamp field without a timezone can lead to data loss, depending on your database session timezone.".into()
+            ),
+            ViolationMessage::Help(
+                "Use timestamptz instead of timestamp for your column type.".into()
             ),
         ]
     },

@@ -1,0 +1,40 @@
+---
+source: linter/src/rules/prefer_timestamptz.rs
+expression: res
+---
+[
+    RuleViolation {
+        kind: PreferTimestampTz,
+        span: Span {
+            start: 0,
+            len: Some(
+                73,
+            ),
+        },
+        messages: [
+            Note(
+                "A timestamp field without a timezone can lead to data loss, depending on your database session timezone.",
+            ),
+            Help(
+                "Use timestamptz instead of timestamp for your column type.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferTimestampTz,
+        span: Span {
+            start: 74,
+            len: Some(
+                94,
+            ),
+        },
+        messages: [
+            Note(
+                "A timestamp field without a timezone can lead to data loss, depending on your database session timezone.",
+            ),
+            Help(
+                "Use timestamptz instead of timestamp for your column type.",
+            ),
+        ],
+    },
+]

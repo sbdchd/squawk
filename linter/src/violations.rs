@@ -34,6 +34,8 @@ pub enum RuleViolationKind {
     PreferTextField,
     #[serde(rename = "prefer-robust-stmts")]
     PreferRobustStmts,
+    #[serde(rename = "prefer-timestamptz")]
+    PreferTimestampTz,
     #[serde(rename = "ban-char-field")]
     BanCharField,
     #[serde(rename = "ban-drop-column")]
