@@ -12,6 +12,7 @@ module.exports = function (plop) {
       data.RuleNameKebab = plop.getHelper("kebabCase")(data.name);
       data.RuleNameSnake = plop.getHelper("snakeCase")(data.name);
       data.RuleNameCamel = plop.getHelper("camelCase")(data.name);
+      data.RuleNamePascal = plop.getHelper("pascalCase")(data.name);
       return [
         {
           type: 'add',
@@ -35,35 +36,50 @@ pub use {{RuleNameSnake}}::*;`,
         {
           type: 'modify',
           path: 'linter/src/violations.rs',
-          pattern: /^\s+\/\/\s\|\|new-rule-above-here$/gm,
-          template: `
-    #[serde(rename = "{{RuleNameKebab}}")]
-    {{RuleNameCamel}},
-          `,
+          pattern: /\/\/\sgenerator::new-rule-above/,
+          template: 
+`#[serde(rename = "{{RuleNameKebab}}")]
+    {{RuleNamePascal}},
+    // generator::new-rule-above`,
         },
-//         {
-//           type: 'modify',
-//           path: 'linter/src/lib.rs',
-//           template: `
-//     SquawkRule {
-//         name: RuleViolationKind::{{RuleNameCamel}},
-//         func: {{RuleNameSnake}},
-//         messages: vec![
-//             ViolationMessage::Note(
-//                 "TODO".into()
-//             ),
-//             ViolationMessage::Help(
-//                 "TODO".into()
-//             ),
-//         ],
-//     }
-// `,
-//         },
-//         {
-//           type: 'modify',
-//           path: 'docs/sidebar.js',
-//           template: `"{{RuleNameKebab}}"`,
-//         },
+        {
+          type: 'modify',
+          path: 'linter/src/lib.rs',
+          pattern: /\/\/\sgenerator::new-rule-above/,
+          template: 
+`SquawkRule {
+        name: RuleViolationKind::{{RuleNamePascal}},
+        func: {{RuleNameSnake}},
+        messages: vec![
+            ViolationMessage::Note(
+                "TODO".into()
+            ),
+            ViolationMessage::Help(
+                "TODO".into()
+            ),
+        ],
+    },
+    // generator::new-rule-above`,
+        },
+        {
+          type: 'modify',
+          path: 'docs/sidebars.js',
+          pattern: /\/\/\sgenerator::new-rule-above/,
+          template: `"{{RuleNameKebab}}",
+      // generator::new-rule-above`,
+        },
+        {
+          type: 'modify',
+          path: 'docs/src/pages/index.js',
+          pattern: /\/\/\sgenerator::new-rule-above/,
+          template: 
+`{
+    name: "{{RuleNameKebab}}",
+    tags: ["TODO"],
+    description: "TODO",
+  },
+  // generator::new-rule-above`,
+        },
       ]
     },
   })
