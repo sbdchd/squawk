@@ -1,57 +1,54 @@
 // configuration for plop to generate a new Squawk rule.
-// use `s/new-rule` to call this. 
+// use `s/new-rule` to call this.
 // You must install `plop` via `npm install -g plop`.
 //
 // https://github.com/plopjs/plop
 module.exports = function (plop) {
-   plop.setGenerator('rule', {
-    description: 'Create a new rule',
+  plop.setGenerator("rule", {
+    description: "Create a new rule",
     prompts: [
       {
-        name: 'name',
-        type: 'input',
-        message: 'Name for the rule',
+        name: "name",
+        type: "input",
+        message: "Name for the rule",
       },
     ],
     actions: function (data) {
-      data.RuleNameKebab = plop.getHelper("kebabCase")(data.name);
-      data.RuleNameSnake = plop.getHelper("snakeCase")(data.name);
-      data.RuleNameCamel = plop.getHelper("camelCase")(data.name);
-      data.RuleNamePascal = plop.getHelper("pascalCase")(data.name);
+      data.RuleNameKebab = plop.getHelper("kebabCase")(data.name)
+      data.RuleNameSnake = plop.getHelper("snakeCase")(data.name)
+      data.RuleNameCamel = plop.getHelper("camelCase")(data.name)
+      data.RuleNamePascal = plop.getHelper("pascalCase")(data.name)
       return [
         {
-          type: 'add',
+          type: "add",
           path: `linter/src/rules/{{RuleNameSnake}}.rs`,
           templateFile: `templates/new_rule.rs.template`,
         },
         {
-          type: 'add',
+          type: "add",
           path: `docs/docs/{{RuleNameSnake}}.md`,
           templateFile: `templates/new_rule.md.template`,
-        },  
+        },
         {
-          type: 'modify',
-          path: 'linter/src/rules/mod.rs',
+          type: "modify",
+          path: "linter/src/rules/mod.rs",
           pattern: /$/,
-          template: 
-`pub mod {{RuleNameSnake}};
+          template: `pub mod {{RuleNameSnake}};
 pub use {{RuleNameSnake}}::*;`,
-        },        
+        },
         {
-          type: 'modify',
-          path: 'linter/src/violations.rs',
+          type: "modify",
+          path: "linter/src/violations.rs",
           pattern: /\/\/\sgenerator::new-rule-above/,
-          template: 
-`#[serde(rename = "{{RuleNameKebab}}")]
+          template: `#[serde(rename = "{{RuleNameKebab}}")]
     {{RuleNamePascal}},
     // generator::new-rule-above`,
         },
         {
-          type: 'modify',
-          path: 'linter/src/lib.rs',
+          type: "modify",
+          path: "linter/src/lib.rs",
           pattern: /\/\/\sgenerator::new-rule-above/,
-          template: 
-`SquawkRule {
+          template: `SquawkRule {
         name: RuleViolationKind::{{RuleNamePascal}},
         func: {{RuleNameSnake}},
         messages: vec![
@@ -66,26 +63,24 @@ pub use {{RuleNameSnake}}::*;`,
     // generator::new-rule-above`,
         },
         {
-          type: 'modify',
-          path: 'linter/src/lib.rs',
+          type: "modify",
+          path: "linter/src/lib.rs",
           pattern: /use crate::rules/,
-          template: 
-`use crate::rules::{{RuleNameSnake}};
+          template: `use crate::rules::{{RuleNameSnake}};
 use crate::rules`,
         },
         {
-          type: 'modify',
-          path: 'docs/sidebars.js',
+          type: "modify",
+          path: "docs/sidebars.js",
           pattern: /\/\/\sgenerator::new-rule-above/,
           template: `"{{RuleNameKebab}}",
       // generator::new-rule-above`,
         },
         {
-          type: 'modify',
-          path: 'docs/src/pages/index.js',
+          type: "modify",
+          path: "docs/src/pages/index.js",
           pattern: /\/\/\sgenerator::new-rule-above/,
-          template: 
-`{
+          template: `{
     name: "{{RuleNameKebab}}",
     tags: ["TODO"],
     description: "TODO",
