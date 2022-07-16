@@ -11,3 +11,4 @@
 3. Add your linter to the `RULES` list in `squawk/linter/lib.rs`.
 4. Document your rule in `squawk/docs/docs/my-new-rule.md`.
 5. Add your docs page ID to `squawk/docs/sidebars.js`.
+6. Add your docs page ID to `squawk/docs/src/pages/index.js`.
