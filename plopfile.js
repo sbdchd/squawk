@@ -1,3 +1,8 @@
+// configuration for plop to generate a new Squawk rule.
+// use `s/new-rule` to call this. 
+// You must install `plop` via `npm install -g plop`.
+//
+// https://github.com/plopjs/plop
 module.exports = function (plop) {
    plop.setGenerator('rule', {
     description: 'Create a new rule',
