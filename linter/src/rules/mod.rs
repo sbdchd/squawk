@@ -30,4 +30,6 @@ pub use ban_char_field::*;
 pub use require_concurrent_index_deletion::*;
 pub mod adding_foreign_key_constraint;
 pub use adding_foreign_key_constraint::*;
+pub mod prefer_timestamptz;
+pub use prefer_timestamptz::*;
 mod utils;

@@ -3,10 +3,9 @@ use crate::{
     violations::{RuleViolation, RuleViolationKind},
 };
 
-use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDef, QualifiedName, RawStmt, Stmt,
-    TableElt,
-};
+use squawk_parser::ast::{ColumnDef, QualifiedName, RawStmt};
+
+use crate::rules::utils::columns_create_or_modified;
 
 /// It's easier to update the check constraint on a text field than a varchar()
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
@@ -15,24 +14,8 @@ use squawk_parser::ast::{
 pub fn prefer_text_field(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
-        match &raw_stmt.stmt {
-            Stmt::CreateStmt(stmt) => {
-                for column_def in &stmt.table_elts {
-                    if let TableElt::ColumnDef(column_def) = column_def {
-                        check_column_def(&mut errs, raw_stmt, column_def);
-                    }
-                }
-            }
-            Stmt::AlterTableStmt(stmt) => {
-                for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
-                    if cmd.subtype == AlterTableType::AddColumn {
-                        if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
-                            check_column_def(&mut errs, raw_stmt, column_def);
-                        }
-                    }
-                }
-            }
-            _ => continue,
+        for column in columns_create_or_modified(&raw_stmt.stmt) {
+            check_column_def(&mut errs, raw_stmt, column);
         }
     }
     errs
@@ -113,6 +96,23 @@ COMMIT;
                         ),
                         Note(
                             "Changing the type may break existing clients.",
+                        ),
+                    ],
+                },
+                RuleViolation {
+                    kind: PreferTextField,
+                    span: Span {
+                        start: 7,
+                        len: Some(
+                            123,
+                        ),
+                    },
+                    messages: [
+                        Note(
+                            "Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.",
+                        ),
+                        Help(
+                            "Use a text field with a check constraint.",
                         ),
                     ],
                 },

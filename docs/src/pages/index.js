@@ -111,6 +111,12 @@ const rules = [
       "Prevent blocking reads and writes to table while table metadata is updated.",
   },
   {
+    name: "prefer-timestamptz",
+    tags: ["schema"],
+    description:
+      "Ensure consistent timezone handling for timestamps, regardless of your database session timezone.",
+  },
+  {
     name: "renaming-column",
     tags: ["backwards compatibility"],
     description: "Prevent breaking existing clients that depend on column.",

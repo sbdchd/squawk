@@ -577,12 +577,12 @@ pub enum ColumnDefConstraint {
     Constraint(Constraint),
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct PGString {
     pub str: String,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub enum QualifiedName {
     String(PGString),
 }
