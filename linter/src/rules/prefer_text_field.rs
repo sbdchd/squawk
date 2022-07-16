@@ -99,6 +99,23 @@ COMMIT;
                         ),
                     ],
                 },
+                RuleViolation {
+                    kind: PreferTextField,
+                    span: Span {
+                        start: 7,
+                        len: Some(
+                            123,
+                        ),
+                    },
+                    messages: [
+                        Note(
+                            "Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.",
+                        ),
+                        Help(
+                            "Use a text field with a check constraint.",
+                        ),
+                    ],
+                },
             ],
         )
         "###);
