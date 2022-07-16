@@ -256,6 +256,7 @@ lazy_static! {
             ),
         ],
     }
+    // generator::new-rule-above
     ];
 
 }
