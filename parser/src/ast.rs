@@ -583,8 +583,9 @@ pub struct PGString {
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
-pub enum QualifiedName {
-    String(PGString),
+pub struct QualifiedName {
+    #[serde(rename = "String")]
+    pub string: PGString,
 }
 
 ///

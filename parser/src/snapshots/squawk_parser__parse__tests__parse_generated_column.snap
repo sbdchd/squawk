@@ -20,16 +20,16 @@ Ok(
                                             ),
                                             type_name: TypeName {
                                                 names: [
-                                                    String(
-                                                        PGString {
+                                                    QualifiedName {
+                                                        string: PGString {
                                                             str: "pg_catalog",
                                                         },
-                                                    ),
-                                                    String(
-                                                        PGString {
+                                                    },
+                                                    QualifiedName {
+                                                        string: PGString {
                                                             str: "bool",
                                                         },
-                                                    ),
+                                                    },
                                                 ],
                                                 type_oid: None,
                                                 setof: false,

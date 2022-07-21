@@ -35,11 +35,11 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "serial",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -90,16 +90,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "timestamptz",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -136,16 +136,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "timestamptz",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -182,16 +182,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "varchar",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -257,11 +257,11 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "text",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -298,11 +298,11 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "jsonb",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -339,16 +339,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "varchar",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -400,16 +400,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "int4",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -446,16 +446,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "int4",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
