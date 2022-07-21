@@ -2,4 +2,13 @@
 
 set -ex
 
-./node_modules/.bin/prettier --check '**/*.{js,md,yml,json}'
+main() {
+  if [ "$CI" ]; then
+    ./node_modules/.bin/prettier --check '**/*.{js,md,yml,json}'
+  else
+    ./node_modules/.bin/prettier '**/*.{js,md,yml,json}' --write
+  fi
+}
+
+main "$@" 
+
