@@ -33,3 +33,5 @@ pub mod adding_foreign_key_constraint;
 pub use adding_foreign_key_constraint::*;
 pub mod prefer_timestamptz;
 pub use prefer_timestamptz::*;
+pub mod prefer_identity;
+pub use prefer_identity::*;
