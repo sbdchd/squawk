@@ -21,12 +21,16 @@ pub fn prefer_timestamptz(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
     if column_def.type_name.names
         == vec![
-            QualifiedName::String(PGString {
-                str: "pg_catalog".to_string(),
-            }),
-            QualifiedName::String(PGString {
-                str: "timestamp".to_string(),
-            }),
+            QualifiedName {
+                string: PGString {
+                    str: "pg_catalog".to_string(),
+                },
+            },
+            QualifiedName {
+                string: PGString {
+                    str: "timestamp".to_string(),
+                },
+            },
         ]
     {
         errs.push(RuleViolation::new(
