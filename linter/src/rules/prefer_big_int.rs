@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::{
     versions::Version,
     violations::{RuleViolation, RuleViolationKind},
@@ -34,34 +36,28 @@ pub fn prefer_big_int(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<Rul
     errs
 }
 
-fn is_small_int_field(qualified_name: Vec<QualifiedName>) -> bool {
-    if let Some(last_name) = qualified_name.last() {}
-    // if qualified_name.len() != 2 {
-    //     return false;
-    // }
-    // let catalog_name: &str = qualified_name[0].into();
-    // let type_name: str = qualified_name[1];
-    // if pg_catalog != "pg_catalog" {
-    //     return false;
-    // }
+lazy_static! {
+    static ref SMALL_INT_TYPES: HashSet<&'static str> = HashSet::from([
+        "smallint",
+        "integer",
+        "int2",
+        "int4",
+        "serial",
+        "serial2",
+        "serial4",
+        "smallserial",
+    ]);
 }
 
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
-    if column_def.type_name.names
-        == vec![
-            QualifiedName::String(PGString {
-                str: "pg_catalog".to_string(),
-            }),
-            QualifiedName::String(PGString {
-                str: "timestamp".to_string(),
-            }),
-        ]
-    {
-        errs.push(RuleViolation::new(
-            RuleViolationKind::PreferTimestampTz,
-            raw_stmt.into(),
-            None,
-        ));
+    if let Some(column_name) = column_def.type_name.names.last() {
+        if SMALL_INT_TYPES.contains(column_name.string.str.as_str()) {
+            errs.push(RuleViolation::new(
+                RuleViolationKind::PreferBigInt,
+                raw_stmt.into(),
+                None,
+            ));
+        }
     }
 }
 
@@ -101,6 +97,9 @@ create table users (
     id smallint
 );
 create table users (
+    id int2
+);
+create table users (
     id integer
 );
 create table users (
@@ -123,8 +122,8 @@ create table users (
         let violations = violations_to_kinds(res);
         assert_eq!(
             violations.len(),
-            7,
-            "we should have 7 statements with violations"
+            8,
+            "we should have 8 statements with violations"
         );
         assert_eq!(
             violations.len(),

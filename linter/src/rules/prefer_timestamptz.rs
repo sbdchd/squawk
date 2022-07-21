@@ -3,7 +3,7 @@ use crate::{
     violations::{RuleViolation, RuleViolationKind},
 };
 
-use squawk_parser::ast::{ColumnDef, PGString, QualifiedName, RawStmt};
+use squawk_parser::ast::{ColumnDef, RawStmt};
 
 use crate::rules::utils::columns_create_or_modified;
 
@@ -19,25 +19,14 @@ pub fn prefer_timestamptz(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec
 }
 
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
-    if column_def.type_name.names
-        == vec![
-            QualifiedName {
-                string: PGString {
-                    str: "pg_catalog".to_string(),
-                },
-            },
-            QualifiedName {
-                string: PGString {
-                    str: "timestamp".to_string(),
-                },
-            },
-        ]
-    {
-        errs.push(RuleViolation::new(
-            RuleViolationKind::PreferTimestampTz,
-            raw_stmt.into(),
-            None,
-        ));
+    if let Some(column_name) = column_def.type_name.names.last() {
+        if column_name.string.str == "timestamp" {
+            errs.push(RuleViolation::new(
+                RuleViolationKind::PreferTimestampTz,
+                raw_stmt.into(),
+                None,
+            ));
+        }
     }
 }
 
