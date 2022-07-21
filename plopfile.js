@@ -26,7 +26,7 @@ module.exports = function (plop) {
         },
         {
           type: "add",
-          path: `docs/docs/{{RuleNameSnake}}.md`,
+          path: `docs/docs/{{RuleNameKebab}}.md`,
           templateFile: `templates/new_rule.md.template`,
         },
         {
