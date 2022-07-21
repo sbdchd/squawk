@@ -3,7 +3,7 @@ use crate::{
     violations::{RuleViolation, RuleViolationKind},
 };
 
-use squawk_parser::ast::{QualifiedName, RawStmt, Stmt, TableElt};
+use squawk_parser::ast::{RawStmt, Stmt, TableElt};
 
 #[must_use]
 pub fn ban_char_type(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {

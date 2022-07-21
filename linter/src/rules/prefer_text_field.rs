@@ -3,7 +3,7 @@ use crate::{
     violations::{RuleViolation, RuleViolationKind},
 };
 
-use squawk_parser::ast::{ColumnDef, QualifiedName, RawStmt};
+use squawk_parser::ast::{ColumnDef, RawStmt};
 
 use crate::rules::utils::columns_create_or_modified;
 
