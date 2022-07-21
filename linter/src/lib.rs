@@ -8,6 +8,7 @@ pub mod violations;
 extern crate lazy_static;
 
 use crate::errors::CheckSqlError;
+use crate::rules::prefer_big_int;
 use crate::rules::{
     adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
     adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
@@ -253,6 +254,18 @@ lazy_static! {
             ),
             ViolationMessage::Help(
                 "Delete the index CONCURRENTLY.".into()
+            ),
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::PreferBigInt,
+        func: prefer_big_int,
+        messages: vec![
+            ViolationMessage::Note(
+                "Hitting the max integer in a 32bit is possible and may break your application.".into()
+            ),
+            ViolationMessage::Help(
+                "Use 64bit integer values instead to prevent hitting this limit.".into()
             ),
         ],
     },

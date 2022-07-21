@@ -137,6 +137,11 @@ const rules = [
     description:
       "Prevent blocking reads/writes to table while index is dropped.",
   },
+  {
+    name: "prefer-big-int",
+    tags: ["schema"],
+    description: "Prevent hitting the 32bit max int limit.",
+  },
   // generator::new-rule-above
 ]
 
