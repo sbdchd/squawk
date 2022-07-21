@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+"""
+s/check_version
+
+Errors if latest version in changelog does not match package.json and cli/Cargo.toml versions.
+
+This script helps prevent releasing Squawk without updating the version using s/update-version.
+"""
+from __future__ import annotations
+from pathlib import Path
+import re
+import json
+
+
+def squawk_root() -> Path:
+    return Path(__file__).parent.parent
+
+
+VERSION_PATTREN = r"##\s*v(?P<version>\d+\.\d+\.\d+).*\d{4}-\d{2}-\d{2}"
+
+
+def find_changelog_version() -> str:
+    changelog = squawk_root() / "CHANGELOG.md"
+    for line in changelog.read_text().split("\n"):
+        match = re.match(VERSION_PATTREN, line)
+        if match is not None:
+            return match.group("version")
+    assert False, "should have found changelog version"
+
+
+def find_npm_version() -> str:
+    package_json = squawk_root() / "package.json"
+    return json.load(package_json.open())["version"]
+
+
+CLI_VERSION_PATTERN = r"version = \"(?P<version>\d+\.\d+\.\d+)\""
+
+
+def find_cli_version() -> str:
+    cargo_toml = squawk_root() / "cli" / "Cargo.toml"
+    for line in cargo_toml.read_text().split("\n"):
+        match = re.match(CLI_VERSION_PATTERN, line)
+        if match is not None:
+            return match.group("version")
+    assert False, "should have found cli version"
+
+
+def main() -> None:
+    changelog_version = find_changelog_version()
+    npm_version = find_npm_version()
+    cli_version = find_cli_version()
+    print("changelog_version:", changelog_version)
+    print("npm_version:", npm_version)
+    print("cli_version:", cli_version)
+
+    if not (changelog_version == npm_version == cli_version):
+        print("❌ version mismatch")
+        exit(1)
+    print("✅ versions match")
+
+
+if __name__ == "__main__":
+    main()
