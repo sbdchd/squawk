@@ -1,6 +1,6 @@
 [package]
 name = "squawk"
-version = "0.14.0"
+version = "0.15.0"
 authors = ["Steve Dignam <steve@dignam.xyz>"]
 edition = "2018"
 license = "GPL-3.0"
