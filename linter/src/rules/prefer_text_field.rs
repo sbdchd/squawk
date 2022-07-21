@@ -3,7 +3,7 @@ use crate::{
     violations::{RuleViolation, RuleViolationKind},
 };
 
-use squawk_parser::ast::{ColumnDef, QualifiedName, RawStmt};
+use squawk_parser::ast::{ColumnDef, RawStmt};
 
 use crate::rules::utils::columns_create_or_modified;
 
@@ -23,8 +23,8 @@ pub fn prefer_text_field(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<
 
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
     let type_name = &column_def.type_name;
-    for QualifiedName::String(field_type_name) in &type_name.names {
-        if field_type_name.str == "varchar" && !type_name.typmods.is_empty() {
+    for field_type_name in &type_name.names {
+        if field_type_name.string.str == "varchar" && !type_name.typmods.is_empty() {
             errs.push(RuleViolation::new(
                 RuleViolationKind::PreferTextField,
                 raw_stmt.into(),
