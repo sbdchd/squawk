@@ -60,14 +60,20 @@ mod test_rules {
     use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
+    lazy_static! {
+        static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![
+            RuleViolationKind::PreferRobustStmts,
+            RuleViolationKind::ChangingColumnType
+        ];
+    }
+
     #[test]
     fn test_serial_primary_key() {
         let bad_sql = r#"
 ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 "#;
 
-        let expected_bad_res =
-            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap_or_default();
+        let expected_bad_res = check_sql(bad_sql, &EXCLUDED_RULES, None).unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
     }
@@ -78,18 +84,13 @@ ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 ALTER TABLE items ADD PRIMARY KEY (id);
 "#;
 
-        let expected_bad_res =
-            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap_or_default();
+        let expected_bad_res = check_sql(bad_sql, &EXCLUDED_RULES, None).unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
 
         let ok_sql = r#"
 ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
 "#;
-        assert_debug_snapshot!(check_sql(
-            ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(check_sql(ok_sql, &EXCLUDED_RULES, None));
     }
 }

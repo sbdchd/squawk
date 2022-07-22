@@ -44,6 +44,7 @@ mod test_rules {
         static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![RuleViolationKind::PreferBigInt,];
     }
 
+    // TODO(chdsbd): Move to correct file.
     #[test]
     fn test_ensure_ignored_when_new_table() {
         let sql = r#"
@@ -69,7 +70,14 @@ CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(sql, &EXCLUDED_RULES, None));
+        assert_debug_snapshot!(check_sql(
+            sql,
+            &[
+                RuleViolationKind::PreferBigInt,
+                RuleViolationKind::PreferTextField
+            ],
+            None
+        ));
     }
 
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS
