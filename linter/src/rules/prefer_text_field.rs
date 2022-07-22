@@ -36,35 +36,15 @@ fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_de
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
-    use crate::violations::RuleViolationKind;
-    use insta::assert_debug_snapshot;
-    #[test]
-    fn test_ensure_ignored_when_new_table() {
-        let sql = r#"
-BEGIN;
-CREATE TABLE "core_foo" (
-  "id" serial NOT NULL PRIMARY KEY, 
-  "created" timestamp with time zone NOT NULL, 
-  "modified" timestamp with time zone NOT NULL, 
-  "mongo_id" varchar(255) NOT NULL UNIQUE, 
-  "description" text NOT NULL, 
-  "metadata" jsonb NOT NULL, 
-  "kind" varchar(255) NOT NULL, 
-  "age" integer NOT NULL, 
-  "tenant_id" integer NULL
-);
-CREATE INDEX "age_index" ON "core_foo" ("age");
-ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
-ALTER TABLE "core_foo" ADD CONSTRAINT "core_foo_tenant_id_4d397ef9_fk_core_myuser_id" 
-    FOREIGN KEY ("tenant_id") REFERENCES "core_myuser" ("id") 
-    DEFERRABLE INITIALLY DEFERRED;
-CREATE INDEX "core_foo_mongo_id_1c1a7e39_like" ON "core_foo" ("mongo_id" varchar_pattern_ops);
-CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
-COMMIT;
-        "#;
 
-        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField], None));
+    use insta::assert_debug_snapshot;
+
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::PreferTextField, None).unwrap()
     }
 
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS
@@ -79,7 +59,7 @@ BEGIN;
 ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
 COMMIT;
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[], None), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r###"
         Ok(
             [
                 RuleViolation {
@@ -134,7 +114,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
 "#;
-        assert_debug_snapshot!(check_sql(bad_sql, &[], None), @r###"
+        assert_debug_snapshot!(lint_sql(bad_sql), @r###"
         Ok(
             [
                 RuleViolation {
@@ -172,7 +152,7 @@ CREATE TABLE "core_bar" (
 --
 ALTER TABLE "core_bar" ADD CONSTRAINT "text_size" CHECK (LENGTH("bravo") <= 100);
 COMMIT;"#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[], None), @r###"
+        assert_debug_snapshot!(lint_sql(ok_sql), @r###"
         Ok(
             [],
         )
@@ -187,11 +167,8 @@ ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
 COMMIT;
 "#;
 
-        let res = check_sql(bad_sql, &[], None);
-        assert!(res.is_ok());
-        let data = res.unwrap_or_default();
-        assert!(!data.is_empty());
-        assert_debug_snapshot!(data);
+        let res = lint_sql(bad_sql);
+        assert_debug_snapshot!(res);
     }
 
     #[test]
@@ -199,7 +176,7 @@ COMMIT;
         let ok_sql = r#"
     CREATE TABLE IF NOT EXISTS foo_table(bar_col varchar);
     "#;
-        let res = check_sql(ok_sql, &[], None);
-        assert_eq!(res, Ok(vec![]));
+        let res = lint_sql(ok_sql);
+        assert_eq!(res, vec![]);
     }
 }

@@ -34,8 +34,16 @@ pub fn ban_char_type(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<Rule
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::BanCharField, None).unwrap()
+    }
+
     #[test]
     fn test_creating_table_with_char_errors() {
         let sql = r#"
@@ -49,7 +57,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(sql, &[], None));
+        assert_debug_snapshot!(lint_sql(sql));
     }
 
     #[test]
@@ -63,6 +71,6 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField], None));
+        assert_debug_snapshot!(lint_sql(sql));
     }
 }

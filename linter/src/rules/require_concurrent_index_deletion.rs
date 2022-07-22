@@ -28,8 +28,18 @@ pub fn require_concurrent_index_deletion(
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
-    use crate::violations::RuleViolationKind;
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::RequireConcurrentIndexDeletion,
+            None,
+        )
+        .unwrap()
+    }
 
     #[test]
     fn test_drop_index_concurrently() {
@@ -37,7 +47,7 @@ mod test_rules {
   -- instead of
   DROP INDEX IF EXISTS "field_name_idx";
   "#;
-        let res = check_sql(bad_sql, &[], None).unwrap();
+        let res = lint_sql(bad_sql);
         assert_eq!(res.len(), 1);
         assert_eq!(
             res[0].kind,
@@ -47,7 +57,7 @@ mod test_rules {
         let ok_sql = r#"
   DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
   "#;
-        assert_eq!(check_sql(ok_sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(ok_sql), vec![]);
     }
 
     #[test]
@@ -55,7 +65,7 @@ mod test_rules {
         let sql = r#"
   DROP TYPE IF EXISTS foo;
   "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), vec![]);
     }
 
     #[test]
@@ -63,7 +73,7 @@ mod test_rules {
         let sql = r#"
   DROP TABLE IF EXISTS some_table;
   "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), vec![]);
     }
 
     #[test]
@@ -71,6 +81,6 @@ mod test_rules {
         let sql = r#"
   DROP TRIGGER IF EXISTS trigger on foo_table;
   "#;
-        assert_eq!(check_sql(sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(sql), vec![]);
     }
 }

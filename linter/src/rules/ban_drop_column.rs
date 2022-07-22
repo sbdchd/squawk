@@ -30,8 +30,15 @@ pub fn ban_drop_column(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<Ru
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::BanDropColumn, None).unwrap()
+    }
 
     #[test]
     fn test_drop_column() {
@@ -39,10 +46,6 @@ mod test_rules {
 ALTER TABLE "bar_tbl" DROP COLUMN "foo_col" CASCADE;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(sql));
     }
 }

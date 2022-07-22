@@ -43,19 +43,16 @@ fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_de
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::check_sql_with_rule;
     use crate::violations::{RuleViolation, RuleViolationKind};
     use insta::assert_debug_snapshot;
 
-    lazy_static! {
-        static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![
-            RuleViolationKind::PreferRobustStmts,
-            RuleViolationKind::ChangingColumnType
-        ];
-    }
-
     fn violations_to_kinds(violations: Vec<RuleViolation>) -> Vec<RuleViolationKind> {
         violations.into_iter().map(|v| v.kind).collect::<Vec<_>>()
+    }
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::PreferTimestampTz, None).unwrap()
     }
 
     #[test]
@@ -70,7 +67,7 @@ create table app.accounts
     created_ts timestamp without time zone
 );
   "#;
-        let res = check_sql(bad_sql, &EXCLUDED_RULES, None).unwrap();
+        let res = lint_sql(bad_sql);
         assert_eq!(
             violations_to_kinds(res),
             vec![
@@ -89,7 +86,7 @@ create table app.accounts
     created_ts timestamp with time zone
 );
   "#;
-        assert_eq!(check_sql(ok_sql, &EXCLUDED_RULES, None), Ok(vec![]));
+        assert_eq!(lint_sql(ok_sql), vec![]);
     }
 
     #[test]
@@ -100,7 +97,7 @@ create table app.accounts
     alter table app.accounts
         alter column created_ts type timestamp without time zone;
   "#;
-        let res = check_sql(bad_sql, &EXCLUDED_RULES, None).unwrap();
+        let res = lint_sql(bad_sql);
 
         assert_debug_snapshot!(res);
         assert_eq!(
@@ -119,6 +116,6 @@ alter table app.accounts
 alter table app.accounts
     alter column created_ts type timestamptz using created_ts at time zone 'UTC';
   "#;
-        assert_eq!(check_sql(ok_sql, &EXCLUDED_RULES, None), Ok(vec![]));
+        assert_eq!(lint_sql(ok_sql), vec![]);
     }
 }
