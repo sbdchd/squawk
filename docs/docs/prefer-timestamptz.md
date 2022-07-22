@@ -51,7 +51,8 @@ alter table app.users
     alter column modified_ts type timestamptz
 ```
 
+## links
 
-
+- ["Don't use timestamp (without time zone) to store UTC times"](https://wiki.postgresql.org/wiki/Don%27t_Do_This#Don.27t_use_timestamp_.28without_time_zone.29_to_store_UTC_times)
 - http://www.creativedeletion.com/2015/03/19/persisting_future_datetimes.html
 - https://codeblog.jonskeet.uk/2019/03/27/storing-utc-is-not-a-silver-bullet/
