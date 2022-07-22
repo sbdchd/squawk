@@ -9,6 +9,7 @@ extern crate lazy_static;
 
 use crate::errors::CheckSqlError;
 use crate::rules::prefer_big_int;
+use crate::rules::prefer_identity;
 use crate::rules::{
     adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
     adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
@@ -182,6 +183,18 @@ lazy_static! {
             ),
             ViolationMessage::Help(
                 "Use 64bit integer values instead to prevent hitting this limit.".into()
+            ),
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::PreferIdentity,
+        func: prefer_identity,
+        messages: vec![
+            ViolationMessage::Note(
+                "Serial types have confusing behaviors that make schema management difficult.".into()
+            ),
+            ViolationMessage::Help(
+                "Use identity columns instead for more features and better usability.".into()
             ),
         ],
     },

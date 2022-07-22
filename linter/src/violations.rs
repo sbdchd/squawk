@@ -30,18 +30,20 @@ pub enum RuleViolationKind {
     DisallowedUniqueConstraint,
     #[serde(rename = "ban-drop-database")]
     BanDropDatabase,
-    #[serde(rename = "prefer-text-field")]
-    PreferTextField,
+    #[serde(rename = "prefer-big-int")]
+    PreferBigInt,
+    #[serde(rename = "prefer-identity")]
+    PreferIdentity,
     #[serde(rename = "prefer-robust-stmts")]
     PreferRobustStmts,
+    #[serde(rename = "prefer-text-field")]
+    PreferTextField,
     #[serde(rename = "prefer-timestamptz")]
     PreferTimestampTz,
     #[serde(rename = "ban-char-field")]
     BanCharField,
     #[serde(rename = "ban-drop-column")]
     BanDropColumn,
-    #[serde(rename = "prefer-big-int")]
-    PreferBigInt,
     // generator::new-rule-above
 }
 
