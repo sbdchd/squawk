@@ -44,12 +44,9 @@ fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_de
 #[cfg(test)]
 mod test_rules {
     use crate::check_sql_with_rule;
+    use crate::rules::test_utils::violations_to_kinds;
     use crate::violations::{RuleViolation, RuleViolationKind};
     use insta::assert_debug_snapshot;
-
-    fn violations_to_kinds(violations: Vec<RuleViolation>) -> Vec<RuleViolationKind> {
-        violations.into_iter().map(|v| v.kind).collect::<Vec<_>>()
-    }
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql_with_rule(sql, &RuleViolationKind::PreferTimestampTz, None).unwrap()
