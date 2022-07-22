@@ -39,6 +39,11 @@ mod test_rules {
     use crate::check_sql;
     use crate::violations::RuleViolationKind;
     use insta::assert_debug_snapshot;
+
+    lazy_static! {
+        static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![RuleViolationKind::PreferBigInt,];
+    }
+
     #[test]
     fn test_ensure_ignored_when_new_table() {
         let sql = r#"
@@ -64,7 +69,7 @@ CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField], None));
+        assert_debug_snapshot!(check_sql(sql, &EXCLUDED_RULES, None));
     }
 
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS
@@ -79,7 +84,7 @@ BEGIN;
 ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
 COMMIT;
 "#;
-        assert_debug_snapshot!(check_sql(sql, &[], None), @r###"
+        assert_debug_snapshot!(check_sql(sql, &EXCLUDED_RULES, None), @r###"
         Ok(
             [
                 RuleViolation {
@@ -134,7 +139,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
 "#;
-        assert_debug_snapshot!(check_sql(bad_sql, &[], None), @r###"
+        assert_debug_snapshot!(check_sql(bad_sql, &EXCLUDED_RULES, None), @r###"
         Ok(
             [
                 RuleViolation {
@@ -172,7 +177,7 @@ CREATE TABLE "core_bar" (
 --
 ALTER TABLE "core_bar" ADD CONSTRAINT "text_size" CHECK (LENGTH("bravo") <= 100);
 COMMIT;"#;
-        assert_debug_snapshot!(check_sql(ok_sql, &[], None), @r###"
+        assert_debug_snapshot!(check_sql(ok_sql, &EXCLUDED_RULES, None), @r###"
         Ok(
             [],
         )
@@ -187,7 +192,7 @@ ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
 COMMIT;
 "#;
 
-        let res = check_sql(bad_sql, &[], None);
+        let res = check_sql(bad_sql, &EXCLUDED_RULES, None);
         assert!(res.is_ok());
         let data = res.unwrap_or_default();
         assert!(!data.is_empty());
@@ -199,7 +204,7 @@ COMMIT;
         let ok_sql = r#"
     CREATE TABLE IF NOT EXISTS foo_table(bar_col varchar);
     "#;
-        let res = check_sql(ok_sql, &[], None);
+        let res = check_sql(ok_sql, &EXCLUDED_RULES, None);
         assert_eq!(res, Ok(vec![]));
     }
 }
