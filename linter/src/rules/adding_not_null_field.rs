@@ -74,12 +74,19 @@ mod test_rules {
 
     use insta::assert_debug_snapshot;
 
+    lazy_static! {
+        static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![
+            RuleViolationKind::PreferRobustStmts,
+            RuleViolationKind::PreferBigInt,
+        ];
+    }
+
     #[test]
     fn set_null() {
         let sql = r#"
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
-        let res = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap();
+        let res = check_sql(sql, &EXCLUDED_RULES, None).unwrap();
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::AddingNotNullableField);
         assert_eq!(
@@ -105,22 +112,14 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(check_sql(bad_sql, &EXCLUDED_RULES, None));
 
         let bad_sql = r#"
 -- not sure how this would ever work, but might as well test it
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(check_sql(bad_sql, &EXCLUDED_RULES, None));
     }
 
     #[test]
@@ -136,7 +135,7 @@ COMMIT;
 
         assert_debug_snapshot!(check_sql(
             ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
+            &EXCLUDED_RULES,
             Some(Version::from_str("11.0.0").unwrap()),
         ));
     }
