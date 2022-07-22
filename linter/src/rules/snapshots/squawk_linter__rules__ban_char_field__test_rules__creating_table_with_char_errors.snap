@@ -1,64 +1,62 @@
 ---
 source: linter/src/rules/ban_char_field.rs
-expression: "check_sql(sql, &[])"
+expression: lint_sql(sql)
 ---
-Ok(
-    [
-        RuleViolation {
-            kind: BanCharField,
-            span: Span {
-                start: 7,
-                len: Some(
-                    194,
-                ),
-            },
-            messages: [
-                Help(
-                    "Use text or varchar instead.",
-                ),
-            ],
+[
+    RuleViolation {
+        kind: BanCharField,
+        span: Span {
+            start: 7,
+            len: Some(
+                194,
+            ),
         },
-        RuleViolation {
-            kind: BanCharField,
-            span: Span {
-                start: 7,
-                len: Some(
-                    194,
-                ),
-            },
-            messages: [
-                Help(
-                    "Use text or varchar instead.",
-                ),
-            ],
+        messages: [
+            Help(
+                "Use text or varchar instead.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: BanCharField,
+        span: Span {
+            start: 7,
+            len: Some(
+                194,
+            ),
         },
-        RuleViolation {
-            kind: BanCharField,
-            span: Span {
-                start: 7,
-                len: Some(
-                    194,
-                ),
-            },
-            messages: [
-                Help(
-                    "Use text or varchar instead.",
-                ),
-            ],
+        messages: [
+            Help(
+                "Use text or varchar instead.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: BanCharField,
+        span: Span {
+            start: 7,
+            len: Some(
+                194,
+            ),
         },
-        RuleViolation {
-            kind: BanCharField,
-            span: Span {
-                start: 7,
-                len: Some(
-                    194,
-                ),
-            },
-            messages: [
-                Help(
-                    "Use text or varchar instead.",
-                ),
-            ],
+        messages: [
+            Help(
+                "Use text or varchar instead.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: BanCharField,
+        span: Span {
+            start: 7,
+            len: Some(
+                194,
+            ),
         },
-    ],
-)
+        messages: [
+            Help(
+                "Use text or varchar instead.",
+            ),
+        ],
+    },
+]

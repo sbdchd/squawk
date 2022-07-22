@@ -115,27 +115,25 @@ CREATE TABLE "core_bar" (
 COMMIT;
 "#;
         assert_debug_snapshot!(lint_sql(bad_sql), @r###"
-        Ok(
-            [
-                RuleViolation {
-                    kind: PreferTextField,
-                    span: Span {
-                        start: 7,
-                        len: Some(
-                            127,
-                        ),
-                    },
-                    messages: [
-                        Note(
-                            "Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.",
-                        ),
-                        Help(
-                            "Use a text field with a check constraint.",
-                        ),
-                    ],
+        [
+            RuleViolation {
+                kind: PreferTextField,
+                span: Span {
+                    start: 7,
+                    len: Some(
+                        127,
+                    ),
                 },
-            ],
-        )
+                messages: [
+                    Note(
+                        "Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.",
+                    ),
+                    Help(
+                        "Use a text field with a check constraint.",
+                    ),
+                ],
+            },
+        ]
         "###);
 
         let ok_sql = r#"
