@@ -116,6 +116,21 @@ mod test_rules {
         check_sql_with_rule(sql, &RuleViolationKind::ConstraintMissingNotValid, None).unwrap()
     }
 
+    #[test]
+    fn test_ensure_ignored_when_new_table() {
+        let sql = r#"
+BEGIN;
+CREATE TABLE "core_foo" (
+"id" serial NOT NULL PRIMARY KEY, 
+"age" integer NOT NULL
+);
+ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
+COMMIT;
+    "#;
+
+        assert_debug_snapshot!(lint_sql(sql));
+    }
+
     /// Using NOT VALID and VALIDATE in a single transaction is equivalent to
     /// adding a constraint without NOT VALID. It will block!
     #[test]
