@@ -60,14 +60,6 @@ mod test_rules {
 
     use insta::assert_debug_snapshot;
 
-    lazy_static! {
-        static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![
-            RuleViolationKind::PreferBigInt,
-            RuleViolationKind::PreferRobustStmts,
-            RuleViolationKind::PreferTextField
-        ];
-    }
-
     ///
     /// ```sql
     /// -- instead of
@@ -93,8 +85,16 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
         "#;
 
-        assert_debug_snapshot!(check_sql(bad_sql, &EXCLUDED_RULES, None));
-        assert_debug_snapshot!(check_sql(ok_sql, &EXCLUDED_RULES, None));
+        assert_debug_snapshot!(check_sql(
+            bad_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            None
+        ));
+        assert_debug_snapshot!(check_sql(
+            ok_sql,
+            &[RuleViolationKind::PreferRobustStmts],
+            None
+        ));
     }
 
     #[test]
@@ -111,12 +111,12 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
         assert_debug_snapshot!(check_sql(
             bad_sql,
-            &EXCLUDED_RULES,
+            &[RuleViolationKind::PreferRobustStmts],
             Some(Version::from_str("11.0.0").unwrap()),
         ));
         assert_debug_snapshot!(check_sql(
             ok_sql,
-            &EXCLUDED_RULES,
+            &[RuleViolationKind::PreferRobustStmts],
             Some(Version::from_str("11.0.0").unwrap()),
         ));
     }

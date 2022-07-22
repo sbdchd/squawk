@@ -36,14 +36,6 @@ pub fn ban_char_type(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<Rule
 mod test_rules {
     use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
-
-    lazy_static! {
-        static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![
-            RuleViolationKind::PreferBigInt,
-            RuleViolationKind::PreferTextField
-        ];
-    }
-
     #[test]
     fn test_creating_table_with_char_errors() {
         let sql = r#"
@@ -57,7 +49,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(sql, &EXCLUDED_RULES, None));
+        assert_debug_snapshot!(check_sql(sql, &[], None));
     }
 
     #[test]
@@ -71,6 +63,6 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(sql, &EXCLUDED_RULES, None));
+        assert_debug_snapshot!(check_sql(sql, &[RuleViolationKind::PreferTextField], None));
     }
 }
