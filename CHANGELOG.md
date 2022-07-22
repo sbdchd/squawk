@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.16.0 - 2022-07-22
+
+## Added
+
+- added `prefer-big-int` rule to prefer 64 bit types over 32 bit types. (#238)
+- added `prefer-identity` rule to prefer `identity` columns over `serial` columns. (#243)
+
 ## v0.15.0 - 2022-07-17
 
 ## Added
