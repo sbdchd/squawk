@@ -5,25 +5,9 @@ use crate::{
     violations::{RuleViolation, RuleViolationKind},
 };
 
-use squawk_parser::ast::{ColumnDef, PGString, QualifiedName, RawStmt};
+use squawk_parser::ast::{ColumnDef, RawStmt};
 
 use super::utils::columns_create_or_modified;
-
-// // bad ints
-// //
-// smallint
-// integer
-// int4
-// serial
-// serial2
-// serial4
-// smallserial
-
-// // okay
-// int8
-// serial8
-// bigserial
-// bigint
 
 #[must_use]
 pub fn prefer_big_int(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
