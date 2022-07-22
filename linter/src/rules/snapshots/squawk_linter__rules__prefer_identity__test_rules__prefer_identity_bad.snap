@@ -1,0 +1,108 @@
+---
+source: linter/src/rules/prefer_identity.rs
+expression: res
+---
+[
+    RuleViolation {
+        kind: PreferIdentity,
+        span: Span {
+            start: 0,
+            len: Some(
+                37,
+            ),
+        },
+        messages: [
+            Note(
+                "Serial types have confusing behaviors that make schema management difficult.",
+            ),
+            Help(
+                "Use identity columns instead for more features and better usability.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferIdentity,
+        span: Span {
+            start: 38,
+            len: Some(
+                38,
+            ),
+        },
+        messages: [
+            Note(
+                "Serial types have confusing behaviors that make schema management difficult.",
+            ),
+            Help(
+                "Use identity columns instead for more features and better usability.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferIdentity,
+        span: Span {
+            start: 77,
+            len: Some(
+                38,
+            ),
+        },
+        messages: [
+            Note(
+                "Serial types have confusing behaviors that make schema management difficult.",
+            ),
+            Help(
+                "Use identity columns instead for more features and better usability.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferIdentity,
+        span: Span {
+            start: 116,
+            len: Some(
+                38,
+            ),
+        },
+        messages: [
+            Note(
+                "Serial types have confusing behaviors that make schema management difficult.",
+            ),
+            Help(
+                "Use identity columns instead for more features and better usability.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferIdentity,
+        span: Span {
+            start: 155,
+            len: Some(
+                42,
+            ),
+        },
+        messages: [
+            Note(
+                "Serial types have confusing behaviors that make schema management difficult.",
+            ),
+            Help(
+                "Use identity columns instead for more features and better usability.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferIdentity,
+        span: Span {
+            start: 198,
+            len: Some(
+                40,
+            ),
+        },
+        messages: [
+            Note(
+                "Serial types have confusing behaviors that make schema management difficult.",
+            ),
+            Help(
+                "Use identity columns instead for more features and better usability.",
+            ),
+        ],
+    },
+]

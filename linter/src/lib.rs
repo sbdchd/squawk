@@ -191,10 +191,10 @@ lazy_static! {
         func: prefer_identity,
         messages: vec![
             ViolationMessage::Note(
-                "TODO".into()
+                "Serial types have confusing behaviors that make schema management difficult.".into()
             ),
             ViolationMessage::Help(
-                "TODO".into()
+                "Use identity columns instead for more features and better usability.".into()
             ),
         ],
     },

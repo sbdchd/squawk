@@ -49,13 +49,14 @@ fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_de
 mod test_rules {
     use insta::assert_debug_snapshot;
 
-    use crate::{check_sql, rules::test_utils::violations_to_kinds, violations::RuleViolationKind};
+    use crate::{
+        check_sql_with_rule,
+        rules::test_utils::violations_to_kinds,
+        violations::{RuleViolation, RuleViolationKind},
+    };
 
-    lazy_static! {
-        static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![
-            RuleViolationKind::PreferRobustStmts,
-            RuleViolationKind::ChangingColumnType
-        ];
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::PreferBigInt, None).unwrap()
     }
 
     #[test]
@@ -74,7 +75,7 @@ create table users (
     id serial8
 );
   "#;
-        assert_eq!(check_sql(ok_sql, &EXCLUDED_RULES, None), Ok(vec![]));
+        assert_eq!(lint_sql(ok_sql), vec![]);
     }
     #[test]
     fn test_create_table_bad() {
@@ -104,7 +105,7 @@ create table users (
     id smallserial
 );
   "#;
-        let res = check_sql(bad_sql, &EXCLUDED_RULES, None).unwrap();
+        let res = lint_sql(bad_sql);
         let violations = violations_to_kinds(&res);
         assert_eq!(
             violations.len(),
