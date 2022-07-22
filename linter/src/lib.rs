@@ -187,6 +187,18 @@ lazy_static! {
         ],
     },
     SquawkRule {
+        name: RuleViolationKind::PreferIdentity,
+        func: prefer_identity,
+        messages: vec![
+            ViolationMessage::Note(
+                "TODO".into()
+            ),
+            ViolationMessage::Help(
+                "TODO".into()
+            ),
+        ],
+    },
+    SquawkRule {
         name: RuleViolationKind::PreferRobustStmts,
         func: prefer_robust_stmts,
         messages: vec![
@@ -267,18 +279,6 @@ lazy_static! {
             ),
             ViolationMessage::Help(
                 "Delete the index CONCURRENTLY.".into()
-            ),
-        ],
-    },
-    SquawkRule {
-        name: RuleViolationKind::PreferIdentity,
-        func: prefer_identity,
-        messages: vec![
-            ViolationMessage::Note(
-                "TODO".into()
-            ),
-            ViolationMessage::Help(
-                "TODO".into()
             ),
         ],
     },
