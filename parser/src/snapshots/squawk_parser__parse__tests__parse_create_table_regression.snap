@@ -24,16 +24,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "int4",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -55,16 +55,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "int4",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
@@ -86,16 +86,16 @@ Ok(
                                 ),
                                 type_name: TypeName {
                                     names: [
-                                        String(
-                                            PGString {
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "pg_catalog",
                                             },
-                                        ),
-                                        String(
-                                            PGString {
+                                        },
+                                        QualifiedName {
+                                            string: PGString {
                                                 str: "int4",
                                             },
-                                        ),
+                                        },
                                     ],
                                     type_oid: None,
                                     setof: false,
