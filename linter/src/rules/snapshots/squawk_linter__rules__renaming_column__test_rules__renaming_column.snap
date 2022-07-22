@@ -1,22 +1,20 @@
 ---
 source: linter/src/rules/renaming_column.rs
-expression: "check_sql(sql, &[])"
+expression: lint_sql(sql)
 ---
-Ok(
-    [
-        RuleViolation {
-            kind: RenamingColumn,
-            span: Span {
-                start: 0,
-                len: Some(
-                    74,
-                ),
-            },
-            messages: [
-                Note(
-                    "Renaming a column may break existing clients.",
-                ),
-            ],
+[
+    RuleViolation {
+        kind: RenamingColumn,
+        span: Span {
+            start: 0,
+            len: Some(
+                74,
+            ),
         },
-    ],
-)
+        messages: [
+            Note(
+                "Renaming a column may break existing clients.",
+            ),
+        ],
+    },
+]

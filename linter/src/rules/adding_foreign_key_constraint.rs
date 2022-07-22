@@ -83,17 +83,14 @@ pub fn adding_foreign_key_constraint(
 #[cfg(test)]
 mod test_rules {
     use crate::{
-        check_sql,
+        check_sql_with_rule,
         violations::{RuleViolation, RuleViolationKind},
     };
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql(sql, &[], None)
-            .unwrap()
-            .into_iter()
-            .filter(|x| x.kind == RuleViolationKind::AddingForeignKeyConstraint)
-            .collect()
+        check_sql_with_rule(sql, &RuleViolationKind::AddingForeignKeyConstraint, None).unwrap()
     }
+
     #[test]
     fn test_create_table_with_foreign_key_constraint() {
         let sql = r#"

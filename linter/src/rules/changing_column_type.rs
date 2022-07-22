@@ -29,8 +29,15 @@ pub fn changing_column_type(tree: &[RawStmt], _pg_version: Option<Version>) -> V
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::ChangingColumnType, None).unwrap()
+    }
 
     #[test]
     fn test_changing_field_type() {
@@ -42,11 +49,7 @@ BEGIN;
 ALTER TABLE "core_recipe" ALTER COLUMN "edits" TYPE text USING "edits"::text;
 COMMIT;
         "#;
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferTextField],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql));
 
         let bad_sql = r#"
 BEGIN;
@@ -58,10 +61,6 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE text USING "foo"::text;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferTextField],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql));
     }
 }

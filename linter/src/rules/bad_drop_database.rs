@@ -26,8 +26,16 @@ pub fn ban_drop_database(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::BanDropDatabase, None).unwrap()
+    }
+
     #[test]
     fn test_ban_drop_database() {
         let sql = r#"
@@ -35,6 +43,6 @@ DROP DATABASE "table_name";
 DROP DATABASE IF EXISTS "table_name";
 DROP DATABASE IF EXISTS "table_name"
         "#;
-        assert_debug_snapshot!(check_sql(sql, &[], None));
+        assert_debug_snapshot!(lint_sql(sql));
     }
 }

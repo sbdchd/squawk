@@ -47,8 +47,15 @@ pub fn disallow_unique_constraint(
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
     use insta::assert_debug_snapshot;
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::DisallowedUniqueConstraint, None).unwrap()
+    }
 
     /// ```sql
     /// -- instead of
@@ -76,21 +83,9 @@ ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
 ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
    "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
-        assert_debug_snapshot!(check_sql(
-            ignored_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
-        assert_debug_snapshot!(check_sql(
-            ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql));
+        assert_debug_snapshot!(lint_sql(ignored_sql));
+        assert_debug_snapshot!(lint_sql(ok_sql));
     }
 
     /// Creating a UNIQUE constraint from an existing index should be considered
@@ -102,9 +97,6 @@ CREATE UNIQUE INDEX CONCURRENTLY "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_
     ON "legacy_questiongrouppg" ("mongo_id");
 ALTER TABLE "legacy_questiongrouppg" ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
         "#;
-        assert_eq!(
-            check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None),
-            Ok(vec![])
-        );
+        assert_eq!(lint_sql(sql), vec![]);
     }
 }

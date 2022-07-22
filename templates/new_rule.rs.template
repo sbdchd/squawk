@@ -14,13 +14,19 @@ pub fn {{RuleNameSnake}}(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
+    use crate::{
+         check_sql_with_rule,
+         violations::{RuleViolation, RuleViolationKind},
+     };
+     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+         check_sql_with_rule(sql, &RuleViolationKind::{{RuleNamePascal}}, None).unwrap()
+     }
 
     #[test]
     fn test_{{RuleNameSnake}}() {
         let ok_sql = r#"
 SELECT 1;
   "#;
-        assert_eq!(check_sql(ok_sql, &[], None), Ok(vec![]));
+        assert_eq!(lint_sql(ok_sql), vec![]);
     }
 }

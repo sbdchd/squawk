@@ -28,8 +28,15 @@ pub fn renaming_column(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<Ru
 
 #[cfg(test)]
 mod test_rules {
-    use crate::check_sql;
     use insta::assert_debug_snapshot;
+
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::RenamingColumn, None).unwrap()
+    }
 
     #[test]
     fn test_renaming_column() {
@@ -37,6 +44,6 @@ mod test_rules {
 ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
         "#;
 
-        assert_debug_snapshot!(check_sql(sql, &[], None));
+        assert_debug_snapshot!(lint_sql(sql));
     }
 }
