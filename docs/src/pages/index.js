@@ -137,6 +137,11 @@ const rules = [
     description:
       "Prevent blocking reads/writes to table while index is dropped.",
   },
+  {
+    name: "prefer-identity",
+    tags: ["schema"],
+    description: "Serial types have confusing behaviors. Use identity columns instead.",
+  },
   // generator::new-rule-above
 ]
 

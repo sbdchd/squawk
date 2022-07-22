@@ -19,6 +19,7 @@ module.exports = {
       "renaming-table",
       "require-concurrent-index-creation",
       "require-concurrent-index-deletion",
+      "prefer-identity",
       // generator::new-rule-above
     ],
   },

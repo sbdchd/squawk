@@ -8,6 +8,7 @@ pub mod violations;
 extern crate lazy_static;
 
 use crate::errors::CheckSqlError;
+use crate::rules::prefer_identity;
 use crate::rules::{
     adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
     adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
@@ -253,6 +254,18 @@ lazy_static! {
             ),
             ViolationMessage::Help(
                 "Delete the index CONCURRENTLY.".into()
+            ),
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::PreferIdentity,
+        func: prefer_identity,
+        messages: vec![
+            ViolationMessage::Note(
+                "TODO".into()
+            ),
+            ViolationMessage::Help(
+                "TODO".into()
             ),
         ],
     },
