@@ -66,7 +66,7 @@ create table app.accounts
   "#;
         let res = lint_sql(bad_sql);
         assert_eq!(
-            violations_to_kinds(res),
+            violations_to_kinds(&res),
             vec![
                 RuleViolationKind::PreferTimestampTz,
                 RuleViolationKind::PreferTimestampTz
@@ -98,7 +98,7 @@ create table app.accounts
 
         assert_debug_snapshot!(res);
         assert_eq!(
-            violations_to_kinds(res),
+            violations_to_kinds(&res),
             vec![
                 RuleViolationKind::PreferTimestampTz,
                 RuleViolationKind::PreferTimestampTz
