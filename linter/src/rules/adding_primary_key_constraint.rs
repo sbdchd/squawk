@@ -57,7 +57,7 @@ pub fn adding_primary_key_constraint(
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
+    use crate::{check_sql_with_rule, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
 
     #[test]
@@ -66,8 +66,12 @@ mod test_rules {
 ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 "#;
 
-        let expected_bad_res =
-            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap_or_default();
+        let expected_bad_res = check_sql_with_rule(
+            bad_sql,
+            &RuleViolationKind::AddingSerialPrimaryKeyField,
+            None,
+        )
+        .unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
     }
@@ -78,17 +82,21 @@ ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 ALTER TABLE items ADD PRIMARY KEY (id);
 "#;
 
-        let expected_bad_res =
-            check_sql(bad_sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap_or_default();
+        let expected_bad_res = check_sql_with_rule(
+            bad_sql,
+            &RuleViolationKind::AddingSerialPrimaryKeyField,
+            None,
+        )
+        .unwrap_or_default();
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
 
         let ok_sql = r#"
 ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
 "#;
-        assert_debug_snapshot!(check_sql(
+        assert_debug_snapshot!(check_sql_with_rule(
             ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
+            &RuleViolationKind::AddingSerialPrimaryKeyField,
             None
         ));
     }

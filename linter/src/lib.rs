@@ -281,6 +281,25 @@ pub fn check_sql(
 }
 
 #[cfg(test)]
+pub fn check_sql_with_rule(
+    sql: &str,
+    rule_kind: &RuleViolationKind,
+    pg_version: Option<Version>,
+) -> Result<Vec<RuleViolation>, CheckSqlError> {
+    let tree = parse_sql_query(sql)?;
+    let mut errs = vec![];
+    for rule in RULES.iter() {
+        if rule.name == *rule_kind {
+            errs.extend((rule.func)(&tree, pg_version));
+        }
+    }
+
+    errs.sort_by_key(|v| v.span.start);
+
+    Ok(errs)
+}
+
+#[cfg(test)]
 mod test_rules {
     use super::*;
     use insta::{assert_debug_snapshot, assert_display_snapshot};

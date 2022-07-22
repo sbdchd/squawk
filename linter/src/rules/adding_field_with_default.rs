@@ -56,9 +56,17 @@ pub fn adding_field_with_default(
 mod test_rules {
     use std::str::FromStr;
 
-    use crate::{check_sql, versions::Version, violations::RuleViolationKind};
+    use crate::{
+        check_sql_with_rule,
+        versions::Version,
+        violations::{RuleViolation, RuleViolationKind},
+    };
 
     use insta::assert_debug_snapshot;
+
+    fn lint_sql(sql: &str, pg_version: Option<Version>) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::AddingFieldWithDefault, pg_version).unwrap()
+    }
 
     ///
     /// ```sql
@@ -85,20 +93,11 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
-        assert_debug_snapshot!(check_sql(
-            ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql, None));
+        assert_debug_snapshot!(lint_sql(ok_sql, None));
     }
 
     #[test]
-
     fn test_adding_field_with_default_in_version_11() {
         let bad_sql = r#"
 -- VOLATILE
@@ -109,15 +108,8 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            Some(Version::from_str("11.0.0").unwrap()),
-        ));
-        assert_debug_snapshot!(check_sql(
-            ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            Some(Version::from_str("11.0.0").unwrap()),
-        ));
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
 }
