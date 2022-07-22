@@ -60,44 +60,25 @@ ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varc
 COMMIT;
 "#;
         assert_debug_snapshot!(lint_sql(sql), @r###"
-        Ok(
-            [
-                RuleViolation {
-                    kind: ChangingColumnType,
-                    span: Span {
-                        start: 7,
-                        len: Some(
-                            123,
-                        ),
-                    },
-                    messages: [
-                        Note(
-                            "Requires an ACCESS EXCLUSIVE lock on the table which blocks reads.",
-                        ),
-                        Note(
-                            "Changing the type may break existing clients.",
-                        ),
-                    ],
+        [
+            RuleViolation {
+                kind: PreferTextField,
+                span: Span {
+                    start: 7,
+                    len: Some(
+                        123,
+                    ),
                 },
-                RuleViolation {
-                    kind: PreferTextField,
-                    span: Span {
-                        start: 7,
-                        len: Some(
-                            123,
-                        ),
-                    },
-                    messages: [
-                        Note(
-                            "Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.",
-                        ),
-                        Help(
-                            "Use a text field with a check constraint.",
-                        ),
-                    ],
-                },
-            ],
-        )
+                messages: [
+                    Note(
+                        "Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.",
+                    ),
+                    Help(
+                        "Use a text field with a check constraint.",
+                    ),
+                ],
+            },
+        ]
         "###);
     }
 
