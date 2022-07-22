@@ -100,6 +100,16 @@ const rules = [
     description: "Prevent blocking reads/writes to table while index is built.",
   },
   {
+    name: "prefer-big-int",
+    tags: ["schema"],
+    description: "Prevent hitting the 32 bit max int limit.",
+  },
+  {
+    name: "prefer-identity",
+    tags: ["schema"],
+    description: "Serial types have confusing behaviors. Use identity columns instead.",
+  },
+  {
     name: "prefer-robust-stmts",
     tags: ["locking"],
     description: "Ensure migrations are atomic or retriable.",
@@ -136,11 +146,6 @@ const rules = [
     tags: ["locking"],
     description:
       "Prevent blocking reads/writes to table while index is dropped.",
-  },
-  {
-    name: "prefer-identity",
-    tags: ["schema"],
-    description: "Serial types have confusing behaviors. Use identity columns instead.",
   },
   // generator::new-rule-above
 ]

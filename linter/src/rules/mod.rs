@@ -1,4 +1,5 @@
 pub mod adding_field_with_default;
+mod test_utils;
 mod utils;
 pub use adding_field_with_default::*;
 pub mod adding_not_null_field;
@@ -35,3 +36,5 @@ pub mod prefer_timestamptz;
 pub use prefer_timestamptz::*;
 pub mod prefer_identity;
 pub use prefer_identity::*;
+pub mod prefer_big_int;
+pub use prefer_big_int::*;

@@ -12,6 +12,8 @@ module.exports = {
       "changing-column-type",
       "constraint-missing-not-valid",
       "disallowed-unique-constraint",
+      "prefer-big-int",
+      "prefer-identity",
       "prefer-robust-stmts",
       "prefer-text-field",
       "prefer-timestamptz",
@@ -19,7 +21,6 @@ module.exports = {
       "renaming-table",
       "require-concurrent-index-creation",
       "require-concurrent-index-deletion",
-      "prefer-identity",
       // generator::new-rule-above
     ],
   },

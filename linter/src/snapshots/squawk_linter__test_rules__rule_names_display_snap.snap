@@ -12,6 +12,7 @@ ban-drop-database
 changing-column-type
 constraint-missing-not-valid
 disallowed-unique-constraint
+prefer-big-int
 prefer-robust-stmts
 prefer-text-field
 prefer-timestamptz
