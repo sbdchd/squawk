@@ -174,6 +174,18 @@ lazy_static! {
         ],
     },
     SquawkRule {
+        name: RuleViolationKind::PreferBigInt,
+        func: prefer_big_int,
+        messages: vec![
+            ViolationMessage::Note(
+                "Hitting the max 32 bit integer is possible and may break your application.".into()
+            ),
+            ViolationMessage::Help(
+                "Use 64bit integer values instead to prevent hitting this limit.".into()
+            ),
+        ],
+    },
+    SquawkRule {
         name: RuleViolationKind::PreferRobustStmts,
         func: prefer_robust_stmts,
         messages: vec![
@@ -254,18 +266,6 @@ lazy_static! {
             ),
             ViolationMessage::Help(
                 "Delete the index CONCURRENTLY.".into()
-            ),
-        ],
-    },
-    SquawkRule {
-        name: RuleViolationKind::PreferBigInt,
-        func: prefer_big_int,
-        messages: vec![
-            ViolationMessage::Note(
-                "Hitting the max 32 bit integer is possible and may break your application.".into()
-            ),
-            ViolationMessage::Help(
-                "Use 64bit integer values instead to prevent hitting this limit.".into()
             ),
         ],
     },

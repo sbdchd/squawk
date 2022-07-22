@@ -62,7 +62,7 @@ mod test_rules {
 
     lazy_static! {
         static ref EXCLUDED_RULES: Vec<RuleViolationKind> = vec![
-            RuleViolationKind::PreferRobustStmts,
+            RuleViolationKind::PreferBigInt,
             RuleViolationKind::ChangingColumnType
         ];
     }
