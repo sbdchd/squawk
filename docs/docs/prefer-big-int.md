@@ -49,7 +49,3 @@ CREATE TABLE posts (
   id bigint primary key
 )
 ```
-
-## links
-
-<!-- TODO -->

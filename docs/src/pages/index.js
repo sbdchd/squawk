@@ -140,7 +140,7 @@ const rules = [
   {
     name: "prefer-big-int",
     tags: ["schema"],
-    description: "Prevent hitting the 32bit max int limit.",
+    description: "Prevent hitting the 32 bit max int limit.",
   },
   // generator::new-rule-above
 ]

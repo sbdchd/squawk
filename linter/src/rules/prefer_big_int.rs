@@ -47,6 +47,8 @@ fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_de
 
 #[cfg(test)]
 mod test_rules {
+    use insta::assert_debug_snapshot;
+
     use crate::{check_sql, rules::test_utils::violations_to_kinds, violations::RuleViolationKind};
 
     lazy_static! {
@@ -103,7 +105,7 @@ create table users (
 );
   "#;
         let res = check_sql(bad_sql, &EXCLUDED_RULES, None).unwrap();
-        let violations = violations_to_kinds(res);
+        let violations = violations_to_kinds(&res);
         assert_eq!(
             violations.len(),
             8,
@@ -117,6 +119,6 @@ create table users (
                 .count(),
             "all violations should be big int violations"
         );
-        // assert_eq!(check_sql(bad_sql, &EXCLUDED_RULES, None), Ok(vec![]));
+        assert_debug_snapshot!(res);
     }
 }

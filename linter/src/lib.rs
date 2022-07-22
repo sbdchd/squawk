@@ -262,7 +262,7 @@ lazy_static! {
         func: prefer_big_int,
         messages: vec![
             ViolationMessage::Note(
-                "Hitting the max integer in a 32bit is possible and may break your application.".into()
+                "Hitting the max 32 bit integer is possible and may break your application.".into()
             ),
             ViolationMessage::Help(
                 "Use 64bit integer values instead to prevent hitting this limit.".into()
