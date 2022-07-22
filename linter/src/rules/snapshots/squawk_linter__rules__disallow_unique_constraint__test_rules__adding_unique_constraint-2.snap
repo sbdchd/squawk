@@ -1,7 +1,5 @@
 ---
 source: linter/src/rules/disallow_unique_constraint.rs
-expression: "check_sql(ok_sql, &[\"prefer-robust-stmts\".into()])"
+expression: lint_sql(ignored_sql)
 ---
-Ok(
-    [],
-)
+[]

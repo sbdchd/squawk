@@ -150,11 +150,7 @@ CREATE TABLE "core_bar" (
 --
 ALTER TABLE "core_bar" ADD CONSTRAINT "text_size" CHECK (LENGTH("bravo") <= 100);
 COMMIT;"#;
-        assert_debug_snapshot!(lint_sql(ok_sql), @r###"
-        Ok(
-            [],
-        )
-        "###);
+        assert_debug_snapshot!(lint_sql(ok_sql), @"[]");
     }
 
     #[test]
