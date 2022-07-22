@@ -70,7 +70,16 @@ pub fn adding_not_nullable_field(
 mod test_rules {
     use std::str::FromStr;
 
-    use crate::{check_sql, versions::Version, violations::RuleViolationKind, ViolationMessage};
+    use crate::{
+        check_sql_with_rule,
+        versions::Version,
+        violations::{RuleViolation, RuleViolationKind},
+        ViolationMessage,
+    };
+
+    fn lint_sql(sql: &str, pg_version: Option<Version>) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::AddingNotNullableField, pg_version).unwrap()
+    }
 
     use insta::assert_debug_snapshot;
 
@@ -79,7 +88,7 @@ mod test_rules {
         let sql = r#"
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
-        let res = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None).unwrap();
+        let res = lint_sql(sql, None);
         assert_eq!(res.len(), 1);
         assert_eq!(res[0].kind, RuleViolationKind::AddingNotNullableField);
         assert_eq!(
@@ -105,22 +114,14 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql, None));
 
         let bad_sql = r#"
 -- not sure how this would ever work, but might as well test it
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql, None));
     }
 
     #[test]
@@ -134,11 +135,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 COMMIT;
         "#;
 
-        assert_debug_snapshot!(check_sql(
-            ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            Some(Version::from_str("11.0.0").unwrap()),
-        ));
+        assert_debug_snapshot!(lint_sql(ok_sql, Some(Version::from_str("11.0.0").unwrap()),));
     }
 
     #[test]
@@ -146,9 +143,6 @@ COMMIT;
         let ok_sql = r#"
 ALTER TABLE "foo_tbl" ADD COLUMN IF NOT EXISTS "bar_col" TEXT DEFAULT 'buzz' NOT NULL;
 "#;
-        assert_eq!(
-            check_sql(ok_sql, &[RuleViolationKind::AddingFieldWithDefault], None),
-            Ok(vec![])
-        );
+        assert_eq!(lint_sql(ok_sql, None), vec![]);
     }
 }

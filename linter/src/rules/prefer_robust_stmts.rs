@@ -112,7 +112,7 @@ pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: Option<Version>) -> Ve
 #[cfg(test)]
 mod test_rules {
     use crate::{
-        check_sql,
+        check_sql_with_rule,
         errors::CheckSqlError,
         violations::{RuleViolation, RuleViolationKind},
     };
@@ -258,14 +258,21 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         let bad_sql = r#"
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   "#;
-        assert_eq!(check_sql(bad_sql, &[], None), Ok(vec![]));
+        assert_eq!(
+            check_sql_with_rule(bad_sql, &RuleViolationKind::PreferRobustStmts, None),
+            Ok(vec![])
+        );
         let bad_sql = r#"
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   "#;
 
         assert_eq!(
-            violations(check_sql(bad_sql, &[], None)),
+            violations(check_sql_with_rule(
+                bad_sql,
+                &RuleViolationKind::PreferRobustStmts,
+                None
+            )),
             Ok(vec![
                 RuleViolationKind::PreferRobustStmts,
                 RuleViolationKind::PreferRobustStmts

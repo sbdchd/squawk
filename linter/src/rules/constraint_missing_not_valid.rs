@@ -106,8 +106,30 @@ pub fn constraint_missing_not_valid(
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
+
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::ConstraintMissingNotValid, None).unwrap()
+    }
+
+    #[test]
+    fn test_ensure_ignored_when_new_table() {
+        let sql = r#"
+BEGIN;
+CREATE TABLE "core_foo" (
+"id" serial NOT NULL PRIMARY KEY, 
+"age" integer NOT NULL
+);
+ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
+COMMIT;
+    "#;
+
+        assert_debug_snapshot!(lint_sql(sql));
+    }
 
     /// Using NOT VALID and VALIDATE in a single transaction is equivalent to
     /// adding a constraint without NOT VALID. It will block!
@@ -119,7 +141,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCE
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
 "#;
-        let res = check_sql(sql, &[], None).unwrap();
+        let res = lint_sql(sql);
         assert_eq!(
             res.len(),
             1,
@@ -143,22 +165,14 @@ COMMIT;
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
    "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql,));
 
         let ok_sql = r#"
 -- use `NOT VALID`
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
    "#;
-        assert_debug_snapshot!(check_sql(
-            ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(ok_sql));
     }
 
     ///
@@ -183,16 +197,8 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
    "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql,));
 
-        assert_debug_snapshot!(check_sql(
-            ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(ok_sql));
     }
 }

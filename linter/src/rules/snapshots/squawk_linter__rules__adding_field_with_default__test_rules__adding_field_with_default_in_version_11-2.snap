@@ -1,7 +1,5 @@
 ---
 source: linter/src/rules/adding_field_with_default.rs
-expression: "check_sql(ok_sql, &[RuleViolationKind::PreferRobustStmts],\n    Option<PgVersion>::parse(\"11.0.0\").unwrap())"
+expression: "lint_sql(ok_sql, pg_version_11)"
 ---
-Ok(
-    [],
-)
+[]

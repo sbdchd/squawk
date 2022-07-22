@@ -1,42 +1,40 @@
 ---
 source: linter/src/rules/changing_column_type.rs
-expression: "check_sql(bad_sql, &[])"
+expression: lint_sql(bad_sql)
 ---
-Ok(
-    [
-        RuleViolation {
-            kind: ChangingColumnType,
-            span: Span {
-                start: 7,
-                len: Some(
-                    124,
-                ),
-            },
-            messages: [
-                Note(
-                    "Requires an ACCESS EXCLUSIVE lock on the table which blocks reads.",
-                ),
-                Note(
-                    "Changing the type may break existing clients.",
-                ),
-            ],
+[
+    RuleViolation {
+        kind: ChangingColumnType,
+        span: Span {
+            start: 7,
+            len: Some(
+                124,
+            ),
         },
-        RuleViolation {
-            kind: ChangingColumnType,
-            span: Span {
-                start: 132,
-                len: Some(
-                    73,
-                ),
-            },
-            messages: [
-                Note(
-                    "Requires an ACCESS EXCLUSIVE lock on the table which blocks reads.",
-                ),
-                Note(
-                    "Changing the type may break existing clients.",
-                ),
-            ],
+        messages: [
+            Note(
+                "Requires an ACCESS EXCLUSIVE lock on the table which blocks reads.",
+            ),
+            Note(
+                "Changing the type may break existing clients.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: ChangingColumnType,
+        span: Span {
+            start: 132,
+            len: Some(
+                73,
+            ),
         },
-    ],
-)
+        messages: [
+            Note(
+                "Requires an ACCESS EXCLUSIVE lock on the table which blocks reads.",
+            ),
+            Note(
+                "Changing the type may break existing clients.",
+            ),
+        ],
+    },
+]

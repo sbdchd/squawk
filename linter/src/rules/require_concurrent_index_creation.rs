@@ -32,8 +32,35 @@ pub fn require_concurrent_index_creation(
 
 #[cfg(test)]
 mod test_rules {
-    use crate::{check_sql, violations::RuleViolationKind};
     use insta::assert_debug_snapshot;
+
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::RequireConcurrentIndexCreation,
+            None,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn test_ensure_ignored_when_new_table() {
+        let sql = r#"
+BEGIN;
+CREATE TABLE "core_foo" (
+"id" serial NOT NULL PRIMARY KEY, 
+"tenant_id" integer NULL
+);
+CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
+COMMIT;
+    "#;
+
+        assert_debug_snapshot!(lint_sql(sql));
+    }
 
     /// ```sql
     /// -- instead of
@@ -48,20 +75,12 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        assert_debug_snapshot!(check_sql(
-            bad_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(bad_sql));
 
         let ok_sql = r#"
   -- use CONCURRENTLY
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
-        assert_debug_snapshot!(check_sql(
-            ok_sql,
-            &[RuleViolationKind::PreferRobustStmts],
-            None
-        ));
+        assert_debug_snapshot!(lint_sql(ok_sql));
     }
 }

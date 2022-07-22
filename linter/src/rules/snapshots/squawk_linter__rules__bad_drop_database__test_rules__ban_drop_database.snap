@@ -1,48 +1,46 @@
 ---
 source: linter/src/rules/bad_drop_database.rs
-expression: "check_sql(sql, &[])"
+expression: lint_sql(sql)
 ---
-Ok(
-    [
-        RuleViolation {
-            kind: BanDropDatabase,
-            span: Span {
-                start: 0,
-                len: Some(
-                    27,
-                ),
-            },
-            messages: [
-                Note(
-                    "Dropping a database may break existing clients.",
-                ),
-            ],
+[
+    RuleViolation {
+        kind: BanDropDatabase,
+        span: Span {
+            start: 0,
+            len: Some(
+                27,
+            ),
         },
-        RuleViolation {
-            kind: BanDropDatabase,
-            span: Span {
-                start: 28,
-                len: Some(
-                    37,
-                ),
-            },
-            messages: [
-                Note(
-                    "Dropping a database may break existing clients.",
-                ),
-            ],
+        messages: [
+            Note(
+                "Dropping a database may break existing clients.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: BanDropDatabase,
+        span: Span {
+            start: 28,
+            len: Some(
+                37,
+            ),
         },
-        RuleViolation {
-            kind: BanDropDatabase,
-            span: Span {
-                start: 66,
-                len: None,
-            },
-            messages: [
-                Note(
-                    "Dropping a database may break existing clients.",
-                ),
-            ],
+        messages: [
+            Note(
+                "Dropping a database may break existing clients.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: BanDropDatabase,
+        span: Span {
+            start: 66,
+            len: None,
         },
-    ],
-)
+        messages: [
+            Note(
+                "Dropping a database may break existing clients.",
+            ),
+        ],
+    },
+]
