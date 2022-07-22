@@ -1,4 +1,5 @@
 pub mod adding_field_with_default;
+mod test_utils;
 mod utils;
 pub use adding_field_with_default::*;
 pub mod adding_not_null_field;
@@ -33,3 +34,5 @@ pub mod adding_foreign_key_constraint;
 pub use adding_foreign_key_constraint::*;
 pub mod prefer_timestamptz;
 pub use prefer_timestamptz::*;
+pub mod prefer_big_int;
+pub use prefer_big_int::*;

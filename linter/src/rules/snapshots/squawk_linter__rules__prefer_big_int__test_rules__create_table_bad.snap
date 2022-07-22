@@ -1,0 +1,142 @@
+---
+source: linter/src/rules/prefer_big_int.rs
+expression: res
+---
+[
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 0,
+            len: Some(
+                39,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 40,
+            len: Some(
+                35,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 76,
+            len: Some(
+                38,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 115,
+            len: Some(
+                35,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 151,
+            len: Some(
+                37,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 189,
+            len: Some(
+                38,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 228,
+            len: Some(
+                38,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 267,
+            len: Some(
+                42,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+]
