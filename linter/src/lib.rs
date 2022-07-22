@@ -280,7 +280,6 @@ pub fn check_sql(
     Ok(errs)
 }
 
-#[cfg(test)]
 pub fn check_sql_with_rule(
     sql: &str,
     rule_kind: &RuleViolationKind,

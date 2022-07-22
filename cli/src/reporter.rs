@@ -578,8 +578,19 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
 #[cfg(test)]
 mod test_reporter {
-    use super::*;
+    use crate::reporter::{pretty_violations, print_violations, Reporter};
+
+    use console::strip_ansi_codes;
     use insta::{assert_debug_snapshot, assert_display_snapshot};
+
+    use squawk_linter::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::AddingNotNullableField, None).unwrap()
+    }
 
     #[test]
     fn test_display_violations_gcc() {
@@ -588,8 +599,7 @@ mod test_reporter {
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
-            .expect("valid sql should parse");
+        let violations = lint_sql(sql);
 
         let filename = "main.sql";
 
@@ -615,8 +625,7 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
-            .expect("valid sql should parse");
+        let violations = lint_sql(sql);
         let filename = "main.sql";
         let mut buff = Vec::new();
 
@@ -652,8 +661,7 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
-            .expect("valid sql should parse");
+        let violations = lint_sql(sql);
         let filename = "main.sql";
         let mut buff = Vec::new();
 
@@ -676,8 +684,7 @@ SELECT 1;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 SELECT 1;
 "#;
-        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
-            .expect("valid sql should parse");
+        let violations = lint_sql(sql);
 
         let filename = "main.sql";
         assert_debug_snapshot!(pretty_violations(violations, sql, filename));
@@ -688,8 +695,7 @@ SELECT 1;
     #[test]
     fn test_trimming_sql_newlines() {
         let sql = r#"ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;"#;
-        let violations = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
-            .expect("valid sql should parse");
+        let violations = lint_sql(sql);
 
         assert_debug_snapshot!(violations, @r###"
         [
