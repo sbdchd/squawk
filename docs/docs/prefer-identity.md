@@ -5,7 +5,7 @@ title: prefer-identity
 
 ## problem
 
-<!-- TODO -->
+Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.
 
 ## solution
 
