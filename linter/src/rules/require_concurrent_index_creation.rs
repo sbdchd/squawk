@@ -47,6 +47,21 @@ mod test_rules {
         .unwrap()
     }
 
+    #[test]
+    fn test_ensure_ignored_when_new_table() {
+        let sql = r#"
+BEGIN;
+CREATE TABLE "core_foo" (
+"id" serial NOT NULL PRIMARY KEY, 
+"tenant_id" integer NULL
+);
+CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
+COMMIT;
+    "#;
+
+        assert_debug_snapshot!(lint_sql(sql));
+    }
+
     /// ```sql
     /// -- instead of
     /// CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
