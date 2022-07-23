@@ -5,6 +5,14 @@ use serde::Deserialize;
 use serde_json::Value;
 use std::ffi::{CStr, CString};
 
+fn parse_str_or_none(str_ptr: *mut i8) -> Option<String> {
+    if str_ptr.is_null() {
+        None
+    } else {
+        unsafe { Some(CStr::from_ptr(str_ptr).to_string_lossy().into()) }
+    }
+}
+
 fn parse_sql_query_base<'a, T>(query: &'a str) -> Result<T, PgQueryError>
 where
     T: Deserialize<'a>,
@@ -13,7 +21,10 @@ where
     let pg_parse_result = unsafe { pg_query_parse(c_str.as_ptr()) };
 
     if !pg_parse_result.error.is_null() {
-        return Err(PgQueryError::PgParseError);
+        unsafe {
+            let err = *pg_parse_result.error;
+            return Err(PgQueryError::PgParseError(parse_str_or_none(err.message)));
+        }
     }
 
     // not sure if this is ever null, but might as well check

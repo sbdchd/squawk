@@ -3,7 +3,11 @@ pub enum PgQueryError {
     ParsingCString,
     JsonParse(String),
     QueryToCString,
-    PgParseError,
+    // The only useful field on PgQueryError is `message`.
+    // The other `lineo` and `filename` fields are just references to the Postgres parser code.
+    //
+    // https://cs.github.com/pganalyze/libpg_query/blob/4b30b03cb3944f01d4807ee89532549ccf115a44/pg_query.h?q=PgQueryError#L6-L13
+    PgParseError(Option<String>),
 }
 
 impl std::fmt::Display for PgQueryError {
@@ -18,7 +22,13 @@ impl std::fmt::Display for PgQueryError {
                 "Squawk schema failed to parse Postgres response. This indicates a bug with Squawk. Please report this error to https://github.com/sbdchd/squawk. Schema error: {}", err
             ),
             Self::QueryToCString => write!(f, "Could not encode query into CString"),
-            Self::PgParseError => write!(f, "Postgres failed to parse query"),
+            Self::PgParseError(ref err) => {
+                if let Some(err) = err {
+                    write!(f, "Postgres failed to parse query: {}",err)
+                } else {
+                    write!(f, "Postgres failed to parse query.")
+                }
+            },
         }
     }
 }

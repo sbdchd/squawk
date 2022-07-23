@@ -129,6 +129,35 @@ impl std::convert::From<CheckSqlError> for CheckFilesError {
     }
 }
 
+fn process_violations(
+    sql: &str,
+    path: &str,
+    excluded_rules: &[RuleViolationKind],
+    pg_version: Option<Version>,
+) -> ViolationContent {
+    match check_sql(sql, excluded_rules, pg_version) {
+        Ok(violations) => pretty_violations(violations, sql, path),
+        Err(err) => ViolationContent {
+            filename: path.into(),
+            sql: sql.into(),
+            violations: vec![ReportViolation {
+                column: 0,
+                file: path.into(),
+                level: ViolationLevel::Error,
+                line: 0,
+                messages: vec![
+                    ViolationMessage::Note(err.to_string()),
+                    ViolationMessage::Help(
+                        "Fix your Postgres statement to use valid syntax.".into(),
+                    ),
+                ],
+                rule_name: RuleViolationKind::InvalidStatement,
+                sql: sql.into(),
+            }],
+        },
+    }
+}
+
 pub fn check_files(
     paths: &[String],
     is_stdin: bool,
@@ -138,31 +167,6 @@ pub fn check_files(
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 
-    let mut process_violations = |sql: &str, path: &str| {
-        let violation = match check_sql(sql, excluded_rules, pg_version) {
-            Ok(violations) => pretty_violations(violations, sql, path),
-            Err(err) => ViolationContent {
-                filename: path.into(),
-                sql: sql.into(),
-                violations: vec![ReportViolation {
-                    column: 0,
-                    file: path.into(),
-                    level: ViolationLevel::Error,
-                    line: 0,
-                    messages: vec![
-                        ViolationMessage::Note(err.to_string()),
-                        ViolationMessage::Help(
-                            "Fix the syntax for your Postgres statement.".into(),
-                        ),
-                    ],
-                    rule_name: RuleViolationKind::InvalidStatement,
-                    sql: sql.into(),
-                }],
-            },
-        };
-        output_violations.push(violation);
-    };
-
     if is_stdin {
         info!("reading content from stdin");
         let sql = get_sql_from_stdin()?;
@@ -171,14 +175,14 @@ pub fn check_files(
             info!("ignoring empty stdin");
         } else {
             let path = stdin_path.unwrap_or_else(|| "stdin".into());
-            process_violations(&sql, &path);
+            output_violations.push(process_violations(&sql, &path, excluded_rules, pg_version));
         }
     }
 
     for path in paths {
         info!("checking file path: {}", path);
         let sql = get_sql_from_path(path)?;
-        process_violations(&sql, path);
+        output_violations.push(process_violations(&sql, path, excluded_rules, pg_version));
     }
     Ok(output_violations)
 }
@@ -599,11 +603,21 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
 #[cfg(test)]
 mod test_check_files {
-    use crate::check_files;
+    use insta::assert_display_snapshot;
+
+    use crate::reporter::fmt_tty;
+
+    use super::process_violations;
 
     #[test]
-    fn test_check_files() {
-        check_files()
+    fn test_check_files_invalid_syntax() {
+        let sql = r#"
+select \;
+        "#;
+        let mut buff = Vec::new();
+        let res = process_violations(sql, "test.sql", &[], None);
+        fmt_tty(&mut buff, &[res]).unwrap();
+        assert_display_snapshot!(std::str::from_utf8(&buff).unwrap());
     }
 }
 
