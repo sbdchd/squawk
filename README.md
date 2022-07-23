@@ -237,6 +237,10 @@ $ nix develop
    npm publish
    ```
 
+### algolia
+
+The squawkhq.com Algolia index can be found on [the crawler website](https://crawler.algolia.com/admin/crawlers/9bf0dffb-bc5a-4d46-9b8d-2f1197285213/overview). Algolia reindexes the site every day at 5:30 (UTC).
+
 ## how it works
 
 squawk wraps calls to [libpg_query-sys](https://github.com/tdbgamer/libpg_query-sys) in a safe
