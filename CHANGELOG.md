@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## Added
+
+- added better error handling of invalid syntax. (#245)
+
 ## v0.16.0 - 2022-07-22
 
 ## Added
