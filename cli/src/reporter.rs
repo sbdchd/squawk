@@ -148,7 +148,7 @@ fn process_violations(
                 messages: vec![
                     ViolationMessage::Note(err.to_string()),
                     ViolationMessage::Help(
-                        "Fix your Postgres statement to use valid syntax.".into(),
+                        "Modify your Postgres statement to use valid syntax.".into(),
                     ),
                 ],
                 rule_name: RuleViolationKind::InvalidStatement,

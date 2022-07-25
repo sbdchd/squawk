@@ -8,6 +8,6 @@ expression: val
   line: 0
   messages:
     - Note: "Postgres failed to parse query: syntax error at or near \"\\\""
-    - Help: Fix your Postgres statement to use valid syntax.
+    - Help: Modify your Postgres statement to use valid syntax.
   rule_name: invalid-statement
 
