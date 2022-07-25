@@ -1,7 +1,6 @@
 ---
 source: cli/src/reporter.rs
 expression: val
-
 ---
 - column: 0
   file: test.sql
