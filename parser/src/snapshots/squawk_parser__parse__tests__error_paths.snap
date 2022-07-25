@@ -3,5 +3,9 @@ source: parser/src/parse.rs
 expression: res
 ---
 Err(
-    PgParseError,
+    PgParseError(
+        Some(
+            "syntax error at or near \"lsakdjf\"",
+        ),
+    ),
 )

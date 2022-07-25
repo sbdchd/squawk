@@ -129,6 +129,35 @@ impl std::convert::From<CheckSqlError> for CheckFilesError {
     }
 }
 
+fn process_violations(
+    sql: &str,
+    path: &str,
+    excluded_rules: &[RuleViolationKind],
+    pg_version: Option<Version>,
+) -> ViolationContent {
+    match check_sql(sql, excluded_rules, pg_version) {
+        Ok(violations) => pretty_violations(violations, sql, path),
+        Err(err) => ViolationContent {
+            filename: path.into(),
+            sql: sql.into(),
+            violations: vec![ReportViolation {
+                column: 0,
+                file: path.into(),
+                level: ViolationLevel::Error,
+                line: 0,
+                messages: vec![
+                    ViolationMessage::Note(err.to_string()),
+                    ViolationMessage::Help(
+                        "Modify your Postgres statement to use valid syntax.".into(),
+                    ),
+                ],
+                rule_name: RuleViolationKind::InvalidStatement,
+                sql: sql.into(),
+            }],
+        },
+    }
+}
+
 pub fn check_files(
     paths: &[String],
     is_stdin: bool,
@@ -138,12 +167,6 @@ pub fn check_files(
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 
-    let mut process_violations = |sql: &str, path: &str| -> Result<(), CheckFilesError> {
-        let violations = check_sql(sql, excluded_rules, pg_version)?;
-        output_violations.push(pretty_violations(violations, sql, path));
-        Ok(())
-    };
-
     if is_stdin {
         info!("reading content from stdin");
         let sql = get_sql_from_stdin()?;
@@ -152,14 +175,14 @@ pub fn check_files(
             info!("ignoring empty stdin");
         } else {
             let path = stdin_path.unwrap_or_else(|| "stdin".into());
-            process_violations(&sql, &path)?;
+            output_violations.push(process_violations(&sql, &path, excluded_rules, pg_version));
         }
     }
 
     for path in paths {
         info!("checking file path: {}", path);
         let sql = get_sql_from_path(path)?;
-        process_violations(&sql, path)?;
+        output_violations.push(process_violations(&sql, path, excluded_rules, pg_version));
     }
     Ok(output_violations)
 }
@@ -184,12 +207,14 @@ arg_enum! {
 #[derive(Debug, Serialize)]
 pub enum ViolationLevel {
     Warning,
+    Error,
 }
 
 impl std::fmt::Display for ViolationLevel {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let val = match self {
             Self::Warning => "warning",
+            Self::Error => "error",
         };
         write!(f, "{}", val)
     }
@@ -244,14 +269,14 @@ pub fn fmt_tty_violation<W: io::Write>(
     f: &mut W,
     violation: &ReportViolation,
 ) -> Result<(), std::io::Error> {
+    let violation_level = match violation.level {
+        ViolationLevel::Warning => style(format!("{}", violation.level)).yellow(),
+        ViolationLevel::Error => style(format!("{}", violation.level)).red(),
+    };
     writeln!(
         f,
         "{}:{}:{}: {}: {}",
-        violation.file,
-        violation.line,
-        violation.column,
-        style(format!("{}", violation.level)).yellow(),
-        violation.rule_name
+        violation.file, violation.line, violation.column, violation_level, violation.rule_name
     )?;
 
     writeln!(f)?;
@@ -573,6 +598,29 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         let body = get_comment_body(violations, "0.2.3");
 
         assert_display_snapshot!(body);
+    }
+}
+
+#[cfg(test)]
+mod test_check_files {
+    use insta::assert_yaml_snapshot;
+    use serde_json::Value;
+
+    use crate::reporter::fmt_json;
+
+    use super::process_violations;
+
+    #[test]
+    fn test_check_files_invalid_syntax() {
+        let sql = r#"
+select \;
+        "#;
+        let mut buff = Vec::new();
+        let res = process_violations(sql, "test.sql", &[], None);
+        fmt_json(&mut buff, vec![res]).unwrap();
+
+        let val: Value = serde_json::from_slice(&buff).unwrap();
+        assert_yaml_snapshot!(val);
     }
 }
 

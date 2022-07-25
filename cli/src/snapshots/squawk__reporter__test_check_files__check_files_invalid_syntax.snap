@@ -1,0 +1,13 @@
+---
+source: cli/src/reporter.rs
+expression: val
+---
+- column: 0
+  file: test.sql
+  level: Error
+  line: 0
+  messages:
+    - Note: "Postgres failed to parse query: syntax error at or near \"\\\""
+    - Help: Modify your Postgres statement to use valid syntax.
+  rule_name: invalid-statement
+

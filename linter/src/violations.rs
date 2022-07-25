@@ -30,6 +30,9 @@ pub enum RuleViolationKind {
     DisallowedUniqueConstraint,
     #[serde(rename = "ban-drop-database")]
     BanDropDatabase,
+    // when we can't parse a Postgres statement, we report this error.
+    #[serde(rename = "invalid-statement")]
+    InvalidStatement,
     #[serde(rename = "prefer-big-int")]
     PreferBigInt,
     #[serde(rename = "prefer-identity")]
