@@ -603,9 +603,10 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
 #[cfg(test)]
 mod test_check_files {
-    use insta::assert_display_snapshot;
+    use insta::assert_yaml_snapshot;
+    use serde_json::Value;
 
-    use crate::reporter::fmt_tty;
+    use crate::reporter::fmt_json;
 
     use super::process_violations;
 
@@ -616,8 +617,10 @@ select \;
         "#;
         let mut buff = Vec::new();
         let res = process_violations(sql, "test.sql", &[], None);
-        fmt_tty(&mut buff, &[res]).unwrap();
-        assert_display_snapshot!(std::str::from_utf8(&buff).unwrap());
+        fmt_json(&mut buff, vec![res]).unwrap();
+
+        let val: Value = serde_json::from_slice(&buff).unwrap();
+        assert_yaml_snapshot!(val);
     }
 }
 
