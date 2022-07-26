@@ -2,7 +2,7 @@
 
 > linter for Postgres migrations
 
-[quick start](https://squawkhq.com/docs/) | [rules documentation](https://squawkhq.com/docs/rules) | [github integration](https://squawkhq.com/docs/github_app)
+[quick start](https://squawkhq.com/docs/) | [rules documentation](https://squawkhq.com/docs/rules) | [github action](https://github.com/sbdchd/squawk-action) | [diy github integration](https://squawkhq.com/docs/github_app)
 
 ## Why?
 
