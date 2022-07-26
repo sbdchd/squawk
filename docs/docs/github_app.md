@@ -12,11 +12,55 @@ Here's a screenshot of an example comment created by `squawk` using the `example
 
 [![squawk pr comment](/img/squawk-pr-comment.png)](https://github.com/sbdchd/squawk/pull/14#issuecomment-647009446)
 
-This document provides instructions for setting up a Squawk GitHub App.
+This document provides instructions for using the Squawk GitHub Action and using Squawk as GitHub App.
 
-## create a GitHub App
+If you're using GitHub Actions, we recommend using the [squawk-action](https://github.com/sbdchd/squawk-action). If you're using Squawk outside of GitHub Actions, like on CircleCI for example, you should configure Squawk as a [GitHub App](#squawk-as-a-github-app).
 
-Squawk needs a corresponding GitHub App so it can talk to GitHub.
+## Squawk GitHub Action
+
+This easiest way to integrate Squawk with GitHub is the [Squawk GitHub Action](https://github.com/sbdchd/squawk-action).
+
+```yml
+# .github/workflows/lint-migrations.yml
+name: Lint Migrations
+
+on: pull_request
+
+jobs:
+  lint_migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Find modified migrations
+        run: |
+          modified_migrations=$(git diff --name-only origin/$GITHUB_BASE_REF...origin/$GITHUB_HEAD_REF 'migrations/*.sql')
+          echo "$modified_migrations"
+          echo "::set-output name=file_names::$modified_migrations"
+        id: modified-migrations
+      - uses: sbdchd/squawk-action@v1
+        with:
+          pattern: ${{ steps.modified-migrations.outputs.file_names }}
+```
+
+For more information, see the [Squawk GitHub Action documentation](https://github.com/sbdchd/squawk-action).
+
+## Custom GitHub Action
+
+If you want to make your own GitHub Action, you can call Squawk using the following code:
+
+```bash
+SQUAWK_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+SQUAWK_GITHUB_REPO_OWNER=$(echo $GITHUB_REPOSITORY | awk -F/ '{print $1}')
+SQUAWK_GITHUB_REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F/ '{print $2}')
+SQUAWK_GITHUB_PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
+squawk upload-to-github example.sql
+```
+
+## Squawk as a GitHub App
+
+If you use Squawk outside of a GitHub Actions, we recommend configuring Squawk as a GitHub App.
+
+To use Squawk as a GitHub App, Squawk needs a corresponding GitHub App so it can talk to GitHub.
 
 1. Create the app
 
@@ -115,14 +159,3 @@ Squawk needs a corresponding GitHub App so it can talk to GitHub.
 
    <https://github.com/sbdchd/squawk/pull/14#issuecomment-647009446>
 
-## GitHub Actions authentication
-
-An alternative way to authenticate with GitHub is via a GitHub Actions token.
-
-```
-SQUAWK_GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
-SQUAWK_GITHUB_REPO_OWNER=$(echo $GITHUB_REPOSITORY | awk -F/ '{print $1}')
-SQUAWK_GITHUB_REPO_NAME=$(echo $GITHUB_REPOSITORY | awk -F/ '{print $2}')
-SQUAWK_GITHUB_PR_NUMBER=$(echo $GITHUB_REF | awk 'BEGIN { FS = "/" } ; { print $3 }')
-squawk upload-to-github example.sql
-```

@@ -53,3 +53,29 @@ example-migration.sql:2:1: warning: disallowed-unique-constraint
 See ["Running Migrations"](./safe_migrations.md#safety-requirements) for information about safely applying migrations in Postgres.
 
 The [CLI docs](./cli.md) have more information about the `squawk` CLI tool and the [GitHub Integration docs](./github_app.md) outline configuring Squawk to work with GitHub pull requests.
+
+## GitHub Action
+
+```yml
+# .github/workflows/lint-migrations.yml
+name: Lint Migrations
+
+on: pull_request
+
+jobs:
+  lint_migrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Find modified migrations
+        run: |
+          modified_migrations=$(git diff --name-only origin/$GITHUB_BASE_REF...origin/$GITHUB_HEAD_REF 'migrations/*.sql')
+          echo "$modified_migrations"
+          echo "::set-output name=file_names::$modified_migrations"
+        id: modified-migrations
+      - uses: sbdchd/squawk-action@v1
+        with:
+          pattern: ${{ steps.modified-migrations.outputs.file_names }}
+```
+
+The [GitHub Integration docs](./github_app.md) has more information on using Squawk with GitHub.
