@@ -61,12 +61,19 @@ create table "account" (
     id bigint generated always as identity primary key,
     created_at timestamptz not null default now()
 );
+create table "account_email" (
+    id bigint generated always as identity primary key,
+    account_id bigint not null,
+    email text not null
+);
 
 -- open a transaction
 begin;
 
 -- run your migration
-alter table app.users
+alter table account_email
+    add constraint fk_account
+    foreign key ("account_id") references "account" ("id") not valid;
 
 -- check locks
 select
