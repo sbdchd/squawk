@@ -80,3 +80,5 @@ ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
 ```
 
 ## links
+
+- https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime

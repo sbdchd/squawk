@@ -80,5 +80,3 @@ select
 from pg_locks;
 
 ```
-
-https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime
