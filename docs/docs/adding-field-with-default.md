@@ -41,7 +41,7 @@ ALTER TABLE "account" ADD COLUMN "ab_group" integer;
 -- blocks reads and writes while schema is changed (fast)
 ALTER TABLE "account" ALTER COLUMN "ab_group" SET DEFAULT random();
 
--- backfill existing rows in batches to set the "last_modified" column
+-- backfill existing rows in batches to set the "ab_group" column
 ```
 
 See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
