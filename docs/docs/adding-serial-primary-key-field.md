@@ -17,14 +17,17 @@ The index will be created in the background and an `ACCESS EXCLUSIVE` lock will 
 Instead of:
 
 ```sql
-ALTER TABLE items ADD PRIMARY KEY (id);
+-- blocks reads and writes to "account" table while constraint is added.
+ALTER TABLE account ADD PRIMARY KEY (id);
 ```
 
 Use:
 
 ```sql
-CREATE UNIQUE INDEX CONCURRENTLY items_pk_idx ON items (id);
-ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
+-- allows reads and writes while index is built
+CREATE UNIQUE INDEX CONCURRENTLY account_pk_idx ON account (id);
+-- blocks reads and writes while table schema is updated (fast)
+ALTER TABLE account ADD CONSTRAINT account_pk PRIMARY KEY USING INDEX account_pk_idx;
 ```
 
 ## further reading

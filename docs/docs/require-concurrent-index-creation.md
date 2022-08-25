@@ -20,11 +20,13 @@ This rule ignores indexes added to tables created in the same transaction.
 Instead of:
 
 ```sql
+-- blocks writes to table while index is built
 CREATE INDEX "email_idx" ON "app_user" ("email");
 ```
 
 Use:
 
 ```sql
+-- allows reads and writes while index is built
 CREATE INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
 ```

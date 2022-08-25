@@ -17,14 +17,13 @@ Instead create an index `CONCURRENTLY` and create the `CONSTRAINT` `USING` the i
 Instead of:
 
 ```sql
-ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+-- blocks reads and writes to table_name while constraint is validated.
+ALTER TABLE distributors ADD CONSTRAINT dist_id_uniq UNIQUE (dist_id);
 ```
 
 Use:
 
 ```sql
-CREATE UNIQUE INDEX CONCURRENTLY dist_id_temp_idx ON distributors (dist_id);
-ALTER TABLE distributors
-    DROP CONSTRAINT distributors_pkey,
-    ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
+-- allows reads and writes while index is built
+CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
 ```
