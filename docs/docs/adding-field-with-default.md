@@ -18,28 +18,30 @@ This statement is only safe when your default is non-volatile.
 :::
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
+-- blocks reads and writes while schema is changed (fast)
+ALTER TABLE "account" ADD COLUMN "foo" integer DEFAULT 10;
 ```
 
 ### adding a volatile default
 
-Add the field as nullable, then set a default, backfill, and remove nullabilty.
+Add the field without a default, set the default, and then backfill existing rows in batches.
 
 Instead of:
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
+-- blocks reads and writes while table is rewritten (slow)
+ALTER TABLE "account" ADD COLUMN "ab_group" integer DEFAULT random();
 ```
 
 Use:
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer;
-ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
--- backfill column in batches
-ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
-```
+-- blocks reads and writes while schema is changed (fast)
+ALTER TABLE "account" ADD COLUMN "ab_group" integer;
+-- blocks reads and writes while schema is changed (fast)
+ALTER TABLE "account" ALTER COLUMN "ab_group" SET DEFAULT random();
 
-We add our column as nullable, set a default for new rows, backfill our column (ideally done in batches to limit locking), and finally remove nullability.
+-- backfill existing rows in batches to set the "last_modified" column
+```
 
 See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
