@@ -5,7 +5,6 @@ use crate::{
 
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
-    TableElt,
 };
 
 /// Adding a foreign key constraint requires a table scan and a
@@ -22,19 +21,6 @@ pub fn adding_foreign_key_constraint(
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
-            Stmt::CreateStmt(stmt) => {
-                for elt in &stmt.table_elts {
-                    if let TableElt::Constraint(constraint) = elt {
-                        if constraint.contype == ConstrType::Foreign {
-                            errs.push(RuleViolation::new(
-                                RuleViolationKind::AddingForeignKeyConstraint,
-                                raw_stmt.into(),
-                                None,
-                            ));
-                        }
-                    }
-                }
-            }
             Stmt::AlterTableStmt(stmt) => {
                 for cmd in &stmt.cmds {
                     match cmd {
@@ -108,11 +94,7 @@ COMMIT;
         "#;
 
         let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 1);
-        assert_eq!(
-            violations[0].kind,
-            RuleViolationKind::AddingForeignKeyConstraint
-        );
+        assert_eq!(violations.len(), 0);
     }
     #[test]
     fn test_add_foreign_key_constraint_not_valid_validate() {
