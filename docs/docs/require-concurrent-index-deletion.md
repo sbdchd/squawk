@@ -18,11 +18,11 @@ Ensure all index deletions use the `CONCURRENTLY` option. `CONCURRENTLY` waits u
 Instead of:
 
 ```sql
-DROP INDEX "email_idx" ON "app_user" ("email");
+DROP INDEX "app"."email_idx";
 ```
 
 Use:
 
 ```sql
-DROP INDEX CONCURRENTLY "email_idx" ON "app_user" ("email");
+DROP INDEX CONCURRENTLY "app"."email_idx";
 ```
