@@ -8,9 +8,8 @@ function main {
     echo "updating version to '$NEW_VERSION'..."
     fastmod '^version = ".*"' 'version = "'$NEW_VERSION'"' cli/Cargo.toml
     fastmod '"version": ".*"' '"version": "'$NEW_VERSION'"' package.json
+    fastmod -m '(pname = "squawk";.*?)version = ".*?"' '${1}version = "'$NEW_VERSION'"' flake.nix
 }
 
 
 main $@
-
-
