@@ -117,8 +117,17 @@ fn main() {
         conf.pg_version
     };
 
+    let assume_transaction = if let Some(assume_transaction) = opts.assume_transaction {
+        assume_transaction
+    } else if let Some(assume_transaction) = conf.assume_transaction {
+        assume_transaction
+    } else {
+        true
+    };
+
     info!("pg version: {:?}", pg_version);
     info!("excluded rules: {:?}", &excluded_rules);
+    info!("assume in a transaction: {:?}", assume_transaction);
 
     let mut clap_app = Opt::clap();
     let stdout = io::stdout();
