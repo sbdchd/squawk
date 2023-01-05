@@ -1,0 +1,5 @@
+---
+source: linter/src/rules/ban_char_field.rs
+expression: lint_sql(sql)
+---
+[]
