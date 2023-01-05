@@ -73,4 +73,17 @@ COMMIT;
         "#;
         assert_debug_snapshot!(lint_sql(sql));
     }
+    #[test]
+    fn regression_with_indexing_2() {
+        let sql = r#"
+BEGIN;
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+ALTER TABLE "core_recipe" ADD CONSTRAINT foo_not_null
+    CHECK ("foo" IS NOT NULL) NOT VALID;
+COMMIT;
+BEGIN;
+
+"#;
+        assert_debug_snapshot!(lint_sql(sql));
+    }
 }

@@ -13,7 +13,6 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
     let mut not_valid_names = HashSet::new();
     let mut in_transaction = false;
     let mut in_bad_index = false;
-    let mut begin_span_start = 0;
     let mut bad_spans = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -21,16 +20,11 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
                 if stmt.kind == TransactionStmtKind::Begin && !in_transaction {
                     in_transaction = true;
                     in_bad_index = false;
-                    begin_span_start = raw_stmt.stmt_location;
+                    not_valid_names.clear();
                 }
                 if stmt.kind == TransactionStmtKind::Commit {
                     if in_bad_index && in_transaction {
-                        bad_spans.push(Span {
-                            start: begin_span_start,
-                            len: Some(
-                                raw_stmt.stmt_location + raw_stmt.stmt_len.unwrap_or_default(),
-                            ),
-                        });
+                        bad_spans.push(raw_stmt.into());
                     }
                     in_transaction = false;
                 }
