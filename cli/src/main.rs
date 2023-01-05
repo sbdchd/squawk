@@ -79,6 +79,9 @@ struct Opt {
     /// Path to the squawk config file (.squawk.toml)
     #[structopt(short = "c", long = "config")]
     config_path: Option<PathBuf>,
+    /// Assume that a transaction will wrap SQL files when run by a migration tool
+    #[structopt(long, possible_values = &["true", "false"])]
+    assume_transaction: Option<bool>,
 }
 
 fn main() {
