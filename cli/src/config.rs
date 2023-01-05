@@ -42,6 +42,8 @@ pub struct Config {
     pub excluded_rules: Vec<RuleViolationKind>,
     #[serde(default)]
     pub pg_version: Option<Version>,
+    #[serde(default)]
+    pub assume_transaction: Option<bool>,
 }
 
 impl Config {
@@ -97,6 +99,7 @@ mod test_config {
         let file = r#"
 pg_version = "19.1"
 excluded_rules = ["require-concurrent-index-creation"]
+assume_transaction = true
         
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
@@ -117,6 +120,16 @@ pg_version = "19.1"
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r#"
 excluded_rules = ["require-concurrent-index-creation"]
+        
+        "#;
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+    }
+    #[test]
+    fn test_load_assume_transaction() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r#"
+assume_transaction = false
         
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
