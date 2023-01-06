@@ -17,6 +17,7 @@ use squawk_parser::ast::{
 pub fn adding_foreign_key_constraint(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
+    _assume_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -74,7 +75,13 @@ mod test_rules {
     };
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::AddingForeignKeyConstraint, None).unwrap()
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::AddingForeignKeyConstraint,
+            None,
+            false,
+        )
+        .unwrap()
     }
 
     #[test]

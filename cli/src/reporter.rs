@@ -136,11 +136,7 @@ fn process_violations(
     pg_version: Option<Version>,
     assume_transaction: bool,
 ) -> ViolationContent {
-    match check_sql(
-        sql,
-        excluded_rules,
-        pg_version, /* , assume_transaction */
-    ) {
+    match check_sql(sql, excluded_rules, pg_version, assume_transaction) {
         Ok(violations) => pretty_violations(violations, sql, path),
         Err(err) => ViolationContent {
             filename: path.into(),
@@ -655,12 +651,7 @@ mod test_reporter {
     };
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(
-            sql,
-            &RuleViolationKind::AddingNotNullableField,
-            None, /* , assume_transaction */
-        )
-        .unwrap()
+        check_sql_with_rule(sql, &RuleViolationKind::AddingNotNullableField, None, false).unwrap()
     }
 
     #[test]
