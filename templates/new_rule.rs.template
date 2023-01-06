@@ -7,7 +7,11 @@ use squawk_parser::ast::RawStmt;
 
 
 #[must_use]
-pub fn {{RuleNameSnake}}(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
+pub fn {{RuleNameSnake}}(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+    _assume_transaction: bool,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     errs
 }
@@ -19,7 +23,7 @@ mod test_rules {
          violations::{RuleViolation, RuleViolationKind},
      };
      fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-         check_sql_with_rule(sql, &RuleViolationKind::{{RuleNamePascal}}, None).unwrap()
+         check_sql_with_rule(sql, &RuleViolationKind::{{RuleNamePascal}}, None, false).unwrap()
      }
 
     #[test]
