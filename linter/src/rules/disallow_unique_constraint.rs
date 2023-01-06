@@ -10,8 +10,9 @@ use squawk_parser::ast::{
 pub fn disallow_unique_constraint(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
+    assume_transaction: bool,
 ) -> Vec<RuleViolation> {
-    let tables_created = tables_created_in_transaction(tree);
+    let tables_created = tables_created_in_transaction(tree, assume_transaction);
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -54,7 +55,13 @@ mod test_rules {
     use insta::assert_debug_snapshot;
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::DisallowedUniqueConstraint, None).unwrap()
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::DisallowedUniqueConstraint,
+            None,
+            false,
+        )
+        .unwrap()
     }
 
     /// ```sql

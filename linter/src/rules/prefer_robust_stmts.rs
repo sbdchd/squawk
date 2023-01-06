@@ -20,9 +20,13 @@ enum Constraint {
 /// more robust by using guards like `IF NOT EXISTS`. So if the migration fails
 /// halfway through, it can be rerun without human intervention.
 #[must_use]
-pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
+pub fn prefer_robust_stmts(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+    assume_transaction: bool,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    let mut inside_transaction = false;
+    let mut inside_transaction = assume_transaction;
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
     // if we only have one statement in our file, Postgres will run that
     // statement in an implicit transaction, so we don't need to worry about
@@ -126,7 +130,7 @@ mod test_rules {
         // our check ignores single statement queries, so we add an extra statement to ensure we check that case
         sql.push_str(";\nSELECT 1;");
         let tree = parse_sql_query(&sql)?;
-        Ok(prefer_robust_stmts(&tree, None))
+        Ok(prefer_robust_stmts(&tree, None, false))
     }
 
     #[test]
@@ -259,7 +263,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   "#;
         assert_eq!(
-            check_sql_with_rule(bad_sql, &RuleViolationKind::PreferRobustStmts, None),
+            check_sql_with_rule(bad_sql, &RuleViolationKind::PreferRobustStmts, None, false),
             Ok(vec![])
         );
         let bad_sql = r#"
@@ -271,7 +275,8 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
             violations(check_sql_with_rule(
                 bad_sql,
                 &RuleViolationKind::PreferRobustStmts,
-                None
+                None,
+                false,
             )),
             Ok(vec![
                 RuleViolationKind::PreferRobustStmts,

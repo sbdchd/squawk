@@ -9,9 +9,9 @@ use squawk_parser::ast::{
 
 /// Return list of spans for offending transactions. From the start of BEGIN to
 /// the end of COMMIT.
-fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
+fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_transaction: bool) -> Vec<Span> {
     let mut not_valid_names = HashSet::new();
-    let mut in_transaction = false;
+    let mut in_transaction = assume_transaction;
     let mut in_bad_index = false;
     let mut bad_spans = vec![];
     for raw_stmt in tree {
@@ -60,10 +60,11 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt]) -> Vec<Span> {
 pub fn constraint_missing_not_valid(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
+    assume_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    let tables_created = tables_created_in_transaction(tree);
-    for span in not_valid_validate_in_transaction(tree) {
+    let tables_created = tables_created_in_transaction(tree, assume_transaction);
+    for span in not_valid_validate_in_transaction(tree, assume_transaction) {
         errs.push(RuleViolation::new(
                 RuleViolationKind::ConstraintMissingNotValid,
                 span,
@@ -107,7 +108,13 @@ mod test_rules {
         violations::{RuleViolation, RuleViolationKind},
     };
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::ConstraintMissingNotValid, None).unwrap()
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::ConstraintMissingNotValid,
+            None,
+            false,
+        )
+        .unwrap()
     }
 
     #[test]
@@ -115,7 +122,7 @@ mod test_rules {
         let sql = r#"
 BEGIN;
 CREATE TABLE "core_foo" (
-"id" serial NOT NULL PRIMARY KEY, 
+"id" serial NOT NULL PRIMARY KEY,
 "age" integer NOT NULL
 );
 ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
