@@ -142,6 +142,7 @@ fn main() {
                 opts.stdin_filepath,
                 &excluded_rules,
                 pg_version,
+                assume_transaction,
             ),
             "Upload to GitHub failed",
         );
@@ -158,6 +159,7 @@ fn main() {
                 opts.stdin_filepath,
                 &excluded_rules,
                 pg_version,
+                assume_transaction,
             ) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);

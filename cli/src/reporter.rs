@@ -134,8 +134,13 @@ fn process_violations(
     path: &str,
     excluded_rules: &[RuleViolationKind],
     pg_version: Option<Version>,
+    assume_transaction: bool,
 ) -> ViolationContent {
-    match check_sql(sql, excluded_rules, pg_version) {
+    match check_sql(
+        sql,
+        excluded_rules,
+        pg_version, /* , assume_transaction */
+    ) {
         Ok(violations) => pretty_violations(violations, sql, path),
         Err(err) => ViolationContent {
             filename: path.into(),
@@ -164,6 +169,7 @@ pub fn check_files(
     stdin_path: Option<String>,
     excluded_rules: &[RuleViolationKind],
     pg_version: Option<Version>,
+    assume_transaction: bool,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 
@@ -175,14 +181,26 @@ pub fn check_files(
             info!("ignoring empty stdin");
         } else {
             let path = stdin_path.unwrap_or_else(|| "stdin".into());
-            output_violations.push(process_violations(&sql, &path, excluded_rules, pg_version));
+            output_violations.push(process_violations(
+                &sql,
+                &path,
+                excluded_rules,
+                pg_version,
+                assume_transaction,
+            ));
         }
     }
 
     for path in paths {
         info!("checking file path: {}", path);
         let sql = get_sql_from_path(path)?;
-        output_violations.push(process_violations(&sql, path, excluded_rules, pg_version));
+        output_violations.push(process_violations(
+            &sql,
+            path,
+            excluded_rules,
+            pg_version,
+            assume_transaction,
+        ));
     }
     Ok(output_violations)
 }
@@ -616,7 +634,7 @@ mod test_check_files {
 select \;
         "#;
         let mut buff = Vec::new();
-        let res = process_violations(sql, "test.sql", &[], None);
+        let res = process_violations(sql, "test.sql", &[], None, false);
         fmt_json(&mut buff, vec![res]).unwrap();
 
         let val: Value = serde_json::from_slice(&buff).unwrap();
@@ -637,7 +655,12 @@ mod test_reporter {
     };
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::AddingNotNullableField, None).unwrap()
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::AddingNotNullableField,
+            None, /* , assume_transaction */
+        )
+        .unwrap()
     }
 
     #[test]

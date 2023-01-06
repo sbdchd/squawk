@@ -111,6 +111,7 @@ pub fn check_and_comment_on_pr(
     stdin_path: Option<String>,
     root_cmd_exclude: &[RuleViolationKind],
     pg_version: Option<Version>,
+    assume_transaction: bool,
 ) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,
@@ -131,6 +132,7 @@ pub fn check_and_comment_on_pr(
         stdin_path,
         &concat(&exclude.unwrap_or_default(), root_cmd_exclude),
         pg_version,
+        assume_transaction,
     )?;
     if file_results.is_empty() {
         info!("no files checked, exiting");
