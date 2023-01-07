@@ -13,7 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - error parsing multiple transactions in one file (#259)
 
-
 ## v0.17.0 - 2022-07-27
 
 ## Added
