@@ -35,6 +35,13 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_in_transaction: bo
                         if let Some(constraint_name) = &cmd.name {
                             if not_valid_names.get(constraint_name).is_some() {
                                 in_bad_index = true;
+                                if assume_in_transaction {
+                                    // Add this to bad_spans here and tied to the
+                                    // VALIDATE CONSTRAINT statement rather than COMMIT. With
+                                    // assume_in_transaction, there isn't a COMMIT statement, so we
+                                    // need a way to show this lint message.
+                                    bad_spans.push(raw_stmt.into());
+                                }
                             }
                         }
                     }
@@ -107,12 +114,23 @@ mod test_rules {
         check_sql_with_rule,
         violations::{RuleViolation, RuleViolationKind},
     };
+
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql_with_rule(
             sql,
             &RuleViolationKind::ConstraintMissingNotValid,
             None,
             false,
+        )
+        .unwrap()
+    }
+
+    fn lint_sql_assuming_in_transaction(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::ConstraintMissingNotValid,
+            None,
+            true,
         )
         .unwrap()
     }
@@ -130,6 +148,19 @@ COMMIT;
     "#;
 
         assert_debug_snapshot!(lint_sql(sql));
+    }
+
+    #[test]
+    fn test_ensure_ignored_when_new_table_with_assume_in_transaction() {
+        let sql = r#"
+CREATE TABLE "core_foo" (
+"id" serial NOT NULL PRIMARY KEY,
+"age" integer NOT NULL
+);
+ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
+    "#;
+
+        assert_debug_snapshot!(lint_sql_assuming_in_transaction(sql));
     }
 
     /// Using NOT VALID and VALIDATE in a single transaction is equivalent to
@@ -152,6 +183,26 @@ COMMIT;
         // We have a custom error message for this case.
         assert_debug_snapshot!(res[0].messages);
     }
+
+    /// Using NOT VALID and VALIDATE in a single transaction is equivalent to
+    /// adding a constraint without NOT VALID. It will block!
+    #[test]
+    fn not_valid_validate_with_assume_in_transaction() {
+        let sql = r#"
+ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCES "app_user" (id) NOT VALID;
+ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
+"#;
+        let res = lint_sql_assuming_in_transaction(sql);
+        assert_eq!(
+            res.len(),
+            1,
+            "it's unsafe to run NOT VALID with VALIDATE in a transaction."
+        );
+        assert_eq!(res[0].kind, RuleViolationKind::ConstraintMissingNotValid);
+        // We have a custom error message for this case.
+        assert_debug_snapshot!(res[0].messages);
+    }
+
     /// ```sql
     /// -- instead of
     /// ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
@@ -166,7 +217,7 @@ COMMIT;
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
    "#;
 
-        assert_debug_snapshot!(lint_sql(bad_sql,));
+        assert_debug_snapshot!(lint_sql(bad_sql));
 
         let ok_sql = r#"
 -- use `NOT VALID`
@@ -198,7 +249,7 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
    "#;
 
-        assert_debug_snapshot!(lint_sql(bad_sql,));
+        assert_debug_snapshot!(lint_sql(bad_sql));
 
         assert_debug_snapshot!(lint_sql(ok_sql));
     }
