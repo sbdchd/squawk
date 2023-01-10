@@ -6,10 +6,10 @@ use std::collections::HashSet;
 
 pub fn tables_created_in_transaction(
     tree: &[RawStmt],
-    assume_transaction: bool,
+    assume_in_transaction: bool,
 ) -> HashSet<String> {
     let mut created_table_names = HashSet::new();
-    let mut inside_transaction = assume_transaction;
+    let mut inside_transaction = assume_in_transaction;
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => match stmt.kind {

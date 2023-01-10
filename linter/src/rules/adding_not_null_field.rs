@@ -24,7 +24,7 @@ fn has_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bo
 pub fn adding_not_nullable_field(
     tree: &[RawStmt],
     pg_version: Option<Version>,
-    _assume_transaction: bool,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     if let Some(pg_version) = pg_version {

@@ -81,7 +81,7 @@ struct Opt {
     config_path: Option<PathBuf>,
     /// Assume that a transaction will wrap SQL files when run by a migration tool
     #[structopt(long, possible_values = &["true", "false"])]
-    assume_transaction: Option<bool>,
+    assume_in_transaction: Option<bool>,
 }
 
 fn main() {
@@ -117,17 +117,17 @@ fn main() {
         conf.pg_version
     };
 
-    let assume_transaction = if let Some(assume_transaction) = opts.assume_transaction {
-        assume_transaction
-    } else if let Some(assume_transaction) = conf.assume_transaction {
-        assume_transaction
+    let assume_in_transaction = if let Some(assume_in_transaction) = opts.assume_in_transaction {
+        assume_in_transaction
+    } else if let Some(assume_in_transaction) = conf.assume_in_transaction {
+        assume_in_transaction
     } else {
         true
     };
 
     info!("pg version: {:?}", pg_version);
     info!("excluded rules: {:?}", &excluded_rules);
-    info!("assume in a transaction: {:?}", assume_transaction);
+    info!("assume in a transaction: {:?}", assume_in_transaction);
 
     let mut clap_app = Opt::clap();
     let stdout = io::stdout();
@@ -142,7 +142,7 @@ fn main() {
                 opts.stdin_filepath,
                 &excluded_rules,
                 pg_version,
-                assume_transaction,
+                assume_in_transaction,
             ),
             "Upload to GitHub failed",
         );
@@ -159,7 +159,7 @@ fn main() {
                 opts.stdin_filepath,
                 &excluded_rules,
                 pg_version,
-                assume_transaction,
+                assume_in_transaction,
             ) {
                 Ok(file_reports) => {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);

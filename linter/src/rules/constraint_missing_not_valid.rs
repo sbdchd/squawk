@@ -9,9 +9,9 @@ use squawk_parser::ast::{
 
 /// Return list of spans for offending transactions. From the start of BEGIN to
 /// the end of COMMIT.
-fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_transaction: bool) -> Vec<Span> {
+fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_in_transaction: bool) -> Vec<Span> {
     let mut not_valid_names = HashSet::new();
-    let mut in_transaction = assume_transaction;
+    let mut in_transaction = assume_in_transaction;
     let mut in_bad_index = false;
     let mut bad_spans = vec![];
     for raw_stmt in tree {
@@ -60,11 +60,11 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_transaction: bool)
 pub fn constraint_missing_not_valid(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    assume_transaction: bool,
+    assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    let tables_created = tables_created_in_transaction(tree, assume_transaction);
-    for span in not_valid_validate_in_transaction(tree, assume_transaction) {
+    let tables_created = tables_created_in_transaction(tree, assume_in_transaction);
+    for span in not_valid_validate_in_transaction(tree, assume_in_transaction) {
         errs.push(RuleViolation::new(
                 RuleViolationKind::ConstraintMissingNotValid,
                 span,

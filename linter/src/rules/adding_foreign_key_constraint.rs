@@ -17,7 +17,7 @@ use squawk_parser::ast::{
 pub fn adding_foreign_key_constraint(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    _assume_transaction: bool,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {

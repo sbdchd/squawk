@@ -8,9 +8,9 @@ use squawk_parser::ast::{RawStmt, Stmt};
 pub fn require_concurrent_index_creation(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    assume_transaction: bool,
+    assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
-    let tables_created = tables_created_in_transaction(tree, assume_transaction);
+    let tables_created = tables_created_in_transaction(tree, assume_in_transaction);
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {

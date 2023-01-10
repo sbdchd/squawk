@@ -9,7 +9,7 @@ Ok(
                 RequireConcurrentIndexCreation,
             ],
             pg_version: None,
-            assume_transaction: None,
+            assume_in_transaction: None,
         },
     ),
 )

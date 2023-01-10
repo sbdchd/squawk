@@ -9,7 +9,7 @@ use squawk_parser::ast::{AlterTableCmds, AlterTableType, RawStmt, Stmt};
 pub fn ban_drop_column(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    _assume_transaction: bool,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {

@@ -23,10 +23,10 @@ enum Constraint {
 pub fn prefer_robust_stmts(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    assume_transaction: bool,
+    assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    let mut inside_transaction = assume_transaction;
+    let mut inside_transaction = assume_in_transaction;
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
     // if we only have one statement in our file, Postgres will run that
     // statement in an implicit transaction, so we don't need to worry about

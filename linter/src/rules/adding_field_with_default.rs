@@ -17,7 +17,7 @@ fn constraint_has_constant_expr(constraint: &Constraint) -> bool {
 pub fn adding_field_with_default(
     tree: &[RawStmt],
     pg_version: Option<Version>,
-    _assume_transaction: bool,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {

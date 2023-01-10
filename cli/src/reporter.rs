@@ -134,9 +134,9 @@ fn process_violations(
     path: &str,
     excluded_rules: &[RuleViolationKind],
     pg_version: Option<Version>,
-    assume_transaction: bool,
+    assume_in_transaction: bool,
 ) -> ViolationContent {
-    match check_sql(sql, excluded_rules, pg_version, assume_transaction) {
+    match check_sql(sql, excluded_rules, pg_version, assume_in_transaction) {
         Ok(violations) => pretty_violations(violations, sql, path),
         Err(err) => ViolationContent {
             filename: path.into(),
@@ -165,7 +165,7 @@ pub fn check_files(
     stdin_path: Option<String>,
     excluded_rules: &[RuleViolationKind],
     pg_version: Option<Version>,
-    assume_transaction: bool,
+    assume_in_transaction: bool,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 
@@ -182,7 +182,7 @@ pub fn check_files(
                 &path,
                 excluded_rules,
                 pg_version,
-                assume_transaction,
+                assume_in_transaction,
             ));
         }
     }
@@ -195,7 +195,7 @@ pub fn check_files(
             path,
             excluded_rules,
             pg_version,
-            assume_transaction,
+            assume_in_transaction,
         ));
     }
     Ok(output_violations)

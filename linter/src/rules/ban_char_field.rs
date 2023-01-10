@@ -9,7 +9,7 @@ use squawk_parser::ast::{RawStmt, Stmt, TableElt};
 pub fn ban_char_type(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    _assume_transaction: bool,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {

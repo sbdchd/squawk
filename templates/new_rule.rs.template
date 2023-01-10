@@ -10,7 +10,7 @@ use squawk_parser::ast::RawStmt;
 pub fn {{RuleNameSnake}}(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    _assume_transaction: bool,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     errs

@@ -17,7 +17,7 @@ Ok(
                     patch: None,
                 },
             ),
-            assume_transaction: Some(
+            assume_in_transaction: Some(
                 true,
             ),
         },

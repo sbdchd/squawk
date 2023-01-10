@@ -14,7 +14,7 @@ use crate::rules::utils::columns_create_or_modified;
 pub fn prefer_text_field(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    _assume_transaction: bool,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {

@@ -7,7 +7,7 @@ Ok(
         Config {
             excluded_rules: [],
             pg_version: None,
-            assume_transaction: Some(
+            assume_in_transaction: Some(
                 false,
             ),
         },
