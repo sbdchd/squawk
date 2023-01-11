@@ -133,6 +133,14 @@ mod test_rules {
         Ok(prefer_robust_stmts(&tree, None, false))
     }
 
+    fn lint_sql_assuming_in_transaction(sql: &str) -> Result<Vec<RuleViolation>, CheckSqlError> {
+        let mut sql = sql.to_owned();
+        // our check ignores single statement queries, so we add an extra statement to ensure we check that case
+        sql.push_str(";\nSELECT 1;");
+        let tree = parse_sql_query(&sql)?;
+        Ok(prefer_robust_stmts(&tree, None, true))
+    }
+
     #[test]
     /// If we drop the constraint before adding it, we don't need the IF EXISTS or a transaction.
     fn drop_before_add() {
@@ -237,6 +245,24 @@ INSERT INTO tbl VALUES (a);
 ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         "#;
         assert_eq!(lint_sql(sql), Ok(vec![]));
+    }
+
+    /// If the statement is in a transaction, or it has a guard like IF NOT
+    /// EXISTS, then it is considered valid by the `prefer-robust-stmt` rule.
+    #[test]
+    fn test_prefer_robust_stmt_okay_cases_with_assume_in_transaction() {
+        let sql = r#"
+ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
+"#;
+        assert_eq!(lint_sql_assuming_in_transaction(sql), Ok(vec![]));
+
+        let sql = r#"
+CREATE TABLE "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "bravo" text NOT NULL
+);
+"#;
+        assert_eq!(lint_sql_assuming_in_transaction(sql), Ok(vec![]));
     }
 
     #[test]
