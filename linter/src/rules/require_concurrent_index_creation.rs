@@ -39,6 +39,7 @@ mod test_rules {
         check_sql_with_rule,
         violations::{RuleViolation, RuleViolationKind},
     };
+
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql_with_rule(
             sql,
@@ -49,12 +50,22 @@ mod test_rules {
         .unwrap()
     }
 
+    fn lint_sql_assuming_in_transaction(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::RequireConcurrentIndexCreation,
+            None,
+            true,
+        )
+        .unwrap()
+    }
+
     #[test]
     fn test_ensure_ignored_when_new_table() {
         let sql = r#"
 BEGIN;
 CREATE TABLE "core_foo" (
-"id" serial NOT NULL PRIMARY KEY, 
+"id" serial NOT NULL PRIMARY KEY,
 "tenant_id" integer NULL
 );
 CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
@@ -62,6 +73,19 @@ COMMIT;
     "#;
 
         assert_debug_snapshot!(lint_sql(sql));
+    }
+
+    #[test]
+    fn test_ensure_ignored_when_new_table_with_assume_in_transaction() {
+        let sql = r#"
+CREATE TABLE "core_foo" (
+"id" serial NOT NULL PRIMARY KEY,
+"tenant_id" integer NULL
+);
+CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
+    "#;
+
+        assert_debug_snapshot!(lint_sql_assuming_in_transaction(sql));
     }
 
     /// ```sql
