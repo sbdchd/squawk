@@ -49,3 +49,30 @@ CREATE TABLE posts (
   id bigint primary key
 )
 ```
+
+
+## solution for alembic and sqlalchemy
+
+Instead of:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class AlembicValidateMigration(BaseModel):    
+    ...
+    integer_field = sa.Column(sa.Integer)
+    ...
+```
+
+Use:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class AlembicValidateMigration(BaseModel):    
+    ...
+    integer_field = sa.Column(sa.BigInteger)
+    ...
+```
