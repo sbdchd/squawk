@@ -84,6 +84,7 @@ struct Opt {
     assume_in_transaction: Option<bool>,
 }
 
+#[allow(clippy::too_many_lines)]
 fn main() {
     let opts = Opt::from_args();
 
