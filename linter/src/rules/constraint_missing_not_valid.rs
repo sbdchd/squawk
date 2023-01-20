@@ -23,7 +23,7 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_in_transaction: bo
                     not_valid_names.clear();
                 }
                 if stmt.kind == TransactionStmtKind::Commit {
-                    if in_bad_index && in_transaction {
+                    if in_bad_index && in_transaction && !assume_in_transaction {
                         bad_spans.push(raw_stmt.into());
                     }
                     in_transaction = false;
@@ -191,6 +191,27 @@ COMMIT;
         let sql = r#"
 ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCES "app_user" (id) NOT VALID;
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
+"#;
+        let res = lint_sql_assuming_in_transaction(sql);
+        assert_eq!(
+            res.len(),
+            1,
+            "it's unsafe to run NOT VALID with VALIDATE in a transaction."
+        );
+        assert_eq!(res[0].kind, RuleViolationKind::ConstraintMissingNotValid);
+        // We have a custom error message for this case.
+        assert_debug_snapshot!(res[0].messages);
+    }
+
+    /// This builds off of the previous test to see that the error is correctly
+    /// attributed when using the "assume in transaction" option and an
+    /// explicit COMMIT.
+    #[test]
+    fn not_valid_validate_with_assume_in_transaction_with_explicit_commit() {
+        let sql = r#"
+ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCES "app_user" (id) NOT VALID;
+ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
+COMMIT;
 "#;
         let res = lint_sql_assuming_in_transaction(sql);
         assert_eq!(
