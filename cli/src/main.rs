@@ -123,7 +123,7 @@ fn main() {
     } else if let Some(assume_in_transaction) = conf.assume_in_transaction {
         assume_in_transaction
     } else {
-        true
+        false
     };
 
     info!("pg version: {:?}", pg_version);
