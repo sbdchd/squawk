@@ -12,20 +12,15 @@ use squawk_parser::ast::{
 fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_in_transaction: bool) -> Vec<Span> {
     let mut not_valid_names = HashSet::new();
     let mut in_transaction = assume_in_transaction;
-    let mut in_bad_index = false;
     let mut bad_spans = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => {
                 if stmt.kind == TransactionStmtKind::Begin && !in_transaction {
                     in_transaction = true;
-                    in_bad_index = false;
                     not_valid_names.clear();
                 }
                 if stmt.kind == TransactionStmtKind::Commit {
-                    if in_bad_index && in_transaction && !assume_in_transaction {
-                        bad_spans.push(raw_stmt.into());
-                    }
                     in_transaction = false;
                 }
             }
@@ -33,15 +28,8 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_in_transaction: bo
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     if cmd.subtype == AlterTableType::ValidateConstraint {
                         if let Some(constraint_name) = &cmd.name {
-                            if not_valid_names.get(constraint_name).is_some() {
-                                in_bad_index = true;
-                                if assume_in_transaction {
-                                    // Add this to bad_spans here and tied to the
-                                    // VALIDATE CONSTRAINT statement rather than COMMIT. With
-                                    // assume_in_transaction, there isn't a COMMIT statement, so we
-                                    // need a way to show this lint message.
-                                    bad_spans.push(raw_stmt.into());
-                                }
+                            if in_transaction && not_valid_names.get(constraint_name).is_some() {
+                                bad_spans.push(raw_stmt.into());
                             }
                         }
                     }
