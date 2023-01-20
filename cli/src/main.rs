@@ -34,6 +34,7 @@ fn exit<E: std::fmt::Display, T>(res: Result<T, E>, msg: &str) -> ! {
 }
 
 /// Find problems in your SQL
+#[allow(clippy::struct_excessive_bools)]
 #[derive(StructOpt, Debug)]
 struct Opt {
     /// Paths to search
@@ -79,9 +80,13 @@ struct Opt {
     /// Path to the squawk config file (.squawk.toml)
     #[structopt(short = "c", long = "config")]
     config_path: Option<PathBuf>,
-    /// Assume that a transaction will wrap SQL files when run by a migration tool
-    #[structopt(long, possible_values = &["true", "false"])]
-    assume_in_transaction: Option<bool>,
+    /// Assume that a transaction will wrap each SQL file when run by a migration tool
+    ///
+    /// Use --no-assume-in-transaction to override any config file that sets this
+    #[structopt(long)]
+    assume_in_transaction: bool,
+    #[structopt(long, hidden = true, conflicts_with = "assume-in-transaction")]
+    no_assume_in_transaction: bool,
 }
 
 #[allow(clippy::too_many_lines)]
@@ -118,8 +123,10 @@ fn main() {
         conf.pg_version
     };
 
-    let assume_in_transaction = if let Some(assume_in_transaction) = opts.assume_in_transaction {
-        assume_in_transaction
+    let assume_in_transaction = if opts.assume_in_transaction {
+        opts.assume_in_transaction
+    } else if opts.no_assume_in_transaction {
+        !opts.no_assume_in_transaction
     } else if let Some(assume_in_transaction) = conf.assume_in_transaction {
         assume_in_transaction
     } else {
