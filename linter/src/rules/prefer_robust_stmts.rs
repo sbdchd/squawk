@@ -102,11 +102,13 @@ pub fn prefer_robust_stmts(
                     None,
                 ));
             }
-            Stmt::DropStmt(stmt) if !stmt.missing_ok => errs.push(RuleViolation::new(
-                RuleViolationKind::PreferRobustStmts,
-                raw_stmt.into(),
-                None,
-            )),
+            Stmt::DropStmt(stmt) if !stmt.missing_ok && !inside_transaction => {
+                errs.push(RuleViolation::new(
+                    RuleViolationKind::PreferRobustStmts,
+                    raw_stmt.into(),
+                    None,
+                ));
+            }
             _ => continue,
         }
     }
@@ -229,6 +231,16 @@ CREATE TABLE IF NOT EXISTS "core_bar" (
 "#;
         assert_eq!(lint_sql(sql), Ok(vec![]));
 
+        // If done in a transaction, most forms of drop are fine
+        let sql = r#"
+BEGIN;
+DROP INDEX "core_bar_foo_id_idx";
+DROP TABLE "core_bar";
+DROP TYPE foo;
+COMMIT;
+"#;
+        assert_eq!(lint_sql(sql), Ok(vec![]));
+
         // select is fine, we're only interested in modifications to the tables
         let sql = r#"
 SELECT 1;
@@ -261,6 +273,13 @@ CREATE TABLE "core_bar" (
     "id" serial NOT NULL PRIMARY KEY,
     "bravo" text NOT NULL
 );
+"#;
+        assert_eq!(lint_sql_assuming_in_transaction(sql), Ok(vec![]));
+
+        let sql = r#"
+DROP INDEX "core_bar_foo_id_idx";
+DROP TABLE "core_bar";
+DROP TYPE foo;
 "#;
         assert_eq!(lint_sql_assuming_in_transaction(sql), Ok(vec![]));
     }
