@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.19.0 - 2023-01-24
+
+### Added
+
+- added `--assume-in-transaction` flag and configuration option to indicate that each SQL file is wrapped in a transaction by an external tool. Thanks @andrewsmith! (#264)
+
 ## v0.18.0 - 2023-01-06
 
 ## Fixed
