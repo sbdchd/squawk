@@ -66,6 +66,7 @@
 
           nativeBuildInputs = old.nativeBuildInputs ++ (with pkgs; [
             cargo-insta
+            clippy
             rustfmt
           ]);
         });
