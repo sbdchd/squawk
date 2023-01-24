@@ -1,0 +1,5 @@
+---
+source: linter/src/rules/require_concurrent_index_creation.rs
+expression: lint_sql_assuming_in_transaction(sql)
+---
+[]

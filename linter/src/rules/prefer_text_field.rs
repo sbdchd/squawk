@@ -11,7 +11,11 @@ use crate::rules::utils::columns_create_or_modified;
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
 /// call.
 #[must_use]
-pub fn prefer_text_field(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
+pub fn prefer_text_field(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+    _assume_in_transaction: bool,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         for column in columns_create_or_modified(&raw_stmt.stmt) {
@@ -44,7 +48,7 @@ mod test_rules {
         violations::{RuleViolation, RuleViolationKind},
     };
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::PreferTextField, None).unwrap()
+        check_sql_with_rule(sql, &RuleViolationKind::PreferTextField, None, false).unwrap()
     }
 
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS

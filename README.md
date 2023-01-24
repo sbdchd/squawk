@@ -68,6 +68,10 @@ USAGE:
     squawk [FLAGS] [OPTIONS] [path]... [SUBCOMMAND]
 
 FLAGS:
+        --assume-in-transaction
+            Assume that a transaction will wrap each SQL file when run by a migration tool
+
+            Use --no-assume-in-transaction to override this setting in any config file that exists
     -h, --help
             Prints help information
 

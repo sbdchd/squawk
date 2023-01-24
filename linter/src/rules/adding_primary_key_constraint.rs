@@ -11,6 +11,7 @@ use squawk_parser::ast::{
 pub fn adding_primary_key_constraint(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -64,7 +65,13 @@ mod test_rules {
     use insta::assert_debug_snapshot;
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::AddingSerialPrimaryKeyField, None).unwrap()
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::AddingSerialPrimaryKeyField,
+            None,
+            false,
+        )
+        .unwrap()
     }
 
     #[test]

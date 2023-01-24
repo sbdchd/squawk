@@ -17,6 +17,7 @@ fn constraint_has_constant_expr(constraint: &Constraint) -> bool {
 pub fn adding_field_with_default(
     tree: &[RawStmt],
     pg_version: Option<Version>,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
@@ -65,7 +66,13 @@ mod test_rules {
     use insta::assert_debug_snapshot;
 
     fn lint_sql(sql: &str, pg_version: Option<Version>) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::AddingFieldWithDefault, pg_version).unwrap()
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::AddingFieldWithDefault,
+            pg_version,
+            false,
+        )
+        .unwrap()
     }
 
     ///

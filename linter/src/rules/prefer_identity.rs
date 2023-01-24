@@ -10,7 +10,11 @@ use squawk_parser::ast::{ColumnDef, RawStmt};
 use super::utils::columns_create_or_modified;
 
 #[must_use]
-pub fn prefer_identity(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
+pub fn prefer_identity(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+    _assume_in_transaction: bool,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         for column in columns_create_or_modified(&raw_stmt.stmt) {
@@ -53,7 +57,7 @@ mod test_rules {
         violations::{RuleViolation, RuleViolationKind},
     };
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::PreferIdentity, None).unwrap()
+        check_sql_with_rule(sql, &RuleViolationKind::PreferIdentity, None, false).unwrap()
     }
 
     #[test]
