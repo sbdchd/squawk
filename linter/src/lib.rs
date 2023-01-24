@@ -26,7 +26,7 @@ use versions::Version;
 #[derive(Clone)]
 pub struct SquawkRule {
     pub name: RuleViolationKind,
-    func: fn(&[RawStmt], Option<Version>) -> Vec<RuleViolation>,
+    func: fn(&[RawStmt], Option<Version>, bool) -> Vec<RuleViolation>,
     pub messages: Vec<ViolationMessage>,
 }
 
@@ -291,6 +291,7 @@ pub fn check_sql(
     sql: &str,
     excluded_rules: &[RuleViolationKind],
     pg_version: Option<Version>,
+    assume_in_transaction: bool,
 ) -> Result<Vec<RuleViolation>, CheckSqlError> {
     let tree = parse_sql_query(sql)?;
 
@@ -298,7 +299,7 @@ pub fn check_sql(
 
     let mut errs = vec![];
     for rule in RULES.iter().filter(|r| !excluded_rules.contains(&r.name)) {
-        errs.extend((rule.func)(&tree, pg_version));
+        errs.extend((rule.func)(&tree, pg_version, assume_in_transaction));
     }
 
     errs.sort_by_key(|v| v.span.start);
@@ -310,12 +311,13 @@ pub fn check_sql_with_rule(
     sql: &str,
     rule_kind: &RuleViolationKind,
     pg_version: Option<Version>,
+    assume_in_transaction: bool,
 ) -> Result<Vec<RuleViolation>, CheckSqlError> {
     let tree = parse_sql_query(sql)?;
     let mut errs = vec![];
     for rule in RULES.iter() {
         if rule.name == *rule_kind {
-            errs.extend((rule.func)(&tree, pg_version));
+            errs.extend((rule.func)(&tree, pg_version, assume_in_transaction));
         }
     }
 
@@ -368,7 +370,7 @@ mod test_rules {
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
   "#;
 
-        let res = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None)
+        let res = check_sql(sql, &[RuleViolationKind::PreferRobustStmts], None, false)
             .expect("valid parsing of SQL");
         let mut prev_span_start = -1;
         for violation in &res {

@@ -20,9 +20,13 @@ enum Constraint {
 /// more robust by using guards like `IF NOT EXISTS`. So if the migration fails
 /// halfway through, it can be rerun without human intervention.
 #[must_use]
-pub fn prefer_robust_stmts(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
+pub fn prefer_robust_stmts(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+    assume_in_transaction: bool,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    let mut inside_transaction = false;
+    let mut inside_transaction = assume_in_transaction;
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
     // if we only have one statement in our file, Postgres will run that
     // statement in an implicit transaction, so we don't need to worry about
@@ -126,7 +130,15 @@ mod test_rules {
         // our check ignores single statement queries, so we add an extra statement to ensure we check that case
         sql.push_str(";\nSELECT 1;");
         let tree = parse_sql_query(&sql)?;
-        Ok(prefer_robust_stmts(&tree, None))
+        Ok(prefer_robust_stmts(&tree, None, false))
+    }
+
+    fn lint_sql_assuming_in_transaction(sql: &str) -> Result<Vec<RuleViolation>, CheckSqlError> {
+        let mut sql = sql.to_owned();
+        // our check ignores single statement queries, so we add an extra statement to ensure we check that case
+        sql.push_str(";\nSELECT 1;");
+        let tree = parse_sql_query(&sql)?;
+        Ok(prefer_robust_stmts(&tree, None, true))
     }
 
     #[test]
@@ -235,6 +247,24 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         assert_eq!(lint_sql(sql), Ok(vec![]));
     }
 
+    /// If the statement is in a transaction, or it has a guard like IF NOT
+    /// EXISTS, then it is considered valid by the `prefer-robust-stmt` rule.
+    #[test]
+    fn test_prefer_robust_stmt_okay_cases_with_assume_in_transaction() {
+        let sql = r#"
+ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
+"#;
+        assert_eq!(lint_sql_assuming_in_transaction(sql), Ok(vec![]));
+
+        let sql = r#"
+CREATE TABLE "core_bar" (
+    "id" serial NOT NULL PRIMARY KEY,
+    "bravo" text NOT NULL
+);
+"#;
+        assert_eq!(lint_sql_assuming_in_transaction(sql), Ok(vec![]));
+    }
+
     #[test]
     fn test_create_index_concurrently_unnamed() {
         let bad_sql = r#"
@@ -259,7 +289,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   "#;
         assert_eq!(
-            check_sql_with_rule(bad_sql, &RuleViolationKind::PreferRobustStmts, None),
+            check_sql_with_rule(bad_sql, &RuleViolationKind::PreferRobustStmts, None, false),
             Ok(vec![])
         );
         let bad_sql = r#"
@@ -271,7 +301,8 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
             violations(check_sql_with_rule(
                 bad_sql,
                 &RuleViolationKind::PreferRobustStmts,
-                None
+                None,
+                false,
             )),
             Ok(vec![
                 RuleViolationKind::PreferRobustStmts,

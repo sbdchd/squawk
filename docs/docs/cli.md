@@ -52,6 +52,14 @@ excluded_rules = [
 # .squawk.toml
 pg_version = "11.0"
 ```
+
+### specifying whether SQL files will be wrapped in a transaction
+
+```toml
+# .squawk.toml
+assume_in_transaction = true
+```
+
 ### using all options
 
 ```toml
@@ -61,6 +69,7 @@ excluded_rules = [
     "require-concurrent-index-creation",
     "require-concurrent-index-deletion",
 ]
+assume_in_transaction = true
 ```
 
 
@@ -78,46 +87,50 @@ USAGE:
     squawk [FLAGS] [OPTIONS] [path]... [SUBCOMMAND]
 
 FLAGS:
-    -h, --help          
+        --assume-in-transaction
+            Assume that a transaction will wrap each SQL file when run by a migration tool
+
+            Use --no-assume-in-transaction to override any config file that sets this
+    -h, --help
             Prints help information
 
-        --list-rules    
+        --list-rules
             List all available rules
 
-    -V, --version       
+    -V, --version
             Prints version information
 
-        --verbose       
+        --verbose
             Enable debug logging output
 
 
 OPTIONS:
-    -c, --config <config-path>         
+    -c, --config <config-path>
             Path to the squawk config file (.squawk.toml)
 
-        --dump-ast <ast-format>        
+        --dump-ast <ast-format>
             Output AST in JSON [possible values: Raw, Parsed, Debug]
 
-    -e, --exclude <rule>...            
+    -e, --exclude <rule>...
             Exclude specific warnings
-            
+
             For example: --exclude=require-concurrent-index-creation,ban-drop-database
-        --explain <rule>               
+        --explain <rule>
             Provide documentation on the given rule
 
-        --pg-version <pg-version>      
+        --pg-version <pg-version>
             Specify postgres version
-            
+
             For example: --pg-version=13.0
-        --reporter <reporter>          
+        --reporter <reporter>
             Style of error reporting [possible values: Tty, Gcc, Json]
 
-        --stdin-filepath <filepath>    
+        --stdin-filepath <filepath>
             Path to use in reporting for stdin
 
 
 ARGS:
-    <path>...    
+    <path>...
             Paths to search
 
 

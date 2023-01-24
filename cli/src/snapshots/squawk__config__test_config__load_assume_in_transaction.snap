@@ -5,11 +5,11 @@ expression: "Config::parse(Some(squawk_toml.path().to_path_buf()))"
 Ok(
     Some(
         Config {
-            excluded_rules: [
-                RequireConcurrentIndexCreation,
-            ],
+            excluded_rules: [],
             pg_version: None,
-            assume_in_transaction: None,
+            assume_in_transaction: Some(
+                false,
+            ),
         },
     ),
 )

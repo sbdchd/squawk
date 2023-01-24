@@ -6,7 +6,11 @@ use crate::{
 use squawk_parser::ast::{AlterTableCmds, AlterTableType, RawStmt, Stmt};
 
 #[must_use]
-pub fn ban_drop_column(tree: &[RawStmt], _pg_version: Option<Version>) -> Vec<RuleViolation> {
+pub fn ban_drop_column(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+    _assume_in_transaction: bool,
+) -> Vec<RuleViolation> {
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -37,7 +41,7 @@ mod test_rules {
     use insta::assert_debug_snapshot;
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::BanDropColumn, None).unwrap()
+        check_sql_with_rule(sql, &RuleViolationKind::BanDropColumn, None, false).unwrap()
     }
 
     #[test]

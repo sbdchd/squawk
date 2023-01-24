@@ -24,6 +24,7 @@ fn has_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bo
 pub fn adding_not_nullable_field(
     tree: &[RawStmt],
     pg_version: Option<Version>,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
     if let Some(pg_version) = pg_version {
@@ -78,7 +79,13 @@ mod test_rules {
     };
 
     fn lint_sql(sql: &str, pg_version: Option<Version>) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::AddingNotNullableField, pg_version).unwrap()
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::AddingNotNullableField,
+            pg_version,
+            false,
+        )
+        .unwrap()
     }
 
     use insta::assert_debug_snapshot;
