@@ -52,4 +52,4 @@ CREATE TABLE posts (
 
 ## related
 
-See ["prefer-bigint-over-int"](./prefer-bigint-over-int.md).
+See ["prefer-bigint-over-int"](./prefer-bigint-over-int.md) for a simliar lint rule against 32 bit integers.

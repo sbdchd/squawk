@@ -52,4 +52,4 @@ CREATE TABLE posts (
 
 ## related
 
-See ["prefer-bigint-over-smallint"](./prefer-bigint-over-smallint.md).
+See ["prefer-bigint-over-smallint"](./prefer-bigint-over-smallint.md)for a simliar lint rule against 16 bit integers.
