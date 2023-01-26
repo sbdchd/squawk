@@ -3,49 +3,10 @@ id: prefer-big-int
 title: prefer-big-int
 ---
 
+## deprecated
 
-## problem
+This rule has been split into ["prefer-bigint-over-int"](./prefer-bigint-over-int.md) and ["prefer-bigint-over-smallint"](./prefer-bigint-over-smallint.md).
 
-Using 32 bit integer fields can result in hitting the max int limit.
+Please use those rules instead.
 
-## solution
-
-Use 64 bit integer field instead, like `BIGSERIAL` or `BIGINT`.
-
-
-### serial
-
-Instead of:
-
-```sql
-CREATE TABLE posts (
-  id serial primary key
-)
-```
-
-Use:
-
-```sql
-CREATE TABLE posts (
-  id bigserial primary key
-)
-```
-
-
-### int
-
-Instead of:
-
-```sql
-CREATE TABLE posts (
-  id int primary key
-)
-```
-
-Use:
-
-```sql
-CREATE TABLE posts (
-  id bigint primary key
-)
-```
+This will be removed in a future release.

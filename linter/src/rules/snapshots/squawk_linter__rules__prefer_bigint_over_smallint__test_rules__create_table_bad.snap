@@ -1,0 +1,75 @@
+---
+source: linter/src/rules/prefer_bigint_over_smallint.rs
+expression: res
+
+---
+[
+    RuleViolation {
+        kind: PreferBigintOverSmallint,
+        span: Span {
+            start: 0,
+            len: Some(
+                39,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 16 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigintOverSmallint,
+        span: Span {
+            start: 40,
+            len: Some(
+                35,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 16 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigintOverSmallint,
+        span: Span {
+            start: 76,
+            len: Some(
+                42,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 16 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigintOverSmallint,
+        span: Span {
+            start: 119,
+            len: Some(
+                38,
+            ),
+        },
+        messages: [
+            Note(
+                "Hitting the max 16 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+]
