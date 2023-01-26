@@ -28,17 +28,13 @@ create table app.users
 ```
 
 ## solution for alembic and sqlalchemy
-Details: https://docs.sqlalchemy.org/en/13/dialects/postgresql.html
 
-Use:
-
-Built-in support for rendering of IDENTITY is not available yet, 
-however the following compilation hook may be used to replace occurrences of SERIAL with IDENTITY:
+Built-in support for rendering of `IDENTITY` is not available yet, 
+however the following compilation hook may be used to replace occurrences of `SERIAL` with `IDENTITY`. See the [SQLAlchemy docs for more information](https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#postgresql-10-identity-columns).
 
 ```python
 from sqlalchemy.schema import CreateColumn
 from sqlalchemy.ext.compiler import compiles
-
 
 @compiles(CreateColumn, "postgresql")
 def use_identity(element, compiler, **kw):

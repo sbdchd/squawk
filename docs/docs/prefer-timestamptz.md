@@ -41,6 +41,7 @@ Instead of:
 alter table app.users
     alter column created_ts type timestamp,
     alter column modified_ts type timestamp without time zone
+    alter column modified_ts type timestamp without time zone
 ```
 
 Use:
@@ -60,21 +61,20 @@ Instead of:
 # models.py
 import sqlalchemy as sa
 
-class AlembicValidateMigration(BaseModel):    
-    ...
-    datetime_field = sa.Column(sa.DateTime)
-    ...
+class User(BaseModel):
+    created_ts = sa.Column(sa.DateTime)
+    modified_ts = sa.Column(sa.DateTime)
 ```
 
 Use:
 
 ```python
+# models.py
 import sqlalchemy as sa
 
-class AlembicValidateMigration(BaseModel): 
-    ...
-    datetime_field = sa.Column(sa.DateTime(timezone=True))
-    ...
+class User(BaseModel):
+    created_ts = sa.Column(sa.DateTime(timezone=True))
+    modified_ts = sa.Column(sa.DateTime(timezone=True))
 ```
 
 

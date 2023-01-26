@@ -59,10 +59,8 @@ Instead of:
 # models.py
 import sqlalchemy as sa
 
-class AlembicValidateMigration(BaseModel):    
-    ...
-    integer_field = sa.Column(sa.Integer)
-    ...
+class Post(BaseModel):
+    id = sa.Column(sa.Integer)
 ```
 
 Use:
@@ -71,8 +69,6 @@ Use:
 # models.py
 import sqlalchemy as sa
 
-class AlembicValidateMigration(BaseModel):    
-    ...
-    integer_field = sa.Column(sa.BigInteger)
-    ...
+class Post(BaseModel):
+    id = sa.Column(sa.BigInteger)
 ```

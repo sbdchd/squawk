@@ -40,36 +40,17 @@ Instead of:
 # models.py
 import sqlalchemy as sa
 
-class AlembicValidateMigration(BaseModel):    
-    ...
-    some_string = sa.Column(sa.String(length=32))
-    ...
+class User(BaseModel):
+    email = sa.Column(sa.String(length=100))
 ```
 
 Use:
 
-if size is required
 ```python
 # models.py
 import sqlalchemy as sa
 
-class AlembicValidateMigration(BaseModel): 
-    ...    
-    __table_args__ = (
-        sa.CheckConstraint("LENGTH("some_string") <= 32"),
-    )
-    ...
-    some_string = sa.Column(sa.Text)
-    ...
-```
-
-if size is not required
-```python
-# models.py
-import sqlalchemy as sa
-
-class AlembicValidateMigration(BaseModel):    
-    ...
-    some_string = sa.Column(sa.Text)
-    ...
+class User(BaseModel):
+    __table_args__ = (sa.CheckConstraint('length("email") <= 100'),)
+    email = sa.Column(sa.Text)
 ```
