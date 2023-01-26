@@ -179,6 +179,14 @@ COMMIT;
     }
 
     #[test]
+    fn test_parsing_create_table_using_like() {
+        let sql =
+            r#"CREATE TABLE core_bar (LIKE core_foo INCLUDING DEFAULTS INCLUDING CONSTRAINTS);"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
     fn test_parse_sql_create_index() {
         let sql = r#"CREATE INDEX "table_name_idx" ON "table_name" ("table_field");"#;
         let res = parse_sql_query(sql);
