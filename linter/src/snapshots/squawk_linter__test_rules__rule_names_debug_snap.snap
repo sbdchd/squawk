@@ -1,6 +1,7 @@
 ---
 source: linter/src/lib.rs
 expression: rule_names
+
 ---
 [
     "adding-field-with-default",
@@ -14,6 +15,8 @@ expression: rule_names
     "constraint-missing-not-valid",
     "disallowed-unique-constraint",
     "prefer-big-int",
+    "prefer-bigint-over-int",
+    "prefer-bigint-over-smallint",
     "prefer-identity",
     "prefer-robust-stmts",
     "prefer-text-field",

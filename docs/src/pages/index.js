@@ -102,7 +102,17 @@ const rules = [
   {
     name: "prefer-big-int",
     tags: ["schema"],
+    description: "Deprecated. See prefer-bigint-over-int and prefer-bigint-over-smallint instead.",
+  },
+  {
+    name: "prefer-bigint-over-int",
+    tags: ["schema"],
     description: "Prevent hitting the 32 bit max int limit.",
+  },
+  {
+    name: "prefer-bigint-over-smallint",
+    tags: ["schema"],
+    description: "Prevent hitting the 16 bit max int limit.",
   },
   {
     name: "prefer-identity",

@@ -13,6 +13,8 @@ module.exports = {
       "constraint-missing-not-valid",
       "disallowed-unique-constraint",
       "prefer-big-int",
+      "prefer-bigint-over-int",
+      "prefer-bigint-over-smallint",
       "prefer-identity",
       "prefer-robust-stmts",
       "prefer-text-field",

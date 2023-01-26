@@ -35,6 +35,10 @@ pub enum RuleViolationKind {
     InvalidStatement,
     #[serde(rename = "prefer-big-int")]
     PreferBigInt,
+    #[serde(rename = "prefer-bigint-over-int")]
+    PreferBigintOverInt,
+    #[serde(rename = "prefer-bigint-over-smallint")]
+    PreferBigintOverSmallint,
     #[serde(rename = "prefer-identity")]
     PreferIdentity,
     #[serde(rename = "prefer-robust-stmts")]

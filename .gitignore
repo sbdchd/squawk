@@ -3,3 +3,6 @@
 *.pending-snap
 *.tgz
 *.pem
+
+# IntelliJ IDE users
+.idea
