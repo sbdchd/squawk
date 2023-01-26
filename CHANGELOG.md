@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.20.0 - 2023-01-26
+
+### Added
+
+- added `prefer-bigint-over-int` and `prefer-bigint-over-smallint` to replace `prefer-big-int`. Thanks @aldenquimby! (#273)
+
+### Fixed
+
+- Support TableLikeClause in table creation. Thanks @qoelet! (#271)
+
 ## v0.19.0 - 2023-01-24
 
 ### Added
