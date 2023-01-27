@@ -3,72 +3,10 @@ id: prefer-big-int
 title: prefer-big-int
 ---
 
+## deprecated
 
-## problem
+:::caution Deprecated
+This rule has been deprecated in favor of ["prefer-bigint-over-int"](./prefer-bigint-over-int.md) and ["prefer-bigint-over-smallint"](./prefer-bigint-over-smallint.md).
+:::
 
-Using 32 bit integer fields can result in hitting the max int limit.
-
-## solution
-
-Use 64 bit integer field instead, like `BIGSERIAL` or `BIGINT`.
-
-
-### serial
-
-Instead of:
-
-```sql
-CREATE TABLE posts (
-  id serial primary key
-)
-```
-
-Use:
-
-```sql
-CREATE TABLE posts (
-  id bigserial primary key
-)
-```
-
-
-### int
-
-Instead of:
-
-```sql
-CREATE TABLE posts (
-  id int primary key
-)
-```
-
-Use:
-
-```sql
-CREATE TABLE posts (
-  id bigint primary key
-)
-```
-
-
-## solution for alembic and sqlalchemy
-
-Instead of:
-
-```python
-# models.py
-import sqlalchemy as sa
-
-class Post(BaseModel):
-    id = sa.Column(sa.Integer)
-```
-
-Use:
-
-```python
-# models.py
-import sqlalchemy as sa
-
-class Post(BaseModel):
-    id = sa.Column(sa.BigInteger)
-```
+This rule has been split into ["prefer-bigint-over-int"](./prefer-bigint-over-int.md) and ["prefer-bigint-over-smallint"](./prefer-bigint-over-smallint.md) to allow more granular linting against integer fields. Please use this new rules as this rule will be removed in a future release.

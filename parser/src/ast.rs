@@ -771,6 +771,12 @@ pub struct Constraint {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+pub struct TableLikeClause {
+    pub relation: RangeVar,
+    pub options: i32,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
 pub struct RenameStmt {
     // Node	   *object;			/* in case it's some other object */
     pub newname: String,
@@ -790,6 +796,7 @@ pub struct RenameStmt {
 pub enum TableElt {
     ColumnDef(ColumnDef),
     Constraint(Constraint),
+    TableLikeClause(TableLikeClause),
 }
 
 /// What to do at commit time for temporary relations

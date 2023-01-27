@@ -38,3 +38,7 @@ pub mod prefer_identity;
 pub use prefer_identity::*;
 pub mod prefer_big_int;
 pub use prefer_big_int::*;
+pub mod prefer_bigint_over_int;
+pub use prefer_bigint_over_int::*;
+pub mod prefer_bigint_over_smallint;
+pub use prefer_bigint_over_smallint::*;
