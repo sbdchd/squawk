@@ -41,7 +41,6 @@ Instead of:
 alter table app.users
     alter column created_ts type timestamp,
     alter column modified_ts type timestamp without time zone
-    alter column modified_ts type timestamp without time zone
 ```
 
 Use:
