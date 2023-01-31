@@ -9,8 +9,9 @@ use squawk_parser::ast::{
 };
 
 fn constraint_has_constant_expr(constraint: &Constraint) -> bool {
-    constraint.raw_expr.is_some()
-        && constraint.raw_expr.as_ref().unwrap_or(&json!({}))["A_Const"] != Value::Null
+    let def = json!({});
+    let raw_expr = constraint.raw_expr.as_ref().unwrap_or(&def);
+    raw_expr["A_Const"] != Value::Null || raw_expr["TypeCast"]["arg"]["A_Const"] != Value::Null
 }
 
 #[must_use]
