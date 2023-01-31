@@ -232,4 +232,12 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
         let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
+    #[test]
+    fn test_add_numbers_ok() {
+        let ok_sql = r#"
+alter table account_metadata add column blah integer default 2 + 2;
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
 }
