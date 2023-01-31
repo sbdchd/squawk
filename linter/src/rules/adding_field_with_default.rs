@@ -122,7 +122,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
     }
 
     #[test]
-    fn test_adding_field_with_bool_default_in_version_11_ok() {
+    fn test_adding_field_with_bool_default_in_version_11_err() {
         let bad_sql = r#"
 -- VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
@@ -131,10 +131,37 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
         assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
     }
     #[test]
-    fn test_adding_field_with_bool_default_in_version_11_err() {
+    fn test_adding_field_with_bool_default_in_version_11_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
+    #[test]
+    fn test_adding_field_with_string_default_in_version_11_ok() {
+        let ok_sql = r#"
+-- NON-VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
+    #[test]
+    fn test_adding_field_with_enum_default_in_version_11_ok() {
+        let ok_sql = r#"
+-- NON-VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-variant';
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
+    #[test]
+    fn test_adding_field_with_jsonb_default_in_version_11_ok() {
+        let ok_sql = r#"
+-- NON-VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT '{}'::jsonb;
 "#;
         let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
