@@ -119,4 +119,23 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
+
+    #[test]
+    fn test_adding_field_with_bool_default_in_version_11_ok() {
+        let bad_sql = r#"
+-- VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
+    }
+    #[test]
+    fn test_adding_field_with_bool_default_in_version_11_err() {
+        let ok_sql = r#"
+-- NON-VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
 }
