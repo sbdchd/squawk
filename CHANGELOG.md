@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## v0.20.0 - 2023-01-26
+## v0.20.0 - 2023-01-31
 
 ### Added
 
@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Support TableLikeClause in table creation. Thanks @qoelet! (#271)
+- Recognize most DROP statements within a transaction as robust. Thanks @andrewsmith! (#276)
 
 ## v0.19.0 - 2023-01-24
 
