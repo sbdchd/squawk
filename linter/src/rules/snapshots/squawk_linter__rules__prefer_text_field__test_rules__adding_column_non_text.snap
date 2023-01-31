@@ -1,6 +1,6 @@
 ---
 source: linter/src/rules/prefer_text_field.rs
-expression: data
+expression: res
 ---
 [
     RuleViolation {

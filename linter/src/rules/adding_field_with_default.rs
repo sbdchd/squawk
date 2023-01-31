@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use crate::{
     versions::Version,
     violations::{RuleViolation, RuleViolationKind},
@@ -5,14 +7,27 @@ use crate::{
 
 use serde_json::{json, Value};
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, Constraint, RawStmt, Stmt,
+    AlterTableCmds, AlterTableDef, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
 
-fn constraint_has_constant_expr(constraint: &Constraint) -> bool {
-    let def = json!({});
-    let raw_expr = constraint.raw_expr.as_ref().unwrap_or(&def);
+fn constraint_has_constant_expr(raw_expr: &Value) -> bool {
     raw_expr["A_Const"] != Value::Null || raw_expr["TypeCast"]["arg"]["A_Const"] != Value::Null
 }
+
+fn is_non_volatile_func_call(raw_expr: &Value, non_volatile_funcs: &HashSet<String>) -> bool {
+    let func_name = raw_expr["FuncCall"]["funcname"][0]["String"]["str"].as_str();
+
+    let Some(func_name) = func_name else {
+        return false;
+    };
+
+    // NOTE(chdsbd): we don't check functions with args, because I'm not certain
+    // if there's a problem with volatile functions there. If we need this
+    // functionality, we can add it later.
+    raw_expr["FuncCall"]["args"] == Value::Null && non_volatile_funcs.contains(func_name)
+}
+
+const NON_VOLATILE_BUILT_IN_FUNCTIONS: &str = include_str!("non_volatile_built_in_functions.txt");
 
 #[must_use]
 pub fn adding_field_with_default(
@@ -21,6 +36,15 @@ pub fn adding_field_with_default(
     _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
+
+    let non_volatile_funcs: HashSet<_> = NON_VOLATILE_BUILT_IN_FUNCTIONS
+        .split('\n')
+        .into_iter()
+        .map(|x| x.trim().to_lowercase())
+        .filter(|x| !x.is_empty())
+        .collect();
+
+    // println!("{:#?}", non_volatile_funcs);
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
@@ -30,8 +54,14 @@ pub fn adding_field_with_default(
                             for ColumnDefConstraint::Constraint(constraint) in &def.constraints {
                                 if constraint.contype == ConstrType::Default {
                                     if let Some(pg_version) = pg_version {
+                                        let def = json!({});
+                                        let raw_expr = constraint.raw_expr.as_ref().unwrap_or(&def);
                                         if pg_version > Version::new(11, None, None)
-                                            && constraint_has_constant_expr(constraint)
+                                            && (constraint_has_constant_expr(raw_expr)
+                                                || is_non_volatile_func_call(
+                                                    raw_expr,
+                                                    &non_volatile_funcs,
+                                                ))
                                         {
                                             continue;
                                         }
@@ -87,12 +117,15 @@ mod test_rules {
     /// -- remove nullability
     /// ```
     #[test]
-    fn test_adding_field_with_default() {
+    fn test_docs_example_bad() {
         let bad_sql = r#"
 -- instead of
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 "#;
-
+        assert_debug_snapshot!(lint_sql(bad_sql, None));
+    }
+    #[test]
+    fn test_docs_example_ok() {
         let ok_sql = r#"
 -- use
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer;
@@ -100,29 +133,33 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- backfill
 -- remove nullability
         "#;
-
-        assert_debug_snapshot!(lint_sql(bad_sql, None));
         assert_debug_snapshot!(lint_sql(ok_sql, None));
     }
 
     #[test]
-    fn test_adding_field_with_default_in_version_11() {
-        let bad_sql = r#"
--- VOLATILE
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
-"#;
+    fn test_default_integer_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 "#;
 
         let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
-        assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
 
     #[test]
-    fn test_adding_field_with_bool_default_in_version_11_err() {
+    fn test_default_uuid_err() {
+        let bad_sql = r#"
+-- VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
+"#;
+
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
+    }
+
+    #[test]
+    fn test_default_volatile_func_err() {
         let bad_sql = r#"
 -- VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
@@ -131,7 +168,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
         assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
     }
     #[test]
-    fn test_adding_field_with_bool_default_in_version_11_ok() {
+    fn test_default_bool_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
@@ -140,7 +177,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_adding_field_with_string_default_in_version_11_ok() {
+    fn test_default_str_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
@@ -149,7 +186,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_adding_field_with_enum_default_in_version_11_ok() {
+    fn test_default_enum_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-variant';
@@ -158,10 +195,37 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-varia
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_adding_field_with_jsonb_default_in_version_11_ok() {
+    fn test_default_jsonb_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT '{}'::jsonb;
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
+    #[test]
+    fn test_default_arbitrary_func_err() {
+        let ok_sql = r#"
+-- NON-VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT myjsonb();
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
+    #[test]
+    fn test_default_random_with_args_err() {
+        let ok_sql = r#"
+-- NON-VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
+"#;
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
+    #[test]
+    fn test_default_now_func_ok() {
+        let ok_sql = r#"
+-- NON-VOLATILE
+ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
 "#;
         let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
