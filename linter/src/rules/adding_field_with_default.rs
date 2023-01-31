@@ -27,6 +27,8 @@ fn is_non_volatile_func_call(raw_expr: &Value, non_volatile_funcs: &HashSet<Stri
     raw_expr["FuncCall"]["args"] == Value::Null && non_volatile_funcs.contains(func_name)
 }
 
+// Generated via the following Postgres query:
+//      select proname from pg_proc where provolatile <> 'v';
 const NON_VOLATILE_BUILT_IN_FUNCTIONS: &str = include_str!("non_volatile_built_in_functions.txt");
 
 #[must_use]
