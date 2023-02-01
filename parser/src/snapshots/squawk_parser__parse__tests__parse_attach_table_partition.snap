@@ -1,0 +1,100 @@
+---
+source: parser/src/parse.rs
+expression: res
+
+---
+Ok(
+    [
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: AttachPartition,
+                                name: None,
+                                def: Some(
+                                    PartitionCmd(
+                                        Object({
+                                            "bound": Object({
+                                                "location": Number(
+                                                    78,
+                                                ),
+                                                "lowerdatums": Array([
+                                                    Object({
+                                                        "A_Const": Object({
+                                                            "location": Number(
+                                                                84,
+                                                            ),
+                                                            "val": Object({
+                                                                "String": Object({
+                                                                    "str": String(
+                                                                        "2008-02-01",
+                                                                    ),
+                                                                }),
+                                                            }),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "strategy": String(
+                                                    "r",
+                                                ),
+                                                "upperdatums": Array([
+                                                    Object({
+                                                        "A_Const": Object({
+                                                            "location": Number(
+                                                                102,
+                                                            ),
+                                                            "val": Object({
+                                                                "String": Object({
+                                                                    "str": String(
+                                                                        "2008-03-01",
+                                                                    ),
+                                                                }),
+                                                            }),
+                                                        }),
+                                                    }),
+                                                ]),
+                                            }),
+                                            "name": Object({
+                                                "inh": Bool(
+                                                    true,
+                                                ),
+                                                "location": Number(
+                                                    42,
+                                                ),
+                                                "relname": String(
+                                                    "measurement_y2008m02",
+                                                ),
+                                                "relpersistence": String(
+                                                    "p",
+                                                ),
+                                            }),
+                                        }),
+                                    ),
+                                ),
+                                behavior: Restrict,
+                                missing_ok: false,
+                            },
+                        ),
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "measurement",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 13,
+                    },
+                    relkind: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                116,
+            ),
+        },
+    ],
+)
