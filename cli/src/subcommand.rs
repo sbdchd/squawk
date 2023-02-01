@@ -20,16 +20,15 @@ impl std::fmt::Display for SquawkError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             Self::CheckFilesError(ref err) => {
-                write!(f, "Failed to dump AST: {}", err)
+                write!(f, "Failed to dump AST: {err}")
             }
             Self::GithubError(ref err) => err.fmt(f),
             Self::GithubPrivateKeyBase64DecodeError(ref err) => write!(
                 f,
-                "Failed to decode GitHub private key from base64 encoding: {}",
-                err
+                "Failed to decode GitHub private key from base64 encoding: {err}"
             ),
             Self::GithubPrivateKeyDecodeError(ref err) => {
-                write!(f, "Could not decode GitHub private key to string: {}", err)
+                write!(f, "Could not decode GitHub private key to string: {err}")
             }
             Self::GithubPrivateKeyMissing => write!(f, "Missing GitHub private key"),
         }

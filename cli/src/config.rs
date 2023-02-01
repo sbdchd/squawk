@@ -28,10 +28,10 @@ impl std::fmt::Display for ConfigError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             Self::LookupError(ref err) => {
-                write!(f, "Error when finding configuration file: {}", err)
+                write!(f, "Error when finding configuration file: {err}")
             }
-            Self::ReadError(ref err) => write!(f, "Failed to read configuration file: {}", err),
-            Self::ParseError(ref err) => write!(f, "Failed to parse configuration file: {}", err),
+            Self::ReadError(ref err) => write!(f, "Failed to read configuration file: {err}"),
+            Self::ParseError(ref err) => write!(f, "Failed to parse configuration file: {err}"),
         }
     }
 }

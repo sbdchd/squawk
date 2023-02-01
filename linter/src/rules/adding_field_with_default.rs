@@ -234,6 +234,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
     }
     #[test]
     fn test_add_numbers_ok() {
+        // This should be okay, but we don't handle expressions like this at the moment.
         let ok_sql = r#"
 alter table account_metadata add column blah integer default 2 + 2;
 "#;
