@@ -1304,6 +1304,27 @@ CREATE TABLE measurement_y2006m02 PARTITION OF measurement
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
+
+    #[test]
+    fn test_parse_attach_table_partition() {
+        let sql = r#"
+ALTER TABLE measurement ATTACH PARTITION measurement_y2008m02
+    FOR VALUES FROM ('2008-02-01') TO ('2008-03-01' );
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
+    fn test_parse_detach_table_partition() {
+        let sql = r#"
+ALTER TABLE measurement
+    DETACH PARTITION measurement_y2006m02;
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+
     #[test]
     fn test_drop_index() {
         let sql = r#"
