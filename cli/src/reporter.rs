@@ -76,16 +76,16 @@ pub fn dump_ast_for_paths<W: io::Write>(
             DumpAstOption::Raw => {
                 let json_ast = parse_sql_query_json(sql)?;
                 let json_str = serde_json::to_string(&json_ast)?;
-                writeln!(f, "{}", json_str)?;
+                writeln!(f, "{json_str}")?;
             }
             DumpAstOption::Parsed => {
                 let ast = parse_sql_query(sql)?;
                 let ast_str = serde_json::to_string(&ast)?;
-                writeln!(f, "{}", ast_str)?;
+                writeln!(f, "{ast_str}")?;
             }
             DumpAstOption::Debug => {
                 let ast = parse_sql_query(sql)?;
-                writeln!(f, "{:#?}", ast)?;
+                writeln!(f, "{ast:#?}")?;
             }
         }
         Ok(())
@@ -230,7 +230,7 @@ impl std::fmt::Display for ViolationLevel {
             Self::Warning => "warning",
             Self::Error => "error",
         };
-        write!(f, "{}", val)
+        write!(f, "{val}")
     }
 }
 
@@ -346,7 +346,7 @@ fn fmt_json<W: io::Write>(
         .flat_map(|x| x.violations)
         .collect::<Vec<_>>();
     let json_str = serde_json::to_string(&violations)?;
-    writeln!(f, "{}", json_str)
+    writeln!(f, "{json_str}")
 }
 
 #[derive(Debug)]
@@ -427,10 +427,10 @@ fn output_rule_info<W: io::Write>(writer: &mut W, rule: &SquawkRule) -> Result<(
     writeln!(writer, "{}", rule.name)?;
     for msg in &rule.messages {
         let msg_content = match msg {
-            ViolationMessage::Note(s) => format!("note: {}", s),
-            ViolationMessage::Help(s) => format!("help: {}", s),
+            ViolationMessage::Note(s) => format!("note: {s}"),
+            ViolationMessage::Help(s) => format!("help: {s}"),
         };
-        writeln!(writer, "    {}", msg_content)?;
+        writeln!(writer, "    {msg_content}")?;
     }
     Ok(())
 }

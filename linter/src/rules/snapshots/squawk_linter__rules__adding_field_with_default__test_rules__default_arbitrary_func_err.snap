@@ -1,0 +1,23 @@
+---
+source: linter/src/rules/adding_field_with_default.rs
+expression: "lint_sql(ok_sql, pg_version_11)"
+---
+[
+    RuleViolation {
+        kind: AddingFieldWithDefault,
+        span: Span {
+            start: 0,
+            len: Some(
+                83,
+            ),
+        },
+        messages: [
+            Note(
+                "Adding a field with a VOLATILE DEFAULT requires a table table rewrite with an ACCESS EXCLUSIVE lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.",
+            ),
+            Help(
+                "Add the field as nullable, then set a default, backfill, and remove nullabilty.",
+            ),
+        ],
+    },
+]

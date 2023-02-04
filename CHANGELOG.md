@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Better support non-volatile defaults for `adding-field-with-default`. (#278)
+
 ## v0.20.0 - 2023-01-31
 
 ### Added

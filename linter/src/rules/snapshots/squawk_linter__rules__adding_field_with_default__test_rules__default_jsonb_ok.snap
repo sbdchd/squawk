@@ -1,0 +1,5 @@
+---
+source: linter/src/rules/adding_field_with_default.rs
+expression: "lint_sql(ok_sql, pg_version_11)"
+---
+[]

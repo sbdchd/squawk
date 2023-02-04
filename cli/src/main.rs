@@ -27,7 +27,7 @@ fn exit<E: std::fmt::Display, T>(res: Result<T, E>, msg: &str) -> ! {
     match res {
         Ok(_) => process::exit(0),
         Err(err) => {
-            eprintln!("{}: {}", msg, err);
+            eprintln!("{msg}: {err}");
             process::exit(1)
         }
     }
@@ -105,7 +105,7 @@ fn main() {
 
     let conf = Config::parse(opts.config_path)
         .unwrap_or_else(|e| {
-            eprintln!("Configuration error: {}", e);
+            eprintln!("Configuration error: {e}");
             process::exit(1);
         })
         .unwrap_or_default();
@@ -177,17 +177,17 @@ fn main() {
                         .sum::<usize>();
                     match print_violations(&mut handle, file_reports, &reporter) {
                         Ok(_) => {
-                            let exit_code = if total_violations > 0 { 1 } else { 0 };
+                            let exit_code = i32::from(total_violations > 0);
                             process::exit(exit_code);
                         }
                         Err(e) => {
-                            eprintln!("Problem reporting violations: {}", e);
+                            eprintln!("Problem reporting violations: {e}");
                             process::exit(1);
                         }
                     }
                 }
                 Err(e) => {
-                    eprintln!("Problem linting SQL files: {}", e);
+                    eprintln!("Problem linting SQL files: {e}");
                     process::exit(1)
                 }
             }

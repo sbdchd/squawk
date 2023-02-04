@@ -19,12 +19,12 @@ impl std::fmt::Display for PgQueryError {
             ),
             Self::JsonParse(ref err) => write!(
                 f,
-                "Squawk schema failed to parse Postgres response. This indicates a bug with Squawk. Please report this error to https://github.com/sbdchd/squawk. Schema error: {}", err
+                "Squawk schema failed to parse Postgres response. This indicates a bug with Squawk. Please report this error to https://github.com/sbdchd/squawk. Schema error: {err}"
             ),
             Self::QueryToCString => write!(f, "Could not encode query into CString"),
             Self::PgParseError(ref err) => {
                 if let Some(err) = err {
-                    write!(f, "Postgres failed to parse query: {}",err)
+                    write!(f, "Postgres failed to parse query: {err}")
                 } else {
                     write!(f, "Postgres failed to parse query.")
                 }

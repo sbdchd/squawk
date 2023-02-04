@@ -36,9 +36,8 @@ fn create_access_token(jwt: &str, install_id: i64) -> Result<GithubAccessToken, 
     Ok(reqwest::Client::new()
         .post(&format!(
             "https://api.github.com/app/installations/{install_id}/access_tokens",
-            install_id = install_id
         ))
-        .header(AUTHORIZATION, format!("Bearer {}", jwt))
+        .header(AUTHORIZATION, format!("Bearer {jwt}"))
         .header(ACCEPT, "application/vnd.github.machine-man-preview+json")
         .send()?
         .error_for_status()?
@@ -55,7 +54,7 @@ pub(crate) fn create_comment(comment: CommentArgs, secret: &str) -> Result<(), G
             repo = comment.repo,
             issue_number = comment.issue
         ))
-        .header(AUTHORIZATION, format!("Bearer {}", secret))
+        .header(AUTHORIZATION, format!("Bearer {secret}"))
         .json(&comment_body)
         .send()?
         .error_for_status()?;
@@ -72,7 +71,7 @@ pub struct GitHubAppInfo {
 pub fn get_app_info(jwt: &str) -> Result<GitHubAppInfo, GithubError> {
     Ok(reqwest::Client::new()
         .get("https://api.github.com/app")
-        .header(AUTHORIZATION, format!("Bearer {}", jwt))
+        .header(AUTHORIZATION, format!("Bearer {jwt}"))
         .send()?
         .error_for_status()?
         .json::<GitHubAppInfo>()?)
@@ -82,10 +81,10 @@ impl std::fmt::Display for GithubError {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match *self {
             Self::JsonWebTokenCreation(ref err) => {
-                write!(f, "Could not create JWT: {}", err)
+                write!(f, "Could not create JWT: {err}")
             }
             Self::HttpError(ref err) => {
-                write!(f, "Problem calling GitHub API: {}", err)
+                write!(f, "Problem calling GitHub API: {err}")
             }
         }
     }
@@ -154,7 +153,7 @@ pub(crate) fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Commen
             issue_number = pr.issue
         ))
         .query(&[("per_page", 100)])
-        .header(AUTHORIZATION, format!("Bearer {}", secret))
+        .header(AUTHORIZATION, format!("Bearer {secret}",))
         .send()?
         .error_for_status()?
         .json::<Vec<Comment>>()?)
@@ -171,11 +170,8 @@ pub(crate) fn update_comment(
     reqwest::Client::new()
         .patch(&format!(
             "https://api.github.com/repos/{owner}/{repo}/issues/comments/{comment_id}",
-            owner = owner,
-            repo = repo,
-            comment_id = comment_id
         ))
-        .header(AUTHORIZATION, format!("Bearer {}", secret))
+        .header(AUTHORIZATION, format!("Bearer {secret}"))
         .json(&CommentBody { body })
         .send()?
         .error_for_status()?;
