@@ -143,6 +143,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+ALTER TABLE "account" ADD COLUMN "last_modified" timestamptz DEFAULT now();
 "#;
 
         let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
