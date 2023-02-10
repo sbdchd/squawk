@@ -140,3 +140,7 @@ DROP INDEX "foo_idx";
 -- use:
 DROP INDEX IF EXISTS "foo_idx";
 ```
+
+
+## solution for alembic and sqlalchemy
+Alembic doesn't support `IF NOT EXISTS`. You must use raw SQL via [`op.execute()`](https://alembic.sqlalchemy.org/en/latest/ops.html#alembic.operations.Operations.execute). See this [GitHub Issue tracking `IF NOT EXISTS` support](https://github.com/sqlalchemy/alembic/issues/151) for more information.

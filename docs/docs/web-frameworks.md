@@ -86,3 +86,51 @@ We cannot use the auto generated SQL from Django's migration system. We must use
     DROP TRIGGER IF EXISTS published_default_trigger on post;
     DROP FUNCTION IF EXISTS null_published_trigger;
     ```
+
+
+## Alembic and SQLAlchemy
+
+### usage
+
+```shell
+alembic upgrade head --sql | squawk
+```
+or you can choose revisions
+```shell
+alembic upgrade first_revision:last_revision --sql | squawk
+```
+
+### settings
+
+Use `transaction_per_migration = True` 
+in [configure](https://alembic.sqlalchemy.org/en/latest/api/runtime.html#alembic.runtime.environment.EnvironmentContext.configure.params.transaction_per_migration)
+
+```python
+# env.py
+...
+context.configure(
+   ...
+   transaction_per_migration=True
+   ...
+)
+...
+```
+
+Set `lock_timeout` and `statement_timeout`
+
+```python
+# env.py
+...
+def run_migrations_online() -> None:
+    """Run migrations in 'online' mode.
+    In this scenario we need to create an Engine
+    and associate a connection with the context.
+    """
+    connectable = engine_from_config(
+        config.get_section(config.config_ini_section),
+        prefix="sqlalchemy.",
+        poolclass=pool.NullPool,
+        connect_args={'options': '-c lock_timeout=4000 -c statement_timeout=5000'}
+    )
+...
+```

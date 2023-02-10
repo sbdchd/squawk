@@ -30,3 +30,27 @@ CREATE TABLE "app_user" (
 );
 ALTER TABLE "app_user" ADD CONSTRAINT "text_size" CHECK (LENGTH("email") <= 100);
 ```
+
+
+## solution for alembic and sqlalchemy
+
+Instead of:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class User(BaseModel):
+    email = sa.Column(sa.String(length=100))
+```
+
+Use:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class User(BaseModel):
+    __table_args__ = (sa.CheckConstraint('length("email") <= 100'),)
+    email = sa.Column(sa.Text)
+```

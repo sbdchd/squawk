@@ -51,6 +51,32 @@ alter table app.users
     alter column modified_ts type timestamptz
 ```
 
+
+## solution for alembic and sqlalchemy
+
+Instead of:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class User(BaseModel):
+    created_ts = sa.Column(sa.DateTime)
+    modified_ts = sa.Column(sa.DateTime)
+```
+
+Use:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class User(BaseModel):
+    created_ts = sa.Column(sa.DateTime(timezone=True))
+    modified_ts = sa.Column(sa.DateTime(timezone=True))
+```
+
+
 ## links
 
 - ["Don't use timestamp (without time zone) to store UTC times"](https://wiki.postgresql.org/wiki/Don%27t_Do_This#Don.27t_use_timestamp_.28without_time_zone.29_to_store_UTC_times)

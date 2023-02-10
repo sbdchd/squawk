@@ -43,3 +43,54 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
 We add our column as nullable, set a default for new rows, backfill our column (ideally done in batches to limit locking), and finally remove nullability.
 
 See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
+
+
+## solution for alembic and sqlalchemy
+
+Instead of:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class CoreRecipe(BaseModel):
+    __tablename__ = "core_recipe"
+    ...
+    foo = sa.Column(sa.BigInteger, server_default="10", nullable=False)
+```
+
+Use:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class CoreRecipe(BaseModel):
+    __tablename__ = "core_recipe"
+    ...
+    foo = sa.Column(sa.BigInteger, default=10, nullable=True)
+```
+
+```python
+# migrations/*.py
+import sqlalchemy as sa
+from alembic import op
+
+def schema_upgrades():
+    op.add_column("core_recipe", sa.Column("foo", sa.BigInteger(), nullable=True))
+    op.execute(
+        sa.text(
+            """
+            ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
+            """
+        ),
+    )
+    # if you have the big table use batch update
+    op.execute(
+        sa.text("""UPDATE core_recipe SET foo = 10"""),
+    )
+    
+
+def schema_downgrades():
+    op.drop_column("core_recipe", "foo")
+```

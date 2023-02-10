@@ -79,6 +79,216 @@ ALTER TABLE "email" ADD CONSTRAINT "fk_user"
 ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
 ```
 
+
+## solution for alembic and sqlalchemy
+
+### adding constraint to existing table ###
+
+Instead of:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+
+class Email(BaseModel):
+    __tablename__ = "email"
+    ...
+    user_id = sa.Column(sa.BigInteger, sa.ForeignKey("user.id"))
+    ...
+
+
+class User(BaseModel):
+    __tablename__ = "user"
+
+    id = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
+    ...
+```
+
+```python
+# migrations/*.py
+import sqlalchemy as sa
+from alembic import op
+
+
+def schema_upgrades():
+    op.add_column("email", sa.Column("user_id", sa.BigInteger(), nullable=True))
+    op.create_foreign_key(None, "email", "user", ["user_id"], ["id"])
+
+
+def schema_downgrades():
+    op.drop_constraint(None, "email", type_="foreignkey")
+    op.drop_column("email", "user_id")
+```
+
+Use:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+
+class Email(BaseModel):
+    __tablename__ = "email"
+    ...
+    user_id = sa.Column(sa.BigInteger, sa.ForeignKey("user.id", name="fk_user"))
+    ...
+
+
+class User(BaseModel):
+    __tablename__ = "user"
+
+    id = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
+    ...
+```
+
+```python
+# migrations/*.py
+# First migration
+import sqlalchemy as sa
+from alembic import op
+
+
+def schema_upgrades():
+    op.add_column("email", sa.Column("user_id", sa.BigInteger(), nullable=True))
+    op.create_foreign_key(
+        "fk_user", 
+        "email", 
+        "user", 
+        ["user_id"], 
+        ["id"], 
+        postgresql_not_valid=True
+    )
+
+
+def schema_downgrades():
+    op.drop_constraint(
+        "fk_user", 
+        "email", 
+        type_="foreignkey"
+    )
+    op.drop_column("email", "user_id")
+```
+
+```python
+# migrations/*.py
+# Second migration
+import sqlalchemy as sa
+from alembic import op
+
+
+def schema_upgrades():
+    op.execute(
+        sa.text(
+            """ALTER TABLE email VALIDATE CONSTRAINT fk_user"""
+        ),
+    )
+```
+
+
+### adding constraint to new table
+
+Instead of:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+
+class User(BaseModel):
+    __tablename__ = "user"
+    ...
+
+
+class Email(BaseModel):
+    __tablename__ = "email"
+
+    id = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
+
+    user_id = sa.Column(sa.BigInteger, sa.ForeignKey("user.id"))
+```
+
+```python
+# migrations/*.py
+import sqlalchemy as sa
+from alembic import op
+
+
+def schema_upgrades():
+    op.create_table("email",
+    sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
+    sa.Column("user_id", sa.BigInteger(), nullable=True),
+    sa.ForeignKeyConstraint(["user_id"], ["user.id"], ),
+    sa.PrimaryKeyConstraint("id")
+    )
+
+
+def schema_downgrades():
+    op.drop_table("new_table")
+```
+
+Use:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class User(BaseModel):
+    __tablename__ = "user"
+    ...
+
+
+class Email(BaseModel):
+    __tablename__ = "email"
+
+    id = sa.Column(sa.BigInteger, primary_key=True, autoincrement=True)
+
+    user_id = sa.Column(sa.BigInteger, sa.ForeignKey("user.id", name="fk_user"))
+```
+
+```python
+# migrations/*.py
+# First migration
+import sqlalchemy as sa
+from alembic import op
+
+
+def schema_upgrades():
+    op.create_table("email",
+    sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),
+    sa.Column("user_id", sa.BigInteger(), nullable=True),
+    sa.PrimaryKeyConstraint("id")
+    )
+    op.create_foreign_key(
+        "fk_user",
+        "email",
+        "user",
+        ["user_id"],
+        ["id"],
+        postgresql_not_valid=True
+    )
+
+
+def schema_downgrades():
+    op.drop_table("new_table")
+```
+
+```python
+# migrations/*.py
+# Second migration
+import sqlalchemy as sa
+from alembic import op
+
+
+def schema_upgrades():
+    op.execute(
+        sa.text(
+            """ALTER TABLE email VALIDATE CONSTRAINT fk_user"""
+        ),
+    )
+
+```
+
 ## links
 
 - https://travisofthenorth.com/blog/2017/2/2/postgres-adding-foreign-keys-with-zero-downtime

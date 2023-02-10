@@ -27,3 +27,28 @@ Use:
 -- allows reads and writes while index is built
 CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
 ```
+
+
+## solution for alembic and sqlalchemy
+
+```python
+# migrations/*.py
+from alembic import op
+
+def schema_upgrades():
+    with op.get_context().autocommit_block():
+        op.create_index(
+            op.f("dist_id_uniq"),
+            "distributors",
+            ["dist_id"],
+            unique=True,
+            postgresql_concurrently=True,
+        )
+
+def schema_downgrades():
+    with op.get_context().autocommit_block():
+        op.drop_index(
+            op.f("dist_id_uniq"),
+            postgresql_concurrently=True,
+        )
+```

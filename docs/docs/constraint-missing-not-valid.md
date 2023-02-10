@@ -29,6 +29,63 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
 ```
 
+## solution for alembic and sqlalchemy
+
+Instead of:
+
+```python
+# migrations/*.py
+from alembic import op
+
+def schema_upgrades():
+    op.create_check_constraint(
+        constraint_name="positive_balance",
+        table_name="accounts",
+        condition='"balance" >= 0',
+    )
+
+def schema_downgrades():
+    op.drop_constraint(
+        constraint_name="positive_balance",
+        table_name="accounts",
+    )
+```
+
+Use:
+
+
+```python
+# migrations/*.py
+# First migration
+from alembic import op
+import sqlalchemy as sa
+
+def schema_upgrades():
+    op.create_check_constraint(
+        constraint_name="positive_balance",
+        table_name="accounts",
+        condition='"balance" >= 0',
+        postgresql_not_valid=True,
+    )
+
+def schema_downgrades():
+    op.drop_constraint(
+        constraint_name="positive_balance",
+        table_name="accounts",
+    )
+```
+
+```python
+# migrations/*.py
+# Second migration
+from alembic import op
+import sqlalchemy as sa
+
+def schema_upgrades():
+    op.execute(
+        sa.text("ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance"),
+    )
+```
 
 ## how "not valid, validate" works
 
