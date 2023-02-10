@@ -1,7 +1,6 @@
 ---
 source: linter/src/rules/prefer_bigint_over_smallint.rs
 expression: res
-
 ---
 [
     RuleViolation {

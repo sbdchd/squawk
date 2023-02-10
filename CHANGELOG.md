@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Better support non-volatile defaults for `adding-field-with-default`. (#278)
+
+## v0.20.0 - 2023-01-31
+
+### Added
+
+- added `prefer-bigint-over-int` and `prefer-bigint-over-smallint` to replace `prefer-big-int`. Thanks @aldenquimby! (#273)
+
+### Fixed
+
+- Support TableLikeClause in table creation. Thanks @qoelet! (#271)
+- Recognize most DROP statements within a transaction as robust. Thanks @andrewsmith! (#276)
+
 ## v0.19.0 - 2023-01-24
 
 ### Added
