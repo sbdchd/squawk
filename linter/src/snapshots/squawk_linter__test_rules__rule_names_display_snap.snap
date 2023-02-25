@@ -1,7 +1,6 @@
 ---
 source: linter/src/lib.rs
 expression: "rule_names.join(\"\\n\")"
-
 ---
 adding-field-with-default
 adding-foreign-key-constraint
@@ -10,6 +9,7 @@ adding-serial-primary-key-field
 ban-char-field
 ban-drop-column
 ban-drop-database
+ban-drop-not-null
 ban-drop-table
 changing-column-type
 constraint-missing-not-valid

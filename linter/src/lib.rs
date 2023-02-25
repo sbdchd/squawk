@@ -8,6 +8,7 @@ pub mod violations;
 extern crate lazy_static;
 
 use crate::errors::CheckSqlError;
+use crate::rules::ban_drop_not_null;
 use crate::rules::prefer_big_int;
 use crate::rules::prefer_identity;
 use crate::rules::{
@@ -107,6 +108,15 @@ lazy_static! {
             ViolationMessage::Note(
                 "Dropping a database may break existing clients.".into()
             )
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::BanDropNotNull,
+        func: ban_drop_not_null,
+        messages: vec![
+            ViolationMessage::Note(
+                "Dropping a NOT NULL constraint may break existing clients.".into()
+            ),
         ],
     },
     SquawkRule {

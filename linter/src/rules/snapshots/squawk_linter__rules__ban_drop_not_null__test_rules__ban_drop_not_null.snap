@@ -1,0 +1,20 @@
+---
+source: linter/src/rules/ban_drop_not_null.rs
+expression: lint_sql(bad_sql)
+---
+[
+    RuleViolation {
+        kind: BanDropNotNull,
+        span: Span {
+            start: 0,
+            len: Some(
+                59,
+            ),
+        },
+        messages: [
+            Note(
+                "Dropping a NOT NULL constraint may break existing clients.",
+            ),
+        ],
+    },
+]
