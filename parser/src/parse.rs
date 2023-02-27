@@ -4,8 +4,9 @@ use libpg_query::{pg_query_free_parse_result, pg_query_parse};
 use serde::Deserialize;
 use serde_json::Value;
 use std::ffi::{CStr, CString};
+use std::os::raw::c_char;
 
-fn parse_str_or_none(str_ptr: *mut i8) -> Option<String> {
+fn parse_str_or_none(str_ptr: *mut c_char) -> Option<String> {
     if str_ptr.is_null() {
         None
     } else {
