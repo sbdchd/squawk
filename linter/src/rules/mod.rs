@@ -42,3 +42,5 @@ pub mod prefer_bigint_over_int;
 pub use prefer_bigint_over_int::*;
 pub mod prefer_bigint_over_smallint;
 pub use prefer_bigint_over_smallint::*;
+pub mod ban_drop_table;
+pub use ban_drop_table::*;

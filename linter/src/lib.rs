@@ -16,7 +16,7 @@ use crate::rules::{
     changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
     prefer_bigint_over_int, prefer_bigint_over_smallint, prefer_robust_stmts, prefer_text_field,
     prefer_timestamptz, renaming_column, renaming_table, require_concurrent_index_creation,
-    require_concurrent_index_deletion,
+    require_concurrent_index_deletion, ban_drop_table,
 };
 use crate::violations::{RuleViolation, RuleViolationKind, ViolationMessage};
 use squawk_parser::ast::RawStmt;
@@ -106,6 +106,15 @@ lazy_static! {
         messages: vec![
             ViolationMessage::Note(
                 "Dropping a database may break existing clients.".into()
+            )
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::BanDropTable,
+        func: ban_drop_table,
+        messages: vec![
+            ViolationMessage::Note(
+                "Dropping a table may break existing clients.".into()
             )
         ],
     },
