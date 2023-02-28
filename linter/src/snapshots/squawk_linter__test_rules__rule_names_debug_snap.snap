@@ -11,6 +11,7 @@ expression: rule_names
     "ban-char-field",
     "ban-drop-column",
     "ban-drop-database",
+    "ban-drop-table",
     "changing-column-type",
     "constraint-missing-not-valid",
     "disallowed-unique-constraint",
