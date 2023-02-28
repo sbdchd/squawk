@@ -84,6 +84,12 @@ const rules = [
       "Prevent breaking existing clients that depend on the database.",
   },
   {
+    name: "ban-drop-table",
+    tags: ["backwards compatibility"],
+    description:
+        "Prevent breaking existing clients that depend on the table.",
+  },
+  {
     name: "changing-column-type",
     tags: ["backwards compatibility", "locking"],
     description:

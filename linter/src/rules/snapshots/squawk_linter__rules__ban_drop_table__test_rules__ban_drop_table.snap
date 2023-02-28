@@ -1,0 +1,47 @@
+---
+source: linter/src/rules/ban_drop_table.rs
+expression: lint_sql(sql)
+
+---
+[
+    RuleViolation {
+        kind: BanDropTable,
+        span: Span {
+            start: 0,
+            len: Some(
+                24,
+            ),
+        },
+        messages: [
+            Note(
+                "Dropping a table may break existing clients.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: BanDropTable,
+        span: Span {
+            start: 25,
+            len: Some(
+                34,
+            ),
+        },
+        messages: [
+            Note(
+                "Dropping a table may break existing clients.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: BanDropTable,
+        span: Span {
+            start: 60,
+            len: None,
+        },
+        messages: [
+            Note(
+                "Dropping a table may break existing clients.",
+            ),
+        ],
+    },
+]

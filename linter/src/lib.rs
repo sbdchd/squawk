@@ -13,7 +13,7 @@ use crate::rules::prefer_identity;
 use crate::rules::{
     adding_field_with_default, adding_foreign_key_constraint, adding_not_nullable_field,
     adding_primary_key_constraint, ban_char_type, ban_drop_column, ban_drop_database,
-    changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
+    ban_drop_table, changing_column_type, constraint_missing_not_valid, disallow_unique_constraint,
     prefer_bigint_over_int, prefer_bigint_over_smallint, prefer_robust_stmts, prefer_text_field,
     prefer_timestamptz, renaming_column, renaming_table, require_concurrent_index_creation,
     require_concurrent_index_deletion,
@@ -106,6 +106,15 @@ lazy_static! {
         messages: vec![
             ViolationMessage::Note(
                 "Dropping a database may break existing clients.".into()
+            )
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::BanDropTable,
+        func: ban_drop_table,
+        messages: vec![
+            ViolationMessage::Note(
+                "Dropping a table may break existing clients.".into()
             )
         ],
     },
