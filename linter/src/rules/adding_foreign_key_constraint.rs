@@ -85,6 +85,16 @@ mod test_rules {
         .unwrap()
     }
 
+    fn lint_sql_assuming_in_transaction(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::AddingForeignKeyConstraint,
+            None,
+            true,
+        )
+        .unwrap()
+    }
+
     #[test]
     fn test_create_table_with_foreign_key_constraint() {
         let sql = r#"
@@ -102,6 +112,32 @@ COMMIT;
         "#;
 
         assert_debug_snapshot!(lint_sql(sql));
+    }
+
+    #[test]
+    fn test_create_table_and_add_foreign_key_constraint_after() {
+        let sql = r#"
+BEGIN;
+CREATE TABLE "email" (
+  "user_id" INT
+);
+ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+COMMIT;
+        "#;
+
+        assert_debug_snapshot!(lint_sql(sql));
+    }
+
+    #[test]
+    fn test_create_table_and_add_foreign_key_constraint_after_with_assume_in_transaction() {
+        let sql = r#"
+CREATE TABLE "email" (
+  "user_id" INT
+);
+ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+        "#;
+
+        assert_debug_snapshot!(lint_sql_assuming_in_transaction(sql));
     }
 
     #[test]
