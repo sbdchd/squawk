@@ -9,6 +9,7 @@ module.exports = {
       "adding-serial-primary-key-field",
       "ban-char-field",
       "ban-drop-database",
+      "ban-drop-not-null",
       "changing-column-type",
       "constraint-missing-not-valid",
       "disallowed-unique-constraint",

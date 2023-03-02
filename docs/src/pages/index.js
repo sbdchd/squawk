@@ -84,6 +84,11 @@ const rules = [
       "Prevent breaking existing clients that depend on the database.",
   },
   {
+    name: "ban-drop-not-null",
+    tags: ["backwards compatibility"],
+    description: "Prevent breaking existing clients that don't expect NULL values.",
+  },
+  {
     name: "ban-drop-table",
     tags: ["backwards compatibility"],
     description:
@@ -245,4 +250,3 @@ function Home() {
 }
 
 export default Home
-

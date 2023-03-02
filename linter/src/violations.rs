@@ -53,6 +53,8 @@ pub enum RuleViolationKind {
     BanDropColumn,
     #[serde(rename = "ban-drop-table")]
     BanDropTable,
+    #[serde(rename = "ban-drop-not-null")]
+    BanDropNotNull,
     // generator::new-rule-above
 }
 
