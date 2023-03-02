@@ -1,4 +1,5 @@
 use crate::{
+    rules::utils::tables_created_in_transaction,
     versions::Version,
     violations::{RuleViolation, RuleViolationKind},
 };
@@ -17,12 +18,16 @@ use squawk_parser::ast::{
 pub fn adding_foreign_key_constraint(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    _assume_in_transaction: bool,
+    assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
+    let tables_created = tables_created_in_transaction(tree, assume_in_transaction);
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
+                if tables_created.contains(&stmt.relation.relname) {
+                    continue;
+                }
                 for cmd in &stmt.cmds {
                     match cmd {
                         AlterTableCmds::AlterTableCmd(ref command) => {
