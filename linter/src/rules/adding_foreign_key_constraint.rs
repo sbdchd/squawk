@@ -73,6 +73,7 @@ mod test_rules {
         check_sql_with_rule,
         violations::{RuleViolation, RuleViolationKind},
     };
+    use insta::assert_debug_snapshot;
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql_with_rule(
@@ -100,9 +101,9 @@ CREATE TABLE email (
 COMMIT;
         "#;
 
-        let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 0);
+        assert_debug_snapshot!(lint_sql(sql));
     }
+
     #[test]
     fn test_add_foreign_key_constraint_not_valid_validate() {
         let sql = r#"
@@ -113,9 +114,9 @@ ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
 
-        let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 0);
+        assert_debug_snapshot!(lint_sql(sql));
     }
+
     #[test]
     fn test_add_foreign_key_constraint_lock() {
         let sql = r#"
@@ -125,13 +126,9 @@ ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES 
 COMMIT;
         "#;
 
-        let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 1);
-        assert_eq!(
-            violations[0].kind,
-            RuleViolationKind::AddingForeignKeyConstraint
-        );
+        assert_debug_snapshot!(lint_sql(sql));
     }
+
     #[test]
     fn test_add_column_references_lock() {
         let sql = r#"
@@ -140,11 +137,6 @@ ALTER TABLE "emails" ADD COLUMN "user_id" INT REFERENCES "user" ("id");
 COMMIT;
         "#;
 
-        let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 1);
-        assert_eq!(
-            violations[0].kind,
-            RuleViolationKind::AddingForeignKeyConstraint
-        );
+        assert_debug_snapshot!(lint_sql(sql));
     }
 }
