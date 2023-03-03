@@ -81,7 +81,7 @@ Ok(
                                 opclass: [
                                     Object({
                                         "String": Object({
-                                            "str": String(
+                                            "sval": String(
                                                 "varchar_pattern_ops",
                                             ),
                                         }),

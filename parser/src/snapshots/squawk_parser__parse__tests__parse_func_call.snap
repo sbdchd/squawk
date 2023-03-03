@@ -67,7 +67,7 @@ Ok(
                                             "funcname": Array([
                                                 Object({
                                                     "String": Object({
-                                                        "str": String(
+                                                        "sval": String(
                                                             "to_json",
                                                         ),
                                                     }),

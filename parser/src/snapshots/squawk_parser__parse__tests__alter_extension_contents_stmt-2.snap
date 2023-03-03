@@ -24,7 +24,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "anyelement",
                                                     ),
                                                 }),
@@ -43,7 +43,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "hstore",
                                                     ),
                                                 }),
@@ -58,7 +58,7 @@ Ok(
                             "objname": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "populate_record",
                                         ),
                                     }),

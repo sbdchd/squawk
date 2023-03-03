@@ -13,7 +13,7 @@ Ok(
                     "funcname": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "check_account_update",
                                 ),
                             }),

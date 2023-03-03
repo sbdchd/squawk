@@ -10,7 +10,7 @@ Ok(
                     "conversion_name": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "myconv",
                                 ),
                             }),
@@ -22,7 +22,7 @@ Ok(
                     "func_name": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "myfunc",
                                 ),
                             }),

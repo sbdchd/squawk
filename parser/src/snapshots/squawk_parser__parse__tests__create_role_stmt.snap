@@ -32,7 +32,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "jw8s0F4",
                                         ),
                                     }),
@@ -52,7 +52,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "2005-01-01",
                                         ),
                                     }),

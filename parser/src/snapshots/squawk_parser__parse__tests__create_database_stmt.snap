@@ -28,7 +28,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "salesapp",
                                         ),
                                     }),
@@ -48,7 +48,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "salesspace",
                                         ),
                                     }),
@@ -83,7 +83,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "LATIN1",
                                         ),
                                     }),
@@ -103,7 +103,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "template0",
                                         ),
                                     }),

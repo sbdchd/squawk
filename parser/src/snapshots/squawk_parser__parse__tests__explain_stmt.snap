@@ -82,7 +82,7 @@ Ok(
                                                         "fields": Array([
                                                             Object({
                                                                 "String": Object({
-                                                                    "str": String(
+                                                                    "sval": String(
                                                                         "a",
                                                                     ),
                                                                 }),
@@ -99,7 +99,7 @@ Ok(
                                                 "name": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "=",
                                                             ),
                                                         }),
@@ -131,7 +131,7 @@ Ok(
                                                         "fields": Array([
                                                             Object({
                                                                 "String": Object({
-                                                                    "str": String(
+                                                                    "sval": String(
                                                                         "b",
                                                                     ),
                                                                 }),
@@ -148,7 +148,7 @@ Ok(
                                                 "name": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "=",
                                                             ),
                                                         }),

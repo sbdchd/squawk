@@ -17,7 +17,7 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "_int4",
                                     ),
                                 }),
@@ -40,7 +40,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "&&",
                                                 ),
                                             }),
@@ -67,7 +67,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "anyarray",
                                                             ),
                                                         }),
@@ -86,7 +86,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "anyarray",
                                                             ),
                                                         }),
@@ -101,7 +101,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "=",
                                                 ),
                                             }),
@@ -122,7 +122,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "@>",
                                                 ),
                                             }),
@@ -143,7 +143,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "<@",
                                                 ),
                                             }),
@@ -170,7 +170,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "_int4",
                                                             ),
                                                         }),
@@ -189,7 +189,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "query_int",
                                                             ),
                                                         }),
@@ -204,7 +204,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "@@",
                                                 ),
                                             }),
@@ -231,7 +231,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -250,7 +250,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "_int4",
                                                             ),
                                                         }),
@@ -269,14 +269,14 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "pg_catalog",
                                                             ),
                                                         }),
                                                     }),
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -295,7 +295,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "oid",
                                                             ),
                                                         }),
@@ -314,7 +314,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -329,7 +329,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "g_int_consistent",
                                                 ),
                                             }),
@@ -356,7 +356,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -375,7 +375,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -390,7 +390,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "g_int_union",
                                                 ),
                                             }),
@@ -417,7 +417,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -432,7 +432,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "g_int_compress",
                                                 ),
                                             }),
@@ -459,7 +459,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -474,7 +474,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "g_int_decompress",
                                                 ),
                                             }),
@@ -501,7 +501,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -520,7 +520,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -539,7 +539,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -554,7 +554,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "g_int_penalty",
                                                 ),
                                             }),
@@ -581,7 +581,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -600,7 +600,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -615,7 +615,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "g_int_picksplit",
                                                 ),
                                             }),
@@ -642,7 +642,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "_int4",
                                                             ),
                                                         }),
@@ -661,7 +661,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "_int4",
                                                             ),
                                                         }),
@@ -680,7 +680,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "internal",
                                                             ),
                                                         }),
@@ -695,7 +695,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "g_int_same",
                                                 ),
                                             }),
@@ -711,7 +711,7 @@ Ok(
                     "opclassname": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "gist__int_ops",
                                 ),
                             }),

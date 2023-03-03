@@ -20,14 +20,14 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "pg_catalog",
                                                 ),
                                             }),
                                         }),
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "int8",
                                                 ),
                                             }),
@@ -42,7 +42,7 @@ Ok(
                         "objname": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "int4",
                                     ),
                                 }),
@@ -56,14 +56,14 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "pg_catalog",
                                     ),
                                 }),
                             }),
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "int8",
                                     ),
                                 }),
@@ -80,7 +80,7 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "int4",
                                     ),
                                 }),

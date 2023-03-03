@@ -19,7 +19,7 @@ Ok(
                             "items": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "name",
                                         ),
                                     }),
@@ -72,14 +72,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "int4",
                                                     ),
                                                 }),
@@ -94,7 +94,7 @@ Ok(
                             "objname": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "sqrt",
                                         ),
                                     }),

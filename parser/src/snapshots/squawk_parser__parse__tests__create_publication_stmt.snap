@@ -59,7 +59,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "insert",
                                         ),
                                     }),

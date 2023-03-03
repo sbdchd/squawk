@@ -10,7 +10,7 @@ Ok(
                     "funcname": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "populate",
                                 ),
                             }),
@@ -24,7 +24,7 @@ Ok(
                                         "items": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "\nDECLARE\n    -- declarations\nBEGIN\n    PERFORM my_function();\nEND;\n",
                                                     ),
                                                 }),
@@ -47,7 +47,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "plpgsql",
                                         ),
                                     }),
@@ -71,14 +71,14 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "pg_catalog",
                                     ),
                                 }),
                             }),
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "int4",
                                     ),
                                 }),

@@ -10,7 +10,7 @@ Ok(
                     "defnames": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "s1",
                                 ),
                             }),
@@ -71,7 +71,7 @@ Ok(
                     "stat_types": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "dependencies",
                                 ),
                             }),

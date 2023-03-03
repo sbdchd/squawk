@@ -122,14 +122,14 @@ Ok(
                                     Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "a",
                                                 ),
                                             }),
                                         }),
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "c",
                                                 ),
                                             }),

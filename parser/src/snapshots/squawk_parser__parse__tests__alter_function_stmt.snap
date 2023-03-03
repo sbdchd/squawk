@@ -45,14 +45,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "int4",
                                                     ),
                                                 }),
@@ -67,7 +67,7 @@ Ok(
                             "objname": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "sqrt",
                                         ),
                                     }),
@@ -102,14 +102,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "int4",
                                                     ),
                                                 }),
@@ -124,7 +124,7 @@ Ok(
                             "objname": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "sqrt",
                                         ),
                                     }),
@@ -210,7 +210,7 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "text",
                                                 ),
                                             }),
@@ -225,7 +225,7 @@ Ok(
                         "objname": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "check_password",
                                     ),
                                 }),
@@ -280,7 +280,7 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "text",
                                                 ),
                                             }),
@@ -295,7 +295,7 @@ Ok(
                         "objname": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "check_password",
                                     ),
                                 }),

@@ -18,7 +18,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "float8",
                                                     ),
                                                 }),
@@ -50,7 +50,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "float8mi",
                                                     ),
                                                 }),
@@ -76,7 +76,7 @@ Ok(
                     "typeName": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "floatrange",
                                 ),
                             }),

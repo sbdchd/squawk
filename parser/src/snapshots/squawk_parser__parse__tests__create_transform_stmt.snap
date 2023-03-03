@@ -17,7 +17,7 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "internal",
                                                 ),
                                             }),
@@ -32,7 +32,7 @@ Ok(
                         "objname": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "hstore_to_plpython",
                                     ),
                                 }),
@@ -52,7 +52,7 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "internal",
                                                 ),
                                             }),
@@ -67,7 +67,7 @@ Ok(
                         "objname": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "plpython_to_hstore",
                                     ),
                                 }),
@@ -81,7 +81,7 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "hstore",
                                     ),
                                 }),

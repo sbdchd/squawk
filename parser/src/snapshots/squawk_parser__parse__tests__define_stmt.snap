@@ -57,7 +57,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "complex_add",
                                                     ),
                                                 }),
@@ -89,7 +89,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "complex",
                                                     ),
                                                 }),
@@ -115,7 +115,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "(0,0)",
                                         ),
                                     }),
@@ -135,7 +135,7 @@ Ok(
                     "defnames": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "sum",
                                 ),
                             }),

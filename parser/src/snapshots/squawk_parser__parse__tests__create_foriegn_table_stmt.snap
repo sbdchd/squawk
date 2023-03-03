@@ -56,14 +56,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "bpchar",
                                                     ),
                                                 }),
@@ -121,14 +121,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "varchar",
                                                     ),
                                                 }),
@@ -186,14 +186,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "int4",
                                                     ),
                                                 }),
@@ -223,7 +223,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "date",
                                                     ),
                                                 }),
@@ -253,14 +253,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "varchar",
                                                     ),
                                                 }),
@@ -306,14 +306,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "interval",
                                                     ),
                                                 }),

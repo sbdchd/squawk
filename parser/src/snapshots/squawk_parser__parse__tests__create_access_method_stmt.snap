@@ -16,7 +16,7 @@ Ok(
                     "handler_name": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "heptree_handler",
                                 ),
                             }),

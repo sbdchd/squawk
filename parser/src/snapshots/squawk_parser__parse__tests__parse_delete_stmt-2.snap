@@ -31,7 +31,7 @@ Ok(
                                     "fields": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "account_age",
                                                 ),
                                             }),
@@ -48,7 +48,7 @@ Ok(
                             "name": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             ">",
                                         ),
                                     }),
