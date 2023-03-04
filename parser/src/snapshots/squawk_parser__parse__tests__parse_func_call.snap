@@ -19,51 +19,17 @@ Ok(
                                         Object({
                                             "args": Array([
                                                 Object({
-                                                    "TypeCast": Object({
-                                                        "arg": Object({
-                                                            "A_Const": Object({
-                                                                "location": Number(
-                                                                    59,
-                                                                ),
-                                                                "val": Object({
-                                                                    "String": Object({
-                                                                        "str": String(
-                                                                            "f",
-                                                                        ),
-                                                                    }),
-                                                                }),
-                                                            }),
-                                                        }),
+                                                    "A_Const": Object({
+                                                        "boolval": Object({}),
                                                         "location": Number(
-                                                            -1,
+                                                            59,
                                                         ),
-                                                        "typeName": Object({
-                                                            "location": Number(
-                                                                -1,
-                                                            ),
-                                                            "names": Array([
-                                                                Object({
-                                                                    "String": Object({
-                                                                        "str": String(
-                                                                            "pg_catalog",
-                                                                        ),
-                                                                    }),
-                                                                }),
-                                                                Object({
-                                                                    "String": Object({
-                                                                        "str": String(
-                                                                            "bool",
-                                                                        ),
-                                                                    }),
-                                                                }),
-                                                            ]),
-                                                            "typemod": Number(
-                                                                -1,
-                                                            ),
-                                                        }),
                                                     }),
                                                 }),
                                             ]),
+                                            "funcformat": String(
+                                                "COERCE_EXPLICIT_CALL",
+                                            ),
                                             "funcname": Array([
                                                 Object({
                                                     "String": Object({
