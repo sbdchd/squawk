@@ -8,7 +8,7 @@ Ok(
             stmt: DeclareCursorStmt(
                 Object({
                     "options": Number(
-                        32,
+                        256,
                     ),
                     "portalname": String(
                         "curs2",
