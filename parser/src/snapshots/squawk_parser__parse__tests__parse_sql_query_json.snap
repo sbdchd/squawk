@@ -108,6 +108,9 @@ Ok(
                                 }),
                             }),
                         ]),
+                        "objtype": String(
+                            "OBJECT_TABLE",
+                        ),
                         "relation": Object({
                             "inh": Bool(
                                 true,
@@ -122,9 +125,6 @@ Ok(
                                 "p",
                             ),
                         }),
-                        "relkind": String(
-                            "OBJECT_TABLE",
-                        ),
                     }),
                 }),
                 "stmt_len": Number(

@@ -75,7 +75,7 @@ Ok(
                         alias: None,
                         location: 21,
                     },
-                    relkind: Table,
+                    objtype: Table,
                     missing_ok: false,
                 },
             ),
