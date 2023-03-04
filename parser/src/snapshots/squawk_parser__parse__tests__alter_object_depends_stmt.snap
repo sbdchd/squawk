@@ -8,11 +8,9 @@ Ok(
             stmt: AlterObjectDependsStmt(
                 Object({
                     "extname": Object({
-                        "String": Object({
-                            "str": String(
-                                "extension_name",
-                            ),
-                        }),
+                        "sval": String(
+                            "extension_name",
+                        ),
                     }),
                     "object": Object({
                         "List": Object({
@@ -55,11 +53,9 @@ Ok(
             stmt: AlterObjectDependsStmt(
                 Object({
                     "extname": Object({
-                        "String": Object({
-                            "str": String(
-                                "extension_name",
-                            ),
-                        }),
+                        "sval": String(
+                            "extension_name",
+                        ),
                     }),
                     "object": Object({
                         "ObjectWithArgs": Object({
