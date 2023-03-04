@@ -29,6 +29,32 @@ Ok(
                                 }),
                             }),
                         ]),
+                        "objfuncargs": Array([
+                            Object({
+                                "FunctionParameter": Object({
+                                    "argType": Object({
+                                        "location": Number(
+                                            96,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "sval": String(
+                                                        "internal",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
+                                    }),
+                                    "mode": String(
+                                        "FUNC_PARAM_DEFAULT",
+                                    ),
+                                }),
+                            }),
+                        ]),
                         "objname": Array([
                             Object({
                                 "String": Object({
@@ -60,6 +86,32 @@ Ok(
                                     ]),
                                     "typemod": Number(
                                         -1,
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "objfuncargs": Array([
+                            Object({
+                                "FunctionParameter": Object({
+                                    "argType": Object({
+                                        "location": Number(
+                                            151,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "sval": String(
+                                                        "internal",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
+                                    }),
+                                    "mode": String(
+                                        "FUNC_PARAM_DEFAULT",
                                     ),
                                 }),
                             }),

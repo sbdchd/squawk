@@ -362,6 +362,56 @@ Ok(
                                             }),
                                         }),
                                     ]),
+                                    "objfuncargs": Array([
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        246,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "sval": String(
+                                                                    "int4",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_DEFAULT",
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        252,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "sval": String(
+                                                                    "int2",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_DEFAULT",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
                                     "objname": Array([
                                         Object({
                                             "String": Object({
@@ -724,6 +774,56 @@ Ok(
                                                 ]),
                                                 "typemod": Number(
                                                     -1,
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "objfuncargs": Array([
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        455,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "sval": String(
+                                                                    "int2",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_DEFAULT",
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        461,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "sval": String(
+                                                                    "int4",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_DEFAULT",
                                                 ),
                                             }),
                                         }),
