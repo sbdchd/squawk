@@ -11,9 +11,9 @@ Ok(
                         Object({
                             "DefElem": Object({
                                 "arg": Object({
-                                    "Integer": Object({
-                                        "ival": Number(
-                                            1,
+                                    "Boolean": Object({
+                                        "boolval": Bool(
+                                            true,
                                         ),
                                     }),
                                 }),
