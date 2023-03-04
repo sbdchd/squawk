@@ -35,12 +35,10 @@ Ok(
                                         "location": Number(
                                             28,
                                         ),
-                                        "val": Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "bar",
-                                                ),
-                                            }),
+                                        "sval": Object({
+                                            "sval": String(
+                                                "bar",
+                                            ),
                                         }),
                                     }),
                                 }),
@@ -82,16 +80,14 @@ Ok(
                             ]),
                             "rexpr": Object({
                                 "A_Const": Object({
+                                    "ival": Object({
+                                        "ival": Number(
+                                            10,
+                                        ),
+                                    }),
                                     "location": Number(
                                         47,
                                     ),
-                                    "val": Object({
-                                        "Integer": Object({
-                                            "ival": Number(
-                                                10,
-                                            ),
-                                        }),
-                                    }),
                                 }),
                             }),
                         }),

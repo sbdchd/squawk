@@ -18,16 +18,14 @@ Ok(
                                     ),
                                     "val": Object({
                                         "A_Const": Object({
+                                            "ival": Object({
+                                                "ival": Number(
+                                                    1,
+                                                ),
+                                            }),
                                             "location": Number(
                                                 12,
                                             ),
-                                            "val": Object({
-                                                "Integer": Object({
-                                                    "ival": Number(
-                                                        1,
-                                                    ),
-                                                }),
-                                            }),
                                         }),
                                     }),
                                 }),

@@ -46,12 +46,10 @@ Ok(
                                         "location": Number(
                                             81,
                                         ),
-                                        "val": Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "2006-02-01",
-                                                ),
-                                            }),
+                                        "sval": Object({
+                                            "sval": String(
+                                                "2006-02-01",
+                                            ),
                                         }),
                                     }),
                                 }),
@@ -65,12 +63,10 @@ Ok(
                                         "location": Number(
                                             99,
                                         ),
-                                        "val": Object({
-                                            "String": Object({
-                                                "str": String(
-                                                    "2006-03-01",
-                                                ),
-                                            }),
+                                        "sval": Object({
+                                            "sval": String(
+                                                "2006-03-01",
+                                            ),
                                         }),
                                     }),
                                 }),

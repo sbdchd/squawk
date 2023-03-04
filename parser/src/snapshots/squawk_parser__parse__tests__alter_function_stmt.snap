@@ -156,12 +156,10 @@ Ok(
                                                     "location": Number(
                                                         197,
                                                     ),
-                                                    "val": Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "admin",
-                                                            ),
-                                                        }),
+                                                    "sval": Object({
+                                                        "sval": String(
+                                                            "admin",
+                                                        ),
                                                     }),
                                                 }),
                                             }),
@@ -170,12 +168,10 @@ Ok(
                                                     "location": Number(
                                                         204,
                                                     ),
-                                                    "val": Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "pg_temp",
-                                                            ),
-                                                        }),
+                                                    "sval": Object({
+                                                        "sval": String(
+                                                            "pg_temp",
+                                                        ),
                                                     }),
                                                 }),
                                             }),

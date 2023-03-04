@@ -26,12 +26,10 @@ Ok(
                                                             "location": Number(
                                                                 84,
                                                             ),
-                                                            "val": Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "2008-02-01",
-                                                                    ),
-                                                                }),
+                                                            "sval": Object({
+                                                                "sval": String(
+                                                                    "2008-02-01",
+                                                                ),
                                                             }),
                                                         }),
                                                     }),
@@ -45,12 +43,10 @@ Ok(
                                                             "location": Number(
                                                                 102,
                                                             ),
-                                                            "val": Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "2008-03-01",
-                                                                    ),
-                                                                }),
+                                                            "sval": Object({
+                                                                "sval": String(
+                                                                    "2008-03-01",
+                                                                ),
                                                             }),
                                                         }),
                                                     }),

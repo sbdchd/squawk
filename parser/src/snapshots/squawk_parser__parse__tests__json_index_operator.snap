@@ -54,12 +54,10 @@ Ok(
                                                     "location": Number(
                                                         72,
                                                     ),
-                                                    "val": Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "bar",
-                                                            ),
-                                                        }),
+                                                    "sval": Object({
+                                                        "sval": String(
+                                                            "bar",
+                                                        ),
                                                     }),
                                                 }),
                                             }),

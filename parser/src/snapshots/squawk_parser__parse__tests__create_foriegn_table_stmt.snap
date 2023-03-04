@@ -75,16 +75,14 @@ Ok(
                                         "typmods": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            5,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         51,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                5,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),
@@ -140,16 +138,14 @@ Ok(
                                         "typmods": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            40,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         88,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                40,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),
@@ -272,16 +268,14 @@ Ok(
                                         "typmods": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            10,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         182,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                10,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),
@@ -325,16 +319,14 @@ Ok(
                                         "typmods": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            3072,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         212,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                3072,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),

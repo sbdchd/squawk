@@ -60,12 +60,10 @@ Ok(
                                                             "location": Number(
                                                                 56,
                                                             ),
-                                                            "val": Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "^\\d{5}$",
-                                                                    ),
-                                                                }),
+                                                            "sval": Object({
+                                                                "sval": String(
+                                                                    "^\\d{5}$",
+                                                                ),
                                                             }),
                                                         }),
                                                     }),
@@ -109,12 +107,10 @@ Ok(
                                                             "location": Number(
                                                                 77,
                                                             ),
-                                                            "val": Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "^\\d{5}-\\d{4}$",
-                                                                    ),
-                                                                }),
+                                                            "sval": Object({
+                                                                "sval": String(
+                                                                    "^\\d{5}-\\d{4}$",
+                                                                ),
                                                             }),
                                                         }),
                                                     }),

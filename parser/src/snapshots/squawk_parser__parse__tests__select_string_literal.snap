@@ -21,12 +21,10 @@ Ok(
                                             "location": Number(
                                                 7,
                                             ),
-                                            "val": Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "some string",
-                                                    ),
-                                                }),
+                                            "sval": Object({
+                                                "sval": String(
+                                                    "some string",
+                                                ),
                                             }),
                                         }),
                                     }),

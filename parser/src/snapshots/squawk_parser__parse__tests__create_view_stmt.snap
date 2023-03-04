@@ -26,12 +26,10 @@ Ok(
                                                 "location": Number(
                                                     29,
                                                 ),
-                                                "val": Object({
-                                                    "String": Object({
-                                                        "str": String(
-                                                            "Hello World",
-                                                        ),
-                                                    }),
+                                                "sval": Object({
+                                                    "sval": String(
+                                                        "Hello World",
+                                                    ),
                                                 }),
                                             }),
                                         }),
@@ -152,12 +150,10 @@ Ok(
                                             "location": Number(
                                                 113,
                                             ),
-                                            "val": Object({
-                                                "String": Object({
-                                                    "str": String(
-                                                        "Comedy",
-                                                    ),
-                                                }),
+                                            "sval": Object({
+                                                "sval": String(
+                                                    "Comedy",
+                                                ),
                                             }),
                                         }),
                                     }),
