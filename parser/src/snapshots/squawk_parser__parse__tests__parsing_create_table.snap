@@ -37,7 +37,7 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "serial",
+                                                sval: "serial",
                                             },
                                         },
                                     ],
@@ -92,12 +92,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "timestamptz",
+                                                sval: "timestamptz",
                                             },
                                         },
                                     ],
@@ -138,12 +138,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "timestamptz",
+                                                sval: "timestamptz",
                                             },
                                         },
                                     ],
@@ -184,12 +184,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "varchar",
+                                                sval: "varchar",
                                             },
                                         },
                                     ],
@@ -259,7 +259,7 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "text",
+                                                sval: "text",
                                             },
                                         },
                                     ],
@@ -300,7 +300,7 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "jsonb",
+                                                sval: "jsonb",
                                             },
                                         },
                                     ],
@@ -341,12 +341,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "varchar",
+                                                sval: "varchar",
                                             },
                                         },
                                     ],
@@ -402,12 +402,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "int4",
+                                                sval: "int4",
                                             },
                                         },
                                     ],
@@ -448,12 +448,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "int4",
+                                                sval: "int4",
                                             },
                                         },
                                     ],

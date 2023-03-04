@@ -24,7 +24,7 @@ pub fn prefer_timestamptz(
 
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
     if let Some(type_name) = column_def.type_name.names.last() {
-        if type_name.string.str == "timestamp" {
+        if type_name.string.sval == "timestamp" {
             errs.push(RuleViolation::new(
                 RuleViolationKind::PreferTimestampTz,
                 raw_stmt.into(),

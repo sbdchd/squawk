@@ -579,7 +579,7 @@ pub enum ColumnDefConstraint {
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct PGString {
-    pub str: String,
+    pub sval: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]

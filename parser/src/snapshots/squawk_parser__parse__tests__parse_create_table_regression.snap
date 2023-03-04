@@ -26,12 +26,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "int4",
+                                                sval: "int4",
                                             },
                                         },
                                     ],
@@ -57,12 +57,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "int4",
+                                                sval: "int4",
                                             },
                                         },
                                     ],
@@ -88,12 +88,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "int4",
+                                                sval: "int4",
                                             },
                                         },
                                     ],

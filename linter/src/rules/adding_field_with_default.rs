@@ -15,7 +15,7 @@ fn constraint_has_constant_expr(raw_expr: &Value) -> bool {
 }
 
 fn is_non_volatile_func_call(raw_expr: &Value, non_volatile_funcs: &HashSet<String>) -> bool {
-    let func_name = raw_expr["FuncCall"]["funcname"][0]["String"]["str"].as_str();
+    let func_name = raw_expr["FuncCall"]["funcname"][0]["String"]["sval"].as_str();
 
     let Some(func_name) = func_name else {
         return false;
