@@ -10,37 +10,54 @@ Ok(
                     "pubname": String(
                         "mypublication",
                     ),
-                    "tables": Array([
+                    "pubobjects": Array([
                         Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
+                            "PublicationObjSpec": Object({
+                                "pubobjtype": String(
+                                    "PUBLICATIONOBJ_TABLE",
                                 ),
-                                "location": Number(
-                                    44,
-                                ),
-                                "relname": String(
-                                    "users",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
+                                "pubtable": Object({
+                                    "relation": Object({
+                                        "inh": Bool(
+                                            true,
+                                        ),
+                                        "location": Number(
+                                            44,
+                                        ),
+                                        "relname": String(
+                                            "users",
+                                        ),
+                                        "relpersistence": String(
+                                            "p",
+                                        ),
+                                    }),
+                                }),
                             }),
                         }),
                         Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
-                                ),
+                            "PublicationObjSpec": Object({
                                 "location": Number(
                                     51,
                                 ),
-                                "relname": String(
-                                    "departments",
+                                "pubobjtype": String(
+                                    "PUBLICATIONOBJ_TABLE",
                                 ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
+                                "pubtable": Object({
+                                    "relation": Object({
+                                        "inh": Bool(
+                                            true,
+                                        ),
+                                        "location": Number(
+                                            51,
+                                        ),
+                                        "relname": String(
+                                            "departments",
+                                        ),
+                                        "relpersistence": String(
+                                            "p",
+                                        ),
+                                    }),
+                                }),
                             }),
                         }),
                     ]),
@@ -79,21 +96,28 @@ Ok(
                     "pubname": String(
                         "insert_only",
                     ),
-                    "tables": Array([
+                    "pubobjects": Array([
                         Object({
-                            "RangeVar": Object({
-                                "inh": Bool(
-                                    true,
+                            "PublicationObjSpec": Object({
+                                "pubobjtype": String(
+                                    "PUBLICATIONOBJ_TABLE",
                                 ),
-                                "location": Number(
-                                    105,
-                                ),
-                                "relname": String(
-                                    "mydata",
-                                ),
-                                "relpersistence": String(
-                                    "p",
-                                ),
+                                "pubtable": Object({
+                                    "relation": Object({
+                                        "inh": Bool(
+                                            true,
+                                        ),
+                                        "location": Number(
+                                            105,
+                                        ),
+                                        "relname": String(
+                                            "mydata",
+                                        ),
+                                        "relpersistence": String(
+                                            "p",
+                                        ),
+                                    }),
+                                }),
                             }),
                         }),
                     ]),
