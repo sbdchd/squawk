@@ -8,7 +8,7 @@ Ok(
             stmt: AlterSubscriptionStmt(
                 Object({
                     "kind": String(
-                        "ALTER_SUBSCRIPTION_PUBLICATION",
+                        "ALTER_SUBSCRIPTION_SET_PUBLICATION",
                     ),
                     "publication": Array([
                         Object({
