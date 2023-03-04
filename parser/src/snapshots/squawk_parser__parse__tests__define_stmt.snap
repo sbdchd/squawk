@@ -20,7 +20,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "complex",
                                                             ),
                                                         }),
@@ -31,7 +31,7 @@ Ok(
                                                 ),
                                             }),
                                             "mode": String(
-                                                "FUNC_PARAM_IN",
+                                                "FUNC_PARAM_DEFAULT",
                                             ),
                                         }),
                                     }),
@@ -39,11 +39,7 @@ Ok(
                             }),
                         }),
                         Object({
-                            "Integer": Object({
-                                "ival": Number(
-                                    -1,
-                                ),
-                            }),
+                            "Integer": Object({}),
                         }),
                     ]),
                     "definition": Array([
