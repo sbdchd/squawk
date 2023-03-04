@@ -18,34 +18,16 @@ Ok(
                     ]),
                     "exprs": Array([
                         Object({
-                            "ColumnRef": Object({
-                                "fields": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "a",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "location": Number(
-                                    40,
+                            "StatsElem": Object({
+                                "name": String(
+                                    "a",
                                 ),
                             }),
                         }),
                         Object({
-                            "ColumnRef": Object({
-                                "fields": Array([
-                                    Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "b",
-                                            ),
-                                        }),
-                                    }),
-                                ]),
-                                "location": Number(
-                                    43,
+                            "StatsElem": Object({
+                                "name": String(
+                                    "b",
                                 ),
                             }),
                         }),
