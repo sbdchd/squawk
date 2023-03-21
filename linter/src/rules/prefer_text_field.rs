@@ -28,7 +28,7 @@ pub fn prefer_text_field(
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
     let type_name = &column_def.type_name;
     for field_type_name in &type_name.names {
-        if field_type_name.string.str == "varchar" && !type_name.typmods.is_empty() {
+        if field_type_name.string.sval == "varchar" && !type_name.typmods.is_empty() {
             errs.push(RuleViolation::new(
                 RuleViolationKind::PreferTextField,
                 raw_stmt.into(),

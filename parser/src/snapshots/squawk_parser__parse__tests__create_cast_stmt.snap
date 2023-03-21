@@ -20,14 +20,14 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "pg_catalog",
                                                 ),
                                             }),
                                         }),
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "int8",
                                                 ),
                                             }),
@@ -39,10 +39,43 @@ Ok(
                                 }),
                             }),
                         ]),
+                        "objfuncargs": Array([
+                            Object({
+                                "FunctionParameter": Object({
+                                    "argType": Object({
+                                        "location": Number(
+                                            49,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "sval": String(
+                                                        "pg_catalog",
+                                                    ),
+                                                }),
+                                            }),
+                                            Object({
+                                                "String": Object({
+                                                    "sval": String(
+                                                        "int8",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
+                                    }),
+                                    "mode": String(
+                                        "FUNC_PARAM_DEFAULT",
+                                    ),
+                                }),
+                            }),
+                        ]),
                         "objname": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "int4",
                                     ),
                                 }),
@@ -56,14 +89,14 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "pg_catalog",
                                     ),
                                 }),
                             }),
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "int8",
                                     ),
                                 }),
@@ -80,7 +113,7 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "int4",
                                     ),
                                 }),

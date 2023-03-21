@@ -56,14 +56,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "bpchar",
                                                     ),
                                                 }),
@@ -75,16 +75,14 @@ Ok(
                                         "typmods": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            5,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         51,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                5,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),
@@ -121,14 +119,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "varchar",
                                                     ),
                                                 }),
@@ -140,16 +138,14 @@ Ok(
                                         "typmods": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            40,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         88,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                40,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),
@@ -186,14 +182,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "int4",
                                                     ),
                                                 }),
@@ -223,7 +219,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "date",
                                                     ),
                                                 }),
@@ -253,14 +249,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "varchar",
                                                     ),
                                                 }),
@@ -272,16 +268,14 @@ Ok(
                                         "typmods": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            10,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         182,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                10,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),
@@ -306,14 +300,14 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "pg_catalog",
                                                     ),
                                                 }),
                                             }),
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "interval",
                                                     ),
                                                 }),
@@ -325,16 +319,14 @@ Ok(
                                         "typmods": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            3072,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         212,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                3072,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),

@@ -82,7 +82,7 @@ Ok(
                                                         "fields": Array([
                                                             Object({
                                                                 "String": Object({
-                                                                    "str": String(
+                                                                    "sval": String(
                                                                         "a",
                                                                     ),
                                                                 }),
@@ -99,7 +99,7 @@ Ok(
                                                 "name": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "=",
                                                             ),
                                                         }),
@@ -107,16 +107,14 @@ Ok(
                                                 ]),
                                                 "rexpr": Object({
                                                     "A_Const": Object({
+                                                        "ival": Object({
+                                                            "ival": Number(
+                                                                1,
+                                                            ),
+                                                        }),
                                                         "location": Number(
                                                             45,
                                                         ),
-                                                        "val": Object({
-                                                            "Integer": Object({
-                                                                "ival": Number(
-                                                                    1,
-                                                                ),
-                                                            }),
-                                                        }),
                                                     }),
                                                 }),
                                             }),
@@ -131,7 +129,7 @@ Ok(
                                                         "fields": Array([
                                                             Object({
                                                                 "String": Object({
-                                                                    "str": String(
+                                                                    "sval": String(
                                                                         "b",
                                                                     ),
                                                                 }),
@@ -148,7 +146,7 @@ Ok(
                                                 "name": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "=",
                                                             ),
                                                         }),
@@ -156,16 +154,10 @@ Ok(
                                                 ]),
                                                 "rexpr": Object({
                                                     "A_Const": Object({
+                                                        "ival": Object({}),
                                                         "location": Number(
                                                             57,
                                                         ),
-                                                        "val": Object({
-                                                            "Integer": Object({
-                                                                "ival": Number(
-                                                                    0,
-                                                                ),
-                                                            }),
-                                                        }),
                                                     }),
                                                 }),
                                             }),

@@ -26,7 +26,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -45,7 +45,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -60,7 +60,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "<",
                                                 ),
                                             }),
@@ -87,7 +87,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -106,7 +106,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -121,7 +121,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "<=",
                                                 ),
                                             }),
@@ -148,7 +148,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -167,7 +167,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -182,7 +182,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "=",
                                                 ),
                                             }),
@@ -209,7 +209,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -228,7 +228,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -243,7 +243,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     ">=",
                                                 ),
                                             }),
@@ -270,7 +270,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -289,7 +289,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -304,7 +304,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     ">",
                                                 ),
                                             }),
@@ -331,7 +331,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -350,7 +350,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -362,10 +362,60 @@ Ok(
                                             }),
                                         }),
                                     ]),
+                                    "objfuncargs": Array([
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        246,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "sval": String(
+                                                                    "int4",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_DEFAULT",
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        252,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "sval": String(
+                                                                    "int2",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_DEFAULT",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "btint42cmp",
                                                 ),
                                             }),
@@ -392,7 +442,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -411,7 +461,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -426,7 +476,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "<",
                                                 ),
                                             }),
@@ -453,7 +503,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -472,7 +522,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -487,7 +537,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "<=",
                                                 ),
                                             }),
@@ -514,7 +564,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -533,7 +583,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -548,7 +598,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "=",
                                                 ),
                                             }),
@@ -575,7 +625,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -594,7 +644,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -609,7 +659,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     ">=",
                                                 ),
                                             }),
@@ -636,7 +686,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -655,7 +705,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -670,7 +720,7 @@ Ok(
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     ">",
                                                 ),
                                             }),
@@ -697,7 +747,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int2",
                                                             ),
                                                         }),
@@ -716,7 +766,7 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "int4",
                                                             ),
                                                         }),
@@ -728,10 +778,60 @@ Ok(
                                             }),
                                         }),
                                     ]),
+                                    "objfuncargs": Array([
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        455,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "sval": String(
+                                                                    "int2",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_DEFAULT",
+                                                ),
+                                            }),
+                                        }),
+                                        Object({
+                                            "FunctionParameter": Object({
+                                                "argType": Object({
+                                                    "location": Number(
+                                                        461,
+                                                    ),
+                                                    "names": Array([
+                                                        Object({
+                                                            "String": Object({
+                                                                "sval": String(
+                                                                    "int4",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    ]),
+                                                    "typemod": Number(
+                                                        -1,
+                                                    ),
+                                                }),
+                                                "mode": String(
+                                                    "FUNC_PARAM_DEFAULT",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
                                     "objname": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "btint24cmp",
                                                 ),
                                             }),
@@ -747,7 +847,7 @@ Ok(
                     "opfamilyname": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "integer_ops",
                                 ),
                             }),

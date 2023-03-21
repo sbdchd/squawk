@@ -32,7 +32,7 @@ Ok(
                                                             "fields": Array([
                                                                 Object({
                                                                     "String": Object({
-                                                                        "str": String(
+                                                                        "sval": String(
                                                                             "value",
                                                                         ),
                                                                     }),
@@ -49,7 +49,7 @@ Ok(
                                                     "name": Array([
                                                         Object({
                                                             "String": Object({
-                                                                "str": String(
+                                                                "sval": String(
                                                                     "~",
                                                                 ),
                                                             }),
@@ -60,12 +60,10 @@ Ok(
                                                             "location": Number(
                                                                 56,
                                                             ),
-                                                            "val": Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "^\\d{5}$",
-                                                                    ),
-                                                                }),
+                                                            "sval": Object({
+                                                                "sval": String(
+                                                                    "^\\d{5}$",
+                                                                ),
                                                             }),
                                                         }),
                                                     }),
@@ -81,7 +79,7 @@ Ok(
                                                             "fields": Array([
                                                                 Object({
                                                                     "String": Object({
-                                                                        "str": String(
+                                                                        "sval": String(
                                                                             "value",
                                                                         ),
                                                                     }),
@@ -98,7 +96,7 @@ Ok(
                                                     "name": Array([
                                                         Object({
                                                             "String": Object({
-                                                                "str": String(
+                                                                "sval": String(
                                                                     "~",
                                                                 ),
                                                             }),
@@ -109,12 +107,10 @@ Ok(
                                                             "location": Number(
                                                                 77,
                                                             ),
-                                                            "val": Object({
-                                                                "String": Object({
-                                                                    "str": String(
-                                                                        "^\\d{5}-\\d{4}$",
-                                                                    ),
-                                                                }),
+                                                            "sval": Object({
+                                                                "sval": String(
+                                                                    "^\\d{5}-\\d{4}$",
+                                                                ),
                                                             }),
                                                         }),
                                                     }),
@@ -135,7 +131,7 @@ Ok(
                     "domainname": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "us_postal_code",
                                 ),
                             }),
@@ -148,7 +144,7 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "text",
                                     ),
                                 }),

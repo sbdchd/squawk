@@ -10,7 +10,7 @@ Ok(
                     "typeName": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "happiness",
                                 ),
                             }),
@@ -19,21 +19,21 @@ Ok(
                     "vals": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "happy",
                                 ),
                             }),
                         }),
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "very happy",
                                 ),
                             }),
                         }),
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "ecstatic",
                                 ),
                             }),

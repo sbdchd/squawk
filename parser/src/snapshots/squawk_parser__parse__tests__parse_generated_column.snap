@@ -22,12 +22,12 @@ Ok(
                                                 names: [
                                                     QualifiedName {
                                                         string: PGString {
-                                                            str: "pg_catalog",
+                                                            sval: "pg_catalog",
                                                         },
                                                     },
                                                     QualifiedName {
                                                         string: PGString {
-                                                            str: "bool",
+                                                            sval: "bool",
                                                         },
                                                     },
                                                 ],
@@ -55,7 +55,7 @@ Ok(
                                                                             "fields": Array([
                                                                                 Object({
                                                                                     "String": Object({
-                                                                                        "str": String(
+                                                                                        "sval": String(
                                                                                             "p",
                                                                                         ),
                                                                                     }),
@@ -115,7 +115,7 @@ Ok(
                         alias: None,
                         location: 13,
                     },
-                    relkind: Table,
+                    objtype: Table,
                     missing_ok: false,
                 },
             ),

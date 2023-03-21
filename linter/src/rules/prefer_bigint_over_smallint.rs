@@ -31,7 +31,7 @@ lazy_static! {
 
 fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
     if let Some(column_name) = column_def.type_name.names.last() {
-        if SMALL_INT_TYPES.contains(column_name.string.str.as_str()) {
+        if SMALL_INT_TYPES.contains(column_name.string.sval.as_str()) {
             errs.push(RuleViolation::new(
                 RuleViolationKind::PreferBigintOverSmallint,
                 raw_stmt.into(),

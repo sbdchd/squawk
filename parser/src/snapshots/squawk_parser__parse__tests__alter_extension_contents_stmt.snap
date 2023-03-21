@@ -12,7 +12,7 @@ Ok(
                     ),
                     "object": Object({
                         "String": Object({
-                            "str": String(
+                            "sval": String(
                                 "hstore",
                             ),
                         }),

@@ -46,7 +46,7 @@ Ok(
                                     "fields": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "account_age",
                                                 ),
                                             }),
@@ -63,7 +63,7 @@ Ok(
                             "name": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             ">",
                                         ),
                                     }),
@@ -71,16 +71,14 @@ Ok(
                             ]),
                             "rexpr": Object({
                                 "A_Const": Object({
+                                    "ival": Object({
+                                        "ival": Number(
+                                            10,
+                                        ),
+                                    }),
                                     "location": Number(
                                         68,
                                     ),
-                                    "val": Object({
-                                        "Integer": Object({
-                                            "ival": Number(
-                                                10,
-                                            ),
-                                        }),
-                                    }),
                                 }),
                             }),
                         }),

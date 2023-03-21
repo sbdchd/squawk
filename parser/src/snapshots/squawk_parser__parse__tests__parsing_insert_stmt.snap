@@ -38,44 +38,38 @@ Ok(
                                         "items": Array([
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            1,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         31,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                1,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            2,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         34,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                2,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                             Object({
                                                 "A_Const": Object({
+                                                    "ival": Object({
+                                                        "ival": Number(
+                                                            3,
+                                                        ),
+                                                    }),
                                                     "location": Number(
                                                         37,
                                                     ),
-                                                    "val": Object({
-                                                        "Integer": Object({
-                                                            "ival": Number(
-                                                                3,
-                                                            ),
-                                                        }),
-                                                    }),
                                                 }),
                                             }),
                                         ]),

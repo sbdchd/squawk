@@ -38,7 +38,7 @@ Ok(
                                                                         "fields": Array([
                                                                             Object({
                                                                                 "String": Object({
-                                                                                    "str": String(
+                                                                                    "sval": String(
                                                                                         "p",
                                                                                     ),
                                                                                 }),
@@ -83,14 +83,14 @@ Ok(
                                                 "names": Array([
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "pg_catalog",
                                                             ),
                                                         }),
                                                     }),
                                                     Object({
                                                         "String": Object({
-                                                            "str": String(
+                                                            "sval": String(
                                                                 "bool",
                                                             ),
                                                         }),
@@ -108,6 +108,9 @@ Ok(
                                 }),
                             }),
                         ]),
+                        "objtype": String(
+                            "OBJECT_TABLE",
+                        ),
                         "relation": Object({
                             "inh": Bool(
                                 true,
@@ -122,9 +125,6 @@ Ok(
                                 "p",
                             ),
                         }),
-                        "relkind": String(
-                            "OBJECT_TABLE",
-                        ),
                     }),
                 }),
                 "stmt_len": Number(
@@ -133,7 +133,7 @@ Ok(
             }),
         ]),
         "version": Number(
-            130003,
+            150001,
         ),
     }),
 )

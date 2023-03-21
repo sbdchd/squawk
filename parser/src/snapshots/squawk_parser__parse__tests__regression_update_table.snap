@@ -15,49 +15,12 @@ Ok(
                                     "column_name",
                                 ),
                                 def: Some(
-                                    TypeCast(
+                                    Constant(
                                         Object({
-                                            "arg": Object({
-                                                "A_Const": Object({
-                                                    "location": Number(
-                                                        73,
-                                                    ),
-                                                    "val": Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "f",
-                                                            ),
-                                                        }),
-                                                    }),
-                                                }),
-                                            }),
+                                            "boolval": Object({}),
                                             "location": Number(
-                                                -1,
+                                                73,
                                             ),
-                                            "typeName": Object({
-                                                "location": Number(
-                                                    -1,
-                                                ),
-                                                "names": Array([
-                                                    Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "pg_catalog",
-                                                            ),
-                                                        }),
-                                                    }),
-                                                    Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "bool",
-                                                            ),
-                                                        }),
-                                                    }),
-                                                ]),
-                                                "typemod": Number(
-                                                    -1,
-                                                ),
-                                            }),
                                         }),
                                     ),
                                 ),
@@ -75,7 +38,7 @@ Ok(
                         alias: None,
                         location: 21,
                     },
-                    relkind: Table,
+                    objtype: Table,
                     missing_ok: false,
                 },
             ),

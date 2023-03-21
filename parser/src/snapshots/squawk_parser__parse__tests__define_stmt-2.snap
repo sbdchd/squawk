@@ -18,7 +18,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "box",
                                                     ),
                                                 }),
@@ -50,7 +50,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "box",
                                                     ),
                                                 }),
@@ -82,7 +82,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "area_equal_procedure",
                                                     ),
                                                 }),
@@ -111,7 +111,7 @@ Ok(
                                         "items": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "===",
                                                     ),
                                                 }),
@@ -137,7 +137,7 @@ Ok(
                                         "items": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "!==",
                                                     ),
                                                 }),
@@ -166,7 +166,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "area_restriction_procedure",
                                                     ),
                                                 }),
@@ -198,7 +198,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "area_join_procedure",
                                                     ),
                                                 }),
@@ -250,7 +250,7 @@ Ok(
                     "defnames": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "===",
                                 ),
                             }),

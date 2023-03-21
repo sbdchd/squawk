@@ -10,7 +10,7 @@ Ok(
                     "plhandler": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "plpgsql_call_handler",
                                 ),
                             }),
@@ -25,7 +25,7 @@ Ok(
                     "plvalidator": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "plpgsql_validator",
                                 ),
                             }),

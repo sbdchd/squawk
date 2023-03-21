@@ -36,14 +36,14 @@ Ok(
                             "items": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "index_method",
                                         ),
                                     }),
                                 }),
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "name",
                                         ),
                                     }),
@@ -72,14 +72,14 @@ Ok(
                             "items": Array([
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "index_method",
                                         ),
                                     }),
                                 }),
                                 Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "name",
                                         ),
                                     }),

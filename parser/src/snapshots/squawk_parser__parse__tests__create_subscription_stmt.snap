@@ -13,14 +13,14 @@ Ok(
                     "publication": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "mypublication",
                                 ),
                             }),
                         }),
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "insert_only",
                                 ),
                             }),

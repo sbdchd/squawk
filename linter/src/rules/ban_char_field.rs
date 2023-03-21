@@ -19,7 +19,7 @@ pub fn ban_char_type(
                     if let TableElt::ColumnDef(column_def) = column_def {
                         let type_name = &column_def.type_name;
                         for field_type_name in &type_name.names {
-                            if field_type_name.string.str == "bpchar" {
+                            if field_type_name.string.sval == "bpchar" {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::BanCharField,
                                     raw_stmt.into(),

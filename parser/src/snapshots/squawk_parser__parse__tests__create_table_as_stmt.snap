@@ -26,6 +26,9 @@ Ok(
                             ),
                         }),
                     }),
+                    "objtype": String(
+                        "OBJECT_TABLE",
+                    ),
                     "query": Object({
                         "SelectStmt": Object({
                             "fromClause": Array([
@@ -75,9 +78,6 @@ Ok(
                             ]),
                         }),
                     }),
-                    "relkind": String(
-                        "OBJECT_TABLE",
-                    ),
                 }),
             ),
             stmt_location: 0,

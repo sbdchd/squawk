@@ -14,18 +14,6 @@
         overlay = (final: prev:
           let
             inherit (prev) lib;
-
-            # The query parser produces a slightly different AST between major versions
-            # and Squawk is not capable of handling >=14 correctly yet.
-            libpg_query13 = final.libpg_query.overrideAttrs (_: rec {
-              version = "13-2.1.0";
-              src = final.fetchFromGitHub {
-                owner = "pganalyze";
-                repo = "libpg_query";
-                rev = version;
-                hash = "sha256-DpvPmBvpx5pWDlx6T3Kp82ALi6FjOO549Exd8tWXDIk=";
-              };
-            });
           in
           {
             squawk = final.rustPlatform.buildRustPackage {
@@ -51,7 +39,7 @@
                 Security
               ]);
 
-              LIBPG_QUERY_PATH = libpg_query13;
+              LIBPG_QUERY_PATH = final.libpg_query;
 
               meta = with lib; {
                 description = "Linter for PostgreSQL, focused on migrations";

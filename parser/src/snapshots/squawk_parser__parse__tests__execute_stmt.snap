@@ -13,16 +13,14 @@ Ok(
                     "params": Array([
                         Object({
                             "A_Const": Object({
+                                "ival": Object({
+                                    "ival": Number(
+                                        1,
+                                    ),
+                                }),
                                 "location": Number(
                                     17,
                                 ),
-                                "val": Object({
-                                    "Integer": Object({
-                                        "ival": Number(
-                                            1,
-                                        ),
-                                    }),
-                                }),
                             }),
                         }),
                         Object({
@@ -30,12 +28,10 @@ Ok(
                                 "location": Number(
                                     20,
                                 ),
-                                "val": Object({
-                                    "String": Object({
-                                        "str": String(
-                                            "Hunter Valley",
-                                        ),
-                                    }),
+                                "sval": Object({
+                                    "sval": String(
+                                        "Hunter Valley",
+                                    ),
                                 }),
                             }),
                         }),
@@ -44,27 +40,23 @@ Ok(
                                 "location": Number(
                                     37,
                                 ),
-                                "val": Object({
-                                    "String": Object({
-                                        "str": String(
-                                            "t",
-                                        ),
-                                    }),
+                                "sval": Object({
+                                    "sval": String(
+                                        "t",
+                                    ),
                                 }),
                             }),
                         }),
                         Object({
                             "A_Const": Object({
+                                "fval": Object({
+                                    "fval": String(
+                                        "200.00",
+                                    ),
+                                }),
                                 "location": Number(
                                     42,
                                 ),
-                                "val": Object({
-                                    "Float": Object({
-                                        "str": String(
-                                            "200.00",
-                                        ),
-                                    }),
-                                }),
                             }),
                         }),
                     ]),

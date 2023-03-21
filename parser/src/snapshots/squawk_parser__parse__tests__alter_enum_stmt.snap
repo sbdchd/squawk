@@ -19,7 +19,7 @@ Ok(
                     "typeName": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "colors",
                                 ),
                             }),

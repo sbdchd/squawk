@@ -38,7 +38,7 @@ Ok(
                     }),
                     "object": Object({
                         "String": Object({
-                            "str": String(
+                            "sval": String(
                                 "name",
                             ),
                         }),
@@ -64,7 +64,7 @@ Ok(
                             "DefElem": Object({
                                 "arg": Object({
                                     "String": Object({
-                                        "str": String(
+                                        "sval": String(
                                             "new_tablespace",
                                         ),
                                     }),

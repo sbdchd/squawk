@@ -17,7 +17,7 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "internal",
                                                 ),
                                             }),
@@ -29,10 +29,36 @@ Ok(
                                 }),
                             }),
                         ]),
+                        "objfuncargs": Array([
+                            Object({
+                                "FunctionParameter": Object({
+                                    "argType": Object({
+                                        "location": Number(
+                                            96,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "sval": String(
+                                                        "internal",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
+                                    }),
+                                    "mode": String(
+                                        "FUNC_PARAM_DEFAULT",
+                                    ),
+                                }),
+                            }),
+                        ]),
                         "objname": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "hstore_to_plpython",
                                     ),
                                 }),
@@ -52,7 +78,7 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "internal",
                                                 ),
                                             }),
@@ -64,10 +90,36 @@ Ok(
                                 }),
                             }),
                         ]),
+                        "objfuncargs": Array([
+                            Object({
+                                "FunctionParameter": Object({
+                                    "argType": Object({
+                                        "location": Number(
+                                            151,
+                                        ),
+                                        "names": Array([
+                                            Object({
+                                                "String": Object({
+                                                    "sval": String(
+                                                        "internal",
+                                                    ),
+                                                }),
+                                            }),
+                                        ]),
+                                        "typemod": Number(
+                                            -1,
+                                        ),
+                                    }),
+                                    "mode": String(
+                                        "FUNC_PARAM_DEFAULT",
+                                    ),
+                                }),
+                            }),
+                        ]),
                         "objname": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "plpython_to_hstore",
                                     ),
                                 }),
@@ -81,7 +133,7 @@ Ok(
                         "names": Array([
                             Object({
                                 "String": Object({
-                                    "str": String(
+                                    "sval": String(
                                         "hstore",
                                     ),
                                 }),

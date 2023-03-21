@@ -50,7 +50,7 @@ Ok(
                                         "items": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "myschema",
                                                     ),
                                                 }),

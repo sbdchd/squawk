@@ -1,7 +1,6 @@
 ---
 source: parser/src/parse.rs
 expression: res
-
 ---
 Ok(
     [
@@ -29,7 +28,7 @@ Ok(
                                     alias: None,
                                     location: 28,
                                 },
-                                options: 6,
+                                options: 12,
                             },
                         ),
                     ],

@@ -8,12 +8,12 @@ Ok(
             stmt: AlterSubscriptionStmt(
                 Object({
                     "kind": String(
-                        "ALTER_SUBSCRIPTION_PUBLICATION",
+                        "ALTER_SUBSCRIPTION_SET_PUBLICATION",
                     ),
                     "publication": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "insert_only",
                                 ),
                             }),
@@ -39,9 +39,9 @@ Ok(
                         Object({
                             "DefElem": Object({
                                 "arg": Object({
-                                    "Integer": Object({
-                                        "ival": Number(
-                                            0,
+                                    "Boolean": Object({
+                                        "boolval": Bool(
+                                            false,
                                         ),
                                     }),
                                 }),

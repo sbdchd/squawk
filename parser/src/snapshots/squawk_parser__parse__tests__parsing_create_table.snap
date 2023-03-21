@@ -37,7 +37,7 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "serial",
+                                                sval: "serial",
                                             },
                                         },
                                     ],
@@ -92,12 +92,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "timestamptz",
+                                                sval: "timestamptz",
                                             },
                                         },
                                     ],
@@ -138,12 +138,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "timestamptz",
+                                                sval: "timestamptz",
                                             },
                                         },
                                     ],
@@ -184,12 +184,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "varchar",
+                                                sval: "varchar",
                                             },
                                         },
                                     ],
@@ -199,16 +199,14 @@ Ok(
                                     typmods: [
                                         Object({
                                             "A_Const": Object({
+                                                "ival": Object({
+                                                    "ival": Number(
+                                                        255,
+                                                    ),
+                                                }),
                                                 "location": Number(
                                                     189,
                                                 ),
-                                                "val": Object({
-                                                    "Integer": Object({
-                                                        "ival": Number(
-                                                            255,
-                                                        ),
-                                                    }),
-                                                }),
                                             }),
                                         }),
                                     ],
@@ -259,7 +257,7 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "text",
+                                                sval: "text",
                                             },
                                         },
                                     ],
@@ -300,7 +298,7 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "jsonb",
+                                                sval: "jsonb",
                                             },
                                         },
                                     ],
@@ -341,12 +339,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "varchar",
+                                                sval: "varchar",
                                             },
                                         },
                                     ],
@@ -356,16 +354,14 @@ Ok(
                                     typmods: [
                                         Object({
                                             "A_Const": Object({
+                                                "ival": Object({
+                                                    "ival": Number(
+                                                        255,
+                                                    ),
+                                                }),
                                                 "location": Number(
                                                     291,
                                                 ),
-                                                "val": Object({
-                                                    "Integer": Object({
-                                                        "ival": Number(
-                                                            255,
-                                                        ),
-                                                    }),
-                                                }),
                                             }),
                                         }),
                                     ],
@@ -402,12 +398,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "int4",
+                                                sval: "int4",
                                             },
                                         },
                                     ],
@@ -448,12 +444,12 @@ Ok(
                                     names: [
                                         QualifiedName {
                                             string: PGString {
-                                                str: "pg_catalog",
+                                                sval: "pg_catalog",
                                             },
                                         },
                                         QualifiedName {
                                             string: PGString {
-                                                str: "int4",
+                                                sval: "int4",
                                             },
                                         },
                                     ],

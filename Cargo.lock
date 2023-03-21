@@ -780,9 +780,9 @@ dependencies = [
 
 [[package]]
 name = "libpg_query-sys"
-version = "0.2.1"
+version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c47418958c9f43ec0260f3da70c28b43ca78c804e4f9c08e3c78788cd5c109dc"
+checksum = "93cf760aa87806ddcd0941236bde171c96e929358161c845e720a8f2d1857246"
 dependencies = [
  "bindgen",
  "make-cmd",

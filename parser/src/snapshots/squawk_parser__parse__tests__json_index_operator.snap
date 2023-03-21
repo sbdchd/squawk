@@ -26,7 +26,7 @@ Ok(
                                                     "fields": Array([
                                                         Object({
                                                             "String": Object({
-                                                                "str": String(
+                                                                "sval": String(
                                                                     "foo",
                                                                 ),
                                                             }),
@@ -43,7 +43,7 @@ Ok(
                                             "name": Array([
                                                 Object({
                                                     "String": Object({
-                                                        "str": String(
+                                                        "sval": String(
                                                             "->>",
                                                         ),
                                                     }),
@@ -54,12 +54,10 @@ Ok(
                                                     "location": Number(
                                                         72,
                                                     ),
-                                                    "val": Object({
-                                                        "String": Object({
-                                                            "str": String(
-                                                                "bar",
-                                                            ),
-                                                        }),
+                                                    "sval": Object({
+                                                        "sval": String(
+                                                            "bar",
+                                                        ),
                                                     }),
                                                 }),
                                             }),

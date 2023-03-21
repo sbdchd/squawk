@@ -26,14 +26,14 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "pg_catalog",
                                                 ),
                                             }),
                                         }),
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "float8",
                                                 ),
                                             }),
@@ -63,14 +63,14 @@ Ok(
                                     "names": Array([
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "pg_catalog",
                                                 ),
                                             }),
                                         }),
                                         Object({
                                             "String": Object({
-                                                "str": String(
+                                                "sval": String(
                                                     "float8",
                                                 ),
                                             }),

@@ -38,7 +38,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "my_box_in_function",
                                                     ),
                                                 }),
@@ -70,7 +70,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "my_box_out_function",
                                                     ),
                                                 }),
@@ -102,7 +102,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "float4",
                                                     ),
                                                 }),
@@ -128,7 +128,7 @@ Ok(
                     "defnames": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "box",
                                 ),
                             }),

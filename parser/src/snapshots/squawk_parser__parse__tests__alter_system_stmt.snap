@@ -14,12 +14,10 @@ Ok(
                                     "location": Number(
                                         30,
                                     ),
-                                    "val": Object({
-                                        "String": Object({
-                                            "str": String(
-                                                "hot_standby",
-                                            ),
-                                        }),
+                                    "sval": Object({
+                                        "sval": String(
+                                            "hot_standby",
+                                        ),
                                     }),
                                 }),
                             }),

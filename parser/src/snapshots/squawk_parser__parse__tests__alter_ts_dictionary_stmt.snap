@@ -10,7 +10,7 @@ Ok(
                     "dictname": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "my_dict",
                                 ),
                             }),
@@ -27,7 +27,7 @@ Ok(
                                         "names": Array([
                                             Object({
                                                 "String": Object({
-                                                    "str": String(
+                                                    "sval": String(
                                                         "newrussian",
                                                     ),
                                                 }),

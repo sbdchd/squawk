@@ -10,7 +10,7 @@ Ok(
                     "cfgname": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "astro_en",
                                 ),
                             }),
@@ -22,7 +22,7 @@ Ok(
                                 "items": Array([
                                     Object({
                                         "String": Object({
-                                            "str": String(
+                                            "sval": String(
                                                 "astrosyn",
                                             ),
                                         }),
@@ -35,7 +35,7 @@ Ok(
                                 "items": Array([
                                     Object({
                                         "String": Object({
-                                            "str": String(
+                                            "sval": String(
                                                 "english_ispell",
                                             ),
                                         }),
@@ -48,7 +48,7 @@ Ok(
                                 "items": Array([
                                     Object({
                                         "String": Object({
-                                            "str": String(
+                                            "sval": String(
                                                 "english_stem",
                                             ),
                                         }),
@@ -63,7 +63,7 @@ Ok(
                     "tokentype": Array([
                         Object({
                             "String": Object({
-                                "str": String(
+                                "sval": String(
                                     "asciiword",
                                 ),
                             }),

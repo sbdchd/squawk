@@ -414,7 +414,7 @@ pub enum AlterTableCmds {
 pub struct AlterTableStmt {
     pub cmds: Vec<AlterTableCmds>,
     pub relation: RangeVar,
-    pub relkind: ObjectType,
+    pub objtype: ObjectType,
     #[serde(default)]
     pub missing_ok: bool,
 }
@@ -579,7 +579,7 @@ pub enum ColumnDefConstraint {
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
 pub struct PGString {
-    pub str: String,
+    pub sval: String,
 }
 
 #[derive(Debug, PartialEq, Eq, Deserialize, Serialize)]
