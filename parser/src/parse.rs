@@ -107,7 +107,7 @@ mod tests {
     #[test]
     fn test_error_paths() {
         let sql = r#"lsakdjf;asdlfkjasd;lfj"#;
-        let res = parse_sql_query(sql);
+        let res = parse_sql_query(sql).unwrap_err();
         assert_debug_snapshot!(res);
     }
 
@@ -208,7 +208,10 @@ ALTER TABLE "legacy_questiongrouppg"
         let sql = r#"DELETE FROM "table_name";"#;
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
+    }
 
+    #[test]
+    fn test_parse_delete_stmt_2() {
         let sql = r#"DELETE FROM "table_name" WHERE account_age > 10;"#;
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
@@ -220,6 +223,13 @@ ALTER TABLE "legacy_questiongrouppg"
         let res = parse_sql_query(sql).unwrap();
         assert_debug_snapshot!(res);
 
+        let sql = r#"SELECT * from "table_name" UNION ALL SELECT * from "table_foo";"#;
+        let res = parse_sql_query(sql).unwrap();
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
+    fn test_parse_set_operations_stmt_2() {
         let sql = r#"SELECT * from "table_name" UNION ALL SELECT * from "table_foo";"#;
         let res = parse_sql_query(sql).unwrap();
         assert_debug_snapshot!(res);
@@ -493,7 +503,7 @@ $$;
 
 CALL insert_data(1, 2);
 "#;
-        let res = parse_sql_query(sql);
+        let res = parse_sql_query(sql).unwrap_err();
         assert_debug_snapshot!(res);
     }
 
