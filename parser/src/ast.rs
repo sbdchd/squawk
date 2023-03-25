@@ -907,6 +907,7 @@ pub enum Stmt {
     CreateEventTrigStmt(Value),
     AlterEventTrigStmt(Value),
     CreateFunctionStmt(Value),
+    CallStmt(Value),
     AlterFunctionStmt(Value),
     CreatePLangStmt(Value),
     CreateRoleStmt(Value),

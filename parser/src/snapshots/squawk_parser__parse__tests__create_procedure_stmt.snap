@@ -2,6 +2,198 @@
 source: parser/src/parse.rs
 expression: res
 ---
-JsonParse(
-    "unknown variant `CallStmt`, expected one of `TransactionStmt`, `SelectStmt`, `IndexStmt`, `AlterTableStmt`, `RenameStmt`, `CreateStmt`, `InsertStmt`, `UpdateStmt`, `DeleteStmt`, `CreateSchemaStmt`, `AlterDomainStmt`, `GrantStmt`, `GrantRoleStmt`, `AlterDefaultPrivilegesStmt`, `CopyStmt`, `VariableSetStmt`, `VariableShowStmt`, `CreateTableSpaceStmt`, `DropTableSpaceStmt`, `CreateExtensionStmt`, `AlterExtensionStmt`, `DropStmt`, `AlterObjectSchemaStmt`, `AlterExtensionContentsStmt`, `CreateFdwStmt`, `AlterFdwStmt`, `CreateForeignServerStmt`, `AlterForeignServerStmt`, `CreateForeignTableStmt`, `CreateUserMappingStmt`, `AlterUserMappingStmt`, `DropUserMappingStmt`, `ImportForeignSchemaStmt`, `CreatePolicyStmt`, `AlterPolicyStmt`, `CreateAmStmt`, `CreateTrigStmt`, `CreateEventTrigStmt`, `AlterEventTrigStmt`, `CreateFunctionStmt`, `AlterFunctionStmt`, `CreatePLangStmt`, `CreateRoleStmt`, `AlterRoleStmt`, `AlterRoleSetStmt`, `DropRoleStmt`, `CreateSeqStmt`, `AlterSeqStmt`, `DefineStmt`, `CreateDomainStmt`, `CreateOpClassStmt`, `CreateOpFamilyStmt`, `AlterOpFamilyStmt`, `TruncateStmt`, `CommentStmt`, `SecLabelStmt`, `DeclareCursorStmt`, `ClosePortalStmt`, `FetchStmt`, `CreateStatsStmt`, `ExplainStmt`, `AlterOwnerStmt`, `DoStmt`, `AlterObjectDependsStmt`, `AlterOperatorStmt`, `RuleStmt`, `NotifyStmt`, `ListenStmt`, `UnlistenStmt`, `CompositeTypeStmt`, `CreateEnumStmt`, `CreateRangeStmt`, `AlterEnumStmt`, `ViewStmt`, `LoadStmt`, `CreatedbStmt`, `AlterDatabaseStmt`, `AlterDatabaseSetStmt`, `DropdbStmt`, `AlterSystemStmt`, `ClusterStmt`, `VacuumStmt`, `CreateTableAsStmt`, `RefreshMatViewStmt`, `CheckPointStmt`, `DiscardStmt`, `LockStmt`, `ConstraintsSetStmt`, `ReindexStmt`, `CreateConversionStmt`, `CreateCastStmt`, `CreateTransformStmt`, `PrepareStmt`, `ExecuteStmt`, `DeallocateStmt`, `DropOwnedStmt`, `ReassignOwnedStmt`, `AlterTSDictionaryStmt`, `AlterTSConfigurationStmt`, `CreatePublicationStmt`, `AlterPublicationStmt`, `CreateSubscriptionStmt`, `AlterSubscriptionStmt`, `DropSubscriptionStmt` at line 1 column 825",
-)
+[
+    RawStmt {
+        stmt: CreateFunctionStmt(
+            Object({
+                "funcname": Array([
+                    Object({
+                        "String": Object({
+                            "sval": String(
+                                "insert_data",
+                            ),
+                        }),
+                    }),
+                ]),
+                "is_procedure": Bool(
+                    true,
+                ),
+                "options": Array([
+                    Object({
+                        "DefElem": Object({
+                            "arg": Object({
+                                "String": Object({
+                                    "sval": String(
+                                        "sql",
+                                    ),
+                                }),
+                            }),
+                            "defaction": String(
+                                "DEFELEM_UNSPEC",
+                            ),
+                            "defname": String(
+                                "language",
+                            ),
+                            "location": Number(
+                                52,
+                            ),
+                        }),
+                    }),
+                    Object({
+                        "DefElem": Object({
+                            "arg": Object({
+                                "List": Object({
+                                    "items": Array([
+                                        Object({
+                                            "String": Object({
+                                                "sval": String(
+                                                    "\nINSERT INTO tbl VALUES (a);\nINSERT INTO tbl VALUES (b);\n",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                }),
+                            }),
+                            "defaction": String(
+                                "DEFELEM_UNSPEC",
+                            ),
+                            "defname": String(
+                                "as",
+                            ),
+                            "location": Number(
+                                65,
+                            ),
+                        }),
+                    }),
+                ]),
+                "parameters": Array([
+                    Object({
+                        "FunctionParameter": Object({
+                            "argType": Object({
+                                "location": Number(
+                                    32,
+                                ),
+                                "names": Array([
+                                    Object({
+                                        "String": Object({
+                                            "sval": String(
+                                                "pg_catalog",
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "String": Object({
+                                            "sval": String(
+                                                "int4",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "typemod": Number(
+                                    -1,
+                                ),
+                            }),
+                            "mode": String(
+                                "FUNC_PARAM_DEFAULT",
+                            ),
+                            "name": String(
+                                "a",
+                            ),
+                        }),
+                    }),
+                    Object({
+                        "FunctionParameter": Object({
+                            "argType": Object({
+                                "location": Number(
+                                    43,
+                                ),
+                                "names": Array([
+                                    Object({
+                                        "String": Object({
+                                            "sval": String(
+                                                "pg_catalog",
+                                            ),
+                                        }),
+                                    }),
+                                    Object({
+                                        "String": Object({
+                                            "sval": String(
+                                                "int4",
+                                            ),
+                                        }),
+                                    }),
+                                ]),
+                                "typemod": Number(
+                                    -1,
+                                ),
+                            }),
+                            "mode": String(
+                                "FUNC_PARAM_DEFAULT",
+                            ),
+                            "name": String(
+                                "b",
+                            ),
+                        }),
+                    }),
+                ]),
+            }),
+        ),
+        stmt_location: 0,
+        stmt_len: Some(
+            129,
+        ),
+    },
+    RawStmt {
+        stmt: CallStmt(
+            Object({
+                "funccall": Object({
+                    "args": Array([
+                        Object({
+                            "A_Const": Object({
+                                "ival": Object({
+                                    "ival": Number(
+                                        1,
+                                    ),
+                                }),
+                                "location": Number(
+                                    149,
+                                ),
+                            }),
+                        }),
+                        Object({
+                            "A_Const": Object({
+                                "ival": Object({
+                                    "ival": Number(
+                                        2,
+                                    ),
+                                }),
+                                "location": Number(
+                                    152,
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "funcformat": String(
+                        "COERCE_EXPLICIT_CALL",
+                    ),
+                    "funcname": Array([
+                        Object({
+                            "String": Object({
+                                "sval": String(
+                                    "insert_data",
+                                ),
+                            }),
+                        }),
+                    ]),
+                    "location": Number(
+                        137,
+                    ),
+                }),
+            }),
+        ),
+        stmt_location: 130,
+        stmt_len: Some(
+            24,
+        ),
+    },
+]

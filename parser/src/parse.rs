@@ -503,7 +503,7 @@ $$;
 
 CALL insert_data(1, 2);
 "#;
-        let res = parse_sql_query(sql).unwrap_err();
+        let res = parse_sql_query(sql).unwrap();
         assert_debug_snapshot!(res);
     }
 
