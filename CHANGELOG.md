@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fix regression in parsing union queries. (#293)
+- Fix regression in parsing union queries. Fix parsing call statement. (#293)
 
 ## v0.21.0 - 2023-02-14
 
