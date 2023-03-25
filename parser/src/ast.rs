@@ -161,9 +161,9 @@ pub struct SelectStmt {
     #[serde(default)]
     pub all: bool,
     /// left child
-    pub larg: Option<Box<SelectChild>>,
+    pub larg: Option<Box<SelectStmt>>,
     /// right child
-    pub rarg: Option<Box<SelectChild>>,
+    pub rarg: Option<Box<SelectStmt>>,
 }
 
 /// Sort ordering options for ORDER BY and CREATE INDEX
