@@ -7,9 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.22.0 - 2023-03-25
+
+### Added
+
+- added `ban-drop-table` rule. Thanks @borisrozumnuk! (#286)
+- added `not-null-constraint` rule. Thanks @andrewsmith! (#288)
+
 ### Fixed
 
-- Fix regression in parsing union queries. Fix parsing call statement. (#293)
+- Fixed building Squawk on platforms where `c_char` is unsigned. Thanks @ods! (#285)
+- Fixed Squawk compatiblity with Nix. Thanks @andrewsmith! (#287)
+- Fixed regression in parsing union queries. Fixed parsing call statement. (#293)
+
+### Changed
+
+- Upgrade libpg_query from 13 to 15. Thanks @andrewsmith! (#291)
 
 ## v0.21.0 - 2023-02-14
 
