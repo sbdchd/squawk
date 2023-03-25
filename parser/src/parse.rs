@@ -217,11 +217,11 @@ ALTER TABLE "legacy_questiongrouppg"
     #[test]
     fn test_parse_set_operations_stmt() {
         let sql = r#"SELECT * from "table_name" UNION SELECT * from "table_foo";"#;
-        let res = parse_sql_query(sql);
+        let res = parse_sql_query(sql).unwrap();
         assert_debug_snapshot!(res);
 
         let sql = r#"SELECT * from "table_name" UNION ALL SELECT * from "table_foo";"#;
-        let res = parse_sql_query(sql);
+        let res = parse_sql_query(sql).unwrap();
         assert_debug_snapshot!(res);
     }
 
