@@ -2,10 +2,8 @@
 source: parser/src/parse.rs
 expression: res
 ---
-Err(
-    PgParseError(
-        Some(
-            "syntax error at or near \"lsakdjf\"",
-        ),
+PgParseError(
+    Some(
+        "syntax error at or near \"lsakdjf\"",
     ),
 )

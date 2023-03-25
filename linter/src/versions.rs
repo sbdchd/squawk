@@ -136,6 +136,6 @@ mod test_pg_version {
             Version::from_str("10.2.1"),
             Ok(Version::new(10, Some(2), Some(1)))
         );
-        assert_debug_snapshot!(Version::from_str("test"));
+        assert_debug_snapshot!(Version::from_str("test").unwrap_err());
     }
 }
