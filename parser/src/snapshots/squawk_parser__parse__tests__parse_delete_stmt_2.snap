@@ -1,0 +1,79 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt {
+            stmt: DeleteStmt(
+                Object({
+                    "relation": Object({
+                        "inh": Bool(
+                            true,
+                        ),
+                        "location": Number(
+                            12,
+                        ),
+                        "relname": String(
+                            "table_name",
+                        ),
+                        "relpersistence": String(
+                            "p",
+                        ),
+                    }),
+                    "whereClause": Object({
+                        "A_Expr": Object({
+                            "kind": String(
+                                "AEXPR_OP",
+                            ),
+                            "lexpr": Object({
+                                "ColumnRef": Object({
+                                    "fields": Array([
+                                        Object({
+                                            "String": Object({
+                                                "sval": String(
+                                                    "account_age",
+                                                ),
+                                            }),
+                                        }),
+                                    ]),
+                                    "location": Number(
+                                        31,
+                                    ),
+                                }),
+                            }),
+                            "location": Number(
+                                43,
+                            ),
+                            "name": Array([
+                                Object({
+                                    "String": Object({
+                                        "sval": String(
+                                            ">",
+                                        ),
+                                    }),
+                                }),
+                            ]),
+                            "rexpr": Object({
+                                "A_Const": Object({
+                                    "ival": Object({
+                                        "ival": Number(
+                                            10,
+                                        ),
+                                    }),
+                                    "location": Number(
+                                        45,
+                                    ),
+                                }),
+                            }),
+                        }),
+                    }),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                47,
+            ),
+        },
+    ],
+)
