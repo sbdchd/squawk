@@ -26,11 +26,6 @@ jobs:
 
       - name: Install latest rust toolchain
         uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.67.0
-          target: x86_64-unknown-linux-gnu
-          default: true
-          override: true
 
       - name: Build
         run: RUSTFLAGS='-C target-feature=+crt-static' cargo build --target x86_64-unknown-linux-gnu --all --release && ls target && mv target/x86_64-unknown-linux-gnu/release/squawk target/release/squawk-linux-x86_64
@@ -65,11 +60,6 @@ jobs:
 
       - name: Install latest rust toolchain
         uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.67.0
-          target: x86_64-apple-darwin
-          default: true
-          override: true
 
       - name: Build for mac
         run: cargo build --all --release && mv target/release/squawk target/release/squawk-darwin-x86_64
@@ -115,10 +105,6 @@ jobs:
 
       - name: Install latest rust toolchain
         uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.67.0
-          default: true
-          override: true
 
       - name: Install Rust Fmt
         run: rustup component add rustfmt
@@ -144,10 +130,6 @@ jobs:
 
       - name: Install latest rust toolchain
         uses: actions-rs/toolchain@v1
-        with:
-          toolchain: 1.67.0
-          default: true
-          override: true
 
       - name: Test
         run: ./s/test
