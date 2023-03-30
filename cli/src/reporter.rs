@@ -68,7 +68,7 @@ impl std::convert::From<serde_json::error::Error> for DumpAstError {
 pub fn dump_ast_for_paths<W: io::Write>(
     f: &mut W,
     paths: &[String],
-    is_stdin: bool,
+    read_stdin: bool,
     dump_ast: &DumpAstOption,
 ) -> Result<(), DumpAstError> {
     let mut process_dump_ast = |sql: &str| -> Result<(), DumpAstError> {
@@ -90,7 +90,7 @@ pub fn dump_ast_for_paths<W: io::Write>(
         }
         Ok(())
     };
-    if is_stdin {
+    if read_stdin {
         let sql = get_sql_from_stdin()?;
         process_dump_ast(&sql)?;
         return Ok(());
@@ -161,7 +161,7 @@ fn process_violations(
 
 pub fn check_files(
     paths: &[String],
-    is_stdin: bool,
+    read_stdin: bool,
     stdin_path: Option<String>,
     excluded_rules: &[RuleViolationKind],
     pg_version: Option<Version>,
@@ -169,7 +169,7 @@ pub fn check_files(
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
     let mut output_violations = vec![];
 
-    if is_stdin {
+    if read_stdin {
         info!("reading content from stdin");
         let sql = get_sql_from_stdin()?;
         // ignore stdin if it's empty.

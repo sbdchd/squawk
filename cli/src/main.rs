@@ -155,15 +155,16 @@ fn main() {
             "Upload to GitHub failed",
         );
     } else if !opts.paths.is_empty() || is_stdin {
+        let read_stdin = opts.paths.is_empty() && is_stdin;
         if let Some(dump_ast_kind) = opts.dump_ast {
             exit(
-                dump_ast_for_paths(&mut handle, &opts.paths, is_stdin, &dump_ast_kind),
+                dump_ast_for_paths(&mut handle, &opts.paths, read_stdin, &dump_ast_kind),
                 "Failed to dump AST",
             );
         } else {
             match check_files(
                 &opts.paths,
-                is_stdin,
+                read_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
                 pg_version,
