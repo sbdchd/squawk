@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Only read from stdin when file paths are not provided.
+- Only read from stdin when file paths are not provided. (#295)
 
 ## v0.22.0 - 2023-03-25
 
