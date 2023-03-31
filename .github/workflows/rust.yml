@@ -24,10 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install rust toolchain
+      - name: Install Toolchain
         uses: oxidecomputer/actions-rs_toolchain@oxide/master
 
-      - name: cache rust
+      - name: Cache
         uses: Swatinem/rust-cache@v2
 
       - name: Build
@@ -61,10 +61,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install rust toolchain
+      - name: Install Toolchain
         uses: oxidecomputer/actions-rs_toolchain@oxide/master
 
-      - name: cache rust
+      - name: Cache
         uses: Swatinem/rust-cache@v2
 
       - name: Build for mac
@@ -109,10 +109,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install rust toolchain
+      - name: Install Toolchain
         uses: oxidecomputer/actions-rs_toolchain@oxide/master
 
-      - name: cache rust
+      - name: Cache
         uses: Swatinem/rust-cache@v2
 
       - name: Install Rust Fmt
@@ -137,10 +137,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Install rust toolchain
+      - name: Install Toolchain
         uses: oxidecomputer/actions-rs_toolchain@oxide/master
 
-      - name: cache rust
+      - name: Cache
         uses: Swatinem/rust-cache@v2
 
       - name: Test
