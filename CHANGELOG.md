@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.23.0 - 2023-03-30
+
 ### Changed
 
 - Only read from stdin when file paths are not provided. (#295)
