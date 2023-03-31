@@ -1,0 +1,8 @@
+#!/bin/sh
+set -ex
+
+main() {
+  pin-github-action  --allow='actions/*' ./github/workflows/*
+}
+
+main "$@" 
