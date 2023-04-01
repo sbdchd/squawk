@@ -1,6 +1,6 @@
 {
   "name": "squawk-cli",
-  "version": "0.22.0",
+  "version": "0.23.0",
   "description": "linter for PostgreSQL, focused on migrations",
   "repository": "git@github.com:sbdchd/squawk.git",
   "author": "Steve Dignam <steve@dignam.xyz>",
@@ -30,5 +30,8 @@
   },
   "dependencies": {
     "node-fetch": "^2.6.0"
+  },
+  "volta": {
+    "node": "18.15.0"
   }
 }
