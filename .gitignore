@@ -6,3 +6,4 @@
 
 # IntelliJ IDE users
 .idea
+node_modules/
