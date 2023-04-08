@@ -2,4 +2,22 @@
 source: linter/src/rules/adding_not_null_field.rs
 expression: "lint_sql(bad_sql, None)"
 ---
-[]
+[
+    RuleViolation {
+        kind: AddingNotNullableField,
+        span: Span {
+            start: 7,
+            len: Some(
+                104,
+            ),
+        },
+        messages: [
+            Note(
+                "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+            ),
+            Help(
+                "Make the field nullable.",
+            ),
+        ],
+    },
+]
