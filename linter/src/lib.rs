@@ -8,6 +8,7 @@ pub mod violations;
 extern crate lazy_static;
 
 use crate::errors::CheckSqlError;
+use crate::rules::adding_required_field;
 use crate::rules::ban_drop_not_null;
 use crate::rules::prefer_big_int;
 use crate::rules::prefer_identity;
@@ -68,6 +69,18 @@ lazy_static! {
                 "Adding a NOT NULL field requires exclusive locks and table rewrites.".into(),
             ),
             ViolationMessage::Help("Make the field nullable.".into())
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::AddingRequiredField,
+        func: adding_required_field,
+        messages: vec![
+            ViolationMessage::Note(
+                "Adding a NOT NULL field without a DEFAULT will fail for a populated table.".into()
+            ),
+            ViolationMessage::Help(
+                "Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).".into()
+            ),
         ],
     },
     SquawkRule {
