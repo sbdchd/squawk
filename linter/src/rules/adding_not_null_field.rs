@@ -2,23 +2,7 @@ use crate::versions::Version;
 use crate::violations::{RuleViolation, RuleViolationKind};
 use crate::ViolationMessage;
 
-use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
-};
-
-fn has_not_null_and_default_constraint(constraints: &[ColumnDefConstraint]) -> bool {
-    let mut has_not_null = false;
-    let mut has_default = false;
-    for ColumnDefConstraint::Constraint(constraint) in constraints {
-        if constraint.contype == ConstrType::NotNull {
-            has_not_null = true;
-        }
-        if constraint.contype == ConstrType::Default {
-            has_default = true;
-        }
-    }
-    has_not_null && has_default
-}
+use squawk_parser::ast::{AlterTableCmds, AlterTableType, RawStmt, Stmt};
 
 #[must_use]
 pub fn adding_not_nullable_field(
@@ -47,17 +31,6 @@ pub fn adding_not_nullable_field(
                                 ViolationMessage::Help("Use a check constraint instead.".into())
                             ]),
                         ));
-                    }
-                    if cmd.subtype == AlterTableType::AddColumn {
-                        if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
-                            if has_not_null_and_default_constraint(&column_def.constraints) {
-                                errs.push(RuleViolation::new(
-                                    RuleViolationKind::AddingNotNullableField,
-                                    raw_stmt.into(),
-                                    None,
-                                ));
-                            }
-                        }
                     }
                 }
             }
@@ -99,22 +72,21 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
 
     #[test]
     fn test_adding_field_that_is_not_nullable() {
-        let bad_sql = r#"
+        let ok_sql = r#"
 BEGIN;
---
--- Add field foo to recipe
---
+-- This will cause a table rewrite for Postgres versions before 11, but that is handled by
+-- adding-field-with-default.
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
-        assert_debug_snapshot!(lint_sql(bad_sql, None));
+        assert_debug_snapshot!(lint_sql(ok_sql, None));
     }
 
     #[test]
     fn test_adding_field_that_is_not_nullable_without_default() {
         let ok_sql = r#"
--- This won't work if the table is populated, but that error is caught by adding_required_field.
+-- This won't work if the table is populated, but that error is caught by adding-required-field.
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
         assert_debug_snapshot!(lint_sql(ok_sql, None));
