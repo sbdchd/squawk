@@ -651,7 +651,7 @@ mod test_reporter {
     };
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
-        check_sql_with_rule(sql, &RuleViolationKind::AddingNotNullableField, None, false).unwrap()
+        check_sql_with_rule(sql, &RuleViolationKind::AddingRequiredField, None, false).unwrap()
     }
 
     #[test]
@@ -675,8 +675,8 @@ SELECT 1;
         assert!(res.is_ok());
 
         assert_display_snapshot!(String::from_utf8_lossy(&buff), @r###"
-        main.sql:1:0: warning: adding-not-nullable-field Adding a NOT NULL field requires exclusive locks and table rewrites. Make the field nullable.
-        main.sql:3:1: warning: adding-not-nullable-field Adding a NOT NULL field requires exclusive locks and table rewrites. Make the field nullable.
+        main.sql:1:0: warning: adding-required-field Adding a NOT NULL field without a DEFAULT will fail for a populated table. Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).
+        main.sql:3:1: warning: adding-required-field Adding a NOT NULL field without a DEFAULT will fail for a populated table. Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).
         "###);
     }
 
@@ -734,8 +734,9 @@ SELECT 1;
         );
 
         assert!(res.is_ok());
-        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r###"[{"file":"main.sql","line":1,"column":0,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field requires exclusive locks and table rewrites."},{"Help":"Make the field nullable."}],"rule_name":"adding-not-nullable-field"},{"file":"main.sql","line":3,"column":1,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field requires exclusive locks and table rewrites."},{"Help":"Make the field nullable."}],"rule_name":"adding-not-nullable-field"}]
-"###);
+        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r###"
+        [{"file":"main.sql","line":1,"column":0,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field without a DEFAULT will fail for a populated table."},{"Help":"Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+)."}],"rule_name":"adding-required-field"},{"file":"main.sql","line":3,"column":1,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field without a DEFAULT will fail for a populated table."},{"Help":"Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+)."}],"rule_name":"adding-required-field"}]
+        "###);
     }
 
     #[test]
@@ -762,7 +763,7 @@ SELECT 1;
         assert_debug_snapshot!(violations, @r###"
         [
             RuleViolation {
-                kind: AddingNotNullableField,
+                kind: AddingRequiredField,
                 span: Span {
                     start: 0,
                     len: Some(
@@ -771,10 +772,10 @@ SELECT 1;
                 },
                 messages: [
                     Note(
-                        "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                        "Adding a NOT NULL field without a DEFAULT will fail for a populated table.",
                     ),
                     Help(
-                        "Make the field nullable.",
+                        "Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).",
                     ),
                 ],
             },
@@ -794,13 +795,13 @@ SELECT 1;
                     level: Warning,
                     messages: [
                         Note(
-                            "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                            "Adding a NOT NULL field without a DEFAULT will fail for a populated table.",
                         ),
                         Help(
-                            "Make the field nullable.",
+                            "Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).",
                         ),
                     ],
-                    rule_name: AddingNotNullableField,
+                    rule_name: AddingRequiredField,
                     sql: "ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;",
                 },
             ],
