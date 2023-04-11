@@ -26,4 +26,5 @@ expression: rule_names
     "renaming-table",
     "require-concurrent-index-creation",
     "require-concurrent-index-deletion",
+    "transaction-nesting",
 ]

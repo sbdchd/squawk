@@ -10,6 +10,7 @@ module.exports = {
       "ban-char-field",
       "ban-drop-database",
       "ban-drop-not-null",
+      "ban-drop-table",
       "changing-column-type",
       "constraint-missing-not-valid",
       "disallowed-unique-constraint",
@@ -24,7 +25,7 @@ module.exports = {
       "renaming-table",
       "require-concurrent-index-creation",
       "require-concurrent-index-deletion",
-      "ban-drop-table",
+      "transaction-nesting",
       // generator::new-rule-above
     ],
   },

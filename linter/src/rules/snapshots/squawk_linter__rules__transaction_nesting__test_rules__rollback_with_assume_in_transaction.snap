@@ -1,0 +1,23 @@
+---
+source: linter/src/rules/transaction_nesting.rs
+expression: lint_sql_assuming_in_transaction(bad_sql)
+---
+[
+    RuleViolation {
+        kind: TransactionNesting,
+        span: Span {
+            start: 10,
+            len: Some(
+                90,
+            ),
+        },
+        messages: [
+            Note(
+                "Attempting to end the transaction that is managed by your migration tool.",
+            ),
+            Help(
+                "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
+            ),
+        ],
+    },
+]
