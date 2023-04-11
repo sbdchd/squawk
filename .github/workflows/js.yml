@@ -1,6 +1,10 @@
 name: Javascript
 
-on: push
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   pre_job:
