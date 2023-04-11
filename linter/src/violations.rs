@@ -55,6 +55,8 @@ pub enum RuleViolationKind {
     BanDropTable,
     #[serde(rename = "ban-drop-not-null")]
     BanDropNotNull,
+    #[serde(rename = "transaction-nesting")]
+    TransactionNesting,
     // generator::new-rule-above
 }
 

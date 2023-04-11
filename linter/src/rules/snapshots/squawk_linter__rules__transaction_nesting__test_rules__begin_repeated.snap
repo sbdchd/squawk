@@ -1,0 +1,23 @@
+---
+source: linter/src/rules/transaction_nesting.rs
+expression: lint_sql(bad_sql)
+---
+[
+    RuleViolation {
+        kind: TransactionNesting,
+        span: Span {
+            start: 7,
+            len: Some(
+                6,
+            ),
+        },
+        messages: [
+            Note(
+                "There is an existing transaction already in progress.",
+            ),
+            Help(
+                "COMMIT the previous transaction before issuing a BEGIN or START TRANSACTION statement.",
+            ),
+        ],
+    },
+]

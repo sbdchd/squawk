@@ -1,0 +1,23 @@
+---
+source: linter/src/rules/transaction_nesting.rs
+expression: lint_sql_assuming_in_transaction(bad_sql)
+---
+[
+    RuleViolation {
+        kind: TransactionNesting,
+        span: Span {
+            start: 0,
+            len: Some(
+                6,
+            ),
+        },
+        messages: [
+            Note(
+                "There is an existing transaction already in progress, managed by your migration tool.",
+            ),
+            Help(
+                "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
+            ),
+        ],
+    },
+]
