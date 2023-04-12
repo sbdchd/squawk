@@ -57,6 +57,8 @@ pub enum RuleViolationKind {
     BanDropNotNull,
     #[serde(rename = "transaction-nesting")]
     TransactionNesting,
+    #[serde(rename = "adding-required-field")]
+    AddingRequiredField,
     // generator::new-rule-above
 }
 

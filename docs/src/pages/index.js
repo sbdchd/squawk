@@ -68,6 +68,11 @@ const rules = [
       "Prevent blocking reads/writes to table while table is scanned on PG < 11.",
   },
   {
+    name: "adding-required-field",
+    tags: ["backwards compatibility"],
+    description: "Prevent adding a new required field to an existing table.",
+  },
+  {
     name: "adding-serial-primary-key-field",
     tags: ["locking"],
     description: "Prevent blocking reads/writes to table while index is built.",

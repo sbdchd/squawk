@@ -13,13 +13,13 @@ ViolationContent {
             level: Warning,
             messages: [
                 Note(
-                    "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                    "Adding a NOT NULL field without a DEFAULT will fail for a populated table.",
                 ),
                 Help(
-                    "Make the field nullable.",
+                    "Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).",
                 ),
             ],
-            rule_name: AddingNotNullableField,
+            rule_name: AddingRequiredField,
             sql: "   ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;",
         },
         ReportViolation {
@@ -29,13 +29,13 @@ ViolationContent {
             level: Warning,
             messages: [
                 Note(
-                    "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                    "Adding a NOT NULL field without a DEFAULT will fail for a populated table.",
                 ),
                 Help(
-                    "Make the field nullable.",
+                    "Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).",
                 ),
             ],
-            rule_name: AddingNotNullableField,
+            rule_name: AddingRequiredField,
             sql: "ALTER TABLE \"core_foo\" ADD COLUMN \"bar\" integer NOT NULL;",
         },
     ],

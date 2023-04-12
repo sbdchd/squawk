@@ -2,20 +2,20 @@
 source: cli/src/reporter.rs
 expression: "strip_ansi_codes(&String::from_utf8_lossy(&buff))"
 ---
-main.sql:1:0: warning: adding-not-nullable-field
+main.sql:1:0: warning: adding-required-field
 
    1 |  
    2 |    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 
-  note: Adding a NOT NULL field requires exclusive locks and table rewrites.
-  help: Make the field nullable.
+  note: Adding a NOT NULL field without a DEFAULT will fail for a populated table.
+  help: Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).
 
-main.sql:3:1: warning: adding-not-nullable-field
+main.sql:3:1: warning: adding-required-field
 
    3 | ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
 
-  note: Adding a NOT NULL field requires exclusive locks and table rewrites.
-  help: Make the field nullable.
+  note: Adding a NOT NULL field without a DEFAULT will fail for a populated table.
+  help: Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).
 
 find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
 
