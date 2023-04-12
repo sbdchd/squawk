@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.24.0 - 2023-04-11
+
+### Added
+
+- added `transaction-nesting` rule. Thanks @andrewsmith! (#303)
+- added `adding-required-field` rule from `adding-not-nullable-field`. Thanks @andrewsmith! (#301)
+
+### Changed
+
+- functionality in `adding-not-nullable-field` for adding non-nullable fields was moved into `adding-required-field`. Thanks @andrewsmith! (#301)
+
 ## v0.23.0 - 2023-03-30
 
 ### Changed
