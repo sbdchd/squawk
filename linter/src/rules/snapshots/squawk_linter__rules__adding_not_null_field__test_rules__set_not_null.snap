@@ -1,6 +1,6 @@
 ---
 source: linter/src/rules/adding_not_null_field.rs
-expression: "lint_sql(bad_sql, None)"
+expression: "lint_sql(sql, None)"
 ---
 [
     RuleViolation {
@@ -8,15 +8,15 @@ expression: "lint_sql(bad_sql, None)"
         span: Span {
             start: 0,
             len: Some(
-                124,
+                58,
             ),
         },
         messages: [
             Note(
-                "Adding a NOT NULL field requires exclusive locks and table rewrites.",
+                "Setting a column NOT NULL blocks reads while the table is scanned.",
             ),
             Help(
-                "Make the field nullable.",
+                "Use a check constraint instead.",
             ),
         ],
     },

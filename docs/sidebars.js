@@ -6,6 +6,7 @@ module.exports = {
       "adding-field-with-default",
       "adding-foreign-key-constraint",
       "adding-not-nullable-field",
+      "adding-required-field",
       "adding-serial-primary-key-field",
       "ban-char-field",
       "ban-drop-database",
