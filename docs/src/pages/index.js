@@ -173,6 +173,11 @@ const rules = [
     description:
       "Prevent blocking reads/writes to table while index is dropped.",
   },
+  {
+    name: "transaction-nesting",
+    tags: ["locking"],
+    description: "Ensure migrations use transactions correctly.",
+  },
   // generator::new-rule-above
 ]
 

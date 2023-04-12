@@ -26,6 +26,7 @@ module.exports = {
       "renaming-table",
       "require-concurrent-index-creation",
       "require-concurrent-index-deletion",
+      "transaction-nesting",
       // generator::new-rule-above
     ],
   },
