@@ -19,7 +19,7 @@ This will fail immediately upon running for any populated table. Furthermore, ol
 
 ### allow null values initially
 
-Make new columns optional by omitting the `NOT NULL` constraint until all existing data and application code has been updated to set appropriate values for the column. Then set it to `NOT NULL`, following the guidance in the [adding-not-nullable-field](./adding-not-nullable-field) docs.
+Make new columns optional by omitting the `NOT NULL` constraint until all existing data and application code has been updated to set appropriate values for the column. Then set it to `NOT NULL`, following the guidance in the [adding-not-nullable-field](./adding-not-nullable-field.md) docs.
 
 For example:
 
@@ -29,7 +29,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean;
 
 ### set a non-volatile default
 
-If using Postgres version 11 or later, add a `DEFAULT` value that is not volatile, as described in [adding-field-with-default](./adding-field-with-default). This allows the column to keep its `NOT NULL` constraint.
+If using Postgres version 11 or later, add a `DEFAULT` value that is not volatile, as described in [adding-field-with-default](./adding-field-with-default.md). This allows the column to keep its `NOT NULL` constraint.
 
 For example:
 
