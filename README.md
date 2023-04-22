@@ -222,6 +222,14 @@ $ nix develop
 [nix-shell]$ ./s/fmt
 ```
 
+### adding a new rule
+
+When adding a new rule, the `s/new-rule` script will create stubs for your rule in Rust and in Documentation site.
+
+```bash
+s/new-rule 'prefer big serial'
+```
+
 ### releasing a new version
 
 1. update the CHANGELOG.md and bump version in the cli `Cargo.toml`, ensure the
