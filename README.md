@@ -188,6 +188,7 @@ Note the `files` parameter as it specifies the location of the files to be linte
 - <https://github.com/tbicr/django-pg-zero-downtime-migrations>
 - <https://github.com/3YOURMIND/django-migration-linter>
 - <https://github.com/ankane/strong_migrations>
+- <https://github.com/AdmTal/PostgreSQL-Query-Lock-Explainer>
 
 ## related blog posts / SE Posts / PG Docs
 
