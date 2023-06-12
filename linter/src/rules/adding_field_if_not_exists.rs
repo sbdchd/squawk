@@ -49,7 +49,7 @@ mod test_rules {
             pg_version,
             false,
         )
-            .unwrap()
+        .unwrap()
     }
 
     #[test]
