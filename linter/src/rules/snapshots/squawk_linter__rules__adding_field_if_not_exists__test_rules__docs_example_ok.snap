@@ -1,0 +1,5 @@
+---
+source: linter/src/rules/adding_field_if_not_exists.rs
+expression: "lint_sql(ok_sql, None)"
+---
+[]

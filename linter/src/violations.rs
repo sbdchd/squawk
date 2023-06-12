@@ -14,6 +14,8 @@ pub enum RuleViolationKind {
     ConstraintMissingNotValid,
     #[serde(rename = "adding-field-with-default")]
     AddingFieldWithDefault,
+    #[serde(rename = "adding-field-if-not-exists")]
+    AddingFieldIfNotExists,
     #[serde(rename = "adding-foreign-key-constraint")]
     AddingForeignKeyConstraint,
     #[serde(rename = "changing-column-type")]

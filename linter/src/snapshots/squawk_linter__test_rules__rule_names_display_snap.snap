@@ -2,6 +2,7 @@
 source: linter/src/lib.rs
 expression: "rule_names.join(\"\\n\")"
 ---
+adding-field-if-not-exists
 adding-field-with-default
 adding-foreign-key-constraint
 adding-not-nullable-field
