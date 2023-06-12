@@ -8,7 +8,7 @@ expression: "lint_sql(bad_sql, None)"
         span: Span {
             start: 0,
             len: Some(
-                76,
+                62,
             ),
         },
         messages: [
