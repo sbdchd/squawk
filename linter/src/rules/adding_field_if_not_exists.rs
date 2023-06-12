@@ -53,16 +53,15 @@ mod test_rules {
     }
 
     #[test]
-    fn test_docs_example_bad() {
+    fn test_example_bad() {
         let bad_sql = r#"
--- instead of
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 "#;
         assert_debug_snapshot!(lint_sql(bad_sql, None));
     }
 
     #[test]
-    fn test_docs_example_ok() {
+    fn test_example_ok() {
         let ok_sql = r#"
 ALTER TABLE "core_recipe" ADD COLUMN IF NOT EXISTS "foo" integer;
         "#;
