@@ -29,7 +29,7 @@ Ok(
                                                             "a",
                                                         ),
                                                         "location": Number(
-                                                            55,
+                                                            41,
                                                         ),
                                                         "raw_expr": Object({
                                                             "NullTest": Object({
@@ -45,12 +45,12 @@ Ok(
                                                                             }),
                                                                         ]),
                                                                         "location": Number(
-                                                                            76,
+                                                                            62,
                                                                         ),
                                                                     }),
                                                                 }),
                                                                 "location": Number(
-                                                                    78,
+                                                                    64,
                                                                 ),
                                                                 "nulltesttype": String(
                                                                     "IS_NOT_NULL",
@@ -65,7 +65,7 @@ Ok(
                                                             "CONSTR_NOTNULL",
                                                         ),
                                                         "location": Number(
-                                                            98,
+                                                            84,
                                                         ),
                                                     }),
                                                 }),
@@ -74,11 +74,11 @@ Ok(
                                                 true,
                                             ),
                                             "location": Number(
-                                                45,
+                                                31,
                                             ),
                                             "typeName": Object({
                                                 "location": Number(
-                                                    47,
+                                                    33,
                                                 ),
                                                 "names": Array([
                                                     Object({
@@ -102,9 +102,6 @@ Ok(
                                             }),
                                         }),
                                     }),
-                                    "missing_ok": Bool(
-                                        true,
-                                    ),
                                     "subtype": String(
                                         "AT_AddColumn",
                                     ),
@@ -131,7 +128,7 @@ Ok(
                     }),
                 }),
                 "stmt_len": Number(
-                    106,
+                    92,
                 ),
             }),
         ]),
