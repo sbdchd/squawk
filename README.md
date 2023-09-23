@@ -1,4 +1,4 @@
-# squawk [![npm](https://img.shields.io/npm/v/squawk-cli)](https://www.npmjs.com/package/squawk-cli) ![Rust CI](https://github.com/sbdchd/squawk/workflows/Rust%20CI/badge.svg)
+# squawk [![npm](https://img.shields.io/npm/v/squawk-cli)](https://www.npmjs.com/package/squawk-cli)
 
 > linter for Postgres migrations
 
