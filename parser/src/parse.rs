@@ -250,6 +250,13 @@ ALTER TABLE "legacy_questiongrouppg"
     }
 
     #[test]
+    fn test_parse_alter_table_set_list() {
+        let sql = "ALTER TABLE table_name SET (autovacuum_vacuum_scale_factor = 0.0);";
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
     fn test_parse_alter_collation_stmt() {
         let sql = "ALTER COLLATION name RENAME TO new_name;";
         let res = parse_sql_query(sql);

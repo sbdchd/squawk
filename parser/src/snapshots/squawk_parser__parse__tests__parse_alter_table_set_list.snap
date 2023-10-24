@@ -1,0 +1,67 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt {
+            stmt: AlterTableStmt(
+                AlterTableStmt {
+                    cmds: [
+                        AlterTableCmd(
+                            AlterTableCmd {
+                                subtype: SetRelOptions,
+                                name: None,
+                                def: Some(
+                                    List(
+                                        Object({
+                                            "items": Array([
+                                                Object({
+                                                    "DefElem": Object({
+                                                        "arg": Object({
+                                                            "Float": Object({
+                                                                "fval": String(
+                                                                    "0.0",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                        "defaction": String(
+                                                            "DEFELEM_UNSPEC",
+                                                        ),
+                                                        "defname": String(
+                                                            "autovacuum_vacuum_scale_factor",
+                                                        ),
+                                                        "location": Number(
+                                                            28,
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                        }),
+                                    ),
+                                ),
+                                behavior: Restrict,
+                                missing_ok: false,
+                            },
+                        ),
+                    ],
+                    relation: RangeVar {
+                        catalogname: None,
+                        schemaname: None,
+                        relname: "table_name",
+                        inh: true,
+                        relpersistence: "p",
+                        alias: None,
+                        location: 12,
+                    },
+                    objtype: Table,
+                    missing_ok: false,
+                },
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                65,
+            ),
+        },
+    ],
+)
