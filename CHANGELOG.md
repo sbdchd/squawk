@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.24.1 - 2023-10-24
+
+### Fixed
+
+- support parsing `alter table set` statements (#321)
+
 ## v0.24.0 - 2023-04-11
 
 ### Added

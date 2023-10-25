@@ -663,6 +663,7 @@ pub enum AlterTableDef {
     Constant(Value),
     ReplicaIdentityStmt(Value),
     SQLValueFunction(Value),
+    List(Value),
     PartitionCmd(Value),
 }
 
