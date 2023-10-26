@@ -14,4 +14,4 @@ Squawk was unable to parse the query using the PostgreSQL parser.
 
 Usually the provided statement contains an error and isn't a valid Postgres statement.
 
-Squawk uses the [libpg_query-sys](https://github.com/tdbgamer/libpg_query-sys) Rust bindings to [libpg_query](https://github.com/pganalyze/libpg_query) 10-1.0.2 to parse Postgres queries using the Postgres parser.
+Squawk uses the [libpg_query-sys](https://github.com/tdbgamer/libpg_query-sys) Rust bindings to [libpg_query](https://github.com/pganalyze/libpg_query) to parse Postgres queries using the Postgres parser.
