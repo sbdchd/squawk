@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.24.2 - 2023-11-07
+
+### Fixed
+
+- support parsing `alter database refresh collation` statements (#324)
+
 ## v0.24.1 - 2023-10-24
 
 ### Fixed

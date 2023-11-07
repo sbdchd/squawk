@@ -1,0 +1,21 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    [
+        RawStmt {
+            stmt: AlterDatabaseRefreshCollStmt(
+                Object({
+                    "dbname": String(
+                        "pipelines",
+                    ),
+                }),
+            ),
+            stmt_location: 0,
+            stmt_len: Some(
+                51,
+            ),
+        },
+    ],
+)

@@ -945,6 +945,7 @@ pub enum Stmt {
     ViewStmt(Value),
     LoadStmt(Value),
     CreatedbStmt(Value),
+    AlterDatabaseRefreshCollStmt(Value),
     AlterDatabaseStmt(Value),
     AlterDatabaseSetStmt(Value),
     DropdbStmt(Value),

@@ -966,6 +966,15 @@ ALTER DATABASE name RESET ALL;
     }
 
     #[test]
+    fn test_alter_database_collation() {
+        let sql = r#"
+ALTER DATABASE pipelines REFRESH COLLATION VERSION;
+"#;
+        let res = parse_sql_query(sql);
+        assert_debug_snapshot!(res);
+    }
+
+    #[test]
     fn test_drop_database_stmt() {
         let sql = r#"
 DROP DATABASE name;
