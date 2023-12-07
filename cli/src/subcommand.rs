@@ -14,6 +14,7 @@ pub enum SquawkError {
     GithubPrivateKeyBase64DecodeError(base64::DecodeError),
     GithubPrivateKeyDecodeError(std::string::FromUtf8Error),
     GithubPrivateKeyMissing,
+    RulesViolatedError,
 }
 
 impl std::fmt::Display for SquawkError {
@@ -31,6 +32,7 @@ impl std::fmt::Display for SquawkError {
                 write!(f, "Could not decode GitHub private key to string: {err}")
             }
             Self::GithubPrivateKeyMissing => write!(f, "Missing GitHub private key"),
+            Self::RulesViolatedError => write!(f, "Rules were violated"),
         }
     }
 }
@@ -59,6 +61,9 @@ pub enum Command {
         /// --exclude=require-concurrent-index-creation,ban-drop-database
         #[structopt(short, long, use_delimiter = true)]
         exclude: Option<Vec<RuleViolationKind>>,
+        /// Exits with an error code when specified
+        #[structopt(long)]
+        exit_on_error: bool,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
         github_private_key: Option<String>,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
@@ -115,6 +120,7 @@ pub fn check_and_comment_on_pr(
     let Command::UploadToGithub {
         paths,
         exclude,
+        exit_on_error,
         github_private_key,
         github_token,
         github_app_id,
@@ -133,7 +139,8 @@ pub fn check_and_comment_on_pr(
         pg_version,
         assume_in_transaction,
     )?;
-    if file_results.is_empty() {
+    let is_empty = file_results.is_empty();
+    if is_empty {
         info!("no files checked, exiting");
         return Ok(());
     }
@@ -147,13 +154,13 @@ pub fn check_and_comment_on_pr(
                 get_github_private_key(github_private_key, github_private_key_base64)?;
             let gh = app::GitHub::new(&gh_private_key, github_app_id, github_install_id)?;
 
-            return Ok(comment_on_pr(
+            comment_on_pr(
                 &gh,
                 &github_repo_owner,
                 &github_repo_name,
                 github_pr_number,
                 &comment_body,
-            )?);
+            )?;
         }
     }
     if let Some(github_token) = github_token {
@@ -167,5 +174,10 @@ pub fn check_and_comment_on_pr(
             &comment_body,
         )?;
     }
+
+    if !is_empty && exit_on_error {
+        return Err(SquawkError::RulesViolatedError);
+    }
+
     Ok(())
 }
