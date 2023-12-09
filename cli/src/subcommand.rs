@@ -14,6 +14,7 @@ pub enum SquawkError {
     GithubPrivateKeyBase64DecodeError(base64::DecodeError),
     GithubPrivateKeyDecodeError(std::string::FromUtf8Error),
     GithubPrivateKeyMissing,
+    RulesViolatedError { violations: usize, files: usize },
 }
 
 impl std::fmt::Display for SquawkError {
@@ -31,6 +32,9 @@ impl std::fmt::Display for SquawkError {
                 write!(f, "Could not decode GitHub private key to string: {err}")
             }
             Self::GithubPrivateKeyMissing => write!(f, "Missing GitHub private key"),
+            Self::RulesViolatedError { violations, files } => {
+                write!(f, "Found {violations} violation(s) across {files} file(s)")
+            }
         }
     }
 }
@@ -59,6 +63,9 @@ pub enum Command {
         /// --exclude=require-concurrent-index-creation,ban-drop-database
         #[structopt(short, long, use_delimiter = true)]
         exclude: Option<Vec<RuleViolationKind>>,
+        /// Exits with an error if violations are found
+        #[structopt(long)]
+        fail_on_violations: bool,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
         github_private_key: Option<String>,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
@@ -115,6 +122,7 @@ pub fn check_and_comment_on_pr(
     let Command::UploadToGithub {
         paths,
         exclude,
+        fail_on_violations,
         github_private_key,
         github_token,
         github_app_id,
@@ -138,7 +146,7 @@ pub fn check_and_comment_on_pr(
         return Ok(());
     }
     info!("generating github comment body");
-    let comment_body = get_comment_body(file_results, VERSION);
+    let comment_body = get_comment_body(&file_results, VERSION);
 
     if let Some(github_install_id) = github_install_id {
         if let Some(github_app_id) = github_app_id {
@@ -147,16 +155,15 @@ pub fn check_and_comment_on_pr(
                 get_github_private_key(github_private_key, github_private_key_base64)?;
             let gh = app::GitHub::new(&gh_private_key, github_app_id, github_install_id)?;
 
-            return Ok(comment_on_pr(
+            comment_on_pr(
                 &gh,
                 &github_repo_owner,
                 &github_repo_name,
                 github_pr_number,
                 &comment_body,
-            )?);
+            )?;
         }
-    }
-    if let Some(github_token) = github_token {
+    } else if let Some(github_token) = github_token {
         info!("using github actions client");
         let gh = actions::GitHub::new(&github_token);
         comment_on_pr(
@@ -167,5 +174,15 @@ pub fn check_and_comment_on_pr(
             &comment_body,
         )?;
     }
+
+    let violations: usize = file_results.iter().map(|f| f.violations.len()).sum();
+
+    if fail_on_violations && violations > 0 {
+        return Err(SquawkError::RulesViolatedError {
+            violations,
+            files: file_results.len(),
+        });
+    }
+
     Ok(())
 }

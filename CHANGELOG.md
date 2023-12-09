@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.25.0 - 2023-12-09
+
+### Added
+
+- added `squawk upload-to-github --fail-on-violations` flag to exit with error if violations are found (#327). Thanks @wmartins!
+
 ## v0.24.2 - 2023-11-07
 
 ### Fixed

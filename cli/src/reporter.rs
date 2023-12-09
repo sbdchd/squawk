@@ -452,12 +452,12 @@ const fn get_violations_emoji(count: usize) -> &'static str {
     }
 }
 
-fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::Error> {
-    let sql = violation.sql;
+fn get_sql_file_content(violation: &ViolationContent) -> Result<String, std::io::Error> {
+    let sql = &violation.sql;
     let mut buff = Vec::new();
     let violation_count = violation.violations.len();
-    for v in violation.violations {
-        fmt_tty_violation(&mut buff, &v)?;
+    for v in &violation.violations {
+        fmt_tty_violation(&mut buff, v)?;
     }
     let violations_text_raw = &String::from_utf8_lossy(&buff);
     let violations_text = strip_ansi_codes(violations_text_raw);
@@ -498,7 +498,7 @@ fn get_sql_file_content(violation: ViolationContent) -> Result<String, std::io::
     ))
 }
 
-pub fn get_comment_body(files: Vec<ViolationContent>, version: &str) -> String {
+pub fn get_comment_body(files: &[ViolationContent], version: &str) -> String {
     let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
 
     let violations_emoji = get_violations_emoji(violations_count);
@@ -563,7 +563,7 @@ SELECT 1;
             }],
         }];
 
-        let body = get_comment_body(violations, "0.2.3");
+        let body = get_comment_body(&violations, "0.2.3");
 
         assert_display_snapshot!(body);
     }
@@ -598,7 +598,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
             },
         ];
 
-        let body = get_comment_body(violations, "0.2.3");
+        let body = get_comment_body(&violations, "0.2.3");
 
         assert_display_snapshot!(body);
     }
@@ -609,7 +609,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
     fn test_generating_no_violations_no_files() {
         let violations = vec![];
 
-        let body = get_comment_body(violations, "0.2.3");
+        let body = get_comment_body(&violations, "0.2.3");
 
         assert_display_snapshot!(body);
     }
