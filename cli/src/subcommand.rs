@@ -139,8 +139,7 @@ pub fn check_and_comment_on_pr(
         pg_version,
         assume_in_transaction,
     )?;
-    let is_empty = file_results.is_empty();
-    if is_empty {
+    if file_results.is_empty() {
         info!("no files checked, exiting");
         return Ok(());
     }
@@ -174,7 +173,7 @@ pub fn check_and_comment_on_pr(
         )?;
     }
 
-    if !is_empty && exit_on_error {
+    if exit_on_error {
         return Err(SquawkError::RulesViolatedError);
     }
 
