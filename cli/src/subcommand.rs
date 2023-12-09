@@ -162,8 +162,7 @@ pub fn check_and_comment_on_pr(
                 &comment_body,
             )?;
         }
-    }
-    if let Some(github_token) = github_token {
+    } else if let Some(github_token) = github_token {
         info!("using github actions client");
         let gh = actions::GitHub::new(&github_token);
         comment_on_pr(
