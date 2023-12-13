@@ -1595,7 +1595,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "squawk"
-version = "0.25.0"
+version = "0.26.0"
 dependencies = [
  "atty",
  "base64 0.12.3",

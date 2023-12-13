@@ -191,7 +191,9 @@ pub fn check_and_comment_on_pr(
         pg_version,
         assume_in_transaction,
     )?;
-    if file_results.is_empty() {
+
+    // We should only leave a comment when there are files checked.
+    if paths.is_empty() {
         info!("no files checked, exiting");
         return Ok(());
     }
