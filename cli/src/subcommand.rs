@@ -1,7 +1,7 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
 
 use log::info;
-use squawk_github::{actions, app, comment_on_pr, GithubError};
+use squawk_github::{actions, app, comment_on_pr, GitHubApi, GithubError};
 use squawk_linter::{versions::Version, violations::RuleViolationKind};
 use structopt::StructOpt;
 
@@ -14,6 +14,7 @@ pub enum SquawkError {
     GithubPrivateKeyBase64DecodeError(base64::DecodeError),
     GithubPrivateKeyDecodeError(std::string::FromUtf8Error),
     GithubPrivateKeyMissing,
+    GitHubCredentialsMissing,
     RulesViolatedError { violations: usize, files: usize },
 }
 
@@ -32,6 +33,19 @@ impl std::fmt::Display for SquawkError {
                 write!(f, "Could not decode GitHub private key to string: {err}")
             }
             Self::GithubPrivateKeyMissing => write!(f, "Missing GitHub private key"),
+            Self::GitHubCredentialsMissing => write!(
+                f,
+                "Missing GitHub credentials:
+
+For a GitHub token:
+--github-token is required
+
+For a GitHub App:
+--github-app-id is required
+--github-install-id is required
+--github-private-key or --github-private-key-base64 is required
+"
+            ),
             Self::RulesViolatedError { violations, files } => {
                 write!(f, "Found {violations} violation(s) across {files} file(s)")
             }
@@ -111,6 +125,33 @@ fn concat(a: &[RuleViolationKind], b: &[RuleViolationKind]) -> Vec<RuleViolation
     [a, b].concat()
 }
 
+fn create_gh_app(
+    github_install_id: Option<i64>,
+    github_app_id: Option<i64>,
+    github_token: Option<String>,
+    github_private_key: Option<String>,
+    github_private_key_base64: Option<String>,
+) -> Result<Box<dyn GitHubApi>, SquawkError> {
+    if let Some(github_install_id) = github_install_id {
+        if let Some(github_app_id) = github_app_id {
+            info!("using github app client");
+            let gh_private_key =
+                get_github_private_key(github_private_key, github_private_key_base64)?;
+            return Ok(Box::new(app::GitHub::new(
+                &gh_private_key,
+                github_app_id,
+                github_install_id,
+            )?));
+        }
+    }
+
+    if let Some(github_token) = github_token {
+        info!("using github actions client");
+        return Ok(Box::new(actions::GitHub::new(&github_token)));
+    };
+    Err(SquawkError::GitHubCredentialsMissing)
+}
+
 pub fn check_and_comment_on_pr(
     cmd: Command,
     is_stdin: bool,
@@ -132,6 +173,15 @@ pub fn check_and_comment_on_pr(
         github_pr_number,
         github_private_key_base64,
     } = cmd;
+
+    let github_app = create_gh_app(
+        github_install_id,
+        github_app_id,
+        github_token,
+        github_private_key,
+        github_private_key_base64,
+    )?;
+
     info!("checking files");
     let file_results = check_files(
         &paths,
@@ -148,32 +198,13 @@ pub fn check_and_comment_on_pr(
     info!("generating github comment body");
     let comment_body = get_comment_body(&file_results, VERSION);
 
-    if let Some(github_install_id) = github_install_id {
-        if let Some(github_app_id) = github_app_id {
-            info!("using github app client");
-            let gh_private_key =
-                get_github_private_key(github_private_key, github_private_key_base64)?;
-            let gh = app::GitHub::new(&gh_private_key, github_app_id, github_install_id)?;
-
-            comment_on_pr(
-                &gh,
-                &github_repo_owner,
-                &github_repo_name,
-                github_pr_number,
-                &comment_body,
-            )?;
-        }
-    } else if let Some(github_token) = github_token {
-        info!("using github actions client");
-        let gh = actions::GitHub::new(&github_token);
-        comment_on_pr(
-            &gh,
-            &github_repo_owner,
-            &github_repo_name,
-            github_pr_number,
-            &comment_body,
-        )?;
-    }
+    comment_on_pr(
+        github_app.as_ref(),
+        &github_repo_owner,
+        &github_repo_name,
+        github_pr_number,
+        &comment_body,
+    )?;
 
     let violations: usize = file_results.iter().map(|f| f.violations.len()).sum();
 
