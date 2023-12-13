@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.26.0 - 2023-12-12
+
+### Changed
+
+- `squawk upload-to-github` will always leave a pull request comment if files are evaluated. Previously if violations were resolved, stale warnings would be left in a comment. (#330)
+
 ## v0.25.0 - 2023-12-09
 
 ### Added
