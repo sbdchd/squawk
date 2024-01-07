@@ -59,6 +59,8 @@ pub enum RuleViolationKind {
     TransactionNesting,
     #[serde(rename = "adding-required-field")]
     AddingRequiredField,
+    #[serde(rename = "ban-concurrent-index-creation-in-transaction")]
+    BanConcurrentIndexCreationInTransaction,
     // generator::new-rule-above
 }
 

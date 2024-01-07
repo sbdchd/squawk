@@ -1,0 +1,23 @@
+---
+source: linter/src/rules/ban_concurrent_index_creation_in_transaction.rs
+expression: lint_sql(bad_sql)
+---
+[
+    RuleViolation {
+        kind: BanConcurrentIndexCreationInTransaction,
+        span: Span {
+            start: 25,
+            len: Some(
+                76,
+            ),
+        },
+        messages: [
+            Note(
+                "Concurrent index creation is not allowed inside a transaction.",
+            ),
+            Help(
+                "Build the index outside any transactions.",
+            ),
+        ],
+    },
+]
