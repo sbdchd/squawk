@@ -8,7 +8,7 @@ expression: lint_sql(sql)
         span: Span {
             start: 0,
             len: Some(
-                101,
+                69,
             ),
         },
         messages: [
