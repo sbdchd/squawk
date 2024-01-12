@@ -29,6 +29,23 @@ CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
 ```
 
 
+Instead of :
+
+```sql
+-- blocks reads and writes to table_name while constraint is validated.
+ALTER TABLE distributors
+    ADD COLUMN dist_id text CONSTRAINT dist_id_uniq UNIQUE (dist_id);
+```
+
+Use:
+
+```sql
+-- add nullable column separately to prevent blocking read/writes.
+ALTER TABLE distributors ADD COLUMN dist_id text;
+-- allows reads and writes while index is built
+CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
+```
+
 ## solution for alembic and sqlalchemy
 
 ```python
