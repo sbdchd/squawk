@@ -3,7 +3,7 @@ use crate::versions::Version;
 use crate::violations::{RuleViolation, RuleViolationKind};
 
 use squawk_parser::ast::{
-    AlterTableCmds, AlterTableDef, AlterTableType, ConstrType, RawStmt, Stmt,
+    AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
 
 #[must_use]
@@ -34,6 +34,20 @@ pub fn disallow_unique_constraint(
                                     raw_stmt.into(),
                                     None,
                                 ));
+                            }
+                        }
+                        (Some(AlterTableDef::ColumnDef(col)), AlterTableType::AddColumn) => {
+                            if tables_created.contains(tbl_name) {
+                                continue;
+                            }
+                            for ColumnDefConstraint::Constraint(constraint) in &col.constraints {
+                                if constraint.contype == ConstrType::Unique {
+                                    errs.push(RuleViolation::new(
+                                        RuleViolationKind::DisallowedUniqueConstraint,
+                                        raw_stmt.into(),
+                                        None,
+                                    ));
+                                }
                             }
                         }
                         _ => continue,
@@ -143,5 +157,19 @@ CREATE TABLE products (
 ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
         "#;
         assert_eq!(lint_sql_assuming_in_transaction(sql), vec![]);
+    }
+    #[test]
+    fn test_unique_constraint_inline_add_column() {
+        let sql = r#"
+ALTER TABLE foo ADD COLUMN bar text CONSTRAINT foo_bar_unique UNIQUE;
+    "#;
+        assert_debug_snapshot!(lint_sql(sql));
+    }
+    #[test]
+    fn test_unique_constraint_inline_add_column_unique() {
+        let sql = r#"
+ALTER TABLE foo ADD COLUMN bar text UNIQUE;
+"#;
+        assert_debug_snapshot!(lint_sql(sql));
     }
 }
