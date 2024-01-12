@@ -178,6 +178,11 @@ const rules = [
     tags: ["locking"],
     description: "Ensure migrations use transactions correctly.",
   },
+  {
+    name: "ban-concurrent-index-creation-in-transaction",
+    tags: ["schema"],
+    description: "Prevent forbidden use of transactions during concurrent index creation.",
+  },
   // generator::new-rule-above
 ]
 

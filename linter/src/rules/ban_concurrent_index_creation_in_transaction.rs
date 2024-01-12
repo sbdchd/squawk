@@ -1,0 +1,102 @@
+use crate::versions::Version;
+use crate::violations::{RuleViolation, RuleViolationKind};
+
+use squawk_parser::ast::{RawStmt, Stmt, TransactionStmtKind};
+
+#[must_use]
+pub fn ban_concurrent_index_creation_in_transaction(
+    tree: &[RawStmt],
+    _pg_version: Option<Version>,
+    assume_in_transaction: bool,
+) -> Vec<RuleViolation> {
+    let mut in_transaction = assume_in_transaction;
+    let mut errs = vec![];
+    for raw_stmt in tree {
+        match &raw_stmt.stmt {
+            Stmt::TransactionStmt(stmt) => {
+                if stmt.kind == TransactionStmtKind::Begin && !in_transaction {
+                    in_transaction = true;
+                }
+                if stmt.kind == TransactionStmtKind::Commit {
+                    in_transaction = false;
+                }
+            }
+            Stmt::IndexStmt(stmt) => {
+                if stmt.concurrent && in_transaction {
+                    errs.push(RuleViolation::new(
+                        RuleViolationKind::BanConcurrentIndexCreationInTransaction,
+                        raw_stmt.into(),
+                        None,
+                    ));
+                }
+            }
+            _ => continue,
+        }
+    }
+    errs
+}
+
+#[cfg(test)]
+mod test_rules {
+    use insta::assert_debug_snapshot;
+
+    use crate::{
+        check_sql_with_rule,
+        violations::{RuleViolation, RuleViolationKind},
+    };
+
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::BanConcurrentIndexCreationInTransaction,
+            None,
+            false,
+        )
+        .unwrap()
+    }
+
+    fn lint_sql_assuming_in_transaction(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::BanConcurrentIndexCreationInTransaction,
+            None,
+            true,
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn test_adding_index_concurrently_in_transaction() {
+        let bad_sql = r#"
+  -- instead of
+  BEGIN;
+  CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+  COMMIT;
+  "#;
+
+        assert_debug_snapshot!(lint_sql(bad_sql));
+
+        let ok_sql = r#"
+  -- run outside a transaction
+  CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+  "#;
+        assert_debug_snapshot!(lint_sql(ok_sql));
+    }
+
+    #[test]
+    fn test_adding_index_concurrently_in_transaction_with_assume_in_transaction() {
+        let bad_sql = r#"
+  -- instead of
+  CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+  "#;
+
+        assert_debug_snapshot!(lint_sql_assuming_in_transaction(bad_sql));
+
+        let ok_sql = r#"
+  -- run outside a transaction
+  COMMIT;
+  CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+  "#;
+        assert_debug_snapshot!(lint_sql_assuming_in_transaction(ok_sql));
+    }
+}

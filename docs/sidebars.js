@@ -27,6 +27,7 @@ module.exports = {
       "require-concurrent-index-creation",
       "require-concurrent-index-deletion",
       "transaction-nesting",
+      "ban-concurrent-index-creation-in-transaction",
       // generator::new-rule-above
     ],
   },

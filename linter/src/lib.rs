@@ -9,6 +9,7 @@ extern crate lazy_static;
 
 use crate::errors::CheckSqlError;
 use crate::rules::adding_required_field;
+use crate::rules::ban_concurrent_index_creation_in_transaction;
 use crate::rules::ban_drop_not_null;
 use crate::rules::prefer_big_int;
 use crate::rules::prefer_identity;
@@ -105,6 +106,18 @@ lazy_static! {
                 "Use text or varchar instead.".into()
             ),
         ]
+    },
+    SquawkRule {
+        name: RuleViolationKind::BanConcurrentIndexCreationInTransaction,
+        func: ban_concurrent_index_creation_in_transaction,
+        messages: vec![
+            ViolationMessage::Note(
+                "Concurrent index creation is not allowed inside a transaction.".into()
+            ),
+            ViolationMessage::Help(
+                "Build the index outside any transactions.".into()
+            ),
+        ],
     },
     SquawkRule {
         name: RuleViolationKind::BanDropColumn,

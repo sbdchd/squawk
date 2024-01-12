@@ -8,6 +8,7 @@ adding-not-nullable-field
 adding-required-field
 adding-serial-primary-key-field
 ban-char-field
+ban-concurrent-index-creation-in-transaction
 ban-drop-column
 ban-drop-database
 ban-drop-not-null
