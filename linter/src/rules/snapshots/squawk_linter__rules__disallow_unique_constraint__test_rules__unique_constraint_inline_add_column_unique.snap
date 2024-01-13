@@ -1,0 +1,23 @@
+---
+source: linter/src/rules/disallow_unique_constraint.rs
+expression: lint_sql(sql)
+---
+[
+    RuleViolation {
+        kind: DisallowedUniqueConstraint,
+        span: Span {
+            start: 0,
+            len: Some(
+                43,
+            ),
+        },
+        messages: [
+            Note(
+                "Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.",
+            ),
+            Help(
+                "Create an index CONCURRENTLY and create the constraint using the index.",
+            ),
+        ],
+    },
+]
