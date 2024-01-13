@@ -11,7 +11,8 @@ https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-CON
 
 ## solution
 
-Remove surrounding transaction markers if any, and check that the `CREATE INDEX` command is not implicitly wrapped in a transaction.
+Remove surrounding transaction markers if any.
+For migrations that are implicitly wrapped in a transaction, ensure that the `CREATE INDEX` command is the only command in the migration to allow migration tool to detect that no transaction is needed.
 
 Instead of:
 
@@ -100,6 +101,8 @@ def schema_downgrades():
 
     # <any other downgrade commands>
 ```
+
+`golang-migrate` wraps migrations in transactions but is clever enough to perform the migration if the migration file does not contain further commands next to the `CREATE INDEX` command.
 
 ## links
 

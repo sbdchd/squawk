@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.28.0 - 2024-01-12
+
+### Changed
+
+- add exceptions for `ban-concurrent-index-creation-in-transaction` to handle golang-migrate. Thanks @janrueth! (#339)
+
 ## v0.27.0 - 2024-01-11
 
 ### Added

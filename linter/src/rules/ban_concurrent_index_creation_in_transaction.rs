@@ -23,6 +23,10 @@ pub fn ban_concurrent_index_creation_in_transaction(
             }
             Stmt::IndexStmt(stmt) => {
                 if stmt.concurrent && in_transaction {
+                    if assume_in_transaction && tree.len() == 1 {
+                        // Migration tools should not require the transaction here so this is usually safe
+                        continue;
+                    }
                     errs.push(RuleViolation::new(
                         RuleViolationKind::BanConcurrentIndexCreationInTransaction,
                         raw_stmt.into(),
@@ -87,16 +91,29 @@ mod test_rules {
     fn test_adding_index_concurrently_in_transaction_with_assume_in_transaction() {
         let bad_sql = r#"
   -- instead of
-  CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+  CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+  ALTER TABLE "table_name" ADD CONSTRAINT "field_name_id" UNIQUE USING INDEX "field_name_idx";
   "#;
 
         assert_debug_snapshot!(lint_sql_assuming_in_transaction(bad_sql));
 
         let ok_sql = r#"
-  -- run outside a transaction
-  COMMIT;
-  CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+  -- run index creation in a standalone migration
+  CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   "#;
+        assert_debug_snapshot!(lint_sql_assuming_in_transaction(ok_sql));
+    }
+
+    #[test]
+    fn test_adding_index_concurrently_in_transaction_with_assume_in_transaction_but_outside() {
+        let ok_sql = r#"
+  -- the following will work too
+  COMMIT;
+  CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
+  BEGIN;
+  ALTER TABLE "table_name" ADD CONSTRAINT "field_name_id" UNIQUE USING INDEX "field_name_idx";
+  "#;
+
         assert_debug_snapshot!(lint_sql_assuming_in_transaction(ok_sql));
     }
 }
