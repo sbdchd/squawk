@@ -8,7 +8,7 @@ expression: lint_sql_assuming_in_transaction(bad_sql)
         span: Span {
             start: 0,
             len: Some(
-                92,
+                99,
             ),
         },
         messages: [
