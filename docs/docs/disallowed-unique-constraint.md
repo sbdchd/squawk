@@ -29,7 +29,7 @@ CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
 ```
 
 
-Instead of :
+Instead of:
 
 ```sql
 -- blocks reads and writes to table_name while constraint is validated.
