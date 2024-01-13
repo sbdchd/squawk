@@ -37,9 +37,6 @@ pub fn disallow_unique_constraint(
                             }
                         }
                         (Some(AlterTableDef::ColumnDef(col)), AlterTableType::AddColumn) => {
-                            if tables_created.contains(tbl_name) {
-                                continue;
-                            }
                             for ColumnDefConstraint::Constraint(constraint) in &col.constraints {
                                 if constraint.contype == ConstrType::Unique {
                                     errs.push(RuleViolation::new(
