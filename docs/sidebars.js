@@ -9,6 +9,8 @@ module.exports = {
       "adding-required-field",
       "adding-serial-primary-key-field",
       "ban-char-field",
+      "ban-concurrent-index-creation-in-transaction",
+      "ban-drop-column",
       "ban-drop-database",
       "ban-drop-not-null",
       "ban-drop-table",
@@ -27,7 +29,6 @@ module.exports = {
       "require-concurrent-index-creation",
       "require-concurrent-index-deletion",
       "transaction-nesting",
-      "ban-concurrent-index-creation-in-transaction",
       // generator::new-rule-above
     ],
   },
