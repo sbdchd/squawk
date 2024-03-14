@@ -190,6 +190,7 @@ Note the `files` parameter as it specifies the location of the files to be linte
 - <https://github.com/ankane/strong_migrations>
 - <https://github.com/AdmTal/PostgreSQL-Query-Lock-Explainer>
 - <https://github.com/stripe/pg-schema-diff>
+- <https://github.com/kristiandupont/schemalint>
 
 ## related blog posts / SE Posts / PG Docs
 
