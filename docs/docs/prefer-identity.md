@@ -29,7 +29,18 @@ create table app.users
 
 ## solution for alembic and sqlalchemy
 
-Built-in support for rendering of `IDENTITY` is not available yet, 
+As of sqlalchemy 1.4, use:
+
+```python
+# models.py
+import sqlalchemy as sa
+
+class User(BaseModel):
+    id = sa.Column(sa.Integer, sa.Identity(), primary_key=True)
+```
+
+
+For sqlalchemy 1.3 or prior built-in support for rendering of `IDENTITY` is not available yet, 
 however the following compilation hook may be used to replace occurrences of `SERIAL` with `IDENTITY`. See the [SQLAlchemy docs for more information](https://docs.sqlalchemy.org/en/13/dialects/postgresql.html#postgresql-10-identity-columns).
 
 ```python
