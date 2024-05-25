@@ -1,4 +1,4 @@
-use crate::rules::utils::tables_created_in_transaction;
+use crate::rules::utils::tables_created;
 use crate::versions::Version;
 use crate::violations::{RuleViolation, RuleViolationKind};
 
@@ -8,9 +8,9 @@ use squawk_parser::ast::{RawStmt, Stmt};
 pub fn require_concurrent_index_creation(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    assume_in_transaction: bool,
+    _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
-    let tables_created = tables_created_in_transaction(tree, assume_in_transaction);
+    let tables_created = tables_created(tree);
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -86,6 +86,19 @@ CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
     "#;
 
         assert_debug_snapshot!(lint_sql_assuming_in_transaction(sql));
+    }
+    #[test]
+    fn test_ensure_ignored_when_new_table_with_assume_in_transaction_if_table() {
+        let sql = r#"
+        create table if not exists customer
+        (
+            email text
+        );
+        
+        create unique index if not exists idx_custome_email on customer (email);
+    "#;
+
+        assert_debug_snapshot!(lint_sql(sql));
     }
 
     /// ```sql

@@ -27,6 +27,20 @@ pub fn tables_created_in_transaction(
     }
     created_table_names
 }
+pub fn tables_created(tree: &[RawStmt]) -> HashSet<String> {
+    let mut created_table_names = HashSet::new();
+    for raw_stmt in tree {
+        match &raw_stmt.stmt {
+            Stmt::CreateStmt(stmt) => {
+                let stmt = &stmt.relation;
+                let table_name = &stmt.relname;
+                created_table_names.insert(table_name.clone());
+            }
+            _ => continue,
+        }
+    }
+    created_table_names
+}
 
 pub fn columns_create_or_modified(stmt: &Stmt) -> Vec<&ColumnDef> {
     let mut columns = vec![];
