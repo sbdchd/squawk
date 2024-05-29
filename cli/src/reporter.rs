@@ -1,5 +1,6 @@
 use console::strip_ansi_codes;
 use console::style;
+use glob::Pattern;
 use log::info;
 use serde::Serialize;
 use squawk_linter::errors::CheckSqlError;
@@ -164,6 +165,7 @@ pub fn check_files(
     read_stdin: bool,
     stdin_path: Option<String>,
     excluded_rules: &[RuleViolationKind],
+    excluded_paths: &[Pattern],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
@@ -188,17 +190,35 @@ pub fn check_files(
     }
 
     for path in paths {
-        info!("checking file path: {}", path);
-        let sql = get_sql_from_path(path)?;
-        output_violations.push(process_violations(
-            &sql,
-            path,
-            excluded_rules,
-            pg_version,
-            assume_in_transaction,
-        ));
+        if has_match_in_paths(path, excluded_paths) {
+            info!("skipping exluded file path: {}", path);
+            output_violations.push(ViolationContent {
+                filename: path.into(),
+                sql: String::new(),
+                violations: vec![],
+            });
+        } else {
+            info!("checking file path: {}", path);
+            let sql = get_sql_from_path(path)?;
+            output_violations.push(process_violations(
+                &sql,
+                path,
+                excluded_rules,
+                pg_version,
+                assume_in_transaction,
+            ));
+        }
     }
     Ok(output_violations)
+}
+
+fn has_match_in_paths(path: &str, excluded_paths: &[Pattern]) -> bool {
+    for excluded in excluded_paths {
+        if excluded.matches(path) {
+            return true;
+        }
+    }
+    false
 }
 
 fn get_sql_from_stdin() -> Result<String, io::Error> {
@@ -520,7 +540,7 @@ pub fn get_comment_body(files: &[ViolationContent], version: &str) -> String {
         violation_count = violations_count,
         file_count = files.len(),
         sql_file_content = files
-            .into_iter()
+            .iter()
             .filter_map(|x| get_sql_file_content(x).ok())
             .collect::<Vec<String>>()
             .join("\n"),

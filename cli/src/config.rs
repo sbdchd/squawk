@@ -39,6 +39,8 @@ impl std::fmt::Display for ConfigError {
 #[derive(Debug, Default, Deserialize)]
 pub struct Config {
     #[serde(default)]
+    pub excluded_paths: Vec<String>,
+    #[serde(default)]
     pub excluded_rules: Vec<RuleViolationKind>,
     #[serde(default)]
     pub pg_version: Option<Version>,
@@ -98,6 +100,7 @@ mod test_config {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r#"
 pg_version = "19.1"
+excluded_paths = ["example.sql"]
 excluded_rules = ["require-concurrent-index-creation"]
 assume_in_transaction = true
         
@@ -120,6 +123,16 @@ pg_version = "19.1"
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r#"
 excluded_rules = ["require-concurrent-index-creation"]
+        
+        "#;
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+    }
+    #[test]
+    fn test_load_excluded_paths() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r#"
+excluded_paths = ["example.sql"]
         
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");

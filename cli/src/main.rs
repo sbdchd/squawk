@@ -14,6 +14,7 @@ use crate::reporter::{
 use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
 use config::Config;
+use glob::Pattern;
 use log::info;
 use simplelog::CombinedLogger;
 use squawk_linter::versions::Version;
@@ -40,6 +41,12 @@ struct Opt {
     /// Paths to search
     #[structopt(value_name = "path")]
     paths: Vec<String>,
+    /// Paths to exclude
+    ///
+    /// For example:
+    /// --exclude-paths 202401*.sql
+    #[structopt(long = "exclude-paths", use_delimiter = true)]
+    excluded_paths: Option<Vec<String>>,
     /// Exclude specific warnings
     ///
     /// For example:
@@ -117,6 +124,22 @@ fn main() {
         conf.excluded_rules
     };
 
+    // the --exclude-paths flag completely overrides the configuration file.
+    let excluded_paths = if let Some(excluded_paths) = opts.excluded_paths {
+        excluded_paths
+    } else {
+        conf.excluded_paths
+    };
+    let excluded_path_patterns = excluded_paths
+        .iter()
+        .map(|excluded_path| {
+            Pattern::new(excluded_path).unwrap_or_else(|e| {
+                eprintln!("Pattern error: {e}");
+                process::exit(1);
+            })
+        })
+        .collect::<Vec<Pattern>>();
+
     let pg_version = if let Some(pg_version) = opts.pg_version {
         Some(pg_version)
     } else {
@@ -135,6 +158,7 @@ fn main() {
 
     info!("pg version: {:?}", pg_version);
     info!("excluded rules: {:?}", &excluded_rules);
+    info!("excluded paths: {:?}", &excluded_paths);
     info!("assume in a transaction: {:?}", assume_in_transaction);
 
     let mut clap_app = Opt::clap();
@@ -149,6 +173,7 @@ fn main() {
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
+                &excluded_path_patterns,
                 pg_version,
                 assume_in_transaction,
             ),
@@ -167,6 +192,7 @@ fn main() {
                 read_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
+                &excluded_path_patterns,
                 pg_version,
                 assume_in_transaction,
             ) {

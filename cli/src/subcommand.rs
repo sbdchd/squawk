@@ -1,5 +1,6 @@
 use crate::reporter::{check_files, get_comment_body, CheckFilesError};
 
+use glob::Pattern;
 use log::info;
 use squawk_github::{actions, app, comment_on_pr, GitHubApi, GithubError};
 use squawk_linter::{versions::Version, violations::RuleViolationKind};
@@ -157,6 +158,7 @@ pub fn check_and_comment_on_pr(
     is_stdin: bool,
     stdin_path: Option<String>,
     root_cmd_exclude: &[RuleViolationKind],
+    root_cmd_exclude_paths: &[Pattern],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> Result<(), SquawkError> {
@@ -188,6 +190,7 @@ pub fn check_and_comment_on_pr(
         is_stdin,
         stdin_path,
         &concat(&exclude.unwrap_or_default(), root_cmd_exclude),
+        root_cmd_exclude_paths,
         pg_version,
         assume_in_transaction,
     )?;

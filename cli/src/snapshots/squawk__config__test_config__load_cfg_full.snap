@@ -1,10 +1,14 @@
 ---
 source: cli/src/config.rs
 expression: "Config::parse(Some(squawk_toml.path().to_path_buf()))"
+
 ---
 Ok(
     Some(
         Config {
+            excluded_paths: [
+                "example.sql",
+            ],
             excluded_rules: [
                 RequireConcurrentIndexCreation,
             ],
