@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- added `--excluded-paths` flag to ignore paths when searching for files (#350). Thanks @rdaniels6813!
+- added `--excluded-paths` flag and `excluded_paths = ["example.sql"]` configuration option to ignore paths when searching for files (#350). Thanks @rdaniels6813!
 
 ## v0.28.0 - 2024-01-12
 
