@@ -1,10 +1,12 @@
 ---
 source: cli/src/config.rs
 expression: "Config::parse(Some(squawk_toml.path().to_path_buf()))"
+
 ---
 Ok(
     Some(
         Config {
+            excluded_paths: [],
             excluded_rules: [],
             pg_version: Some(
                 Version {

@@ -21,6 +21,14 @@ Individual rules can be disabled via the `--exclude` flag
 squawk --exclude=adding-field-with-default,disallowed-unique-constraint example.sql
 ```
 
+## files
+
+Files can be excluded from linting via the `--exclude-path` flag. Glob matching is supported and the flag can be provided multiple times.
+
+```shell
+squawk --exclude-path=005_user_ids.sql --exclude-path='*user_ids.sql' migrations/*
+```
+
 ## `.squawk.toml` configuration file
 
 Rules can be disabled with a configuration file.
@@ -31,7 +39,7 @@ By default, Squawk will traverse up from the current directory to find a `.squaw
 squawk --config=~/.squawk.toml example.sql
 ```
 
-The `--exclude` and `--pg-version` flags will always be prioritized over the configuration file.
+The `--exclude`, `--exclude-path`, and `--pg-version` flags will always be prioritized over the configuration file.
 
 
 ## example `.squawk.toml` configurations
@@ -70,6 +78,10 @@ excluded_rules = [
     "require-concurrent-index-deletion",
 ]
 assume_in_transaction = true
+excluded_paths = [
+    "005_user_ids.sql",
+    "*user_ids.sql",
+]
 ```
 
 

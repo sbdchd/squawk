@@ -92,6 +92,13 @@ OPTIONS:
         --dump-ast <ast-format>
             Output AST in JSON [possible values: Raw, Parsed, Debug]
 
+        --exclude-path <excluded-path>...
+            Paths to exclude
+
+            For example: --exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql
+
+            --exclude-path='*user_ids.sql'
+
     -e, --exclude <rule>...
             Exclude specific warnings
 
