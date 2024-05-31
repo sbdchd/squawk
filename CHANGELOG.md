@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v0.29.0 - 2024-05-30
+
+### Added
+
+- added `--excluded-paths` flag to ignore paths when searching for files (#350). Thanks @rdaniels6813!
+
 ## v0.28.0 - 2024-01-12
 
 ### Changed

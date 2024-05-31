@@ -190,13 +190,14 @@ pub fn check_files(
     }
 
     for path in paths {
-        if has_match_in_paths(path, excluded_paths) {
-            info!("skipping exluded file path: {}", path);
-            output_violations.push(ViolationContent {
-                filename: path.into(),
-                sql: String::new(),
-                violations: vec![],
-            });
+        if let Some(pattern) = excluded_paths
+            .iter()
+            .find(|&excluded| excluded.matches(path))
+        {
+            info!(
+                "skipping excluded file path: {}. pattern: {}",
+                path, pattern
+            );
         } else {
             info!("checking file path: {}", path);
             let sql = get_sql_from_path(path)?;
@@ -210,15 +211,6 @@ pub fn check_files(
         }
     }
     Ok(output_violations)
-}
-
-fn has_match_in_paths(path: &str, excluded_paths: &[Pattern]) -> bool {
-    for excluded in excluded_paths {
-        if excluded.matches(path) {
-            return true;
-        }
-    }
-    false
 }
 
 fn get_sql_from_stdin() -> Result<String, io::Error> {

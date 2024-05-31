@@ -44,9 +44,11 @@ struct Opt {
     /// Paths to exclude
     ///
     /// For example:
-    /// --exclude-paths 202401*.sql
-    #[structopt(long = "exclude-paths", use_delimiter = true)]
-    excluded_paths: Option<Vec<String>>,
+    /// --exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql
+    ///
+    /// --exclude-path='*user_ids.sql'
+    #[structopt(long = "exclude-path")]
+    excluded_path: Option<Vec<String>>,
     /// Exclude specific warnings
     ///
     /// For example:
@@ -124,8 +126,8 @@ fn main() {
         conf.excluded_rules
     };
 
-    // the --exclude-paths flag completely overrides the configuration file.
-    let excluded_paths = if let Some(excluded_paths) = opts.excluded_paths {
+    // the --exclude-path flag completely overrides the configuration file.
+    let excluded_paths = if let Some(excluded_paths) = opts.excluded_path {
         excluded_paths
     } else {
         conf.excluded_paths
