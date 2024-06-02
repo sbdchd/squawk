@@ -6,6 +6,4 @@ members = [
     "github"
 ]
 
-[profile.dev]
-# disable debug symbols to improve compile times.
-debug = false
+
