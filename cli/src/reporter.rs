@@ -139,13 +139,13 @@ fn process_violations(
     assume_in_transaction: bool,
 ) -> ViolationContent {
     match check_sql(sql, excluded_rules, pg_version, assume_in_transaction) {
-        Ok(violations) => pretty_violations(violations, sql, &path),
+        Ok(violations) => pretty_violations(violations, sql, path),
         Err(err) => ViolationContent {
-            filename: path.to_string(),
+            filename: path.into(),
             sql: sql.into(),
             violations: vec![ReportViolation {
                 column: 0,
-                file: path.to_string(),
+                file: path.into(),
                 level: ViolationLevel::Error,
                 line: 0,
                 messages: vec![
@@ -654,20 +654,6 @@ mod test_reporter {
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql_with_rule(sql, &RuleViolationKind::AddingRequiredField, None, false).unwrap()
-    }
-
-    #[test]
-    fn test_glob() {
-        let patterns = glob::glob("example/example.sql").unwrap();
-        for pattern in patterns {
-            let path = pattern.unwrap();
-
-            println!("{:?}", path);
-        }
-        assert_debug_snapshot!(std::env::current_dir().unwrap());
-        // assert_debug_snapshot!(patterns
-        //     .map(std::result::Result::unwrap)
-        //     .collect::<Vec<_>>());
     }
 
     #[test]
