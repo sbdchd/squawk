@@ -1,4 +1,7 @@
-use crate::reporter::{check_files, get_comment_body, CheckFilesError};
+use crate::{
+    file_finding::find_paths,
+    reporter::{check_files, get_comment_body, CheckFilesError},
+};
 
 use glob::Pattern;
 use log::info;
@@ -158,7 +161,7 @@ pub fn check_and_comment_on_pr(
     is_stdin: bool,
     stdin_path: Option<String>,
     root_cmd_exclude: &[RuleViolationKind],
-    root_cmd_exclude_paths: &[Pattern],
+    root_cmd_exclude_paths: &[String],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> Result<(), SquawkError> {
@@ -184,13 +187,14 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     )?;
 
+    let found_paths = find_paths(&paths, root_cmd_exclude_paths);
+
     info!("checking files");
     let file_results = check_files(
-        &paths,
+        &found_paths,
         is_stdin,
         stdin_path,
         &concat(&exclude.unwrap_or_default(), root_cmd_exclude),
-        root_cmd_exclude_paths,
         pg_version,
         assume_in_transaction,
     )?;
