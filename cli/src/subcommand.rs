@@ -1,9 +1,8 @@
 use crate::{
-    file_finding::find_paths,
+    file_finding::{find_paths, FindFilesError},
     reporter::{check_files, get_comment_body, CheckFilesError},
 };
 
-use glob::Pattern;
 use log::info;
 use squawk_github::{actions, app, comment_on_pr, GitHubApi, GithubError};
 use squawk_linter::{versions::Version, violations::RuleViolationKind};
@@ -14,6 +13,7 @@ const VERSION: &str = env!("CARGO_PKG_VERSION");
 #[derive(Debug)]
 pub enum SquawkError {
     CheckFilesError(CheckFilesError),
+    FindFilesError(FindFilesError),
     GithubError(GithubError),
     GithubPrivateKeyBase64DecodeError(base64::DecodeError),
     GithubPrivateKeyDecodeError(std::string::FromUtf8Error),
@@ -27,6 +27,9 @@ impl std::fmt::Display for SquawkError {
         match *self {
             Self::CheckFilesError(ref err) => {
                 write!(f, "Failed to dump AST: {err}")
+            }
+            Self::FindFilesError(ref err) => {
+                write!(f, "Failed to find files: {err}")
             }
             Self::GithubError(ref err) => err.fmt(f),
             Self::GithubPrivateKeyBase64DecodeError(ref err) => write!(
@@ -66,6 +69,11 @@ impl std::convert::From<GithubError> for SquawkError {
 impl std::convert::From<CheckFilesError> for SquawkError {
     fn from(e: CheckFilesError) -> Self {
         Self::CheckFilesError(e)
+    }
+}
+impl std::convert::From<FindFilesError> for SquawkError {
+    fn from(e: FindFilesError) -> Self {
+        Self::FindFilesError(e)
     }
 }
 
@@ -187,7 +195,7 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     )?;
 
-    let found_paths = find_paths(&paths, root_cmd_exclude_paths);
+    let found_paths = find_paths(&paths, root_cmd_exclude_paths)?;
 
     info!("checking files");
     let file_results = check_files(

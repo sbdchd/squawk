@@ -1,6 +1,5 @@
 use console::strip_ansi_codes;
 use console::style;
-use glob::Pattern;
 use log::info;
 use serde::Serialize;
 use squawk_linter::errors::CheckSqlError;

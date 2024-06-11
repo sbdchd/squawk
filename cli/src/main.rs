@@ -16,7 +16,6 @@ use crate::reporter::{
 use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
 use config::Config;
-use glob::Pattern;
 use log::info;
 use simplelog::CombinedLogger;
 use squawk_linter::versions::Version;
@@ -161,7 +160,10 @@ fn main() {
 
     let is_stdin = !atty::is(Stream::Stdin);
 
-    let found_paths = find_paths(&opts.path_patterns, &excluded_paths);
+    let found_paths = find_paths(&opts.path_patterns, &excluded_paths).unwrap_or_else(|e| {
+        eprintln!("Failed to find files: {e}");
+        process::exit(1);
+    });
     if let Some(subcommand) = opts.cmd {
         exit(
             check_and_comment_on_pr(
