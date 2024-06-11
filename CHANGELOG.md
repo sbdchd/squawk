@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.0.0 - 2024-06-11
+
+### Changed
+
+- provided paths now support glob matching. `squawk 'migrations/*.sql'` (#352)
+
 ## v0.29.0 - 2024-05-30
 
 ### Added
