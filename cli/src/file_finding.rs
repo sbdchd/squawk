@@ -2,29 +2,6 @@ use std::path::PathBuf;
 
 use log::info;
 
-use crate::subcommand::SquawkError;
-
-#[derive(Debug)]
-pub enum FindFilesError {
-    PatternError(glob::PatternError),
-}
-
-impl std::fmt::Display for FindFilesError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match *self {
-            Self::PatternError(ref err) => {
-                write!(f, "Failed to build pattern: {err}")
-            }
-        }
-    }
-}
-
-impl std::convert::From<glob::PatternError> for FindFilesError {
-    fn from(e: glob::PatternError) -> Self {
-        Self::PatternError(e)
-    }
-}
-
 /// Given a list of patterns or paths, along with exclusion patterns, find matching files.
 pub fn find_paths(path_patterns: &[String], exclude_patterns: &[String]) -> Vec<PathBuf> {
     let mut matched_paths = vec![];
