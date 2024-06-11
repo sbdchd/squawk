@@ -16,7 +16,7 @@ use crate::reporter::{
 use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
 use config::Config;
-use log::info;
+use log::{error, info};
 use simplelog::CombinedLogger;
 use squawk_linter::versions::Version;
 use squawk_linter::violations::RuleViolationKind;
@@ -164,6 +164,13 @@ fn main() {
         eprintln!("Failed to find files: {e}");
         process::exit(1);
     });
+    if found_paths.is_empty() && !opts.path_patterns.is_empty() {
+        eprintln!(
+            "Failed to find files for provided patterns: {:?}",
+            opts.path_patterns
+        );
+        process::exit(1);
+    }
     if let Some(subcommand) = opts.cmd {
         exit(
             check_and_comment_on_pr(
