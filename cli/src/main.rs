@@ -4,9 +4,11 @@
 #[allow(clippy::enum_variant_names)]
 #[allow(clippy::module_name_repetitions)]
 mod config;
+mod file_finding;
 mod reporter;
 mod subcommand;
 
+use crate::file_finding::find_paths;
 use crate::reporter::{
     check_files, dump_ast_for_paths, explain_rule, list_rules, print_violations, DumpAstOption,
     Reporter,
@@ -14,7 +16,6 @@ use crate::reporter::{
 use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
 use config::Config;
-use glob::Pattern;
 use log::info;
 use simplelog::CombinedLogger;
 use squawk_linter::versions::Version;
@@ -38,9 +39,9 @@ fn exit<E: std::fmt::Display, T>(res: Result<T, E>, msg: &str) -> ! {
 #[allow(clippy::struct_excessive_bools)]
 #[derive(StructOpt, Debug)]
 struct Opt {
-    /// Paths to search
+    /// Paths or patterns to search
     #[structopt(value_name = "path")]
-    paths: Vec<String>,
+    path_patterns: Vec<String>,
     /// Paths to exclude
     ///
     /// For example:
@@ -132,16 +133,6 @@ fn main() {
     } else {
         conf.excluded_paths
     };
-    let excluded_path_patterns = excluded_paths
-        .iter()
-        .map(|excluded_path| {
-            Pattern::new(excluded_path).unwrap_or_else(|e| {
-                eprintln!("Pattern error: {e}");
-                process::exit(1);
-            })
-        })
-        .collect::<Vec<Pattern>>();
-
     let pg_version = if let Some(pg_version) = opts.pg_version {
         Some(pg_version)
     } else {
@@ -168,6 +159,18 @@ fn main() {
     let mut handle = stdout.lock();
 
     let is_stdin = !atty::is(Stream::Stdin);
+
+    let found_paths = find_paths(&opts.path_patterns, &excluded_paths).unwrap_or_else(|e| {
+        eprintln!("Failed to find files: {e}");
+        process::exit(1);
+    });
+    if found_paths.is_empty() && !opts.path_patterns.is_empty() {
+        eprintln!(
+            "Failed to find files for provided patterns: {:?}",
+            opts.path_patterns
+        );
+        process::exit(1);
+    }
     if let Some(subcommand) = opts.cmd {
         exit(
             check_and_comment_on_pr(
@@ -175,26 +178,25 @@ fn main() {
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
-                &excluded_path_patterns,
+                &excluded_paths,
                 pg_version,
                 assume_in_transaction,
             ),
             "Upload to GitHub failed",
         );
-    } else if !opts.paths.is_empty() || is_stdin {
-        let read_stdin = opts.paths.is_empty() && is_stdin;
+    } else if !found_paths.is_empty() || is_stdin {
+        let read_stdin = found_paths.is_empty() && is_stdin;
         if let Some(dump_ast_kind) = opts.dump_ast {
             exit(
-                dump_ast_for_paths(&mut handle, &opts.paths, read_stdin, &dump_ast_kind),
+                dump_ast_for_paths(&mut handle, &found_paths, read_stdin, &dump_ast_kind),
                 "Failed to dump AST",
             );
         } else {
             match check_files(
-                &opts.paths,
+                &found_paths,
                 read_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
-                &excluded_path_patterns,
                 pg_version,
                 assume_in_transaction,
             ) {

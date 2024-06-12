@@ -7,7 +7,7 @@ title: CLI
 
 ```bash
 # lint a file or multiple
-squawk migration_001.sql migration_002.sql migration_003.sql
+squawk migration_001.sql migration_002.sql migration_003.sql 'migrations/*.sql'
 
 # lint from standard in
 cat migration.sql | squawk
@@ -26,7 +26,7 @@ squawk --exclude=adding-field-with-default,disallowed-unique-constraint example.
 Files can be excluded from linting via the `--exclude-path` flag. Glob matching is supported and the flag can be provided multiple times.
 
 ```shell
-squawk --exclude-path=005_user_ids.sql --exclude-path='*user_ids.sql' migrations/*
+squawk --exclude-path=005_user_ids.sql --exclude-path='*user_ids.sql' 'migrations/*.sql'
 ```
 
 ## `.squawk.toml` configuration file

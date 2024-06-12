@@ -1,6 +1,5 @@
 use console::strip_ansi_codes;
 use console::style;
-use glob::Pattern;
 use log::info;
 use serde::Serialize;
 use squawk_linter::errors::CheckSqlError;
@@ -13,10 +12,11 @@ use std::convert::TryFrom;
 use std::fs::File;
 use std::io;
 use std::io::prelude::*;
+use std::path::PathBuf;
 use structopt::clap::arg_enum;
 use structopt::StructOpt;
 
-fn get_sql_from_path(path: &str) -> Result<String, std::io::Error> {
+fn get_sql_from_path(path: &PathBuf) -> Result<String, std::io::Error> {
     let mut file = File::open(path)?;
     let mut contents = String::new();
     file.read_to_string(&mut contents).map(|_| contents)
@@ -68,7 +68,7 @@ impl std::convert::From<serde_json::error::Error> for DumpAstError {
 
 pub fn dump_ast_for_paths<W: io::Write>(
     f: &mut W,
-    paths: &[String],
+    paths: &[PathBuf],
     read_stdin: bool,
     dump_ast: &DumpAstOption,
 ) -> Result<(), DumpAstError> {
@@ -161,11 +161,10 @@ fn process_violations(
 }
 
 pub fn check_files(
-    paths: &[String],
+    path_patterns: &[PathBuf],
     read_stdin: bool,
     stdin_path: Option<String>,
     excluded_rules: &[RuleViolationKind],
-    excluded_paths: &[Pattern],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> Result<Vec<ViolationContent>, CheckFilesError> {
@@ -189,26 +188,16 @@ pub fn check_files(
         }
     }
 
-    for path in paths {
-        if let Some(pattern) = excluded_paths
-            .iter()
-            .find(|&excluded| excluded.matches(path))
-        {
-            info!(
-                "skipping excluded file path: {}. pattern: {}",
-                path, pattern
-            );
-        } else {
-            info!("checking file path: {}", path);
-            let sql = get_sql_from_path(path)?;
-            output_violations.push(process_violations(
-                &sql,
-                path,
-                excluded_rules,
-                pg_version,
-                assume_in_transaction,
-            ));
-        }
+    for path in path_patterns {
+        info!("checking file path: {}", path.display());
+        let sql = get_sql_from_path(path)?;
+        output_violations.push(process_violations(
+            &sql,
+            path.to_str().unwrap(),
+            excluded_rules,
+            pg_version,
+            assume_in_transaction,
+        ));
     }
     Ok(output_violations)
 }
