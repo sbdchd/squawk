@@ -16,7 +16,7 @@ use crate::reporter::{
 use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
 use config::Config;
-use log::{error, info};
+use log::info;
 use simplelog::CombinedLogger;
 use squawk_linter::versions::Version;
 use squawk_linter::violations::RuleViolationKind;
