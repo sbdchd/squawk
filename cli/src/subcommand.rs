@@ -1,9 +1,9 @@
 #![allow(clippy::too_many_arguments)]
+use crate::config::Config;
 use crate::{
     file_finding::{find_paths, FindFilesError},
     reporter::{check_files, get_comment_body, CheckFilesError},
 };
-use crate::config::Config;
 use log::info;
 use squawk_github::{actions, app, comment_on_pr, GitHubApi, GithubError};
 use squawk_linter::{versions::Version, violations::RuleViolationKind};
@@ -177,11 +177,12 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     } = cmd;
 
-    let fail_on_violations = if let Some(fail_on_violations_cfg) = cfg.upload_to_github.fail_on_violations {
-        fail_on_violations_cfg
-    } else {
-        fail_on_violations
-    };
+    let fail_on_violations =
+        if let Some(fail_on_violations_cfg) = cfg.upload_to_github.fail_on_violations {
+            fail_on_violations_cfg
+        } else {
+            fail_on_violations
+        };
 
     let github_app = create_gh_app(
         github_install_id,
