@@ -1,8 +1,9 @@
+#![allow(clippy::too_many_arguments)]
+use crate::config::Config;
 use crate::{
     file_finding::{find_paths, FindFilesError},
     reporter::{check_files, get_comment_body, CheckFilesError},
 };
-
 use log::info;
 use squawk_github::{actions, app, comment_on_pr, GitHubApi, GithubError};
 use squawk_linter::{versions::Version, violations::RuleViolationKind};
@@ -83,12 +84,6 @@ pub enum Command {
     UploadToGithub {
         /// Paths to search
         paths: Vec<String>,
-        /// Exclude specific warnings
-        ///
-        /// For example:
-        /// --exclude=require-concurrent-index-creation,ban-drop-database
-        #[structopt(short, long, use_delimiter = true)]
-        exclude: Option<Vec<RuleViolationKind>>,
         /// Exits with an error if violations are found
         #[structopt(long)]
         fail_on_violations: bool,
@@ -132,11 +127,6 @@ fn get_github_private_key(
     }
 }
 
-fn concat(a: &[RuleViolationKind], b: &[RuleViolationKind]) -> Vec<RuleViolationKind> {
-    // from: https://stackoverflow.com/a/53476705/3720597
-    [a, b].concat()
-}
-
 fn create_gh_app(
     github_install_id: Option<i64>,
     github_app_id: Option<i64>,
@@ -166,16 +156,16 @@ fn create_gh_app(
 
 pub fn check_and_comment_on_pr(
     cmd: Command,
+    cfg: &Config,
     is_stdin: bool,
     stdin_path: Option<String>,
-    root_cmd_exclude: &[RuleViolationKind],
-    root_cmd_exclude_paths: &[String],
+    exclude: &[RuleViolationKind],
+    exclude_paths: &[String],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,
-        exclude,
         fail_on_violations,
         github_private_key,
         github_token,
@@ -187,6 +177,13 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     } = cmd;
 
+    let fail_on_violations =
+        if let Some(fail_on_violations_cfg) = cfg.upload_to_github.fail_on_violations {
+            fail_on_violations_cfg
+        } else {
+            fail_on_violations
+        };
+
     let github_app = create_gh_app(
         github_install_id,
         github_app_id,
@@ -195,14 +192,14 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     )?;
 
-    let found_paths = find_paths(&paths, root_cmd_exclude_paths)?;
+    let found_paths = find_paths(&paths, exclude_paths)?;
 
     info!("checking files");
     let file_results = check_files(
         &found_paths,
         is_stdin,
         stdin_path,
-        &concat(&exclude.unwrap_or_default(), root_cmd_exclude),
+        exclude,
         pg_version,
         assume_in_transaction,
     )?;
