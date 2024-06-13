@@ -85,7 +85,7 @@ pub enum Command {
         /// Paths to search
         paths: Vec<String>,
         /// Exits with an error if violations are found
-        #[structopt(long, env = "SQUAWK_GITHUB_FAIL_ON_VIOLATIONS")]
+        #[structopt(long)]
         fail_on_violations: bool,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
         github_private_key: Option<String>,
