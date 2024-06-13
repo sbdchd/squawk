@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.1.0 
+
+### Changed
+
+- support configuration for "fail_on_violations" via `upload_to_github.fail_on_violations` (#353)
+- support root flags within upload-to-github subcommand (#353)
+
 ## v1.0.0 - 2024-06-11
 
 ### Changed
