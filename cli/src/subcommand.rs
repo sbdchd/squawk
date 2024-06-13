@@ -1,3 +1,4 @@
+#![allow(clippy::too_many_arguments)]
 use crate::{
     file_finding::{find_paths, FindFilesError},
     reporter::{check_files, get_comment_body, CheckFilesError},
