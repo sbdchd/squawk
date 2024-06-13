@@ -1,7 +1,6 @@
 ---
 source: cli/src/config.rs
 expression: "Config::parse(Some(squawk_toml.path().to_path_buf()))"
-
 ---
 Ok(
     Some(
@@ -24,6 +23,9 @@ Ok(
             assume_in_transaction: Some(
                 true,
             ),
+            upload_to_github: UploadToGitHubConfig {
+                fail_on_violations: None,
+            },
         },
     ),
 )

@@ -90,7 +90,7 @@ pub enum Command {
         #[structopt(short, long, use_delimiter = true)]
         exclude: Option<Vec<RuleViolationKind>>,
         /// Exits with an error if violations are found
-        #[structopt(long)]
+        #[structopt(long, env = "SQUAWK_GITHUB_FAIL_ON_VIOLATIONS")]
         fail_on_violations: bool,
         #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
         github_private_key: Option<String>,

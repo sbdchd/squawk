@@ -37,6 +37,12 @@ impl std::fmt::Display for ConfigError {
 }
 
 #[derive(Debug, Default, Deserialize)]
+pub struct UploadToGitHubConfig {
+    #[serde(default)]
+    pub fail_on_violations: Option<bool>,
+}
+
+#[derive(Debug, Default, Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub excluded_paths: Vec<String>,
@@ -46,6 +52,8 @@ pub struct Config {
     pub pg_version: Option<Version>,
     #[serde(default)]
     pub assume_in_transaction: Option<bool>,
+    #[serde(default)]
+    pub upload_to_github: UploadToGitHubConfig
 }
 
 impl Config {
@@ -144,6 +152,16 @@ excluded_paths = ["example.sql"]
         let file = r#"
 assume_in_transaction = false
         
+        "#;
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+    }
+    #[test]
+    fn test_load_fail_on_violations() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r#"
+[upload_to_github]
+fail_on_violations = true        
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));

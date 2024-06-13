@@ -8,11 +8,11 @@ Ok(
             excluded_paths: [],
             excluded_rules: [],
             pg_version: None,
-            assume_in_transaction: Some(
-                false,
-            ),
+            assume_in_transaction: None,
             upload_to_github: UploadToGitHubConfig {
-                fail_on_violations: None,
+                fail_on_violations: Some(
+                    true,
+                ),
             },
         },
     ),
