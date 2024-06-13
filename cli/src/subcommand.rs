@@ -2,7 +2,7 @@ use crate::{
     file_finding::{find_paths, FindFilesError},
     reporter::{check_files, get_comment_body, CheckFilesError},
 };
-
+use crate::config::Config;
 use log::info;
 use squawk_github::{actions, app, comment_on_pr, GitHubApi, GithubError};
 use squawk_linter::{versions::Version, violations::RuleViolationKind};
@@ -155,6 +155,7 @@ fn create_gh_app(
 
 pub fn check_and_comment_on_pr(
     cmd: Command,
+    cfg: &Config,
     is_stdin: bool,
     stdin_path: Option<String>,
     exclude: &[RuleViolationKind],
@@ -174,6 +175,12 @@ pub fn check_and_comment_on_pr(
         github_pr_number,
         github_private_key_base64,
     } = cmd;
+
+    let fail_on_violations = if let Some(fail_on_violations_cfg) = cfg.upload_to_github.fail_on_violations {
+        fail_on_violations_cfg
+    } else {
+        fail_on_violations
+    };
 
     let github_app = create_gh_app(
         github_install_id,

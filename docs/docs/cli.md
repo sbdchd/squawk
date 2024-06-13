@@ -82,6 +82,8 @@ excluded_paths = [
     "005_user_ids.sql",
     "*user_ids.sql",
 ]
+[upload_to_github]
+fail_on_violations = true
 ```
 
 

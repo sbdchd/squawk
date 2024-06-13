@@ -130,14 +130,14 @@ fn main() {
     let excluded_rules = if let Some(excluded_rules) = opts.excluded_rules {
         excluded_rules
     } else {
-        conf.excluded_rules
+        conf.excluded_rules.clone()
     };
 
     // the --exclude-path flag completely overrides the configuration file.
     let excluded_paths = if let Some(excluded_paths) = opts.excluded_path {
         excluded_paths
     } else {
-        conf.excluded_paths
+        conf.excluded_paths.clone()
     };
     let pg_version = if let Some(pg_version) = opts.pg_version {
         Some(pg_version)
@@ -181,6 +181,7 @@ fn main() {
         exit(
             check_and_comment_on_pr(
                 subcommand,
+                &conf,
                 is_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
