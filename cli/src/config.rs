@@ -53,7 +53,7 @@ pub struct Config {
     #[serde(default)]
     pub assume_in_transaction: Option<bool>,
     #[serde(default)]
-    pub upload_to_github: UploadToGitHubConfig
+    pub upload_to_github: UploadToGitHubConfig,
 }
 
 impl Config {

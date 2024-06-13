@@ -83,12 +83,6 @@ pub enum Command {
     UploadToGithub {
         /// Paths to search
         paths: Vec<String>,
-        /// Exclude specific warnings
-        ///
-        /// For example:
-        /// --exclude=require-concurrent-index-creation,ban-drop-database
-        #[structopt(short, long, use_delimiter = true)]
-        exclude: Option<Vec<RuleViolationKind>>,
         /// Exits with an error if violations are found
         #[structopt(long, env = "SQUAWK_GITHUB_FAIL_ON_VIOLATIONS")]
         fail_on_violations: bool,
@@ -132,11 +126,6 @@ fn get_github_private_key(
     }
 }
 
-fn concat(a: &[RuleViolationKind], b: &[RuleViolationKind]) -> Vec<RuleViolationKind> {
-    // from: https://stackoverflow.com/a/53476705/3720597
-    [a, b].concat()
-}
-
 fn create_gh_app(
     github_install_id: Option<i64>,
     github_app_id: Option<i64>,
@@ -168,14 +157,13 @@ pub fn check_and_comment_on_pr(
     cmd: Command,
     is_stdin: bool,
     stdin_path: Option<String>,
-    root_cmd_exclude: &[RuleViolationKind],
-    root_cmd_exclude_paths: &[String],
+    exclude: &[RuleViolationKind],
+    exclude_paths: &[String],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> Result<(), SquawkError> {
     let Command::UploadToGithub {
         paths,
-        exclude,
         fail_on_violations,
         github_private_key,
         github_token,
@@ -195,14 +183,14 @@ pub fn check_and_comment_on_pr(
         github_private_key_base64,
     )?;
 
-    let found_paths = find_paths(&paths, root_cmd_exclude_paths)?;
+    let found_paths = find_paths(&paths, exclude_paths)?;
 
     info!("checking files");
     let file_results = check_files(
         &found_paths,
         is_stdin,
         stdin_path,
-        &concat(&exclude.unwrap_or_default(), root_cmd_exclude),
+        exclude,
         pg_version,
         assume_in_transaction,
     )?;

@@ -48,7 +48,7 @@ struct Opt {
     /// --exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql
     ///
     /// --exclude-path='*user_ids.sql'
-    #[structopt(long = "exclude-path")]
+    #[structopt(long = "exclude-path", global = true)]
     excluded_path: Option<Vec<String>>,
     /// Exclude specific warnings
     ///
@@ -58,14 +58,15 @@ struct Opt {
         short = "e",
         long = "exclude",
         value_name = "rule",
-        use_delimiter = true
+        use_delimiter = true,
+        global = true
     )]
     excluded_rules: Option<Vec<RuleViolationKind>>,
     /// Specify postgres version
     ///
     /// For example:
     /// --pg-version=13.0
-    #[structopt(long)]
+    #[structopt(long, global = true)]
     pg_version: Option<Version>,
     /// List all available rules
     #[structopt(long)]
@@ -85,17 +86,22 @@ struct Opt {
     #[structopt(subcommand)]
     cmd: Option<Command>,
     /// Enable debug logging output
-    #[structopt(long)]
+    #[structopt(long, global = true)]
     verbose: bool,
     /// Path to the squawk config file (.squawk.toml)
-    #[structopt(short = "c", long = "config")]
+    #[structopt(short = "c", long = "config", global = true)]
     config_path: Option<PathBuf>,
     /// Assume that a transaction will wrap each SQL file when run by a migration tool
     ///
     /// Use --no-assume-in-transaction to override any config file that sets this
-    #[structopt(long)]
+    #[structopt(long, global = true)]
     assume_in_transaction: bool,
-    #[structopt(long, hidden = true, conflicts_with = "assume-in-transaction")]
+    #[structopt(
+        long,
+        hidden = true,
+        conflicts_with = "assume-in-transaction",
+        global = true
+    )]
     no_assume_in_transaction: bool,
 }
 
