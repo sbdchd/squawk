@@ -29,11 +29,11 @@ jobs:
       matrix:
         include:
           - arch: x86_64
-            target: x86_64-unknown-linux-musl
-            container: x86_64-musl
+            target: x86_64-unknown-linux-gnu
+            container: x86_64-gnu
           - arch: aarch64
-            target: aarch64-unknown-linux-musl
-            container: aarch64-musl
+            target: aarch64-unknown-linux-gnu
+            container: aarch64-gnu
 
     name: Linux ${{ matrix.arch }}
     runs-on: ubuntu-latest
