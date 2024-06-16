@@ -102,8 +102,8 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Cache
-        uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
+      # - name: Cache
+      #   uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
 
       - name: Build for mac
         run: cargo build --release --target=${{ matrix.target }} && mv target/${{ matrix.target }}/release/squawk target/release/squawk-${{ matrix.target }}
