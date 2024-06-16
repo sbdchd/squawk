@@ -35,6 +35,7 @@ jobs:
             target: aarch64-unknown-linux-musl
             container: aarch64-musl
 
+    name: macOS ${{ matrix.arch }}
     runs-on: ubuntu-latest
 
     steps:
