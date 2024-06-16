@@ -46,19 +46,22 @@ const { binaryPath } = require("./helpers")
 // e.g.: https://github.com/sbdchd/squawk/releases/download/v0.1.3/squawk-darwin-x86_64
 const RELEASES_BASE_URL = "https://github.com/sbdchd/squawk/releases/download"
 
+const SUPPORTED_PLATFORMS = new Set([
+  'x86_64-apple-darwin',
+  'aarch64-apple-darwin',
+  'x86_64-unknown-linux-musl',
+  'aarch64-unknown-linux-musl',
+])
+
 /**
  * @param {string} platform
+ * @param {string} arch
  */
-function getDownloadUrl(platform) {
-  const releasesUrl = `${RELEASES_BASE_URL}/v${pkgInfo.version}/squawk`
-  switch (platform) {
-    case "darwin":
-      return `${releasesUrl}-darwin-x86_64`
-    case "linux":
-      return `${releasesUrl}-linux-x86_64`
-    default:
-      return null
+function getDownloadUrl(platform, arch) {
+  if (!SUPPORTED_PLATFORMS.has(`${platform}-${arch}`)) {
+    return null
   }
+  return `${RELEASES_BASE_URL}/v${pkgInfo.version}/squawk-${platform}-${arch}`
 }
 
 function getNpmCache() {
@@ -107,7 +110,7 @@ function getDecompressor(response) {
 function downloadBinary() {
   const arch = os.arch()
   const platform = os.platform()
-  const downloadUrl = getDownloadUrl(platform)
+  const downloadUrl = getDownloadUrl(platform, arch)
   if (!downloadUrl) {
     return Promise.reject(new Error(`unsupported target ${platform}-${arch}`))
   }
