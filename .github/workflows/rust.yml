@@ -20,10 +20,11 @@ jobs:
         with:
           paths_ignore: '["docs/**", "*.md"]'
 
-  build-linux:
+  build-linux-x64:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
 
+    name: Linux x86_64
     runs-on: ubuntu-latest
 
     steps:
@@ -32,25 +33,30 @@ jobs:
 
       - name: Install Toolchain
         uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
+        with:
+          toolchain: stable
+          target: x86_64-unknown-linux-gnu
+          profile: minimal
+          override: true
 
       - name: Cache
         uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
 
       - name: Build
-        run: RUSTFLAGS='-C target-feature=+crt-static' cargo build --target x86_64-unknown-linux-gnu --all --release && ls target && mv target/x86_64-unknown-linux-gnu/release/squawk target/release/squawk-linux-x86_64
+        run: cargo build --target x86_64-unknown-linux-gnu --release && mv target/x86_64-unknown-linux-gnu/release/squawk target/release/squawk-linux-x64
 
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
           name: release
-          path: target/release/squawk-linux-x86_64
+          path: target/release/squawk-linux-x64
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/release/squawk-linux-x86_64
+            target/release/squawk-linux-x64
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -61,6 +67,16 @@ jobs:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            target: x86_64-apple-darwin
+          - arch: arm64
+            target: aarch64-apple-darwin
+
+    name: macOS ${{ matrix.arch }}
     runs-on: macos-latest
 
     steps:
@@ -69,31 +85,35 @@ jobs:
 
       - name: Install Toolchain
         uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
+        with:
+          target: ${{ matrix.target }}
+          profile: minimal
+          override: true
 
       - name: Cache
         uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
 
       - name: Build for mac
-        run: cargo build --all --release && mv target/release/squawk target/release/squawk-darwin-x86_64
+        run: cargo build --release --target=${{ matrix.target }} && mv target/${{ matrix.target }}/release/squawk target/release/squawk-darwin-${{ matrix.arch }}
 
       - name: Artifact
         uses: actions/upload-artifact@v3
         with:
           name: release
-          path: target/release/squawk-darwin-x86_64
+          path: target/release/squawk-darwin-${{ matrix.arch }}
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/release/squawk-darwin-x86_64
+            target/release/squawk-darwin-${{ matrix.arch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-npm:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-linux, build-mac]
+    needs: [build-linux-x64, build-mac]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
