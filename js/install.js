@@ -46,12 +46,7 @@ const { binaryPath } = require("./helpers")
 // e.g.: https://github.com/sbdchd/squawk/releases/download/v0.1.3/squawk-darwin-x86_64
 const RELEASES_BASE_URL = "https://github.com/sbdchd/squawk/releases/download"
 
-const SUPPORTED_PLATFORMS = new Set([
-  "x86_64-apple-darwin",
-  "aarch64-apple-darwin",
-  "x86_64-unknown-linux-musl",
-  "aarch64-unknown-linux-musl",
-])
+const SUPPORTED_PLATFORMS = new Set(["darmin-x64", "darwin-arm64", "linux-x64"])
 
 /**
  * @param {string} platform
