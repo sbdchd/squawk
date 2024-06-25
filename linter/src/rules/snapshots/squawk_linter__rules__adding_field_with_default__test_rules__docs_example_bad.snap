@@ -13,7 +13,7 @@ expression: "lint_sql(bad_sql, None)"
         },
         messages: [
             Note(
-                "Adding a field with a VOLATILE DEFAULT requires a table table rewrite with an ACCESS EXCLUSIVE lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.",
+                "Adding a field with a VOLATILE DEFAULT requires a table rewrite with an ACCESS EXCLUSIVE lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.",
             ),
             Help(
                 "Add the field as nullable, then set a default, backfill, and remove nullabilty.",
