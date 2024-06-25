@@ -43,7 +43,7 @@ lazy_static! {
         func: adding_field_with_default,
         messages: vec![
             ViolationMessage::Note(
-                "Adding a field with a VOLATILE DEFAULT requires a table table rewrite with an ACCESS EXCLUSIVE lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.".into(),
+                "Adding a field with a VOLATILE DEFAULT requires a table rewrite with an ACCESS EXCLUSIVE lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.".into(),
             ),
             ViolationMessage::Help(
                 "Add the field as nullable, then set a default, backfill, and remove nullabilty.".into(),
