@@ -55,6 +55,12 @@ pub fn prefer_robust_stmts(
                         }
                     }
 
+                    if cmd.subtype == AlterTableType::EnableRowSecurity
+                        || cmd.subtype == AlterTableType::DisableRowSecurity
+                    {
+                        continue;
+                    }
+
                     if let Some(AlterTableDef::Constraint(constraint)) = &cmd.def {
                         if let Some(constraint_name) = &constraint.conname {
                             if let Some(constraint) = constraint_names.get_mut(constraint_name) {
@@ -288,6 +294,36 @@ DROP TYPE foo;
     fn test_create_index_concurrently_unnamed() {
         let bad_sql = r#"
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
+  "#;
+
+        assert_debug_snapshot!(lint_sql(bad_sql));
+    }
+
+    #[test]
+    fn enable_row_level_security() {
+        let bad_sql = r#"
+CREATE TABLE IF NOT EXISTS test();
+ALTER TABLE IF EXISTS test ENABLE ROW LEVEL SECURITY;
+  "#;
+
+        assert_debug_snapshot!(lint_sql(bad_sql));
+    }
+
+    #[test]
+    fn enable_row_level_security_without_exists_check() {
+        let bad_sql = r#"
+CREATE TABLE IF NOT EXISTS test();
+ALTER TABLE test ENABLE ROW LEVEL SECURITY;
+  "#;
+
+        assert_debug_snapshot!(lint_sql(bad_sql));
+    }
+
+    #[test]
+    fn disable_row_level_security() {
+        let bad_sql = r#"
+CREATE TABLE IF NOT EXISTS test();
+ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
   "#;
 
         assert_debug_snapshot!(lint_sql(bad_sql));

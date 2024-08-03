@@ -1,0 +1,7 @@
+---
+source: linter/src/rules/prefer_robust_stmts.rs
+expression: lint_sql(bad_sql)
+---
+Ok(
+    [],
+)
