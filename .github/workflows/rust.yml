@@ -60,8 +60,45 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # windows isn't supported by libpg_query
-  # https://github.com/lfittl/libpg_query/issues/44
+  build-windows:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
+    name: Windows
+
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Toolchain
+        uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
+        with:
+          toolchain: stable
+          target: x86_64-pc-windows-msvc
+          profile: minimal
+          override: true
+
+      - name: Cache
+        uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
+
+      - name: Build
+        run: cargo build --target x86_64-pc-windows-msvc --release && mv target/x86_64-pc-windows-msvc/release/squawk.exe target/release/squawk-windows-x64.exe
+
+      - name: Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: release
+          path: target/release/squawk-windows-x64.exe
+
+      - name: Release
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            target/release/squawk-windows-x64.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-mac:
     needs: pre_job

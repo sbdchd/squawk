@@ -46,7 +46,13 @@ const { binaryPath } = require("./helpers")
 // e.g.: https://github.com/sbdchd/squawk/releases/download/v0.1.3/squawk-darwin-x86_64
 const RELEASES_BASE_URL = "https://github.com/sbdchd/squawk/releases/download"
 
-const SUPPORTED_PLATFORMS = new Set(["darwin-x64", "darwin-arm64", "linux-x64"])
+const SUPPORTED_PLATFORMS = new Set([
+  "darwin-x64",
+  "darwin-arm64",
+  "linux-x64",
+  "win32-x64",
+])
+const BINARY_NAME_OVERRIDE = new Map([["win32-x64", "squawk-windows-x64.exe"]])
 
 /**
  * @param {string} platform
@@ -56,7 +62,10 @@ function getDownloadUrl(platform, arch) {
   if (!SUPPORTED_PLATFORMS.has(`${platform}-${arch}`)) {
     return null
   }
-  return `${RELEASES_BASE_URL}/v${pkgInfo.version}/squawk-${platform}-${arch}`
+  const name =
+    BINARY_NAME_OVERRIDE.get(`${platform}-${arch}`) ||
+    `squawk-${platform}-${arch}`
+  return `${RELEASES_BASE_URL}/v${pkgInfo.version}/${name}`
 }
 
 function getNpmCache() {
