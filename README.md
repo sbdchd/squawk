@@ -15,7 +15,7 @@ Also it seemed like a nice project to spend more time with Rust.
 
 Note: due to `squawk`'s dependency on
 [`libpg_query`](https://github.com/lfittl/libpg_query/issues/44), `squawk`
-only supports Linux and macOS
+supports Linux, macOS and Windows
 
 ```shell
 npm install -g squawk-cli
