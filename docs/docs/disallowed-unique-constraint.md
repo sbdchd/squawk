@@ -26,6 +26,8 @@ Use:
 ```sql
 -- allows reads and writes while index is built
 CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
+-- add constraint using the built index
+ALTER TABLE distributors ADD CONSTRAINT distributors_dist_id_key UNIQUE USING INDEX dist_id_uniq;
 ```
 
 
@@ -44,12 +46,15 @@ Use:
 ALTER TABLE distributors ADD COLUMN dist_id text;
 -- allows reads and writes while index is built
 CREATE UNIQUE INDEX CONCURRENTLY dist_id_uniq ON distributors (dist_id);
+-- add constraint using the built index
+ALTER TABLE distributors ADD CONSTRAINT distributors_dist_id_key UNIQUE USING INDEX dist_id_uniq;
 ```
 
 ## solution for alembic and sqlalchemy
 
 ```python
 # migrations/*.py
+# First migration
 from alembic import op
 
 def schema_upgrades():
@@ -69,3 +74,29 @@ def schema_downgrades():
             postgresql_concurrently=True,
         )
 ```
+
+```python
+# migrations/*.py
+# Second migration
+from alembic import op
+import sqlalchemy as sa
+
+def schema_upgrades():
+    op.execute(
+        sa.text(
+            """
+            ALTER TABLE distributors ADD CONSTRAINT distributors_dist_id_key UNIQUE USING INDEX dist_id_uniq;
+            """
+        ),
+    )
+
+def schema_downgrades():
+    op.drop_constraint(
+        "distributors_dist_id_key",
+        type_="unique",
+    )
+```
+
+## links
+
+- https://www.postgresql.org/docs/current/sql-altertable.html#SQL-ALTERTABLE-DESC-ADD-TABLE-CONSTRAINT-USING-INDEX
