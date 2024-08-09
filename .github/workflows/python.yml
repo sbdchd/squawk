@@ -55,7 +55,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-linux-${{ matrix.platform.target }}
-          path: dist
+          path: cli/dist
+          if-no-files-found: error
 
   windows:
     needs: pre_job
@@ -81,7 +82,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-windows-${{ matrix.platform.target }}
-          path: dist
+          path: cli/dist
+          if-no-files-found: error
 
   macos:
     needs: pre_job
@@ -107,7 +109,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-macos-${{ matrix.platform.target }}
-          path: dist
+          path: cli/dist
+          if-no-files-found: error
 
   sdist:
     needs: pre_job
@@ -125,7 +128,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-sdist
-          path: dist
+          path: cli/dist
+          if-no-files-found: error
 
   release:
     name: Release
