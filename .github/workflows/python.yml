@@ -20,12 +20,14 @@ jobs:
         platform:
           - runner: ubuntu-latest
             target: x86_64
-            before-script: yum install clang llvm llvm-devel -y
-    #          - runner: ubuntu-latest
-    #            target: aarch64-unknown-linux-gnu
-    #            docker-options: --platform linux/arm64
+            before-script: yum install clang llvm llvm-devel -y && python3 -m ensurepip
+          - runner: ubuntu-latest
+            target: aarch64-unknown-linux-gnu
+            docker-options: --platform linux/arm64
     steps:
       - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
@@ -34,8 +36,7 @@ jobs:
           args: --release --out dist
           manylinux: manylinux_2_28
           docker-options: ${{ matrix.platform.docker-options }}
-          # https://github.com/PyO3/maturin-action/issues/249
-          # sccache: "true"
+          sccache: "true"
           before-script-linux: ${{ matrix.platform.before-script }}
       - name: Upload wheels
         uses: actions/upload-artifact@v4
