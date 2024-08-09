@@ -28,7 +28,7 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_in_transaction: bo
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     if cmd.subtype == AlterTableType::ValidateConstraint {
                         if let Some(constraint_name) = &cmd.name {
-                            if in_transaction && not_valid_names.get(constraint_name).is_some() {
+                            if in_transaction && not_valid_names.contains(constraint_name) {
                                 bad_spans.push(raw_stmt.into());
                             }
                         }
@@ -221,18 +221,18 @@ COMMIT;
     /// ```
     #[test]
     fn test_adding_foreign_key() {
-        let bad_sql = r#"
+        let bad_sql = r"
 -- instead of
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
-   "#;
+   ";
 
         assert_debug_snapshot!(lint_sql(bad_sql));
 
-        let ok_sql = r#"
+        let ok_sql = r"
 -- use `NOT VALID`
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
-   "#;
+   ";
         assert_debug_snapshot!(lint_sql(ok_sql));
     }
 

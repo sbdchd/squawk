@@ -95,17 +95,17 @@ mod test_rules {
 
     #[test]
     fn test_no_nesting() {
-        let ok_sql = r#"
+        let ok_sql = r"
 BEGIN;
 SELECT 1;
 COMMIT;
-  "#;
+  ";
         assert_eq!(lint_sql(ok_sql), vec![]);
     }
 
     #[test]
     fn test_no_nesting_repeated() {
-        let ok_sql = r#"
+        let ok_sql = r"
 BEGIN;
 SELECT 1;
 COMMIT;
@@ -114,65 +114,65 @@ COMMIT;
 BEGIN;
 SELECT 2;
 COMMIT;
-  "#;
+  ";
         assert_eq!(lint_sql(ok_sql), vec![]);
     }
 
     #[test]
     fn test_no_nesting_with_assume_in_transaction() {
-        let ok_sql = r#"
+        let ok_sql = r"
 SELECT 1;
-  "#;
+  ";
         assert_eq!(lint_sql_assuming_in_transaction(ok_sql), vec![]);
     }
 
     #[test]
     fn test_begin_repeated() {
-        let bad_sql = r#"
+        let bad_sql = r"
 BEGIN;
 BEGIN;
 SELECT 1;
 COMMIT;
-  "#;
+  ";
         assert_debug_snapshot!(lint_sql(bad_sql));
     }
 
     #[test]
     fn test_begin_with_assume_in_transaction() {
-        let bad_sql = r#"
+        let bad_sql = r"
 BEGIN;
 SELECT 1;
-  "#;
+  ";
         assert_debug_snapshot!(lint_sql_assuming_in_transaction(bad_sql));
     }
 
     #[test]
     fn test_commit_repeated() {
-        let bad_sql = r#"
+        let bad_sql = r"
 BEGIN;
 SELECT 1;
 COMMIT;
 COMMIT;
-  "#;
+  ";
         assert_debug_snapshot!(lint_sql(bad_sql));
     }
 
     #[test]
     fn test_commit_with_assume_in_transaction() {
-        let bad_sql = r#"
+        let bad_sql = r"
 SELECT 1;
 COMMIT;
-  "#;
+  ";
         assert_debug_snapshot!(lint_sql_assuming_in_transaction(bad_sql));
     }
 
     #[test]
     fn test_rollback_with_assume_in_transaction() {
-        let bad_sql = r#"
+        let bad_sql = r"
 SELECT 1;
 -- Not sure why rollback would be used in a migration, but test for completeness
 ROLLBACK;
-  "#;
+  ";
         assert_debug_snapshot!(lint_sql_assuming_in_transaction(bad_sql));
     }
 }

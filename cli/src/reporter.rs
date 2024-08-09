@@ -543,9 +543,9 @@ mod test_github_comment {
     fn test_generating_comment_multiple_files() {
         let violations = vec![ViolationContent {
             filename: "alpha.sql".into(),
-            sql: r#"
+            sql: r"
 SELECT 1;
-                "#
+                "
             .into(),
             violations: vec![ReportViolation {
                 file: "alpha.sql".into(),
@@ -627,9 +627,9 @@ mod test_check_files {
 
     #[test]
     fn test_check_files_invalid_syntax() {
-        let sql = r#"
+        let sql = r"
 select \;
-        "#;
+        ";
         let mut buff = Vec::new();
         let res = process_violations(sql, "test.sql", &[], None, false);
         fmt_json(&mut buff, vec![res]).unwrap();
@@ -675,10 +675,10 @@ SELECT 1;
         );
         assert!(res.is_ok());
 
-        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r###"
+        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r"
         main.sql:1:0: warning: adding-required-field Adding a NOT NULL field without a DEFAULT will fail for a populated table. Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).
         main.sql:3:1: warning: adding-required-field Adding a NOT NULL field without a DEFAULT will fail for a populated table. Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).
-        "###);
+        ");
     }
 
     #[test]
@@ -735,9 +735,9 @@ SELECT 1;
         );
 
         assert!(res.is_ok());
-        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r###"
+        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r#"
         [{"file":"main.sql","line":1,"column":0,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field without a DEFAULT will fail for a populated table."},{"Help":"Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+)."}],"rule_name":"adding-required-field"},{"file":"main.sql","line":3,"column":1,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field without a DEFAULT will fail for a populated table."},{"Help":"Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+)."}],"rule_name":"adding-required-field"}]
-        "###);
+        "#);
     }
 
     #[test]
@@ -761,7 +761,7 @@ SELECT 1;
         let sql = r#"ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;"#;
         let violations = lint_sql(sql);
 
-        assert_debug_snapshot!(violations, @r###"
+        assert_debug_snapshot!(violations, @r#"
         [
             RuleViolation {
                 kind: AddingRequiredField,
@@ -781,10 +781,10 @@ SELECT 1;
                 ],
             },
         ]
-        "###);
+        "#);
 
         let filename = "main.sql";
-        assert_debug_snapshot!(pretty_violations(violations, sql, filename), @r###"
+        assert_debug_snapshot!(pretty_violations(violations, sql, filename), @r#"
         ViolationContent {
             filename: "main.sql",
             sql: "ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;",
@@ -807,6 +807,6 @@ SELECT 1;
                 },
             ],
         }
-        "###);
+        "#);
     }
 }

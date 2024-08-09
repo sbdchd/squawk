@@ -149,20 +149,20 @@ excluded_paths = ["example.sql"]
     #[test]
     fn test_load_assume_in_transaction() {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
-        let file = r#"
+        let file = r"
 assume_in_transaction = false
         
-        "#;
+        ";
         fs::write(&squawk_toml, file).expect("Unable to write file");
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
     fn test_load_fail_on_violations() {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
-        let file = r#"
+        let file = r"
 [upload_to_github]
 fail_on_violations = true        
-        "#;
+        ";
         fs::write(&squawk_toml, file).expect("Unable to write file");
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
     }

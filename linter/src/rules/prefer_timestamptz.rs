@@ -47,7 +47,7 @@ mod test_rules {
 
     #[test]
     fn test_create_with_timestamp() {
-        let bad_sql = r#"
+        let bad_sql = r"
 create table app.users
 (
     created_ts   timestamp
@@ -56,7 +56,7 @@ create table app.accounts
 (
     created_ts timestamp without time zone
 );
-  "#;
+  ";
         let res = lint_sql(bad_sql);
         assert_eq!(
             violations_to_kinds(&res),
@@ -66,7 +66,7 @@ create table app.accounts
             ]
         );
 
-        let ok_sql = r#"
+        let ok_sql = r"
 create table app.users
 (
     created_ts   timestamptz
@@ -75,18 +75,18 @@ create table app.accounts
 (
     created_ts timestamp with time zone
 );
-  "#;
+  ";
         assert_eq!(lint_sql(ok_sql), vec![]);
     }
 
     #[test]
     fn test_alter_table() {
-        let bad_sql = r#"
+        let bad_sql = r"
     alter table app.users
         alter column created_ts type timestamp;
     alter table app.accounts
         alter column created_ts type timestamp without time zone;
-  "#;
+  ";
         let res = lint_sql(bad_sql);
 
         assert_debug_snapshot!(res);
@@ -98,14 +98,14 @@ create table app.accounts
             ]
         );
 
-        let ok_sql = r#"
+        let ok_sql = r"
 alter table app.users
     alter column created_ts type timestamptz;
 alter table app.accounts
     alter column created_ts type timestamp with time zone;
 alter table app.accounts
     alter column created_ts type timestamptz using created_ts at time zone 'UTC';
-  "#;
+  ";
         assert_eq!(lint_sql(ok_sql), vec![]);
     }
 }

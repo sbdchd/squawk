@@ -7,7 +7,7 @@ use squawk_parser::ast::{ColumnDef, RawStmt};
 
 use crate::rules::utils::columns_create_or_modified;
 
-/// It's easier to update the check constraint on a text field than a varchar()
+/// It's easier to update the check constraint on a text field than a `varchar()`
 /// size since the check constraint can use NOT VALID with a separate VALIDATE
 /// call.
 #[must_use]
@@ -63,7 +63,7 @@ BEGIN;
 ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
 COMMIT;
 "#;
-        assert_debug_snapshot!(lint_sql(sql), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r#"
         [
             RuleViolation {
                 kind: PreferTextField,
@@ -83,7 +83,7 @@ COMMIT;
                 ],
             },
         ]
-        "###);
+        "#);
     }
 
     #[test]
@@ -99,7 +99,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
 "#;
-        assert_debug_snapshot!(lint_sql(bad_sql), @r###"
+        assert_debug_snapshot!(lint_sql(bad_sql), @r#"
         [
             RuleViolation {
                 kind: PreferTextField,
@@ -119,7 +119,7 @@ COMMIT;
                 ],
             },
         ]
-        "###);
+        "#);
 
         let ok_sql = r#"
 BEGIN;
@@ -152,9 +152,9 @@ COMMIT;
 
     #[test]
     fn allow_varchar_without_specified_limit() {
-        let ok_sql = r#"
+        let ok_sql = r"
     CREATE TABLE IF NOT EXISTS foo_table(bar_col varchar);
-    "#;
+    ";
         let res = lint_sql(ok_sql);
         assert_eq!(res, vec![]);
     }
