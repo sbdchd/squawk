@@ -34,21 +34,24 @@ jobs:
           - runner: ubuntu-latest
             target: x86_64
             before-script: yum install clang llvm llvm-devel -y && python3 -m ensurepip
+            manylinux: manylinux_2_28
           - runner: ubuntu-latest
             target: aarch64-unknown-linux-gnu
-            docker-options: --platform linux/arm64
+            maturin-options: --zig
+            # Use zig 0.11.0 because this version contains generic-glibc < 2.38
+            # after glibc >= 2.38 strchrnul available in glibc by default
+            # and zig cc doesn't provide mechanism to disable it in older glibc targets
+            before-script: |
+              python3 -m pip install ziglang==0.11.0
     steps:
       - uses: actions/checkout@v4
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
           working-directory: cli
-          args: --release --out dist
-          manylinux: manylinux_2_28
-          docker-options: ${{ matrix.platform.docker-options }}
+          args: --release --out dist ${{ matrix.platform.maturin-options }}
+          manylinux: ${{ matrix.platform.manylinux }}
           sccache: "true"
           before-script-linux: ${{ matrix.platform.before-script }}
       - name: Upload wheels
