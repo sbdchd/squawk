@@ -41,7 +41,6 @@ pub fn adding_field_with_default(
 
     let non_volatile_funcs: HashSet<_> = NON_VOLATILE_BUILT_IN_FUNCTIONS
         .split('\n')
-        .into_iter()
         .map(|x| x.trim().to_lowercase())
         .filter(|x| !x.is_empty())
         .collect();
@@ -235,9 +234,9 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
     #[test]
     fn test_add_numbers_ok() {
         // This should be okay, but we don't handle expressions like this at the moment.
-        let ok_sql = r#"
+        let ok_sql = r"
 alter table account_metadata add column blah integer default 2 + 2;
-"#;
+";
         let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }

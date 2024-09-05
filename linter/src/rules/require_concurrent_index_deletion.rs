@@ -64,25 +64,25 @@ mod test_rules {
 
     #[test]
     fn regression_false_positive_drop_type() {
-        let sql = r#"
+        let sql = r"
   DROP TYPE IF EXISTS foo;
-  "#;
+  ";
         assert_eq!(lint_sql(sql), vec![]);
     }
 
     #[test]
     fn regression_false_positive_drop_table() {
-        let sql = r#"
+        let sql = r"
   DROP TABLE IF EXISTS some_table;
-  "#;
+  ";
         assert_eq!(lint_sql(sql), vec![]);
     }
 
     #[test]
     fn regression_false_positive_drop_trigger() {
-        let sql = r#"
+        let sql = r"
   DROP TRIGGER IF EXISTS trigger on foo_table;
-  "#;
+  ";
         assert_eq!(lint_sql(sql), vec![]);
     }
 }

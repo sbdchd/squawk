@@ -57,7 +57,7 @@ mod test_rules {
 
     #[test]
     fn test_create_table_ok() {
-        let ok_sql = r#"
+        let ok_sql = r"
 create table users (
     id bigint
 );
@@ -82,12 +82,12 @@ create table users (
 create table users (
     id serial2
 );
-  "#;
+  ";
         assert_eq!(lint_sql(ok_sql), vec![]);
     }
     #[test]
     fn test_create_table_bad() {
-        let bad_sql = r#"
+        let bad_sql = r"
 create table users (
     id integer
 );
@@ -100,7 +100,7 @@ create table users (
 create table users (
     id serial4
 );
-  "#;
+  ";
         let res = lint_sql(bad_sql);
         let violations = violations_to_kinds(&res);
         assert_eq!(

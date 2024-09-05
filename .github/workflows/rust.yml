@@ -150,7 +150,7 @@ jobs:
 
   publish-npm:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-linux-x64, build-mac]
+    needs: [build-linux-x64, build-mac, build-windows]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

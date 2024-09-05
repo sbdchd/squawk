@@ -76,9 +76,9 @@ mod test_rules {
 
     #[test]
     fn test_serial_primary_key() {
-        let bad_sql = r#"
+        let bad_sql = r"
 ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
-"#;
+";
 
         let expected_bad_res = lint_sql(bad_sql);
         assert_ne!(expected_bad_res, vec![]);
@@ -87,17 +87,17 @@ ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 
     #[test]
     fn test_plain_primary_key() {
-        let bad_sql = r#"
+        let bad_sql = r"
 ALTER TABLE items ADD PRIMARY KEY (id);
-"#;
+";
 
         let expected_bad_res = lint_sql(bad_sql);
         assert_ne!(expected_bad_res, vec![]);
         assert_debug_snapshot!(expected_bad_res);
 
-        let ok_sql = r#"
+        let ok_sql = r"
 ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
-"#;
+";
         assert_debug_snapshot!(lint_sql(ok_sql,));
     }
 }

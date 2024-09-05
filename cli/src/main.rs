@@ -45,9 +45,10 @@ struct Opt {
     /// Paths to exclude
     ///
     /// For example:
-    /// --exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql
     ///
-    /// --exclude-path='*user_ids.sql'
+    /// `--exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql`
+    ///
+    /// `--exclude-path='*user_ids.sql'`
     #[structopt(long = "exclude-path", global = true)]
     excluded_path: Option<Vec<String>>,
     /// Exclude specific warnings
@@ -149,10 +150,8 @@ fn main() {
         opts.assume_in_transaction
     } else if opts.no_assume_in_transaction {
         !opts.no_assume_in_transaction
-    } else if let Some(assume_in_transaction) = conf.assume_in_transaction {
-        assume_in_transaction
     } else {
-        false
+        conf.assume_in_transaction.unwrap_or_default()
     };
 
     info!("pg version: {:?}", pg_version);
@@ -214,7 +213,7 @@ fn main() {
                         .map(|f| f.violations.len())
                         .sum::<usize>();
                     match print_violations(&mut handle, file_reports, &reporter) {
-                        Ok(_) => {
+                        Ok(()) => {
                             let exit_code = i32::from(total_violations > 0);
                             process::exit(exit_code);
                         }

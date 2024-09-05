@@ -248,15 +248,15 @@ COMMIT;
         assert_eq!(lint_sql(sql), Ok(vec![]));
 
         // select is fine, we're only interested in modifications to the tables
-        let sql = r#"
+        let sql = r"
 SELECT 1;
-"#;
+";
         assert_eq!(lint_sql(sql), Ok(vec![]));
 
         // inserts are also okay
-        let sql = r#"
+        let sql = r"
 INSERT INTO tbl VALUES (a);
-"#;
+";
         assert_eq!(lint_sql(sql), Ok(vec![]));
 
         let sql = r#"
@@ -301,30 +301,30 @@ DROP TYPE foo;
 
     #[test]
     fn enable_row_level_security() {
-        let bad_sql = r#"
+        let bad_sql = r"
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE IF EXISTS test ENABLE ROW LEVEL SECURITY;
-  "#;
+  ";
 
         assert_debug_snapshot!(lint_sql(bad_sql));
     }
 
     #[test]
     fn enable_row_level_security_without_exists_check() {
-        let bad_sql = r#"
+        let bad_sql = r"
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE test ENABLE ROW LEVEL SECURITY;
-  "#;
+  ";
 
         assert_debug_snapshot!(lint_sql(bad_sql));
     }
 
     #[test]
     fn disable_row_level_security() {
-        let bad_sql = r#"
+        let bad_sql = r"
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
-  "#;
+  ";
 
         assert_debug_snapshot!(lint_sql(bad_sql));
     }
@@ -371,7 +371,7 @@ ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
         let sql = r#"
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 "#;
-        assert_debug_snapshot!(lint_sql(sql), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r#"
         Ok(
             [
                 RuleViolation {
@@ -390,12 +390,12 @@ ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
                 },
             ],
         )
-        "###);
+        "#);
 
         let sql = r#"
 CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
 "#;
-        assert_debug_snapshot!(lint_sql(sql), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r#"
         Ok(
             [
                 RuleViolation {
@@ -414,12 +414,12 @@ CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
                 },
             ],
         )
-        "###);
+        "#);
 
         let sql = r#"
 CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
 "#;
-        assert_debug_snapshot!(lint_sql(sql), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r#"
         Ok(
             [
                 RuleViolation {
@@ -438,12 +438,12 @@ CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NUL
                 },
             ],
         )
-        "###);
+        "#);
 
         let sql = r#"
 ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
         "#;
-        assert_debug_snapshot!(lint_sql(sql), @r###"
+        assert_debug_snapshot!(lint_sql(sql), @r#"
         Ok(
             [
                 RuleViolation {
@@ -462,6 +462,6 @@ ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
                 },
             ],
         )
-        "###);
+        "#);
     }
 }

@@ -100,7 +100,7 @@ pub struct SelectStmt {
     // target for SELECT INTO
     #[serde(rename = "intoClause")]
     pub into_clause: Option<Value>,
-    /// the target list (of ResTarget)
+    /// the target list (of `ResTarget`)
     #[serde(rename = "targetList")]
     pub target_list: Option<Vec<Value>>,
     /// the FROM clause
@@ -115,7 +115,7 @@ pub struct SelectStmt {
     /// HAVING conditional-expression
     #[serde(rename = "havingClause")]
     pub having_clause: Option<Value>,
-    /// WINDOW window_name AS (...), ...
+    /// WINDOW `window_name` AS (...), ...
     #[serde(rename = "windowClause")]
     pub window_clause: Option<Value>,
 
@@ -135,7 +135,7 @@ pub struct SelectStmt {
     // These fields are used in both "leaf" SelectStmts and upper-level
     // SelectStmts.
     //
-    /// sort clause (a list of SortBy's)
+    /// sort clause (a list of `SortBy`'s)
     #[serde(rename = "sortClause")]
     sort_clause: Option<Value>,
     /// # of result tuples to skip
@@ -144,7 +144,7 @@ pub struct SelectStmt {
     /// # of result tuples to return
     #[serde(rename = "limitCount")]
     limit_count: Option<Value>,
-    /// FOR UPDATE (list of LockingClause's)
+    /// FOR UPDATE (list of `LockingClause`'s)
     #[serde(rename = "lockingClause")]
     locking_clause: Option<Value>,
     /// WITH clause
@@ -241,7 +241,7 @@ pub struct RangeVar {
     /// expand rel by inheritance? recursively act on children?
     #[serde(default)]
     pub inh: bool,
-    /// see RELPERSISTENCE_* in pg_class.h
+    /// see RELPERSISTENCE_* in `pg_class.h`
     pub relpersistence: String,
     /// table alias & optional column aliases
     pub alias: Option<Value>,
@@ -818,7 +818,7 @@ pub enum OnCommitAction {
 pub struct CreateStmt {
     /// relation to create
     pub relation: RangeVar,
-    /// column definitions (list of ColumnDef)
+    /// column definitions (list of `ColumnDef`)
     #[serde(rename = "tableElts", default)]
     pub table_elts: Vec<TableElt>,
     /// relations to inherit from (list of inhRelation)
