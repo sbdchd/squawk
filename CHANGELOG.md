@@ -7,9 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.2.0 - 2024-09-08
+
 ### Added
 
-- added support windows builds (#368)
+- added support windows builds (#368). Thanks @ermakov-oleg!
+- improved docs for "disallowed-unique-constraint" (#370). Thanks @teeyingyap!
+
+### Fixed
+
+- fixed "prefer-robust-stmts" to work with RLS (#367)
 
 ## v1.1.2 - 2024-06-26
 
