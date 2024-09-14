@@ -26,6 +26,7 @@ jobs:
 
   linux:
     needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
     runs-on: ${{ matrix.platform.runner }}
     strategy:
       matrix:
@@ -62,6 +63,7 @@ jobs:
 
   windows:
     needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
     runs-on: ${{ matrix.platform.runner }}
     strategy:
       matrix:
@@ -88,6 +90,7 @@ jobs:
 
   macos:
     needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
     runs-on: ${{ matrix.platform.runner }}
     strategy:
       matrix:
@@ -114,6 +117,7 @@ jobs:
 
   sdist:
     needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -136,6 +140,7 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    if: "startsWith(github.ref, 'refs/tags/')"
     needs: [linux, windows, macos, sdist]
     steps:
       - uses: actions/download-artifact@v4
