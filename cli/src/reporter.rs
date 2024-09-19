@@ -321,6 +321,7 @@ pub fn fmt_tty<W: io::Write>(f: &mut W, files: &[ViolationContent]) -> Result<()
     }
     let total_violations = files.iter().map(|f| f.violations.len()).sum::<usize>();
     let files_checked = files.len();
+    let files_with_violations = files.iter().filter(|f| !f.violations.is_empty()).count();
     if total_violations == 0 {
         writeln!(
             f,
@@ -333,6 +334,16 @@ pub fn fmt_tty<W: io::Write>(f: &mut W, files: &[ViolationContent]) -> Result<()
             f,
             "find detailed examples and solutions for each rule at {}",
             style("https://squawkhq.com/docs/rules").underlined()
+        )?;
+        writeln!(
+            f,
+            "Found {total_violations} issue{plural} in {files_with_violations} file{files_plural} (checked {files_checked} {files_checked_plural})",
+            total_violations = total_violations,
+            plural = if total_violations == 1 { "" } else { "s" },
+            files_with_violations = files_with_violations,
+            files_plural = if files_with_violations == 1 { "" } else { "s" },
+            files_checked = files_checked,
+            files_checked_plural = if files_checked == 1 { "source file" } else { "source files" }
         )?;
     }
     Ok(())
