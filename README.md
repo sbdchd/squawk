@@ -13,12 +13,11 @@ Also it seemed like a nice project to spend more time with Rust.
 
 ## Install
 
-Note: due to `squawk`'s dependency on
-[`libpg_query`](https://github.com/lfittl/libpg_query/issues/44), `squawk`
-supports Linux, macOS and Windows
-
 ```shell
 npm install -g squawk-cli
+
+# or via PYPI
+pip install squawk-cli
 
 # or install binaries directly via the releases page
 https://github.com/sbdchd/squawk/releases
