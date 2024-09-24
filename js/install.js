@@ -50,6 +50,7 @@ const SUPPORTED_PLATFORMS = new Set([
   "darwin-x64",
   "darwin-arm64",
   "linux-x64",
+  "linux-arm64",
   "win32-x64",
 ])
 const BINARY_NAME_OVERRIDE = new Map([["win32-x64", "squawk-windows-x64.exe"]])
