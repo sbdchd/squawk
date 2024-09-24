@@ -39,6 +39,9 @@ jobs:
           profile: minimal
           override: true
 
+      - name: Apt
+        run: sudo apt-get install gcc-aarch64-linux-gnu
+
       - name: Cache
         uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
 
