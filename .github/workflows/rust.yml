@@ -83,7 +83,7 @@ jobs:
         uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
 
       - name: Build
-        run: cargo build --target aarch64-unknown-linux-gnu --release && mv target/aarch64-unknown-linux-gnu/release/squawk target/release/squawk-linux-arm64
+        run: RUSTFLAGS="-C linker=aarch64-linux-gnu-gcc" cargo build --target aarch64-unknown-linux-gnu --release && mv target/aarch64-unknown-linux-gnu/release/squawk target/release/squawk-linux-arm64
 
       - name: Artifact
         uses: actions/upload-artifact@v3
