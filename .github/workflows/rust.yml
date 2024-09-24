@@ -39,9 +39,6 @@ jobs:
           profile: minimal
           override: true
 
-      - name: Apt
-        run: sudo apt-get install gcc-aarch64-linux-gnu
-
       - name: Cache
         uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
 
@@ -70,6 +67,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Apt
+        run: sudo apt-get install gcc-aarch64-linux-gnu
 
       - name: Install Toolchain
         uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
