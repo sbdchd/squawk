@@ -61,6 +61,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build-linux-arm64:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
+
     name: Linux arm64
     runs-on: ubuntu-latest
 
