@@ -37,7 +37,7 @@ pub fn prefer_robust_stmts(
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => match stmt.kind {
-                TransactionStmtKind::Begin => inside_transaction = true,
+                TransactionStmtKind::Begin | TransactionStmtKind::Start => inside_transaction = true,
                 TransactionStmtKind::Commit => inside_transaction = false,
                 _ => continue,
             },
