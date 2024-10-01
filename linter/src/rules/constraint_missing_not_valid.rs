@@ -16,7 +16,10 @@ fn not_valid_validate_in_transaction(tree: &[RawStmt], assume_in_transaction: bo
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => {
-                if (stmt.kind == TransactionStmtKind::Begin || stmt.kind == TransactionStmtKind::Start) && !in_transaction {
+                if (stmt.kind == TransactionStmtKind::Begin
+                    || stmt.kind == TransactionStmtKind::Start)
+                    && !in_transaction
+                {
                     in_transaction = true;
                     not_valid_names.clear();
                 }
