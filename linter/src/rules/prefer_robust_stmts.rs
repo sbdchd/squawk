@@ -369,6 +369,23 @@ ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
     }
 
     #[test]
+    fn test_start_transaction() {
+        let sql = r#"
+START TRANSACTION;
+
+ALTER TABLE "A" DROP CONSTRAINT "UQ_c4fb579a038211909ee524ccf29";
+
+ALTER TABLE "B" DROP CONSTRAINT "UQ_791c01fe9438d66a94490d0da28";
+
+ALTER TABLE "C" DROP CONSTRAINT "UQ_23fbf20e8ab4e806941359f4f79";
+
+ALTER TABLE "D" DROP CONSTRAINT "UQ_468cad3743146a81c94b0b114ac";
+
+COMMIT;"#;
+        assert_eq!(lint_sql(sql), Ok(vec![]));
+    }
+
+    #[test]
     fn test_prefer_robust_stmt_failure_cases() {
         let sql = r#"
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
