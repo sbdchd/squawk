@@ -14,7 +14,10 @@ pub fn ban_concurrent_index_creation_in_transaction(
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::TransactionStmt(stmt) => {
-                if stmt.kind == TransactionStmtKind::Begin && !in_transaction {
+                if (stmt.kind == TransactionStmtKind::Begin
+                    || stmt.kind == TransactionStmtKind::Start)
+                    && !in_transaction
+                {
                     in_transaction = true;
                 }
                 if stmt.kind == TransactionStmtKind::Commit {
