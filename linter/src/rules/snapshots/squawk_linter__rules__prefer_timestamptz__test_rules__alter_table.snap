@@ -6,10 +6,8 @@ expression: res
     RuleViolation {
         kind: PreferTimestampTz,
         span: Span {
-            start: 0,
-            len: Some(
-                73,
-            ),
+            start: 48,
+            len: None,
         },
         messages: [
             Note(
@@ -23,10 +21,8 @@ expression: res
     RuleViolation {
         kind: PreferTimestampTz,
         span: Span {
-            start: 74,
-            len: Some(
-                94,
-            ),
+            start: 125,
+            len: None,
         },
         messages: [
             Note(

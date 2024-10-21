@@ -18,7 +18,7 @@ pub fn prefer_identity(
     let mut errs = vec![];
     for raw_stmt in tree {
         for column in columns_create_or_modified(&raw_stmt.stmt) {
-            check_column_def(&mut errs, raw_stmt, column);
+            check_column_def(&mut errs, column);
         }
     }
     errs
@@ -35,12 +35,12 @@ lazy_static! {
     ]);
 }
 
-fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
+fn check_column_def(errs: &mut Vec<RuleViolation>, column_def: &ColumnDef) {
     if let Some(column_name) = column_def.type_name.names.last() {
         if SERIAL_TYPES.contains(column_name.string.sval.as_str()) {
             errs.push(RuleViolation::new(
                 RuleViolationKind::PreferIdentity,
-                raw_stmt.into(),
+                column_def.into(),
                 None,
             ));
         }

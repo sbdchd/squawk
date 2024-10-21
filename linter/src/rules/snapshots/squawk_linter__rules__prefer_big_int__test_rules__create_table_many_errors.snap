@@ -1,0 +1,36 @@
+---
+source: linter/src/rules/prefer_big_int.rs
+expression: res
+---
+[
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 26,
+            len: None,
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+    RuleViolation {
+        kind: PreferBigInt,
+        span: Span {
+            start: 43,
+            len: None,
+        },
+        messages: [
+            Note(
+                "Hitting the max 32 bit integer is possible and may break your application.",
+            ),
+            Help(
+                "Use 64bit integer values instead to prevent hitting this limit.",
+            ),
+        ],
+    },
+]

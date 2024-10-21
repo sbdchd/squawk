@@ -6,10 +6,8 @@ expression: lint_sql(sql)
     RuleViolation {
         kind: BanCharField,
         span: Span {
-            start: 7,
-            len: Some(
-                194,
-            ),
+            start: 76,
+            len: None,
         },
         messages: [
             Help(
@@ -20,10 +18,8 @@ expression: lint_sql(sql)
     RuleViolation {
         kind: BanCharField,
         span: Span {
-            start: 7,
-            len: Some(
-                194,
-            ),
+            start: 108,
+            len: None,
         },
         messages: [
             Help(
@@ -34,10 +30,8 @@ expression: lint_sql(sql)
     RuleViolation {
         kind: BanCharField,
         span: Span {
-            start: 7,
-            len: Some(
-                194,
-            ),
+            start: 144,
+            len: None,
         },
         messages: [
             Help(
@@ -48,10 +42,8 @@ expression: lint_sql(sql)
     RuleViolation {
         kind: BanCharField,
         span: Span {
-            start: 7,
-            len: Some(
-                194,
-            ),
+            start: 173,
+            len: None,
         },
         messages: [
             Help(

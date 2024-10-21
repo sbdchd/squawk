@@ -18,7 +18,7 @@ pub fn prefer_big_int(
     let mut errs = vec![];
     for raw_stmt in tree {
         for column in columns_create_or_modified(&raw_stmt.stmt) {
-            check_column_def(&mut errs, raw_stmt, column);
+            check_column_def(&mut errs, column);
         }
     }
     errs
@@ -37,12 +37,12 @@ lazy_static! {
     ]);
 }
 
-fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
+fn check_column_def(errs: &mut Vec<RuleViolation>, column_def: &ColumnDef) {
     if let Some(column_name) = column_def.type_name.names.last() {
         if SMALL_INT_TYPES.contains(column_name.string.sval.as_str()) {
             errs.push(RuleViolation::new(
                 RuleViolationKind::PreferBigInt,
-                raw_stmt.into(),
+                column_def.into(),
                 None,
             ));
         }
@@ -124,6 +124,17 @@ create table users (
                 .count(),
             "all violations should be big int violations"
         );
+        assert_debug_snapshot!(res);
+    }
+    #[test]
+    fn test_create_table_many_errors() {
+        let bad_sql = r"
+create table users (
+    foo integer,
+    bar serial
+);
+  ";
+        let res = lint_sql(bad_sql);
         assert_debug_snapshot!(res);
     }
 }

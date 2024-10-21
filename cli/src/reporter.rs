@@ -386,13 +386,18 @@ pub fn pretty_violations(
                 #[allow(clippy::cast_sign_loss)]
                 let start = start as usize;
 
-                #[allow(clippy::cast_sign_loss)]
-                let len = len.unwrap_or(0) as usize;
-
                 // 1-indexed
-                let lineno = sql[..start].lines().count() + 1;
+                // remove the leading whitespace on last line
+                let lineno = sql[..start].trim_end().lines().count() + 1;
 
-                let content = &sql[start..=start + len];
+                let content = if let Some(len) = len {
+                    #[allow(clippy::cast_sign_loss)]
+                    &sql[start..=start + len as usize]
+                } else {
+                    // Use current line
+                    let tail = sql[start..].find('\n').unwrap_or(sql.len() - start);
+                    &sql[start..=start + tail]
+                };
 
                 // TODO(sbdchd): could remove the leading whitespace and comments to
                 // get cleaner reports
