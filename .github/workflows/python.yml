@@ -49,6 +49,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
+          maturin-version: v1.7.1
           working-directory: cli
           args: --release --out dist ${{ matrix.platform.maturin-options }}
           manylinux: ${{ matrix.platform.manylinux }}
