@@ -6,10 +6,8 @@ expression: res
     RuleViolation {
         kind: PreferIdentity,
         span: Span {
-            start: 0,
-            len: Some(
-                37,
-            ),
+            start: 26,
+            len: None,
         },
         messages: [
             Note(
@@ -23,10 +21,8 @@ expression: res
     RuleViolation {
         kind: PreferIdentity,
         span: Span {
-            start: 38,
-            len: Some(
-                38,
-            ),
+            start: 64,
+            len: None,
         },
         messages: [
             Note(
@@ -40,10 +36,8 @@ expression: res
     RuleViolation {
         kind: PreferIdentity,
         span: Span {
-            start: 77,
-            len: Some(
-                38,
-            ),
+            start: 103,
+            len: None,
         },
         messages: [
             Note(
@@ -57,10 +51,8 @@ expression: res
     RuleViolation {
         kind: PreferIdentity,
         span: Span {
-            start: 116,
-            len: Some(
-                38,
-            ),
+            start: 142,
+            len: None,
         },
         messages: [
             Note(
@@ -74,10 +66,8 @@ expression: res
     RuleViolation {
         kind: PreferIdentity,
         span: Span {
-            start: 155,
-            len: Some(
-                42,
-            ),
+            start: 181,
+            len: None,
         },
         messages: [
             Note(
@@ -91,10 +81,8 @@ expression: res
     RuleViolation {
         kind: PreferIdentity,
         span: Span {
-            start: 198,
-            len: Some(
-                40,
-            ),
+            start: 224,
+            len: None,
         },
         messages: [
             Note(

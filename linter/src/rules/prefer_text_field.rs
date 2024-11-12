@@ -19,19 +19,19 @@ pub fn prefer_text_field(
     let mut errs = vec![];
     for raw_stmt in tree {
         for column in columns_create_or_modified(&raw_stmt.stmt) {
-            check_column_def(&mut errs, raw_stmt, column);
+            check_column_def(&mut errs, column);
         }
     }
     errs
 }
 
-fn check_column_def(errs: &mut Vec<RuleViolation>, raw_stmt: &RawStmt, column_def: &ColumnDef) {
+fn check_column_def(errs: &mut Vec<RuleViolation>, column_def: &ColumnDef) {
     let type_name = &column_def.type_name;
     for field_type_name in &type_name.names {
         if field_type_name.string.sval == "varchar" && !type_name.typmods.is_empty() {
             errs.push(RuleViolation::new(
                 RuleViolationKind::PreferTextField,
-                raw_stmt.into(),
+                column_def.into(),
                 None,
             ));
         }
@@ -68,10 +68,8 @@ COMMIT;
             RuleViolation {
                 kind: PreferTextField,
                 span: Span {
-                    start: 7,
-                    len: Some(
-                        123,
-                    ),
+                    start: 77,
+                    len: None,
                 },
                 messages: [
                     Note(
@@ -104,10 +102,8 @@ COMMIT;
             RuleViolation {
                 kind: PreferTextField,
                 span: Span {
-                    start: 7,
-                    len: Some(
-                        127,
-                    ),
+                    start: 103,
+                    len: None,
                 },
                 messages: [
                     Note(

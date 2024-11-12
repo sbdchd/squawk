@@ -6,10 +6,8 @@ expression: res
     RuleViolation {
         kind: PreferBigintOverInt,
         span: Span {
-            start: 0,
-            len: Some(
-                38,
-            ),
+            start: 26,
+            len: None,
         },
         messages: [
             Note(
@@ -23,10 +21,8 @@ expression: res
     RuleViolation {
         kind: PreferBigintOverInt,
         span: Span {
-            start: 39,
-            len: Some(
-                35,
-            ),
+            start: 65,
+            len: None,
         },
         messages: [
             Note(
@@ -40,10 +36,8 @@ expression: res
     RuleViolation {
         kind: PreferBigintOverInt,
         span: Span {
-            start: 75,
-            len: Some(
-                37,
-            ),
+            start: 101,
+            len: None,
         },
         messages: [
             Note(
@@ -57,10 +51,8 @@ expression: res
     RuleViolation {
         kind: PreferBigintOverInt,
         span: Span {
-            start: 113,
-            len: Some(
-                38,
-            ),
+            start: 139,
+            len: None,
         },
         messages: [
             Note(

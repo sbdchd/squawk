@@ -6,10 +6,8 @@ expression: res
     RuleViolation {
         kind: PreferTextField,
         span: Span {
-            start: 7,
-            len: Some(
-                66,
-            ),
+            start: 43,
+            len: None,
         },
         messages: [
             Note(

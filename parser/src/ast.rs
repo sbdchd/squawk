@@ -54,6 +54,16 @@ impl std::convert::From<&RawStmt> for Span {
     }
 }
 
+impl std::convert::From<&ColumnDef> for Span {
+    fn from(stmt: &ColumnDef) -> Self {
+        Self {
+            start: stmt.location,
+            // Use current line
+            len: None,
+        }
+    }
+}
+
 impl RawStmt {
     #[must_use]
     pub fn span(&self) -> Span {

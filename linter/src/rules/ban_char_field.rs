@@ -22,7 +22,7 @@ pub fn ban_char_type(
                             if field_type_name.string.sval == "bpchar" {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::BanCharField,
-                                    raw_stmt.into(),
+                                    column_def.into(),
                                     None,
                                 ));
                             }
