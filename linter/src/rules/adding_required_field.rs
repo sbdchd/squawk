@@ -4,6 +4,14 @@ use crate::violations::{RuleViolation, RuleViolationKind};
 use squawk_parser::ast::{
     AlterTableCmds, AlterTableDef, AlterTableType, ColumnDefConstraint, ConstrType, RawStmt, Stmt,
 };
+fn has_generated_constraint(constraints: &[ColumnDefConstraint]) -> bool {
+    for ColumnDefConstraint::Constraint(constraint) in constraints {
+        if constraint.contype == ConstrType::Generated {
+            return true;
+        }
+    }
+    return false;
+}
 
 fn has_not_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bool {
     let mut has_not_null = false;
@@ -33,6 +41,9 @@ pub fn adding_required_field(
                 for AlterTableCmds::AlterTableCmd(cmd) in &stmt.cmds {
                     if cmd.subtype == AlterTableType::AddColumn {
                         if let Some(AlterTableDef::ColumnDef(column_def)) = &cmd.def {
+                            if has_generated_constraint(&column_def.constraints) {
+                                continue;
+                            }
                             if has_not_null_and_no_default_constraint(&column_def.constraints) {
                                 errs.push(RuleViolation::new(
                                     RuleViolationKind::AddingRequiredField,
@@ -85,5 +96,21 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
   "#;
         assert_debug_snapshot!(lint_sql(bad_sql));
+    }
+    #[test]
+    fn test_generated_stored_not_null() {
+        let ok_sql = r"
+ ALTER TABLE foo
+    ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED NOT NULL;
+        ";
+        assert_debug_snapshot!(lint_sql(ok_sql));
+    }
+    #[test]
+    fn test_generated_stored() {
+        let ok_sql = r"
+ ALTER TABLE foo
+    ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED ;
+        ";
+        assert_debug_snapshot!(lint_sql(ok_sql));
     }
 }

@@ -1,0 +1,23 @@
+---
+source: linter/src/rules/adding_field_with_default.rs
+expression: "lint_sql(bad_sql, pg_version_11)"
+---
+[
+    RuleViolation {
+        kind: AddingFieldWithDefault,
+        span: Span {
+            start: 0,
+            len: Some(
+                90,
+            ),
+        },
+        messages: [
+            Note(
+                "Adding a generated column requires a table rewrite with an ACCESS EXCLUSIVE lock.",
+            ),
+            Help(
+                "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.",
+            ),
+        ],
+    },
+]

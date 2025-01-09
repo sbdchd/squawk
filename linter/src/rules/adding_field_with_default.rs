@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use crate::{
     versions::Version,
-    violations::{RuleViolation, RuleViolationKind},
+    violations::{RuleViolation, RuleViolationKind, ViolationMessage},
 };
 
 use serde_json::{json, Value};
@@ -71,6 +71,20 @@ pub fn adding_field_with_default(
                                         RuleViolationKind::AddingFieldWithDefault,
                                         raw_stmt.into(),
                                         None,
+                                    ));
+                                }
+                                if constraint.contype == ConstrType::Generated {
+                                    errs.push(RuleViolation::new(
+                                        RuleViolationKind::AddingFieldWithDefault,
+                                        raw_stmt.into(),
+                                        Some(vec![
+                                            ViolationMessage::Note(
+                                            "Adding a generated column requires a table rewrite with an ACCESS EXCLUSIVE lock.".into(),
+                                        ),
+                                        ViolationMessage::Help(
+                                            "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.".into(),
+                                        ),
+                                        ]),
                                     ));
                                 }
                             }
@@ -239,5 +253,15 @@ alter table account_metadata add column blah integer default 2 + 2;
 ";
         let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
+    }
+
+    #[test]
+    fn test_generated_stored() {
+        let bad_sql = r"
+        ALTER TABLE foo
+    ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;
+        ";
+        let pg_version_11 = Some(Version::from_str("11.0.0").unwrap());
+        assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
     }
 }

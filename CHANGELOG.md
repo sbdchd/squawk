@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.5.0
+
+### Added
+
+- Added warning to `adding-field-with-default` to warn about generated columns (#397).
+
+### Fixed
+
+- Fixed bug in `adding-required-field` where generated columns were incorrectly flagged (#397).
+
 ## v1.4.1
 
 ### Fixed
