@@ -55,7 +55,7 @@ Instead of using a generated column, use a trigger.
 Instead of:
 
 ```sql
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer GENERATED ALWAAYS as ("bar" + "baz") STORED;
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer GENERATED ALWAYS as ("bar" + "baz") STORED;
 ```
 
 Use:
