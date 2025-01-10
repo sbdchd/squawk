@@ -10,7 +10,7 @@ fn has_generated_constraint(constraints: &[ColumnDefConstraint]) -> bool {
             return true;
         }
     }
-    return false;
+    false
 }
 
 fn has_not_null_and_no_default_constraint(constraints: &[ColumnDefConstraint]) -> bool {
