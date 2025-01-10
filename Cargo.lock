@@ -759,7 +759,7 @@ dependencies = [
 [[package]]
 name = "libpg_query-sys"
 version = "0.4.0"
-source = "git+https://github.com/chdsbd/libpg_query-sys.git?rev=f4584dcbcb8c1f3bee550477257e84a846fdd92d#f4584dcbcb8c1f3bee550477257e84a846fdd92d"
+source = "git+https://github.com/chdsbd/libpg_query-sys.git?rev=ac223c7b197459d657d166449ccf99883f23bbcb#ac223c7b197459d657d166449ccf99883f23bbcb"
 dependencies = [
  "bindgen",
  "cc",
@@ -1586,7 +1586,7 @@ checksum = "6e63cff320ae2c57904679ba7cb63280a3dc4613885beafb148ee7bf9aa9042d"
 
 [[package]]
 name = "squawk"
-version = "1.5.0"
+version = "1.5.1"
 dependencies = [
  "atty",
  "base64 0.12.3",

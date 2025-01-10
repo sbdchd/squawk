@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.5.1 - 2025-01-10
+
+### Fixed
+
+- Fixed support for custom LIBPG_QUERY_PATH (#399).
+
 ## v1.5.0 - 2025-01-09
 
 ### Added
