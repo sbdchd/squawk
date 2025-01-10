@@ -45,6 +45,40 @@ We add our column as nullable, set a default for new rows, backfill our column (
 See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-valid-validate-works) for more information on adding constraints as `NOT VALID`.
 
 
+### Adding a generated column
+
+Adding a generated column in Postgres will cause a table rewrite, locking the table while the update completes.
+
+Instead of using a generated column, use a trigger.
+
+
+Instead of:
+
+```sql
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer GENERATED ALWAAYS as ("bar" + "baz") STORED;
+```
+
+Use:
+
+```sql
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer;
+
+-- backfill column in batches
+
+-- add a trigger to match the generated column behavior
+CREATE FUNCTION foo_update_trigger()
+RETURNS trigger AS '
+BEGIN
+NEW.foo := NEW.bar + NEW.baz;
+RETURN NEW;
+END' LANGUAGE 'plpgsql';
+
+CREATE TRIGGER update_foo_column
+BEFORE INSERT ON core_recipe
+FOR EACH ROW
+EXECUTE PROCEDURE foo_update_trigger();
+```
+
 ## solution for alembic and sqlalchemy
 
 Instead of:

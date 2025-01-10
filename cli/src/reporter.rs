@@ -481,10 +481,10 @@ fn get_sql_file_content(violation: &ViolationContent) -> Result<String, std::io:
 
     let violation_content = if violation_count > 0 {
         format!(
-            r#"
+            r"
 ```
 {}
-```"#,
+```",
             violations_text.trim_matches('\n')
         )
     } else {
@@ -494,7 +494,7 @@ fn get_sql_file_content(violation: &ViolationContent) -> Result<String, std::io:
     let violations_emoji = get_violations_emoji(violation_count);
 
     Ok(format!(
-        r#"
+        r"
 <h3><code>{filename}</code></h3>
 
 ```sql
@@ -506,7 +506,7 @@ fn get_sql_file_content(violation: &ViolationContent) -> Result<String, std::io:
 {violation_content}
     
 ---
-    "#,
+    ",
         violations_emoji = violations_emoji,
         filename = violation.filename,
         sql = sql,
@@ -521,7 +521,7 @@ pub fn get_comment_body(files: &[ViolationContent], version: &str) -> String {
     let violations_emoji = get_violations_emoji(violations_count);
 
     format!(
-        r#"
+        r"
 # Squawk Report
 
 ### **{violations_emoji} {violation_count}** violations across **{file_count}** file(s)
@@ -532,7 +532,7 @@ pub fn get_comment_body(files: &[ViolationContent], version: &str) -> String {
 [📚 More info on rules](https://github.com/sbdchd/squawk#rules)
 
 ⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) ({version}), a linter for PostgreSQL, focused on migrations
-"#,
+",
         violations_emoji = violations_emoji,
         violation_count = violations_count,
         file_count = files.len(),
