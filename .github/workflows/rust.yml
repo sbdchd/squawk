@@ -10,7 +10,7 @@ on:
 
 jobs:
   pre_job:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       should_skip: ${{ steps.skip_check.outputs.should_skip }}
       paths_result: ${{ steps.skip_check.outputs.paths_result }}
@@ -25,7 +25,7 @@ jobs:
     if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
 
     name: Linux x86_64
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -65,7 +65,7 @@ jobs:
     if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
 
     name: Linux arm64
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -194,7 +194,7 @@ jobs:
   publish-npm:
     if: startsWith(github.ref, 'refs/tags/')
     needs: [build-linux-x64, build-mac, build-windows]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -209,7 +209,7 @@ jobs:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -237,7 +237,7 @@ jobs:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -253,7 +253,7 @@ jobs:
         run: ./s/test
 
   check_version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
