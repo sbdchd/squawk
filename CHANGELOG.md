@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.5.2 - 2025-01-11
+
+### Fixed
+
+- Fixed accidental glibc upgrade (#401).
+
 ## v1.5.1 - 2025-01-10
 
 ### Fixed
