@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.5.4 - 2025-01-14
+
+### Fixed
+
+- Fixed building macOS Python wheels for x86 (#406). Thanks @ermakov-oleg!
+
 ## v1.5.3 - 2025-01-12
 
 ### Fixed
