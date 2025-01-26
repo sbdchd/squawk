@@ -45,7 +45,6 @@ pub fn adding_field_with_default(
         .filter(|x| !x.is_empty())
         .collect();
 
-    // println!("{:#?}", non_volatile_funcs);
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
