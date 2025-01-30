@@ -75,7 +75,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_nullable() {
+    fn nullable() {
         let ok_sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean;
   "#;
@@ -83,7 +83,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean;
     }
 
     #[test]
-    fn test_not_null_with_default() {
+    fn not_null_with_default() {
         let ok_sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
   "#;
@@ -91,14 +91,14 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
     }
 
     #[test]
-    fn test_not_null_without_default() {
+    fn not_null_without_default() {
         let bad_sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
   "#;
         assert_debug_snapshot!(lint_sql(bad_sql));
     }
     #[test]
-    fn test_generated_stored_not_null() {
+    fn generated_stored_not_null() {
         let ok_sql = r"
  ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED NOT NULL;
@@ -106,7 +106,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
         assert_debug_snapshot!(lint_sql(ok_sql));
     }
     #[test]
-    fn test_generated_stored() {
+    fn generated_stored() {
         let ok_sql = r"
  ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED ;

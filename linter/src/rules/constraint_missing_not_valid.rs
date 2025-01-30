@@ -127,7 +127,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_ensure_ignored_when_new_table() {
+    fn ensure_ignored_when_new_table() {
         let sql = r#"
 BEGIN;
 CREATE TABLE "core_foo" (
@@ -142,7 +142,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_ensure_ignored_when_new_table_with_assume_in_transaction() {
+    fn ensure_ignored_when_new_table_with_assume_in_transaction() {
         let sql = r#"
 CREATE TABLE "core_foo" (
 "id" serial NOT NULL PRIMARY KEY,
@@ -223,7 +223,7 @@ COMMIT;
     /// ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
     /// ```
     #[test]
-    fn test_adding_foreign_key() {
+    fn adding_foreign_key() {
         let bad_sql = r"
 -- instead of
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
@@ -249,7 +249,7 @@ ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
     /// ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
     /// ```
     #[test]
-    fn test_adding_check_constraint() {
+    fn adding_check_constraint() {
         let bad_sql = r#"
 -- instead of
 ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);

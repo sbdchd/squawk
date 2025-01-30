@@ -45,7 +45,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_drop_column() {
+    fn drop_column() {
         let sql = r#"
 ALTER TABLE "bar_tbl" DROP COLUMN "foo_col" CASCADE;
         "#;

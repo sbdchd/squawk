@@ -40,7 +40,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_ban_drop_table() {
+    fn ban_drop_table() {
         let sql = r#"
 DROP TABLE "table_name";
 DROP TABLE IF EXISTS "table_name";

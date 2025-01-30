@@ -41,7 +41,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_ban_drop_database() {
+    fn ban_drop_database() {
         let sql = r#"
 DROP DATABASE "table_name";
 DROP DATABASE IF EXISTS "table_name";

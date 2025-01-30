@@ -61,7 +61,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_ensure_ignored_when_new_table() {
+    fn ensure_ignored_when_new_table() {
         let sql = r#"
 BEGIN;
 CREATE TABLE "core_foo" (
@@ -76,7 +76,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_ensure_ignored_when_new_table_with_assume_in_transaction() {
+    fn ensure_ignored_when_new_table_with_assume_in_transaction() {
         let sql = r#"
 CREATE TABLE "core_foo" (
 "id" serial NOT NULL PRIMARY KEY,
@@ -95,7 +95,7 @@ CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
     /// CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
     /// ```
     #[test]
-    fn test_adding_index_non_concurrently() {
+    fn adding_index_non_concurrently() {
         let bad_sql = r#"
   -- instead of
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");

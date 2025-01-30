@@ -94,7 +94,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_no_nesting() {
+    fn no_nesting() {
         let ok_sql = r"
 BEGIN;
 SELECT 1;
@@ -104,7 +104,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_no_nesting_repeated() {
+    fn no_nesting_repeated() {
         let ok_sql = r"
 BEGIN;
 SELECT 1;
@@ -119,7 +119,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_no_nesting_with_assume_in_transaction() {
+    fn no_nesting_with_assume_in_transaction() {
         let ok_sql = r"
 SELECT 1;
   ";
@@ -127,7 +127,7 @@ SELECT 1;
     }
 
     #[test]
-    fn test_begin_repeated() {
+    fn begin_repeated() {
         let bad_sql = r"
 BEGIN;
 BEGIN;
@@ -138,7 +138,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_begin_with_assume_in_transaction() {
+    fn begin_with_assume_in_transaction() {
         let bad_sql = r"
 BEGIN;
 SELECT 1;
@@ -147,7 +147,7 @@ SELECT 1;
     }
 
     #[test]
-    fn test_commit_repeated() {
+    fn commit_repeated() {
         let bad_sql = r"
 BEGIN;
 SELECT 1;
@@ -158,7 +158,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_commit_with_assume_in_transaction() {
+    fn commit_with_assume_in_transaction() {
         let bad_sql = r"
 SELECT 1;
 COMMIT;
@@ -167,7 +167,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_rollback_with_assume_in_transaction() {
+    fn rollback_with_assume_in_transaction() {
         let bad_sql = r"
 SELECT 1;
 -- Not sure why rollback would be used in a migration, but test for completeness

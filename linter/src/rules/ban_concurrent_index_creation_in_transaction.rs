@@ -73,7 +73,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_adding_index_concurrently_in_transaction() {
+    fn adding_index_concurrently_in_transaction() {
         let bad_sql = r#"
   -- instead of
   BEGIN;
@@ -91,7 +91,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_adding_index_concurrently_in_transaction_with_assume_in_transaction() {
+    fn adding_index_concurrently_in_transaction_with_assume_in_transaction() {
         let bad_sql = r#"
   -- instead of
   CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
@@ -108,7 +108,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_adding_index_concurrently_in_transaction_with_assume_in_transaction_but_outside() {
+    fn adding_index_concurrently_in_transaction_with_assume_in_transaction_but_outside() {
         let ok_sql = r#"
   -- the following will work too
   COMMIT;

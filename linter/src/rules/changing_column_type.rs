@@ -44,7 +44,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_changing_field_type() {
+    fn changing_field_type() {
         let bad_sql = r#"
 BEGIN;
 --

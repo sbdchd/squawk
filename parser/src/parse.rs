@@ -60,14 +60,14 @@ mod tests {
     use insta::assert_debug_snapshot;
 
     #[test]
-    fn test_parse_sql_query_json() {
+    fn parse_sql_query_json_works() {
         let sql = r"ALTER TABLE table_c ADD column c boolean GENERATED ALWAYS AS (p IS NOT NULL) STORED NOT NULL;";
         let res = parse_sql_query_json(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_span_with_indent() {
+    fn span_with_indent() {
         // NOTE: the span information for these starts at 0 even though the SQL
         // is offset.
         let sql = r"   SELECT 1;";
@@ -75,7 +75,7 @@ mod tests {
         assert_debug_snapshot!(res);
     }
     #[test]
-    fn test_span_with_new_line_and_indent() {
+    fn span_with_new_line_and_indent() {
         let sql = r"
     SELECT 1;";
         let res = parse_sql_query(sql);
@@ -83,7 +83,7 @@ mod tests {
     }
 
     #[test]
-    fn test_adding_index_non_concurrently() {
+    fn adding_index_non_concurrently() {
         let sql = r#"
   -- instead of
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
@@ -105,14 +105,14 @@ mod tests {
     }
 
     #[test]
-    fn test_error_paths() {
+    fn error_paths() {
         let sql = r"lsakdjf;asdlfkjasd;lfj";
         let res = parse_sql_query(sql).unwrap_err();
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_migration() {
+    fn migration() {
         let sql = r#"
 BEGIN;
 CREATE INDEX "table_name_field_name_idx" ON "table_name" ("field_name");
@@ -124,41 +124,41 @@ COMMIT;
     }
 
     #[test]
-    fn test_select_string_literal() {
+    fn select_string_literal() {
         let sql = r"SELECT 'some string';";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_select_one() {
+    fn select_one() {
         let sql = r"SELECT 1;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
     #[test]
-    fn test_parse_sql_create_index_concurrently() {
+    fn parse_sql_create_index_concurrently() {
         let sql = r#"CREATE INDEX CONCURRENTLY "table_name_idx" ON "table_name" ("table_field");"#;
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_insert_stmt() {
+    fn parsing_insert_stmt() {
         let sql = r"INSERT INTO table_name VALUES (1, 2, 3);";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_update_stmt() {
+    fn parsing_update_stmt() {
         let sql = r"UPDATE table_name SET foo = 'bar' WHERE buzz > 10;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_create_table() {
+    fn parsing_create_table() {
         let sql = r#"
 BEGIN;
 CREATE TABLE "core_foo" (
@@ -180,7 +180,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_parsing_create_table_using_like() {
+    fn parsing_create_table_using_like() {
         let sql =
             r"CREATE TABLE core_bar (LIKE core_foo INCLUDING DEFAULTS INCLUDING CONSTRAINTS);";
         let res = parse_sql_query(sql);
@@ -188,13 +188,13 @@ COMMIT;
     }
 
     #[test]
-    fn test_parse_sql_create_index() {
+    fn parse_sql_create_index() {
         let sql = r#"CREATE INDEX "table_name_idx" ON "table_name" ("table_field");"#;
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
     #[test]
-    fn test_parse_sql_create_unique_index_safe() {
+    fn parse_sql_create_unique_index_safe() {
         let sql = r#"
 ALTER TABLE "legacy_questiongrouppg" 
     ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE 
@@ -204,21 +204,21 @@ ALTER TABLE "legacy_questiongrouppg"
         assert_debug_snapshot!(res);
     }
     #[test]
-    fn test_parse_delete_stmt() {
+    fn parse_delete_stmt() {
         let sql = r#"DELETE FROM "table_name";"#;
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parse_delete_stmt_2() {
+    fn parse_delete_stmt_2() {
         let sql = r#"DELETE FROM "table_name" WHERE account_age > 10;"#;
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parse_set_operations_stmt() {
+    fn parse_set_operations_stmt() {
         let sql = r#"SELECT * from "table_name" UNION SELECT * from "table_foo";"#;
         let res = parse_sql_query(sql).unwrap();
         assert_debug_snapshot!(res);
@@ -229,133 +229,133 @@ ALTER TABLE "legacy_questiongrouppg"
     }
 
     #[test]
-    fn test_parse_set_operations_stmt_2() {
+    fn parse_set_operations_stmt_2() {
         let sql = r#"SELECT * from "table_name" UNION ALL SELECT * from "table_foo";"#;
         let res = parse_sql_query(sql).unwrap();
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parse_create_schema_stmt() {
+    fn parse_create_schema_stmt() {
         let sql = r"CREATE SCHEMA schema_name;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parse_replica_identity_stmt() {
+    fn parse_replica_identity_stmt() {
         let sql = "ALTER TABLE aa REPLICA IDENTITY FULL;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parse_alter_table_set_list() {
+    fn parse_alter_table_set_list() {
         let sql = "ALTER TABLE table_name SET (autovacuum_vacuum_scale_factor = 0.0);";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parse_alter_collation_stmt() {
+    fn parse_alter_collation_stmt() {
         let sql = "ALTER COLLATION name RENAME TO new_name;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parse_alter_domain_stmt() {
+    fn parse_alter_domain_stmt() {
         let sql = "ALTER DOMAIN zipcode SET NOT NULL;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_grant_stmt() {
+    fn parsing_grant_stmt() {
         let sql = "GRANT INSERT ON films TO PUBLIC;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_grant_role() {
+    fn parsing_grant_role() {
         let sql = "GRANT admins TO joe;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_alter_default_privileges_stmt() {
+    fn alter_default_privileges_stmt() {
         let sql = "ALTER DEFAULT PRIVILEGES IN SCHEMA myschema GRANT SELECT ON TABLES TO PUBLIC;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_copy_stmt() {
+    fn parsing_copy_stmt() {
         let sql = "COPY country FROM '/usr1/proj/bray/sql/country_data';";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_variable_set_stmt() {
+    fn parsing_variable_set_stmt() {
         let sql = "set session my.vars.id = '1';";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_variable_show_stmt() {
+    fn parsing_variable_show_stmt() {
         let sql = "SHOW name";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_create_table_space_stmt() {
+    fn parsing_create_table_space_stmt() {
         let sql = "CREATE TABLESPACE dbspace LOCATION '/data/dbs';";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_parsing_drop_table_space_stmt() {
+    fn parsing_drop_table_space_stmt() {
         let sql = "DROP TABLESPACE dbspace;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_alter_table_space_stmt() {
+    fn alter_table_space_stmt() {
         let sql = "ALTER TABLESPACE index_space RENAME TO fast_raid;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_create_extension() {
+    fn create_extension() {
         let sql = "CREATE EXTENSION hstore;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_alter_table_extension() {
+    fn alter_table_extension() {
         let sql = "ALTER EXTENSION hstore UPDATE TO '2.0';";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_drop_extension() {
+    fn drop_extension() {
         let sql = "DROP EXTENSION hstore;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_alter_extension_contents_stmt() {
+    fn alter_extension_contents_stmt() {
         let sql = "ALTER EXTENSION hstore SET SCHEMA utils;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
@@ -366,35 +366,35 @@ ALTER TABLE "legacy_questiongrouppg"
     }
 
     #[test]
-    fn test_create_foreign_data_wrapper() {
+    fn create_foreign_data_wrapper() {
         let sql = "CREATE FOREIGN DATA WRAPPER dummy;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_alter_foreign_data_wrapper() {
+    fn alter_foreign_data_wrapper() {
         let sql = "ALTER FOREIGN DATA WRAPPER dbi OPTIONS (ADD foo '1', DROP 'bar');";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_create_foreign_server_stmt() {
+    fn create_foreign_server_stmt() {
         let sql = "CREATE SERVER myserver FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'foo', dbname 'foodb', port '5432');";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_alter_foreign_server_stmt() {
+    fn alter_foreign_server_stmt() {
         let sql = "ALTER SERVER foo OPTIONS (host 'foo', dbname 'foodb');";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_create_foriegn_table_stmt() {
+    fn create_foriegn_table_stmt() {
         let sql = r"
 CREATE FOREIGN TABLE films (
     code        char(5) NOT NULL,
@@ -411,28 +411,28 @@ SERVER film_server;
     }
 
     #[test]
-    fn test_create_user_mapping_stmt() {
+    fn create_user_mapping_stmt() {
         let sql = "CREATE USER MAPPING FOR bob SERVER foo OPTIONS (user 'bob', password 'secret');";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_alter_user_mapping_stmt() {
+    fn alter_user_mapping_stmt() {
         let sql = "ALTER USER MAPPING FOR bob SERVER foo OPTIONS (SET password 'public');";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_drop_user_mapping_stmt() {
+    fn drop_user_mapping_stmt() {
         let sql = "DROP USER MAPPING IF EXISTS FOR bob SERVER foo;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_import_foreign_schema_stmt() {
+    fn import_foreign_schema_stmt() {
         let sql = r"
 IMPORT FOREIGN SCHEMA foreign_films
     FROM SERVER film_server INTO films;
@@ -442,14 +442,14 @@ IMPORT FOREIGN SCHEMA foreign_films
     }
 
     #[test]
-    fn test_create_policy_stmt() {
+    fn create_policy_stmt() {
         let sql = "CREATE POLICY name ON table_name FOR ALL;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_alter_policy_stmt() {
+    fn alter_policy_stmt() {
         let sql = "ALTER POLICY name ON table_name RENAME TO new_name;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
@@ -460,14 +460,14 @@ IMPORT FOREIGN SCHEMA foreign_films
     }
 
     #[test]
-    fn test_create_access_method_stmt() {
+    fn create_access_method_stmt() {
         let sql = "CREATE ACCESS METHOD heptree TYPE INDEX HANDLER heptree_handler;";
         let res = parse_sql_query(sql);
         assert_debug_snapshot!(res);
     }
 
     #[test]
-    fn test_create_trigger_stmt() {
+    fn create_trigger_stmt() {
         let sql = r"
 CREATE TRIGGER check_update
     BEFORE UPDATE ON accounts
@@ -479,7 +479,7 @@ CREATE TRIGGER check_update
     }
 
     #[test]
-    fn test_create_event_trigger_stmt() {
+    fn create_event_trigger_stmt() {
         let sql = r"
 CREATE EVENT TRIGGER abort_ddl ON ddl_command_start
    EXECUTE PROCEDURE abort_any_command();
@@ -489,7 +489,7 @@ CREATE EVENT TRIGGER abort_ddl ON ddl_command_start
     }
 
     #[test]
-    fn test_alter_event_trigger_stmt() {
+    fn alter_event_trigger_stmt() {
         let sql = r"
 ALTER EVENT TRIGGER name DISABLE;
 ";
@@ -499,7 +499,7 @@ ALTER EVENT TRIGGER name DISABLE;
 
     /// Postgres >=11 feature not supported in libpg_query
     #[test]
-    fn test_create_procedure_stmt() {
+    fn create_procedure_stmt() {
         let sql = r"
 CREATE PROCEDURE insert_data(a integer, b integer)
 LANGUAGE SQL
@@ -515,7 +515,7 @@ CALL insert_data(1, 2);
     }
 
     #[test]
-    fn test_create_function_stmt() {
+    fn create_function_stmt() {
         let sql = r"
 CREATE FUNCTION populate() RETURNS integer AS $$
 DECLARE
@@ -530,7 +530,7 @@ $$ LANGUAGE plpgsql;
     }
 
     #[test]
-    fn test_create_plang_stmt() {
+    fn create_plang_stmt() {
         let sql = r"
 CREATE TRUSTED PROCEDURAL LANGUAGE plpgsql
     HANDLER plpgsql_call_handler
@@ -541,7 +541,7 @@ CREATE TRUSTED PROCEDURAL LANGUAGE plpgsql
     }
 
     #[test]
-    fn test_create_role_stmt() {
+    fn create_role_stmt() {
         let sql = r"
 CREATE ROLE miriam 
     WITH LOGIN PASSWORD 'jw8s0F4' 
@@ -552,7 +552,7 @@ CREATE ROLE miriam
     }
 
     #[test]
-    fn test_alter_role_stmt() {
+    fn alter_role_stmt() {
         let sql = r"
 ALTER ROLE miriam CREATEROLE CREATEDB;
 ";
@@ -561,7 +561,7 @@ ALTER ROLE miriam CREATEROLE CREATEDB;
     }
 
     #[test]
-    fn test_alter_role_set_stmt() {
+    fn alter_role_set_stmt() {
         let sql = r"
 ALTER ROLE worker_bee SET maintenance_work_mem = 100000;
 ";
@@ -570,7 +570,7 @@ ALTER ROLE worker_bee SET maintenance_work_mem = 100000;
     }
 
     #[test]
-    fn test_drop_role_set_stmt() {
+    fn drop_role_set_stmt() {
         let sql = r"
 DROP ROLE jonathan;
 ";
@@ -579,7 +579,7 @@ DROP ROLE jonathan;
     }
 
     #[test]
-    fn test_create_sequence_stmt() {
+    fn create_sequence_stmt() {
         let sql = r"
 CREATE SEQUENCE serial START 101;
 ";
@@ -588,7 +588,7 @@ CREATE SEQUENCE serial START 101;
     }
 
     #[test]
-    fn test_alter_sequence_stmt() {
+    fn alter_sequence_stmt() {
         let sql = r"
 ALTER SEQUENCE serial RESTART WITH 105;
 ";
@@ -597,7 +597,7 @@ ALTER SEQUENCE serial RESTART WITH 105;
     }
 
     #[test]
-    fn test_define_stmt() {
+    fn define_stmt() {
         let sql = r"
 CREATE AGGREGATE sum (complex)
 (
@@ -637,7 +637,7 @@ CREATE TYPE box (
     }
 
     #[test]
-    fn test_create_domain_stmt() {
+    fn create_domain_stmt() {
         let sql = r"
 CREATE DOMAIN us_postal_code AS TEXT
 CHECK(
@@ -650,7 +650,7 @@ OR VALUE ~ '^\d{5}-\d{4}$'
     }
 
     #[test]
-    fn test_create_op_class_stmt() {
+    fn create_op_class_stmt() {
         let sql = r"
 CREATE OPERATOR CLASS gist__int_ops
     DEFAULT FOR TYPE _int4 USING gist AS
@@ -672,7 +672,7 @@ CREATE OPERATOR CLASS gist__int_ops
     }
 
     #[test]
-    fn test_alter_op_class_stmt() {
+    fn alter_op_class_stmt() {
         let sql = r"
 ALTER OPERATOR CLASS name USING index_method RENAME TO new_name;
 ALTER OPERATOR CLASS name USING index_method
@@ -685,7 +685,7 @@ ALTER OPERATOR CLASS name USING index_method
     }
 
     #[test]
-    fn test_alter_op_family_stmt() {
+    fn alter_op_family_stmt() {
         let sql = r"
 ALTER OPERATOR FAMILY integer_ops USING btree ADD
 
@@ -710,7 +710,7 @@ ALTER OPERATOR FAMILY integer_ops USING btree ADD
     }
 
     #[test]
-    fn test_truncate_stmt() {
+    fn truncate_stmt() {
         let sql = r"
 TRUNCATE bigtable, fattable, bar RESTART IDENTITY;
 TRUNCATE foo CASCADE;
@@ -720,7 +720,7 @@ TRUNCATE foo CASCADE;
     }
 
     #[test]
-    fn test_comment_on_stmt() {
+    fn comment_on_stmt() {
         let sql = r"
 COMMENT ON AGGREGATE my_aggregate (double precision) IS 'Computes sample variance';
 ";
@@ -729,7 +729,7 @@ COMMENT ON AGGREGATE my_aggregate (double precision) IS 'Computes sample varianc
     }
 
     #[test]
-    fn test_security_label_stmt() {
+    fn security_label_stmt() {
         let sql = r"
 SECURITY LABEL FOR selinux ON TABLE mytable IS 'system_u:object_r:sepgsql_table_t:s0';
 ";
@@ -738,7 +738,7 @@ SECURITY LABEL FOR selinux ON TABLE mytable IS 'system_u:object_r:sepgsql_table_
     }
 
     #[test]
-    fn test_declare_cursor_stmt() {
+    fn declare_cursor_stmt() {
         let sql = r"
 DECLARE
     curs2 CURSOR FOR SELECT * FROM tenk1;
@@ -748,7 +748,7 @@ DECLARE
     }
 
     #[test]
-    fn test_close_portal_stmt() {
+    fn close_portal_stmt() {
         let sql = r"
 CLOSE curs1;
 ";
@@ -757,7 +757,7 @@ CLOSE curs1;
     }
 
     #[test]
-    fn test_fetch_stmt() {
+    fn fetch_stmt() {
         let sql = r"
 FETCH FORWARD 5 FROM foo;
 ";
@@ -766,7 +766,7 @@ FETCH FORWARD 5 FROM foo;
     }
 
     #[test]
-    fn test_create_stats_stmt() {
+    fn create_stats_stmt() {
         let sql = r"
 CREATE STATISTICS s1 (dependencies) ON a, b FROM t1;
 ";
@@ -775,7 +775,7 @@ CREATE STATISTICS s1 (dependencies) ON a, b FROM t1;
     }
 
     #[test]
-    fn test_explain_stmt() {
+    fn explain_stmt() {
         let sql = r"
 EXPLAIN ANALYZE SELECT * FROM t1 WHERE (a = 1) AND (b = 0);
 ";
@@ -784,7 +784,7 @@ EXPLAIN ANALYZE SELECT * FROM t1 WHERE (a = 1) AND (b = 0);
     }
 
     #[test]
-    fn test_alter_function_stmt() {
+    fn alter_function_stmt() {
         let sql = r"
 ALTER FUNCTION sqrt(integer) RENAME TO square_root;
 ALTER FUNCTION sqrt(integer) OWNER TO joe;
@@ -797,7 +797,7 @@ ALTER FUNCTION check_password(text) RESET search_path;
     }
 
     #[test]
-    fn test_do_stmt() {
+    fn do_stmt() {
         let sql = r"
 DO $$DECLARE r record;
 BEGIN
@@ -813,7 +813,7 @@ END$$;
     }
 
     #[test]
-    fn test_alter_object_depends_stmt() {
+    fn alter_object_depends_stmt() {
         let sql = r"
 ALTER TRIGGER name ON table_name 
     DEPENDS ON EXTENSION extension_name;
@@ -825,7 +825,7 @@ ALTER FUNCTION sqrt(integer)
     }
 
     #[test]
-    fn test_alter_operator_stmt() {
+    fn alter_operator_stmt() {
         let sql = r"
 ALTER OPERATOR @@ (text, text) OWNER TO joe;
 ALTER OPERATOR @@ (text, text) SET SCHEMA bar;
@@ -836,7 +836,7 @@ ALTER OPERATOR && (_int4, _int4) SET (RESTRICT = _int_contsel, JOIN = _int_contj
     }
 
     #[test]
-    fn test_rule_stmt() {
+    fn rule_stmt() {
         let sql = r#"
 CREATE RULE "_RETURN" AS
     ON SELECT TO t1
@@ -850,7 +850,7 @@ CREATE RULE notify_me AS ON UPDATE TO mytable DO ALSO NOTIFY mytable;
     }
 
     #[test]
-    fn test_notify_stmt() {
+    fn notify_stmt() {
         let sql = r"
 NOTIFY virtual;
 NOTIFY virtual, 'This is the payload';
@@ -860,7 +860,7 @@ NOTIFY virtual, 'This is the payload';
     }
 
     #[test]
-    fn test_listen_stmt() {
+    fn listen_stmt() {
         let sql = r"
 LISTEN virtual;
 ";
@@ -869,7 +869,7 @@ LISTEN virtual;
     }
 
     #[test]
-    fn test_unlisten_stmt() {
+    fn unlisten_stmt() {
         let sql = r"
 UNLISTEN virtual;
 ";
@@ -878,7 +878,7 @@ UNLISTEN virtual;
     }
 
     #[test]
-    fn test_composite_type_stmt() {
+    fn composite_type_stmt() {
         let sql = r"
 CREATE TYPE complex AS (
     r       double precision,
@@ -890,7 +890,7 @@ CREATE TYPE complex AS (
     }
 
     #[test]
-    fn test_create_enum_stmt() {
+    fn create_enum_stmt() {
         let sql = r"
 CREATE TYPE happiness AS ENUM ('happy', 'very happy', 'ecstatic');
 ";
@@ -899,7 +899,7 @@ CREATE TYPE happiness AS ENUM ('happy', 'very happy', 'ecstatic');
     }
 
     #[test]
-    fn test_create_range_stmt() {
+    fn create_range_stmt() {
         let sql = r"
 CREATE TYPE floatrange AS RANGE (
     subtype = float8,
@@ -911,7 +911,7 @@ CREATE TYPE floatrange AS RANGE (
     }
 
     #[test]
-    fn test_alter_enum_stmt() {
+    fn alter_enum_stmt() {
         let sql = r"
 ALTER TYPE colors ADD VALUE 'orange' AFTER 'red';
 ";
@@ -920,7 +920,7 @@ ALTER TYPE colors ADD VALUE 'orange' AFTER 'red';
     }
 
     #[test]
-    fn test_create_view_stmt() {
+    fn create_view_stmt() {
         let sql = r"
 CREATE VIEW vista AS SELECT 'Hello World';
 CREATE VIEW comedies AS
@@ -933,7 +933,7 @@ CREATE VIEW comedies AS
     }
 
     #[test]
-    fn test_load_stmt() {
+    fn load_stmt() {
         let sql = r"
 LOAD 'filename';
 ";
@@ -942,7 +942,7 @@ LOAD 'filename';
     }
 
     #[test]
-    fn test_create_database_stmt() {
+    fn create_database_stmt() {
         let sql = r"
 CREATE DATABASE lusiadas;
 CREATE DATABASE sales OWNER salesapp TABLESPACE salesspace;
@@ -953,7 +953,7 @@ CREATE DATABASE music ENCODING 'LATIN1' TEMPLATE template0;
     }
 
     #[test]
-    fn test_alter_database_stmt() {
+    fn alter_database_stmt() {
         let sql = r"
 ALTER DATABASE name RENAME TO new_name;
 ALTER DATABASE name OWNER TO new_owner;
@@ -966,7 +966,7 @@ ALTER DATABASE name RESET ALL;
     }
 
     #[test]
-    fn test_alter_database_collation() {
+    fn alter_database_collation() {
         let sql = r"
 ALTER DATABASE pipelines REFRESH COLLATION VERSION;
 ";
@@ -975,7 +975,7 @@ ALTER DATABASE pipelines REFRESH COLLATION VERSION;
     }
 
     #[test]
-    fn test_drop_database_stmt() {
+    fn drop_database_stmt() {
         let sql = r"
 DROP DATABASE name;
 DROP DATABASE IF EXISTS name;
@@ -985,7 +985,7 @@ DROP DATABASE IF EXISTS name;
     }
 
     #[test]
-    fn test_alter_system_stmt() {
+    fn alter_system_stmt() {
         let sql = r"
 ALTER SYSTEM SET wal_level = hot_standby;
 ALTER SYSTEM RESET wal_level;
@@ -995,7 +995,7 @@ ALTER SYSTEM RESET wal_level;
     }
 
     #[test]
-    fn test_cluster_stmt() {
+    fn cluster_stmt() {
         let sql = r"
 CLUSTER employees USING employees_ind;
 CLUSTER employees;
@@ -1006,7 +1006,7 @@ CLUSTER;
     }
 
     #[test]
-    fn test_vacuum_stmt() {
+    fn vacuum_stmt() {
         let sql = r"
 VACUUM (VERBOSE, ANALYZE) foo;
 ";
@@ -1015,7 +1015,7 @@ VACUUM (VERBOSE, ANALYZE) foo;
     }
 
     #[test]
-    fn test_create_table_as_stmt() {
+    fn create_table_as_stmt() {
         let sql = r"
 CREATE TABLE films2 AS
   TABLE films;
@@ -1025,7 +1025,7 @@ CREATE TABLE films2 AS
     }
 
     #[test]
-    fn test_refresh_material_view_stmt() {
+    fn refresh_material_view_stmt() {
         let sql = r"
 REFRESH MATERIALIZED VIEW order_summary;
 REFRESH MATERIALIZED VIEW annual_statistics_basis WITH NO DATA;
@@ -1035,7 +1035,7 @@ REFRESH MATERIALIZED VIEW annual_statistics_basis WITH NO DATA;
     }
 
     #[test]
-    fn test_checkpoint() {
+    fn checkpoint() {
         let sql = r"
 CHECKPOINT;
 ";
@@ -1044,7 +1044,7 @@ CHECKPOINT;
     }
 
     #[test]
-    fn test_discard_stmt() {
+    fn discard_stmt() {
         let sql = r"
 DISCARD PLANS;
 DISCARD SEQUENCES;
@@ -1055,7 +1055,7 @@ DISCARD TEMP;
     }
 
     #[test]
-    fn test_lock_stmt() {
+    fn lock_stmt() {
         let sql = r"
 LOCK TABLE films IN SHARE MODE;
 LOCK TABLE films IN SHARE ROW EXCLUSIVE MODE;
@@ -1065,7 +1065,7 @@ LOCK TABLE films IN SHARE ROW EXCLUSIVE MODE;
     }
 
     #[test]
-    fn test_set_constraints() {
+    fn set_constraints() {
         let sql = r"
 SET CONSTRAINTS ALL DEFERRED;
 SET CONSTRAINTS ALL IMMEDIATE;
@@ -1076,7 +1076,7 @@ SET CONSTRAINTS foo IMMEDIATE;
     }
 
     #[test]
-    fn test_reindex_stmt() {
+    fn reindex_stmt() {
         let sql = r"
 REINDEX INDEX my_index;
 REINDEX TABLE table_name;
@@ -1088,7 +1088,7 @@ REINDEX SYSTEM table_name;
     }
 
     #[test]
-    fn test_create_conversion_stmt() {
+    fn create_conversion_stmt() {
         let sql = r"
 CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM myfunc;
 ";
@@ -1097,7 +1097,7 @@ CREATE CONVERSION myconv FOR 'UTF8' TO 'LATIN1' FROM myfunc;
     }
 
     #[test]
-    fn test_create_cast_stmt() {
+    fn create_cast_stmt() {
         let sql = r"
 CREATE CAST (bigint AS int4) WITH FUNCTION int4(bigint) AS ASSIGNMENT;
 ";
@@ -1116,7 +1116,7 @@ CREATE CAST (bigint AS int4) WITH FUNCTION int4(bigint) AS ASSIGNMENT;
     }
 
     #[test]
-    fn test_alter_column_default_with_function() {
+    fn alter_column_default_with_function() {
         let sql = r#"
         ALTER TABLE "table_name" ALTER COLUMN "column_name" SET DEFAULT CURRENT_TIMESTAMP;
         "#;
@@ -1126,7 +1126,7 @@ CREATE CAST (bigint AS int4) WITH FUNCTION int4(bigint) AS ASSIGNMENT;
     }
 
     #[test]
-    fn test_create_transform_stmt() {
+    fn create_transform_stmt() {
         let sql = r"
 CREATE TRANSFORM FOR hstore LANGUAGE plpythonu (
     FROM SQL WITH FUNCTION hstore_to_plpython(internal),
@@ -1138,7 +1138,7 @@ CREATE TRANSFORM FOR hstore LANGUAGE plpythonu (
     }
 
     #[test]
-    fn test_prepare_stmt() {
+    fn prepare_stmt() {
         let sql = r"
 PREPARE fooplan (int, text, bool, numeric) AS
     INSERT INTO foo VALUES($1, $2, $3, $4);
@@ -1148,7 +1148,7 @@ PREPARE fooplan (int, text, bool, numeric) AS
     }
 
     #[test]
-    fn test_execute_stmt() {
+    fn execute_stmt() {
         let sql = r"
 EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);
 ";
@@ -1157,7 +1157,7 @@ EXECUTE fooplan(1, 'Hunter Valley', 't', 200.00);
     }
 
     #[test]
-    fn test_deallocate_stmt() {
+    fn deallocate_stmt() {
         let sql = r"
 DEALLOCATE PREPARE ALL;
 ";
@@ -1166,7 +1166,7 @@ DEALLOCATE PREPARE ALL;
     }
 
     #[test]
-    fn test_drop_owned_stmt() {
+    fn drop_owned_stmt() {
         let sql = r"
 DROP OWNED BY foo CASCADE;
 ";
@@ -1175,7 +1175,7 @@ DROP OWNED BY foo CASCADE;
     }
 
     #[test]
-    fn test_reassign_owned_stmt() {
+    fn reassign_owned_stmt() {
         let sql = r"
 REASSIGN OWNED BY old_role TO new_role;
 ";
@@ -1184,7 +1184,7 @@ REASSIGN OWNED BY old_role TO new_role;
     }
 
     #[test]
-    fn test_alter_ts_dictionary_stmt() {
+    fn alter_ts_dictionary_stmt() {
         let sql = r"
 ALTER TEXT SEARCH DICTIONARY my_dict ( StopWords = newrussian );
 ";
@@ -1193,7 +1193,7 @@ ALTER TEXT SEARCH DICTIONARY my_dict ( StopWords = newrussian );
     }
 
     #[test]
-    fn test_alter_ts_configuration_stmt() {
+    fn alter_ts_configuration_stmt() {
         let sql = r"
 ALTER TEXT SEARCH CONFIGURATION astro_en
     ADD MAPPING FOR asciiword WITH astrosyn, english_ispell, english_stem;
@@ -1203,7 +1203,7 @@ ALTER TEXT SEARCH CONFIGURATION astro_en
     }
 
     #[test]
-    fn test_create_publication_stmt() {
+    fn create_publication_stmt() {
         let sql = r"
 CREATE PUBLICATION mypublication FOR TABLE users, departments;
 CREATE PUBLICATION insert_only FOR TABLE mydata
@@ -1214,7 +1214,7 @@ CREATE PUBLICATION insert_only FOR TABLE mydata
     }
 
     #[test]
-    fn test_alter_publication() {
+    fn alter_publication() {
         let sql = r"
 ALTER PUBLICATION noinsert SET (publish = 'update, delete');
 ALTER PUBLICATION mypublication ADD TABLE users, departments;
@@ -1224,7 +1224,7 @@ ALTER PUBLICATION name RENAME TO new_name
         assert_debug_snapshot!(res);
     }
     #[test]
-    fn test_parse_func_call() {
+    fn parse_func_call() {
         let sql = r"
 ALTER TABLE foobar ALTER COLUMN value SET DEFAULT TO_JSON(false);
 ";
@@ -1233,7 +1233,7 @@ ALTER TABLE foobar ALTER COLUMN value SET DEFAULT TO_JSON(false);
     }
 
     #[test]
-    fn test_json_index_operator() {
+    fn json_index_operator() {
         let sql = r#"
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "idx_a_foo_bar" ON "a" ((foo->>'bar'));
 "#;
@@ -1242,7 +1242,7 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS "idx_a_foo_bar" ON "a" ((foo->>'bar'));
     }
 
     #[test]
-    fn test_create_subscription_stmt() {
+    fn create_subscription_stmt() {
         let sql = r"
 CREATE SUBSCRIPTION mysub
          CONNECTION 'host=192.168.1.50 port=5432 user=foo dbname=foodb'
@@ -1253,7 +1253,7 @@ CREATE SUBSCRIPTION mysub
     }
 
     #[test]
-    fn test_alter_subscription_stmt() {
+    fn alter_subscription_stmt() {
         let sql = r"
 ALTER SUBSCRIPTION mysub SET PUBLICATION insert_only;
 ALTER SUBSCRIPTION mysub DISABLE;
@@ -1263,7 +1263,7 @@ ALTER SUBSCRIPTION mysub DISABLE;
     }
 
     #[test]
-    fn test_drop_subscription_stmt() {
+    fn drop_subscription_stmt() {
         let sql = r"
 DROP SUBSCRIPTION mysub;
 ";
@@ -1309,7 +1309,7 @@ ALTER TABLE table_c ADD column c boolean GENERATED ALWAYS AS (p IS NOT NULL) STO
     }
 
     #[test]
-    fn test_parse_create_table_regression() {
+    fn parse_create_table_regression() {
         let sql = r"
 CREATE TABLE example (
     a integer,
@@ -1323,7 +1323,7 @@ CREATE TABLE example (
     }
 
     #[test]
-    fn test_parse_create_table_partition() {
+    fn parse_create_table_partition() {
         let sql = r"
 CREATE TABLE measurement_y2006m02 PARTITION OF measurement
     FOR VALUES FROM ('2006-02-01') TO ('2006-03-01');
@@ -1333,7 +1333,7 @@ CREATE TABLE measurement_y2006m02 PARTITION OF measurement
     }
 
     #[test]
-    fn test_parse_attach_table_partition() {
+    fn parse_attach_table_partition() {
         let sql = r"
 ALTER TABLE measurement ATTACH PARTITION measurement_y2008m02
     FOR VALUES FROM ('2008-02-01') TO ('2008-03-01' );
@@ -1343,7 +1343,7 @@ ALTER TABLE measurement ATTACH PARTITION measurement_y2008m02
     }
 
     #[test]
-    fn test_parse_detach_table_partition() {
+    fn parse_detach_table_partition() {
         let sql = r"
 ALTER TABLE measurement
     DETACH PARTITION measurement_y2006m02;
@@ -1353,7 +1353,7 @@ ALTER TABLE measurement
     }
 
     #[test]
-    fn test_drop_index() {
+    fn drop_index() {
         let sql = r#"
 DROP INDEX "email_idx";
 DROP INDEX IF EXISTS "email_idx";

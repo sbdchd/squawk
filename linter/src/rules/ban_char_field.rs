@@ -49,7 +49,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_creating_table_with_char_errors() {
+    fn creating_table_with_char_errors() {
         let sql = r#"
 BEGIN;
 CREATE TABLE "core_bar" (
@@ -65,7 +65,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_creating_table_with_var_char_and_text_okay() {
+    fn creating_table_with_var_char_and_text_okay() {
         let sql = r#"
 BEGIN;
 CREATE TABLE "core_bar" (

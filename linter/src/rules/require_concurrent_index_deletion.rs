@@ -44,7 +44,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_drop_index_concurrently() {
+    fn drop_index_concurrently() {
         let bad_sql = r#"
   -- instead of
   DROP INDEX IF EXISTS "field_name_idx";

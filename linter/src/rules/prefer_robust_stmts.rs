@@ -203,7 +203,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_id
     /// If the statement is in a transaction, or it has a guard like IF NOT
     /// EXISTS, then it is considered valid by the `prefer-robust-stmt` rule.
     #[test]
-    fn test_prefer_robust_stmt_okay_cases() {
+    fn prefer_robust_stmt_okay_cases() {
         let sql = r#"
 BEGIN;
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
@@ -270,7 +270,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
     /// If the statement is in a transaction, or it has a guard like IF NOT
     /// EXISTS, then it is considered valid by the `prefer-robust-stmt` rule.
     #[test]
-    fn test_prefer_robust_stmt_okay_cases_with_assume_in_transaction() {
+    fn prefer_robust_stmt_okay_cases_with_assume_in_transaction() {
         let sql = r#"
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 "#;
@@ -293,7 +293,7 @@ DROP TYPE foo;
     }
 
     #[test]
-    fn test_create_index_concurrently_unnamed() {
+    fn create_index_concurrently_unnamed() {
         let bad_sql = r#"
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   "#;
@@ -341,7 +341,7 @@ ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
     }
 
     #[test]
-    fn test_ignore_single_stmts() {
+    fn ignore_single_stmts() {
         let bad_sql = r#"
   CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
   "#;
@@ -369,7 +369,7 @@ ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
     }
 
     #[test]
-    fn test_start_transaction() {
+    fn start_transaction() {
         let sql = r#"
 START TRANSACTION;
 
@@ -386,7 +386,7 @@ COMMIT;"#;
     }
 
     #[test]
-    fn test_prefer_robust_stmt_failure_cases() {
+    fn prefer_robust_stmt_failure_cases() {
         let sql = r#"
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 "#;

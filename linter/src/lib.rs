@@ -425,7 +425,7 @@ mod test_rules {
     }
     /// Ensure we handle both serializing and deserializing `RuleViolationKind`
     #[test]
-    fn test_parsing_rule_kind() {
+    fn parsing_rule_kind() {
         let rule_names = RULES.iter().map(|r| r.name.clone());
         for rule in rule_names {
             let rule_str = rule.to_string();
@@ -435,19 +435,19 @@ mod test_rules {
     }
     /// Ensure rule names don't change
     #[test]
-    fn test_rule_names_debug_snap() {
+    fn rule_names_debug_snap() {
         let rule_names: Vec<String> = RULES.iter().map(|r| r.name.to_string()).collect();
         assert_debug_snapshot!(rule_names);
     }
     #[test]
-    fn test_rule_names_display_snap() {
+    fn rule_names_display_snap() {
         let rule_names: Vec<String> = RULES.iter().map(|r| r.name.to_string()).collect();
         assert_display_snapshot!(rule_names.join("\n"));
     }
 
     /// Ensure we stort the resulting violations by where they occur in the file.
     #[test]
-    fn test_check_rules_orderin() {
+    fn check_rules_orderin() {
         let sql = r#"
   ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
   CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
