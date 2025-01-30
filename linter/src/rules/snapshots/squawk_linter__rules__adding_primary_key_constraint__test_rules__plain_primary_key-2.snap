@@ -1,5 +1,5 @@
 ---
 source: linter/src/rules/adding_primary_key_constraint.rs
-expression: lint_sql(ok_sql)
+expression: "lint_sql(ok_sql,)"
 ---
 []

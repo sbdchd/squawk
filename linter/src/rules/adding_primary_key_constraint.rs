@@ -75,7 +75,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_serial_primary_key() {
+    fn serial_primary_key() {
         let bad_sql = r"
 ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
 ";
@@ -86,7 +86,7 @@ ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
     }
 
     #[test]
-    fn test_plain_primary_key() {
+    fn plain_primary_key() {
         let bad_sql = r"
 ALTER TABLE items ADD PRIMARY KEY (id);
 ";

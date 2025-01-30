@@ -27,7 +27,7 @@ mod test_rules {
      }
 
     #[test]
-    fn test_{{RuleNameSnake}}() {
+    fn {{RuleNameSnake}}_works() {
         let ok_sql = r#"
 SELECT 1;
   "#;

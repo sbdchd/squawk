@@ -54,7 +54,7 @@ mod test_rules {
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS
     /// EXCLUSIVE lock
     #[test]
-    fn test_increasing_varchar_size() {
+    fn increasing_varchar_size() {
         let sql = r#"
 BEGIN;
 --
@@ -85,7 +85,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_prefer_text_field() {
+    fn prefer_text_field() {
         let bad_sql = r#"
 BEGIN;
 --
@@ -135,7 +135,7 @@ COMMIT;"#;
     }
 
     #[test]
-    fn test_adding_column_non_text() {
+    fn adding_column_non_text() {
         let bad_sql = r#"
 BEGIN;
 ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;

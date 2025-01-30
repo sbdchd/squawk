@@ -104,7 +104,7 @@ mod test_config {
     use super::*;
 
     #[test]
-    fn test_load_cfg_full() {
+    fn load_cfg_full() {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r#"
 pg_version = "19.1"
@@ -117,7 +117,7 @@ assume_in_transaction = true
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
-    fn test_load_pg_version() {
+    fn load_pg_version() {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r#"
 pg_version = "19.1"
@@ -127,7 +127,7 @@ pg_version = "19.1"
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
-    fn test_load_excluded_rules() {
+    fn load_excluded_rules() {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r#"
 excluded_rules = ["require-concurrent-index-creation"]
@@ -137,7 +137,7 @@ excluded_rules = ["require-concurrent-index-creation"]
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
-    fn test_load_excluded_paths() {
+    fn load_excluded_paths() {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r#"
 excluded_paths = ["example.sql"]
@@ -147,7 +147,7 @@ excluded_paths = ["example.sql"]
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
-    fn test_load_assume_in_transaction() {
+    fn load_assume_in_transaction() {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r"
 assume_in_transaction = false
@@ -157,7 +157,7 @@ assume_in_transaction = false
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
-    fn test_load_fail_on_violations() {
+    fn load_fail_on_violations() {
         let squawk_toml = NamedTempFile::new().expect("generate tempFile");
         let file = r"
 [upload_to_github]

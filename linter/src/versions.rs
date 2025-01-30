@@ -114,11 +114,11 @@ mod test_pg_version {
 
     use super::*;
     #[test]
-    fn test_eq() {
+    fn eq() {
         assert_eq!(Version::new(10, None, None), Version::new(10, None, None));
     }
     #[test]
-    fn test_gt() {
+    fn gt() {
         assert!(Version::new(10, Some(1), None) > Version::new(10, None, None));
         assert!(Version::new(10, None, Some(1)) > Version::new(10, None, None));
         assert!(Version::new(10, None, Some(1)) > Version::new(9, None, None));
@@ -126,7 +126,7 @@ mod test_pg_version {
         assert!(!(Version::new(10, None, None) > Version::new(10, None, None)));
     }
     #[test]
-    fn test_parse() {
+    fn parse() {
         assert_eq!(
             Version::from_str("10.1"),
             Ok(Version::new(10, Some(1), None))

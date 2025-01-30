@@ -46,7 +46,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_create_with_timestamp() {
+    fn create_with_timestamp() {
         let bad_sql = r"
 create table app.users
 (
@@ -80,7 +80,7 @@ create table app.accounts
     }
 
     #[test]
-    fn test_alter_table() {
+    fn alter_table() {
         let bad_sql = r"
     alter table app.users
         alter column created_ts type timestamp;

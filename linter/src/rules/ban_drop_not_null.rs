@@ -42,7 +42,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_ban_drop_not_null() {
+    fn ban_drop_not_null() {
         let bad_sql = r#"
 ALTER TABLE "bar_tbl" ALTER COLUMN "foo_col" DROP NOT NULL;
   "#;

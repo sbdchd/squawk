@@ -64,7 +64,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_create_table_ok() {
+    fn create_table_ok() {
         let ok_sql = r"
 create table users (
     id bigint
@@ -82,7 +82,7 @@ create table users (
         assert_eq!(lint_sql(ok_sql), vec![]);
     }
     #[test]
-    fn test_create_table_bad() {
+    fn create_table_bad() {
         let bad_sql = r"
 create table users (
     id smallint
@@ -127,7 +127,7 @@ create table users (
         assert_debug_snapshot!(res);
     }
     #[test]
-    fn test_create_table_many_errors() {
+    fn create_table_many_errors() {
         let bad_sql = r"
 create table users (
     foo integer,

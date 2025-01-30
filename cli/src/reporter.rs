@@ -556,7 +556,7 @@ mod test_github_comment {
     /// Most cases, hopefully, will be a single migration for a given PR, but
     /// let's check the case of multiple migrations
     #[test]
-    fn test_generating_comment_multiple_files() {
+    fn generating_comment_multiple_files() {
         let violations = vec![ViolationContent {
             filename: "alpha.sql".into(),
             sql: r"
@@ -588,7 +588,7 @@ SELECT 1;
     /// Even when we don't have violations we still want to output the SQL for
     /// easy human reading.
     #[test]
-    fn test_generating_comment_no_violations() {
+    fn generating_comment_no_violations() {
         let violations = vec![
             ViolationContent {
                 filename: "alpha.sql".into(),
@@ -623,7 +623,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
     /// Ideally the logic won't leave a comment when there are no migrations but
     /// better safe than sorry
     #[test]
-    fn test_generating_no_violations_no_files() {
+    fn generating_no_violations_no_files() {
         let violations = vec![];
 
         let body = get_comment_body(&violations, "0.2.3");
@@ -642,7 +642,7 @@ mod test_check_files {
     use super::process_violations;
 
     #[test]
-    fn test_check_files_invalid_syntax() {
+    fn check_files_invalid_syntax() {
         let sql = r"
 select \;
         ";
@@ -672,7 +672,7 @@ mod test_reporter {
     }
 
     #[test]
-    fn test_display_violations_gcc() {
+    fn display_violations_gcc() {
         let sql = r#" 
    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
@@ -698,7 +698,7 @@ SELECT 1;
     }
 
     #[test]
-    fn test_display_violations_tty() {
+    fn display_violations_tty() {
         let sql = r#" 
    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
@@ -719,7 +719,7 @@ SELECT 1;
         assert_display_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
     }
     #[test]
-    fn test_display_no_violations_tty() {
+    fn display_no_violations_tty() {
         let mut buff = Vec::new();
 
         let res = print_violations(
@@ -734,7 +734,7 @@ SELECT 1;
     }
 
     #[test]
-    fn test_display_violations_json() {
+    fn display_violations_json() {
         let sql = r#" 
    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
 ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
@@ -757,7 +757,7 @@ SELECT 1;
     }
 
     #[test]
-    fn test_span_offsets() {
+    fn span_offsets() {
         let sql = r#"
 
    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
@@ -773,7 +773,7 @@ SELECT 1;
     /// `pretty_violations` was slicing the SQL improperly, trimming off the first
     /// letter.
     #[test]
-    fn test_trimming_sql_newlines() {
+    fn trimming_sql_newlines() {
         let sql = r#"ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;"#;
         let violations = lint_sql(sql);
 

@@ -131,7 +131,7 @@ mod test_rules {
     /// -- remove nullability
     /// ```
     #[test]
-    fn test_docs_example_bad() {
+    fn docs_example_bad() {
         let bad_sql = r#"
 -- instead of
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
@@ -139,7 +139,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         assert_debug_snapshot!(lint_sql(bad_sql, None));
     }
     #[test]
-    fn test_docs_example_ok() {
+    fn docs_example_ok() {
         let ok_sql = r#"
 -- use
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer;
@@ -151,7 +151,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
     }
 
     #[test]
-    fn test_default_integer_ok() {
+    fn default_integer_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
@@ -162,7 +162,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
     }
 
     #[test]
-    fn test_default_uuid_err() {
+    fn default_uuid_err() {
         let bad_sql = r#"
 -- VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
@@ -173,7 +173,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
     }
 
     #[test]
-    fn test_default_volatile_func_err() {
+    fn default_volatile_func_err() {
         let bad_sql = r#"
 -- VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
@@ -182,7 +182,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
         assert_debug_snapshot!(lint_sql(bad_sql, pg_version_11));
     }
     #[test]
-    fn test_default_bool_ok() {
+    fn default_bool_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
@@ -191,7 +191,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_default_str_ok() {
+    fn default_str_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
@@ -200,7 +200,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_default_enum_ok() {
+    fn default_enum_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-variant';
@@ -209,7 +209,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-varia
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_default_jsonb_ok() {
+    fn default_jsonb_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT '{}'::jsonb;
@@ -218,7 +218,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT '{}'::jsonb;
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_default_arbitrary_func_err() {
+    fn default_arbitrary_func_err() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT myjsonb();
@@ -227,7 +227,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT myjsonb();
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_default_random_with_args_err() {
+    fn default_random_with_args_err() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
@@ -236,7 +236,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_default_now_func_ok() {
+    fn default_now_func_ok() {
         let ok_sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
@@ -245,7 +245,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
         assert_debug_snapshot!(lint_sql(ok_sql, pg_version_11));
     }
     #[test]
-    fn test_add_numbers_ok() {
+    fn add_numbers_ok() {
         // This should be okay, but we don't handle expressions like this at the moment.
         let ok_sql = r"
 alter table account_metadata add column blah integer default 2 + 2;
@@ -255,7 +255,7 @@ alter table account_metadata add column blah integer default 2 + 2;
     }
 
     #[test]
-    fn test_generated_stored() {
+    fn generated_stored() {
         let bad_sql = r"
         ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;

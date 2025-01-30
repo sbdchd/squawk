@@ -43,7 +43,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_renaming_table() {
+    fn renaming_table() {
         let sql = r#"
 ALTER TABLE "table_name" RENAME TO "new_table_name";
         "#;

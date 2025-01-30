@@ -1,0 +1,139 @@
+---
+source: parser/src/parse.rs
+expression: res
+---
+Ok(
+    Object({
+        "stmts": Array([
+            Object({
+                "stmt": Object({
+                    "AlterTableStmt": Object({
+                        "cmds": Array([
+                            Object({
+                                "AlterTableCmd": Object({
+                                    "behavior": String(
+                                        "DROP_RESTRICT",
+                                    ),
+                                    "def": Object({
+                                        "ColumnDef": Object({
+                                            "colname": String(
+                                                "c",
+                                            ),
+                                            "constraints": Array([
+                                                Object({
+                                                    "Constraint": Object({
+                                                        "contype": String(
+                                                            "CONSTR_GENERATED",
+                                                        ),
+                                                        "generated_when": String(
+                                                            "a",
+                                                        ),
+                                                        "location": Number(
+                                                            41,
+                                                        ),
+                                                        "raw_expr": Object({
+                                                            "NullTest": Object({
+                                                                "arg": Object({
+                                                                    "ColumnRef": Object({
+                                                                        "fields": Array([
+                                                                            Object({
+                                                                                "String": Object({
+                                                                                    "sval": String(
+                                                                                        "p",
+                                                                                    ),
+                                                                                }),
+                                                                            }),
+                                                                        ]),
+                                                                        "location": Number(
+                                                                            62,
+                                                                        ),
+                                                                    }),
+                                                                }),
+                                                                "location": Number(
+                                                                    64,
+                                                                ),
+                                                                "nulltesttype": String(
+                                                                    "IS_NOT_NULL",
+                                                                ),
+                                                            }),
+                                                        }),
+                                                    }),
+                                                }),
+                                                Object({
+                                                    "Constraint": Object({
+                                                        "contype": String(
+                                                            "CONSTR_NOTNULL",
+                                                        ),
+                                                        "location": Number(
+                                                            84,
+                                                        ),
+                                                    }),
+                                                }),
+                                            ]),
+                                            "is_local": Bool(
+                                                true,
+                                            ),
+                                            "location": Number(
+                                                31,
+                                            ),
+                                            "typeName": Object({
+                                                "location": Number(
+                                                    33,
+                                                ),
+                                                "names": Array([
+                                                    Object({
+                                                        "String": Object({
+                                                            "sval": String(
+                                                                "pg_catalog",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                    Object({
+                                                        "String": Object({
+                                                            "sval": String(
+                                                                "bool",
+                                                            ),
+                                                        }),
+                                                    }),
+                                                ]),
+                                                "typemod": Number(
+                                                    -1,
+                                                ),
+                                            }),
+                                        }),
+                                    }),
+                                    "subtype": String(
+                                        "AT_AddColumn",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "objtype": String(
+                            "OBJECT_TABLE",
+                        ),
+                        "relation": Object({
+                            "inh": Bool(
+                                true,
+                            ),
+                            "location": Number(
+                                12,
+                            ),
+                            "relname": String(
+                                "table_c",
+                            ),
+                            "relpersistence": String(
+                                "p",
+                            ),
+                        }),
+                    }),
+                }),
+                "stmt_len": Number(
+                    92,
+                ),
+            }),
+        ]),
+        "version": Number(
+            160001,
+        ),
+    }),
+)

@@ -85,7 +85,7 @@ mod test_rules {
     }
 
     #[test]
-    fn test_create_table_with_foreign_key_constraint() {
+    fn create_table_with_foreign_key_constraint() {
         let sql = r#"
 BEGIN;
 CREATE TABLE email (
@@ -104,7 +104,7 @@ COMMIT;
         assert_eq!(violations.len(), 0);
     }
     #[test]
-    fn test_add_foreign_key_constraint_not_valid_validate() {
+    fn add_foreign_key_constraint_not_valid_validate() {
         let sql = r#"
 BEGIN;
 ALTER TABLE "email" ADD COLUMN "user_id" INT;
@@ -117,7 +117,7 @@ COMMIT;
         assert_eq!(violations.len(), 0);
     }
     #[test]
-    fn test_add_foreign_key_constraint_lock() {
+    fn add_foreign_key_constraint_lock() {
         let sql = r#"
 BEGIN;
 ALTER TABLE "email" ADD COLUMN "user_id" INT;
@@ -133,7 +133,7 @@ COMMIT;
         );
     }
     #[test]
-    fn test_add_column_references_lock() {
+    fn add_column_references_lock() {
         let sql = r#"
 BEGIN;
 ALTER TABLE "emails" ADD COLUMN "user_id" INT REFERENCES "user" ("id");

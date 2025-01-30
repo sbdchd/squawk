@@ -63,7 +63,7 @@ mod test_rules {
     use insta::assert_debug_snapshot;
 
     #[test]
-    fn test_set_not_null() {
+    fn set_not_null() {
         let sql = r#"
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
@@ -71,7 +71,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
     }
 
     #[test]
-    fn test_adding_field_that_is_not_nullable() {
+    fn adding_field_that_is_not_nullable() {
         let ok_sql = r#"
 BEGIN;
 -- This will cause a table rewrite for Postgres versions before 11, but that is handled by
@@ -84,7 +84,7 @@ COMMIT;
     }
 
     #[test]
-    fn test_adding_field_that_is_not_nullable_without_default() {
+    fn adding_field_that_is_not_nullable_without_default() {
         let ok_sql = r#"
 -- This won't work if the table is populated, but that error is caught by adding-required-field.
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
@@ -93,7 +93,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
     }
 
     #[test]
-    fn test_adding_field_that_is_not_nullable_in_version_11() {
+    fn adding_field_that_is_not_nullable_in_version_11() {
         let ok_sql = r#"
 BEGIN;
 --
