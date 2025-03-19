@@ -85,6 +85,8 @@ def schema_upgrades():
         condition="view_count IS NOT NULL",
         postgresql_not_valid=True,
     )
+    # Backfill existing rows to get rid of any NULL values. You have have to split
+    # this into two migrations
     op.execute(
         sa.text("ALTER TABLE recipe VALIDATE CONSTRAINT view_count_not_null"),
     )
