@@ -7,16 +7,10 @@ use squawk_parser::ast::{AlterTableCmds, AlterTableType, RawStmt, Stmt};
 #[must_use]
 pub fn adding_not_nullable_field(
     tree: &[RawStmt],
-    pg_version: Option<Version>,
+    _pg_version: Option<Version>,
     _assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
-    if let Some(pg_version) = pg_version {
-        let pg_11 = Version::new(11, Some(0), Some(0));
-        if pg_version >= pg_11 {
-            return errs;
-        }
-    }
 
     for raw_stmt in tree {
         match &raw_stmt.stmt {
@@ -42,32 +36,23 @@ pub fn adding_not_nullable_field(
 
 #[cfg(test)]
 mod test_rules {
-    use std::str::FromStr;
-
     use crate::{
         check_sql_with_rule,
-        versions::Version,
         violations::{RuleViolation, RuleViolationKind},
     };
 
-    fn lint_sql(sql: &str, pg_version: Option<Version>) -> Vec<RuleViolation> {
-        check_sql_with_rule(
-            sql,
-            &RuleViolationKind::AddingNotNullableField,
-            pg_version,
-            false,
-        )
-        .unwrap()
+    fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(sql, &RuleViolationKind::AddingNotNullableField, None, false).unwrap()
     }
 
     use insta::assert_debug_snapshot;
 
     #[test]
     fn set_not_null() {
-        let sql = r#"
+        let bad_sql = r#"
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
-        assert_debug_snapshot!(lint_sql(sql, None));
+        assert_debug_snapshot!(lint_sql(bad_sql));
     }
 
     #[test]
@@ -80,7 +65,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
-        assert_debug_snapshot!(lint_sql(ok_sql, None));
+        assert_debug_snapshot!(lint_sql(ok_sql));
     }
 
     #[test]
@@ -89,19 +74,6 @@ COMMIT;
 -- This won't work if the table is populated, but that error is caught by adding-required-field.
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
-        assert_debug_snapshot!(lint_sql(ok_sql, None));
-    }
-
-    #[test]
-    fn adding_field_that_is_not_nullable_in_version_11() {
-        let ok_sql = r#"
-BEGIN;
---
--- Add field foo to recipe
---
-ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL DEFAULT 10;
-COMMIT;
-        "#;
-        assert_debug_snapshot!(lint_sql(ok_sql, Some(Version::from_str("11.0.0").unwrap()),));
+        assert_debug_snapshot!(lint_sql(ok_sql));
     }
 }
