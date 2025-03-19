@@ -90,7 +90,7 @@ def schema_upgrades():
     op.execute(
         sa.text("ALTER TABLE recipe VALIDATE CONSTRAINT view_count_not_null"),
     )
-    op.alter_column(
+    op.alter_column( # only include this step on pg version >= 12
         "recipe",
         "view_count",
         existing_type=sa.BigInteger(),
@@ -99,7 +99,7 @@ def schema_upgrades():
 
 
 def schema_downgrades():
-    op.alter_column(
+    op.alter_column( # only include this step on pg version >= 12
         "recipe",
         "view_count",
         existing_type=sa.BigInteger(),
