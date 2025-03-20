@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.5.5 - 2025-03-20
+
+### Fixed
+
+- Fixed adding-not-nullable-field incorrectly failing to check for nulls (#412). Thanks @schew2381!
+
 ## v1.5.4 - 2025-01-14
 
 ### Fixed

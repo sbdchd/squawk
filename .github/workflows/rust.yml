@@ -48,7 +48,7 @@ jobs:
       - name: Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release
+          name: release-squawk-linux-x64
           path: target/release/squawk-linux-x64
 
       - name: Release
@@ -91,7 +91,7 @@ jobs:
       - name: Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release
+          name: release-squawk-linux-arm64
           path: target/release/squawk-linux-arm64
 
       - name: Release
@@ -131,7 +131,7 @@ jobs:
       - name: Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release
+          name: release-squawk-windows-x64.exe
           path: target/release/squawk-windows-x64.exe
 
       - name: Release
@@ -179,7 +179,7 @@ jobs:
       - name: Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release
+          name: release-squawk-darwin-${{ matrix.arch }}
           path: target/release/squawk-darwin-${{ matrix.arch }}
 
       - name: Release
