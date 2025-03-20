@@ -46,7 +46,7 @@ jobs:
         run: cargo build --target x86_64-unknown-linux-gnu --release && mv target/x86_64-unknown-linux-gnu/release/squawk target/release/squawk-linux-x64
 
       - name: Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release
           path: target/release/squawk-linux-x64
@@ -89,7 +89,7 @@ jobs:
         run: RUSTFLAGS="-C linker=aarch64-linux-gnu-gcc" cargo build --target aarch64-unknown-linux-gnu --release && mv target/aarch64-unknown-linux-gnu/release/squawk target/release/squawk-linux-arm64
 
       - name: Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release
           path: target/release/squawk-linux-arm64
@@ -129,7 +129,7 @@ jobs:
         run: cargo build --target x86_64-pc-windows-msvc --release && mv target/x86_64-pc-windows-msvc/release/squawk.exe target/release/squawk-windows-x64.exe
 
       - name: Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release
           path: target/release/squawk-windows-x64.exe
@@ -177,7 +177,7 @@ jobs:
         run: cargo build --release --target=${{ matrix.target }} && mv target/${{ matrix.target }}/release/squawk target/release/squawk-darwin-${{ matrix.arch }}
 
       - name: Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: release
           path: target/release/squawk-darwin-${{ matrix.arch }}
