@@ -40,7 +40,7 @@ jobs:
           override: true
 
       - name: Cache
-        uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
 
       - name: Build
         run: cargo build --target x86_64-unknown-linux-gnu --release && mv target/x86_64-unknown-linux-gnu/release/squawk target/release/squawk-linux-x64
@@ -83,7 +83,7 @@ jobs:
           override: true
 
       - name: Cache
-        uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
 
       - name: Build
         run: RUSTFLAGS="-C linker=aarch64-linux-gnu-gcc" cargo build --target aarch64-unknown-linux-gnu --release && mv target/aarch64-unknown-linux-gnu/release/squawk target/release/squawk-linux-arm64
@@ -123,7 +123,7 @@ jobs:
           override: true
 
       - name: Cache
-        uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
 
       - name: Build
         run: cargo build --target x86_64-pc-windows-msvc --release && mv target/x86_64-pc-windows-msvc/release/squawk.exe target/release/squawk-windows-x64.exe
@@ -171,7 +171,7 @@ jobs:
           override: true
 
       - name: Cache
-        uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
 
       - name: Build for mac
         run: cargo build --release --target=${{ matrix.target }} && mv target/${{ matrix.target }}/release/squawk target/release/squawk-darwin-${{ matrix.arch }}
@@ -219,7 +219,7 @@ jobs:
         uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
 
       - name: Cache
-        uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
 
       - name: Install Rust Fmt
         run: rustup component add rustfmt
@@ -247,7 +247,7 @@ jobs:
         uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
 
       - name: Cache
-        uses: Swatinem/rust-cache@6fd3edff6979b79f87531400ad694fb7f2c84b1f # pin@v2
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
 
       - name: Test
         run: ./s/test
