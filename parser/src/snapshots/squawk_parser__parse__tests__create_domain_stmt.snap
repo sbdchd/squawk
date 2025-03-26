@@ -1,13 +1,38 @@
 ---
 source: parser/src/parse.rs
 expression: res
+
 ---
 Ok(
     [
         RawStmt {
             stmt: CreateDomainStmt(
-                Object({
-                    "constraints": Array([
+                CreateDomainStmt {
+                    domain_name: [
+                        QualifiedName {
+                            string: PGString {
+                                sval: "us_postal_code",
+                            },
+                        },
+                    ],
+                    typename: Object({
+                        "location": Number(
+                            33,
+                        ),
+                        "names": Array([
+                            Object({
+                                "String": Object({
+                                    "sval": String(
+                                        "text",
+                                    ),
+                                }),
+                            }),
+                        ]),
+                        "typemod": Number(
+                            -1,
+                        ),
+                    }),
+                    constraints: [
                         Object({
                             "Constraint": Object({
                                 "contype": String(
@@ -127,34 +152,8 @@ Ok(
                                 }),
                             }),
                         }),
-                    ]),
-                    "domainname": Array([
-                        Object({
-                            "String": Object({
-                                "sval": String(
-                                    "us_postal_code",
-                                ),
-                            }),
-                        }),
-                    ]),
-                    "typeName": Object({
-                        "location": Number(
-                            33,
-                        ),
-                        "names": Array([
-                            Object({
-                                "String": Object({
-                                    "sval": String(
-                                        "text",
-                                    ),
-                                }),
-                            }),
-                        ]),
-                        "typemod": Number(
-                            -1,
-                        ),
-                    }),
-                }),
+                    ],
+                },
             ),
             stmt_location: 0,
             stmt_len: Some(
