@@ -10,6 +10,7 @@ extern crate lazy_static;
 use crate::errors::CheckSqlError;
 use crate::rules::adding_required_field;
 use crate::rules::ban_concurrent_index_creation_in_transaction;
+use crate::rules::ban_create_domain_with_constraint;
 use crate::rules::ban_drop_not_null;
 use crate::rules::prefer_big_int;
 use crate::rules::prefer_identity;
@@ -116,6 +117,15 @@ lazy_static! {
             ),
             ViolationMessage::Help(
                 "Build the index outside any transactions.".into()
+            ),
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::BanCreateDomainWithConstraint,
+        func: ban_create_domain_with_constraint,
+        messages: vec![
+            ViolationMessage::Note(
+                "Domains with constraints have poor support for online migrations".into()
             ),
         ],
     },

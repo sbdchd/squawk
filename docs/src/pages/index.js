@@ -183,6 +183,11 @@ const rules = [
     tags: ["schema"],
     description: "Prevent forbidden use of transactions during concurrent index creation.",
   },
+  {
+    name: "ban-create-domain-with-constraint",
+    tags: ["TODO"],
+    description: "TODO",
+  },
   // generator::new-rule-above
 ]
 

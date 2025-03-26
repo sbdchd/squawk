@@ -1,6 +1,7 @@
 ---
 source: linter/src/lib.rs
 expression: rule_names
+
 ---
 [
     "adding-field-with-default",
@@ -10,6 +11,7 @@ expression: rule_names
     "adding-serial-primary-key-field",
     "ban-char-field",
     "ban-concurrent-index-creation-in-transaction",
+    "ban-create-domain-with-constraint",
     "ban-drop-column",
     "ban-drop-database",
     "ban-drop-not-null",
