@@ -179,7 +179,7 @@ repos:
     rev: v0.10.0
     hooks:
      - id: squawk
-       files: path/to/postres/migrations/written/in/sql
+       files: path/to/postgres/migrations/written/in/sql
 ```
 
 Note the `files` parameter as it specifies the location of the files to be linted.
