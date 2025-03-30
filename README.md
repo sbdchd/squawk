@@ -197,6 +197,7 @@ Note the `files` parameter as it specifies the location of the files to be linte
 - <https://github.com/AdmTal/PostgreSQL-Query-Lock-Explainer>
 - <https://github.com/stripe/pg-schema-diff>
 - <https://github.com/kristiandupont/schemalint>
+- <https://github.com/supabase-community/postgres-language-server>
 
 ## related blog posts / SE Posts / PG Docs
 
