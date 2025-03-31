@@ -185,13 +185,13 @@ const rules = [
   },
   {
     name: "ban-create-domain-with-constraint",
-    tags: ["TODO"],
-    description: "TODO",
+    tags: ["schema", "locking"],
+    description: "Domains with constraints have poor support for online migrations",
   },
   {
     name: "ban-alter-domain-with-add-constraint",
-    tags: ["TODO"],
-    description: "TODO",
+    tags: ["schema", "locking"],
+    description: "Domains with constraints have poor support for online migrations",
   },
   // generator::new-rule-above
 ]
