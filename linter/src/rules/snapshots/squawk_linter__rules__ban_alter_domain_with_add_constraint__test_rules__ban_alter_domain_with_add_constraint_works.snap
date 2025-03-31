@@ -1,0 +1,21 @@
+---
+source: linter/src/rules/ban_alter_domain_with_add_constraint.rs
+expression: lint_sql(sql)
+
+---
+[
+    RuleViolation {
+        kind: BanAlterDomainWithAddConstraint,
+        span: Span {
+            start: 0,
+            len: Some(
+                79,
+            ),
+        },
+        messages: [
+            Note(
+                "Domains with constraints have poor support for online migrations",
+            ),
+        ],
+    },
+]

@@ -9,6 +9,7 @@ extern crate lazy_static;
 
 use crate::errors::CheckSqlError;
 use crate::rules::adding_required_field;
+use crate::rules::ban_alter_domain_with_add_constraint;
 use crate::rules::ban_concurrent_index_creation_in_transaction;
 use crate::rules::ban_create_domain_with_constraint;
 use crate::rules::ban_drop_not_null;
@@ -97,6 +98,15 @@ lazy_static! {
                 "Add the PRIMARY KEY constraint USING an index.".into(),
             ),
 
+        ],
+    },
+    SquawkRule {
+        name: RuleViolationKind::BanAlterDomainWithAddConstraint,
+        func: ban_alter_domain_with_add_constraint,
+        messages: vec![
+            ViolationMessage::Note(
+                "Domains with constraints have poor support for online migrations".into()
+            ),
         ],
     },
     SquawkRule {

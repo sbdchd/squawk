@@ -188,6 +188,11 @@ const rules = [
     tags: ["TODO"],
     description: "TODO",
   },
+  {
+    name: "ban-alter-domain-with-add-constraint",
+    tags: ["TODO"],
+    description: "TODO",
+  },
   // generator::new-rule-above
 ]
 

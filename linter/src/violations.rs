@@ -63,6 +63,8 @@ pub enum RuleViolationKind {
     BanConcurrentIndexCreationInTransaction,
     #[serde(rename = "ban-create-domain-with-constraint")]
     BanCreateDomainWithConstraint,
+    #[serde(rename = "ban-alter-domain-with-add-constraint")]
+    BanAlterDomainWithAddConstraint,
     // generator::new-rule-above
 }
 
