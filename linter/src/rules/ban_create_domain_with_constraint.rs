@@ -14,7 +14,7 @@ pub fn ban_create_domain_with_constraint(
     let mut errs = vec![];
     for raw_stmt in tree {
         match &raw_stmt.stmt {
-            Stmt::CreateDomainStmt(stmt) if stmt.constraints.len() > 0 => {
+            Stmt::CreateDomainStmt(stmt) if !stmt.constraints.is_empty() => {
                 errs.push(RuleViolation::new(
                     RuleViolationKind::BanCreateDomainWithConstraint,
                     raw_stmt.into(),
@@ -47,18 +47,18 @@ mod test_rules {
 
     #[test]
     fn ban_create_domain_without_constraint_is_ok() {
-        let sql = r#"
+        let sql = r"
     CREATE DOMAIN domain_name_1 AS TEXT;
     CREATE DOMAIN domain_name_2 AS CHARACTER VARYING;
-      "#;
+      ";
         assert_eq!(lint_sql(sql), vec![]);
     }
 
     #[test]
     fn ban_create_domain_with_constraint_works() {
-        let sql = r#"
+        let sql = r"
     CREATE DOMAIN domain_name_3 AS NUMERIC(15,5) CHECK (value > 0);
-      "#;
+      ";
         assert_debug_snapshot!(lint_sql(sql));
     }
 }

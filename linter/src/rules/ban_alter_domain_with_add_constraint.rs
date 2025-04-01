@@ -48,7 +48,7 @@ mod test_rules {
 
     #[test]
     fn ban_alter_domain_without_add_constraint_is_ok() {
-        let sql = r#"
+        let sql = r"
      ALTER DOMAIN domain_name_1 SET DEFAULT 1;
      ALTER DOMAIN domain_name_2 SET NOT NULL;
      ALTER DOMAIN domain_name_3 DROP CONSTRAINT other_domain_name;
@@ -57,15 +57,15 @@ mod test_rules {
      ALTER DOMAIN domain_name_6 VALIDATE CONSTRAINT constraint_name;
      ALTER DOMAIN domain_name_7 OWNER TO you;
      ALTER DOMAIN domain_name_8 SET SCHEMA foo;
-       "#;
+       ";
         assert_eq!(lint_sql(sql), vec![]);
     }
 
     #[test]
     fn ban_alter_domain_with_add_constraint_works() {
-        let sql = r#"
+        let sql = r"
      ALTER DOMAIN domain_name ADD CONSTRAINT constraint_name CHECK (value > 0);
-       "#;
+       ";
         assert_debug_snapshot!(lint_sql(sql));
     }
 }
