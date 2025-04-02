@@ -173,13 +173,13 @@ See the ["GitHub Integration" docs](https://squawkhq.com/docs/github_app) for mo
 Integrate Squawk into Git workflow with [pre-commit](https://pre-commit.com/). Add the following
 to your project's `.pre-commit-config.yaml`:
 
-```
+```yaml
 repos:
   - repo: https://github.com/sbdchd/squawk
     rev: v0.10.0
     hooks:
-     - id: squawk
-       files: path/to/postgres/migrations/written/in/sql
+      - id: squawk
+        files: path/to/postgres/migrations/written/in/sql
 ```
 
 Note the `files` parameter as it specifies the location of the files to be linted.
