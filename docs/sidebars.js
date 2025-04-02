@@ -29,6 +29,8 @@ module.exports = {
       "require-concurrent-index-creation",
       "require-concurrent-index-deletion",
       "transaction-nesting",
+      "ban-create-domain-with-constraint",
+      "ban-alter-domain-with-add-constraint",
       // generator::new-rule-above
     ],
   },

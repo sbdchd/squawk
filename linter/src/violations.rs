@@ -61,6 +61,10 @@ pub enum RuleViolationKind {
     AddingRequiredField,
     #[serde(rename = "ban-concurrent-index-creation-in-transaction")]
     BanConcurrentIndexCreationInTransaction,
+    #[serde(rename = "ban-create-domain-with-constraint")]
+    BanCreateDomainWithConstraint,
+    #[serde(rename = "ban-alter-domain-with-add-constraint")]
+    BanAlterDomainWithAddConstraint,
     // generator::new-rule-above
 }
 

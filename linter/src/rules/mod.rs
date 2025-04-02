@@ -52,3 +52,7 @@ pub mod adding_required_field;
 pub use adding_required_field::*;
 pub mod ban_concurrent_index_creation_in_transaction;
 pub use ban_concurrent_index_creation_in_transaction::*;
+pub mod ban_create_domain_with_constraint;
+pub use ban_create_domain_with_constraint::*;
+pub mod ban_alter_domain_with_add_constraint;
+pub use ban_alter_domain_with_add_constraint::*;

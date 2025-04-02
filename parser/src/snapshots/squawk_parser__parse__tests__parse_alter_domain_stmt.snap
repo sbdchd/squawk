@@ -1,19 +1,17 @@
 ---
 source: parser/src/parse.rs
 expression: res
+
 ---
 Ok(
     [
         RawStmt {
             stmt: AlterDomainStmt(
-                Object({
-                    "behavior": String(
-                        "DROP_RESTRICT",
-                    ),
-                    "subtype": String(
-                        "O",
-                    ),
-                    "typeName": Array([
+                AlterDomainStmt {
+                    behavior: Restrict,
+                    name: None,
+                    subtype: "O",
+                    typename: Array([
                         Object({
                             "String": Object({
                                 "sval": String(
@@ -22,7 +20,8 @@ Ok(
                             }),
                         }),
                     ]),
-                }),
+                    def: None,
+                },
             ),
             stmt_location: 0,
             stmt_len: Some(

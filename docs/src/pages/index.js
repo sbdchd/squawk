@@ -183,6 +183,16 @@ const rules = [
     tags: ["schema"],
     description: "Prevent forbidden use of transactions during concurrent index creation.",
   },
+  {
+    name: "ban-create-domain-with-constraint",
+    tags: ["schema", "locking"],
+    description: "Domains with constraints have poor support for online migrations",
+  },
+  {
+    name: "ban-alter-domain-with-add-constraint",
+    tags: ["schema", "locking"],
+    description: "Domains with constraints have poor support for online migrations",
+  },
   // generator::new-rule-above
 ]
 

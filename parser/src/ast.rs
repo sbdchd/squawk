@@ -429,6 +429,26 @@ pub struct AlterTableStmt {
     pub missing_ok: bool,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
+pub struct CreateDomainStmt {
+    #[serde(rename = "domainname")]
+    pub domain_name: Vec<QualifiedName>,
+    #[serde(rename = "typeName")]
+    pub typename: Value,
+    #[serde(default)]
+    pub constraints: Vec<Value>,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub struct AlterDomainStmt {
+    pub behavior: DropBehavior,
+    pub name: Option<String>,
+    pub subtype: String,
+    #[serde(rename = "typeName")]
+    pub typename: Value,
+    pub def: Option<Value>,
+}
+
 /// Source: <https://github.com/pganalyze/libpg_query/blob/b2790f8140721ff7f047167ecd7d44267b0a3880/src/pg_query_enum_defs.c#L249-L257>
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub enum DropBehavior {
@@ -888,7 +908,7 @@ pub enum Stmt {
     UpdateStmt(Value),
     DeleteStmt(Value),
     CreateSchemaStmt(Value),
-    AlterDomainStmt(Value),
+    AlterDomainStmt(AlterDomainStmt),
     GrantStmt(Value),
     GrantRoleStmt(Value),
     AlterDefaultPrivilegesStmt(Value),
@@ -928,7 +948,7 @@ pub enum Stmt {
     CreateSeqStmt(Value),
     AlterSeqStmt(Value),
     DefineStmt(Value),
-    CreateDomainStmt(Value),
+    CreateDomainStmt(CreateDomainStmt),
     CreateOpClassStmt(Value),
     CreateOpFamilyStmt(Value),
     AlterOpFamilyStmt(Value),
