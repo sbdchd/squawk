@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.6.0 - 2025-04-02
+
+- Added `ban-alter-domain-with-add-constraint` and `ban-create-domain-with-constraint` (#418). Thanks @johnmastro!
+
 ## v1.5.5 - 2025-03-20
 
 ### Fixed
