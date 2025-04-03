@@ -242,22 +242,20 @@ s/new-rule 'prefer big serial'
 
 ### releasing a new version
 
-1. update the CHANGELOG.md and bump version in the cli `Cargo.toml`, ensure the
-   lock file is updated, and update `package.json` and commit the changes
+1. Update the `CHANGELOG.md`
+
+   Include a description of any fixes / additions. Make sure to include the PR numbers and credit the authors.
+
+2. Run `s/update-version`
 
    ```bash
-   # update version in Cargo.toml files and package.json to 4.5.3
+   # update version in cli/Cargo.toml, package.json, flake.nix to 4.5.3
    s/update-version 4.5.3
    ```
 
-2. create a new release on github - CI will attach the binaries automatically
-3. wait for build artifacts to be attached to release.
-4. login to `npm` and publish new version.
+3. Create a new release on GitHub
 
-   ```bash
-   npm login
-   npm publish
-   ```
+   Use the text and version from the `CHANGELOG.md`
 
 ### algolia
 
