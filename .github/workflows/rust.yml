@@ -207,8 +207,7 @@ jobs:
 
   publish-docker:
     if: startsWith(github.ref, 'refs/tags/')
-    #needs: [build-linux-x64, build-mac, build-windows]
-    needs: pre_job
+    needs: [build-linux-x64, build-mac, build-windows]
     runs-on: ubuntu-22.04
     permissions:
       contents: read
@@ -238,6 +237,7 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
+            type=raw,value=latest
             type=ref,event=branch
             type=sha
 
