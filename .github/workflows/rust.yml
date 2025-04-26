@@ -205,6 +205,55 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
 
+  publish-docker:
+    if: startsWith(github.ref, 'refs/tags/')
+    #needs: [build-linux-x64, build-mac, build-windows]
+    needs: pre_job
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    env:
+      REGISTRY: ghcr.io
+      IMAGE_NAME: ${{ github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+            type=sha
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   lint:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'
