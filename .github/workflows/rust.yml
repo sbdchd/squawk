@@ -206,7 +206,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
 
   publish-docker:
-    if: startsWith(github.ref, 'refs/tags/')
     needs: [build-linux-x64, build-mac, build-windows]
     runs-on: ubuntu-22.04
     permissions:
@@ -237,9 +236,8 @@ jobs:
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=raw,value=latest
+            type=ref,event=pr
             type=ref,event=branch
-            type=sha
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
