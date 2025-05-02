@@ -829,6 +829,7 @@ SELECT 1;
 
     #[test]
     fn regression_slicing_issue_425() {
+        // Squawk was crashing with an slicing issue.
         let sql = "ALTER TABLE test ADD COLUMN IF NOT EXISTS test INTEGER;";
         let violation = RuleViolation::new(
             RuleViolationKind::PreferBigInt,
@@ -839,5 +840,27 @@ SELECT 1;
             None,
         );
         pretty_violations(vec![violation], sql, "main.sql");
+    }
+    #[test]
+    fn highlight_column_for_issues() {
+        // Display only the columns with issues for large DDLs.
+        fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+            check_sql_with_rule(sql, &RuleViolationKind::PreferTextField, None, false).unwrap()
+        }
+        // Squawk was crashing with an slicing issue.
+        let sql = "create table test_table (
+    col1 varchar(255),
+    col2 varchar(255),
+    col3 varchar(255)
+    --- other columns
+);";
+        let violations = lint_sql(sql);
+        let res = pretty_violations(violations, sql, "main.sql");
+        let columns = res
+            .violations
+            .iter()
+            .map(|v| v.sql.clone())
+            .collect::<String>();
+        assert_display_snapshot!(columns);
     }
 }
