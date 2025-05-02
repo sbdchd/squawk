@@ -396,7 +396,8 @@ pub fn pretty_violations(
                 } else {
                     // Use current line
                     let tail = sql[start..].find('\n').unwrap_or(sql.len() - start);
-                    &sql[start..=start + tail]
+
+                    &sql.chars().skip(start).take(tail + 1).collect::<String>()
                 };
 
                 // TODO(sbdchd): could remove the leading whitespace and comments to
