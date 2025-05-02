@@ -666,6 +666,7 @@ mod test_reporter {
         check_sql_with_rule,
         violations::{RuleViolation, RuleViolationKind},
     };
+    use squawk_parser::ast::Span;
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql_with_rule(sql, &RuleViolationKind::AddingRequiredField, None, false).unwrap()
@@ -824,5 +825,19 @@ SELECT 1;
             ],
         }
         "#);
+    }
+
+    #[test]
+    fn regression_slicing_issue_425() {
+        let sql = "ALTER TABLE test ADD COLUMN IF NOT EXISTS test INTEGER;";
+        let violation = RuleViolation::new(
+            RuleViolationKind::PreferBigInt,
+            Span {
+                start: 42,
+                len: None,
+            },
+            None,
+        );
+        pretty_violations(vec![violation], sql, "main.sql");
     }
 }
