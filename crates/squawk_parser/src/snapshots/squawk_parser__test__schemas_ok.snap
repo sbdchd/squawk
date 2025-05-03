@@ -1,0 +1,609 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/schemas.sql
+---
+SOURCE_FILE
+  COMMENT "-- create_schema"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "myschema"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "current_role"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    SESSION_USER_KW "session_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE "\n  "
+    CREATE_TABLE
+      CREATE_KW "create"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
+      WHITESPACE " "
+      TABLE_ARGS
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        COMMA ","
+        WHITESPACE " "
+        COLUMN
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+        R_PAREN ")"
+    WHITESPACE "\n  "
+    CREATE_TABLE
+      CREATE_KW "create"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t1"
+      WHITESPACE " "
+      TABLE_ARGS
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "z"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int8"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            SCHEMA_KW "schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          TABLE_KW "table"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              DATABASE_KW "database"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            SCHEMA_KW "schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          TABLE_KW "table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "myschema"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "myschema"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME
+      IDENT "myschema"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "schema_name"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    IDENT "user_name"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- create_schema_with_sequence"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE "\n  "
+    CREATE_SEQUENCE_STMT
+      CREATE_KW "create"
+      WHITESPACE " "
+      SEQUENCE_KW "sequence"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- create_schema_with_trigger"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE "\n  "
+    CREATE_TRIGGER_STMT
+      CREATE_KW "create"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      NAME
+        IDENT "t"
+      WHITESPACE " "
+      AFTER_KW "after"
+      WHITESPACE " "
+      INSERT_KW "insert"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+      WHITESPACE "\n    "
+      EXECUTE_KW "execute"
+      WHITESPACE " "
+      FUNCTION_KW "function"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "f"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- search_path"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "show"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "myschema"
+    COMMA ","
+    IDENT "public"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "myschema"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    TIME_KW "time"
+    WHITESPACE " "
+    ZONE_KW "zone"
+    WHITESPACE " "
+    LITERAL
+      STRING "'America/Los_Angeles'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    TIME_KW "time"
+    WHITESPACE " "
+    ZONE_KW "zone"
+    WHITESPACE " "
+    DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    TIME_KW "time"
+    WHITESPACE " "
+    ZONE_KW "zone"
+    WHITESPACE " "
+    LOCAL_KW "local"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      FLOAT_NUMBER "10.0"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operator"
+  WHITESPACE "\n"
+  COMMENT "-- binary"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "3"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              IDENT "pg_catalog"
+              DOT "."
+              PLUS "+"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "3"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              PLUS "+"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              IDENT "a"
+              DOT "."
+              CUSTOM_OP
+                AMP "&"
+                AMP "&"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- unary"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              IDENT "pg_catalog"
+              DOT "."
+              MINUS "-"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              MINUS "-"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            OPERATOR_CALL
+              OPERATOR_KW "operator"
+              L_PAREN "("
+              IDENT "a"
+              DOT "."
+              IDENT "b"
+              DOT "."
+              MINUS "-"
+              R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

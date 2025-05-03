@@ -1,0 +1,86 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_database.sql
+---
+SOURCE_FILE
+  COMMENT "-- drop_database"
+  WHITESPACE "\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    FORCE_KW "force"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    FORCE_KW "force"
+    COMMA ","
+    WHITESPACE " "
+    FORCE_KW "force"
+    WHITESPACE " "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "\"table_name\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "\"table_name\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "\"table_name\""
+  WHITESPACE "\n\n"

@@ -1,0 +1,59 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_text_search_config.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_CONFIG_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_CONFIG_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "bar"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- restrict"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_CONFIG_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "bar"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

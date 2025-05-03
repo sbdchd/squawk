@@ -1,0 +1,121 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_sequence.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_SEQUENCE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_SEQUENCE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMPORARY_KW "temporary"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "s"
+    WHITESPACE "\n "
+    AS_KW "as"
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    WHITESPACE "\n "
+    INCREMENT_KW "increment"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE "\n "
+    MINVALUE_KW "minvalue"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE "\n "
+    NO_KW "no"
+    WHITESPACE " "
+    MINVALUE_KW "minvalue"
+    WHITESPACE "\n "
+    MAXVALUE_KW "maxvalue"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "100"
+    WHITESPACE "\n "
+    NO_KW "no"
+    WHITESPACE " "
+    MAXVALUE_KW "maxvalue"
+    WHITESPACE "\n "
+    START_KW "start"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE "\n "
+    CACHE_KW "cache"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE "\n "
+    NO_KW "no"
+    WHITESPACE " "
+    CYCLE_KW "cycle"
+    WHITESPACE "\n "
+    OWNED_KW "owned"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- unlogged"
+  WHITESPACE "\n"
+  CREATE_SEQUENCE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    UNLOGGED_KW "unlogged"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

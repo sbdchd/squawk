@@ -1,0 +1,238 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/vacuum.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "VERBOSE"
+    COMMA ","
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "onek"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    FULL_KW "full"
+    COMMA ","
+    WHITESPACE " \n    "
+    FULL_KW "full"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE " \n    "
+    FULL_KW "full"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE " \n    "
+    ANALYZE_KW "analyze"
+    COMMA ","
+    WHITESPACE "\n    "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n    "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "disable_page_skipping"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "disable_page_skipping"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "disable_page_skipping"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "skip_locked"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "skip_locked"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "skip_locked"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "index_cleanup"
+    WHITESPACE " "
+    IDENT "auto"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "index_cleanup"
+    WHITESPACE " "
+    ON_KW "on"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "index_cleanup"
+    WHITESPACE " "
+    OFF_KW "off"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "process_main"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "process_main"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "process_main"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n    "
+    TRUNCATE_KW "truncate"
+    COMMA ","
+    WHITESPACE "\n    "
+    TRUNCATE_KW "truncate"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n    "
+    TRUNCATE_KW "truncate"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n    "
+    PARALLEL_KW "parallel"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "100"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "skip_database_stats"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "skip_database_stats"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "skip_database_stats"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "only_database_stats"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "only_database_stats"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "only_database_stats"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "buffer_usage_limit"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE "\n    "
+    IDENT "buffer_usage_limit"
+    WHITESPACE " "
+    LITERAL
+      STRING "'10 TB'"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pre_pg_9_syntax"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    FULL_KW "full"
+    WHITESPACE " "
+    FREEZE_KW "freeze"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

@@ -1,0 +1,51 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_user_mapping.sql
+---
+SOURCE_FILE
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  ALTER_USER_MAPPING_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "current_role"
+    WHITESPACE "\n    "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+    WHITESPACE "\n    "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    ADD_KW "add"
+    WHITESPACE " "
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    COMMA ","
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    WHITESPACE " "
+    LITERAL
+      STRING "'w'"
+    COMMA ","
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

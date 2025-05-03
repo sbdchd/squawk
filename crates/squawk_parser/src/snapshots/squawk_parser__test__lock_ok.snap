@@ -1,0 +1,222 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/lock.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table_names"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+    WHITESPACE " "
+    STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- lock_mode"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    ACCESS_KW "access"
+    WHITESPACE " "
+    SHARE_KW "share"
+    WHITESPACE " "
+    MODE_KW "mode"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    ROW_KW "row"
+    WHITESPACE " "
+    SHARE_KW "share"
+    WHITESPACE " "
+    MODE_KW "mode"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    ROW_KW "row"
+    WHITESPACE " "
+    EXCLUSIVE_KW "exclusive"
+    WHITESPACE " "
+    MODE_KW "mode"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    SHARE_KW "share"
+    WHITESPACE " "
+    UPDATE_KW "update"
+    WHITESPACE " "
+    EXCLUSIVE_KW "exclusive"
+    WHITESPACE " "
+    MODE_KW "mode"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    SHARE_KW "share"
+    WHITESPACE " "
+    MODE_KW "mode"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    SHARE_KW "share"
+    WHITESPACE " "
+    ROW_KW "row"
+    WHITESPACE " "
+    EXCLUSIVE_KW "exclusive"
+    WHITESPACE " "
+    MODE_KW "mode"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    EXCLUSIVE_KW "exclusive"
+    WHITESPACE " "
+    MODE_KW "mode"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    ACCESS_KW "access"
+    WHITESPACE " "
+    EXCLUSIVE_KW "exclusive"
+    WHITESPACE " "
+    MODE_KW "mode"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- all"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "lock"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    STAR "*"
+    COMMA ","
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    ROW_KW "row"
+    WHITESPACE " "
+    EXCLUSIVE_KW "exclusive"
+    WHITESPACE " "
+    MODE_KW "mode"
+    WHITESPACE " "
+    NOWAIT_KW "nowait"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

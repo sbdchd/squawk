@@ -1,0 +1,66 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_server.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_SERVER_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_SERVER_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SERVER_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

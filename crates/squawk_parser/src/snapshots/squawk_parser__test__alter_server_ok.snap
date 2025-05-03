@@ -1,0 +1,105 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_server.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  ALTER_SERVER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+    WHITESPACE "\n  "
+    VERSION_KW "version"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v1'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  ALTER_SERVER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+    WHITESPACE "\n  "
+    VERSION_KW "version"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v1'"
+    WHITESPACE "\n  "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    ADD_KW "add"
+    WHITESPACE " "
+    NAME
+      IDENT "o"
+    WHITESPACE " "
+    LITERAL
+      STRING "'val'"
+    COMMA ","
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_SERVER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+    WHITESPACE "\n  "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_SERVER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+    WHITESPACE "\n  "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_SERVER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+    WHITESPACE "\n  "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

@@ -1,0 +1,85 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_domain.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_DOMAIN_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    NAME
+      IDENT "d"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_DOMAIN_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    NAME
+      IDENT "d"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    WHITESPACE "\n  "
+    COLLATE
+      COLLATE_KW "collate"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"fr_FR\""
+    WHITESPACE "\n  "
+    DEFAULT_CONSTRAINT
+      DEFAULT_KW "default"
+      WHITESPACE " "
+      LITERAL
+        STRING "'fooooo'"
+    WHITESPACE "\n  "
+    CHECK_CONSTRAINT
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      CHECK_KW "check"
+      WHITESPACE " "
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    NOT_NULL_CONSTRAINT
+      NOT_KW "not"
+      WHITESPACE " "
+      NULL_KW "null"
+    WHITESPACE "\n  "
+    NULL_CONSTRAINT
+      NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

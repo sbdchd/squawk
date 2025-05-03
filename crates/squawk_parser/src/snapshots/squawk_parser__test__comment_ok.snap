@@ -1,0 +1,1335 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/comment.sql
+---
+SOURCE_FILE
+  COMMENT "-- access_method"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    ACCESS_KW "access"
+    WHITESPACE " "
+    METHOD_KW "method"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "m"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- aggregate_star"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "my_agg"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      STAR "*"
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- aggregate"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      STAR "*"
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- aggregate_with_params"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- aggregate_order_by"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      WHITESPACE " "
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      PARAM
+        TIME_TYPE
+          NAME_REF
+            TIMESTAMP_KW "timestamp"
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cast"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- collation"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- column"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    COLUMN_KW "column"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- constraint_on_table"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    CONSTRAINT_KW "constraint"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- constraint_on_domain"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    CONSTRAINT_KW "constraint"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- conversion"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    CONVERSION_KW "conversion"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- database"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- domain"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extension"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "e"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- event_trigger"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    EVENT_KW "event"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "e"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- foreign_data_wrapper"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- foreign_table"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- function"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- function_with_args"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- index"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "idx"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- large_object"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    LARGE_KW "large"
+    WHITESPACE " "
+    OBJECT_KW "object"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- materialized_view"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operator"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CUSTOM_OP
+      AT "@"
+      R_ANGLE ">"
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "jsonb"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "jsonb"
+    R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CUSTOM_OP
+      AT "@"
+      R_ANGLE ">"
+    L_PAREN "("
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "200"
+        R_PAREN ")"
+    R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operator_class"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operator_family"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- policy"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- language"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "l"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- procedural_language"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "l"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- procedure"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- procedure_with_args"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- publication"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "p"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- role"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "r"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- routine"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    ROUTINE_KW "routine"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "r"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- routine_with_args"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    ROUTINE_KW "routine"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "r"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                JSON_KW "json"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rule"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "r"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- sequence"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- server"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- statistics"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- subscription"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    SUBSCRIPTION_KW "subscription"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table_null"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- tablespace"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- text_search_configuration"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- text_search_dictionary"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    DICTIONARY_KW "dictionary"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- text_search_parser"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    PARSER_KW "parser"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- text_search_template"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    TEMPLATE_KW "template"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- transform"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trigger"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "u"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- type_"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- view"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

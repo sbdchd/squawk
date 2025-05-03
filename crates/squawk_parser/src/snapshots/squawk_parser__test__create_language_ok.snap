@@ -1,0 +1,72 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_language.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_LANGUAGE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME
+      IDENT "l"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_LANGUAGE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    TRUSTED_KW "trusted"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME
+      IDENT "l"
+    WHITESPACE "\n  "
+    HANDLER_KW "handler"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE "\n  "
+    INLINE_KW "inline"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
+    WHITESPACE "\n  "
+    VALIDATOR_KW "validator"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "x"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "y"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

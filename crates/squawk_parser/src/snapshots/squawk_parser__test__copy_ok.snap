@@ -1,0 +1,373 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/copy.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple_copy_from"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "copy"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "copytest"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    LITERAL
+      STRING "'/tmp/copy.data'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- copy_to"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "country"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    STDOUT_KW "STDOUT"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      DELIMITER_KW "DELIMITER"
+    WHITESPACE " "
+    LITERAL
+      STRING "'|'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- copy_from"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "country"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    LITERAL
+      STRING "'/usr1/proj/bray/sql/country_data'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- copy_to_file"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    L_PAREN "("
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "country"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "country_name"
+          WHITESPACE " "
+          LIKE_KW "LIKE"
+          WHITESPACE " "
+          LITERAL
+            STRING "'A%'"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      STRING "'/usr1/proj/bray/sql/a_list_countries.copy'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- copy_to_compress_filed"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "country"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    PROGRAM_KW "PROGRAM"
+    WHITESPACE " "
+    LITERAL
+      STRING "'gzip > /usr1/proj/bray/sql/country_data.gz'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- log_setting"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "copy"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "x"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "y"
+      R_PAREN ")"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    LITERAL
+      STRING "'/tmp/input.file'"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    NAME
+      IDENT "on_error"
+    WHITESPACE " "
+    IDENT "ignore"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "log_verbosity"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- on_error"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "copy"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "copytest"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    LITERAL
+      STRING "'/tmp/copy.data'"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    NAME
+      IDENT "on_error"
+    WHITESPACE " "
+    IDENT "ignore"
+    WHITESPACE " "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- all_the_options"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "copy"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      FORMAT_KW "format"
+    WHITESPACE " "
+    CSV_KW "csv"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      FREEZE_KW "freeze"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      FREEZE_KW "freeze"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      FREEZE_KW "freeze"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      DELIMITER_KW "delimiter"
+    WHITESPACE " "
+    LITERAL
+      STRING "','"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      NULL_KW "null"
+    WHITESPACE " "
+    LITERAL
+      STRING "'\\n'"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      DEFAULT_KW "default"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      HEADER_KW "header"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      HEADER_KW "header"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      HEADER_KW "header"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      HEADER_KW "header"
+    WHITESPACE " "
+    MATCH_KW "match"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      QUOTE_KW "quote"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      ESCAPE_KW "escape"
+    WHITESPACE " "
+    LITERAL
+      STRING "'bar'"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "force_quote"
+    WHITESPACE " "
+    STAR "*"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "force_quote"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "d"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "force_not_null"
+    WHITESPACE " "
+    STAR "*"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "force_not_null"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "a"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "force_null"
+    WHITESPACE " "
+    STAR "*"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "force_null"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "on_error"
+    WHITESPACE " "
+    IDENT "stop"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "on_error"
+    WHITESPACE " "
+    IDENT "ignore"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      ENCODING_KW "encoding"
+    WHITESPACE " "
+    LITERAL
+      STRING "'utf8'"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "log_verbosity"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

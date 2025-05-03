@@ -1,0 +1,1142 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/select_funcs_pg17.sql
+---
+SOURCE_FILE
+  WHITESPACE "\n"
+  COMMENT "-- json_table"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "jt"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n "
+      NAME_REF
+        IDENT "my_films"
+      COMMA ","
+      WHITESPACE "\n "
+      CALL_EXPR
+        NAME_REF
+          JSON_TABLE_KW "JSON_TABLE"
+        WHITESPACE " "
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE " "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n   "
+          NAME
+            IDENT "id"
+          WHITESPACE " "
+          FOR_KW "FOR"
+          WHITESPACE " "
+          ORDINALITY_KW "ORDINALITY"
+          COMMA ","
+          WHITESPACE "\n   "
+          NAME
+            IDENT "kind"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.kind'"
+          COMMA ","
+          WHITESPACE "\n   "
+          NAME
+            IDENT "title"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.films[*].title'"
+          WHITESPACE " "
+          WITH_KW "WITH"
+          WHITESPACE " "
+          WRAPPER_KW "WRAPPER"
+          COMMA ","
+          WHITESPACE "\n   "
+          NAME
+            IDENT "director"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.films[*].director'"
+          WHITESPACE " "
+          WITH_KW "WITH"
+          WHITESPACE " "
+          WRAPPER_KW "WRAPPER"
+          R_PAREN ")"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "jt"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json_table_nested_path"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "jt"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n "
+      NAME_REF
+        IDENT "my_films"
+      COMMA ","
+      WHITESPACE "\n "
+      CALL_EXPR
+        NAME_REF
+          JSON_TABLE_KW "JSON_TABLE"
+        WHITESPACE " "
+        ARG_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*] ? (@.films[*].director == $filter)'"
+          WHITESPACE "\n   "
+          PASSING_KW "PASSING"
+          WHITESPACE " "
+          LITERAL
+            STRING "'Alfred Hitchcock'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FILTER_KW "filter"
+          WHITESPACE "\n   "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n    "
+          NAME
+            IDENT "id"
+          WHITESPACE " "
+          FOR_KW "FOR"
+          WHITESPACE " "
+          ORDINALITY_KW "ORDINALITY"
+          COMMA ","
+          WHITESPACE "\n    "
+          NAME
+            IDENT "kind"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.kind'"
+          COMMA ","
+          WHITESPACE "\n    "
+          NESTED_KW "NESTED"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.films[*]'"
+          WHITESPACE " "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n      "
+          NAME
+            IDENT "title"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          JSON_FORMAT_CLAUSE
+            FORMAT_KW "FORMAT"
+            WHITESPACE " "
+            JSON_KW "JSON"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.title'"
+          WHITESPACE " "
+          OMIT_KW "OMIT"
+          WHITESPACE " "
+          QUOTES_KW "QUOTES"
+          COMMA ","
+          WHITESPACE "\n      "
+          NAME
+            IDENT "director"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.director'"
+          WHITESPACE " "
+          KEEP_KW "KEEP"
+          WHITESPACE " "
+          QUOTES_KW "QUOTES"
+          R_PAREN ")"
+          R_PAREN ")"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "jt"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json_table_without_filter"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "jt"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n "
+      NAME_REF
+        IDENT "my_films"
+      COMMA ","
+      WHITESPACE "\n "
+      CALL_EXPR
+        NAME_REF
+          JSON_TABLE_KW "JSON_TABLE"
+        WHITESPACE " "
+        ARG_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          NAME_REF
+            IDENT "js"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE "\n   "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n    "
+          NAME
+            IDENT "id"
+          WHITESPACE " "
+          FOR_KW "FOR"
+          WHITESPACE " "
+          ORDINALITY_KW "ORDINALITY"
+          COMMA ","
+          WHITESPACE "\n    "
+          NAME
+            IDENT "kind"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.kind'"
+          COMMA ","
+          WHITESPACE "\n    "
+          NESTED_KW "NESTED"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.films[*]'"
+          WHITESPACE " "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n      "
+          NAME
+            IDENT "title"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          JSON_FORMAT_CLAUSE
+            FORMAT_KW "FORMAT"
+            WHITESPACE " "
+            JSON_KW "JSON"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.title'"
+          WHITESPACE " "
+          OMIT_KW "OMIT"
+          WHITESPACE " "
+          QUOTES_KW "QUOTES"
+          COMMA ","
+          WHITESPACE "\n      "
+          NAME
+            IDENT "director"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.director'"
+          WHITESPACE " "
+          KEEP_KW "KEEP"
+          WHITESPACE " "
+          QUOTES_KW "QUOTES"
+          R_PAREN ")"
+          R_PAREN ")"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "jt"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json_table_union"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          JSON_TABLE_KW "JSON_TABLE"
+        WHITESPACE " "
+        ARG_LIST
+          L_PAREN "("
+          WHITESPACE "\n"
+          CAST_EXPR
+            LITERAL
+              STRING "'{\"favorites\":\n    {\"movies\":\n      [{\"name\": \"One\", \"director\": \"John Doe\"},\n       {\"name\": \"Two\", \"director\": \"Don Joe\"}],\n     \"books\":\n      [{\"name\": \"Mystery\", \"authors\": [{\"name\": \"Brown Dan\"}]},\n       {\"name\": \"Wonder\", \"authors\": [{\"name\": \"Jun Murakami\"}, {\"name\":\"Craig Doe\"}]}]\n}}'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    JSON_KW "json"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.favorites[*]'"
+          WHITESPACE "\n"
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n  "
+          NAME
+            IDENT "user_id"
+          WHITESPACE " "
+          FOR_KW "FOR"
+          WHITESPACE " "
+          ORDINALITY_KW "ORDINALITY"
+          COMMA ","
+          WHITESPACE "\n  "
+          NESTED_KW "NESTED"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.movies[*]'"
+          WHITESPACE "\n    "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n    "
+          NAME
+            IDENT "movie_id"
+          WHITESPACE " "
+          FOR_KW "FOR"
+          WHITESPACE " "
+          ORDINALITY_KW "ORDINALITY"
+          COMMA ","
+          WHITESPACE "\n    "
+          NAME
+            IDENT "mname"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.name'"
+          COMMA ","
+          WHITESPACE "\n    "
+          NAME
+            IDENT "director"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          NESTED_KW "NESTED"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.books[*]'"
+          WHITESPACE "\n    "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n      "
+          NAME
+            IDENT "book_id"
+          WHITESPACE " "
+          FOR_KW "FOR"
+          WHITESPACE " "
+          ORDINALITY_KW "ORDINALITY"
+          COMMA ","
+          WHITESPACE "\n      "
+          NAME
+            IDENT "bname"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.name'"
+          COMMA ","
+          WHITESPACE "\n      "
+          NESTED_KW "NESTED"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.authors[*]'"
+          WHITESPACE "\n        "
+          COLUMNS_KW "COLUMNS"
+          WHITESPACE " "
+          L_PAREN "("
+          WHITESPACE "\n          "
+          NAME
+            IDENT "author_id"
+          WHITESPACE " "
+          FOR_KW "FOR"
+          WHITESPACE " "
+          ORDINALITY_KW "ORDINALITY"
+          COMMA ","
+          WHITESPACE "\n          "
+          NAME
+            IDENT "author_name"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+          WHITESPACE " "
+          PATH_KW "PATH"
+          WHITESPACE " "
+          LITERAL
+            STRING "'$.name'"
+          R_PAREN ")"
+          R_PAREN ")"
+          R_PAREN ")"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_KW "json"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_KW "json"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              WHITESPACE " "
+              JSON_KEYS_UNIQUE_CLAUSE
+                WITH_KW "with"
+                WHITESPACE " "
+                UNIQUE_KW "unique"
+                WHITESPACE " "
+                KEYS_KW "keys"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_KW "json"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              WHITESPACE " "
+              JSON_KEYS_UNIQUE_CLAUSE
+                WITH_KW "with"
+                WHITESPACE " "
+                UNIQUE_KW "unique"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_KW "json"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              WHITESPACE " "
+              JSON_KEYS_UNIQUE_CLAUSE
+                WITHOUT_KW "without"
+                WHITESPACE " "
+                UNIQUE_KW "unique"
+                WHITESPACE " "
+                KEYS_KW "keys"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_KW "json"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              WHITESPACE " "
+              JSON_KEYS_UNIQUE_CLAUSE
+                WITHOUT_KW "without"
+                WHITESPACE " "
+                UNIQUE_KW "unique"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json_serialize"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_SERIALIZE_KW "json_serialize"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_SERIALIZE_KW "json_serialize"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_SERIALIZE_KW "json_serialize"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_RETURNING_CLAUSE
+                RETURNING_KW "returning"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "foo"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_SERIALIZE_KW "json_serialize"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              WHITESPACE " "
+              JSON_RETURNING_CLAUSE
+                RETURNING_KW "returning"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "foo"
+                WHITESPACE " "
+                JSON_FORMAT_CLAUSE
+                  FORMAT_KW "format"
+                  WHITESPACE " "
+                  JSON_KW "json"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json_query"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_QUERY_KW "json_query"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_WRAPPER_BEHAVIOR_CLAUSE
+                WITH_KW "with"
+                WHITESPACE " "
+                WRAPPER_KW "wrapper"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_QUERY_KW "json_query"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE "\n  "
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              COMMA ","
+              WHITESPACE " \n  "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_PASSING_CLAUSE
+                PASSING_KW "passing"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "foo"
+                COMMA ","
+                WHITESPACE " \n  "
+                NAME_REF
+                  IDENT "d"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "bar"
+              WHITESPACE " \n  "
+              JSON_RETURNING_CLAUSE
+                RETURNING_KW "returning"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+                WHITESPACE " \n  "
+                JSON_FORMAT_CLAUSE
+                  FORMAT_KW "format"
+                  WHITESPACE " "
+                  JSON_KW "json"
+              WHITESPACE " \n  "
+              JSON_WRAPPER_BEHAVIOR_CLAUSE
+                WITH_KW "with"
+                WHITESPACE " "
+                UNCONDITIONAL_KW "unconditional"
+                WHITESPACE " "
+                ARRAY_KW "array"
+                WHITESPACE " "
+                WRAPPER_KW "wrapper"
+              WHITESPACE "\n  "
+              JSON_QUOTES_CLAUSE
+                KEEP_KW "keep"
+                WHITESPACE " "
+                QUOTES_KW "quotes"
+                WHITESPACE " "
+                ON_KW "on"
+                WHITESPACE " "
+                SCALAR_KW "scalar"
+                WHITESPACE " "
+                STRING_KW "string"
+              WHITESPACE "\n  "
+              JSON_BEHAVIOR_CLAUSE
+                UNKNOWN_KW "unknown"
+                WHITESPACE " "
+                ON_KW "on"
+                WHITESPACE " "
+                EMPTY_KW "empty"
+                WHITESPACE "\n  "
+                EMPTY_KW "empty"
+                WHITESPACE " "
+                ARRAY_KW "array"
+                WHITESPACE " "
+                ON_KW "on"
+                WHITESPACE " "
+                ERROR_KW "error"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- json_exists"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_EXISTS_KW "json_exists"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_EXISTS_KW "json_exists"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE "\n  "
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              COMMA ","
+              WHITESPACE "\n  "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_PASSING_CLAUSE
+                PASSING_KW "passing"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "d"
+              WHITESPACE "\n  "
+              JSON_ON_ERROR_CLAUSE
+                DEFAULT_KW "default"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "z"
+                WHITESPACE " "
+                ON_KW "on"
+                WHITESPACE " "
+                ERROR_KW "error"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc examples"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_EXISTS_KW "JSON_EXISTS"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "jsonb"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'{\"key1\": [1,2,3]}'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'strict $.key1[*] ? (@ > $x)'"
+              WHITESPACE " "
+              JSON_PASSING_CLAUSE
+                PASSING_KW "PASSING"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "x"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_EXISTS_KW "JSON_EXISTS"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "jsonb"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'{\"a\": [1,2,3]}'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'lax $.a[5]'"
+              WHITESPACE " "
+              JSON_ON_ERROR_CLAUSE
+                ERROR_KW "ERROR"
+                WHITESPACE " "
+                ON_KW "ON"
+                WHITESPACE " "
+                ERROR_KW "ERROR"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_EXISTS_KW "JSON_EXISTS"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "jsonb"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'{\"a\": [1,2,3]}'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'strict $.a[5]'"
+              WHITESPACE " "
+              JSON_ON_ERROR_CLAUSE
+                ERROR_KW "ERROR"
+                WHITESPACE " "
+                ON_KW "ON"
+                WHITESPACE " "
+                ERROR_KW "ERROR"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json_value"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_VALUE_KW "json_value"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_VALUE_KW "json_value"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE "\n  "
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              JSON_FORMAT_CLAUSE
+                FORMAT_KW "format"
+                WHITESPACE " "
+                JSON_KW "json"
+              COMMA ","
+              WHITESPACE "\n  "
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              JSON_PASSING_CLAUSE
+                PASSING_KW "passing"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "d"
+              WHITESPACE "\n  "
+              JSON_RETURNING_CLAUSE
+                RETURNING_KW "returning"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "foo"
+                WHITESPACE " "
+                JSON_FORMAT_CLAUSE
+                  FORMAT_KW "format"
+                  WHITESPACE " "
+                  JSON_KW "json"
+              WHITESPACE "\n  "
+              JSON_BEHAVIOR_CLAUSE
+                UNKNOWN_KW "unknown"
+                WHITESPACE " "
+                ON_KW "on"
+                WHITESPACE " "
+                EMPTY_KW "empty"
+                WHITESPACE "\n  "
+                DEFAULT_KW "default"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "z"
+                WHITESPACE " "
+                ON_KW "on"
+                WHITESPACE " "
+                ERROR_KW "error"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

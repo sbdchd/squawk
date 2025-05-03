@@ -1,0 +1,75 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_language.sql
+---
+SOURCE_FILE
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_LANGUAGE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "x"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "y"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_LANGUAGE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "x"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "y"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_LANGUAGE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "x"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_LANGUAGE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "x"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

@@ -1,0 +1,3037 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_function.sql
+---
+SOURCE_FILE
+  COMMENT "-- create_func_with_in_out"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "dup"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "f2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select $1, cast($1 as text) || ' is text' $$"
+      WHITESPACE "\n    "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- security_definer"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "check_password"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "uname"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        NAME
+          IDENT "pass"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BOOLEAN_KW "BOOLEAN"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE passed BOOLEAN;\nBEGIN\n        SELECT  (pwd = $2) INTO passed\n        FROM    pwds\n        WHERE   username = $1;\n\n        RETURN passed;\nEND;\n$$"
+      WHITESPACE "  "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE "\n    "
+      SECURITY_FUNC_OPTION
+        SECURITY_KW "SECURITY"
+        WHITESPACE " "
+        DEFINER_KW "DEFINER"
+      WHITESPACE "\n    "
+      COMMENT "-- Set a secure search_path: trusted schema(s), then 'pg_temp'."
+      WHITESPACE "\n    "
+      SET_FUNC_OPTION
+        SET_KW "SET"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "search_path"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ADMIN_KW "admin"
+        COMMA ","
+        WHITESPACE " "
+        IDENT "pg_temp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- create_function_with_percent_type"
+  WHITESPACE "\n"
+  COMMENT "-- column type return"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PERCENT_TYPE
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+          PERCENT_TYPE_CLAUSE
+            PERCENT "%"
+            TYPE_KW "type"
+      R_PAREN ")"
+    WHITESPACE " \n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PERCENT_TYPE
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "b"
+        PERCENT_TYPE_CLAUSE
+          PERCENT "%"
+          TYPE_KW "type"
+    WHITESPACE " \n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- setof return"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "b"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- void return"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- omitted return"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LITERAL
+          STRING "'sql'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "public"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select 1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LITERAL
+          STRING "'sql'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "b"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "d"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select 1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LITERAL
+          STRING "'sql'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "public"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "a"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      ARRAY_TYPE
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NUMERIC_KW "numeric"
+        L_BRACK "["
+        R_BRACK "]"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LITERAL
+          STRING "'sql'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- returns table"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- transform"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      TRANSFORM_FUNC_OPTION
+        TRANSFORM_KW "transform"
+        WHITESPACE " "
+        FOR_KW "for"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+        COMMA ","
+        WHITESPACE " "
+        FOR_KW "for"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "b"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- transform with type with args"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      CHAR_TYPE
+        VARCHAR_KW "varchar"
+        L_PAREN "("
+        ARG_LIST
+          ARG
+            LITERAL
+              INT_NUMBER "255"
+          R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      TRANSFORM_FUNC_OPTION
+        TRANSFORM_KW "transform"
+        WHITESPACE " "
+        FOR_KW "for"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- window"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      WINDOW_FUNC_OPTION
+        WINDOW_KW "window"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- immutable, stable, volatile"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        STABLE_KW "stable"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        VOLATILE_KW "volatile"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- [ not ] leakproof"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LEAKPROOF_FUNC_OPTION
+        NOT_KW "not"
+        WHITESPACE " "
+        LEAKPROOF_KW "leakproof"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LEAKPROOF_FUNC_OPTION
+        LEAKPROOF_KW "leakproof"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      STRICT_FUNC_OPTION
+        CALLED_KW "called"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        INPUT_KW "input"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      STRICT_FUNC_OPTION
+        RETURNS_KW "returns"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        INPUT_KW "input"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- [ EXTERNAL ] SECURITY INVOKER | [ EXTERNAL ] SECURITY DEFINER"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SECURITY_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SECURITY_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SECURITY_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SECURITY_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- parallel"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "unsafe"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "restricted"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- cost"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      COST_FUNC_OPTION
+        COST_KW "cost"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rows"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      ROWS_FUNC_OPTION
+        ROWS_KW "rows"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- suport"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SUPPORT_FUNC_OPTION
+        SUPPORT_KW "support"
+        WHITESPACE " "
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SUPPORT_FUNC_OPTION
+        SUPPORT_KW "support"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set configuration_parameter"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        WHITESPACE " "
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- as def"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select 1'"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- as 'object_file', 'link_symbol'"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- return"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      RETURN_FUNC_OPTION
+        RETURN_KW "return"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- begin atomic"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      BEGIN_FUNC_OPTION
+        BEGIN_KW "begin"
+        WHITESPACE " "
+        ATOMIC_KW "atomic"
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        SEMICOLON ";"
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      BEGIN_FUNC_OPTION
+        BEGIN_KW "begin"
+        WHITESPACE " "
+        ATOMIC_KW "atomic"
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        SEMICOLON ";"
+        WHITESPACE "\n  "
+        END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- lots of ;"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      BEGIN_FUNC_OPTION
+        BEGIN_KW "begin"
+        WHITESPACE " "
+        ATOMIC_KW "atomic"
+        WHITESPACE "\n"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        SEMICOLON ";"
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        SEMICOLON ";"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- all options"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n  "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n  "
+      TRANSFORM_FUNC_OPTION
+        TRANSFORM_KW "transform"
+        WHITESPACE " "
+        FOR_KW "for"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+      WHITESPACE "\n  "
+      WINDOW_FUNC_OPTION
+        WINDOW_KW "window"
+      WHITESPACE "\n  "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE "\n  "
+      LEAKPROOF_FUNC_OPTION
+        NOT_KW "not"
+        WHITESPACE " "
+        LEAKPROOF_KW "leakproof"
+      WHITESPACE "\n  "
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE "\n  "
+      SECURITY_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+      WHITESPACE "\n  "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+      WHITESPACE "\n  "
+      COST_FUNC_OPTION
+        COST_KW "cost"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1000"
+      WHITESPACE "\n  "
+      ROWS_FUNC_OPTION
+        ROWS_KW "rows"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1000"
+      WHITESPACE "\n  "
+      SUPPORT_FUNC_OPTION
+        SUPPORT_KW "support"
+        WHITESPACE " "
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      WHITESPACE "\n  "
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "b"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+      WHITESPACE "\n  "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n  "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+      WHITESPACE "\n  "
+      RETURN_FUNC_OPTION
+        RETURN_KW "return"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- regression"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select 1 + 1'"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "bitmask"
+        WHITESPACE " "
+        BIT_TYPE
+          BIT_KW "bit"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "8"
+            R_PAREN ")"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BOOLEAN_KW "boolean"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'0'"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- argmode"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_INOUT
+          IN_KW "in"
+          WHITESPACE " "
+          OUT_KW "out"
+        WHITESPACE " "
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_INOUT
+          INOUT_KW "inout"
+        WHITESPACE " "
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_VARIADIC
+          VARIADIC_KW "variadic"
+        WHITESPACE " "
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- with_arg_names"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- single arg"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multi args"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                FLOAT_KW "float"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        NAME
+          IDENT "arg2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- named and unnamed"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                FLOAT_KW "float"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- default"
+  WHITESPACE "\n"
+  COMMENT "-- ="
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                FLOAT_KW "float"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "4"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not a parser error but something to warn about"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                FLOAT_KW "float"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- default"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          DEFAULT_KW "default"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- expr w/ default"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          DEFAULT_KW "default"
+          WHITESPACE " "
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- expr w/ ="
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          EQ "="
+          WHITESPACE " "
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- param_type_order"
+  WHITESPACE "\n"
+  COMMENT "-- mode name type"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "arg"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- mode type"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- name mode type"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "int8"
+        WHITESPACE " "
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- name type"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "int8"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- type"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n\n"

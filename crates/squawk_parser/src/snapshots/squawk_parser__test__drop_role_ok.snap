@@ -1,0 +1,62 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_role.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

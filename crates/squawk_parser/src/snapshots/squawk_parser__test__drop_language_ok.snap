@@ -1,0 +1,52 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_language.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_LANGUAGE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_LANGUAGE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_LANGUAGE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

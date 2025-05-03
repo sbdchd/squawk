@@ -1,0 +1,47 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/err/values.sql
+---
+SOURCE_FILE
+  WHITESPACE "\n"
+  COMMENT "-- trailing comma and missing comma between value lists"
+  WHITESPACE "\n"
+  SELECT
+    VALUES_KW "values"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    ERROR
+      COMMA ","
+    R_PAREN ")"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extra comma, aka missing tuple"
+  WHITESPACE "\n"
+  SELECT
+    VALUES_KW "values"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+    COMMA ","
+    ERROR
+      COMMA ","
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@66: unexpected trailing comma
+ERROR@68: expected COMMA
+ERROR@120: expected L_PAREN

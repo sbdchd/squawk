@@ -1,0 +1,220 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/fetch.sql
+---
+SOURCE_FILE
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    NEXT_KW "next"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    PRIOR_KW "prior"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    PRIOR_KW "prior"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    PRIOR_KW "prior"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    PRIOR_KW "PRIOR"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FIRST_KW "FIRST"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LAST_KW "LAST"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    RELATIVE_KW "RELATIVE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FORWARD_KW "FORWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FORWARD_KW "FORWARD"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FORWARD_KW "FORWARD"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

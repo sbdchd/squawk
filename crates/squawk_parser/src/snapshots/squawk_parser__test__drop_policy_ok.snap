@@ -1,0 +1,76 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_policy.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_POLICY_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_POLICY_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "r"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_name"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_POLICY_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "r"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

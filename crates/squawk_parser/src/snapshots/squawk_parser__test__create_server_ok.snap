@@ -1,0 +1,123 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_server.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_SERVER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_SERVER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE " \n  "
+    TYPE_KW "type"
+    WHITESPACE " "
+    LITERAL
+      STRING "'bar'"
+    WHITESPACE " \n  "
+    VERSION_KW "version"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    WHITESPACE "\n  "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f"
+    WHITESPACE "\n  "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "bar"
+    WHITESPACE " "
+    LITERAL
+      STRING "'b'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- docs_1"
+  WHITESPACE "\n"
+  CREATE_SERVER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    NAME
+      IDENT "myserver"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    DATA_KW "DATA"
+    WHITESPACE " "
+    WRAPPER_KW "WRAPPER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "postgres_fdw"
+    WHITESPACE " "
+    OPTIONS_KW "OPTIONS"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "host"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "dbname"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foodb'"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "port"
+    WHITESPACE " "
+    LITERAL
+      STRING "'5432'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

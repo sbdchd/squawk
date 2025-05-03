@@ -1,0 +1,358 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_rule.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_RULE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    SELECT_KW "select"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_RULE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    NAME
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    SELECT_KW "select"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              NEW_KW "new"
+            DOT "."
+            NAME_REF
+              IDENT "foo"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              OLD_KW "old"
+            DOT "."
+            NAME_REF
+              IDENT "foo"
+        WHITESPACE " "
+        OR_KW "or"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              OLD_KW "old"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          NEQ "!="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              NEW_KW "new"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+    WHITESPACE "\n  "
+    DO_KW "do"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+    WHITESPACE "\n    "
+    INSERT_STMT
+      INSERT_KW "insert"
+      WHITESPACE " "
+      INTO_KW "into"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      WHITESPACE " "
+      SELECT
+        VALUES_KW "values"
+        WHITESPACE " "
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+        R_PAREN ")"
+    SEMICOLON ";"
+    WHITESPACE "\n    "
+    DELETE_STMT
+      DELETE_KW "delete"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    SEMICOLON ";"
+    WHITESPACE "\n    "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+    SEMICOLON ";"
+    WHITESPACE "\n    "
+    UPDATE_STMT
+      UPDATE_KW "update"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      WHITESPACE " "
+      SET_KW "set"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    SEMICOLON ";"
+    WHITESPACE "\n    "
+    NOTIFY_STMT
+      NOTIFY_KW "notify"
+      WHITESPACE " "
+      NAME
+        IDENT "f"
+    SEMICOLON ";"
+    WHITESPACE "\n  "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_1"
+  WHITESPACE "\n"
+  CREATE_RULE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME
+      IDENT "\"_RETURN\""
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    ON_KW "ON"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t1"
+    WHITESPACE "\n    "
+    DO_KW "DO"
+    WHITESPACE " "
+    INSTEAD_KW "INSTEAD"
+    WHITESPACE "\n        "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "t2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_RULE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME
+      IDENT "\"_RETURN\""
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    ON_KW "ON"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t2"
+    WHITESPACE "\n    "
+    DO_KW "DO"
+    WHITESPACE " "
+    INSTEAD_KW "INSTEAD"
+    WHITESPACE "\n        "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "t1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_2"
+  WHITESPACE "\n"
+  CREATE_RULE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME
+      IDENT "notify_me"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "mytable"
+    WHITESPACE " "
+    DO_KW "DO"
+    WHITESPACE " "
+    ALSO_KW "ALSO"
+    WHITESPACE " "
+    NOTIFY_STMT
+      NOTIFY_KW "NOTIFY"
+      WHITESPACE " "
+      NAME
+        IDENT "mytable"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "mytable"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      NAME_KW "name"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "42"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

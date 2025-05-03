@@ -1,0 +1,48 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_user_mapping.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_USER_MAPPING_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_USER_MAPPING_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "current_role"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "some_server_name"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

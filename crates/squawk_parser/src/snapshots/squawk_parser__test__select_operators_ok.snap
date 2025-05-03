@@ -1,0 +1,5079 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/select_operators.sql
+---
+SOURCE_FILE
+  COMMENT "-- logical_operators"
+  WHITESPACE "\n"
+  COMMENT "-- and"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- or"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            WHITESPACE " "
+            OR_KW "or"
+            WHITESPACE " "
+            LITERAL
+              FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            NOT_KW "not"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not is null"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            NOT_KW "not"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "x"
+              WHITESPACE " "
+              IS_KW "is"
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            NOT_KW "not"
+            WHITESPACE " "
+            POSTFIX_EXPR
+              NAME_REF
+                IDENT "x"
+              WHITESPACE " "
+              ISNULL_KW "isnull"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- geo_operators"
+  WHITESPACE "\n\n"
+  COMMENT "-- add"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,1),(0,0)'"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- concat"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(0,0),(1,1)]'"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(2,2),(3,3),(4,4)]'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- subtract"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,1),(0,0)'"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiply"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((0,0),(1,0),(1,1))'"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(3.0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((0,0),(1,0),(1,1))'"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "cosd"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "45"
+                    R_PAREN ")"
+                COMMA ","
+                WHITESPACE " "
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "sind"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "45"
+                    R_PAREN ")"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- divide"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((0,0),(1,0),(1,1))'"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2.0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((0,0),(1,0),(1,1))'"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "cosd"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "45"
+                    R_PAREN ")"
+                COMMA ","
+                WHITESPACE " "
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "sind"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "45"
+                    R_PAREN ")"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- length"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              AT "@"
+              MINUS "-"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(0,0),(1,0),(1,1)]'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- center point"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,2),(0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- number of points"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              POUND "#"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                PATH_KW "path"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((1,0),(0,1),(-1,0))'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- point intersection"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(0,0),(1,1)]'"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(1,0),(0,1)]'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- box intersection"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,2),(-1,-1)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,1),(-2,-2)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- closest point"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(0,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+              POUND "#"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(2,0),(0,2)]'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- distance between"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "circle"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<(0,0),1>'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "circle"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<(5,0),1>'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first contains"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "circle"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<(0,0),2>'"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,1)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first contained in second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,1)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "circle"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<(0,0),2>'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- objects overlap"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,1),(0,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,2),(0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- object strictly left"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "circle"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<(0,0),1>'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              L_ANGLE "<"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "circle"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<(5,0),1>'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- object strictly right"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "circle"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<(5,0),1>'"
+            WHITESPACE " "
+            CUSTOM_OP
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "circle"
+              WHITESPACE " "
+              LITERAL
+                STRING "'<(0,0),1>'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first extended to right of second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,1),(0,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              L_ANGLE "<"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,2),(0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first extends to left of second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(3,3),(0,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,2),(0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first strictly below second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(3,3),(0,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              L_ANGLE "<"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(5,5),(3,4)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first strictly above second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(3,3),(0,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(5,5),(3,4)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first doesn't extend above second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,1),(0,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              L_ANGLE "<"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,2),(0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first doesn't extend below second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(3,3),(0,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              AMP "&"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,2),(0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first below second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((1,1),(0,0))'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              CARET "^"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((2,2),(1,1))'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first above second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((2,2),(1,1))'"
+            WHITESPACE " "
+            CUSTOM_OP
+              R_ANGLE ">"
+              CARET "^"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((1,1),(0,0))'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- objects intersect"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(-1,0),(1,0)]'"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+              POUND "#"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "box"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(2,2),(-2,-2)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- line horizontal"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              QUESTION "?"
+              MINUS "-"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(-1,0),(1,0)]'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- points horizontally aligned"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(1,0)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+              MINUS "-"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- line vertical"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              QUESTION "?"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(-1,0),(1,0)]'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- points vertically aligned"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(0,1)'"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "point"
+              WHITESPACE " "
+              LITERAL
+                STRING "'(0,0)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- lines perpendicular"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(0,0),(0,1)]'"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+              MINUS "-"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(0,0),(1,0)]'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- lines parallel"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(-1,0),(1,0)]'"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "lseg"
+              WHITESPACE " "
+              LITERAL
+                STRING "'[(-1,2),(1,2)]'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- objects the same"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "polygon"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((0,0),(1,1))'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "polygon"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((1,1),(0,0))'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- network_operators"
+  WHITESPACE "\n\n"
+  COMMENT "-- subnet contained by or equal"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "inet"
+              WHITESPACE " "
+              LITERAL
+                STRING "'192.168.1/24'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              L_ANGLE "<"
+              EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "inet"
+              WHITESPACE " "
+              LITERAL
+                STRING "'192.168.1/24'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- subnet contain or equal subnet"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "inet"
+              WHITESPACE " "
+              LITERAL
+                STRING "'192.168.1/24'"
+            WHITESPACE " "
+            CUSTOM_OP
+              R_ANGLE ">"
+              R_ANGLE ">"
+              EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "inet"
+              WHITESPACE " "
+              LITERAL
+                STRING "'192.168.1/24'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- fts_operators"
+  WHITESPACE "\n\n"
+  COMMENT "-- negative tsquery"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              BANG "!"
+              BANG "!"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'cat'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- subnet contain or equal subnet"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "inet"
+              WHITESPACE " "
+              LITERAL
+                STRING "'192.168.1/24'"
+            WHITESPACE " "
+            CUSTOM_OP
+              R_ANGLE ">"
+              R_ANGLE ">"
+              EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "inet"
+              WHITESPACE " "
+              LITERAL
+                STRING "'192.168.1/24'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- array_operators"
+  WHITESPACE "\n"
+  COMMENT "-- first array (as a set) contain the second (as a set)?"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "3"
+              R_BRACK "]"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              R_ANGLE ">"
+            WHITESPACE " "
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "3"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "3"
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first array (as a set) contained by the second (as a set)?"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "7"
+              R_BRACK "]"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              AT "@"
+            WHITESPACE " "
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "7"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "6"
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is there any overlap"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "3"
+              R_BRACK "]"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+            WHITESPACE " "
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "1"
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- concat"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            ARRAY_EXPR
+              ARRAY_KW "ARRAY"
+              L_BRACK "["
+              ARRAY_EXPR
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "2"
+                R_BRACK "]"
+              COMMA ","
+              ARRAY_EXPR
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "3"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "4"
+                R_BRACK "]"
+              R_BRACK "]"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            ARRAY_EXPR
+              ARRAY_KW "ARRAY"
+              L_BRACK "["
+              ARRAY_EXPR
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "6"
+                R_BRACK "]"
+              COMMA ","
+              ARRAY_EXPR
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "7"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "8"
+                R_BRACK "]"
+              COMMA ","
+              ARRAY_EXPR
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "9"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_BRACK "]"
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- starts with"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'alphabet'"
+            WHITESPACE " "
+            CUSTOM_OP
+              CARET "^"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'alph'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- array_access"
+  WHITESPACE "\n"
+  COMMENT "-- first index"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            NAME_REF
+              IDENT "a"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "0"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- slicing"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            INDEX_EXPR
+              NAME_REF
+                IDENT "b"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COLON ":"
+              LITERAL
+                INT_NUMBER "2"
+              R_BRACK "]"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+            COLON ":"
+            LITERAL
+              INT_NUMBER "1"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- omitted bounds"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            INDEX_EXPR
+              NAME_REF
+                IDENT "c"
+              L_BRACK "["
+              COLON ":"
+              LITERAL
+                INT_NUMBER "2"
+              R_BRACK "]"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "2"
+            COLON ":"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- omitted part 2"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            INDEX_EXPR
+              NAME_REF
+                IDENT "schedule"
+              L_BRACK "["
+              COLON ":"
+              R_BRACK "]"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+            COLON ":"
+            LITERAL
+              INT_NUMBER "1"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- string_operators"
+  WHITESPACE "\n"
+  COMMENT "-- concatenate"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'Post'"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              STRING "'greSQL'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'Value: '"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "42"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- normalization check"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\0061\\0308bc'"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            NAME_REF
+              NORMALIZED_KW "normalized"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\0061\\0308bc'"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            NAME_REF
+              NFC_KW "nfc"
+          WHITESPACE " "
+          NAME
+            NORMALIZED_KW "normalized"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\0061\\0308bc'"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            NAME_REF
+              NFD_KW "nfd"
+          WHITESPACE " "
+          NAME
+            NORMALIZED_KW "normalized"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\0061\\0308bc'"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            NAME_REF
+              NFKC_KW "nfkc"
+          WHITESPACE " "
+          NAME
+            NORMALIZED_KW "normalized"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\0061\\0308bc'"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            NAME_REF
+              NFKD_KW "nfkd"
+          WHITESPACE " "
+          NAME
+            NORMALIZED_KW "normalized"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\0061\\0308bc'"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            NAME_REF
+              NFD_KW "nfd"
+          WHITESPACE " "
+          NAME
+            NORMALIZED_KW "normalized"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pattern_matching"
+  WHITESPACE "\n"
+  COMMENT "-- like"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            LIKE_KW "like"
+            WHITESPACE " "
+            LITERAL
+              STRING "'bar'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not like"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            NOT_LIKE
+              NOT_KW "not"
+              WHITESPACE " "
+              LIKE_KW "like"
+            WHITESPACE " "
+            LITERAL
+              STRING "'bar'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ~~"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- !~~"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- similar to"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc'"
+            WHITESPACE " "
+            SIMILAR_TO
+              SIMILAR_KW "similar"
+              WHITESPACE " "
+              TO_KW "to"
+            WHITESPACE " "
+            LITERAL
+              STRING "'abc'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- posix regex"
+  WHITESPACE "\n"
+  COMMENT "-- string matches regex case sensitive"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'f.*'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- string matches regex case insensitive"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- string does not match regex case sensitive"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- string does not match regex case insensitive"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- compare_operators"
+  WHITESPACE "\n"
+  COMMENT "-- less than"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- greater than"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "5"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- less than or equal to"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "8"
+            WHITESPACE " "
+            LTEQ "<="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- greater than or equal to"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "9"
+            WHITESPACE " "
+            GTEQ ">="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "7"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- equal"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "5"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not equal"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            NEQB "<>"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            NEQ "!="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- between (inclusive of the range endpoints)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "foo"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "bar"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not between (the negation of between)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            NOT_KW "not"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            NOT_KW "not"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "foo"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "bar"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- between symmetric (between, after sorting the two endpoint values)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            SYMMETRIC_KW "symmetric"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not between symmetric (not between, after sorting the two endpoint values)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            NOT_KW "not"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            SYMMETRIC_KW "symmetric"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is distinct from (not equal, treating null as a comparable value)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            IS_DISTINCT_FROM
+              IS_KW "is"
+              WHITESPACE " "
+              DISTINCT_KW "distinct"
+              WHITESPACE " "
+              FROM_KW "from"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is not distinct from (equal, treating null as a comparable value)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            IS_NOT_DISTINCT_FROM
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+              WHITESPACE " "
+              DISTINCT_KW "distinct"
+              WHITESPACE " "
+              FROM_KW "from"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- at time zone"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'2024-01-01 12:00:00'"
+            WHITESPACE " "
+            AT_TIME_ZONE
+              AT_KW "at"
+              WHITESPACE " "
+              TIME_KW "time"
+              WHITESPACE " "
+              ZONE_KW "zone"
+            WHITESPACE " "
+            LITERAL
+              STRING "'UTC'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is null"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              FLOAT_NUMBER "1.5"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is not null"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'null'"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- isnull (non-standard syntax)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          POSTFIX_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            ISNULL_KW "isnull"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- notnull (non-standard syntax)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          POSTFIX_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            ISNULL_KW "isnull"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is true"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is not true"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is false"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            LITERAL
+              FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is not false"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            LITERAL
+              FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is unknown"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            NAME_REF
+              UNKNOWN_KW "unknown"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- is not unknown"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            NAME_REF
+              UNKNOWN_KW "unknown"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- math_operators"
+  WHITESPACE "\n"
+  COMMENT "-- addition"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- unary plus"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "3.5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- subtraction"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- negation"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            MINUS "-"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  INT_NUMBER "4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiplication"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- division"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              FLOAT_NUMBER "5.0"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "5"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  INT_NUMBER "5"
+              R_PAREN ")"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- modulo"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "5"
+            WHITESPACE " "
+            PERCENT "%"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- exponentiation"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            CARET "^"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            CARET "^"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  INT_NUMBER "3"
+                WHITESPACE " "
+                CARET "^"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "3"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- square root"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              PIPE "|"
+              SLASH "/"
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "25.0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cube root"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+              SLASH "/"
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "64.0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- absolute value"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              AT "@"
+            WHITESPACE " "
+            PREFIX_EXPR
+              MINUS "-"
+              LITERAL
+                FLOAT_NUMBER "5.0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise and"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "91"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "15"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise or"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "32"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise exclusive OR"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "17"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise NOT"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              TILDE "~"
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise shift left"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              L_ANGLE "<"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise shift right"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "8"
+            WHITESPACE " "
+            CUSTOM_OP
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitstring_operators"
+  WHITESPACE "\n"
+  COMMENT "-- bitwise and"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BIT_STRING "B'10001'"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+            WHITESPACE " "
+            LITERAL
+              BIT_STRING "B'01101'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise or"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BIT_STRING "B'10001'"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              BIT_STRING "B'01101'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise xor"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BIT_STRING "B'10001'"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+            WHITESPACE " "
+            LITERAL
+              BIT_STRING "B'01101'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitwise not"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              BIT_STRING "B'10001'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitshift left"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BIT_STRING "B'10001'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              L_ANGLE "<"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bitshift right"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BIT_STRING "B'10001'"
+            WHITESPACE " "
+            CUSTOM_OP
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- range"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int4range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "4"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              AT "@"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int4range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "7"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json_ops"
+  WHITESPACE "\n"
+  COMMENT "-- extract"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[{\"a\":\"foo\"},{\"b\":\"bar\"},{\"c\":\"baz\"}]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\": {\"b\":\"foo\"}}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extract as text"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[1,2,3]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\":1,\"b\":2}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extract path as json"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\": {\"b\": [\"foo\",\"bar\"]}}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{a,b,1}'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extract path as text"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\": {\"b\": [\"foo\",\"bar\"]}}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{a,b,1}'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- contains"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'\"foo\"'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'\"foo\"'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"b\":2}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\":1, \"b\":2}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- existence"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\":1, \"b\":2}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[\"a\", \"b\", \"c\"]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- any keys exist"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\":1, \"b\":2, \"c\":3}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+              PIPE "|"
+            WHITESPACE " "
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                STRING "'b'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'d'"
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- all keys exist"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[\"a\", \"b\", \"c\"]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              QUESTION "?"
+              AMP "&"
+            WHITESPACE " "
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                STRING "'a'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'b'"
+              R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- concat"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[\"a\", \"b\"]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'[\"a\", \"d\"]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\": \"b\"}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"c\": \"d\"}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[1, 2]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'3'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\": \"b\"}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'42'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[1, 2]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "jsonb_build_array"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  LITERAL
+                    STRING "'[3, 4]'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "jsonb"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- delete"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\": \"b\", \"c\": \"d\"}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[\"a\", \"b\", \"c\", \"b\"]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\": \"b\", \"c\": \"d\"}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'{a,c}'"
+              COLON2 "::"
+              ARRAY_TYPE
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+                L_BRACK "["
+                R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[\"a\", \"b\"]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- delete at path"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[\"a\", {\"b\":1}]'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+              MINUS "-"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{1,b}'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json path find"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"items\": [1, 2, 3]}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              QUESTION "?"
+            WHITESPACE " "
+            LITERAL
+              STRING "'$.items[*] ? (@ > 2)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- json path predicate check"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'{\"a\":[1,2,3,4,5]}'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'$.a[*] > 2'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- subscripting"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            NAME_REF
+              IDENT "foo"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            NAME_REF
+              IDENT "bar"
+            L_BRACK "["
+            LITERAL
+              STRING "'a'"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'[1, \"2\", null]'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "jsonb"
+              R_PAREN ")"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'{\"a\": 1}'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "jsonb"
+              R_PAREN ")"
+            L_BRACK "["
+            LITERAL
+              STRING "'a'"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            INDEX_EXPR
+              INDEX_EXPR
+                PAREN_EXPR
+                  L_PAREN "("
+                  CAST_EXPR
+                    LITERAL
+                      STRING "'{\"a\": {\"b\": {\"c\": 1}}}'"
+                    COLON2 "::"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "jsonb"
+                  R_PAREN ")"
+                L_BRACK "["
+                LITERAL
+                  STRING "'a'"
+                R_BRACK "]"
+              L_BRACK "["
+              LITERAL
+                STRING "'b'"
+              R_BRACK "]"
+            L_BRACK "["
+            LITERAL
+              STRING "'c'"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "mytable"
+              DOT "."
+              NAME_REF
+                IDENT "arraycolumn"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "4"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            INDEX_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "mytable"
+                DOT "."
+                NAME_REF
+                  IDENT "two_d_column"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "17"
+              R_BRACK "]"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "34"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            LITERAL
+              PARAM "$1"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "10"
+            COLON ":"
+            LITERAL
+              INT_NUMBER "42"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "arrayfunction"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "a"
+                  COMMA ","
+                  NAME_REF
+                    IDENT "b"
+                  R_PAREN ")"
+              R_PAREN ")"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "42"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select_with_collate"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'foo'"
+                WHITESPACE " "
+                COLLATE_KW "collate"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "\"fr_FR\""
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              COLLATE_KW "collate"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"de_DE\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'Å'"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'A'"
+              WHITESPACE " "
+              COLLATE_KW "collate"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "ignore_accent_case"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              COLLATE_KW "collate"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"de_DE\""
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              COLLATE_KW "collate"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              COLLATE_KW "collate"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"POSIX\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        CUSTOM_OP
+          PIPE "|"
+          PIPE "|"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"fr_FR\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              BANG "!"
+              BANG "!"
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              COLLATE_KW "collate"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            PREFIX_EXPR
+              MINUS "-"
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            COLLATE_KW "collate"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            PREFIX_EXPR
+              PLUS "+"
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            COLLATE_KW "collate"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            PREFIX_EXPR
+              MINUS "-"
+              INDEX_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "t"
+                  DOT "."
+                  NAME_REF
+                    IDENT "a"
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "0"
+                R_BRACK "]"
+            WHITESPACE " "
+            COLLATE_KW "collate"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            PREFIX_EXPR
+              MINUS "-"
+              CAST_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "t"
+                  DOT "."
+                  NAME_REF
+                    IDENT "b"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "c"
+            WHITESPACE " "
+            COLLATE_KW "collate"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cube_operators"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              R_ANGLE ">"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              AT "@"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              R_ANGLE ">"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              POUND "#"
+              R_ANGLE ">"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              EQ "="
+              R_ANGLE ">"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- more_ops"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              PLUS "+"
+              R_ANGLE ">"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- prefix operators"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              STAR "*"
+              STAR "*"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- range_operators"
+  WHITESPACE "\n"
+  COMMENT "-- contains"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int4range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "4"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int4range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "3"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- contains element"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'[2011-01-01,2011-03-01)'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsrange"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'2011-01-10'"
+              COLON2 "::"
+              TIME_TYPE
+                NAME_REF
+                  TIMESTAMP_KW "timestamp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first contained by second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int4range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "4"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              AT "@"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int4range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "7"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- element contained in range"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "42"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              AT "@"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int4range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "7"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- range overlap"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "3"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "7"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "4"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "12"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first range strictly left"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "10"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              L_ANGLE "<"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "100"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "110"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first range strictly right"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "50"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "60"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "20"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "30"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first range not extend right of second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "20"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              L_ANGLE "<"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "18"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "20"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first range not extend left of second"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "7"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "20"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "10"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ranges adjacent"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "numrange"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "1.1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "2.2"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              PIPE "|"
+              MINUS "-"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "numrange"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "2.2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "3.3"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- union"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "numrange"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "15"
+                R_PAREN ")"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "numrange"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "10"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "20"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- intersection"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "15"
+                R_PAREN ")"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "10"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "20"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- difference"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "15"
+                R_PAREN ")"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "int8range"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "10"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "20"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- OVERLAPS"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            TUPLE_EXPR
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "date"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2001-02-16'"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  IDENT "date"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2001-12-21'"
+              R_PAREN ")"
+            WHITESPACE " "
+            OVERLAPS_KW "overlaps"
+            WHITESPACE " "
+            TUPLE_EXPR
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "date"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2001-10-30'"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  IDENT "date"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2002-10-30'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- postfix operators"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            NAME_REF
+              UNKNOWN_KW "unknown"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- single tuple"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            IN_KW "in"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multi tuple"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            IN_KW "in"
+            WHITESPACE " "
+            TUPLE_EXPR
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "3"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not_in"
+  WHITESPACE "\n"
+  COMMENT "-- select"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            NOT_IN
+              NOT_KW "not"
+              WHITESPACE " "
+              IN_KW "in"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- single char operators that are okay in the prefix position"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            PLUS "+"
+            NAME_REF
+              IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            MINUS "-"
+            NAME_REF
+              IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              TILDE "~"
+            NAME_REF
+              IDENT "h"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              BANG "!"
+            NAME_REF
+              IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              AT "@"
+            NAME_REF
+              IDENT "j"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              POUND "#"
+            NAME_REF
+              IDENT "k"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              AMP "&"
+            NAME_REF
+              IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              PIPE "|"
+            NAME_REF
+              IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              QUESTION "?"
+            NAME_REF
+              IDENT "q"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              BACKTICK "`"
+            NAME_REF
+              IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n"

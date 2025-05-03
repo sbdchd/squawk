@@ -1,0 +1,92 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/truncate.sql
+---
+SOURCE_FILE
+  COMMENT "-- pg_grammar"
+  WHITESPACE "\n"
+  TRUNCATE_STMT
+    TRUNCATE_KW "truncate"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n"
+    RESTART_KW "restart"
+    WHITESPACE " "
+    IDENTITY_KW "identity"
+    WHITESPACE "\n"
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiple_tables"
+  WHITESPACE "\n"
+  TRUNCATE_STMT
+    TRUNCATE_KW "TRUNCATE"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
+    WHITESPACE " "
+    STAR "*"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rest"
+  WHITESPACE "\n"
+  TRUNCATE_STMT
+    TRUNCATE_KW "truncate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  TRUNCATE_STMT
+    TRUNCATE_KW "truncate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    CONTINUE_KW "continue"
+    WHITESPACE " "
+    IDENTITY_KW "identity"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  TRUNCATE_STMT
+    TRUNCATE_KW "truncate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    CONTINUE_KW "continue"
+    WHITESPACE " "
+    IDENTITY_KW "identity"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

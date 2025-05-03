@@ -1,0 +1,730 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_index.sql
+---
+SOURCE_FILE
+  COMMENT "-- create_index"
+  WHITESPACE "\n"
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "c"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- more options"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    UNIQUE_KW "unique"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    CONCURRENTLY_KW "concurrently"
+    WHITESPACE " \n  "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME
+      IDENT "i"
+    WHITESPACE " \n  "
+    ON_KW "on"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " \n  "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "bar"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "c"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- column options"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        COLLATE_KW "collate"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"fr_FR\""
+      WHITESPACE " "
+      ASC_KW "asc"
+      WHITESPACE " "
+      NULLS_KW "nulls"
+      WHITESPACE " "
+      LAST_KW "last"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      DESC_KW "desc"
+      WHITESPACE " "
+      NULLS_KW "nulls"
+      WHITESPACE " "
+      FIRST_KW "first"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- opclass"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      WHITESPACE "\n  "
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      IDENT "text_pattern_ops"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME
+        IDENT "strength"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PRIMARY_KW "primary"
+      COMMA ","
+      WHITESPACE " "
+      NAME
+        IDENT "variant"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      DEFAULT_KW "default"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      NAME_REF
+        IDENT "b"
+      WHITESPACE " "
+      IDENT "text_pattern_ops"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME
+        IDENT "strength"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PRIMARY_KW "primary"
+      R_PAREN ")"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- column expr"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "c"
+              R_PAREN ")"
+          WHITESPACE " "
+          PLUS "+"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+        R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing options"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "c"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    CONSTRAINT_INCLUDE_CLAUSE
+      INCLUDE_KW "include"
+      WHITESPACE " "
+      COLUMN_LIST
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        COLUMN
+          NAME_REF
+            IDENT "b"
+        R_PAREN ")"
+    WHITESPACE "\n  "
+    NULLS_KW "nulls"
+    WHITESPACE " "
+    NOT_KW "not"
+    WHITESPACE " "
+    DISTINCT_KW "distinct"
+    WHITESPACE "\n  "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "buzz"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "space"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "c"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    NULLS_KW "nulls"
+    WHITESPACE " "
+    DISTINCT_KW "distinct"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "is"
+          WHITESPACE " "
+          NOT_KW "not"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "public"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "c"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_examples"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    UNIQUE_KW "UNIQUE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "title_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "title"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    UNIQUE_KW "UNIQUE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "title_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "title"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_INCLUDE_CLAUSE
+      INCLUDE_KW "INCLUDE"
+      WHITESPACE " "
+      COLUMN_LIST
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "director"
+        COMMA ","
+        WHITESPACE " "
+        COLUMN
+          NAME_REF
+            IDENT "rating"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "title_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "title"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "WITH"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "deduplicate_items"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              OFF_KW "off"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        CALL_EXPR
+          NAME_REF
+            IDENT "lower"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "title"
+            R_PAREN ")"
+        R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "title_idx_german"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "title"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"de_DE\""
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "title_idx_nulls_low"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "title"
+      WHITESPACE " "
+      NULLS_KW "NULLS"
+      WHITESPACE " "
+      FIRST_KW "FIRST"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    UNIQUE_KW "UNIQUE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "title_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "title"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "WITH"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fillfactor"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "70"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "gin_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "documents_table"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "GIN"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "locations"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "WITH"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fastupdate"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              OFF_KW "off"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "code_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "code"
+      R_PAREN ")"
+    WHITESPACE " "
+    TABLESPACE_KW "TABLESPACE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "indexspace"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "pointloc"
+    WHITESPACE "\n    "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "points"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "box"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            LOCATION_KW "location"
+          COMMA ","
+          NAME_REF
+            LOCATION_KW "location"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    CONCURRENTLY_KW "CONCURRENTLY"
+    WHITESPACE " "
+    NAME
+      IDENT "sales_quantity_index"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "sales_table"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "quantity"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

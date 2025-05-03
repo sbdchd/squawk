@@ -1,0 +1,99 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_cast.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "b"
+    R_PAREN ")"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "b"
+    R_PAREN ")"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

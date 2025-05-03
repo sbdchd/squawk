@@ -1,0 +1,207 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_subscription.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_SUBSCRIPTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SUBSCRIPTION_KW "subscription"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE "\n  "
+    CONNECTION_KW "connection"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    WHITESPACE "\n  "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_SUBSCRIPTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SUBSCRIPTION_KW "subscription"
+    WHITESPACE " "
+    NAME
+      IDENT "s"
+    WHITESPACE "\n  "
+    CONNECTION_KW "connection"
+    WHITESPACE " "
+    LITERAL
+      STRING "'host=10.0.0.1 port=5432 user=u dbname=d'"
+    WHITESPACE "\n  "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE "\n  "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "connect"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "create_slot"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "enabled"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "slot_name"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        STRING "'bar'"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            BINARY_KW "binary"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "copy_data"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "synchronous_commit"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              OFF_KW "off"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "two_phase"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "disable_on_error"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "password_required"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "run_as_owner"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "origin"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        STRING "'foo'"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "failover"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
+      WHITESPACE "\n  "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

@@ -1,0 +1,62 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_access_method.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_ACCESS_METHOD_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    ACCESS_KW "access"
+    WHITESPACE " "
+    METHOD_KW "method"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "m"
+    WHITESPACE "\n  "
+    TYPE_KW "type"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE "\n  "
+    HANDLER_KW "handler"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_ACCESS_METHOD_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    ACCESS_KW "access"
+    WHITESPACE " "
+    METHOD_KW "method"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "m"
+    WHITESPACE "\n  "
+    TYPE_KW "type"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE "\n  "
+    HANDLER_KW "handler"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

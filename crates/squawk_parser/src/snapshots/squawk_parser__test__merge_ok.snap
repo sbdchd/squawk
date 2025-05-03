@@ -1,0 +1,606 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/merge.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "u"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- aliases_with_as"
+  WHITESPACE "\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE " "
+    ALIAS
+      AS_KW "as"
+      WHITESPACE " "
+      NAME
+        IDENT "f"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "as"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "b"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- using_rows_from"
+  WHITESPACE "\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      ROWS_KW "rows"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "f"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
+      R_PAREN ")"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- aliases_no_as"
+  WHITESPACE "\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE " "
+    ALIAS
+      NAME
+        IDENT "f"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "b"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "b"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table_with_star"
+  WHITESPACE "\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    STAR "*"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "u"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table_with_only"
+  WHITESPACE "\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "u"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- paren_query"
+  WHITESPACE "\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      L_PAREN "("
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "id"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "from"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "bar"
+      R_PAREN ")"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "u"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      L_PAREN "("
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "id"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "from"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "bar"
+          WHITESPACE " "
+          JOIN
+            JOIN_KW "join"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "foo"
+            WHITESPACE " "
+            ALIAS
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "f"
+            WHITESPACE " "
+            ON_KW "on"
+            WHITESPACE " "
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "f"
+                DOT "."
+                NAME_REF
+                  IDENT "id"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "bar"
+                DOT "."
+                NAME_REF
+                  IDENT "id"
+      R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "as"
+        WHITESPACE " "
+        NAME
+          IDENT "u"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "u"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      L_PAREN "("
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "id"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "from"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "bar"
+      R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "u"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "u"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- when_clauses_dupe"
+  WHITESPACE "\n"
+  MERGE_STMT
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
+      WHITESPACE "\n    "
+      ON_KW "on"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "u"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    MATCHED_KW "matched"
+    WHITESPACE " "
+    THEN_KW "then"
+    WHITESPACE " \n    "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n"

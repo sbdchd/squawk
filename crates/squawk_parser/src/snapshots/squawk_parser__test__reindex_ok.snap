@@ -1,0 +1,104 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/reindex.sql
+---
+SOURCE_FILE
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  REINDEX_STMT
+    REINDEX_KW "REINDEX"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "my_index"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REINDEX_STMT
+    REINDEX_KW "REINDEX"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    NAME
+      IDENT "my_table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REINDEX_STMT
+    REINDEX_KW "REINDEX"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    CONCURRENTLY_KW "CONCURRENTLY"
+    WHITESPACE " "
+    NAME
+      IDENT "my_broken_table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- complete_syntax"
+  WHITESPACE "\n"
+  REINDEX_STMT
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    L_PAREN "("
+    CONCURRENTLY_KW "concurrently"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME
+      IDENT "fooo"
+    COMMA ","
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    R_PAREN ")"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    CONCURRENTLY_KW "concurrently"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REINDEX_STMT
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    SYSTEM_KW "system"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REINDEX_STMT
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REINDEX_STMT
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REINDEX_STMT
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

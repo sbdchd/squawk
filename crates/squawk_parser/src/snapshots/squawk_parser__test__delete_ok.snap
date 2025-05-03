@@ -1,0 +1,986 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/delete.sql
+---
+SOURCE_FILE
+  COMMENT "-- delete"
+  WHITESPACE "\n"
+  COMMENT "-- with where"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "price"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- no where"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- only"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- *"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- alias"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- using, where, return"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    IDENT "a"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+    WHITESPACE "\n  "
+    RETURNING_KW "returning"
+    WHITESPACE " "
+    STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- using"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " \n"
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n"
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "order_items"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "oi"
+      WHITESPACE "\n  "
+      JOIN
+        LEFT_KW "left"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "orders"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "o"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "oi"
+            DOT "."
+            NAME_REF
+              IDENT "order_id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "o"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "user_sessions"
+    WHITESPACE " "
+    IDENT "us"
+    WHITESPACE "\n"
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "users"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "u"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "user_id"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              CALL_EXPR
+                NAME_REF
+                  IDENT "max"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "login_time"
+                  R_PAREN ")"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "last_login"
+        WHITESPACE "\n  "
+        FROM_CLAUSE
+          FROM_KW "from"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "login_history"
+        WHITESPACE "\n  "
+        GROUP_BY_CLAUSE
+          GROUP_KW "group"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "user_id"
+      R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "lh"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- where return"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+    WHITESPACE "\n  "
+    RETURNING_KW "returning"
+    WHITESPACE " "
+    STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- returning"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "employees"
+    WHITESPACE " "
+    IDENT "e"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "e"
+          DOT "."
+          NAME_REF
+            IDENT "department_id"
+        WHITESPACE " "
+        IN_KW "in"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          WHITESPACE "\n  "
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "department_id"
+            WHITESPACE " \n  "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "departments"
+            WHITESPACE " \n  "
+            WHERE_CLAUSE
+              WHERE_KW "where"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "budget"
+                WHITESPACE " "
+                L_ANGLE "<"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "50000"
+          WHITESPACE "\n"
+          R_PAREN ")"
+    WHITESPACE "\n"
+    RETURNING_KW "returning"
+    WHITESPACE " "
+    FIELD_EXPR
+      NAME_REF
+        IDENT "e"
+      DOT "."
+      NAME_REF
+        IDENT "employee_id"
+    COMMA ","
+    WHITESPACE " "
+    FIELD_EXPR
+      NAME_REF
+        IDENT "e"
+      DOT "."
+      NAME_REF
+        NAME_KW "name"
+    COMMA ","
+    WHITESPACE " "
+    FIELD_EXPR
+      NAME_REF
+        IDENT "e"
+      DOT "."
+      NAME_REF
+        IDENT "department_id"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cursor"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "invoices"
+    WHITESPACE " \n"
+    WHERE_KW "where"
+    WHITESPACE " "
+    CURRENT_KW "current"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    IDENT "invoice_cursor"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- returning"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " \n"
+    RETURNING_KW "returning"
+    WHITESPACE " "
+    STAR "*"
+    COMMA ","
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "foo"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
+    COMMA ","
+    WHITESPACE " "
+    FIELD_EXPR
+      NAME_REF
+        IDENT "foo"
+      DOT "."
+      STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- with"
+  WHITESPACE "\n"
+  DELETE_STMT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "q"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    IDENT "a"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "q"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "as"
+        WHITESPACE " "
+        NAME
+          IDENT "d"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "a"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "d"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      RECURSIVE_KW "recursive"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "q"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    IDENT "a"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "q"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "as"
+        WHITESPACE " "
+        NAME
+          IDENT "d"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "a"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "d"
+          DOT "."
+          NAME_REF
+            IDENT "id"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- nested"
+  WHITESPACE "\n"
+  DELETE_STMT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t2"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          WITH_CLAUSE
+            WITH_KW "with"
+            WHITESPACE " "
+            WITH_TABLE
+              NAME
+                IDENT "t"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              L_PAREN "("
+              WHITESPACE "\n    "
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "1"
+              WHITESPACE "\n  "
+              R_PAREN ")"
+          WHITESPACE "\n  "
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                STAR "*"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "t"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    USING_CLAUSE
+      USING_KW "USING"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "producers"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "producer_id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "producers"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "producers"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "producer_id"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "id"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "producers"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  NAME_KW "name"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'foo'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "kind"
+        WHITESPACE " "
+        NEQB "<>"
+        WHITESPACE " "
+        LITERAL
+          STRING "'Musical'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "films"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tasks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "status"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'DONE'"
+    WHITESPACE " "
+    RETURNING_KW "RETURNING"
+    WHITESPACE " "
+    STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tasks"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c_tasks"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "delete_batch"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "l"
+                  DOT "."
+                  NAME_REF
+                    IDENT "ctid"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "user_logs"
+            WHITESPACE " "
+            ALIAS
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "l"
+          WHITESPACE "\n    "
+          WHERE_CLAUSE
+            WHERE_KW "WHERE"
+            WHITESPACE " "
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "l"
+                DOT "."
+                NAME_REF
+                  IDENT "status"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                STRING "'archived'"
+          WHITESPACE "\n    "
+          ORDER_BY_CLAUSE
+            ORDER_KW "ORDER"
+            WHITESPACE " "
+            BY_KW "BY"
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "l"
+              DOT "."
+              NAME_REF
+                IDENT "creation_date"
+          WHITESPACE "\n    "
+          LOCKING_CLAUSE
+            FOR_KW "FOR"
+            WHITESPACE " "
+            UPDATE_KW "UPDATE"
+          WHITESPACE "\n    "
+          LIMIT_CLAUSE
+            LIMIT_KW "LIMIT"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10000"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "user_logs"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    IDENT "dl"
+    WHITESPACE "\n  "
+    USING_CLAUSE
+      USING_KW "USING"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "delete_batch"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "del"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "dl"
+          DOT "."
+          NAME_REF
+            IDENT "ctid"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "del"
+          DOT "."
+          NAME_REF
+            IDENT "ctid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

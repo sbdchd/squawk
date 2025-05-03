@@ -1,0 +1,331 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_view.sql
+---
+SOURCE_FILE
+  COMMENT "-- column_set_default"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    DEFAULT_KW "default"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "42"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    COLUMN_KW "column"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    DEFAULT_KW "default"
+    WHITESPACE " "
+    NAME_REF
+      CURRENT_TIMESTAMP_KW "current_timestamp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- column_drop_default"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    COLUMN_KW "column"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner_to"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner_to_current_role"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "current_role"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner_to_current_user"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner_to_session_user"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    SESSION_USER_KW "session_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename_to"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename_column"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    COLUMN_KW "column"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_schema"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_options"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'x'"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "100"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "d"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- reset_options"
+  WHITESPACE "\n"
+  ALTER_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    RESET_KW "reset"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

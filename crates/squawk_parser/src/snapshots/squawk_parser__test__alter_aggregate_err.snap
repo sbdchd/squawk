@@ -1,0 +1,45 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/err/alter_aggregate.sql
+---
+SOURCE_FILE
+  COMMENT "-- can't have out params in aggregates"
+  WHITESPACE "\n"
+  ALTER_AGGREGATE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        PATH_TYPE
+          IDENT "t"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        PATH_TYPE
+          IDENT "u"
+      R_PAREN ")"
+    WHITESPACE " \n    "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

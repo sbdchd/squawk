@@ -1,0 +1,204 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_materialized_view.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "bar"
+    WHITESPACE "\n  "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "u"
+    WHITESPACE "\n  "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "x"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "buzz"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              INT_NUMBER "3"
+    WHITESPACE "\n  "
+    WITH_KW "with"
+    WHITESPACE " "
+    NO_KW "no"
+    WHITESPACE " "
+    DATA_KW "data"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      TABLE_KW "table"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- values"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

@@ -1,0 +1,84 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_foreign_data_wrapper.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_FOREIGN_DATA_WRAPPER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME
+      IDENT "w"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_FOREIGN_DATA_WRAPPER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME
+      IDENT "w"
+    WHITESPACE "\n  "
+    HANDLER_KW "handler"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE "\n  "
+    NO_KW "no"
+    WHITESPACE " "
+    HANDLER_KW "handler"
+    WHITESPACE "\n  "
+    VALIDATOR_KW "validator"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE "\n  "
+    NO_KW "no"
+    WHITESPACE " "
+    VALIDATOR_KW "validator"
+    WHITESPACE "\n  "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    WHITESPACE " "
+    LITERAL
+      STRING "'bar'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

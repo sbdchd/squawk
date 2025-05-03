@@ -1,0 +1,142 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/precedence.sql
+---
+SOURCE_FILE
+  COMMENT "-- see: https://github.com/postgres/postgres/blob/028b4b21df26fee67b3ce75c6f14fcfd3c7cf2ee/src/backend/parser/gram.y#L12699"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                PAREN_EXPR
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "SELECT"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            INT_NUMBER "2"
+                  R_PAREN ")"
+                R_PAREN ")"
+              WHITESPACE " "
+              PLUS "+"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "3"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            COMPOUND_SELECT
+              PAREN_EXPR
+                L_PAREN "("
+                PAREN_EXPR
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "SELECT"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            INT_NUMBER "2"
+                  R_PAREN ")"
+                R_PAREN ")"
+              WHITESPACE " "
+              UNION_KW "UNION"
+              WHITESPACE " "
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "SELECT"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "2"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- TODO!"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "foo"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "bar"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "baz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- equal to:"
+  WHITESPACE "\n"
+  PAREN_EXPR
+    L_PAREN "("
+    COMPOUND_SELECT
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "foo"
+      WHITESPACE " "
+      UNION_KW "UNION"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "bar"
+    R_PAREN ")"
+  WHITESPACE " "
+  ORDER_BY_CLAUSE
+    ORDER_KW "ORDER"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "baz"
+  SEMICOLON ";"
+  WHITESPACE "\n"

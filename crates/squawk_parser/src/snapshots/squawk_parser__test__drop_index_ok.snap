@@ -1,0 +1,118 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_index.sql
+---
+SOURCE_FILE
+  COMMENT "-- drop_index"
+  WHITESPACE "\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    CONCURRENTLY_KW "concurrently"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"field_name_idx\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    CONCURRENTLY_KW "concurrently"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"field_name_idx\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

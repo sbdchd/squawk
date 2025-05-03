@@ -1,0 +1,228 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_statistics.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_STATISTICS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PAREN_EXPR
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      R_PAREN ")"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_STATISTICS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "s"
+    L_PAREN "("
+    NAME_REF
+      IDENT "mcv"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "ndistinct"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "dependencies"
+    R_PAREN ")"
+    WHITESPACE "\n"
+    ON_KW "on"
+    WHITESPACE " "
+    PAREN_EXPR
+      L_PAREN "("
+      NAME_REF
+        IDENT "foo"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "bar"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "buzz"
+    COMMA ","
+    WHITESPACE " "
+    PAREN_EXPR
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PLUS "+"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- docs_1"
+  WHITESPACE "\n"
+  CREATE_STATISTICS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    STATISTICS_KW "STATISTICS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "s1"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "dependencies"
+    R_PAREN ")"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- docs_2"
+  WHITESPACE "\n"
+  CREATE_STATISTICS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    STATISTICS_KW "STATISTICS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "s2"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "mcv"
+    R_PAREN ")"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- docs_3"
+  WHITESPACE "\n"
+  CREATE_STATISTICS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    STATISTICS_KW "STATISTICS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "s3"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "ndistinct"
+    R_PAREN ")"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "date_trunc"
+      ARG_LIST
+        L_PAREN "("
+        LITERAL
+          STRING "'month'"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "a"
+        R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "date_trunc"
+      ARG_LIST
+        L_PAREN "("
+        LITERAL
+          STRING "'day'"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "a"
+        R_PAREN ")"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

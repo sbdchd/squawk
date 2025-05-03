@@ -1,0 +1,111 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/err/alter_table.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing alter_table"
+  WHITESPACE "\n"
+  ERROR
+    ADD_KW "add"
+  WHITESPACE " "
+  ERROR
+    COLUMN_KW "column"
+  WHITESPACE " "
+  ERROR
+    IDENT "foo"
+  WHITESPACE " "
+  ERROR
+    BOOLEAN_KW "boolean"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- mismatch options"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_CONSTRAINT
+      ALTER_KW "alter"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      CONSTRAINT_OPTION_LIST
+        NOT_DEFERRABLE_CONSTRAINT_OPTION
+          NOT_KW "not"
+          WHITESPACE " "
+          DEFERRABLE_KW "deferrable"
+        WHITESPACE " "
+        INITALLY_DEFERRED_CONSTRAINT_OPTION
+          INITIALLY_KW "initially"
+          WHITESPACE " "
+          DEFERRED_KW "deferred"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pg 18 only, via: https://www.depesz.com/2025/05/01/waiting-for-postgresql-18-allow-not-null-constraints-to-be-added-as-not-valid/"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "public"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "copy_2"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "id_not_null"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              NOT_KW "not"
+  WHITESPACE " "
+  ERROR
+    NULL_KW "null"
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  WHITESPACE " "
+  ERROR
+    NOT_KW "not"
+  WHITESPACE " "
+  ERROR
+    VALID_KW "valid"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@23: expected command, found ADD_KW
+ERROR@27: expected command, found COLUMN_KW
+ERROR@34: expected command, found IDENT
+ERROR@38: expected command, found BOOLEAN_KW
+ERROR@134: constraint declared INITIALLY DEFERRED must be DEFERRABLE
+ERROR@322: expected FOREIGN_KW
+ERROR@322: expected KEY_KW
+ERROR@322: expected column list
+ERROR@322: expected REFERENCES_KW
+ERROR@326: expected SEMICOLON
+ERROR@327: expected command, found NULL_KW
+ERROR@332: expected command, found IDENT
+ERROR@335: expected command, found NOT_KW
+ERROR@339: expected command, found VALID_KW

@@ -1,0 +1,567 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_text_search_configuration.sql
+---
+SOURCE_FILE
+  COMMENT "-- add_mapping"
+  WHITESPACE "\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    ADD_KW "add"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    ADD_KW "add"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "u"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "e"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- alter_mapping"
+  WHITESPACE "\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- alter_mapping_replace"
+  WHITESPACE "\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    REPLACE_KW "replace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    REPLACE_KW "replace"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- alter_mapping_for_replace"
+  WHITESPACE "\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE " "
+    REPLACE_KW "replace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE " "
+    REPLACE_KW "replace"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_mapping"
+  WHITESPACE "\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    DROP_KW "drop"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE "\n    "
+    DROP_KW "drop"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "m"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "m"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner_to"
+  WHITESPACE "\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_schema"
+  WHITESPACE "\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "n"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

@@ -1,0 +1,82 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_conversion.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_CONVERSION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CONVERSION_KW "conversion"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "c"
+    WHITESPACE " \n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    WHITESPACE " \n  "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_CONVERSION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    DEFAULT_KW "default"
+    WHITESPACE " "
+    CONVERSION_KW "conversion"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "c"
+    WHITESPACE " \n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    WHITESPACE " \n  "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    WHITESPACE " \n  "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

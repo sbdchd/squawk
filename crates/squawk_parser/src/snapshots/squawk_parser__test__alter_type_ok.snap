@@ -1,0 +1,669 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_type.sql
+---
+SOURCE_FILE
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename_attribute"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename_attribute_cascade"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "b"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_value"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    VALUE_KW "value"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_value_full"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    VALUE_KW "value"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    WHITESPACE " "
+    BEFORE_KW "before"
+    WHITESPACE " "
+    LITERAL
+      STRING "'w'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    VALUE_KW "value"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    WHITESPACE " "
+    AFTER_KW "after"
+    WHITESPACE " "
+    LITERAL
+      STRING "'w'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename_value"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    VALUE_KW "value"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      STRING "'w'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_property"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "q"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'w'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_attribute"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_attribute_collate"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    COLLATE
+      COLLATE_KW "collate"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_attribute_cascade"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_attribute"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- alter_attribute"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- alter_attribute_set_data"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    WHITESPACE " "
+    COLLATE
+      COLLATE_KW "collate"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiple_actions"
+  WHITESPACE "\n"
+  ALTER_TYPE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME
+      IDENT "a"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    ATTRIBUTE_KW "attribute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

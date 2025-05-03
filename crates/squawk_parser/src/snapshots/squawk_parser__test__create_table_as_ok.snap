@@ -1,0 +1,165 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_table_as.sql
+---
+SOURCE_FILE
+  COMMENT "-- execute"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMP_KW "temp"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    COMMIT_KW "commit"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    EXECUTE_STMT
+      EXECUTE_KW "execute"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f"
+      ARG_LIST
+        L_PAREN "("
+        NAME_REF
+          IDENT "a"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "u"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "where"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "c"
+          WHITESPACE " "
+          GTEQ ">="
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    SELECT
+      TABLE_KW "table"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- values"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMPORARY_KW "temporary"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMPORARY_KW "temporary"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

@@ -1,0 +1,80 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_transform.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_TRANSFORM_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_TRANSFORM_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- type_args"
+  WHITESPACE "\n"
+  DROP_TRANSFORM_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

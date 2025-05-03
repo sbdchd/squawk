@@ -1,0 +1,724 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_materialized_view.sql
+---
+SOURCE_FILE
+  COMMENT "-- rename_view"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename_column"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " \n  "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    COLUMN_KW "column"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_schema"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- depends_extension"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    DEPENDS_KW "depends"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    NO_KW "no"
+    WHITESPACE " "
+    DEPENDS_KW "depends"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_tablespace"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    SET_KW "set"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    OWNED_KW "owned"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "u"
+    WHITESPACE "\n  "
+    SET_KW "set"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+    WHITESPACE " "
+    NOWAIT_KW "nowait"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- action_alter_col_stats"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " \n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- action_alter_col_set"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_OPTIONS
+        SET_KW "set"
+        WHITESPACE " "
+        L_PAREN "("
+        NAME
+          IDENT "n_distinct"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          FLOAT_NUMBER "1.0"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_OPTIONS
+        SET_KW "set"
+        WHITESPACE " "
+        L_PAREN "("
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- action_alter_col_reset"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      RESET_OPTIONS
+        RESET_KW "reset"
+        WHITESPACE " "
+        L_PAREN "("
+        NAME
+          IDENT "n_distinct"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      RESET_OPTIONS
+        RESET_KW "reset"
+        WHITESPACE " "
+        L_PAREN "("
+        NAME
+          IDENT "n_distinct"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "n_distinct_inherited"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- action_alter_col_storage"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        IDENT "plain"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        EXTERNAL_KW "external"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        IDENT "extended"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        IDENT "main"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " \n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- action_alter_col_compression"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_COMPRESSION
+        SET_KW "set"
+        WHITESPACE " "
+        COMPRESSION_KW "compression"
+        WHITESPACE " "
+        IDENT "pglz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_COMPRESSION
+        SET_KW "set"
+        WHITESPACE " "
+        COMPRESSION_KW "compression"
+        WHITESPACE " "
+        IDENT "pglz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- action_cluster"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    DISABLE_CLUSTER
+      CLUSTER_KW "cluster"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- action_set_without_cluster"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    SET_WITHOUT_CLUSTER
+      SET_KW "set"
+      WHITESPACE " "
+      WITHOUT_KW "without"
+      WHITESPACE " "
+      CLUSTER_KW "cluster"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

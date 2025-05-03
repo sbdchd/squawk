@@ -1,0 +1,322 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_trigger.sql
+---
+SOURCE_FILE
+  COMMENT "-- create_trigger"
+  WHITESPACE "\n"
+  CREATE_TRIGGER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    NAME
+      IDENT "update_foo_column"
+    WHITESPACE "\n"
+    BEFORE_KW "BEFORE"
+    WHITESPACE " "
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "core_recipe"
+    WHITESPACE "\n"
+    FOR_KW "FOR"
+    WHITESPACE " "
+    EACH_KW "EACH"
+    WHITESPACE " "
+    ROW_KW "ROW"
+    WHITESPACE "\n"
+    EXECUTE_KW "EXECUTE"
+    WHITESPACE " "
+    PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "foo_update_trigger"
+      ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- with_most_fields"
+  WHITESPACE "\n"
+  CREATE_TRIGGER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME
+      IDENT "buzz"
+    WHITESPACE " "
+    INSTEAD_KW "instead"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    INSERT_KW "insert"
+    WHITESPACE " "
+    OR_KW "or"
+    WHITESPACE " "
+    DELETE_KW "delete"
+    WHITESPACE " \n"
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "buzz"
+    WHITESPACE "\n"
+    REFERENCING_KW "referencing"
+    WHITESPACE " \n  "
+    OLD_KW "old"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+    WHITESPACE "\n  "
+    NEW_KW "new"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "bar"
+    WHITESPACE "\n"
+    FOR_KW "for"
+    WHITESPACE " "
+    EACH_KW "each"
+    WHITESPACE " "
+    STATEMENT_KW "statement"
+    WHITESPACE " \n"
+    WHEN_KW "when"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+      WHITESPACE " "
+      AND_KW "and"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "is"
+          WHITESPACE " "
+          NOT_KW "not"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "null"
+    R_PAREN ")"
+    WHITESPACE "\n"
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    CALL_EXPR
+      FIELD_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "x"
+          DOT "."
+          NAME_REF
+            IDENT "y"
+        DOT "."
+        NAME_REF
+          IDENT "z"
+      ARG_LIST
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        COMMA ","
+        LITERAL
+          INT_NUMBER "2"
+        COMMA ","
+        LITERAL
+          STRING "'3'"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- constraint"
+  WHITESPACE "\n"
+  CREATE_TRIGGER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CONSTRAINT_KW "constraint"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME
+      IDENT "t"
+    WHITESPACE " "
+    AFTER_KW "after"
+    WHITESPACE " "
+    INSERT_KW "insert"
+    WHITESPACE " "
+    OR_KW "or"
+    WHITESPACE " "
+    DELETE_KW "delete"
+    WHITESPACE " \n"
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE "\n"
+    FOR_KW "for"
+    WHITESPACE " "
+    EACH_KW "each"
+    WHITESPACE " "
+    ROW_KW "row"
+    WHITESPACE "\n"
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "f"
+      ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- with_most_fields_part2"
+  WHITESPACE "\n"
+  CREATE_TRIGGER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME
+      IDENT "bar"
+    WHITESPACE " "
+    AFTER_KW "after"
+    WHITESPACE " "
+    UPDATE_KW "update"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE "\n"
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE "\n"
+    REFERENCING_KW "referencing"
+    WHITESPACE " \n  "
+    NEW_KW "new"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "bar"
+    WHITESPACE "\n  "
+    OLD_KW "old"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+    WHITESPACE "\n"
+    FOR_KW "for"
+    WHITESPACE " "
+    ROW_KW "row"
+    WHITESPACE " \n"
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "foo"
+      ARG_LIST
+        L_PAREN "("
+        LITERAL
+          STRING "'bar'"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_TRIGGER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME
+      IDENT "bar"
+    WHITESPACE " "
+    BEFORE_KW "before"
+    WHITESPACE " "
+    TRUNCATE_KW "truncate"
+    WHITESPACE " "
+    OR_KW "or"
+    WHITESPACE " "
+    DELETE_KW "delete"
+    WHITESPACE " "
+    OR_KW "or"
+    WHITESPACE " "
+    INSERT_KW "insert"
+    WHITESPACE "\n"
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "buzz"
+    WHITESPACE "\n"
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "a"
+      ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

@@ -1,0 +1,520 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_view.sql
+---
+SOURCE_FILE
+  COMMENT "-- docs"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vista"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              STRING "'Hello World'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vista"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CAST_EXPR
+              NAME_REF
+                TEXT_KW "text"
+              WHITESPACE " "
+              LITERAL
+                STRING "'Hello World'"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "hello"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "comedies"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE "\n    "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "films"
+      WHITESPACE "\n    "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "kind"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'Comedy'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "universal_comedies"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE "\n    "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "comedies"
+      WHITESPACE "\n    "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "classification"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'U'"
+    WHITESPACE "\n    "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    CHECK_KW "CHECK"
+    WHITESPACE " "
+    OPTION_KW "OPTION"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "pg_comedies"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE "\n    "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "comedies"
+      WHITESPACE "\n    "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "classification"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'PG'"
+    WHITESPACE "\n    "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    CASCADED_KW "CASCADED"
+    WHITESPACE " "
+    CHECK_KW "CHECK"
+    WHITESPACE " "
+    OPTION_KW "OPTION"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "comedies"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "f"
+              DOT "."
+              STAR "*"
+          COMMA ","
+          WHITESPACE "\n           "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "country_code_to_name"
+              ARG_LIST
+                L_PAREN "("
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "f"
+                  DOT "."
+                  NAME_REF
+                    IDENT "country_code"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "country"
+          COMMA ","
+          WHITESPACE "\n           "
+          TARGET
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "SELECT"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      CALL_EXPR
+                        NAME_REF
+                          IDENT "avg"
+                        ARG_LIST
+                          L_PAREN "("
+                          FIELD_EXPR
+                            NAME_REF
+                              IDENT "r"
+                            DOT "."
+                            NAME_REF
+                              IDENT "rating"
+                          R_PAREN ")"
+                WHITESPACE "\n            "
+                FROM_CLAUSE
+                  FROM_KW "FROM"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "user_ratings"
+                  WHITESPACE " "
+                  ALIAS
+                    NAME
+                      IDENT "r"
+                WHITESPACE "\n            "
+                WHERE_CLAUSE
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    FIELD_EXPR
+                      NAME_REF
+                        IDENT "r"
+                      DOT "."
+                      NAME_REF
+                        IDENT "film_id"
+                    WHITESPACE " "
+                    EQ "="
+                    WHITESPACE " "
+                    FIELD_EXPR
+                      NAME_REF
+                        IDENT "f"
+                      DOT "."
+                      NAME_REF
+                        IDENT "id"
+              R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "avg_rating"
+      WHITESPACE "\n    "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "films"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "f"
+      WHITESPACE "\n    "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            NAME_REF
+              IDENT "kind"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'Comedy'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    RECURSIVE_KW "RECURSIVE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "public"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "nums_1_100"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "n"
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    COMPOUND_SELECT
+      SELECT
+        VALUES_KW "VALUES"
+        WHITESPACE " "
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
+      WHITESPACE "\n"
+      UNION_KW "UNION"
+      WHITESPACE " "
+      ALL_KW "ALL"
+      WHITESPACE "\n    "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              BIN_EXPR
+                NAME_REF
+                  IDENT "n"
+                PLUS "+"
+                LITERAL
+                  INT_NUMBER "1"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "nums_1_100"
+        WHITESPACE " "
+        WHERE_CLAUSE
+          WHERE_KW "WHERE"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "n"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "100"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- complete_syntax"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    TEMP_KW "temp"
+    WHITESPACE " "
+    RECURSIVE_KW "recursive"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "buzz"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMPORARY_KW "temporary"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    WHITESPACE "\n"
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              INT_NUMBER "3"
+    WHITESPACE "\n"
+    WITH_KW "with"
+    WHITESPACE " "
+    LOCAL_KW "local"
+    WHITESPACE " "
+    CHECK_KW "check"
+    WHITESPACE " "
+    OPTION_KW "option"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

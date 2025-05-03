@@ -1,0 +1,28 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/deallocate.sql
+---
+SOURCE_FILE
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  DEALLOCATE_STMT
+    DEALLOCATE_KW "deallocate"
+    WHITESPACE " "
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DEALLOCATE_STMT
+    DEALLOCATE_KW "deallocate"
+    WHITESPACE " "
+    ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DEALLOCATE_STMT
+    DEALLOCATE_KW "deallocate"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

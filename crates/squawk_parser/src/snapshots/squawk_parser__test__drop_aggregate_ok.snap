@@ -1,0 +1,243 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_aggregate.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " \n  "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " \n    "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
+    COMMA ","
+    WHITESPACE " \n    "
+    CALL_EXPR
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
+    COMMA ","
+    WHITESPACE " \n    "
+    CALL_EXPR
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      PARAM_LIST
+        L_PAREN "("
+        WHITESPACE "\n        "
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "foo"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INTEGER_KW "integer"
+        COMMA ","
+        WHITESPACE "\n        "
+        PARAM
+          NAME
+            IDENT "bar"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INTEGER_KW "integer"
+        COMMA ","
+        WHITESPACE "\n        "
+        PARAM
+          PATH_TYPE
+            TEXT_KW "text"
+        WHITESPACE "\n    "
+        R_PAREN ")"
+    COMMA ","
+    WHITESPACE " \n    "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
+    WHITESPACE "\n  "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- aggregate"
+  WHITESPACE "\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      PARAM_LIST
+        L_PAREN "("
+        WHITESPACE "\n  "
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INTEGER_KW "integer"
+        COMMA ","
+        WHITESPACE "\n  "
+        PARAM
+          PATH_TYPE
+            TEXT_KW "text"
+        COMMA ","
+        WHITESPACE "\n  "
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  NUMERIC_KW "numeric"
+        WHITESPACE "\n  "
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE "\n    "
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+          WHITESPACE " "
+          TIME_TYPE
+            NAME_REF
+              TIMESTAMP_KW "timestamp"
+        COMMA ","
+        WHITESPACE "\n    "
+        PARAM
+          NAME
+            IDENT "b"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  NUMERIC_KW "numeric"
+        COMMA ","
+        WHITESPACE "\n    "
+        PARAM
+          PATH_TYPE
+            TEXT_KW "text"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      PARAM_LIST
+        L_PAREN "("
+        WHITESPACE "\n  "
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE "\n    "
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+          WHITESPACE " "
+          TIME_TYPE
+            NAME_REF
+              TIMESTAMP_KW "timestamp"
+        COMMA ","
+        WHITESPACE "\n    "
+        PARAM
+          NAME
+            IDENT "b"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  NUMERIC_KW "numeric"
+        COMMA ","
+        WHITESPACE "\n    "
+        PARAM
+          PATH_TYPE
+            TEXT_KW "text"
+        WHITESPACE "\n"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

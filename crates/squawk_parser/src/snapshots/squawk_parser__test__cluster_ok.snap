@@ -1,0 +1,108 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/cluster.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "cluster"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "cluster"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "idx"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- options_only"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "cluster"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pre_14"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "cluster"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "idx"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pre_17"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "cluster"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pre_8_3"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "cluster"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

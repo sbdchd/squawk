@@ -1,0 +1,43 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_large_object.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  ALTER_LARGE_OBJECT_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    LARGE_KW "large"
+    WHITESPACE " "
+    OBJECT_KW "object"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "12345"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- current_role"
+  WHITESPACE "\n"
+  ALTER_LARGE_OBJECT_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    LARGE_KW "large"
+    WHITESPACE " "
+    OBJECT_KW "object"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "12345"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "current_role"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

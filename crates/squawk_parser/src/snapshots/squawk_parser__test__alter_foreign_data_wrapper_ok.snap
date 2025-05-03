@@ -1,0 +1,246 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_foreign_data_wrapper.sql
+---
+SOURCE_FILE
+  COMMENT "-- handler"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_DATA_WRAPPER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "w"
+    WHITESPACE "\n  "
+    HANDLER_KW "handler"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "h"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- no_handler"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_DATA_WRAPPER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "w"
+    WHITESPACE "\n  "
+    NO_KW "no"
+    WHITESPACE " "
+    HANDLER_KW "handler"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- validator"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_DATA_WRAPPER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "w"
+    WHITESPACE "\n  "
+    VALIDATOR_KW "validator"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- no_validator"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_DATA_WRAPPER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "w"
+    WHITESPACE "\n  "
+    NO_KW "no"
+    WHITESPACE " "
+    VALIDATOR_KW "validator"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- options"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_DATA_WRAPPER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "w"
+    WHITESPACE "\n  "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    ADD_KW "add"
+    WHITESPACE " "
+    NAME
+      IDENT "o"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    COMMA ","
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    NAME
+      IDENT "o"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    COMMA ","
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    NAME
+      IDENT "o"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiple"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_DATA_WRAPPER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "w"
+    WHITESPACE "\n  "
+    HANDLER_KW "handler"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "h"
+    WHITESPACE "\n  "
+    NO_KW "no"
+    WHITESPACE " "
+    HANDLER_KW "handler"
+    WHITESPACE "\n  "
+    VALIDATOR_KW "validator"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE "\n  "
+    NO_KW "no"
+    WHITESPACE " "
+    VALIDATOR_KW "validator"
+    WHITESPACE "\n  "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    ADD_KW "add"
+    WHITESPACE " "
+    NAME
+      IDENT "o"
+    WHITESPACE " "
+    LITERAL
+      STRING "'v'"
+    COMMA ","
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    NAME
+      IDENT "o"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    COMMA ","
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    NAME
+      IDENT "d"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_DATA_WRAPPER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "w"
+    WHITESPACE "\n  "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_DATA_WRAPPER_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "w"
+    WHITESPACE "\n  "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

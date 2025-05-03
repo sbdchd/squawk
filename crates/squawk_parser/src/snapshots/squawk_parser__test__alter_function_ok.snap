@@ -1,0 +1,357 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_function.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        STABLE_KW "stable"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- action_with_params"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiple_actions"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " \n  "
+    FUNC_OPTION_LIST
+      STRICT_FUNC_OPTION
+        CALLED_KW "called"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        INPUT_KW "input"
+      WHITESPACE "\n  "
+      STRICT_FUNC_OPTION
+        RETURNS_KW "returns"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        INPUT_KW "input"
+      WHITESPACE "\n  "
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE "\n  "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE "\n  "
+      VOLATILITY_FUNC_OPTION
+        STABLE_KW "stable"
+      WHITESPACE "\n  "
+      VOLATILITY_FUNC_OPTION
+        VOLATILE_KW "volatile"
+      WHITESPACE "\n  "
+      LEAKPROOF_FUNC_OPTION
+        NOT_KW "not"
+        WHITESPACE " "
+        LEAKPROOF_KW "leakproof"
+      WHITESPACE "\n  "
+      LEAKPROOF_FUNC_OPTION
+        LEAKPROOF_KW "leakproof"
+      WHITESPACE "\n  "
+      SECURITY_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+      WHITESPACE "\n  "
+      SECURITY_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+      WHITESPACE "\n  "
+      SECURITY_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+      WHITESPACE "\n  "
+      SECURITY_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+      WHITESPACE "\n  "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "unsafe"
+      WHITESPACE "\n  "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "restricted"
+      WHITESPACE "\n  "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+      WHITESPACE "\n  "
+      COST_FUNC_OPTION
+        COST_KW "cost"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+      WHITESPACE "\n  "
+      ROWS_FUNC_OPTION
+        ROWS_KW "rows"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+      WHITESPACE "\n  "
+      SUPPORT_FUNC_OPTION
+        SUPPORT_KW "support"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "f"
+      WHITESPACE "\n  "
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "c"
+        WHITESPACE " "
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+      WHITESPACE "\n  "
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "c"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+      WHITESPACE "\n  "
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "c"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        DEFAULT_KW "default"
+      WHITESPACE "\n  "
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "c"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
+      WHITESPACE "\n  "
+      RESET_FUNC_OPTION
+        RESET_KW "reset"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "c"
+      WHITESPACE "\n  "
+      RESET_FUNC_OPTION
+        RESET_KW "reset"
+        WHITESPACE " "
+        ALL_KW "all"
+    WHITESPACE "\n  "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- depends"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    DEPENDS_KW "depends"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    NO_KW "no"
+    WHITESPACE " "
+    DEPENDS_KW "depends"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

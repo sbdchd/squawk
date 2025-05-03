@@ -1,0 +1,114 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/analyze.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "analyze"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYSE_KW "analyse"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full_parens"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "skip_locked"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "buffer_usage_limit"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

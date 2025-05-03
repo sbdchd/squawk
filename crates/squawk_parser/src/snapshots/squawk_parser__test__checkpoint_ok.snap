@@ -1,0 +1,11 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/checkpoint.sql
+---
+SOURCE_FILE
+  COMMENT "-- checkpoint"
+  WHITESPACE "\n"
+  CHECKPOINT_STMT
+    CHECKPOINT_KW "checkpoint"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

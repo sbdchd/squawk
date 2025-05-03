@@ -1,0 +1,365 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_domain.sql
+---
+SOURCE_FILE
+  COMMENT "-- set_default"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    SET_DEFAULT
+      SET_KW "set"
+      WHITESPACE " "
+      DEFAULT_KW "default"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "42"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_default"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    DROP_DEFAULT
+      DROP_KW "drop"
+      WHITESPACE " "
+      DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_not_null"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    SET_NOT_NULL
+      SET_KW "set"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_not_null"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    DROP_NOT_NULL
+      DROP_KW "drop"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_constraint"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      CHECK_CONSTRAINT
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "c"
+        WHITESPACE " "
+        CHECK_KW "check"
+        WHITESPACE " "
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            VALUE_KW "value"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "0"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      CHECK_CONSTRAINT
+        CHECK_KW "check"
+        WHITESPACE " "
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            VALUE_KW "value"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "0"
+        R_PAREN ")"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      VALID_KW "valid"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      CHECK_CONSTRAINT
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        CHECK_KW "check"
+        WHITESPACE " "
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_constraint"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    DROP_CONSTRAINT
+      DROP_KW "drop"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    DROP_CONSTRAINT
+      DROP_KW "drop"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      IF_EXISTS
+        IF_KW "if"
+        WHITESPACE " "
+        EXISTS_KW "exists"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename_constraint"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    RENAME_CONSTRAINT
+      RENAME_KW "rename"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- validate_constraint"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    VALIDATE_CONSTRAINT
+      VALIDATE_KW "validate"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner_to"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename_to"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME
+        IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_schema"
+  WHITESPACE "\n"
+  ALTER_DOMAIN_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

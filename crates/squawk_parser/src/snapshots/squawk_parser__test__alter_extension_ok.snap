@@ -1,0 +1,2487 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_extension.sql
+---
+SOURCE_FILE
+  COMMENT "-- update_to"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    UPDATE_KW "update"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    UPDATE_KW "update"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    JSON_KW "json"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    UPDATE_KW "update"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_access_method"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ACCESS_KW "access"
+    WHITESPACE " "
+    METHOD_KW "method"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    ACCESS_KW "access"
+    WHITESPACE " "
+    METHOD_KW "method"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_aggregate"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      WHITESPACE " "
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE " "
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "c"
+      WHITESPACE " "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      STAR "*"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_cast"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            BIGINT_KW "bigint"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            SMALLINT_KW "smallint"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_collation"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_conversion"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    CONVERSION_KW "conversion"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    CONVERSION_KW "conversion"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    CONVERSION_KW "conversion"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    CONVERSION_KW "conversion"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_domain"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_event_trigger"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    EVENT_KW "event"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    EVENT_KW "event"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_foreign_data_wrapper"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_foreign_table"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_function"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_materialized_view"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_operator"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CUSTOM_OP
+      L_ANGLE "<"
+      L_ANGLE "<"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CUSTOM_OP
+      R_ANGLE ">"
+      R_ANGLE ">"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    COMMA ","
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_operator_class"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_operator_family"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_language"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_procedure"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_routine"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ROUTINE_KW "routine"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ROUTINE_KW "routine"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROUTINE_KW "routine"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROUTINE_KW "routine"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_sequence"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_table"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_text_search_configuration"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    CONFIGURATION_KW "configuration"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_text_search_dictionary"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    DICTIONARY_KW "dictionary"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    DICTIONARY_KW "dictionary"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    DICTIONARY_KW "dictionary"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    DICTIONARY_KW "dictionary"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_text_search_parser"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    PARSER_KW "parser"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    PARSER_KW "parser"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    PARSER_KW "parser"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    PARSER_KW "parser"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_text_search_template"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    TEMPLATE_KW "template"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    TEMPLATE_KW "template"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    TEMPLATE_KW "template"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    TEMPLATE_KW "template"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_transform"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "type_name"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "type_name"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_type"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_view"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_extension"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_publication"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_schema"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_server"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_database"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_index"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_statistics"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_role"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_subscription"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    SUBSCRIPTION_KW "subscription"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    SUBSCRIPTION_KW "subscription"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_drop_tablespace"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_EXTENSION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "e"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

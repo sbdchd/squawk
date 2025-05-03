@@ -1,0 +1,84 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_ext.sql
+---
+SOURCE_FILE
+  COMMENT "-- create_extension"
+  WHITESPACE "\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME
+      IDENT "hstore"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IDENT "addons"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE "\n  "
+    WITH_KW "with"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IDENT "bar"
+    WHITESPACE "\n  "
+    VERSION_KW "version"
+    WHITESPACE " "
+    IDENT "foo"
+    WHITESPACE "\n  "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE "\n  "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IDENT "bar"
+    WHITESPACE "\n  "
+    VERSION_KW "version"
+    WHITESPACE " "
+    LITERAL
+      STRING "'buzz'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

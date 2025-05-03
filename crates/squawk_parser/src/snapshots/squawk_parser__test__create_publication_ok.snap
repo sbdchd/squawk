@@ -1,0 +1,256 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_publication.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_PUBLICATION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- all_tables"
+  WHITESPACE "\n"
+  CREATE_PUBLICATION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE "\n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    TABLES_KW "tables"
+    WHITESPACE "\n  "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table"
+  WHITESPACE "\n"
+  CREATE_PUBLICATION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " \n  "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    COMMA ","
+    WHITESPACE " \n  "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "buzz"
+    WHITESPACE " "
+    STAR "*"
+    COMMA ","
+    WHITESPACE " \n  "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    COMMA ","
+    WHITESPACE " \n  "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    WHERE_KW "where"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+      WHITESPACE " "
+      OR_KW "or"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        NEQ "!="
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n  "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table_in_schema"
+  WHITESPACE "\n"
+  CREATE_PUBLICATION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE "\n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    TABLES_KW "tables"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    COMMA ","
+    WHITESPACE " "
+    CURRENT_SCHEMA_KW "current_schema"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiple tables"
+  WHITESPACE "\n"
+  CREATE_PUBLICATION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME
+      IDENT "pub"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "chats"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "users"
+  SEMICOLON ";"
+  WHITESPACE "\n"

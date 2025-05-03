@@ -1,0 +1,285 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_database.sql
+---
+SOURCE_FILE
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- tablespace"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- refresh"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    REFRESH_KW "refresh"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    VERSION_KW "version"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_param"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "p"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "v"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "p"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    IDENT "v"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "p"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "p"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    CURRENT_KW "current"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- reset"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    RESET_KW "reset"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    RESET_KW "reset"
+    WHITESPACE " "
+    ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- with_option"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    IDENT "allow_connections"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- option_connection_limit"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    CONNECTION_KW "connection"
+    WHITESPACE " "
+    LIMIT_KW "limit"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- option_is_template"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    IDENT "is_template"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- with_multiple_options"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "d"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    IDENT "allow_connections"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    WHITESPACE " "
+    CONNECTION_KW "connection"
+    WHITESPACE " "
+    LIMIT_KW "limit"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE " "
+    IDENT "is_template"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

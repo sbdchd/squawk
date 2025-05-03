@@ -1,0 +1,252 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_policy.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- as_"
+  WHITESPACE "\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    IDENT "permissive"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    IDENT "restrictive"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    IDENT "permissive"
+    WHITESPACE "\n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "public"
+    COMMA ","
+    WHITESPACE " "
+    CURRENT_ROLE_KW "current_role"
+    COMMA ","
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+    COMMA ","
+    WHITESPACE " "
+    SESSION_USER_KW "session_user"
+    WHITESPACE "\n  "
+    USING_KW "using"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+      WHITESPACE " "
+      AND_KW "and"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    WITH_KW "with"
+    WHITESPACE " "
+    CHECK_KW "check"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "x"
+      WHITESPACE " "
+      L_ANGLE "<"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- for_"
+  WHITESPACE "\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT_KW "select"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    INSERT_KW "insert"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    UPDATE_KW "update"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_POLICY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    FOR_KW "for"
+    WHITESPACE " "
+    DELETE_KW "delete"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

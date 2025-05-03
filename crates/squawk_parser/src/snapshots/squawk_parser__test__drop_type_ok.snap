@@ -1,0 +1,132 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/drop_type.sql
+---
+SOURCE_FILE
+  COMMENT "-- drop_type"
+  WHITESPACE "\n"
+  DROP_TYPE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TYPE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TYPE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TYPE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TYPE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TYPE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    WHITESPACE " "
+    RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TYPE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"

@@ -1,0 +1,21 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/listen.sql
+---
+SOURCE_FILE
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  LISTEN_STMT
+    LISTEN_KW "listen"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  LISTEN_STMT
+    LISTEN_KW "LISTEN"
+    WHITESPACE " "
+    NAME
+      IDENT "virtual"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

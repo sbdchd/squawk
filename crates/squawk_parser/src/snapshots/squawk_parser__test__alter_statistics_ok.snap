@@ -1,0 +1,123 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_statistics.sql
+---
+SOURCE_FILE
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_STATISTICS_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_STATISTICS_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_STATISTICS_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  ALTER_STATISTICS_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- statistics_value"
+  WHITESPACE "\n"
+  ALTER_STATISTICS_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "100"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_STATISTICS_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

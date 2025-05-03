@@ -1,0 +1,20 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/err/alter_sequence.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing option"
+  WHITESPACE "\n"
+  ALTER_SEQUENCE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@34: expected ALTER SEQUENCE option

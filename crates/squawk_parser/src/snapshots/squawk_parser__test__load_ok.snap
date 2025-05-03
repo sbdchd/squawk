@@ -1,0 +1,14 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/load.sql
+---
+SOURCE_FILE
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  LOAD_STMT
+    LOAD_KW "load"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

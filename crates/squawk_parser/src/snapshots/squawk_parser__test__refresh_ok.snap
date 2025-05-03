@@ -1,0 +1,58 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/refresh.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  REFRESH_STMT
+    REFRESH_KW "REFRESH"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "order_summary"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REFRESH_STMT
+    REFRESH_KW "REFRESH"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "annual_statistics_basis"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    NO_KW "NO"
+    WHITESPACE " "
+    DATA_KW "DATA"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REFRESH_STMT
+    REFRESH_KW "refresh"
+    WHITESPACE " "
+    MATERIALIZED_KW "materialized"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    CONCURRENTLY_KW "concurrently"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    DATA_KW "data"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

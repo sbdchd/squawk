@@ -1,0 +1,6680 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/misc.sql
+---
+SOURCE_FILE
+  CREATE_TABLE
+    COMMENT "-- https://www.timescale.com/blog/boosting-postgres-insert-performance/"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "sensors"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "sensorid"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "ts"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "TIMESTAMPTZ"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          VALUE_KW "value"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "FLOAT8"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "sensors"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "ts"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "sensorid"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          VALUE_KW "value"
+      R_PAREN ")"
+    WHITESPACE " \n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " \n  "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "unnest"
+          ARG_LIST
+            L_PAREN "("
+            WHITESPACE "\n    "
+            CAST_EXPR
+              LITERAL
+                PARAM "$1"
+              COLON2 "::"
+              ARRAY_TYPE
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "timestamptz"
+                L_BRACK "["
+                R_BRACK "]"
+            COMMA ","
+            WHITESPACE " \n    "
+            CAST_EXPR
+              LITERAL
+                PARAM "$2"
+              COLON2 "::"
+              ARRAY_TYPE
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+                L_BRACK "["
+                R_BRACK "]"
+            COMMA ","
+            WHITESPACE " \n    "
+            CAST_EXPR
+              LITERAL
+                PARAM "$3"
+              COLON2 "::"
+              ARRAY_TYPE
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float8"
+                L_BRACK "["
+                R_BRACK "]"
+            WHITESPACE "\n"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "sensors"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "sensorid"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "ts"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          VALUE_KW "value"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " \n  "
+      L_PAREN "("
+      LITERAL
+        PARAM "$1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        PARAM "$2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        PARAM "$3"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " \n  "
+      L_PAREN "("
+      LITERAL
+        PARAM "$4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        PARAM "$5"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        PARAM "$6"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " \n  "
+      COMMENT "--  ..., "
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        PARAM "$2998"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        PARAM "$2999"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        PARAM "$3000"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- https://www.timescale.com/blog/combining-semantic-search-and-full-text-search-in-postgresql-with-cohere-pgvector-and-pgai/"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "movies"
+    WHITESPACE "\n"
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "embedding"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CALL_EXPR
+      FIELD_EXPR
+        NAME_REF
+          IDENT "ai"
+        DOT "."
+        NAME_REF
+          IDENT "cohere_embed"
+      ARG_LIST
+        L_PAREN "("
+        WHITESPACE "\n    "
+        LITERAL
+          STRING "'embed-english-v3.0'"
+        WHITESPACE "\n    "
+        COMMA ","
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "CONCAT_WS"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              STRING "'. '"
+            COMMA ","
+            WHITESPACE "\n        "
+            NAME_REF
+              IDENT "title"
+            COMMA ","
+            WHITESPACE "\n        "
+            CALL_EXPR
+              NAME_REF
+                COALESCE_KW "COALESCE"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "overview"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "''"
+                R_PAREN ")"
+            WHITESPACE "\n    "
+            R_PAREN ")"
+        WHITESPACE "\n    "
+        COMMA ","
+        WHITESPACE " "
+        NAMED_ARG
+          NAME_REF
+            IDENT "input_type"
+          FAT_ARROW "=>"
+          LITERAL
+            STRING "'search_document'"
+        WHITESPACE "\n    "
+        COMMENT "-- , api_key=>%s"
+        WHITESPACE "\n    "
+        COMMA ","
+        WHITESPACE " "
+        NAMED_ARG
+          NAME_REF
+            IDENT "api_key"
+          FAT_ARROW "=>"
+          LITERAL
+            PARAM "$1"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "embedding"
+        WHITESPACE " "
+        IS_KW "is"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "title"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "overview"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "movies"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "plainto_tsquery"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'english'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            PARAM "$1"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "query"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "to_tsvector"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              STRING "'english'"
+            COMMA ","
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "title"
+              WHITESPACE " "
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              BIN_EXPR
+                LITERAL
+                  STRING "' '"
+                WHITESPACE " "
+                CUSTOM_OP
+                  PIPE "|"
+                  PIPE "|"
+                WHITESPACE " "
+                CALL_EXPR
+                  NAME_REF
+                    COALESCE_KW "COALESCE"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "overview"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "''"
+                    R_PAREN ")"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          AT "@"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "query"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "ts_rank_cd"
+        ARG_LIST
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "to_tsvector"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'english'"
+              COMMA ","
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "title"
+                WHITESPACE " "
+                CUSTOM_OP
+                  PIPE "|"
+                  PIPE "|"
+                WHITESPACE " "
+                BIN_EXPR
+                  LITERAL
+                    STRING "' '"
+                  WHITESPACE " "
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  WHITESPACE " "
+                  CALL_EXPR
+                    NAME_REF
+                      COALESCE_KW "COALESCE"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "overview"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "''"
+                      R_PAREN ")"
+              R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            IDENT "query"
+          R_PAREN ")"
+      WHITESPACE " "
+      DESC_KW "DESC"
+    WHITESPACE "\n"
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "query_embedding"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n    "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "cohere_embed"
+                  ARG_LIST
+                    L_PAREN "("
+                    WHITESPACE "\n        "
+                    LITERAL
+                      STRING "'embed-english-v3.0'"
+                    WHITESPACE "\n        "
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      PARAM "$1"
+                    WHITESPACE "\n        "
+                    COMMA ","
+                    WHITESPACE " "
+                    NAMED_ARG
+                      NAME_REF
+                        IDENT "_input_type"
+                      FAT_ARROW "=>"
+                      LITERAL
+                        STRING "'search_query'"
+                    WHITESPACE "\n        "
+                    COMMENT "-- , _api_key=>%s"
+                    WHITESPACE "\n        "
+                    COMMA ","
+                    WHITESPACE " "
+                    NAMED_ARG
+                      NAME_REF
+                        IDENT "_api_key"
+                      FAT_ARROW "=>"
+                      LITERAL
+                        PARAM "$2"
+                    WHITESPACE "\n    "
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "embedding"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "title"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "overview"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "movies"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "query_embedding"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "movies"
+          DOT "."
+          NAME_REF
+            IDENT "embedding"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          EQ "="
+          R_ANGLE ">"
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "query_embedding"
+          DOT "."
+          NAME_REF
+            IDENT "embedding"
+    WHITESPACE "\n"
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "x"
+            DOT "."
+            NAME_REF
+              IDENT "\"index\""
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "x"
+              DOT "."
+              NAME_REF
+                DOCUMENT_KW "document"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'text'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"text\""
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "x"
+            DOT "."
+            NAME_REF
+              IDENT "relevance_score"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "jsonb_to_recordset"
+        ARG_LIST
+          L_PAREN "("
+          WHITESPACE "\n    "
+          BIN_EXPR
+            CALL_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "ai"
+                DOT "."
+                NAME_REF
+                  IDENT "cohere_rerank"
+              ARG_LIST
+                L_PAREN "("
+                WHITESPACE "\n        "
+                LITERAL
+                  STRING "'rerank-english-v3.0'"
+                COMMA ","
+                WHITESPACE "\n        "
+                COMMENT "-- %s,"
+                WHITESPACE "\n        "
+                LITERAL
+                  PARAM "$1"
+                COMMA ","
+                WHITESPACE "\n        "
+                COMMENT "-- %s::jsonb,"
+                WHITESPACE "\n        "
+                CAST_EXPR
+                  LITERAL
+                    PARAM "$2"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "jsonb"
+                COMMA ","
+                WHITESPACE "\n        "
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "return_documents"
+                  WHITESPACE " "
+                  FAT_ARROW "=>"
+                  WHITESPACE " "
+                  LITERAL
+                    TRUE_KW "true"
+                COMMA ","
+                WHITESPACE "\n        "
+                COMMENT "-- api_key=>%s"
+                WHITESPACE "\n        "
+                NAMED_ARG
+                  NAME_REF
+                    IDENT "api_key"
+                  FAT_ARROW "=>"
+                  LITERAL
+                    PARAM "$3"
+                WHITESPACE "\n    "
+                R_PAREN ")"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'results'"
+          WHITESPACE "\n"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "\"index\""
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME
+              IDENT "\"document\""
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "jsonb"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME
+              IDENT "relevance_score"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float8"
+          R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relevance_score"
+      WHITESPACE " "
+      DESC_KW "DESC"
+    WHITESPACE "\n"
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- https://www.depesz.com/2024/11/15/grouping-data-into-array-of-sums-fun-with-custom-aggregates/"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "sum_per_hour"
+    PARAM_LIST
+      L_PAREN "("
+      WHITESPACE " "
+      PARAM
+        PARAM_INOUT
+          INOUT_KW "INOUT"
+        WHITESPACE " "
+        NAME
+          IDENT "p_state"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int8"
+          L_BRACK "["
+          R_BRACK "]"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_IN
+          IN_KW "IN"
+        WHITESPACE " "
+        NAME
+          IDENT "p_hour"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_IN
+          IN_KW "IN"
+        WHITESPACE " "
+        NAME
+          IDENT "p_count"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      WHITESPACE " "
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      ARRAY_TYPE
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+        L_BRACK "["
+        R_BRACK "]"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE\nBEGIN\n    -- sanity checks\n    IF p_hour < 0 THEN\n        raise exception 'Hour can''t be < 0 : %', p_hour;\n    END IF;\n    IF p_hour > 23 THEN\n        raise exception 'Hour can''t be > 23 : %', p_hour;\n    END IF;\n \n    -- actual count modification\n    p_state[ p_hour ] := p_state[ p_hour ] + p_count;\n \n    RETURN;\nEND;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum_per_hour"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              LITERAL
+                STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "15"
+              WHITESPACE " "
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_AGGREGATE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    AGGREGATE_KW "aggregate"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "sum_per_hour"
+    PARAM_LIST
+      L_PAREN "("
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      WHITESPACE " "
+      R_PAREN ")"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      IDENT "sfunc"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "sum_per_hour"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "stype"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    ARRAY_TYPE
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+      L_BRACK "["
+      R_BRACK "]"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "initcond"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "category_id"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          NAME_REF
+            IDENT "object_id"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "date_trunc"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              LITERAL
+                STRING "'day'"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "interaction_ts"
+              WHITESPACE " "
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "interaction_date"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum_per_hour"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              CAST_EXPR
+                CALL_EXPR
+                  NAME_REF
+                    EXTRACT_KW "EXTRACT"
+                  ARG_LIST
+                    L_PAREN "("
+                    WHITESPACE " "
+                    STRING "'hour'"
+                    WHITESPACE " "
+                    FROM_KW "FROM"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "interaction_ts"
+                    R_PAREN ")"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "int4"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "interaction_count"
+              WHITESPACE " "
+              R_PAREN ")"
+            WHITESPACE " "
+            FILTER_CLAUSE
+              FILTER_KW "FILTER"
+              WHITESPACE " "
+              L_PAREN "("
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "interaction_type"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'a'"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "a_counts"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum_per_hour"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              CAST_EXPR
+                CALL_EXPR
+                  NAME_REF
+                    EXTRACT_KW "EXTRACT"
+                  ARG_LIST
+                    L_PAREN "("
+                    WHITESPACE " "
+                    STRING "'hour'"
+                    WHITESPACE " "
+                    FROM_KW "FROM"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "interaction_ts"
+                    R_PAREN ")"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "int4"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "interaction_count"
+              WHITESPACE " "
+              R_PAREN ")"
+            WHITESPACE " "
+            FILTER_CLAUSE
+              FILTER_KW "FILTER"
+              WHITESPACE " "
+              L_PAREN "("
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "interaction_type"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'b'"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "b_counts"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      NAME_REF
+        IDENT "input_data"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "sum_hour_arrays"
+    PARAM_LIST
+      L_PAREN "("
+      WHITESPACE " "
+      PARAM
+        PARAM_IN
+          IN_KW "IN"
+        WHITESPACE " "
+        NAME
+          IDENT "p_left"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int8"
+          L_BRACK "["
+          R_BRACK "]"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_IN
+          IN_KW "IN"
+        WHITESPACE " "
+        NAME
+          IDENT "p_right"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int8"
+          L_BRACK "["
+          R_BRACK "]"
+      WHITESPACE " "
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      ARRAY_TYPE
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+        L_BRACK "["
+        R_BRACK "]"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE\n    i int4;\n    v_result int8[];\nBEGIN\n    FOR i IN 0..23 LOOP\n        v_result[i] := p_left[i] + p_right[i];\n    END LOOP;\n    RETURN v_result;\nEND;\n$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- https://www.crunchydata.com/blog/postgres-partitioning-with-a-default-partition"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "time_taptest_table"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "col3"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        LITERAL
+          STRING "'2024-12-25'"
+        COLON2 "::"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "time_taptest_table_default"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "time_taptest_table"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "time_taptest_table"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "col3"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        LITERAL
+          STRING "'2024-12-25'"
+        COLON2 "::"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "partman_test"
+        DOT "."
+        NAME_REF
+          IDENT "time_taptest_table_default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    TABLE_KW "Table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"partman_test.time_taptest_table_p20241124\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    TABLE_KW "Table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"partman_test.time_taptest_table_default\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "time_taptest_table_p20241225"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "time_taptest_table"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'2024-12-25'"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'2024-12-26'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clean_default_temp"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      LIKE_CLAUSE
+        LIKE_KW "LIKE"
+        WHITESPACE " "
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "partman_test"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "time_taptest_table_default"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "partition_data"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n    "
+        DELETE_STMT
+          DELETE_KW "DELETE"
+          WHITESPACE " "
+          FROM_KW "FROM"
+          WHITESPACE " "
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "partman_test"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "time_taptest_table_default"
+          WHITESPACE " "
+          RETURNING_KW "RETURNING"
+          WHITESPACE " "
+          STAR "*"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clean_default_temp"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "col1"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col2"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col3"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "col1"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "col2"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "col3"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "partition_data"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "time_taptest_table_p20241225"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "time_taptest_table"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'2024-12-25'"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'2024-12-26'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "partition_data"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n    "
+        DELETE_STMT
+          DELETE_KW "DELETE"
+          WHITESPACE " "
+          FROM_KW "FROM"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "clean_default_temp"
+          WHITESPACE " "
+          RETURNING_KW "RETURNING"
+          WHITESPACE " "
+          STAR "*"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "time_taptest_table"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "col1"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col2"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col3"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "col1"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "col2"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "col3"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "partition_data"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clean_default_temp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "partman_test"
+        DOT "."
+        NAME_REF
+          IDENT "time_taptest_table_default"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "partman_test"
+        DOT "."
+        NAME_REF
+          IDENT "time_taptest_table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "partman_test"
+        DOT "."
+        NAME_REF
+          IDENT "time_taptest_table_p20241225"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "partman"
+          DOT "."
+          NAME_REF
+            IDENT "check_default"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "partman"
+          DOT "."
+          NAME_REF
+            IDENT "check_default"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            FALSE_KW "false"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "partman_test"
+        DOT "."
+        NAME_REF
+          IDENT "time_taptest_table_default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CALL_STMT
+    CALL_KW "CALL"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "partition_data_proc"
+    ARG_LIST
+      L_PAREN "("
+      LITERAL
+        STRING "'partman_test.time_taptest_table'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "partman_test"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "time_taptest_table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "partman"
+          DOT "."
+          NAME_REF
+            IDENT "partition_gap_fill"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'partman_test.time_taptest_table'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- https://www.crunchydata.com/blog/smarter-postgres-llm-with-retrieval-augmented-generation"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "openai"
+              DOT "."
+              NAME_REF
+                IDENT "prompt"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE "\n  "
+              LITERAL
+                STRING "'You are a science fiction expert!'"
+              COMMA ","
+              WHITESPACE "\n  "
+              LITERAL
+                STRING "'What is the Star Trek episode where Deanna and her\n   mother are kidnapped?'"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tng"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "title"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "plot"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n    "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tng"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "title"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "plot"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PROGRAM_KW "PROGRAM"
+    WHITESPACE " "
+    LITERAL
+      STRING "'curl https://raw.githubusercontent.com/pramsey/pgsql-openai/refs/heads/main/examples/rag/tng.txt'"
+    WHITESPACE "\n    "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n        "
+    NAME
+      FORMAT_KW "FORMAT"
+    WHITESPACE " "
+    CSV_KW "csv"
+    COMMA ","
+    WHITESPACE "\n        "
+    NAME
+      DELIMITER_KW "DELIMITER"
+    WHITESPACE " "
+    LITERAL
+      ESC_STRING "E'\\t'"
+    WHITESPACE "\n        "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Enable pgvector"
+  WHITESPACE "\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    EXTENSION_KW "EXTENSION"
+    WHITESPACE " "
+    NAME
+      IDENT "pgvector"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Add an emedding column to the table"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tng"
+    WHITESPACE "\n    "
+    ADD_COLUMN
+      ADD_KW "ADD"
+      WHITESPACE " "
+      COLUMN_KW "COLUMN"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vec"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "vector"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Populate the column with embeddings from an LLM model"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tng"
+    WHITESPACE "\n    "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vec"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CAST_EXPR
+      CALL_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "openai"
+          DOT "."
+          NAME_REF
+            IDENT "vector"
+        ARG_LIST
+          L_PAREN "("
+          BIN_EXPR
+            NAME_REF
+              IDENT "title"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "' -- '"
+              WHITESPACE " "
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "plot"
+          R_PAREN ")"
+      COLON2 "::"
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "vector"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "title"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tng"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "vec"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  CAST_EXPR
+                    CALL_EXPR
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "openai"
+                        DOT "."
+                        NAME_REF
+                          IDENT "vector"
+                      ARG_LIST
+                        L_PAREN "("
+                        LITERAL
+                          STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
+                        R_PAREN ")"
+                    COLON2 "::"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "vector"
+          R_PAREN ")"
+    WHITESPACE "\n"
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "OR"
+      WHITESPACE " "
+      REPLACE_KW "REPLACE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "trektrivia"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "query_text"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "TEXT"
+    WHITESPACE "\n    "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        LITERAL
+          STRING "'plpgsql'"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE\n    query_embedding VECTOR;\n    context_chunks TEXT;\nBEGIN\n    -- Step 1: Get the embedding vector for the query text\n    query_embedding := openai.vector(query_text)::VECTOR;\n\n    -- Step 2: Find the 5 closest plot summaries to the query embedding\n    -- Step 3: Lump together results into a context lump\n    SELECT string_agg('Episode: { Title: ' || title || ' } Summary: {' || plot, E'}}\\n\\n\\n') INTO context_chunks\n    FROM (\n        SELECT plot, title\n        FROM tng\n        ORDER BY vec <-> query_embedding\n        LIMIT 5\n    ) AS similar_plots;\n\n    -- Step 4: Run the query against the LLM with the augmented context\n    RETURN openai.prompt(context_chunks, query_text);\nEND;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "trektrivia"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- https://www.crunchydata.com/blog/pg_incremental-incremental-data-processing-in-postgres"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "/* define the raw data and summary table */"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "events"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "event_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bigserial"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "event_time"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "user_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "response_time"
+        WHITESPACE " "
+        DOUBLE_TYPE
+          DOUBLE_KW "double"
+          WHITESPACE " "
+          PRECISION_KW "precision"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "view_counts"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          DAY_KW "day"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "user_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "count"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      COMMA ","
+      WHITESPACE " "
+      PRIMARY_KEY_CONSTRAINT
+        PRIMARY_KW "primary"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              DAY_KW "day"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "user_id"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* enable fast range scans on the sequence column */"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "events"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "brin"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "event_id"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* for demo: generate some random data */"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "events"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "event_time"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "user_id"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "response_time"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "now"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              CALL_EXPR
+                NAME_REF
+                  IDENT "random"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              WHITESPACE " "
+              STAR "*"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "100"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "random"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "1000000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* define a sequence pipeline that periodically upserts view counts */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "incremental"
+              DOT "."
+              NAME_REF
+                IDENT "create_sequence_pipeline"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'view-count-pipeline'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'events'"
+              COMMA ","
+              WHITESPACE "\n  "
+              LITERAL
+                DOLLAR_QUOTED_STRING "$$\n    insert into view_counts\n    select date_trunc('day', event_time), user_id, count(*)\n    from events where event_id between $1 and $2\n    group by 1, 2\n    on conflict (day, user_id) do update set count = view_counts.count + EXCLUDED.count;\n  $$"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* get the most active users of today */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "user_id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "count"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "view_counts"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          DAY_KW "day"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CAST_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "now"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "date"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      WHITESPACE " "
+      DESC_KW "desc"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  CREATE_TABLE
+    COMMENT "/* create a table with a single JSONB column and a sequence to track new objects */"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "events_json"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        GENERATED_CONSTRAINT
+          GENERATED_KW "generated"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          DEFAULT_KW "default"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          IDENTITY_KW "identity"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "payload"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "jsonb"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "events_json"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "brin"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "id"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* load some data from a local newline-delimited JSON file */"
+  WHITESPACE "\n"
+  COMMENT "-- \\copy events_json (payload) from '2024-12-15-00.json' with (format 'csv', quote e'\\x01', delimiter e'\\x02', escape e'\\x01')"
+  WHITESPACE "\n\n\n"
+  COMMENT "/* periodically unpack the new JSON objects into the events table */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "incremental"
+              DOT "."
+              NAME_REF
+                IDENT "create_sequence_pipeline"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'unpack-json-pipeline'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'events_json'"
+              COMMA ","
+              WHITESPACE "\n  "
+              LITERAL
+                DOLLAR_QUOTED_STRING "$$\n    insert into events (event_id, event_time, user_id, response_time)\n    select\n      nextval('events_event_id_seq'),\n      (payload->>'created_at')::timestamptz,\n      (payload->'actor'->>'id')::bigint,\n      (payload->>'response_time')::double precision\n    from events_json\n    where id between $1 and $2\n  $$"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  CREATE_TABLE
+    COMMENT "/* create a table for number of active users per hour */"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "user_counts"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          HOUR_KW "hour"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "user_count"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      COMMA ","
+      WHITESPACE " "
+      PRIMARY_KEY_CONSTRAINT
+        PRIMARY_KW "primary"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              HOUR_KW "hour"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* enable fast range scans on the event_time column */"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "events"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "brin"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "event_time"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* aggregates a range of 1 hour intervals after an hour has passed */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "incremental"
+              DOT "."
+              NAME_REF
+                IDENT "create_time_interval_pipeline"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'distinct-user-count'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'1 hour'"
+              COMMA ","
+              WHITESPACE "\n  "
+              LITERAL
+                DOLLAR_QUOTED_STRING "$$\n    insert into view_counts\n    select date_trunc('hour', event_time), count(distinct user_id)\n    from events where event_time >= $1 and event_time < $2\n    group by 1\n  $$"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* get number of active users per hour */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            HOUR_KW "hour"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "user_count"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "user_counts"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* define a function that wraps a COPY TO command to export data */"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "export_events"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "start_time"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        NAME
+          IDENT "end_time"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$function$ begin\n\n  /* select all rows in a time range and export them to a Parquet file */\n  execute format(\n    'copy (select * from events where event_time >= %L and event_time < %L) to %L',\n    start_time, end_time, format('s3://mybucket/events/%s.parquet', start_time::date)\n  );\n\nend; $function$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* export data as 1 file per day, starting at Jan 1st */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "incremental"
+              DOT "."
+              NAME_REF
+                IDENT "create_time_interval_pipeline"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE "\n  "
+              LITERAL
+                STRING "'export-events'"
+              COMMA ","
+              WHITESPACE "\n  "
+              LITERAL
+                STRING "'1 day'"
+              COMMA ","
+              WHITESPACE "\n  "
+              LITERAL
+                STRING "'select export_events($1, $2)'"
+              COMMA ","
+              WHITESPACE "\n\n  "
+              NAMED_ARG
+                NAME_REF
+                  IDENT "source_table_name"
+                WHITESPACE " "
+                COLONEQ ":="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'events'"
+              COMMA ","
+              WHITESPACE " "
+              COMMENT "/* wait for writes on events to finish */"
+              WHITESPACE "\n  "
+              NAMED_ARG
+                NAME_REF
+                  IDENT "batched"
+                WHITESPACE " "
+                COLONEQ ":="
+                WHITESPACE " "
+                LITERAL
+                  FALSE_KW "false"
+              COMMA ","
+              WHITESPACE "              "
+              COMMENT "/* separate execution for each day     */"
+              WHITESPACE "\n  "
+              NAMED_ARG
+                NAME_REF
+                  IDENT "start_time"
+                WHITESPACE " "
+                COLONEQ ":="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2024-01-01'"
+              WHITESPACE "     "
+              COMMENT "/* export all days from Jan 1st now    */"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "/* define function that wraps a COPY FROM command to import data */"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "import_events"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          PATH_KW "path"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$function$ begin\n\n  /* load a file into the events table */\n  execute format('copy events from %L', path);\n\nend; $function$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* load all the files under a prefix, and automatically load new files, one at a time */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "incremental"
+              DOT "."
+              NAME_REF
+                IDENT "create_file_list_pipeline"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE "\n    "
+              LITERAL
+                STRING "'import-events'"
+              COMMA ","
+              WHITESPACE "\n    "
+              LITERAL
+                STRING "'s3://mybucket/events/*.csv'"
+              COMMA ","
+              WHITESPACE "\n    "
+              LITERAL
+                STRING "'select import_events($1)'"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "jobname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "start_time"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "status"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "return_message"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "cron"
+        DOT "."
+        NAME_REF
+          IDENT "job_run_details"
+      WHITESPACE " "
+      JOIN
+        JOIN_KW "join"
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "cron"
+          DOT "."
+          NAME_REF
+            IDENT "job"
+        WHITESPACE " "
+        USING_CLAUSE
+          USING_KW "using"
+          WHITESPACE " "
+          PAREN_EXPR
+            L_PAREN "("
+            NAME_REF
+              IDENT "jobid"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "jobname"
+        WHITESPACE " "
+        LIKE_KW "like"
+        WHITESPACE " "
+        LITERAL
+          STRING "'pipeline:event-import%'"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE " "
+      DESC_KW "desc"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers"
+  WHITESPACE "\n\n"
+  CREATE_FOREIGN_DATA_WRAPPER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME
+      IDENT "wasm_wrapper"
+    WHITESPACE "\n  "
+    HANDLER_KW "handler"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "wasm_fdw_handler"
+    WHITESPACE "\n  "
+    VALIDATOR_KW "validator"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "wasm_fdw_validator"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SERVER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME
+      IDENT "cal_server"
+    WHITESPACE "\n  "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "wasm_wrapper"
+    WHITESPACE "\n  "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      IDENT "fdw_package_url"
+    WHITESPACE " "
+    LITERAL
+      STRING "'https://github.com/supabase/wrappers/releases/download/wasm_cal_fdw_v0.1.0/cal_fdw.wasm'"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "fdw_package_name"
+    WHITESPACE " "
+    LITERAL
+      STRING "'supabase:cal-fdw'"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "fdw_package_version"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0.1.0'"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "fdw_package_checksum"
+    WHITESPACE " "
+    LITERAL
+      STRING "'4afe4fac8c51f2caa1de8483b3817d2cec3a14cd8a65a3942c8b4ff6c430f08a'"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "api_key"
+    WHITESPACE " "
+    LITERAL
+      STRING "'<your Cal.com API key>'"
+    WHITESPACE "\n  "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME
+      IDENT "cal"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FOREIGN_TABLE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "cal"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "event_types"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "attrs"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "jsonb"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cal_server"
+    WHITESPACE "\n  "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      OBJECT_KW "object"
+    WHITESPACE " "
+    LITERAL
+      STRING "'event-types'"
+    WHITESPACE "\n  "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FOREIGN_TABLE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "cal"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "bookings"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "attrs"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "jsonb"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cal_server"
+    WHITESPACE "\n  "
+    OPTIONS_KW "options"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      OBJECT_KW "object"
+    WHITESPACE " "
+    LITERAL
+      STRING "'bookings'"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "rowid_column"
+    WHITESPACE " "
+    LITERAL
+      STRING "'attrs'"
+    WHITESPACE "\n  "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extract event types"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "\n  "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "etg"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            BIN_EXPR
+              LITERAL
+                STRING "'profile'"
+              CUSTOM_OP
+                MINUS "-"
+                R_ANGLE ">"
+                R_ANGLE ">"
+              LITERAL
+                STRING "'name'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "profile"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "et"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'id'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "id"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "et"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'title'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "title"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "cal"
+        DOT "."
+        NAME_REF
+          IDENT "event_types"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+      WHITESPACE "\n  "
+      JOIN
+        CROSS_KW "cross"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "json_array_elements"
+          ARG_LIST
+            L_PAREN "("
+            CAST_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "attrs"
+                  CUSTOM_OP
+                    MINUS "-"
+                    R_ANGLE ">"
+                  LITERAL
+                    STRING "'eventTypeGroups'"
+                R_PAREN ")"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "etg"
+        WHITESPACE "\n  "
+        JOIN
+          CROSS_KW "cross"
+          WHITESPACE " "
+          JOIN_KW "join"
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              IDENT "json_array_elements"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                PAREN_EXPR
+                  L_PAREN "("
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "etg"
+                    CUSTOM_OP
+                      MINUS "-"
+                      R_ANGLE ">"
+                    LITERAL
+                      STRING "'eventTypes'"
+                  R_PAREN ")"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        JSON_KW "json"
+              R_PAREN ")"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "et"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extract bookings"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "\n  "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "bk"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'id'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "id"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "bk"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'title'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "title"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "bk"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            BIN_EXPR
+              LITERAL
+                STRING "'responses'"
+              CUSTOM_OP
+                MINUS "-"
+                R_ANGLE ">"
+                R_ANGLE ">"
+              LITERAL
+                STRING "'name'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "bk"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            LITERAL
+              STRING "'startTime'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "start_time"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "cal"
+        DOT "."
+        NAME_REF
+          IDENT "bookings"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+      WHITESPACE "\n  "
+      JOIN
+        CROSS_KW "cross"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "json_array_elements"
+          ARG_LIST
+            L_PAREN "("
+            CAST_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "attrs"
+                  CUSTOM_OP
+                    MINUS "-"
+                    R_ANGLE ">"
+                  LITERAL
+                    STRING "'bookings'"
+                R_PAREN ")"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "bk"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- make a 15 minutes meeting with Elon Musk"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "cal"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bookings"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "attrs"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n  "
+      CAST_EXPR
+        LITERAL
+          STRING "'{\n     \"start\": \"2025-01-01T23:30:00.000Z\",\n     \"eventTypeId\": 1398027,\n     \"attendee\": {\n       \"name\": \"Elon Musk\",\n       \"email\": \"elon.musk@x.com\",\n       \"timeZone\": \"America/New_York\"\n     }\n  }'"
+        COLON2 "::"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "jsonb"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- https://www.tinybird.co/blog-posts/outgrowing-postgres-how-to-run-olap-workloads-on-postgres"
+  WHITESPACE "\n\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "hourly_stats"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE "\n     "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "date_trunc"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'hour'"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "event_time"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              HOUR_KW "hour"
+          COMMA ","
+          WHITESPACE "\n    "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "count"
+              ARG_LIST
+                L_PAREN "("
+                STAR "*"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "events"
+          COMMA ","
+          WHITESPACE "\n    "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "count"
+              ARG_LIST
+                L_PAREN "("
+                DISTINCT_KW "distinct"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "user_id"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "users"
+      WHITESPACE "\n"
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "events"
+      WHITESPACE " "
+      GROUP_BY_CLAUSE
+        GROUP_KW "GROUP"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    UNIQUE_KW "UNIQUE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "hourly_stats"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        HOUR_KW "hour"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "events"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_time"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "user_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    RANGE_KW "RANGE"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "event_time"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "events"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COMMENT "-- Frequently queried columns"
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_time"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "user_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COMMENT "-- Rarely queried metadata"
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "user_agent"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "ip_address"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "inet"
+      COMMA ","
+      WHITESPACE "\n    "
+      COMMENT "-- Large payload rarely used in aggregations"
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_data"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "jsonb"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "events_core"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bigserial"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_time"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "user_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "events_metadata"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "events_core"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "user_agent"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "ip_address"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "inet"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "events_payload"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "events_core"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "event_data"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "jsonb"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- -- Instead of one simple insert"
+  WHITESPACE "\n"
+  COMMENT "-- INSERT INTO events VALUES (...);"
+  WHITESPACE "\n\n"
+  COMMENT "-- -- You now need transaction-wrapped multi-table inserts"
+  WHITESPACE "\n"
+  COMMENT "--  BEGIN;"
+  WHITESPACE "\n"
+  COMMENT "--      INSERT INTO events_core (...) RETURNING event_id;"
+  WHITESPACE "\n"
+  COMMENT "--      INSERT INTO events_metadata (...);"
+  WHITESPACE "\n"
+  COMMENT "--      INSERT INTO events_payload (...);"
+  WHITESPACE "\n"
+  COMMENT "--  COMMIT;"
+  WHITESPACE "\n\n"
+  COMMENT "-- Simple query becomes a three-way join"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "e"
+            DOT "."
+            NAME_REF
+              IDENT "event_time"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "e"
+            DOT "."
+            NAME_REF
+              IDENT "event_type"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "m"
+            DOT "."
+            NAME_REF
+              IDENT "user_agent"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              IDENT "event_data"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "events_core"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "e"
+      WHITESPACE "\n"
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "events_metadata"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "m"
+        WHITESPACE "\n  "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "e"
+            DOT "."
+            NAME_REF
+              IDENT "event_id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "m"
+            DOT "."
+            NAME_REF
+              IDENT "event_id"
+      WHITESPACE "\n"
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "events_payload"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "p"
+        WHITESPACE "\n  "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "e"
+            DOT "."
+            NAME_REF
+              IDENT "event_id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              IDENT "event_id"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "e"
+          DOT "."
+          NAME_REF
+            IDENT "event_time"
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "now"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+          WHITESPACE " "
+          MINUS "-"
+          WHITESPACE " "
+          CAST_EXPR
+            NAME_REF
+              INTERVAL_KW "interval"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 day'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    EXTENSION_KW "EXTENSION"
+    WHITESPACE " "
+    NAME
+      IDENT "cstore_fdw"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SERVER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    NAME
+      IDENT "cstore_server"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    DATA_KW "DATA"
+    WHITESPACE " "
+    WRAPPER_KW "WRAPPER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cstore_fdw"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FOREIGN_TABLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "metrics_columnar"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      DAY_KW "day"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "date"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "metric_name"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      VALUE_KW "value"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            NUMERIC_KW "numeric"
+    R_PAREN ")"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cstore_server"
+    WHITESPACE "\n"
+    OPTIONS_KW "OPTIONS"
+    L_PAREN "("
+    NAME
+      COMPRESSION_KW "compression"
+    WHITESPACE " "
+    LITERAL
+      STRING "'pglz'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    EXTENSION_KW "EXTENSION"
+    WHITESPACE " "
+    NAME
+      IDENT "pg_analytics"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FOREIGN_TABLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "metrics"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      DAY_KW "day"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "date"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "metric_name"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      VALUE_KW "value"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            NUMERIC_KW "numeric"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parquet_server"
+    WHITESPACE "\n"
+    OPTIONS_KW "OPTIONS"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "files"
+    WHITESPACE " "
+    LITERAL
+      STRING "'s3://bucket/metrics/*.parquet'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    EXTENSION_KW "EXTENSION"
+    WHITESPACE " "
+    NAME
+      IDENT "pg_duckdb"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "metrics"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE " \n   "
+      COLUMN
+        NAME_REF
+          DAY_KW "day"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "metric_name"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          VALUE_KW "value"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NUMERIC_KW "numeric"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "duckdb"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_EXTENSION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    EXTENSION_KW "EXTENSION"
+    WHITESPACE " "
+    NAME
+      IDENT "pg_mooncake"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "metrics"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          DAY_KW "day"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "metric_name"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          VALUE_KW "value"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NUMERIC_KW "numeric"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "columnstore"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Instead of this complex self-join"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " \n  "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            MONTH_KW "month"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          NAME_REF
+            IDENT "revenue"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            WHITESPACE "\n    "
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "SELECT"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    CALL_EXPR
+                      NAME_REF
+                        IDENT "AVG"
+                      ARG_LIST
+                        L_PAREN "("
+                        NAME_REF
+                          IDENT "revenue"
+                        R_PAREN ")"
+              WHITESPACE " \n    "
+              FROM_CLAUSE
+                FROM_KW "FROM"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "monthly_revenues"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "m2"
+              WHITESPACE " \n    "
+              WHERE_CLAUSE
+                WHERE_KW "WHERE"
+                WHITESPACE " "
+                BIN_EXPR
+                  BIN_EXPR
+                    FIELD_EXPR
+                      NAME_REF
+                        IDENT "m2"
+                      DOT "."
+                      NAME_REF
+                        MONTH_KW "month"
+                    WHITESPACE " "
+                    LTEQ "<="
+                    WHITESPACE " "
+                    FIELD_EXPR
+                      NAME_REF
+                        IDENT "m1"
+                      DOT "."
+                      NAME_REF
+                        MONTH_KW "month"
+                  WHITESPACE " \n    "
+                  AND_KW "AND"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    FIELD_EXPR
+                      NAME_REF
+                        IDENT "m2"
+                      DOT "."
+                      NAME_REF
+                        MONTH_KW "month"
+                    WHITESPACE " "
+                    R_ANGLE ">"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "m1"
+                        DOT "."
+                        NAME_REF
+                          MONTH_KW "month"
+                      WHITESPACE " "
+                      MINUS "-"
+                      WHITESPACE " "
+                      CAST_EXPR
+                        NAME_REF
+                          INTERVAL_KW "interval"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'3 months'"
+            WHITESPACE "\n  "
+            R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "rolling_avg"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "monthly_revenues"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "m1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Use this cleaner window function"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " \n  "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            MONTH_KW "month"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          NAME_REF
+            IDENT "revenue"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "AVG"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "revenue"
+              R_PAREN ")"
+            WHITESPACE " "
+            OVER_CLAUSE
+              OVER_KW "OVER"
+              WHITESPACE " "
+              L_PAREN "("
+              WHITESPACE "\n    "
+              WINDOW_DEF
+                ORDER_BY_CLAUSE
+                  ORDER_KW "ORDER"
+                  WHITESPACE " "
+                  BY_KW "BY"
+                  WHITESPACE " "
+                  NAME_REF
+                    MONTH_KW "month"
+                WHITESPACE " \n    "
+                ROWS_KW "ROWS"
+                WHITESPACE " "
+                BETWEEN_KW "BETWEEN"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2"
+                WHITESPACE " "
+                PRECEDING_KW "PRECEDING"
+                WHITESPACE " "
+                AND_KW "AND"
+                WHITESPACE " "
+                CURRENT_KW "CURRENT"
+                WHITESPACE " "
+                ROW_KW "ROW"
+              WHITESPACE "\n  "
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "rolling_avg"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "monthly_revenues"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n  "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "date_trunc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'month'"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                TIMESTAMP_KW "timestamp"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            MONTH_KW "month"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          NAME_REF
+            IDENT "customer_segment"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "SUM"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "revenue"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "revenue"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "SUM"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "SUM"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "revenue"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            OVER_CLAUSE
+              OVER_KW "OVER"
+              WHITESPACE " "
+              L_PAREN "("
+              WHITESPACE "\n    "
+              WINDOW_DEF
+                PARTITION_KW "PARTITION"
+                WHITESPACE " "
+                BY_KW "BY"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "customer_segment"
+                WHITESPACE "\n    "
+                ORDER_BY_CLAUSE
+                  ORDER_KW "ORDER"
+                  WHITESPACE " "
+                  BY_KW "BY"
+                  WHITESPACE " "
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "date_trunc"
+                    ARG_LIST
+                      L_PAREN "("
+                      LITERAL
+                        STRING "'month'"
+                      COMMA ","
+                      WHITESPACE " "
+                      NAME_REF
+                        TIMESTAMP_KW "timestamp"
+                      R_PAREN ")"
+              WHITESPACE "\n  "
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "running_total"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "transactions"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Use CTEs to break down complex analytics"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "monthly_stats"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " \n    "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "date_trunc"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'month'"
+                    COMMA ","
+                    WHITESPACE " "
+                    NAME_REF
+                      TIMESTAMP_KW "timestamp"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  MONTH_KW "month"
+              COMMA ","
+              WHITESPACE "\n    "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "COUNT"
+                  ARG_LIST
+                    L_PAREN "("
+                    DISTINCT_KW "DISTINCT"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "user_id"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "users"
+              COMMA ","
+              WHITESPACE "\n    "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "SUM"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "revenue"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "revenue"
+          WHITESPACE "\n  "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "events"
+          WHITESPACE " \n  "
+          WHERE_CLAUSE
+            WHERE_KW "WHERE"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                TIMESTAMP_KW "timestamp"
+              WHITESPACE " "
+              GTEQ ">="
+              WHITESPACE " "
+              BIN_EXPR
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "NOW"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                MINUS "-"
+                WHITESPACE " "
+                CAST_EXPR
+                  NAME_REF
+                    INTERVAL_KW "interval"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'12 months'"
+          WHITESPACE "\n  "
+          GROUP_BY_CLAUSE
+            GROUP_KW "GROUP"
+            WHITESPACE " "
+            BY_KW "BY"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+        WHITESPACE "\n"
+        R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n"
+      WITH_TABLE
+        NAME
+          IDENT "user_segments"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " \n    "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "user_id"
+              COMMA ","
+              WHITESPACE "\n    "
+              TARGET
+                CASE_EXPR
+                  CASE_KW "CASE"
+                  WHITESPACE " \n        "
+                  WHEN_CLAUSE
+                    WHEN_KW "WHEN"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "lifetime_value"
+                      WHITESPACE " "
+                      R_ANGLE ">"
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "1000"
+                    WHITESPACE " "
+                    THEN_KW "THEN"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'high'"
+                  WHITESPACE "\n        "
+                  WHEN_CLAUSE
+                    WHEN_KW "WHEN"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "lifetime_value"
+                      WHITESPACE " "
+                      R_ANGLE ">"
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "100"
+                    WHITESPACE " "
+                    THEN_KW "THEN"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'medium'"
+                  WHITESPACE "\n        "
+                  ELSE_KW "ELSE"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'low'"
+                  WHITESPACE "\n    "
+                  END_KW "END"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "segment"
+          WHITESPACE "\n  "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "users"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " \n  "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            MONTH_KW "month"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          NAME_REF
+            IDENT "segment"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              DISTINCT_KW "DISTINCT"
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "e"
+                DOT "."
+                NAME_REF
+                  IDENT "user_id"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "users"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "SUM"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "revenue"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "revenue"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "events"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "e"
+      WHITESPACE "\n"
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "user_segments"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "s"
+        WHITESPACE "\n  "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "e"
+            DOT "."
+            NAME_REF
+              IDENT "user_id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "user_id"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " \n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " \n  "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "date_trunc"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'month'"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  TIMESTAMP_KW "timestamp"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              MONTH_KW "month"
+          COMMA ","
+          WHITESPACE "\n  "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "COUNT"
+              ARG_LIST
+                L_PAREN "("
+                STAR "*"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "events"
+          COMMA ","
+          WHITESPACE "\n  "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "COUNT"
+              ARG_LIST
+                L_PAREN "("
+                DISTINCT_KW "DISTINCT"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "user_id"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "users"
+      WHITESPACE "\n"
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "events"
+      WHITESPACE "\n"
+      GROUP_BY_CLAUSE
+        GROUP_KW "GROUP"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Key settings for parallel queries"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_workers_per_gather"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- Workers per query"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_setup_cost"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "             "
+  COMMENT "-- Lower = more parallelism"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_tuple_cost"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FLOAT_NUMBER "0.001"
+  SEMICOLON ";"
+  WHITESPACE "          "
+  COMMENT "-- Lower = more parallelism"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "min_parallel_table_scan_size"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'8MB'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- Table size threshold"
+  WHITESPACE "\n\n"
+  COMMENT "-- Get detailed buffering info"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "BUFFERS"
+    R_PAREN ")"
+    WHITESPACE " \n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+  WHITESPACE " "
+  COMMENT "/* your query */"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Look for:"
+  WHITESPACE "\n"
+  COMMENT "-- \"Parallel Seq Scan\" - Is parallelism being used?"
+  WHITESPACE "\n"
+  COMMENT "-- \"Hash Join\" vs \"Nested Loop\" - Right join strategy?"
+  WHITESPACE "\n"
+  COMMENT "-- \"Sort Method: quicksort\" vs \"external sort\" - Enough work_mem?"
+  WHITESPACE "\n"
+  COMMENT "-- \"Rows Removed by Filter\" - Could an index help?"
+  WHITESPACE "\n\n"
+  COMMENT "-- Sorts intermediate results unnecessarily"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "user_id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " \n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          DISTINCT_CLAUSE
+            DISTINCT_KW "DISTINCT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "user_id"
+        WHITESPACE " \n  "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "events"
+        WHITESPACE " \n  "
+        ORDER_BY_CLAUSE
+          ORDER_KW "ORDER"
+          WHITESPACE " "
+          BY_KW "BY"
+          WHITESPACE " "
+          NAME_REF
+            TIMESTAMP_KW "timestamp"
+      WHITESPACE "\n"
+      R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Remove unnecessary ORDER BY"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "user_id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " \n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          DISTINCT_CLAUSE
+            DISTINCT_KW "DISTINCT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "user_id"
+        WHITESPACE " \n  "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "events"
+      WHITESPACE "\n"
+      R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Gets all rows then filters"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "user_id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "status"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "user_status"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        TUPLE_EXPR
+          L_PAREN "("
+          NAME_REF
+            IDENT "user_id"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            TIMESTAMP_KW "timestamp"
+          R_PAREN ")"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          WHITESPACE "\n  "
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "user_id"
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "MAX"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        TIMESTAMP_KW "timestamp"
+                      R_PAREN ")"
+            WHITESPACE "\n  "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "user_status"
+            WHITESPACE "\n  "
+            GROUP_BY_CLAUSE
+              GROUP_KW "GROUP"
+              WHITESPACE " "
+              BY_KW "BY"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "user_id"
+          WHITESPACE "\n"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Uses DISTINCT ON"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      DISTINCT_CLAUSE
+        DISTINCT_KW "DISTINCT"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        L_PAREN "("
+        NAME_REF
+          IDENT "user_id"
+        R_PAREN ")"
+      WHITESPACE " \n  "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "user_id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "status"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "user_status"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "user_id"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        TIMESTAMP_KW "timestamp"
+      WHITESPACE " "
+      DESC_KW "DESC"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "idx_events_month"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "events"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      WHITESPACE "\n  "
+      CALL_EXPR
+        NAME_REF
+          IDENT "date_trunc"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'month'"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            TIMESTAMP_KW "timestamp"
+          R_PAREN ")"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "event_logs_ts_brin"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "event_logs"
+    WHITESPACE "\n"
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "brin"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        TIMESTAMP_KW "timestamp"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "WITH"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pages_per_range"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "128"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "corr"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                CAST_EXPR
+                  NAME_REF
+                    IDENT "ctid"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float8"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                CAST_EXPR
+                  NAME_REF
+                    TIMESTAMP_KW "timestamp"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float8"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "event_logs"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- https://www.crunchydata.com/blog/indexing-materialized-views-in-postgres"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "recent_product_sales"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE "\n    "
+        TARGET_LIST
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                IDENT "sku"
+          COMMA ","
+          WHITESPACE "\n    "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "SUM"
+              ARG_LIST
+                L_PAREN "("
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "po"
+                  DOT "."
+                  NAME_REF
+                    IDENT "qty"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "total_quantity"
+      WHITESPACE "\n"
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE "\n    "
+        NAME_REF
+          IDENT "products"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "p"
+        WHITESPACE "\n    "
+        JOIN
+          JOIN_KW "JOIN"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "product_orders"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "po"
+          WHITESPACE " "
+          ON_KW "ON"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                IDENT "sku"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "po"
+              DOT "."
+              NAME_REF
+                IDENT "sku"
+        WHITESPACE "\n    "
+        JOIN
+          JOIN_KW "JOIN"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "orders"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "o"
+          WHITESPACE " "
+          ON_KW "ON"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "po"
+              DOT "."
+              NAME_REF
+                IDENT "order_id"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "o"
+              DOT "."
+              NAME_REF
+                IDENT "order_id"
+      WHITESPACE "\n"
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE "\n    "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "o"
+            DOT "."
+            NAME_REF
+              IDENT "status"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'Shipped'"
+      WHITESPACE "\n"
+      GROUP_BY_CLAUSE
+        GROUP_KW "GROUP"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE "\n    "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "p"
+          DOT "."
+          NAME_REF
+            IDENT "sku"
+      WHITESPACE "\n"
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE "\n    "
+        LITERAL
+          INT_NUMBER "2"
+        WHITESPACE " "
+        DESC_KW "DESC"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "sku_index"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "recent_product_sales"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "sku"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REFRESH_STMT
+    REFRESH_KW "REFRESH"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "recent_product_sales"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    UNIQUE_KW "UNIQUE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "unique_idx_recent_product_sales"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "recent_product_sales"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "sku"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "sku_index"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  REFRESH_STMT
+    REFRESH_KW "REFRESH"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    CONCURRENTLY_KW "CONCURRENTLY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "recent_product_sales"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  CREATE_TABLE
+    COMMENT "-- https://www.timescale.com/blog/iot-renewable-energy-models-building-the-future-with-time-series-data"
+    WHITESPACE "\n"
+    COMMENT "-- Example time series data structure for a solar panel"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "solar_panel_metrics"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          TIME_KW "time"
+        WHITESPACE "        "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "TIMESTAMPTZ"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NULL_KW "NULL"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "panel_id"
+        WHITESPACE "    "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "voltage"
+        WHITESPACE "     "
+        DOUBLE_TYPE
+          DOUBLE_KW "DOUBLE"
+          WHITESPACE " "
+          PRECISION_KW "PRECISION"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          CURRENT_KW "current"
+        WHITESPACE "     "
+        DOUBLE_TYPE
+          DOUBLE_KW "DOUBLE"
+          WHITESPACE " "
+          PRECISION_KW "PRECISION"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "temperature"
+        WHITESPACE " "
+        DOUBLE_TYPE
+          DOUBLE_KW "DOUBLE"
+          WHITESPACE " "
+          PRECISION_KW "PRECISION"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "irradiance"
+        WHITESPACE "  "
+        DOUBLE_TYPE
+          DOUBLE_KW "DOUBLE"
+          WHITESPACE " "
+          PRECISION_KW "PRECISION"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Create a hypertable for efficient time series operations"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "create_hypertable"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'solar_panel_metrics'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'time'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Calculate daily energy production and compare with expected output"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " \n    "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "time_bucket"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'1 day'"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                TIME_KW "time"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            DAY_KW "day"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          NAME_REF
+            IDENT "panel_id"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "avg"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "voltage"
+                WHITESPACE " "
+                STAR "*"
+                WHITESPACE " "
+                NAME_REF
+                  CURRENT_KW "current"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "actual_power"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          NAME_REF
+            IDENT "expected_power"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "avg"
+                    ARG_LIST
+                      L_PAREN "("
+                      BIN_EXPR
+                        NAME_REF
+                          IDENT "voltage"
+                        WHITESPACE " "
+                        STAR "*"
+                        WHITESPACE " "
+                        NAME_REF
+                          CURRENT_KW "current"
+                      R_PAREN ")"
+                  WHITESPACE " "
+                  SLASH "/"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "expected_power"
+                R_PAREN ")"
+              WHITESPACE " "
+              STAR "*"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "performance_ratio"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "solar_panel_metrics"
+      WHITESPACE "\n"
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "panel_specifications"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "panel_id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          NAME_REF
+            IDENT "specs_id"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          TIME_KW "time"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "now"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+          WHITESPACE " "
+          MINUS "-"
+          WHITESPACE " "
+          CAST_EXPR
+            NAME_REF
+              INTERVAL_KW "INTERVAL"
+            WHITESPACE " "
+            LITERAL
+              STRING "'30 days'"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        DAY_KW "day"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "panel_id"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "expected_power"
+    WHITESPACE "\n"
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "performance_ratio"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "90"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Detect abnormal vibration patterns in wind turbines"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "baseline_stats"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " \n    "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "turbine_id"
+              COMMA ","
+              WHITESPACE "\n    "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "avg"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "vibration_level"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "avg_vibration"
+              COMMA ","
+              WHITESPACE "\n    "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "stddev"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "vibration_level"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "stddev_vibration"
+          WHITESPACE "\n  "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "turbine_metrics"
+          WHITESPACE "\n  "
+          WHERE_CLAUSE
+            WHERE_KW "WHERE"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                TIME_KW "time"
+              WHITESPACE " "
+              R_ANGLE ">"
+              WHITESPACE " "
+              BIN_EXPR
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "now"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                MINUS "-"
+                WHITESPACE " "
+                CAST_EXPR
+                  NAME_REF
+                    INTERVAL_KW "INTERVAL"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'90 days'"
+          WHITESPACE "\n  "
+          GROUP_BY_CLAUSE
+            GROUP_KW "GROUP"
+            WHITESPACE " "
+            BY_KW "BY"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "turbine_id"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " \n    "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "time_bucket"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'5 minutes'"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                TIME_KW "time"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "bucket"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          NAME_REF
+            IDENT "turbine_id"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          NAME_REF
+            IDENT "vibration_level"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "vibration_level"
+                WHITESPACE " "
+                MINUS "-"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "avg_vibration"
+              R_PAREN ")"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "stddev_vibration"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "z_score"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "turbine_metrics"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+      WHITESPACE "\n"
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "baseline_stats"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "b"
+        WHITESPACE " "
+        USING_CLAUSE
+          USING_KW "USING"
+          WHITESPACE " "
+          PAREN_EXPR
+            L_PAREN "("
+            NAME_REF
+              IDENT "turbine_id"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " \n    "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            TIME_KW "time"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "now"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                INTERVAL_KW "INTERVAL"
+              WHITESPACE " "
+              LITERAL
+                STRING "'1 day'"
+        WHITESPACE "\n    "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "abs"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                PAREN_EXPR
+                  L_PAREN "("
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "vibration_level"
+                    WHITESPACE " "
+                    MINUS "-"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "avg_vibration"
+                  R_PAREN ")"
+                WHITESPACE " "
+                SLASH "/"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "stddev_vibration"
+              R_PAREN ")"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Monitor aggregate power availability across resources"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " \n    "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "time_bucket"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'5 minutes'"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                TIME_KW "time"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            INTERVAL_KW "interval"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          NAME_REF
+            IDENT "resource_type"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "available_power"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "total_power"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "storage_capacity"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "total_storage"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vpp_resources"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          TIME_KW "time"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "now"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+          WHITESPACE " "
+          MINUS "-"
+          WHITESPACE " "
+          CAST_EXPR
+            NAME_REF
+              INTERVAL_KW "INTERVAL"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 hour'"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        INTERVAL_KW "interval"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "resource_type"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        INTERVAL_KW "interval"
+      WHITESPACE " "
+      DESC_KW "DESC"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Identify optimal trading windows"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "price_analysis"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " \n    "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "time_bucket"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'1 hour'"
+                    COMMA ","
+                    WHITESPACE " "
+                    NAME_REF
+                      TIME_KW "time"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  HOUR_KW "hour"
+              COMMA ","
+              WHITESPACE "\n    "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "avg"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "price"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "avg_price"
+              COMMA ","
+              WHITESPACE "\n    "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "percentile_cont"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      FLOAT_NUMBER "0.75"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  WITHIN_CLAUSE
+                    WITHIN_KW "WITHIN"
+                    WHITESPACE " "
+                    GROUP_KW "GROUP"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    ORDER_BY_CLAUSE
+                      ORDER_KW "ORDER"
+                      WHITESPACE " "
+                      BY_KW "BY"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "price"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "price_75th"
+          WHITESPACE "\n  "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "energy_prices"
+          WHITESPACE "\n  "
+          WHERE_CLAUSE
+            WHERE_KW "WHERE"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                TIME_KW "time"
+              WHITESPACE " "
+              R_ANGLE ">"
+              WHITESPACE " "
+              BIN_EXPR
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "now"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                MINUS "-"
+                WHITESPACE " "
+                CAST_EXPR
+                  NAME_REF
+                    INTERVAL_KW "INTERVAL"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'30 days'"
+          WHITESPACE "\n  "
+          GROUP_BY_CLAUSE
+            GROUP_KW "GROUP"
+            WHITESPACE " "
+            BY_KW "BY"
+            WHITESPACE " "
+            NAME_REF
+              HOUR_KW "hour"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " \n    "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            HOUR_KW "hour"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          NAME_REF
+            IDENT "avg_price"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          NAME_REF
+            IDENT "price_75th"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CASE_EXPR
+            CASE_KW "CASE"
+            WHITESPACE " \n        "
+            WHEN_CLAUSE
+              WHEN_KW "WHEN"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "avg_price"
+                WHITESPACE " "
+                R_ANGLE ">"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "price_75th"
+              WHITESPACE " "
+              THEN_KW "THEN"
+              WHITESPACE " "
+              LITERAL
+                STRING "'SELL'"
+            WHITESPACE "\n        "
+            WHEN_CLAUSE
+              WHEN_KW "WHEN"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "avg_price"
+                WHITESPACE " "
+                L_ANGLE "<"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "price_75th"
+              WHITESPACE " "
+              THEN_KW "THEN"
+              WHITESPACE " "
+              LITERAL
+                STRING "'BUY'"
+            WHITESPACE "\n        "
+            ELSE_KW "ELSE"
+            WHITESPACE " "
+            LITERAL
+              STRING "'HOLD'"
+            WHITESPACE "\n    "
+            END_KW "END"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "trading_signal"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "price_analysis"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        HOUR_KW "hour"
+  SEMICOLON ";"
+  WHITESPACE "\n"

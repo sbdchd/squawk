@@ -1,0 +1,308 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_operator_class.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_CLASS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "c"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE "\n  "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    STORAGE_KW "storage"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_CLASS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "c"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    WHITESPACE "\n  "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " \n    "
+    STORAGE_KW "storage"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+    COMMA ","
+    WHITESPACE "\n    "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    CUSTOM_OP
+      AMP "&"
+      AMP "&"
+    COMMA ","
+    WHITESPACE "\n    "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "100"
+    WHITESPACE " "
+    CUSTOM_OP
+      L_ANGLE "<"
+      L_ANGLE "<"
+      L_ANGLE "<"
+      L_ANGLE "<"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            BIGINT_KW "bigint"
+    R_PAREN ")"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    COMMA ","
+    WHITESPACE "\n    "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "100"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "10"
+        R_PAREN ")"
+    R_PAREN ")"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    ORDER_KW "order"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    COMMA ","
+    WHITESPACE "\n    "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1010"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    COMMA ","
+    WHITESPACE "\n    "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1010"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            BIGINT_KW "bigint"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n    "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1010"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            BIGINT_KW "bigint"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            SMALLINT_KW "smallint"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

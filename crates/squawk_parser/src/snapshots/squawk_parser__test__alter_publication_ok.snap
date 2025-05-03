@@ -1,0 +1,397 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_publication.sql
+---
+SOURCE_FILE
+  COMMENT "-- add_table"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t1"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t2"
+    WHITESPACE " "
+    WHERE_KW "where"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      R_ANGLE ">"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_tables_in_schema"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TABLES_KW "tables"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE " "
+    TABLES_KW "tables"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    CURRENT_SCHEMA_KW "current_schema"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_table"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t1"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t2"
+    WHITESPACE " "
+    WHERE_KW "where"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      R_ANGLE ">"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_parameters"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "param1"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "param2"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            VALUE_KW "value"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_table"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t1"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t2"
+    WHITESPACE " "
+    WHERE_KW "where"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      R_ANGLE ">"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner_to"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_PUBLICATION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "q"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

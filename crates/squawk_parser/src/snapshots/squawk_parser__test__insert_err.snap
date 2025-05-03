@@ -1,0 +1,171 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/err/insert.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing comma in column list"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    ON_KW "on"
+    WHITESPACE " "
+    CONFLICT_KW "conflict"
+    WHITESPACE " "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing column in column list & trailing comma"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      ERROR
+        COMMA ","
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      ERROR
+        COMMA ","
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    ON_KW "on"
+    WHITESPACE " "
+    CONFLICT_KW "conflict"
+    WHITESPACE " "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing comma in values & trailing comma"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+      WHITESPACE "  "
+      LITERAL
+        INT_NUMBER "6"
+      ERROR
+        COMMA ","
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    ON_KW "on"
+    WHITESPACE " "
+    CONFLICT_KW "conflict"
+    WHITESPACE " "
+    DO_KW "do"
+    WHITESPACE " "
+    NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@51: expected COMMA
+ERROR@168: missing column
+ERROR@170: unexpected trailing comma
+ERROR@301: expected COMMA
+ERROR@304: unexpected trailing comma

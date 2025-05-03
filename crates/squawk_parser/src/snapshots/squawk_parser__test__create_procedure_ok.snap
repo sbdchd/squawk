@@ -1,0 +1,281 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_procedure.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          DEFAULT_KW "DEFAULT"
+          WHITESPACE " "
+          LITERAL
+            STRING "'foo'"
+      COMMA ","
+      WHITESPACE "\n  "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+      COMMA ","
+      WHITESPACE "\n  "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+        WHITESPACE " "
+        PARAM_DEFAULT
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      TRANSFORM_FUNC_OPTION
+        TRANSFORM_KW "transform"
+        WHITESPACE " "
+        FOR_KW "for"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+        COMMA ","
+        WHITESPACE " "
+        FOR_KW "for"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n"
+      SECURITY_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+      WHITESPACE "\n"
+      SECURITY_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        INVOKER_KW "invoker"
+      WHITESPACE "\n"
+      SECURITY_FUNC_OPTION
+        EXTERNAL_KW "external"
+        WHITESPACE " "
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+      WHITESPACE "\n"
+      SECURITY_FUNC_OPTION
+        SECURITY_KW "security"
+        WHITESPACE " "
+        DEFINER_KW "definer"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        WHITESPACE " "
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "buzz"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+      WHITESPACE "\n"
+      RETURN_FUNC_OPTION
+        RETURN_KW "return"
+        WHITESPACE " "
+        BIN_EXPR
+          LITERAL
+            INT_NUMBER "10"
+          WHITESPACE " "
+          PLUS "+"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- with_select_body"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "p"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      BEGIN_FUNC_OPTION
+        BEGIN_KW "begin"
+        WHITESPACE " "
+        ATOMIC_KW "atomic"
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        SEMICOLON ";"
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+        SEMICOLON ";"
+        WHITESPACE "\n"
+        END_KW "end"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

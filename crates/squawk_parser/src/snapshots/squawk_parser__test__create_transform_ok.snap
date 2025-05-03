@@ -1,0 +1,147 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_transform.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_TRANSFORM_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    FROM_KW "from"
+    WHITESPACE " "
+    SQL_KW "sql"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    COMMA ","
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    SQL_KW "sql"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "g"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_TRANSFORM_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    TRANSFORM_KW "transform"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "10231"
+        R_PAREN ")"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "l"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    FROM_KW "from"
+    WHITESPACE " "
+    SQL_KW "sql"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    SQL_KW "sql"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "g"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

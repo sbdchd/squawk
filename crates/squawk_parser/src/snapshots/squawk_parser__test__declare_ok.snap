@@ -1,0 +1,116 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/declare.sql
+---
+SOURCE_FILE
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "cursor_name"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    BINARY_KW "binary"
+    WHITESPACE " "
+    INSENSITIVE_KW "insensitive"
+    WHITESPACE " "
+    NO_KW "no"
+    WHITESPACE " "
+    SCROLL_KW "scroll"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    WITHOUT_KW "without"
+    WHITESPACE " "
+    HOLD_KW "hold"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " \n"
+    BINARY_KW "binary"
+    WHITESPACE " \n"
+    ASENSITIVE_KW "asensitive"
+    WHITESPACE " \n"
+    SCROLL_KW "scroll"
+    WHITESPACE " \n"
+    CURSOR_KW "cursor"
+    WHITESPACE " \n    "
+    WITH_KW "with"
+    WHITESPACE " "
+    HOLD_KW "hold"
+    WHITESPACE " \n    "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

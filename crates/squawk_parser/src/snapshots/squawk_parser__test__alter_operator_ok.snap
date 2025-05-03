@@ -1,0 +1,218 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_operator.sql
+---
+SOURCE_FILE
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "p"
+      DOT "."
+      PATH_SEGMENT
+    PLUS "+"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+    WHITESPACE " \n  "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    PLUS "+"
+    WHITESPACE " "
+    L_PAREN "("
+    NONE_KW "none"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    R_PAREN ")"
+    WHITESPACE " \n  "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- options"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CUSTOM_OP
+      AMP "&"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bool"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bool"
+    R_PAREN ")"
+    WHITESPACE " \n  "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      RESTRICT_KW "restrict"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      JOIN_KW "join"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "j"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "commutator"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "negator"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "n"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "hashes"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "enabled"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "merges"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "enabled"
+    WHITESPACE "\n  "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- none_options"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    PERCENT "%"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    R_PAREN ")"
+    WHITESPACE " \n  "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      RESTRICT_KW "restrict"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    NONE_KW "none"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      JOIN_KW "join"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    NONE_KW "none"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

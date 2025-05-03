@@ -1,0 +1,126 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_event_trigger.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_EVENT_TRIGGER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    EVENT_KW "event"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME
+      IDENT "t"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    IDENT "e"
+    WHITESPACE "\n  "
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    L_PAREN "("
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_EVENT_TRIGGER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    EVENT_KW "event"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    NAME
+      IDENT "t"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    IDENT "e"
+    WHITESPACE "\n  "
+    WHEN_KW "when"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "x"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'bar'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'buzz'"
+    R_PAREN ")"
+    WHITESPACE "\n    "
+    AND_KW "and"
+    WHITESPACE " "
+    NAME_REF
+      REAL_KW "real"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'a'"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    L_PAREN "("
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_1"
+  WHITESPACE "\n"
+  CREATE_EVENT_TRIGGER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    EVENT_KW "EVENT"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    NAME
+      IDENT "abort_ddl"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    IDENT "ddl_command_start"
+    WHITESPACE "\n   "
+    EXECUTE_KW "EXECUTE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abort_any_command"
+    L_PAREN "("
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

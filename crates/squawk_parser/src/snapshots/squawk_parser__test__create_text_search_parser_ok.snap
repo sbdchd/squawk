@@ -1,0 +1,158 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_text_search_parser.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_TEXT_SEARCH_PARSER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    PARSER_KW "parser"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          NAME_KW "name"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      START_KW "start"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "start_function"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "gettoken"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "gettoken_function"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      END_KW "end"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "end_function"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "lextypes"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "lextypes_function"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_TEXT_SEARCH_PARSER_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEXT_KW "text"
+    WHITESPACE " "
+    SEARCH_KW "search"
+    WHITESPACE " "
+    PARSER_KW "parser"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          NAME_KW "name"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      START_KW "start"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "start_function"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "gettoken"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "gettoken_function"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      END_KW "end"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "end_function"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "lextypes"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "lextypes_function"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "headline"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "headline_function"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

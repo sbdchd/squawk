@@ -1,0 +1,185 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_tablespace.sql
+---
+SOURCE_FILE
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_TABLESPACE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_TABLESPACE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLESPACE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_option"
+  WHITESPACE "\n"
+  ALTER_TABLESPACE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "v"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_multiple_options"
+  WHITESPACE "\n"
+  ALTER_TABLESPACE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "v1"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o2"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "v2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- reset_option"
+  WHITESPACE "\n"
+  ALTER_TABLESPACE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RESET_KW "reset"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- reset_multiple_options"
+  WHITESPACE "\n"
+  ALTER_TABLESPACE_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RESET_KW "reset"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o1"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "o2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

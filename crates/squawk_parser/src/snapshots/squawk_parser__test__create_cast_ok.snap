@@ -1,0 +1,151 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_cast.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_CAST_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    WITHOUT_KW "without"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- inout"
+  WHITESPACE "\n"
+  CREATE_CAST_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    WITH_KW "with"
+    WHITESPACE " "
+    INOUT_KW "inout"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    IMPLICIT_KW "implicit"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_CAST_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    WITH_KW "with"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PARAM_OUT
+          OUT_KW "out"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    ASSIGNMENT_KW "assignment"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

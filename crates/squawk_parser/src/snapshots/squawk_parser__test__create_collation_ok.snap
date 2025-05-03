@@ -1,0 +1,156 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_collation.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "c"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- from_full"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "c"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- with_options"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    COLLATION_KW "collation"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "c"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "locale"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "lc_collate"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "lc_ctype"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "provider"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "deterministic"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      IDENT "rules"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "r"
+    COMMA ","
+    WHITESPACE "\n  "
+    NAME
+      VERSION_KW "version"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'100'"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

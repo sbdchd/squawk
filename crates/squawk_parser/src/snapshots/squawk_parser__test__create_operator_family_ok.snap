@@ -1,0 +1,50 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_operator_family.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_FAMILY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_FAMILY_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "b"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

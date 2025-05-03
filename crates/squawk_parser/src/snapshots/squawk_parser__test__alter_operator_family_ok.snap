@@ -1,0 +1,687 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_operator_family.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE "\n  "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_ANGLE "<"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multi"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE "\n  "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    CUSTOM_OP
+      AMP "&"
+      AMP "&"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n  "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    COMMA ","
+    WHITESPACE "\n  "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_IN
+          IN_KW "in"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n  "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    CHAR_TYPE
+      VARCHAR_KW "varchar"
+      L_PAREN "("
+      ARG_LIST
+        ARG
+          LITERAL
+            INT_NUMBER "100"
+        R_PAREN ")"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_op_for_search"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE "\n  "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    R_ANGLE ">"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SEARCH_KW "search"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_op_for_order"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE "\n  "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    R_ANGLE ">"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    ORDER_KW "order"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_func"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE "\n  "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "t"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add_func_with_params"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    ADD_KW "add"
+    WHITESPACE "\n  "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_op"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE "\n  "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_op_single_param"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE "\n  "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_func"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE "\n  "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_func_single_param"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE "\n  "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop_multiple"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    DROP_KW "drop"
+    WHITESPACE "\n  "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n  "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE "\n  "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- owner"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE "\n  "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE "\n  "
+    OWNER_KW "owner"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n"
+  ALTER_OPERATOR_FAMILY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    FAMILY_KW "family"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE "\n  "
+    SET_KW "set"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

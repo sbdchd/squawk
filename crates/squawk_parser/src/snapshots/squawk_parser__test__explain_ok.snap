@@ -1,0 +1,620 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/explain.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- explain_analyze"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- all_options"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    ANALYZE_KW "analyze"
+    COMMA ","
+    WHITESPACE "\n  "
+    VERBOSE_KW "verbose"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "costs"
+    COMMA ","
+    WHITESPACE " \n  "
+    IDENT "costs"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+    COMMA ","
+    WHITESPACE " \n  "
+    IDENT "costs"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+    COMMA ","
+    WHITESPACE " \n  "
+    IDENT "settings"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "generic_plan"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "buffers"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "serialize"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "serialize"
+    WHITESPACE " "
+    NONE_KW "none"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "serialize"
+    WHITESPACE " "
+    TEXT_KW "text"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "serialize"
+    WHITESPACE " "
+    BINARY_KW "binary"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "wal"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "timing"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "summary"
+    COMMA ","
+    WHITESPACE "\n  "
+    IDENT "memory"
+    COMMA ","
+    WHITESPACE "\n  "
+    FORMAT_KW "format"
+    WHITESPACE " "
+    TEXT_KW "text"
+    COMMA ","
+    WHITESPACE "\n  "
+    FORMAT_KW "format"
+    WHITESPACE " "
+    XML_KW "xml"
+    COMMA ","
+    WHITESPACE "\n  "
+    FORMAT_KW "format"
+    WHITESPACE " "
+    JSON_KW "json"
+    COMMA ","
+    WHITESPACE "\n  "
+    FORMAT_KW "format"
+    WHITESPACE " "
+    IDENT "yaml"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_1"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    FORMAT_KW "FORMAT"
+    WHITESPACE " "
+    JSON_KW "JSON"
+    R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_2"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "i"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_3"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    FORMAT_KW "FORMAT"
+    WHITESPACE " "
+    IDENT "YAML"
+    R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "i"
+          EQ "="
+          LITERAL
+            STRING "'4'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_4"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "i"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_5"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "sum"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "i"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "i"
+          WHITESPACE " "
+          L_ANGLE "<"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_6"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "PREPARE"
+    WHITESPACE " "
+    NAME
+      IDENT "query"
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "sum"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "bar"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "test"
+      WHITESPACE "\n    "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            NAME_REF
+              IDENT "id"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              PARAM "$1"
+          WHITESPACE " "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "id"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            LITERAL
+              PARAM "$2"
+      WHITESPACE "\n    "
+      GROUP_BY_CLAUSE
+        GROUP_KW "GROUP"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    EXECUTE_STMT
+      EXECUTE_KW "EXECUTE"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "query"
+      ARG_LIST
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "100"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "200"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_7"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "GENERIC_PLAN"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "sum"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "bar"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "test"
+      WHITESPACE "\n    "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            NAME_REF
+              IDENT "id"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              PARAM "$1"
+          WHITESPACE " "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "id"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            LITERAL
+              PARAM "$2"
+      WHITESPACE "\n    "
+      GROUP_BY_CLAUSE
+        GROUP_KW "GROUP"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doc_example_8"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "GENERIC_PLAN"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "sum"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "bar"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "test"
+      WHITESPACE "\n    "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            NAME_REF
+              IDENT "id"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                PARAM "$1"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INTEGER_KW "integer"
+          WHITESPACE " "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "id"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                PARAM "$2"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INTEGER_KW "integer"
+      WHITESPACE "\n    "
+      GROUP_BY_CLAUSE
+        GROUP_KW "GROUP"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- parens_select"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    PAREN_EXPR
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        PAREN_EXPR
+          L_PAREN "("
+          PAREN_EXPR
+            L_PAREN "("
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "1"
+              R_PAREN ")"
+            R_PAREN ")"
+          R_PAREN ")"
+        R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- parens_values"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    PAREN_EXPR
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        PAREN_EXPR
+          L_PAREN "("
+          PAREN_EXPR
+            L_PAREN "("
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                VALUES_KW "values"
+                WHITESPACE " "
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                R_PAREN ")"
+              R_PAREN ")"
+            R_PAREN ")"
+          R_PAREN ")"
+        R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

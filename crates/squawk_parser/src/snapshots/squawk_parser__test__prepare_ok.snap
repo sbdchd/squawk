@@ -1,0 +1,401 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/prepare.sql
+---
+SOURCE_FILE
+  COMMENT "-- insert"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "PREPARE"
+    WHITESPACE " "
+    NAME
+      IDENT "fooplan"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bool"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            NUMERIC_KW "numeric"
+    R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    INSERT_STMT
+      INSERT_KW "INSERT"
+      WHITESPACE " "
+      INTO_KW "INTO"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      SELECT
+        VALUES_KW "VALUES"
+        L_PAREN "("
+        LITERAL
+          PARAM "$1"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          PARAM "$2"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          PARAM "$3"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          PARAM "$4"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n\n"
+  COMMENT "-- select"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "PREPARE"
+    WHITESPACE " "
+    NAME
+      IDENT "usrrptplan"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "users"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "u"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "logs"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "l"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "u"
+                DOT "."
+                NAME_REF
+                  IDENT "usrid"
+              EQ "="
+              LITERAL
+                PARAM "$1"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "u"
+                DOT "."
+                NAME_REF
+                  IDENT "usrid"
+              EQ "="
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "l"
+                DOT "."
+                NAME_REF
+                  IDENT "usrid"
+          WHITESPACE "\n    "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "l"
+              DOT "."
+              NAME_REF
+                IDENT "date"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              PARAM "$2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  PREPARE_STMT
+    PREPARE_KW "PREPARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    SELECT
+      WITH_CLAUSE
+        WITH_KW "with"
+        WHITESPACE " "
+        WITH_TABLE
+          NAME
+            IDENT "t"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  LITERAL
+                    INT_NUMBER "1"
+          R_PAREN ")"
+      WHITESPACE "\n    "
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- update"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    UPDATE_STMT
+      UPDATE_KW "update"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      SET_KW "set"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "x"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "where"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "x"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- delete"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    DELETE_STMT
+      DELETE_KW "delete"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "where"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "x"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- merge"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    MERGE_STMT
+      MERGE_KW "merge"
+      WHITESPACE " "
+      INTO_KW "into"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t1"
+      WHITESPACE "\n  "
+      USING_CLAUSE
+        USING_KW "using"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "t2"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t1"
+            DOT "."
+            NAME_REF
+              IDENT "id"
+      WHITESPACE "\n  "
+      WHEN_KW "when"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE " "
+      DO_KW "do"
+      WHITESPACE " "
+      NOTHING_KW "nothing"
+      WHITESPACE "\n  "
+      WHEN_KW "when"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SOURCE_KW "source"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE " "
+      DO_KW "do"
+      WHITESPACE " "
+      NOTHING_KW "nothing"
+      WHITESPACE "\n  "
+      WHEN_KW "when"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE " "
+      DO_KW "do"
+      WHITESPACE " "
+      NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- values"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n  "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'one'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'two'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

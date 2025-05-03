@@ -1,0 +1,104 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_table_pg17.sql
+---
+SOURCE_FILE
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_EXPRESSION
+        SET_KW "set"
+        WHITESPACE " "
+        EXPRESSION_KW "expression"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+        WHITESPACE " "
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "set"
+      WHITESPACE " "
+      ACCESS_KW "access"
+      WHITESPACE " "
+      METHOD_KW "method"
+      WHITESPACE " "
+      DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        MATCH_KW "match"
+        WHITESPACE " "
+        PARTIAL_KW "partial"
+  SEMICOLON ";"
+  WHITESPACE "\n"

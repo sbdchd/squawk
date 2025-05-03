@@ -1,0 +1,185 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_policy.sql
+---
+SOURCE_FILE
+  COMMENT "-- rename"
+  WHITESPACE "\n"
+  ALTER_POLICY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    RENAME_KW "rename"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    NAME
+      IDENT "q"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- to_role"
+  WHITESPACE "\n"
+  ALTER_POLICY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- to_multiple_roles"
+  WHITESPACE "\n"
+  ALTER_POLICY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "r"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "public"
+    COMMA ","
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- using_expr"
+  WHITESPACE "\n"
+  ALTER_POLICY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    USING_KW "using"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- with_check"
+  WHITESPACE "\n"
+  ALTER_POLICY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    WITH_KW "with"
+    WHITESPACE " "
+    CHECK_KW "check"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      R_ANGLE ">"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "d"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  ALTER_POLICY_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "p"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "t"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "r"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "s"
+    WHITESPACE "\n  "
+    USING_KW "using"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    WITH_KW "with"
+    WHITESPACE " "
+    CHECK_KW "check"
+    WHITESPACE " "
+    L_PAREN "("
+    BIN_EXPR
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      R_ANGLE ">"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "d"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

@@ -1,0 +1,3622 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/alter_table.sql
+---
+SOURCE_FILE
+  COMMENT "-- add column"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ADD_COLUMN
+      ADD_KW "add"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "description"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- change column data type"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "price"
+      WHITESPACE " "
+      SET_TYPE
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NUMERIC_KW "numeric"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "10"
+            COMMA ","
+            WHITESPACE " "
+            ARG
+              LITERAL
+                INT_NUMBER "2"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- alter_constraint"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_CONSTRAINT
+      ALTER_KW "alter"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_CONSTRAINT
+      ALTER_KW "alter"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      CONSTRAINT_OPTION_LIST
+        DEFERRABLE_CONSTRAINT_OPTION
+          DEFERRABLE_KW "deferrable"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_CONSTRAINT
+      ALTER_KW "alter"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      CONSTRAINT_OPTION_LIST
+        NOT_DEFERRABLE_CONSTRAINT_OPTION
+          NOT_KW "not"
+          WHITESPACE " "
+          DEFERRABLE_KW "deferrable"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_CONSTRAINT
+      ALTER_KW "alter"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      CONSTRAINT_OPTION_LIST
+        NOT_DEFERRABLE_CONSTRAINT_OPTION
+          NOT_KW "not"
+          WHITESPACE " "
+          DEFERRABLE_KW "deferrable"
+        WHITESPACE " "
+        INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
+          INITIALLY_KW "initially"
+          WHITESPACE " "
+          IMMEDIATE_KW "immediate"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- validate_constraint"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    VALIDATE_CONSTRAINT
+      VALIDATE_KW "validate"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- change column default"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "price"
+      WHITESPACE " "
+      SET_DEFAULT
+        SET_KW "set"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+        WHITESPACE " "
+        LITERAL
+          FLOAT_NUMBER "7.77"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove column default"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "price"
+      WHITESPACE " "
+      DROP_DEFAULT
+        DROP_KW "drop"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- alter_column"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_TYPE
+        SET_KW "set"
+        WHITESPACE " "
+        DATA_KW "data"
+        WHITESPACE " "
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"foo\""
+        WHITESPACE " "
+        USING_KW "using"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_TYPE
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_DEFAULT
+        SET_KW "set"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+        WHITESPACE " "
+        BIN_EXPR
+          LITERAL
+            INT_NUMBER "10"
+          WHITESPACE " "
+          STAR "*"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      DROP_DEFAULT
+        DROP_KW "drop"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_NOT_NULL
+        SET_KW "set"
+        WHITESPACE " "
+        NOT_KW "not"
+        WHITESPACE " "
+        NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      DROP_NOT_NULL
+        DROP_KW "drop"
+        WHITESPACE " "
+        NOT_KW "not"
+        WHITESPACE " "
+        NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      DROP_EXPRESSION
+        DROP_KW "drop"
+        WHITESPACE " "
+        EXPRESSION_KW "expression"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      DROP_EXPRESSION
+        DROP_KW "drop"
+        WHITESPACE " "
+        EXPRESSION_KW "expression"
+        WHITESPACE " "
+        IF_EXISTS
+          IF_KW "if"
+          WHITESPACE " "
+          EXISTS_KW "exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      ADD_GENERATED
+        ADD_KW "add"
+        WHITESPACE " "
+        GENERATED_KW "generated"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        IDENTITY_KW "identity"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      ADD_GENERATED
+        ADD_KW "add"
+        WHITESPACE " "
+        GENERATED_KW "generated"
+        WHITESPACE " "
+        ALWAYS_KW "always"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        IDENTITY_KW "identity"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      ADD_GENERATED
+        ADD_KW "add"
+        WHITESPACE " "
+        GENERATED_KW "generated"
+        WHITESPACE " "
+        ALWAYS_KW "always"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        IDENTITY_KW "identity"
+        WHITESPACE " "
+        SEQUENCE_OPTION_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          SEQUENCE_KW "sequence"
+          WHITESPACE " "
+          NAME_KW "name"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "foo"
+          WHITESPACE " "
+          CYCLE_KW "cycle"
+          WHITESPACE " "
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_GENERATED_OPTIONS
+        SET_GENERATED
+          SET_KW "set"
+          WHITESPACE " "
+          GENERATED_KW "generated"
+          WHITESPACE " "
+          ALWAYS_KW "always"
+        WHITESPACE " "
+        SET_SEQUENCE_OPTION
+          SET_KW "set"
+          WHITESPACE " "
+          SEQUENCE_KW "sequence"
+          WHITESPACE " "
+          NAME_KW "name"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "bar"
+        WHITESPACE " "
+        RESTART
+          RESTART_KW "restart"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE " \n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_GENERATED_OPTIONS
+        SET_GENERATED
+          SET_KW "set"
+          WHITESPACE " "
+          GENERATED_KW "generated"
+          WHITESPACE " "
+          ALWAYS_KW "always"
+        WHITESPACE " "
+        SET_SEQUENCE_OPTION
+          SET_KW "set"
+          WHITESPACE " "
+          SEQUENCE_KW "sequence"
+          WHITESPACE " "
+          NAME_KW "name"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "bar"
+        WHITESPACE " "
+        RESTART
+          RESTART_KW "restart"
+          WHITESPACE " "
+          WITH_KW "with"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE " \n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      DROP_IDENTITY
+        DROP_KW "drop"
+        WHITESPACE " "
+        IDENTITY_KW "identity"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      DROP_IDENTITY
+        DROP_KW "drop"
+        WHITESPACE " "
+        IDENTITY_KW "identity"
+        WHITESPACE " "
+        IF_EXISTS
+          IF_KW "if"
+          WHITESPACE " "
+          EXISTS_KW "exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STATISTICS
+        SET_KW "set"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_OPTIONS
+        SET_KW "set"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE " "
+        NAME
+          IDENT "foo"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "buzz"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "b"
+        WHITESPACE " "
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      RESET_OPTIONS
+        RESET_KW "reset"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE " "
+        NAME
+          IDENT "foo"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "buzz"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      RESET_OPTIONS
+        RESET_KW "reset"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE " "
+        NAME
+          IDENT "p"
+        DOT "."
+        NAME
+          IDENT "foo"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "buzz"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_OPTIONS
+        SET_KW "set"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "a"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "z"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          IDENT "w"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+        COMMA ","
+        WHITESPACE " "
+        NAME
+          JSON_KW "json"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        IDENT "plain"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        EXTERNAL_KW "external"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        IDENT "extended"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        IDENT "main"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "set"
+        WHITESPACE " "
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_COMPRESSION
+        SET_KW "set"
+        WHITESPACE " "
+        COMPRESSION_KW "compression"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_COMPRESSION
+        SET_KW "set"
+        WHITESPACE " "
+        COMPRESSION_KW "compression"
+        WHITESPACE " "
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_GENERATED_OPTIONS
+        RESTART
+          RESTART_KW "restart"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- inherit"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    INHERIT
+      INHERIT_KW "inherit"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    NO_INHERIT
+      NO_KW "no"
+      WHITESPACE " "
+      INHERIT_KW "inherit"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove constraint"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    DROP_CONSTRAINT
+      DROP_KW "drop"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "some_name"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove column not null constraint"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "product_no"
+      WHITESPACE " "
+      DROP_NOT_NULL
+        DROP_KW "drop"
+        WHITESPACE " "
+        NOT_KW "not"
+        WHITESPACE " "
+        NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove constraint if exists"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    DROP_CONSTRAINT
+      DROP_KW "drop"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      IF_EXISTS
+        IF_KW "if"
+        WHITESPACE " "
+        EXISTS_KW "exists"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "some_name"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DROP_CONSTRAINT
+      DROP_KW "drop"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      IF_EXISTS
+        IF_KW "if"
+        WHITESPACE " "
+        EXISTS_KW "exists"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DROP_CONSTRAINT
+      DROP_KW "drop"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      IF_EXISTS
+        IF_KW "if"
+        WHITESPACE " "
+        EXISTS_KW "exists"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- disable_trigger"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DISABLE_TRIGGER
+      DISABLE_KW "disable"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DISABLE_TRIGGER
+      DISABLE_KW "disable"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DISABLE_TRIGGER
+      DISABLE_KW "disable"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      USER_KW "user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- enable_trigger"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_TRIGGER
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_TRIGGER
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_TRIGGER
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      USER_KW "user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_REPLICA_TRIGGER
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      REPLICA_KW "replica"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_ALWAYS_TRIGGER
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      ALWAYS_KW "always"
+      WHITESPACE " "
+      TRIGGER_KW "trigger"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- replica_identity"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    REPLICA_IDENTITY
+      REPLICA_KW "replica"
+      WHITESPACE " "
+      IDENTITY_KW "identity"
+      WHITESPACE " "
+      DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    REPLICA_IDENTITY
+      REPLICA_KW "replica"
+      WHITESPACE " "
+      IDENTITY_KW "identity"
+      WHITESPACE " "
+      USING_KW "using"
+      WHITESPACE " "
+      INDEX_KW "index"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    REPLICA_IDENTITY
+      REPLICA_KW "replica"
+      WHITESPACE " "
+      IDENTITY_KW "identity"
+      WHITESPACE " "
+      FULL_KW "full"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    REPLICA_IDENTITY
+      REPLICA_KW "replica"
+      WHITESPACE " "
+      IDENTITY_KW "identity"
+      WHITESPACE " "
+      NOTHING_KW "nothing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rule_enable_disable"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DISABLE_RULE
+      DISABLE_KW "disable"
+      WHITESPACE " "
+      RULE_KW "rule"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_RULE
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      RULE_KW "rule"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_REPLICA_RULE
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      REPLICA_KW "replica"
+      WHITESPACE " "
+      RULE_KW "rule"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_ALWAYS_RULE
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      ALWAYS_KW "always"
+      WHITESPACE " "
+      RULE_KW "rule"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- row_level_security"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DISABLE_RLS
+      DISABLE_KW "disable"
+      WHITESPACE " "
+      ROW_KW "row"
+      WHITESPACE " "
+      LEVEL_KW "level"
+      WHITESPACE " "
+      SECURITY_KW "security"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ENABLE_RLS
+      ENABLE_KW "enable"
+      WHITESPACE " "
+      ROW_KW "row"
+      WHITESPACE " "
+      LEVEL_KW "level"
+      WHITESPACE " "
+      SECURITY_KW "security"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    FORCE_RLS
+      FORCE_KW "force"
+      WHITESPACE " "
+      ROW_KW "row"
+      WHITESPACE " "
+      LEVEL_KW "level"
+      WHITESPACE " "
+      SECURITY_KW "security"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    NO_FORCE_RLS
+      NO_KW "no"
+      WHITESPACE " "
+      FORCE_KW "force"
+      WHITESPACE " "
+      ROW_KW "row"
+      WHITESPACE " "
+      LEVEL_KW "level"
+      WHITESPACE " "
+      SECURITY_KW "security"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- cluster"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DISABLE_CLUSTER
+      CLUSTER_KW "cluster"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_WITHOUT_CLUSTER
+      SET_KW "set"
+      WHITESPACE " "
+      WITHOUT_KW "without"
+      WHITESPACE " "
+      CLUSTER_KW "cluster"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_WITHOUT_OIDS
+      SET_KW "set"
+      WHITESPACE " "
+      WITHOUT_KW "without"
+      WHITESPACE " "
+      OIDS_KW "oids"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- access_method"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "set"
+      WHITESPACE " "
+      ACCESS_KW "access"
+      WHITESPACE " "
+      METHOD_KW "method"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_LOGGED
+      SET_KW "set"
+      WHITESPACE " "
+      LOGGED_KW "logged"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_UNLOGGED
+      SET_KW "set"
+      WHITESPACE " "
+      UNLOGGED_KW "unlogged"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- of_type"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    OF_TYPE
+      OF_KW "of"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    NOT_OF
+      NOT_KW "not"
+      WHITESPACE " "
+      OF_KW "of"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- column constraint"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ADD_COLUMN
+      ADD_KW "add"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "description"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+      WHITESPACE " "
+      CHECK_CONSTRAINT
+        CHECK_KW "check"
+        WHITESPACE " "
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "description"
+          WHITESPACE " "
+          NEQB "<>"
+          WHITESPACE " "
+          LITERAL
+            STRING "''"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add column not null constraint"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IDENT "product_no"
+      WHITESPACE " "
+      SET_NOT_NULL
+        SET_KW "set"
+        WHITESPACE " "
+        NOT_KW "not"
+        WHITESPACE " "
+        NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multi constraints"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ADD_COLUMN
+      ADD_KW "add"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "description"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+      WHITESPACE " "
+      CHECK_CONSTRAINT
+        CHECK_KW "check"
+        WHITESPACE " "
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "description"
+          WHITESPACE " "
+          NEQB "<>"
+          WHITESPACE " "
+          LITERAL
+            STRING "''"
+        R_PAREN ")"
+      WHITESPACE " "
+      NOT_NULL_CONSTRAINT
+        NOT_KW "not"
+        WHITESPACE " "
+        NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_TYPE
+        TYPE_KW "type"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "timestamptz"
+        WHITESPACE " "
+        USING_KW "using"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "c"
+          WHITESPACE " "
+          AT_TIME_ZONE
+            AT_KW "at"
+            WHITESPACE " "
+            TIME_KW "time"
+            WHITESPACE " "
+            ZONE_KW "zone"
+          WHITESPACE " "
+          LITERAL
+            STRING "'UTC'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove_column"
+  WHITESPACE "\n"
+  COMMENT "-- remove column"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    DROP_COLUMN
+      DROP_KW "drop"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "description"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove column cascade"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    DROP_COLUMN
+      DROP_KW "drop"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "description"
+      WHITESPACE " "
+      CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove column restrict"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DROP_COLUMN
+      DROP_KW "drop"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove column concise"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    DROP_COLUMN
+      DROP_KW "drop"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "description"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remove column if exists"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    DROP_COLUMN
+      DROP_KW "drop"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      IF_EXISTS
+        IF_KW "if"
+        WHITESPACE " "
+        EXISTS_KW "exists"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "description"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- add table_constraint"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      CHECK_CONSTRAINT
+        CHECK_KW "check"
+        WHITESPACE " "
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            NAME_KW "name"
+          WHITESPACE " "
+          NEQB "<>"
+          WHITESPACE " "
+          LITERAL
+            STRING "''"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      UNIQUE_CONSTRAINT
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "some_name"
+        WHITESPACE " "
+        UNIQUE_KW "unique"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "product_no"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      UNIQUE_CONSTRAINT
+        UNIQUE_KW "unique"
+        WHITESPACE " "
+        NULLS_KW "nulls"
+        WHITESPACE " "
+        NOT_KW "not"
+        WHITESPACE " "
+        DISTINCT_KW "distinct"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "c"
+          R_PAREN ")"
+        WHITESPACE " "
+        CONSTRAINT_STORAGE_PARAMS
+          WITH_KW "with"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            FALSE_KW "false"
+          COMMA ","
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      PRIMARY_KEY_CONSTRAINT
+        PRIMARY_KW "primary"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      PRIMARY_KEY_CONSTRAINT
+        PRIMARY_KW "primary"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE "\n  "
+        CONSTRAINT_INCLUDE_CLAUSE
+          INCLUDE_KW "include"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "b"
+            R_PAREN ")"
+        WHITESPACE "\n  "
+        CONSTRAINT_STORAGE_PARAMS
+          WITH_KW "with"
+          WHITESPACE " "
+          L_PAREN "("
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+        WHITESPACE " \n  "
+        CONSTRAINT_INDEX_TABLESPACE
+          USING_KW "using"
+          WHITESPACE " "
+          INDEX_KW "index"
+          WHITESPACE " "
+          TABLESPACE_KW "tablespace"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSIONS
+          L_PAREN "("
+          WHITESPACE "\n  "
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          WITH_KW "with"
+          WHITESPACE " "
+          EQ "="
+          COMMA ","
+          WHITESPACE "\n  "
+          CALL_EXPR
+            NAME_REF
+              IDENT "tsrange"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "c"
+              R_PAREN ")"
+          WHITESPACE " "
+          WITH_KW "with"
+          WHITESPACE " "
+          CUSTOM_OP
+            AMP "&"
+            AMP "&"
+          WHITESPACE "\n"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_INDEX_METHOD
+          USING_KW "using"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "gist"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSIONS
+          L_PAREN "("
+          WHITESPACE "\n  "
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          WITH_KW "with"
+          WHITESPACE " "
+          EQ "="
+          COMMA ","
+          WHITESPACE "\n  "
+          CALL_EXPR
+            NAME_REF
+              IDENT "tsrange"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "c"
+              R_PAREN ")"
+          WHITESPACE " "
+          WITH_KW "with"
+          WHITESPACE " "
+          CUSTOM_OP
+            AMP "&"
+            AMP "&"
+          WHITESPACE "\n"
+          R_PAREN ")"
+        WHITESPACE " "
+        CONSTRAINT_WHERE_CLAUSE
+          WHERE_KW "WHERE"
+          WHITESPACE " "
+          L_PAREN "("
+          BIN_EXPR
+            NAME_REF
+              IDENT "d"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'active'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        MATCH_KW "match"
+        WHITESPACE " "
+        FULL_KW "full"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        MATCH_KW "match"
+        WHITESPACE " "
+        SIMPLE_KW "simple"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        L_PAREN "("
+        NAME_REF
+          IDENT "e"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "f"
+        R_PAREN ")"
+        WHITESPACE " "
+        MATCH_KW "match"
+        WHITESPACE " "
+        FULL_KW "full"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        NO_KW "no"
+        WHITESPACE " "
+        ACTION_KW "action"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        UPDATE_KW "update"
+        WHITESPACE " "
+        SET_KW "set"
+        WHITESPACE " "
+        NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        NO_KW "no"
+        WHITESPACE " "
+        ACTION_KW "action"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        RESTRICT_KW "restrict"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        SET_KW "set"
+        WHITESPACE " "
+        NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        SET_KW "set"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        SET_KW "set"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        SET_KW "set"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+        WHITESPACE " "
+        L_PAREN "("
+        NAME_REF
+          IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "product_group_id"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "product_groups"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- table_constraint_using_index"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      UNIQUE_CONSTRAINT
+        UNIQUE_KW "unique"
+        WHITESPACE " "
+        USING_INDEX
+          USING_KW "using"
+          WHITESPACE " "
+          INDEX_KW "index"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      PRIMARY_KEY_CONSTRAINT
+        PRIMARY_KW "primary"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        USING_INDEX
+          USING_KW "using"
+          WHITESPACE " "
+          INDEX_KW "index"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      UNIQUE_CONSTRAINT
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "c"
+        WHITESPACE " "
+        UNIQUE_KW "unique"
+        WHITESPACE " "
+        USING_INDEX
+          USING_KW "using"
+          WHITESPACE " "
+          INDEX_KW "index"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      PRIMARY_KEY_CONSTRAINT
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "c"
+        WHITESPACE " "
+        PRIMARY_KW "primary"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        USING_INDEX
+          USING_KW "using"
+          WHITESPACE " "
+          INDEX_KW "index"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not valid check"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      CHECK_CONSTRAINT
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "foo_not_null"
+        WHITESPACE "\n  "
+        CHECK_KW "check"
+        WHITESPACE " "
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "\"foo\""
+          WHITESPACE " "
+          IS_NOT
+            IS_KW "is"
+            WHITESPACE " "
+            NOT_KW "not"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "null"
+        R_PAREN ")"
+      WHITESPACE " "
+      NOT_VALID
+        NOT_KW "not"
+        WHITESPACE " "
+        VALID_KW "valid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- rename column"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "product_no"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "product_number"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n"
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    STAR "*"
+    WHITESPACE " \n"
+    RENAME_COLUMN
+      RENAME_KW "rename"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename table"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "products"
+    WHITESPACE " "
+    RENAME_TABLE
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "items"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ONLY_KW "only"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
+    R_PAREN ")"
+    WHITESPACE " "
+    RENAME_TABLE
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rename constraint"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    RENAME_CONSTRAINT
+      RENAME_KW "rename"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set_schema"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set tablespace"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE " "
+    SET_TABLESPACE
+      SET_KW "set"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set tablespace all"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE " "
+    OWNED_KW "owned"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "c"
+    WHITESPACE " \n"
+    SET_TABLESPACE
+      SET_KW "set"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
+      WHITESPACE " "
+      NOWAIT_KW "nowait"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set tablespace owned by"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE " "
+    OWNED_KW "owned"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "bar"
+    WHITESPACE "\n"
+    SET_TABLESPACE
+      SET_KW "set"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "buz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    SET_TABLESPACE
+      SET_KW "set"
+      WHITESPACE " "
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- alter_table_owner"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "table_name"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "new_owner"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- default"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ATTACH_PARTITION
+      ATTACH_KW "attach"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f"
+      WHITESPACE " "
+      DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- partition spec"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ATTACH_PARTITION
+      ATTACH_KW "attach"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f"
+      WHITESPACE " "
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      IN_KW "in"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'bar'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'buzz'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiple_actions"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    NOT_OF
+      NOT_KW "not"
+      WHITESPACE " "
+      OF_KW "of"
+    COMMA ","
+    WHITESPACE " "
+    NOT_OF
+      NOT_KW "not"
+      WHITESPACE " "
+      OF_KW "of"
+    COMMA ","
+    WHITESPACE " "
+    SET_LOGGED
+      SET_KW "set"
+      WHITESPACE " "
+      LOGGED_KW "logged"
+    COMMA ","
+    WHITESPACE " "
+    SET_UNLOGGED
+      SET_KW "set"
+      WHITESPACE " "
+      UNLOGGED_KW "unlogged"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- from pg docs"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "transactions"
+    WHITESPACE "\n  "
+    ADD_COLUMN
+      ADD_KW "ADD"
+      WHITESPACE " "
+      COLUMN_KW "COLUMN"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "status"
+      WHITESPACE " "
+      CHAR_TYPE
+        VARCHAR_KW "varchar"
+        L_PAREN "("
+        ARG_LIST
+          ARG
+            LITERAL
+              INT_NUMBER "30"
+          R_PAREN ")"
+      WHITESPACE " "
+      DEFAULT_CONSTRAINT
+        DEFAULT_KW "DEFAULT"
+        WHITESPACE " "
+        LITERAL
+          STRING "'old'"
+    COMMA ","
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "ALTER"
+      WHITESPACE " "
+      COLUMN_KW "COLUMN"
+      WHITESPACE " "
+      IDENT "status"
+      WHITESPACE " "
+      SET_DEFAULT
+        SET_KW "SET"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+        WHITESPACE " "
+        LITERAL
+          STRING "'current'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DETACH_PARTITION
+      DETACH_KW "detach"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- concurrently"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DETACH_PARTITION
+      DETACH_KW "detach"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f"
+      WHITESPACE " "
+      CONCURRENTLY_KW "concurrently"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- finalize"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    DETACH_PARTITION
+      DETACH_KW "detach"
+      WHITESPACE " "
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f"
+      WHITESPACE " "
+      FINALIZE_KW "finalize"
+  SEMICOLON ";"
+  WHITESPACE "\n"

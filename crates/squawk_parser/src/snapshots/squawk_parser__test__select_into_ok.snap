@@ -1,0 +1,78 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/select_into.sql
+---
+SOURCE_FILE
+  COMMENT "-- docs"
+  WHITESPACE "\n"
+  SELECT_INTO_STMT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    INTO_CLAUSE
+      INTO_KW "INTO"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "films_recent"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "films"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "date_prod"
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        LITERAL
+          STRING "'2002-01-01'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- more_schema"
+  WHITESPACE "\n"
+  SELECT_INTO_STMT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    INTO_CLAUSE
+      INTO_KW "into"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "t"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
