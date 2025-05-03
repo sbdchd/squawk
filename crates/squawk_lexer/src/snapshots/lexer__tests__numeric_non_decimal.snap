@@ -1,0 +1,19 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\n0b100101\n0B10011001\n0o273\n0O755\n0x42f\n0XFFFF\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "0b100101" @ Literal { kind: Int { base: Binary, empty_int: false } },
+    "\n" @ Whitespace,
+    "0B10011001" @ Literal { kind: Int { base: Binary, empty_int: false } },
+    "\n" @ Whitespace,
+    "0o273" @ Literal { kind: Int { base: Octal, empty_int: false } },
+    "\n" @ Whitespace,
+    "0O755" @ Literal { kind: Int { base: Octal, empty_int: false } },
+    "\n" @ Whitespace,
+    "0x42f" @ Literal { kind: Int { base: Hexadecimal, empty_int: false } },
+    "\n" @ Whitespace,
+    "0XFFFF" @ Literal { kind: Int { base: Hexadecimal, empty_int: false } },
+    "\n" @ Whitespace,
+]

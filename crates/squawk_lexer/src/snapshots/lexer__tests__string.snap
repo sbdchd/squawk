@@ -1,0 +1,24 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\n'Dianne''s horse'\n\nselect 'foo ''\nbar';\n\nselect 'foooo'   \n   'bar';\n\n\n'foo \\\\ \\n \\tbar'\n\n'forgot to close the string\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "'Dianne''s horse'" @ Literal { kind: Str { terminated: true } },
+    "\n\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "'foo ''\nbar'" @ Literal { kind: Str { terminated: true } },
+    ";" @ Semi,
+    "\n\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "'foooo'" @ Literal { kind: Str { terminated: true } },
+    "   \n   " @ Whitespace,
+    "'bar'" @ Literal { kind: Str { terminated: true } },
+    ";" @ Semi,
+    "\n\n\n" @ Whitespace,
+    "'foo \\\\ \\n \\tbar'" @ Literal { kind: Str { terminated: true } },
+    "\n\n" @ Whitespace,
+    "'forgot to close the string\n" @ Literal { kind: Str { terminated: false } },
+]

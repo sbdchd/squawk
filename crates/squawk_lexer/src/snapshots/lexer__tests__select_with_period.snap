@@ -1,0 +1,14 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\nselect public.users;\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "public" @ Ident,
+    "." @ Dot,
+    "users" @ Ident,
+    ";" @ Semi,
+    "\n" @ Whitespace,
+]

@@ -1,0 +1,19 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\nE'foo'\n\ne'bar'\n\ne'\\b\\f\\n\\r\\t'\n\ne'\\0\\11\\777'\n\ne'\\x0\\x11\\xFF'\n\ne'\\uAAAA \\UFFFFFFFF'\n\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "E'foo'" @ Literal { kind: EscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+    "e'bar'" @ Literal { kind: EscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+    "e'\\b\\f\\n\\r\\t'" @ Literal { kind: EscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+    "e'\\0\\11\\777'" @ Literal { kind: EscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+    "e'\\x0\\x11\\xFF'" @ Literal { kind: EscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+    "e'\\uAAAA \\UFFFFFFFF'" @ Literal { kind: EscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+]

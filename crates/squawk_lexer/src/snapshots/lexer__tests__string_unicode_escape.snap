@@ -1,0 +1,19 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\nU&\"d\\0061t\\+000061\"\n\nU&\"\\0441\\043B\\043E\\043D\"\n\nu&'\\0441\\043B'\n\nU&\"d!0061t!+000061\" UESCAPE '!'\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "U&\"d\\0061t\\+000061\"" @ Literal { kind: UnicodeEscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+    "U&\"\\0441\\043B\\043E\\043D\"" @ Literal { kind: UnicodeEscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+    "u&'\\0441\\043B'" @ Literal { kind: UnicodeEscStr { terminated: true } },
+    "\n\n" @ Whitespace,
+    "U&\"d!0061t!+000061\"" @ Literal { kind: UnicodeEscStr { terminated: true } },
+    " " @ Whitespace,
+    "UESCAPE" @ Ident,
+    " " @ Whitespace,
+    "'!'" @ Literal { kind: Str { terminated: true } },
+    "\n" @ Whitespace,
+]

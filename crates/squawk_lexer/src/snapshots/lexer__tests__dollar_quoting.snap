@@ -1,0 +1,14 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\n$$Dianne's horse$$\n$SomeTag$Dianne's horse$SomeTag$\n\n-- with dollar inside and matching tags\n$foo$hello$world$bar$\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "$$Dianne's horse$$" @ Literal { kind: DollarQuotedString { terminated: true } },
+    "\n" @ Whitespace,
+    "$SomeTag$Dianne's horse$SomeTag$" @ Literal { kind: DollarQuotedString { terminated: true } },
+    "\n\n" @ Whitespace,
+    "-- with dollar inside and matching tags" @ LineComment,
+    "\n" @ Whitespace,
+    "$foo$hello$world$bar$\n" @ Literal { kind: DollarQuotedString { terminated: false } },
+]

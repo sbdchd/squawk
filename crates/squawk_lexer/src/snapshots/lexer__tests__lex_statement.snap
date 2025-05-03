@@ -1,0 +1,10 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: result
+---
+[
+    "select" @ Ident,
+    " " @ Whitespace,
+    "1" @ Literal { kind: Int { base: Decimal, empty_int: false } },
+    ";" @ Semi,
+]
