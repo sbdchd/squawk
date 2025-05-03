@@ -6,8 +6,8 @@
 
 use crate::ast::AstNode;
 use crate::{ast, match_ast, syntax_error::SyntaxError, SyntaxNode};
-use parser::SyntaxKind::*;
 use rowan::TextRange;
+use squawk_parser::SyntaxKind::*;
 
 pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     for node in root.descendants() {

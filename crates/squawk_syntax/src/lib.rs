@@ -36,7 +36,7 @@ mod test;
 
 use std::{marker::PhantomData, sync::Arc};
 
-pub use parser::SyntaxKind;
+pub use squawk_parser::SyntaxKind;
 
 use ast::AstNode;
 use rowan::GreenNode;

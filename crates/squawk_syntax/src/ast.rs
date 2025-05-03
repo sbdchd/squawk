@@ -33,7 +33,7 @@ mod node_ext;
 use std::marker::PhantomData;
 
 use crate::syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken};
-use parser::SyntaxKind;
+use squawk_parser::SyntaxKind;
 
 pub use self::{
     nodes::*,
