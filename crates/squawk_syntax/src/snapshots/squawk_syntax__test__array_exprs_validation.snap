@@ -9,20 +9,19 @@ SOURCE_FILE@0..42
       WHITESPACE@6..7 " "
       TARGET_LIST@7..22
         TARGET@7..22
-          COL_LABEL@7..22
-            ARRAY_EXPR@7..22
-              L_BRACK@7..8 "["
-              LITERAL@8..11
-                STRING@8..11 "'a'"
-              COMMA@11..12 ","
-              WHITESPACE@12..13 " "
-              LITERAL@13..16
-                STRING@13..16 "'b'"
-              COMMA@16..17 ","
-              WHITESPACE@17..18 " "
-              LITERAL@18..21
-                STRING@18..21 "'c'"
-              R_BRACK@21..22 "]"
+          ARRAY_EXPR@7..22
+            L_BRACK@7..8 "["
+            LITERAL@8..11
+              STRING@8..11 "'a'"
+            COMMA@11..12 ","
+            WHITESPACE@12..13 " "
+            LITERAL@13..16
+              STRING@13..16 "'b'"
+            COMMA@16..17 ","
+            WHITESPACE@17..18 " "
+            LITERAL@18..21
+              STRING@18..21 "'c'"
+            R_BRACK@21..22 "]"
   SEMICOLON@22..23 ";"
   WHITESPACE@23..25 "\n\n"
   SELECT@25..40
@@ -31,19 +30,18 @@ SOURCE_FILE@0..42
       WHITESPACE@31..32 " "
       TARGET_LIST@32..40
         TARGET@32..40
-          COL_LABEL@32..40
-            ARRAY_EXPR@32..40
-              L_BRACK@32..33 "["
-              ARRAY_EXPR@33..39
-                L_BRACK@33..34 "["
-                LITERAL@34..35
-                  INT_NUMBER@34..35 "1"
-                COMMA@35..36 ","
-                WHITESPACE@36..37 " "
-                LITERAL@37..38
-                  INT_NUMBER@37..38 "2"
-                R_BRACK@38..39 "]"
-              R_BRACK@39..40 "]"
+          ARRAY_EXPR@32..40
+            L_BRACK@32..33 "["
+            ARRAY_EXPR@33..39
+              L_BRACK@33..34 "["
+              LITERAL@34..35
+                INT_NUMBER@34..35 "1"
+              COMMA@35..36 ","
+              WHITESPACE@36..37 " "
+              LITERAL@37..38
+                INT_NUMBER@37..38 "2"
+              R_BRACK@38..39 "]"
+            R_BRACK@39..40 "]"
   SEMICOLON@40..41 ";"
   WHITESPACE@41..42 "\n"
 
