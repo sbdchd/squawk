@@ -6,6 +6,7 @@ Errors if latest version in changelog does not match package.json and cli/Cargo.
 
 This script helps prevent releasing Squawk without updating the version using s/update-version.
 """
+
 from __future__ import annotations
 from pathlib import Path
 import re
@@ -37,7 +38,7 @@ CLI_VERSION_PATTERN = r"version = \"(?P<version>\d+\.\d+\.\d+)\""
 
 
 def find_cli_version() -> str:
-    cargo_toml = squawk_root() / "cli" / "Cargo.toml"
+    cargo_toml = squawk_root() / "crates" / "cli" / "Cargo.toml"
     for line in cargo_toml.read_text().split("\n"):
         match = re.match(CLI_VERSION_PATTERN, line)
         if match is not None:

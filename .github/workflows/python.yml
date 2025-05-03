@@ -50,7 +50,7 @@ jobs:
         with:
           target: ${{ matrix.platform.target }}
           maturin-version: v1.7.1
-          working-directory: cli
+          working-directory: crates/cli
           args: --release --out dist ${{ matrix.platform.maturin-options }}
           manylinux: ${{ matrix.platform.manylinux }}
           sccache: "true"
@@ -79,7 +79,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          working-directory: cli
+          working-directory: crates/cli
           args: --release --out dist
           sccache: "true"
       - name: Upload wheels
@@ -106,7 +106,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.platform.target }}
-          working-directory: cli
+          working-directory: crates/cli
           args: --release --out dist
           sccache: "true"
       - name: Upload wheels
@@ -126,7 +126,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           command: sdist
-          working-directory: cli
+          working-directory: crates/cli
           args: --out dist
       - name: Upload sdist
         uses: actions/upload-artifact@v4
