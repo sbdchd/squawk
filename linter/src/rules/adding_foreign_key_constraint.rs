@@ -1,4 +1,5 @@
 use crate::{
+    rules::utils::tables_created_in_transaction,
     versions::Version,
     violations::{RuleViolation, RuleViolationKind},
 };
@@ -17,12 +18,16 @@ use squawk_parser::ast::{
 pub fn adding_foreign_key_constraint(
     tree: &[RawStmt],
     _pg_version: Option<Version>,
-    _assume_in_transaction: bool,
+    assume_in_transaction: bool,
 ) -> Vec<RuleViolation> {
     let mut errs = vec![];
+    let tables_created = tables_created_in_transaction(tree, assume_in_transaction);
     for raw_stmt in tree {
         match &raw_stmt.stmt {
             Stmt::AlterTableStmt(stmt) => {
+                if tables_created.contains(&stmt.relation.relname) {
+                    continue;
+                }
                 for cmd in &stmt.cmds {
                     match cmd {
                         AlterTableCmds::AlterTableCmd(ref command) => {
@@ -73,6 +78,7 @@ mod test_rules {
         check_sql_with_rule,
         violations::{RuleViolation, RuleViolationKind},
     };
+    use insta::assert_debug_snapshot;
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql_with_rule(
@@ -80,6 +86,16 @@ mod test_rules {
             &RuleViolationKind::AddingForeignKeyConstraint,
             None,
             false,
+        )
+        .unwrap()
+    }
+
+    fn lint_sql_assuming_in_transaction(sql: &str) -> Vec<RuleViolation> {
+        check_sql_with_rule(
+            sql,
+            &RuleViolationKind::AddingForeignKeyConstraint,
+            None,
+            true,
         )
         .unwrap()
     }
@@ -100,9 +116,35 @@ CREATE TABLE email (
 COMMIT;
         "#;
 
-        let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 0);
+        assert_debug_snapshot!(lint_sql(sql));
     }
+
+    #[test]
+    fn test_create_table_and_add_foreign_key_constraint_after() {
+        let sql = r#"
+BEGIN;
+CREATE TABLE "email" (
+  "user_id" INT
+);
+ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+COMMIT;
+        "#;
+
+        assert_debug_snapshot!(lint_sql(sql));
+    }
+
+    #[test]
+    fn test_create_table_and_add_foreign_key_constraint_after_with_assume_in_transaction() {
+        let sql = r#"
+CREATE TABLE "email" (
+  "user_id" INT
+);
+ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "user" ("id");
+        "#;
+
+        assert_debug_snapshot!(lint_sql_assuming_in_transaction(sql));
+    }
+
     #[test]
     fn add_foreign_key_constraint_not_valid_validate() {
         let sql = r#"
@@ -113,9 +155,9 @@ ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
 
-        let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 0);
+        assert_debug_snapshot!(lint_sql(sql));
     }
+
     #[test]
     fn add_foreign_key_constraint_lock() {
         let sql = r#"
@@ -125,13 +167,9 @@ ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES 
 COMMIT;
         "#;
 
-        let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 1);
-        assert_eq!(
-            violations[0].kind,
-            RuleViolationKind::AddingForeignKeyConstraint
-        );
+        assert_debug_snapshot!(lint_sql(sql));
     }
+
     #[test]
     fn add_column_references_lock() {
         let sql = r#"
@@ -140,11 +178,6 @@ ALTER TABLE "emails" ADD COLUMN "user_id" INT REFERENCES "user" ("id");
 COMMIT;
         "#;
 
-        let violations = lint_sql(sql);
-        assert_eq!(violations.len(), 1);
-        assert_eq!(
-            violations[0].kind,
-            RuleViolationKind::AddingForeignKeyConstraint
-        );
+        assert_debug_snapshot!(lint_sql(sql));
     }
 }
