@@ -387,7 +387,7 @@ pub enum ViolationMessage<'a> {
 #[derive(Debug)]
 pub struct ViolationMeta<'a> {
     /// A description of the rule that's used when rendering the error message
-    /// in on the CLI. It should be a slightly expanded version of the [ViolationName]
+    /// in on the CLI. It should be a slightly expanded version of the [`ViolationName`]
     pub title: String,
     /// Messages rendered for each error to provide context and offer advice on how to fix.
     pub messages: Vec<ViolationMessage<'a>>,

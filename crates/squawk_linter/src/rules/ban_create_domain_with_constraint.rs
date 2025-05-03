@@ -9,29 +9,27 @@ use crate::{ErrorCode, Linter, Violation};
 pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for item in file.items() {
-        match item {
-            ast::Item::CreateDomain(domain) => {
-                let range = domain.constraints().map(|c| c.syntax().text_range()).fold(
-                    None,
-                    |prev, cur| match prev {
+        if let ast::Item::CreateDomain(domain) = item {
+            let range =
+                domain
+                    .constraints()
+                    .map(|c| c.syntax().text_range())
+                    .fold(None, |prev, cur| match prev {
                         None => Some(cur),
                         Some(prev) => {
                             let new_start = prev.start().min(cur.start());
                             let new_end = prev.end().max(cur.end());
                             Some(TextRange::new(new_start, new_end))
                         }
-                    },
-                );
-                if let Some(range) = range {
-                    ctx.report(Violation::new(
-                    ErrorCode::BanCreateDomainWithConstraint,
-                        "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
-                        range,
-                        None,
-                    ))
-                }
+                    });
+            if let Some(range) = range {
+                ctx.report(Violation::new(
+                ErrorCode::BanCreateDomainWithConstraint,
+                    "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
+                    range,
+                    None,
+                ))
             }
-            _ => (),
         }
     }
 }
