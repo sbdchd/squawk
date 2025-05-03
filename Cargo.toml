@@ -1,5 +1,9 @@
 [workspace]
 members = ["crates/*"]
+authors = ["Squawk Team & Contributors"]
+edition = "2021"
+license = "GPL-3.0"
+rust-version = "1.81.0"
 
 [workspace.dependencies]
 # third party
