@@ -7,7 +7,7 @@ authors.workspace = true
 license.workspace = true
 
 [dependencies]
-parser.workspace = true
+squawk_parser.workspace = true
 rowan.workspace = true
 smol_str.workspace = true
 
