@@ -44,6 +44,8 @@ console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
 annotate-snippets = "0.11.5"
 anyhow = "1.0.94"
+convert_case = "0.7.1"
+clap = { version = "4.5.8", features = ["derive"] }
 
 # local
 squawk-parser = { version = "0.0.0", path = "./crates/parser" }
