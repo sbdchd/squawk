@@ -1,5 +1,7 @@
 [workspace]
 members = ["crates/*"]
+
+[workspace.package]
 authors = ["Squawk Team & Contributors"]
 edition = "2021"
 license = "GPL-3.0"
