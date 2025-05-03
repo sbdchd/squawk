@@ -41,7 +41,7 @@ BEGIN;
 ALTER TABLE "core_recipe" ALTER COLUMN "edits" TYPE text USING "edits"::text;
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ChangingColumnType]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -59,7 +59,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE varchar(255) USING "foo"::varc
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE text USING "foo"::text;
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ChangingColumnType]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);

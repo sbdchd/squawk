@@ -34,7 +34,7 @@ mod test {
         let sql = r#"
 ALTER TABLE "table_name" RENAME TO "new_table_name";
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::RenamingTable]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);

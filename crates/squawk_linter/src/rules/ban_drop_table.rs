@@ -32,7 +32,7 @@ DROP TABLE "table_name";
 DROP TABLE IF EXISTS "table_name";
 DROP TABLE IF EXISTS "table_name"
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanDropTable]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);

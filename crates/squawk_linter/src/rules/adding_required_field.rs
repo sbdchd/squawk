@@ -65,7 +65,7 @@ mod test {
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean;
   "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingRequiredField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
@@ -76,7 +76,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean;
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
   "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingRequiredField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
@@ -87,7 +87,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
   "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingRequiredField]);
         let errors = linter.lint(file, sql);
         assert!(!errors.is_empty());
@@ -100,7 +100,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
 ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED NOT NULL;
   "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingRequiredField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
@@ -112,7 +112,7 @@ ALTER TABLE foo
  ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED ;
   "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingRequiredField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());

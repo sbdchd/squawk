@@ -44,7 +44,7 @@ mod test {
         let sql = r#"
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingNotNullField]);
         linter.settings.pg_version = Version::new(10, 0, 0);
         let errors = linter.lint(file, sql);
@@ -62,7 +62,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10 NOT NULL;
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingNotNullField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
@@ -74,7 +74,7 @@ COMMIT;
 -- This won't work if the table is populated, but that error is caught by adding-required-field.
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingNotNullField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
@@ -90,7 +90,7 @@ BEGIN;
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL DEFAULT 10;
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingNotNullField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());

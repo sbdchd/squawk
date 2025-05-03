@@ -33,7 +33,7 @@ mod test {
         DROP DATABASE IF EXISTS "table_name";
         DROP DATABASE IF EXISTS "table_name"
                 "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanDropDatabase]);
         let errors = linter.lint(file, sql);
         assert!(!errors.is_empty());

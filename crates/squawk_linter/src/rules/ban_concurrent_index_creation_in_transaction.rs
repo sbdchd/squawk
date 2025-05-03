@@ -58,7 +58,7 @@ mod test {
         CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
         COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanConcurrentIndexCreationInTransaction]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -71,7 +71,7 @@ mod test {
   -- run outside a transaction
   CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanConcurrentIndexCreationInTransaction]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -84,7 +84,7 @@ mod test {
   CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   ALTER TABLE "table_name" ADD CONSTRAINT "field_name_id" UNIQUE USING INDEX "field_name_idx";
     "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanConcurrentIndexCreationInTransaction]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);
@@ -98,7 +98,7 @@ mod test {
   -- run index creation in a standalone migration
   CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanConcurrentIndexCreationInTransaction]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);
@@ -114,7 +114,7 @@ mod test {
   BEGIN;
   ALTER TABLE "table_name" ADD CONSTRAINT "field_name_id" UNIQUE USING INDEX "field_name_idx";
     "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanConcurrentIndexCreationInTransaction]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);

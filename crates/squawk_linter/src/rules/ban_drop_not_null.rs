@@ -38,7 +38,7 @@ mod test {
         let sql = r#"
 ALTER TABLE "bar_tbl" ALTER COLUMN "foo_col" DROP NOT NULL;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanDropNotNull]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);

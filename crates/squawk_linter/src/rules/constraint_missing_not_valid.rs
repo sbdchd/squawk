@@ -156,7 +156,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCE
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -169,7 +169,7 @@ COMMIT;
 ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCES "app_user" (id) NOT VALID;
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);
@@ -184,7 +184,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCE
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);
@@ -198,7 +198,7 @@ COMMIT;
 -- instead of
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -212,7 +212,7 @@ ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES 
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -224,7 +224,7 @@ ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
 -- instead of
 ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);
@@ -239,7 +239,7 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
 ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) NOT VALID;
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -256,7 +256,7 @@ CREATE TABLE "core_foo" (
 ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -271,7 +271,7 @@ CREATE TABLE "core_foo" (
 );
 ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);
@@ -287,7 +287,7 @@ CREATE TABLE "core_foo" (
 );
 ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);
@@ -299,7 +299,7 @@ ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
         let sql = r#"
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);

@@ -59,7 +59,7 @@ mod test {
         let sql = r#"
         ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
     "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingPrimaryKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert!(!errors.is_empty());
@@ -71,7 +71,7 @@ mod test {
         let sql = r#"
 ALTER TABLE items ADD PRIMARY KEY (id);
     "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingPrimaryKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert!(!errors.is_empty());
@@ -84,7 +84,7 @@ ALTER TABLE items ADD PRIMARY KEY (id);
 ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
         "#;
 
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingPrimaryKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());

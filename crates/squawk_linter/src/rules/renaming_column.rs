@@ -34,7 +34,7 @@ mod test {
         let sql = r#"
 ALTER TABLE "table_name" RENAME COLUMN "column_name" TO "new_column_name";
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::RenamingColumn]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);

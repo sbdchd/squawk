@@ -141,7 +141,7 @@ create table users (
     id smallserial
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferBigInt]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -172,7 +172,7 @@ create table users (
     id serial8
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferBigInt]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -186,7 +186,7 @@ create table users (
     bar serial
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferBigInt]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -198,7 +198,7 @@ create table users (
         let sql = r#"
 alter table t add column c integer;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferBigInt]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -210,7 +210,7 @@ alter table t add column c integer;
         let sql = r#"
 alter table t alter column c type integer;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferBigInt]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -222,7 +222,7 @@ alter table t alter column c type integer;
         let sql = r#"
 alter table t alter column c type "integer";
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferBigInt]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);

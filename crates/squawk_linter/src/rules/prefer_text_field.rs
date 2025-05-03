@@ -83,7 +83,7 @@ BEGIN;
 ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferTextField]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -103,7 +103,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferTextField]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -118,7 +118,7 @@ create table t (
     "alpha" pg_catalog.varchar(100) NOT NULL
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferTextField]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -132,7 +132,7 @@ BEGIN;
 ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferTextField]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -144,7 +144,7 @@ COMMIT;
         let sql = r#"
 CREATE TABLE IF NOT EXISTS foo_table(bar_col varchar);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferTextField]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -167,7 +167,7 @@ CREATE TABLE "core_bar" (
 ALTER TABLE "core_bar" ADD CONSTRAINT "text_size" CHECK (LENGTH("bravo") <= 100);
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferTextField]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);

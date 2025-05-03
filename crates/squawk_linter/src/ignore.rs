@@ -116,7 +116,7 @@ mod test {
 -- squawk-ignore ban-drop-column
 alter table t drop column c cascade;
         "#;
-        let parse = syntax::SourceFile::parse(sql);
+        let parse = squawk_syntax::SourceFile::parse(sql);
 
         let mut linter = Linter::from([]);
         find_ignores(&mut linter, &parse.syntax_node());
@@ -132,7 +132,7 @@ alter table t drop column c cascade;
 /* squawk-ignore ban-drop-column */
 alter table t drop column c cascade;
         "#;
-        let parse = syntax::SourceFile::parse(sql);
+        let parse = squawk_syntax::SourceFile::parse(sql);
 
         let mut linter = Linter::from([]);
 
@@ -149,7 +149,7 @@ alter table t drop column c cascade;
 -- squawk-ignore ban-drop-column, renaming-column,ban-drop-database
 alter table t drop column c cascade;
         "#;
-        let parse = syntax::SourceFile::parse(sql);
+        let parse = squawk_syntax::SourceFile::parse(sql);
 
         let mut linter = Linter::from([]);
 
@@ -168,7 +168,7 @@ alter table t drop column c cascade;
 /* squawk-ignore ban-drop-column, renaming-column,ban-drop-database */
 alter table t drop column c cascade;
         "#;
-        let parse = syntax::SourceFile::parse(sql);
+        let parse = squawk_syntax::SourceFile::parse(sql);
 
         let mut linter = Linter::from([]);
 
@@ -198,7 +198,7 @@ create table users (
 );
 "#;
 
-        let parse = syntax::SourceFile::parse(sql);
+        let parse = squawk_syntax::SourceFile::parse(sql);
         let errors: Vec<&Violation> = linter.lint(parse, sql);
         assert_eq!(errors.len(), 0);
     }
@@ -208,7 +208,7 @@ create table users (
         let mut linter = Linter::with_all_rules();
         let sql = r#"alter table t add column c char;"#;
 
-        let parse = syntax::SourceFile::parse(sql);
+        let parse = squawk_syntax::SourceFile::parse(sql);
         let errors: Vec<&Violation> = linter.lint(parse, sql);
         assert_eq!(errors.len(), 1);
     }

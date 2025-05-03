@@ -84,7 +84,7 @@ CREATE TABLE "core_bar" (
     "delta" character NOT NULL
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanCharField]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -100,7 +100,7 @@ CREATE TABLE "core_bar" (
     "beta" text NOT NULL
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanCharField]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -126,7 +126,7 @@ create table t (
     p char[]
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanCharField]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -140,7 +140,7 @@ create table t (
   a char[]
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanCharField]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -152,7 +152,7 @@ create table t (
         let sql = r#"
 alter table t add column c char;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanCharField]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);

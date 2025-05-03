@@ -35,7 +35,7 @@ mod test {
         let sql = r#"
      ALTER DOMAIN domain_name ADD CONSTRAINT constraint_name CHECK (value > 0);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanAlterDomainWithAddConstraint]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -53,7 +53,7 @@ mod test {
      ALTER DOMAIN domain_name_7 OWNER TO you;
      ALTER DOMAIN domain_name_8 SET SCHEMA foo;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanAlterDomainWithAddConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);

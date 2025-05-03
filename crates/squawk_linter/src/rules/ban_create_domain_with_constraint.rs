@@ -47,7 +47,7 @@ mod test {
         let sql = r#"
 CREATE DOMAIN domain_name_3 AS NUMERIC(15,5) CHECK (value > 0);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanCreateDomainWithConstraint]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -60,7 +60,7 @@ CREATE DOMAIN domain_name_3 AS NUMERIC(15,5) CHECK (value > 0);
         let sql = r#"
 create domain d as t check (value > 0) not null;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanCreateDomainWithConstraint]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -74,7 +74,7 @@ create domain d as t check (value > 0) not null;
 CREATE DOMAIN domain_name_1 AS TEXT;
 CREATE DOMAIN domain_name_2 AS CHARACTER VARYING;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::BanCreateDomainWithConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);

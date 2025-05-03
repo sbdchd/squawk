@@ -69,7 +69,7 @@ mod test {
         let sql = r#"
 ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -81,7 +81,7 @@ ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
         let sql = r#"
 ALTER TABLE table_name DROP CONSTRAINT field_name_constraint;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -94,7 +94,7 @@ CREATE UNIQUE INDEX CONCURRENTLY dist_id_temp_idx ON distributors (dist_id);
 ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
 ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -107,7 +107,7 @@ CREATE UNIQUE INDEX CONCURRENTLY "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_
     ON "legacy_questiongrouppg" ("mongo_id");
 ALTER TABLE "legacy_questiongrouppg" ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -124,7 +124,7 @@ CREATE TABLE products (
 ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
 COMMIT;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
@@ -139,7 +139,7 @@ CREATE TABLE products (
 );
 ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
         linter.settings.assume_in_transaction = true;
         let errors = linter.lint(file, sql);
@@ -151,7 +151,7 @@ ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
         let sql = r#"
 ALTER TABLE foo ADD COLUMN bar text CONSTRAINT foo_bar_unique UNIQUE;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -163,7 +163,7 @@ ALTER TABLE foo ADD COLUMN bar text CONSTRAINT foo_bar_unique UNIQUE;
         let sql = r#"
 ALTER TABLE foo ADD COLUMN bar text UNIQUE;
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);

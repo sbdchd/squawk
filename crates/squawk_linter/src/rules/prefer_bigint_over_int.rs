@@ -56,7 +56,7 @@ create table users (
     id serial4
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferBigintOverInt]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
@@ -99,7 +99,7 @@ create table users (
     id serial2
 );
         "#;
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferBigintOverInt]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);

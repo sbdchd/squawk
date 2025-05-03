@@ -75,7 +75,7 @@ mod test {
         COMMIT;
         "#;
 
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
@@ -91,7 +91,7 @@ ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
 
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
@@ -106,7 +106,7 @@ ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES 
 COMMIT;
         "#;
 
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 1);
@@ -121,7 +121,7 @@ ALTER TABLE "emails" ADD COLUMN "user_id" INT REFERENCES "user" ("id");
 COMMIT;
         "#;
 
-        let file = syntax::SourceFile::parse(sql);
+        let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 1);
