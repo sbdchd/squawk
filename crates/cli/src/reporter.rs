@@ -645,7 +645,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
 #[cfg(test)]
 mod test_check_files {
-    use insta::assert_yaml_snapshot;
+    use insta::assert_snapshot;
     use serde_json::Value;
 
     use crate::reporter::fmt_json;
@@ -662,7 +662,7 @@ select \;
         fmt_json(&mut buff, vec![res]).unwrap();
 
         let val: Value = serde_json::from_slice(&buff).unwrap();
-        assert_yaml_snapshot!(val);
+        assert_snapshot!(val);
     }
 }
 
