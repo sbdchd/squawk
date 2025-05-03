@@ -19,7 +19,7 @@ fn syntaxtest(fixture: Fixture<&str>) {
         .unwrap();
 
     let parent_dir = input_file.parent().and_then(|x| x.file_name()).unwrap();
-    let parse = SourceFile::parse(&content);
+    let parse = SourceFile::parse(content);
     let mut buffer = format!("{:#?}", parse.syntax_node());
     let errors = parse.errors();
     for syntax_error in &errors {

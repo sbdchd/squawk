@@ -249,7 +249,7 @@ fn api_walkthrough() {
     // match only the top level enum: that is the price we pay for increased API
     // flexibility
     let func_option = func_option_list.options().next().unwrap();
-    let option = match &func_option {
+    let option: &ast::AsFuncOption = match &func_option {
         ast::FuncOption::AsFuncOption(o) => o,
         _ => unreachable!(),
     };

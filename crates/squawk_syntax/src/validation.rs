@@ -46,8 +46,7 @@ fn validate_prefix_expr(prefix_expr: ast::PrefixExpr, acc: &mut Vec<SyntaxError>
     let Some(op) = prefix_expr
         .syntax()
         .children()
-        .into_iter()
-        .find_map(|x| ast::CustomOp::cast(x))
+        .find_map(ast::CustomOp::cast)
     else {
         return;
     };
@@ -58,7 +57,7 @@ fn validate_prefix_expr(prefix_expr: ast::PrefixExpr, acc: &mut Vec<SyntaxError>
 fn validate_custom_op(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
     // TODO: there's more we can validate
     let mut found = 0;
-    for node_or_token in op.syntax().children_with_tokens().into_iter() {
+    for node_or_token in op.syntax().children_with_tokens() {
         match node_or_token {
             rowan::NodeOrToken::Node(_) => (),
             rowan::NodeOrToken::Token(_) => {
@@ -69,14 +68,10 @@ fn validate_custom_op(op: ast::CustomOp, acc: &mut Vec<SyntaxError>) {
             return;
         }
     }
-    let token = op
-        .syntax()
-        .children_with_tokens()
-        .into_iter()
-        .find_map(|x| match x {
-            rowan::NodeOrToken::Node(_) => None,
-            rowan::NodeOrToken::Token(tk) => Some(tk.kind()),
-        });
+    let token = op.syntax().children_with_tokens().find_map(|x| match x {
+        rowan::NodeOrToken::Node(_) => None,
+        rowan::NodeOrToken::Token(tk) => Some(tk.kind()),
+    });
     if let Some(STAR | SLASH | L_ANGLE | R_ANGLE | EQ | PERCENT | CARET) = token {
         acc.push(SyntaxError::new(
             "Invalid operator.",
