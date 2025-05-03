@@ -2,7 +2,7 @@
 
 use std::ops;
 
-use lexer::tokenize;
+use squawk_lexer::tokenize;
 
 use crate::SyntaxKind;
 
@@ -151,7 +151,7 @@ impl<'a> Converter<'a> {
         }
     }
 
-    fn extend_token(&mut self, kind: &lexer::TokenKind, token_text: &str) {
+    fn extend_token(&mut self, kind: &squawk_lexer::TokenKind, token_text: &str) {
         // A note on an intended tradeoff:
         // We drop some useful information here (see patterns with double dots `..`)
         // Storing that info in `SyntaxKind` is not possible due to its layout requirements of
@@ -160,16 +160,16 @@ impl<'a> Converter<'a> {
 
         let syntax_kind = {
             match kind {
-                lexer::TokenKind::LineComment => SyntaxKind::COMMENT,
-                lexer::TokenKind::BlockComment { terminated } => {
+                squawk_lexer::TokenKind::LineComment => SyntaxKind::COMMENT,
+                squawk_lexer::TokenKind::BlockComment { terminated } => {
                     if !terminated {
                         err = "Missing trailing `*/` symbols to terminate the block comment";
                     }
                     SyntaxKind::COMMENT
                 }
 
-                lexer::TokenKind::Whitespace => SyntaxKind::WHITESPACE,
-                lexer::TokenKind::Ident => {
+                squawk_lexer::TokenKind::Whitespace => SyntaxKind::WHITESPACE,
+                squawk_lexer::TokenKind::Ident => {
                     // TODO: check for max identifier length
                     //
                     // see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
@@ -182,43 +182,43 @@ impl<'a> Converter<'a> {
                     // see: https://github.com/postgres/postgres/blob/e032e4c7ddd0e1f7865b246ec18944365d4f8614/src/include/pg_config_manual.h#L29
                     SyntaxKind::from_keyword(token_text).unwrap_or(SyntaxKind::IDENT)
                 }
-                lexer::TokenKind::Literal { kind, .. } => {
+                squawk_lexer::TokenKind::Literal { kind, .. } => {
                     self.extend_literal(token_text.len(), kind);
                     return;
                 }
-                lexer::TokenKind::Semi => SyntaxKind::SEMICOLON,
-                lexer::TokenKind::Comma => SyntaxKind::COMMA,
-                lexer::TokenKind::Dot => SyntaxKind::DOT,
-                lexer::TokenKind::OpenParen => SyntaxKind::L_PAREN,
-                lexer::TokenKind::CloseParen => SyntaxKind::R_PAREN,
-                lexer::TokenKind::OpenBracket => SyntaxKind::L_BRACK,
-                lexer::TokenKind::CloseBracket => SyntaxKind::R_BRACK,
-                lexer::TokenKind::At => SyntaxKind::AT,
-                lexer::TokenKind::Pound => SyntaxKind::POUND,
-                lexer::TokenKind::Tilde => SyntaxKind::TILDE,
-                lexer::TokenKind::Question => SyntaxKind::QUESTION,
-                lexer::TokenKind::Colon => SyntaxKind::COLON,
-                lexer::TokenKind::Eq => SyntaxKind::EQ,
-                lexer::TokenKind::Bang => SyntaxKind::BANG,
-                lexer::TokenKind::Lt => SyntaxKind::L_ANGLE,
-                lexer::TokenKind::Gt => SyntaxKind::R_ANGLE,
-                lexer::TokenKind::Minus => SyntaxKind::MINUS,
-                lexer::TokenKind::And => SyntaxKind::AMP,
-                lexer::TokenKind::Or => SyntaxKind::PIPE,
-                lexer::TokenKind::Plus => SyntaxKind::PLUS,
-                lexer::TokenKind::Star => SyntaxKind::STAR,
-                lexer::TokenKind::Slash => SyntaxKind::SLASH,
-                lexer::TokenKind::Caret => SyntaxKind::CARET,
-                lexer::TokenKind::Percent => SyntaxKind::PERCENT,
-                lexer::TokenKind::Unknown => SyntaxKind::ERROR,
-                lexer::TokenKind::UnknownPrefix => {
+                squawk_lexer::TokenKind::Semi => SyntaxKind::SEMICOLON,
+                squawk_lexer::TokenKind::Comma => SyntaxKind::COMMA,
+                squawk_lexer::TokenKind::Dot => SyntaxKind::DOT,
+                squawk_lexer::TokenKind::OpenParen => SyntaxKind::L_PAREN,
+                squawk_lexer::TokenKind::CloseParen => SyntaxKind::R_PAREN,
+                squawk_lexer::TokenKind::OpenBracket => SyntaxKind::L_BRACK,
+                squawk_lexer::TokenKind::CloseBracket => SyntaxKind::R_BRACK,
+                squawk_lexer::TokenKind::At => SyntaxKind::AT,
+                squawk_lexer::TokenKind::Pound => SyntaxKind::POUND,
+                squawk_lexer::TokenKind::Tilde => SyntaxKind::TILDE,
+                squawk_lexer::TokenKind::Question => SyntaxKind::QUESTION,
+                squawk_lexer::TokenKind::Colon => SyntaxKind::COLON,
+                squawk_lexer::TokenKind::Eq => SyntaxKind::EQ,
+                squawk_lexer::TokenKind::Bang => SyntaxKind::BANG,
+                squawk_lexer::TokenKind::Lt => SyntaxKind::L_ANGLE,
+                squawk_lexer::TokenKind::Gt => SyntaxKind::R_ANGLE,
+                squawk_lexer::TokenKind::Minus => SyntaxKind::MINUS,
+                squawk_lexer::TokenKind::And => SyntaxKind::AMP,
+                squawk_lexer::TokenKind::Or => SyntaxKind::PIPE,
+                squawk_lexer::TokenKind::Plus => SyntaxKind::PLUS,
+                squawk_lexer::TokenKind::Star => SyntaxKind::STAR,
+                squawk_lexer::TokenKind::Slash => SyntaxKind::SLASH,
+                squawk_lexer::TokenKind::Caret => SyntaxKind::CARET,
+                squawk_lexer::TokenKind::Percent => SyntaxKind::PERCENT,
+                squawk_lexer::TokenKind::Unknown => SyntaxKind::ERROR,
+                squawk_lexer::TokenKind::UnknownPrefix => {
                     err = "unknown literal prefix";
                     SyntaxKind::IDENT
                 }
-                lexer::TokenKind::Eof => SyntaxKind::EOF,
-                lexer::TokenKind::Backtick => SyntaxKind::BACKTICK,
-                lexer::TokenKind::Param => SyntaxKind::PARAM,
-                lexer::TokenKind::QuotedIdent { terminated } => {
+                squawk_lexer::TokenKind::Eof => SyntaxKind::EOF,
+                squawk_lexer::TokenKind::Backtick => SyntaxKind::BACKTICK,
+                squawk_lexer::TokenKind::Param => SyntaxKind::PARAM,
+                squawk_lexer::TokenKind::QuotedIdent { terminated } => {
                     if !terminated {
                         err = "Missing trailing \" to terminate the quoted identifier"
                     }
@@ -231,17 +231,17 @@ impl<'a> Converter<'a> {
         self.push(syntax_kind, token_text.len(), err);
     }
 
-    fn extend_literal(&mut self, len: usize, kind: &lexer::LiteralKind) {
+    fn extend_literal(&mut self, len: usize, kind: &squawk_lexer::LiteralKind) {
         let mut err = "";
 
         let syntax_kind = match *kind {
-            lexer::LiteralKind::Int { empty_int, base: _ } => {
+            squawk_lexer::LiteralKind::Int { empty_int, base: _ } => {
                 if empty_int {
                     err = "Missing digits after the integer base prefix";
                 }
                 SyntaxKind::INT_NUMBER
             }
-            lexer::LiteralKind::Float {
+            squawk_lexer::LiteralKind::Float {
                 empty_exponent,
                 base: _,
             } => {
@@ -250,28 +250,28 @@ impl<'a> Converter<'a> {
                 }
                 SyntaxKind::FLOAT_NUMBER
             }
-            lexer::LiteralKind::Str { terminated } => {
+            squawk_lexer::LiteralKind::Str { terminated } => {
                 if !terminated {
                     err = "Missing trailing `'` symbol to terminate the string literal";
                 }
                 // TODO: rust analzyer checks for un-escaped strings, we should too
                 SyntaxKind::STRING
             }
-            lexer::LiteralKind::ByteStr { terminated } => {
+            squawk_lexer::LiteralKind::ByteStr { terminated } => {
                 if !terminated {
                     err = "Missing trailing `'` symbol to terminate the hex bit string literal";
                 }
                 // TODO: rust analzyer checks for un-escaped strings, we should too
                 SyntaxKind::BYTE_STRING
             }
-            lexer::LiteralKind::BitStr { terminated } => {
+            squawk_lexer::LiteralKind::BitStr { terminated } => {
                 if !terminated {
                     err = "Missing trailing `\'` symbol to terminate the bit string literal";
                 }
                 // TODO: rust analzyer checks for un-escaped strings, we should too
                 SyntaxKind::BIT_STRING
             }
-            lexer::LiteralKind::DollarQuotedString { terminated } => {
+            squawk_lexer::LiteralKind::DollarQuotedString { terminated } => {
                 if !terminated {
                     // TODO: we could be fancier and say the ending string we're looking for
                     err = "Unterminated dollar quoted string literal";
@@ -279,14 +279,14 @@ impl<'a> Converter<'a> {
                 // TODO: rust analzyer checks for un-escaped strings, we should too
                 SyntaxKind::DOLLAR_QUOTED_STRING
             }
-            lexer::LiteralKind::UnicodeEscStr { terminated } => {
+            squawk_lexer::LiteralKind::UnicodeEscStr { terminated } => {
                 if !terminated {
                     err = "Missing trailing `'` symbol to terminate the unicode escape string literal";
                 }
                 // TODO: rust analzyer checks for un-escaped strings, we should too
                 SyntaxKind::BYTE_STRING
             }
-            lexer::LiteralKind::EscStr { terminated } => {
+            squawk_lexer::LiteralKind::EscStr { terminated } => {
                 if !terminated {
                     err = "Missing trailing `\'` symbol to terminate the escape string literal";
                 }
