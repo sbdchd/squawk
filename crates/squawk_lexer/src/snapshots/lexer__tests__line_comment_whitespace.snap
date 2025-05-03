@@ -1,0 +1,15 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\nselect 'Hello' -- This is a comment\n' World';\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "'Hello'" @ Literal { kind: Str { terminated: true } },
+    " " @ Whitespace,
+    "-- This is a comment" @ LineComment,
+    "\n" @ Whitespace,
+    "' World'" @ Literal { kind: Str { terminated: true } },
+    ";" @ Semi,
+]

@@ -1,0 +1,11 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\n\"hello &1 -world\";\n\n\n\"hello-world\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "\"hello &1 -world\"" @ QuotedIdent { terminated: true },
+    ";" @ Semi,
+    "\n\n\n" @ Whitespace,
+    "\"hello-world\n" @ QuotedIdent { terminated: false },
+]

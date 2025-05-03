@@ -1,0 +1,10 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\n-- dollar quoting with mismatched tags\n$foo$hello world$bar$\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "-- dollar quoting with mismatched tags" @ LineComment,
+    "\n" @ Whitespace,
+    "$foo$hello world$bar$\n" @ Literal { kind: DollarQuotedString { terminated: false } },
+]

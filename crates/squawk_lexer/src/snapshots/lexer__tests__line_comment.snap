@@ -1,0 +1,9 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: result
+---
+[
+    "\n" @ Whitespace,
+    "-- foooooooooooo bar buzz" @ LineComment,
+    "\n" @ Whitespace,
+]

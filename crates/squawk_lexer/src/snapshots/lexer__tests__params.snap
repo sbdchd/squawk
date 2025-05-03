@@ -1,0 +1,26 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\nselect $1 + $2;\n\nselect $1123123123123;\n\nselect $;\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "$1" @ Param,
+    " " @ Whitespace,
+    "+" @ Plus,
+    " " @ Whitespace,
+    "$2" @ Param,
+    ";" @ Semi,
+    "\n\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "$1123123123123" @ Param,
+    ";" @ Semi,
+    "\n\n" @ Whitespace,
+    "select" @ Ident,
+    " " @ Whitespace,
+    "$" @ Param,
+    ";" @ Semi,
+    "\n" @ Whitespace,
+]
