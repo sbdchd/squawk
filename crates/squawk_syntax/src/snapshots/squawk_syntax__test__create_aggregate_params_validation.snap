@@ -1,0 +1,47 @@
+---
+source: crates/syntax/src/test.rs
+input_file: crates/syntax/test_data/validation/create_aggregate_params.sql
+---
+SOURCE_FILE@0..91
+  COMMENT@0..38 "-- can't have out par ..."
+  WHITESPACE@38..39 "\n"
+  ALTER_AGGREGATE_STMT@39..88
+    ALTER_KW@39..44 "alter"
+    WHITESPACE@44..45 " "
+    AGGREGATE_KW@45..54 "aggregate"
+    WHITESPACE@54..55 " "
+    PATH@55..56
+      PATH_SEGMENT@55..56
+        NAME_REF@55..56
+          IDENT@55..56 "a"
+    WHITESPACE@56..57 " "
+    PARAM_LIST@57..70
+      L_PAREN@57..58 "("
+      PARAM@58..62
+        PARAM_IN@58..60
+          IN_KW@58..60 "in"
+        WHITESPACE@60..61 " "
+        PATH_TYPE@61..62
+          IDENT@61..62 "t"
+      COMMA@62..63 ","
+      WHITESPACE@63..64 " "
+      PARAM@64..69
+        PARAM_OUT@64..67
+          OUT_KW@64..67 "out"
+        WHITESPACE@67..68 " "
+        PATH_TYPE@68..69
+          IDENT@68..69 "u"
+      R_PAREN@69..70 ")"
+    WHITESPACE@70..76 " \n    "
+    SET_KW@76..79 "set"
+    WHITESPACE@79..80 " "
+    SCHEMA_KW@80..86 "schema"
+    WHITESPACE@86..87 " "
+    PATH@87..88
+      PATH_SEGMENT@87..88
+        NAME_REF@87..88
+          IDENT@87..88 "s"
+  SEMICOLON@88..89 ";"
+  WHITESPACE@89..91 "\n\n"
+
+ERROR@64:67 "Out params are not allowed with aggregates."

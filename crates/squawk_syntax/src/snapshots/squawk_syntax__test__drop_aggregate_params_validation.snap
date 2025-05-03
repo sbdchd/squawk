@@ -1,0 +1,239 @@
+---
+source: crates/syntax/src/test.rs
+input_file: crates/syntax/test_data/validation/drop_aggregate_params.sql
+---
+SOURCE_FILE@0..389
+  WHITESPACE@0..1 "\n"
+  COMMENT@1..8 "-- full"
+  WHITESPACE@8..9 "\n"
+  DROP_AGGREGATE_STMT@9..167
+    DROP_KW@9..13 "drop"
+    WHITESPACE@13..14 " "
+    AGGREGATE_KW@14..23 "aggregate"
+    WHITESPACE@23..27 " \n  "
+    IF_EXISTS@27..36
+      IF_KW@27..29 "if"
+      WHITESPACE@29..30 " "
+      EXISTS_KW@30..36 "exists"
+    WHITESPACE@36..42 " \n    "
+    CALL_EXPR@42..46
+      PATH@42..43
+        PATH_SEGMENT@42..43
+          NAME_REF@42..43
+            IDENT@42..43 "a"
+      PARAM_LIST@43..46
+        L_PAREN@43..44 "("
+        STAR@44..45 "*"
+        R_PAREN@45..46 ")"
+    COMMA@46..47 ","
+    WHITESPACE@47..53 " \n    "
+    CALL_EXPR@53..63
+      PATH@53..60
+        PATH@53..56
+          PATH_SEGMENT@53..56
+            NAME_REF@53..56
+              IDENT@53..56 "foo"
+        DOT@56..57 "."
+        PATH_SEGMENT@57..60
+          NAME_REF@57..60
+            IDENT@57..60 "bar"
+      PARAM_LIST@60..63
+        L_PAREN@60..61 "("
+        STAR@61..62 "*"
+        R_PAREN@62..63 ")"
+    COMMA@63..64 ","
+    WHITESPACE@64..70 " \n    "
+    CALL_EXPR@70..146
+      PATH@70..77
+        PATH@70..73
+          PATH_SEGMENT@70..73
+            NAME_REF@70..73
+              IDENT@70..73 "foo"
+        DOT@73..74 "."
+        PATH_SEGMENT@74..77
+          NAME_REF@74..77
+            IDENT@74..77 "bar"
+      PARAM_LIST@77..146
+        L_PAREN@77..78 "("
+        WHITESPACE@78..87 "\n        "
+        PARAM@87..101
+          PARAM_IN@87..89
+            IN_KW@87..89 "in"
+          WHITESPACE@89..90 " "
+          NAME@90..93
+            IDENT@90..93 "foo"
+          WHITESPACE@93..94 " "
+          PATH_TYPE@94..101
+            PATH@94..101
+              PATH_SEGMENT@94..101
+                NAME_REF@94..101
+                  INTEGER_KW@94..101 "integer"
+        COMMA@101..102 ","
+        WHITESPACE@102..111 "\n        "
+        PARAM@111..126
+          PARAM_OUT@111..114
+            OUT_KW@111..114 "out"
+          WHITESPACE@114..115 " "
+          NAME@115..118
+            IDENT@115..118 "bar"
+          WHITESPACE@118..119 " "
+          PATH_TYPE@119..126
+            PATH@119..126
+              PATH_SEGMENT@119..126
+                NAME_REF@119..126
+                  INTEGER_KW@119..126 "integer"
+        COMMA@126..127 ","
+        WHITESPACE@127..136 "\n        "
+        PARAM@136..140
+          PATH_TYPE@136..140
+            TEXT_KW@136..140 "text"
+        WHITESPACE@140..145 "\n    "
+        R_PAREN@145..146 ")"
+    COMMA@146..147 ","
+    WHITESPACE@147..153 " \n    "
+    CALL_EXPR@153..157
+      PATH@153..154
+        PATH_SEGMENT@153..154
+          NAME_REF@153..154
+            IDENT@153..154 "c"
+      PARAM_LIST@154..157
+        L_PAREN@154..155 "("
+        STAR@155..156 "*"
+        R_PAREN@156..157 ")"
+    WHITESPACE@157..160 "\n  "
+    CASCADE_KW@160..167 "cascade"
+  SEMICOLON@167..168 ";"
+  WHITESPACE@168..170 "\n\n"
+  COMMENT@170..182 "-- aggregate"
+  WHITESPACE@182..183 "\n"
+  DROP_AGGREGATE_STMT@183..299
+    DROP_KW@183..187 "drop"
+    WHITESPACE@187..188 " "
+    AGGREGATE_KW@188..197 "aggregate"
+    WHITESPACE@197..198 " "
+    CALL_EXPR@198..290
+      PATH@198..199
+        PATH_SEGMENT@198..199
+          NAME_REF@198..199
+            IDENT@198..199 "a"
+      PARAM_LIST@199..290
+        L_PAREN@199..200 "("
+        WHITESPACE@200..203 "\n  "
+        PARAM@203..210
+          PATH_TYPE@203..210
+            PATH@203..210
+              PATH_SEGMENT@203..210
+                NAME_REF@203..210
+                  INTEGER_KW@203..210 "integer"
+        COMMA@210..211 ","
+        WHITESPACE@211..214 "\n  "
+        PARAM@214..218
+          PATH_TYPE@214..218
+            TEXT_KW@214..218 "text"
+        COMMA@218..219 ","
+        WHITESPACE@219..222 "\n  "
+        PARAM@222..229
+          PATH_TYPE@222..229
+            PATH@222..229
+              PATH_SEGMENT@222..229
+                NAME_REF@222..229
+                  NUMERIC_KW@222..229 "numeric"
+        WHITESPACE@229..232 "\n  "
+        ORDER_KW@232..237 "order"
+        WHITESPACE@237..238 " "
+        BY_KW@238..240 "by"
+        WHITESPACE@240..245 "\n    "
+        PARAM@245..259
+          PARAM_IN@245..247
+            IN_KW@245..247 "in"
+          WHITESPACE@247..248 " "
+          NAME@248..249
+            IDENT@248..249 "a"
+          WHITESPACE@249..250 " "
+          TIME_TYPE@250..259
+            NAME_REF@250..259
+              TIMESTAMP_KW@250..259 "timestamp"
+        COMMA@259..260 ","
+        WHITESPACE@260..265 "\n    "
+        PARAM@265..278
+          PARAM_OUT@265..268
+            OUT_KW@265..268 "out"
+          WHITESPACE@268..269 " "
+          NAME@269..270
+            IDENT@269..270 "b"
+          WHITESPACE@270..271 " "
+          PATH_TYPE@271..278
+            PATH@271..278
+              PATH_SEGMENT@271..278
+                NAME_REF@271..278
+                  NUMERIC_KW@271..278 "numeric"
+        COMMA@278..279 ","
+        WHITESPACE@279..284 "\n    "
+        PARAM@284..288
+          PATH_TYPE@284..288
+            TEXT_KW@284..288 "text"
+        WHITESPACE@288..289 "\n"
+        R_PAREN@289..290 ")"
+    WHITESPACE@290..291 " "
+    RESTRICT_KW@291..299 "restrict"
+  SEMICOLON@299..300 ";"
+  WHITESPACE@300..302 "\n\n"
+  DROP_AGGREGATE_STMT@302..386
+    DROP_KW@302..306 "drop"
+    WHITESPACE@306..307 " "
+    AGGREGATE_KW@307..316 "aggregate"
+    WHITESPACE@316..317 " "
+    CALL_EXPR@317..386
+      PATH@317..324
+        PATH@317..320
+          PATH_SEGMENT@317..320
+            NAME_REF@317..320
+              IDENT@317..320 "foo"
+        DOT@320..321 "."
+        PATH_SEGMENT@321..324
+          NAME_REF@321..324
+            IDENT@321..324 "bar"
+      PARAM_LIST@324..386
+        L_PAREN@324..325 "("
+        WHITESPACE@325..328 "\n  "
+        ORDER_KW@328..333 "order"
+        WHITESPACE@333..334 " "
+        BY_KW@334..336 "by"
+        WHITESPACE@336..341 "\n    "
+        PARAM@341..355
+          PARAM_IN@341..343
+            IN_KW@341..343 "in"
+          WHITESPACE@343..344 " "
+          NAME@344..345
+            IDENT@344..345 "a"
+          WHITESPACE@345..346 " "
+          TIME_TYPE@346..355
+            NAME_REF@346..355
+              TIMESTAMP_KW@346..355 "timestamp"
+        COMMA@355..356 ","
+        WHITESPACE@356..361 "\n    "
+        PARAM@361..374
+          PARAM_OUT@361..364
+            OUT_KW@361..364 "out"
+          WHITESPACE@364..365 " "
+          NAME@365..366
+            IDENT@365..366 "b"
+          WHITESPACE@366..367 " "
+          PATH_TYPE@367..374
+            PATH@367..374
+              PATH_SEGMENT@367..374
+                NAME_REF@367..374
+                  NUMERIC_KW@367..374 "numeric"
+        COMMA@374..375 ","
+        WHITESPACE@375..380 "\n    "
+        PARAM@380..384
+          PATH_TYPE@380..384
+            TEXT_KW@380..384 "text"
+        WHITESPACE@384..385 "\n"
+        R_PAREN@385..386 ")"
+  SEMICOLON@386..387 ";"
+  WHITESPACE@387..389 "\n\n"
+
+ERROR@111:114 "Out params are not allowed with aggregates."
+ERROR@265:268 "Out params are not allowed with aggregates."
+ERROR@361:364 "Out params are not allowed with aggregates."
