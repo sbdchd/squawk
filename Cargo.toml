@@ -40,6 +40,7 @@ squawk-parser = { version = "0.0.0", path = "./crates/parser" }
 squawk-linter = { version = "0.0.0", path = "./crates/linter" }
 squawk-github = { version = "0.0.0", path = "./crates/github" }
 squawk_lexer = { version = "0.0.0", path = "./crates/squawk_lexer" }
+squawk_parser = { version = "0.0.0", path = "./crates/squawk_parser" }
 
 [workspace.lints.clippy]
 collapsible_else_if = "allow"
