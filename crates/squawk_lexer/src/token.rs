@@ -79,13 +79,13 @@ pub enum TokenKind {
     UnknownPrefix,
     /// Positional Parameter, e.g., `$1`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-expressions.html#SQL-EXPRESSIONS-PARAMETERS-POSITIONAL
+    /// see: <https://www.postgresql.org/docs/16/sql-expressions.html#SQL-EXPRESSIONS-PARAMETERS-POSITIONAL>
     Param,
     /// Quoted Identifier, e.g., `"update"` in `update "my_table" set "a" = 5;`
     ///
     /// These are case-sensitive, unlike [`TokenKind::Ident`]
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-IDENTIFIERS>
     QuotedIdent { terminated: bool },
 }
 
@@ -122,34 +122,34 @@ pub enum Base {
 pub enum LiteralKind {
     /// Integer Numeric, e.g., `42`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
     Int { base: Base, empty_int: bool },
     /// Float Numeric, e.g., `1.925e-3`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-CONSTANTS-NUMERIC>
     Float { base: Base, empty_exponent: bool },
     /// String, e.g., `'foo'`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS>
     Str { terminated: bool },
     /// Hexidecimal Bit String, e.g., `X'1FF'`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS>
     ByteStr { terminated: bool },
     /// Bit String, e.g., `B'1001'`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS>
     BitStr { terminated: bool },
     /// Dollar Quoted String, e.g., `$$Dianne's horse$$`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING>
     DollarQuotedString { terminated: bool },
     /// Unicode Escape String, e.g., `U&'d\0061t\+000061'`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE>
     UnicodeEscStr { terminated: bool },
     /// Escape String, e.g, `E'foo'`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html>
     EscStr { terminated: bool },
 }

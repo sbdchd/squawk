@@ -32,9 +32,8 @@ const fn is_whitespace(c: char) -> bool {
 impl Cursor<'_> {
     // see: https://github.com/rust-lang/rust/blob/ba1d7f4a083e6402679105115ded645512a7aea8/compiler/rustc_lexer/src/lib.rs#L339
     pub(crate) fn advance_token(&mut self) -> Token {
-        let first_char = match self.bump() {
-            Some(c) => c,
-            None => return Token::new(TokenKind::Eof, 0),
+        let Some(first_char) = self.bump() else {
+            return Token::new(TokenKind::Eof, 0);
         };
         let token_kind = match first_char {
             // Slash, comment or block comment.
@@ -418,7 +417,7 @@ impl Cursor<'_> {
 
                 // might be the start of our start/end sequence
                 let mut match_count = 0;
-                for start_char in start.iter() {
+                for start_char in &start {
                     if self.first() == *start_char {
                         self.bump();
                         match_count += 1;
