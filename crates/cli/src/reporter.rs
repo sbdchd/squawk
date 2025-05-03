@@ -562,7 +562,7 @@ pub fn get_comment_body(files: &[ViolationContent], version: &str) -> String {
 mod test_github_comment {
     use super::*;
 
-    use insta::assert_display_snapshot;
+    use insta::assert_snapshot;
 
     /// Most cases, hopefully, will be a single migration for a given PR, but
     /// let's check the case of multiple migrations
@@ -593,7 +593,7 @@ SELECT 1;
 
         let body = get_comment_body(&violations, "0.2.3");
 
-        assert_display_snapshot!(body);
+        assert_snapshot!(body);
     }
 
     /// Even when we don't have violations we still want to output the SQL for
@@ -628,7 +628,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
         let body = get_comment_body(&violations, "0.2.3");
 
-        assert_display_snapshot!(body);
+        assert_snapshot!(body);
     }
 
     /// Ideally the logic won't leave a comment when there are no migrations but
@@ -639,13 +639,13 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
 
         let body = get_comment_body(&violations, "0.2.3");
 
-        assert_display_snapshot!(body);
+        assert_snapshot!(body);
     }
 }
 
 #[cfg(test)]
 mod test_check_files {
-    use insta::assert_yaml_snapshot;
+    use insta::assert_snapshot;
     use serde_json::Value;
 
     use crate::reporter::fmt_json;
@@ -662,7 +662,7 @@ select \;
         fmt_json(&mut buff, vec![res]).unwrap();
 
         let val: Value = serde_json::from_slice(&buff).unwrap();
-        assert_yaml_snapshot!(val);
+        assert_snapshot!(val);
     }
 }
 
@@ -671,7 +671,7 @@ mod test_reporter {
     use crate::reporter::{pretty_violations, print_violations, Reporter};
 
     use console::strip_ansi_codes;
-    use insta::{assert_debug_snapshot, assert_display_snapshot};
+    use insta::{assert_debug_snapshot, assert_snapshot};
 
     use squawk_linter::{
         check_sql_with_rule,
@@ -703,7 +703,7 @@ SELECT 1;
         );
         assert!(res.is_ok());
 
-        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r"
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r"
         main.sql:1:0: warning: adding-required-field Adding a NOT NULL field without a DEFAULT will fail for a populated table. Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).
         main.sql:3:1: warning: adding-required-field Adding a NOT NULL field without a DEFAULT will fail for a populated table. Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).
         ");
@@ -728,7 +728,7 @@ SELECT 1;
 
         assert!(res.is_ok());
         // remove the color codes so tests behave in CI as they do locally
-        assert_display_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
+        assert_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
     }
     #[test]
     fn display_no_violations_tty() {
@@ -742,7 +742,7 @@ SELECT 1;
 
         assert!(res.is_ok());
         // remove the color codes so tests behave in CI as they do locally
-        assert_display_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
+        assert_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
     }
 
     #[test]
@@ -763,7 +763,7 @@ SELECT 1;
         );
 
         assert!(res.is_ok());
-        assert_display_snapshot!(String::from_utf8_lossy(&buff), @r#"
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"
         [{"file":"main.sql","line":1,"column":0,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field without a DEFAULT will fail for a populated table."},{"Help":"Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+)."}],"rule_name":"adding-required-field"},{"file":"main.sql","line":3,"column":1,"level":"Warning","messages":[{"Note":"Adding a NOT NULL field without a DEFAULT will fail for a populated table."},{"Help":"Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+)."}],"rule_name":"adding-required-field"}]
         "#);
     }
@@ -872,6 +872,6 @@ SELECT 1;
             .iter()
             .map(|v| v.sql.clone())
             .collect::<String>();
-        assert_display_snapshot!(columns);
+        assert_snapshot!(columns);
     }
 }

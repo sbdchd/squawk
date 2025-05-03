@@ -432,7 +432,7 @@ pub fn check_sql_with_rule(
 #[cfg(test)]
 mod test_rules {
     use super::*;
-    use insta::{assert_debug_snapshot, assert_display_snapshot};
+    use insta::{assert_debug_snapshot, assert_snapshot};
     use std::convert::TryFrom;
     use std::str::FromStr;
 
@@ -462,7 +462,7 @@ mod test_rules {
     #[test]
     fn rule_names_display_snap() {
         let rule_names: Vec<String> = RULES.iter().map(|r| r.name.to_string()).collect();
-        assert_display_snapshot!(rule_names.join("\n"));
+        assert_snapshot!(rule_names.join("\n"));
     }
 
     /// Ensure we stort the resulting violations by where they occur in the file.
