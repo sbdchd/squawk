@@ -1,5 +1,5 @@
 [package]
-name = "parser"
+name = "squawk_parser"
 version = "0.0.0"
 description = "TBD"
 

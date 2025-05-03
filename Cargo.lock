@@ -1213,18 +1213,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "parser"
-version = "0.0.0"
-dependencies = [
- "camino",
- "dir-test",
- "drop_bomb",
- "insta",
- "pg_query",
- "squawk_lexer",
-]
-
-[[package]]
 name = "peeking_take_while"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1889,6 +1877,18 @@ name = "squawk_lexer"
 version = "0.0.0"
 dependencies = [
  "insta",
+]
+
+[[package]]
+name = "squawk_parser"
+version = "0.0.0"
+dependencies = [
+ "camino",
+ "dir-test",
+ "drop_bomb",
+ "insta",
+ "pg_query",
+ "squawk_lexer",
 ]
 
 [[package]]
