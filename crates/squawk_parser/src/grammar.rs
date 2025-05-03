@@ -516,7 +516,7 @@ fn json_object_fn(p: &mut Parser<'_>) -> CompletedMarker {
     })
 }
 
-/// https://www.postgresql.org/docs/17/functions-json.html#FUNCTIONS-SQLJSON-TABLE
+/// <https://www.postgresql.org/docs/17/functions-json.html#FUNCTIONS-SQLJSON-TABLE>
 fn json_table_fn(p: &mut Parser<'_>) -> CompletedMarker {
     custom_fn(p, JSON_TABLE_KW, |p| {
         json_table_arg_list(p);
@@ -748,7 +748,7 @@ fn json_array_fn(p: &mut Parser<'_>) -> CompletedMarker {
     })
 }
 
-/// https://www.postgresql.org/docs/17/functions-comparisons.html#FUNCTIONS-COMPARISONS-ANY-SOME
+/// <https://www.postgresql.org/docs/17/functions-comparisons.html#FUNCTIONS-COMPARISONS-ANY-SOME>
 fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SOME_KW) || p.at(ANY_KW) || p.at(ALL_KW));
     let m = p.start();
@@ -2335,8 +2335,8 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
 }
 
 // error recovery:
-// - https://youtu.be/0HlrqwLjCxA?feature=shared&t=2172
-/// https://www.postgresql.org/docs/17/sql-select.html
+// - <https://youtu.be/0HlrqwLjCxA?feature=shared&t=2172>
+/// <https://www.postgresql.org/docs/17/sql-select.html>
 fn select_stmt(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
     assert!(p.at_ts(SELECT_FIRST));
     let m = m.unwrap_or_else(|| p.start());
@@ -4249,7 +4249,7 @@ fn opt_if_exists(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 // DROP TABLE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-/// https://www.postgresql.org/docs/17/sql-droptable.html
+/// <https://www.postgresql.org/docs/17/sql-droptable.html>
 fn drop_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, TABLE_KW));
     let m = p.start();

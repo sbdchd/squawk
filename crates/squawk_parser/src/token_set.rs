@@ -34,7 +34,7 @@ pub(crate) struct TokenSet([u64; 10]);
 
 /// `TokenSet`s should only include token `SyntaxKind`s, so the discriminant of any passed/included
 /// `SyntaxKind` must *not* be greater than that of the last token `SyntaxKind`.
-/// See https://github.com/rust-lang/rust-analyzer/pull/17037.
+/// See <https://github.com/rust-lang/rust-analyzer/pull/17037>.
 const LAST_TOKEN_KIND_DISCRIMINANT: usize = SyntaxKind::WHITESPACE as usize;
 
 impl TokenSet {

@@ -89,7 +89,7 @@ impl Marker {
 
     /// Finishes the syntax tree node and assigns `kind` to it,
     /// and mark the create a `CompletedMarker` for possible future
-    /// operation like `.precede()` to deal with forward_parent.
+    /// operation like `.precede()` to deal with `forward_parent`.
     pub(crate) fn complete(mut self, p: &mut Parser<'_>, kind: SyntaxKind) -> CompletedMarker {
         self.bomb.defuse();
         let idx = self.pos as usize;
@@ -142,7 +142,7 @@ impl CompletedMarker {
     /// `CompletedMarker(pos: 0, _)`.
     /// Append a new `START` events as `[START, FINISH, NEWSTART]`,
     /// then mark `NEWSTART` as `START`'s parent with saving its relative
-    /// distance to `NEWSTART` into forward_parent(=2 in this case);
+    /// distance to `NEWSTART` into `forward_parent`(=2 in this case);
     pub(crate) fn precede(self, p: &mut Parser<'_>) -> Marker {
         let new_pos = p.start();
         let idx = self.pos as usize;

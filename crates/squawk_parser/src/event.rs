@@ -52,7 +52,7 @@ pub(crate) enum Event {
     ///
     /// Consider this path
     ///
-    /// foo::bar
+    /// `foo::bar`
     ///
     /// The events for it would look like this:
     ///

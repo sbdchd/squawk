@@ -62,7 +62,7 @@ pub enum SyntaxKind {
     /// `=`
     EQ,
     /// `=>`
-    /// Used for NAMED_ARG
+    /// Used for `NAMED_ARG`
     FAT_ARROW,
     /// ```
     /// `
@@ -1076,26 +1076,26 @@ pub enum SyntaxKind {
     STRING,
     /// `X'1FF'`, `U&'d\0061t\+000061'`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE>
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS>
     BYTE_STRING,
     /// `B'1001'`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS>
     BIT_STRING,
     /// `$$Dianne's horse$$`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING>
     DOLLAR_QUOTED_STRING,
     /// `E'foo'`
     ///
-    /// see: https://www.postgresql.org/docs/16/sql-syntax-lexical.html
+    /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html>
     ESC_STRING,
     /// `-- foo`
     /// or
     /// `/* foo */`
     ///
-    /// see: https://www.postgresql.org/docs/17/sql-syntax-lexical.html#SQL-SYNTAX-COMMENTS
+    /// see: <https://www.postgresql.org/docs/17/sql-syntax-lexical.html#SQL-SYNTAX-COMMENTS>
     COMMENT,
     IDENT,
     PARAM,
@@ -1114,7 +1114,7 @@ pub enum SyntaxKind {
     IS_NULL,
     IS_NOT,
     IS_NOT_DISTINCT_FROM,
-    /// https://www.postgresql.org/docs/17/sql-expressions.html#SQL-EXPRESSIONS-OPERATOR-CALLS
+    /// <https://www.postgresql.org/docs/17/sql-expressions.html#SQL-EXPRESSIONS-OPERATOR-CALLS>
     /// Left assoc in postgres/gram.y
     /// Same precedence as operators
     OPERATOR_CALL,
