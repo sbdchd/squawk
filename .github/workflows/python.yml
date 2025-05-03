@@ -59,7 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-linux-${{ matrix.platform.target }}
-          path: cli/dist
+          path: crates/ci/dist
           if-no-files-found: error
 
   windows:
@@ -86,7 +86,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-windows-${{ matrix.platform.target }}
-          path: cli/dist
+          path: crates/ci/dist
           if-no-files-found: error
 
   macos:
@@ -113,7 +113,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-macos-${{ matrix.platform.target }}
-          path: cli/dist
+          path: crates/ci/dist
           if-no-files-found: error
 
   sdist:
@@ -132,7 +132,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: wheels-sdist
-          path: cli/dist
+          path: crates/cli/dist
           if-no-files-found: error
 
   release:
