@@ -1,0 +1,25 @@
+[package]
+name = "parser"
+version = "0.0.0"
+description = "TBD"
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lib]
+doctest = false
+
+[dependencies]
+squawk_lexer.workspace = true
+drop_bomb.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+dir-test.workspace = true
+camino.workspace = true
+pg_query.workspace = true
+
+[lints]
+workspace = true

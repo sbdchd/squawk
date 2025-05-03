@@ -28,11 +28,16 @@ simplelog = "0.12.0"
 structopt = "0.3"
 tempfile = "3.2.0"
 toml = "0.5.9"
+dir-test = "0.4"
+drop_bomb = "0.1.5"
+camino = "1.1.9"
+pg_query = "6.1.0"
 
 # local
 squawk-parser = { version = "0.0.0", path = "./crates/parser" }
 squawk-linter = { version = "0.0.0", path = "./crates/linter" }
 squawk-github = { version = "0.0.0", path = "./crates/github" }
+squawk_lexer = { version = "0.0.0", path = "./crates/squawk_lexer" }
 
 [workspace.lints.clippy]
 collapsible_else_if = "allow"
@@ -40,6 +45,7 @@ collapsible_if = "allow"
 needless_return = "allow"
 doc_markdown = "deny"
 manual_let_else = "deny"
+explicit_iter_loop = "deny"
 
 [profile.dev]
 debug = 0

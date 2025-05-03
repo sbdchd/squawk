@@ -1,0 +1,218 @@
+---
+source: crates/parser/src/test.rs
+input_file: crates/parser/test_data/err/select.sql
+---
+SOURCE_FILE
+  COMMENT "--- via https://duckdb.org/docs/stable/sql/dialect/friendly_sql.html#trailing-commas"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "\n  "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "42"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "x"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          ARRAY_EXPR
+            ARRAY_KW "array"
+            L_BRACK "["
+            LITERAL
+              STRING "'a'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'c'"
+            ERROR
+              COMMA ","
+            R_BRACK "]"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "y"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          LITERAL
+            STRING "'hello world'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "z"
+        ERROR
+          COMMA ","
+  WHITESPACE "\n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing comma in column list"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "as"
+        WHITESPACE " "
+        NAME
+          IDENT "u"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "a"
+          ERROR
+            COMMA ","
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          NAME
+            IDENT "c"
+        WHITESPACE "  "
+        TARGET
+          NAME_REF
+            IDENT "d"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "e"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "--          ^ ^ comma missing"
+  WHITESPACE "\n"
+  COMMENT "--          \\-- this is a label"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing comma in args"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              ERROR
+                COMMA ","
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing args"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "f"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              ERROR
+                COMMA ","
+              ERROR
+                COMMA ","
+              ERROR
+                COMMA ","
+              ERROR
+                COMMA ","
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- in can only be used with tuples / sub queries"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            IN_KW "in"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trailing comma at EOF"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+        ERROR
+          COMMA ","
+  WHITESPACE "\n"
+---
+ERROR@124: unexpected trailing comma
+ERROR@153: unexpected trailing comma
+ERROR@213: unexpected trailing comma
+ERROR@248: missing comma
+ERROR@362: unexpected trailing comma
+ERROR@394: expected expression
+ERROR@395: expected expression
+ERROR@396: expected expression
+ERROR@397: expected expression
+ERROR@500: unexpected trailing comma

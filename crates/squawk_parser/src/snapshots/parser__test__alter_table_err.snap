@@ -1,0 +1,58 @@
+---
+source: crates/parser/src/test.rs
+input_file: crates/parser/test_data/err/alter_table.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing alter_table"
+  WHITESPACE "\n"
+  ERROR
+    ADD_KW "add"
+  WHITESPACE " "
+  ERROR
+    COLUMN_KW "column"
+  WHITESPACE " "
+  ERROR
+    IDENT "foo"
+  WHITESPACE " "
+  ERROR
+    BOOLEAN_KW "boolean"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- mismatch options"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ALTER_CONSTRAINT
+      ALTER_KW "alter"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      CONSTRAINT_OPTION_LIST
+        NOT_DEFERRABLE_CONSTRAINT_OPTION
+          NOT_KW "not"
+          WHITESPACE " "
+          DEFERRABLE_KW "deferrable"
+        WHITESPACE " "
+        INITALLY_DEFERRED_CONSTRAINT_OPTION
+          INITIALLY_KW "initially"
+          WHITESPACE " "
+          DEFERRED_KW "deferred"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@23: expected command, found ADD_KW
+ERROR@27: expected command, found COLUMN_KW
+ERROR@34: expected command, found IDENT
+ERROR@38: expected command, found BOOLEAN_KW
+ERROR@134: constraint declared INITIALLY DEFERRED must be DEFERRABLE
