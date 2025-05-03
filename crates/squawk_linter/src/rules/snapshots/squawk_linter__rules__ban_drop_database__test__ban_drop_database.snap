@@ -1,0 +1,24 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_database.rs
+expression: errors
+---
+[
+    Violation {
+        code: BanDropDatabase,
+        message: "Dropping a database may break existing clients.",
+        text_range: 9..35,
+        messages: [],
+    },
+    Violation {
+        code: BanDropDatabase,
+        message: "Dropping a database may break existing clients.",
+        text_range: 45..81,
+        messages: [],
+    },
+    Violation {
+        code: BanDropDatabase,
+        message: "Dropping a database may break existing clients.",
+        text_range: 91..127,
+        messages: [],
+    },
+]

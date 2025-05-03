@@ -1,0 +1,22 @@
+[package]
+name = "squawk_linter"
+version = "0.0.0"
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+syntax.workspace = true
+lexer.workspace = true
+rowan.workspace = true
+
+serde.workspace = true
+lazy_static.workspace = true
+insta.workspace = true
+enum-iterator.workspace = true
+line-index.workspace = true
+
+
+[lints]
+workspace = true

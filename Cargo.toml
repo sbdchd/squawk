@@ -34,6 +34,8 @@ camino = "1.1.9"
 pg_query = "6.1.0"
 rowan = "0.15.15"
 smol_str = "0.3.2"
+enum-iterator = "2.1.0"
+line-index = "0.1.2"
 
 # local
 squawk-parser = { version = "0.0.0", path = "./crates/parser" }

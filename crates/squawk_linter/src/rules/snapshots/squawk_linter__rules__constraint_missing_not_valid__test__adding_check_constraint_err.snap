@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/constraint_missing_not_valid.rs
+expression: errors
+---
+[
+    Violation {
+        code: ConstraintMissingNotValid,
+        message: "By default new constraints require a table scan and block writes to the table while that scan occurs.",
+        text_range: 38..94,
+        messages: [],
+    },
+]

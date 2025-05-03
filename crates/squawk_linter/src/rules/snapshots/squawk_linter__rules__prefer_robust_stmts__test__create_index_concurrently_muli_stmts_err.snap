@@ -1,0 +1,22 @@
+---
+source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
+expression: errors
+---
+[
+    Violation {
+        code: PreferRobustStmts,
+        message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+        text_range: 1..57,
+        messages: [
+            "Use an explicit name for a concurrently created index",
+        ],
+    },
+    Violation {
+        code: PreferRobustStmts,
+        message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+        text_range: 59..115,
+        messages: [
+            "Use an explicit name for a concurrently created index",
+        ],
+    },
+]
