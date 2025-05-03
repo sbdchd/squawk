@@ -1,11 +1,12 @@
 [workspace]
 members = ["crates/*"]
+resolver = "2"
 
 [workspace.package]
-authors = ["Squawk Team & Contributors"]
 edition = "2021"
-license = "GPL-3.0"
 rust-version = "1.81.0"
+authors = ["Squawk Team & Contributors"]
+license = "GPL-3.0"
 
 [workspace.dependencies]
 # third party
@@ -32,6 +33,14 @@ toml = "0.5.9"
 squawk-parser = { version = "0.0.0", path = "./crates/parser" }
 squawk-linter = { version = "0.0.0", path = "./crates/linter" }
 squawk-github = { version = "0.0.0", path = "./crates/github" }
+
+[workspace.lints.clippy]
+collapsible_else_if = "allow"
+collapsible_if = "allow"
+needless_return = "allow"
+
+[profile.dev]
+debug = 0
 
 [profile.dev.package]
 insta.opt-level = 3
