@@ -42,6 +42,8 @@ wasm-bindgen-test = "0.3.34"
 web-sys = "0.3.77"
 console_error_panic_hook = "0.1.7"
 console_log = "1.0.0"
+annotate-snippets = "0.11.5"
+anyhow = "1.0.94"
 
 # local
 squawk-parser = { version = "0.0.0", path = "./crates/parser" }
