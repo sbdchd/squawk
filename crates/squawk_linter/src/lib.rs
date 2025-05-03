@@ -10,7 +10,7 @@ use lazy_static::lazy_static;
 use rowan::TextRange;
 use serde::{Deserialize, Serialize};
 
-use syntax::{Parse, SourceFile};
+use squawk_syntax::{Parse, SourceFile};
 
 mod ignore;
 mod ignore_index;

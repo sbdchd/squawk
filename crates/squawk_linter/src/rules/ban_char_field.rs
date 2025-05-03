@@ -1,4 +1,4 @@
-use syntax::{
+use squawk_syntax::{
     ast::{self, AstNode},
     Parse, SourceFile, TokenText,
 };

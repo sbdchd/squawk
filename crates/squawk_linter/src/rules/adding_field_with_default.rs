@@ -1,9 +1,9 @@
 use lazy_static::lazy_static;
 use std::collections::HashSet;
 
-use syntax::ast;
-use syntax::ast::{AstNode, HasArgList};
-use syntax::{ast::HasModuleItem, Parse, SourceFile};
+use squawk_syntax::ast;
+use squawk_syntax::ast::{AstNode, HasArgList};
+use squawk_syntax::{ast::HasModuleItem, Parse, SourceFile};
 
 use crate::{ErrorCode, Linter, Violation};
 

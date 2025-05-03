@@ -7,10 +7,9 @@ authors.workspace = true
 license.workspace = true
 
 [dependencies]
-syntax.workspace = true
-lexer.workspace = true
-rowan.workspace = true
+squawk_syntax.workspace = true
 
+rowan.workspace = true
 serde.workspace = true
 lazy_static.workspace = true
 insta.workspace = true

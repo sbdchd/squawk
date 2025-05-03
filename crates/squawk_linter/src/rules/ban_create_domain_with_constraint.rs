@@ -1,5 +1,5 @@
 use rowan::TextRange;
-use syntax::{
+use squawk_syntax::{
     ast::{self, AstNode, HasModuleItem},
     Parse, SourceFile,
 };

@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use rowan::{NodeOrToken, TextRange, TextSize};
-use syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
+use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 
 use crate::{ErrorCode, Linter, Violation};
 

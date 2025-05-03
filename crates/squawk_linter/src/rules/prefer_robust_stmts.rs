@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use syntax::{
+use squawk_syntax::{
     ast::{self, AstNode, HasIfExists, HasIfNotExists, HasModuleItem},
     Parse, SourceFile,
 };
