@@ -121,7 +121,7 @@ fn main() -> Result<ExitCode> {
             Ok(ExitCode::SUCCESS)
         }
         Mode::Lint => {
-            let mut linter = squawk_linter::squawk_linter::with_all_rules();
+            let mut linter = squawk_linter::Linter::with_all_rules();
             linter.settings.assume_in_transaction = args.assume_in_transaction;
             let parse = squawk_syntax::SourceFile::parse(&sql);
 
