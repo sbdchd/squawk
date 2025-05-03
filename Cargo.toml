@@ -38,10 +38,8 @@ squawk-github = { version = "0.0.0", path = "./crates/github" }
 collapsible_else_if = "allow"
 collapsible_if = "allow"
 needless_return = "allow"
-if_not_else = "allow"
-needless_raw_string_hashes = "allow"
-cast_possible_truncation = "allow"
-semicolon_if_nothing_returned = "allow"
+doc_markdown = "deny"
+manual_let_else = "deny"
 
 [profile.dev]
 debug = 0
