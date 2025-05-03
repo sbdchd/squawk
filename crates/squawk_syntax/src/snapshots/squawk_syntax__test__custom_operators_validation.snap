@@ -1,0 +1,105 @@
+---
+source: crates/syntax/src/test.rs
+input_file: crates/syntax/test_data/validation/custom_operators.sql
+---
+SOURCE_FILE@0..108
+  COMMENT@0..30 "-- disallowed prefix  ..."
+  WHITESPACE@30..31 "\n"
+  SELECT@31..40
+    SELECT_CLAUSE@31..40
+      SELECT_KW@31..37 "select"
+      WHITESPACE@37..38 " "
+      TARGET_LIST@38..40
+        TARGET@38..39
+          STAR@38..39 "*"
+        TARGET@39..40
+          NAME_REF@39..40
+            IDENT@39..40 "c"
+  SEMICOLON@40..41 ";"
+  WHITESPACE@41..42 "\n"
+  SELECT@42..51
+    SELECT_CLAUSE@42..51
+      SELECT_KW@42..48 "select"
+      WHITESPACE@48..49 " "
+      TARGET_LIST@49..51
+        TARGET@49..51
+          PREFIX_EXPR@49..51
+            CUSTOM_OP@49..50
+              SLASH@49..50 "/"
+            NAME_REF@50..51
+              IDENT@50..51 "d"
+  SEMICOLON@51..52 ";"
+  WHITESPACE@52..53 "\n"
+  SELECT@53..62
+    SELECT_CLAUSE@53..62
+      SELECT_KW@53..59 "select"
+      WHITESPACE@59..60 " "
+      TARGET_LIST@60..62
+        TARGET@60..62
+          PREFIX_EXPR@60..62
+            CUSTOM_OP@60..61
+              L_ANGLE@60..61 "<"
+            NAME_REF@61..62
+              IDENT@61..62 "e"
+  SEMICOLON@62..63 ";"
+  WHITESPACE@63..64 "\n"
+  SELECT@64..73
+    SELECT_CLAUSE@64..73
+      SELECT_KW@64..70 "select"
+      WHITESPACE@70..71 " "
+      TARGET_LIST@71..73
+        TARGET@71..73
+          PREFIX_EXPR@71..73
+            CUSTOM_OP@71..72
+              R_ANGLE@71..72 ">"
+            NAME_REF@72..73
+              IDENT@72..73 "f"
+  SEMICOLON@73..74 ";"
+  WHITESPACE@74..75 "\n"
+  SELECT@75..84
+    SELECT_CLAUSE@75..84
+      SELECT_KW@75..81 "select"
+      WHITESPACE@81..82 " "
+      TARGET_LIST@82..84
+        TARGET@82..84
+          PREFIX_EXPR@82..84
+            CUSTOM_OP@82..83
+              EQ@82..83 "="
+            NAME_REF@83..84
+              IDENT@83..84 "g"
+  SEMICOLON@84..85 ";"
+  WHITESPACE@85..86 "\n"
+  SELECT@86..95
+    SELECT_CLAUSE@86..95
+      SELECT_KW@86..92 "select"
+      WHITESPACE@92..93 " "
+      TARGET_LIST@93..95
+        TARGET@93..95
+          PREFIX_EXPR@93..95
+            CUSTOM_OP@93..94
+              PERCENT@93..94 "%"
+            NAME_REF@94..95
+              IDENT@94..95 "l"
+  SEMICOLON@95..96 ";"
+  WHITESPACE@96..97 "\n"
+  SELECT@97..106
+    SELECT_CLAUSE@97..106
+      SELECT_KW@97..103 "select"
+      WHITESPACE@103..104 " "
+      TARGET_LIST@104..106
+        TARGET@104..106
+          PREFIX_EXPR@104..106
+            CUSTOM_OP@104..105
+              CARET@104..105 "^"
+            NAME_REF@105..106
+              IDENT@105..106 "m"
+  SEMICOLON@106..107 ";"
+  WHITESPACE@107..108 "\n"
+
+ERROR@39 "missing comma"
+ERROR@49:50 "Invalid operator."
+ERROR@60:61 "Invalid operator."
+ERROR@71:72 "Invalid operator."
+ERROR@82:83 "Invalid operator."
+ERROR@93:94 "Invalid operator."
+ERROR@104:105 "Invalid operator."

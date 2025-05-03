@@ -79,7 +79,7 @@ fn sqltest(fixture: Fixture<&str>) {
 
     let parent_dir = input_file.parent().and_then(|x| x.file_name()).unwrap();
 
-    let (parsed, has_errors) = parse_text(&content);
+    let (parsed, has_errors) = parse_text(content);
 
     with_settings!({
       omit_expression => true,
@@ -97,12 +97,12 @@ fn sqltest(fixture: Fixture<&str>) {
         );
         // skipping pg17 specific stuff since our parser isn't using the latest parser
         if !test_name.ends_with("pg17") {
-            let pg_result = pg_query::parse(&content);
+            let pg_result = pg_query::parse(content);
             if let Err(e) = &pg_result {
                 assert!(
                     &pg_result.is_ok(),
                     "tests defined in the `ok` can't have Postgres parser errors. Found {}",
-                    e.to_string()
+                    e
                 );
             }
         }
