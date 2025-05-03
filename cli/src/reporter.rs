@@ -386,9 +386,19 @@ pub fn pretty_violations(
                 #[allow(clippy::cast_sign_loss)]
                 let start = start as usize;
 
-                // 1-indexed
-                // remove the leading whitespace on last line
-                let lineno = sql[..start].trim_end().lines().count() + 1;
+                let mut lineno = 0;
+
+                for (idx, char) in sql.chars().enumerate() {
+                    if char == '\n' {
+                        lineno += 1;
+                    }
+
+                    if idx == start {
+                        break;
+                    }
+                }
+
+                lineno += 1;
 
                 let content = if let Some(len) = len {
                     #[allow(clippy::cast_sign_loss)]
@@ -396,7 +406,8 @@ pub fn pretty_violations(
                 } else {
                     // Use current line
                     let tail = sql[start..].find('\n').unwrap_or(sql.len() - start);
-                    &sql[start..=start + tail]
+
+                    &sql.chars().skip(start).take(tail + 1).collect::<String>()
                 };
 
                 // TODO(sbdchd): could remove the leading whitespace and comments to
@@ -666,6 +677,7 @@ mod test_reporter {
         check_sql_with_rule,
         violations::{RuleViolation, RuleViolationKind},
     };
+    use squawk_parser::ast::Span;
 
     fn lint_sql(sql: &str) -> Vec<RuleViolation> {
         check_sql_with_rule(sql, &RuleViolationKind::AddingRequiredField, None, false).unwrap()
@@ -824,5 +836,42 @@ SELECT 1;
             ],
         }
         "#);
+    }
+
+    #[test]
+    fn regression_slicing_issue_425() {
+        // Squawk was crashing with an slicing issue.
+        let sql = "ALTER TABLE test ADD COLUMN IF NOT EXISTS test INTEGER;";
+        let violation = RuleViolation::new(
+            RuleViolationKind::PreferBigInt,
+            Span {
+                start: 42,
+                len: None,
+            },
+            None,
+        );
+        pretty_violations(vec![violation], sql, "main.sql");
+    }
+    #[test]
+    fn highlight_column_for_issues() {
+        // Display only the columns with issues for large DDLs.
+        fn lint_sql(sql: &str) -> Vec<RuleViolation> {
+            check_sql_with_rule(sql, &RuleViolationKind::PreferTextField, None, false).unwrap()
+        }
+        // Squawk was crashing with an slicing issue.
+        let sql = "create table test_table (
+    col1 varchar(255),
+    col2 varchar(255),
+    col3 varchar(255)
+    --- other columns
+);";
+        let violations = lint_sql(sql);
+        let res = pretty_violations(violations, sql, "main.sql");
+        let columns = res
+            .violations
+            .iter()
+            .map(|v| v.sql.clone())
+            .collect::<String>();
+        assert_display_snapshot!(columns);
     }
 }

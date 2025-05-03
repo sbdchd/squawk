@@ -7,7 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v1.6.1 - 2025-05-02
+
+### Fixed
+
+- Fixed panic when formatting violations (#426).
+
 ## v1.6.0 - 2025-04-02
+
+### Added
 
 - Added `ban-alter-domain-with-add-constraint` and `ban-create-domain-with-constraint` (#418). Thanks @johnmastro!
 
