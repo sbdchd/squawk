@@ -386,9 +386,19 @@ pub fn pretty_violations(
                 #[allow(clippy::cast_sign_loss)]
                 let start = start as usize;
 
-                // 1-indexed
-                // remove the leading whitespace on last line
-                let lineno = sql[..start].trim_end().lines().count() + 1;
+                let mut lineno = 0;
+
+                for (idx, char) in sql.chars().enumerate() {
+                    if char == '\n' {
+                        lineno += 1;
+                    }
+
+                    if idx == start {
+                        break;
+                    }
+                }
+
+                lineno += 1;
 
                 let content = if let Some(len) = len {
                     #[allow(clippy::cast_sign_loss)]

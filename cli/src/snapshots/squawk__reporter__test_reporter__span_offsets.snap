@@ -8,7 +8,7 @@ ViolationContent {
     violations: [
         ReportViolation {
             file: "main.sql",
-            line: 1,
+            line: 2,
             column: 2,
             level: Warning,
             messages: [
