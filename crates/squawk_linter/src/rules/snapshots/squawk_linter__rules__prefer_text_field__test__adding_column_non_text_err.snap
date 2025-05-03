@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/prefer_text_field.rs
+expression: errors
+---
+[
+    Violation {
+        code: PreferTextField,
+        message: "Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.",
+        text_range: 56..68,
+        messages: [],
+    },
+]

@@ -1,0 +1,42 @@
+---
+source: crates/squawk_linter/src/rules/prefer_identity.rs
+expression: errors
+---
+[
+    Violation {
+        code: PreferIdentity,
+        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        text_range: 29..35,
+        messages: [],
+    },
+    Violation {
+        code: PreferIdentity,
+        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        text_range: 67..74,
+        messages: [],
+    },
+    Violation {
+        code: PreferIdentity,
+        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        text_range: 106..113,
+        messages: [],
+    },
+    Violation {
+        code: PreferIdentity,
+        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        text_range: 145..152,
+        messages: [],
+    },
+    Violation {
+        code: PreferIdentity,
+        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        text_range: 184..195,
+        messages: [],
+    },
+    Violation {
+        code: PreferIdentity,
+        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        text_range: 227..236,
+        messages: [],
+    },
+]

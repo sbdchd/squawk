@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/renaming_table.rs
+expression: errors
+---
+[
+    Violation {
+        code: RenamingTable,
+        message: "Renaming a table may break existing clients.",
+        text_range: 26..52,
+        messages: [],
+    },
+]

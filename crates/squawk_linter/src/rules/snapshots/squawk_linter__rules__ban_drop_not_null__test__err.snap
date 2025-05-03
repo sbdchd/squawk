@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_not_null.rs
+expression: errors
+---
+[
+    Violation {
+        code: BanDropNotNull,
+        message: "Dropping a NOT NULL constraint may break existing clients.",
+        text_range: 46..59,
+        messages: [],
+    },
+]

@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/ban_alter_domain_with_add_constraint.rs
+expression: errors
+---
+[
+    Violation {
+        code: BanAlterDomainWithAddConstraint,
+        message: "Domains with constraints have poor support for online migrations. Use table and column constraints instead.",
+        text_range: 31..79,
+        messages: [],
+    },
+]

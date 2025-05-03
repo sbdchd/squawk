@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/require_concurrent_index_creation.rs
+expression: errors
+---
+[
+    Violation {
+        code: RequireConcurrentIndexCreation,
+        message: "During a normal index creation, table updates are blocked, but reads are still allowed. `CONCURRENTLY` avoids locking the table against writes during index creation.",
+        text_range: 15..75,
+        messages: [],
+    },
+]

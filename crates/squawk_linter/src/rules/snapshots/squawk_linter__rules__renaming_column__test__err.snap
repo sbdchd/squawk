@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/renaming_column.rs
+expression: errors
+---
+[
+    Violation {
+        code: RenamingColumn,
+        message: "Renaming a column may break existing clients.",
+        text_range: 26..74,
+        messages: [],
+    },
+]

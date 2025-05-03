@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/prefer_big_int.rs
+expression: errors
+---
+[
+    Violation {
+        code: PreferBigInt,
+        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 35..44,
+        messages: [],
+    },
+]

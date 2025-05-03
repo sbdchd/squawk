@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/require_concurrent_index_deletion.rs
+expression: errors
+---
+[
+    Violation {
+        code: RequireConcurrentIndexDeletion,
+        message: "A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can be completed.",
+        text_range: 19..56,
+        messages: [],
+    },
+]

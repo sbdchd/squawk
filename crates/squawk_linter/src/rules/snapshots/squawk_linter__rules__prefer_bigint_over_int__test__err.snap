@@ -1,0 +1,30 @@
+---
+source: crates/squawk_linter/src/rules/prefer_bigint_over_int.rs
+expression: errors
+---
+[
+    Violation {
+        code: PreferBigintOverInt,
+        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 29..36,
+        messages: [],
+    },
+    Violation {
+        code: PreferBigintOverInt,
+        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 68..72,
+        messages: [],
+    },
+    Violation {
+        code: PreferBigintOverInt,
+        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 104..110,
+        messages: [],
+    },
+    Violation {
+        code: PreferBigintOverInt,
+        message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 142..149,
+        messages: [],
+    },
+]

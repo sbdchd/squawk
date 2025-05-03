@@ -1,0 +1,172 @@
+use squawk_syntax::{
+    ast::{self, AstNode, HasModuleItem},
+    Parse, SourceFile,
+};
+
+use crate::{text::trim_quotes, ErrorCode, Linter, Violation};
+
+use super::constraint_missing_not_valid::tables_created_in_transaction;
+
+pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+    let file = parse.tree();
+    let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
+    for item in file.items() {
+        if let ast::Item::AlterTable(alter_table) = item {
+            let Some(table_name) = alter_table
+                .path()
+                .and_then(|x| x.segment())
+                .and_then(|x| x.name_ref())
+                .map(|x| x.text().to_string())
+            else {
+                continue;
+            };
+            for action in alter_table.actions() {
+                match action {
+                    ast::AlterTableAction::AddConstraint(add_constraint) => {
+                        if let Some(ast::Constraint::UniqueConstraint(unique_constraint)) =
+                            add_constraint.constraint()
+                        {
+                            if unique_constraint.using_index().is_none()
+                                && !tables_created.contains(trim_quotes(&table_name))
+                            {
+                                ctx.report(Violation::new(
+                                    ErrorCode::DisallowedUniqueConstraint,
+                                    "Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.".into(),
+                                    unique_constraint.syntax().text_range(),
+                                    None,
+                                ));
+                            }
+                        }
+                    }
+                    ast::AlterTableAction::AddColumn(add_column) => {
+                        for constraint in add_column.constraints() {
+                            if let ast::Constraint::UniqueConstraint(unique_constraint) = constraint
+                            {
+                                ctx.report(Violation::new(
+                                    ErrorCode::DisallowedUniqueConstraint,
+                                    "Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.".into(),
+                                    unique_constraint.syntax().text_range(),
+                                    None,
+                                ));
+                            }
+                        }
+                    }
+                    _ => (),
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use insta::assert_debug_snapshot;
+
+    use crate::{Linter, Rule};
+
+    #[test]
+    fn adding_unique_constraint_err() {
+        let sql = r#"
+ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
+        let errors = linter.lint(file, sql);
+        assert_ne!(errors.len(), 0);
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn ok() {
+        let sql = r#"
+ALTER TABLE table_name DROP CONSTRAINT field_name_constraint;
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
+        let errors = linter.lint(file, sql);
+        assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn also_ok() {
+        let sql = r#"
+CREATE UNIQUE INDEX CONCURRENTLY dist_id_temp_idx ON distributors (dist_id);
+ALTER TABLE distributors DROP CONSTRAINT distributors_pkey,
+ADD CONSTRAINT distributors_pkey PRIMARY KEY USING INDEX dist_id_temp_idx;
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
+        let errors = linter.lint(file, sql);
+        assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn unique_constraint_ok() {
+        let sql = r#"
+CREATE UNIQUE INDEX CONCURRENTLY "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx"
+    ON "legacy_questiongrouppg" ("mongo_id");
+ALTER TABLE "legacy_questiongrouppg" ADD CONSTRAINT "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq" UNIQUE USING INDEX "legacy_questiongrouppg_mongo_id_1f8f47d9_uniq_idx";
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
+        let errors = linter.lint(file, sql);
+        assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn unique_constraint_after_create_table() {
+        let sql = r#"
+BEGIN;
+CREATE TABLE products (
+    id bigint generated by default as identity primary key,
+    sku text not null
+);
+ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
+COMMIT;
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
+        let errors = linter.lint(file, sql);
+        assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn unique_constraint_after_create_table_with_assume_in_transaction() {
+        let sql = r#"
+CREATE TABLE products (
+    id bigint generated by default as identity primary key,
+    sku text not null
+);
+ALTER TABLE products ADD CONSTRAINT sku_constraint UNIQUE (sku);
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
+        linter.settings.assume_in_transaction = true;
+        let errors = linter.lint(file, sql);
+        assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn unique_constraint_inline_add_column_err() {
+        let sql = r#"
+ALTER TABLE foo ADD COLUMN bar text CONSTRAINT foo_bar_unique UNIQUE;
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
+        let errors = linter.lint(file, sql);
+        assert_ne!(errors.len(), 0);
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn unique_constraint_inline_add_column_unique_err() {
+        let sql = r#"
+ALTER TABLE foo ADD COLUMN bar text UNIQUE;
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::DisallowUniqueConstraint]);
+        let errors = linter.lint(file, sql);
+        assert_ne!(errors.len(), 0);
+        assert_debug_snapshot!(errors);
+    }
+}

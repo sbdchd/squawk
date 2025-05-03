@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/rules/ban_drop_column.rs
+expression: errors
+---
+[
+    Violation {
+        code: BanDropColumn,
+        message: "Dropping a column may break existing clients.",
+        text_range: 23..52,
+        messages: [],
+    },
+]

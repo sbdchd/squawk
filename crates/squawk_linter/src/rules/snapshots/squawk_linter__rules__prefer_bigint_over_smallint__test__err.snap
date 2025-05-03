@@ -1,0 +1,30 @@
+---
+source: crates/squawk_linter/src/rules/prefer_bigint_over_smallint.rs
+expression: errors
+---
+[
+    Violation {
+        code: PreferBigintOverSmallint,
+        message: "Using 16-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 29..37,
+        messages: [],
+    },
+    Violation {
+        code: PreferBigintOverSmallint,
+        message: "Using 16-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 69..73,
+        messages: [],
+    },
+    Violation {
+        code: PreferBigintOverSmallint,
+        message: "Using 16-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 105..116,
+        messages: [],
+    },
+    Violation {
+        code: PreferBigintOverSmallint,
+        message: "Using 16-bit integer fields can result in hitting the max `int` limit.",
+        text_range: 148..155,
+        messages: [],
+    },
+]
