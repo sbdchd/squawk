@@ -1389,11 +1389,13 @@ fn opt_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     Some(m.complete(p, NAME))
 }
 
+/// ```sql
 /// create type a . b as ();
-///             ^ ^ ^ then name_ref
-///             |   |
-///                 | ^ then name
-///                 |
+/// --          ^ ^ ^ then name_ref
+/// --          |   |
+/// --              | ^ then name
+/// --              |
+/// ```
 fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
     let m = p.start();
     // TODO: does this need to be flagged?
