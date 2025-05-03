@@ -1,6 +1,6 @@
 ---
-source: crates/parser/src/test.rs
-input_file: crates/parser/test_data/ok/create_operator_family.sql
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_operator_family.sql
 ---
 SOURCE_FILE
   COMMENT "-- simple"

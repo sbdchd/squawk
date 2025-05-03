@@ -1,7 +1,7 @@
 ---
-source: crates/parser/src/test.rs
+source: crates/squawk_parser/src/test.rs
 assertion_line: 88
-input_file: crates/parser/test_data/err/alter_table.sql
+input_file: crates/squawk_parser/test_data/err/alter_table.sql
 ---
 SOURCE_FILE
   COMMENT "-- missing alter_table"

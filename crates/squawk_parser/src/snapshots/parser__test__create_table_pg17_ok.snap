@@ -1,6 +1,6 @@
 ---
-source: crates/parser/src/test.rs
-input_file: crates/parser/test_data/ok/create_table_pg17.sql
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_table_pg17.sql
 ---
 SOURCE_FILE
   CREATE_TABLE

@@ -1,6 +1,6 @@
 ---
-source: crates/parser/src/test.rs
-input_file: crates/parser/test_data/err/create_function.sql
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/err/create_function.sql
 ---
 SOURCE_FILE
   COMMENT "-- regression partial definition"

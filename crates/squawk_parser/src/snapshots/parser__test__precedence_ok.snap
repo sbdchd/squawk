@@ -1,6 +1,6 @@
 ---
-source: crates/parser/src/test.rs
-input_file: crates/parser/test_data/ok/precedence.sql
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/precedence.sql
 ---
 SOURCE_FILE
   COMMENT "-- see: https://github.com/postgres/postgres/blob/028b4b21df26fee67b3ce75c6f14fcfd3c7cf2ee/src/backend/parser/gram.y#L12699"
