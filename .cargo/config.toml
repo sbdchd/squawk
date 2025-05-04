@@ -7,7 +7,7 @@ rustflags = ["-Clink-arg=--no-entry"]
 
 # github actions won't compile with lld
 [target.x86_64-unknown-linux-gnu]
-rustflags = ["-Clink-arg=--no-entry"]
+rustflags = []
 
 [build]
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
