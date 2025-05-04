@@ -1,14 +1,12 @@
 {
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "rust-analyzer.checkOnSave.command": "clippy",
-  "rust-analyzer.checkOnSave.extraArgs": [
-    "--all-features",
-    "--",
-    "-D",
-    "clippy::pedantic"
-  ],
+  "rust-analyzer.check.command": "build",
+  "rust-analyzer.showSyntaxTree": true,
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer"
+  },
+  "[sql]": {
+    "editor.tabSize": 2
   }
 }
