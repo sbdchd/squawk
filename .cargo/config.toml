@@ -1,0 +1,9 @@
+[alias]
+xtask = "run --package xtask --"
+
+# wasm won't compile with lld
+[target.wasm32-unknown-unknown]
+rustflags = ["-Clink-arg=--no-entry"]
+
+[build]
+rustflags = ["-Clink-arg=-fuse-ld=lld"]
