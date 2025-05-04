@@ -1,13 +1,6 @@
 [alias]
 xtask = "run --package xtask --"
 
-# wasm won't compile with lld
-[target.wasm32-unknown-unknown]
-rustflags = ["-Clink-arg=--no-entry"]
-
-# github actions won't compile with lld
-[target.x86_64-unknown-linux-gnu]
-rustflags = [""]
-
-[build]
+# only set it up for local because wasm and github actions don't like lld
+[target.aarch64-apple-darwin]
 rustflags = ["-Clink-arg=-fuse-ld=lld"]
