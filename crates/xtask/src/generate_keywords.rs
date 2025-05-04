@@ -151,7 +151,7 @@ fn update_syntax_kind(keywords: &HashMap<String, KeywordMeta>) -> Result<()> {
 
     for line in data.lines() {
         if line.contains(keywords_end) {
-            for kw in keys.iter() {
+            for kw in &keys {
                 // /// `column`
                 // COLUMN_KW,
                 let comment = format!("    /// `{}`\n", kw);
