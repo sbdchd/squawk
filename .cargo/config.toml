@@ -1,6 +1,2 @@
 [alias]
 xtask = "run --package xtask --"
-
-# only set it up for local because wasm and github actions don't like lld
-[target.aarch64-apple-darwin]
-rustflags = ["-Clink-arg=-fuse-ld=lld"]
