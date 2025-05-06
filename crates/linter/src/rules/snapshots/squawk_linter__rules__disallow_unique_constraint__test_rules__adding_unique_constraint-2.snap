@@ -1,5 +1,0 @@
----
-source: linter/src/rules/disallow_unique_constraint.rs
-expression: lint_sql(ignored_sql)
----
-[]

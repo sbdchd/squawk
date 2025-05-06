@@ -177,28 +177,6 @@ checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
 
 [[package]]
 name = "bindgen"
-version = "0.64.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c4243e6031260db77ede97ad86c27e501d646a27ab57b59a574f725d98ab1fb4"
-dependencies = [
- "bitflags 1.3.2",
- "cexpr",
- "clang-sys",
- "lazy_static",
- "lazycell",
- "log",
- "peeking_take_while",
- "proc-macro2",
- "quote",
- "regex",
- "rustc-hash",
- "shlex",
- "syn 1.0.109",
- "which",
-]
-
-[[package]]
-name = "bindgen"
 version = "0.66.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2b84e06fc203107bfbad243f4aba2af864eb7db3b1cf46ea0a023b0b433d2a7"
@@ -1441,18 +1419,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "libpg_query-sys"
-version = "0.4.0"
-source = "git+https://github.com/chdsbd/libpg_query-sys.git?rev=ac223c7b197459d657d166449ccf99883f23bbcb#ac223c7b197459d657d166449ccf99883f23bbcb"
-dependencies = [
- "bindgen 0.64.0",
- "cc",
- "fs_extra",
- "glob",
- "make-cmd",
-]
-
-[[package]]
 name = "line-index"
 version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1488,12 +1454,6 @@ name = "log"
 version = "0.4.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "13dc2df351e3202783a1fe0d44375f7295ffb4049267b0f3018346dc122a1d94"
-
-[[package]]
-name = "make-cmd"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a8ca8afbe8af1785e09636acb5a41e08a765f5f0340568716c18a8700ba3c0d3"
 
 [[package]]
 name = "matches"
@@ -1844,7 +1804,7 @@ version = "6.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f71c7c56dfe299ec6f98aa210aa23458be3b0610c485be60a5873c2f3627c40e"
 dependencies = [
- "bindgen 0.66.1",
+ "bindgen",
  "cc",
  "fs_extra",
  "glob",
@@ -2476,17 +2436,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "serde_repr"
-version = "0.1.20"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "175ee3e80ae9982737ca543e96133087cbd9a485eecc3bc4de9c1a37b47ea59c"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.101",
-]
-
-[[package]]
 name = "serde_urlencoded"
 version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2627,29 +2576,6 @@ dependencies = [
  "reqwest 0.9.24",
  "serde",
  "serde_json",
-]
-
-[[package]]
-name = "squawk-linter"
-version = "0.0.0"
-dependencies = [
- "insta",
- "lazy_static",
- "serde",
- "serde_json",
- "serde_plain",
- "squawk-parser",
-]
-
-[[package]]
-name = "squawk-parser"
-version = "0.0.0"
-dependencies = [
- "insta",
- "libpg_query-sys",
- "serde",
- "serde_json",
- "serde_repr",
 ]
 
 [[package]]
