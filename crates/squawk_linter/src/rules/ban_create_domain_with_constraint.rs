@@ -4,7 +4,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -24,7 +24,7 @@ pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<
                     });
             if let Some(range) = range {
                 ctx.report(Violation::new(
-                ErrorCode::BanCreateDomainWithConstraint,
+                Rule::BanCreateDomainWithConstraint,
                     "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
                     range,
                     None,

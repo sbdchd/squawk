@@ -7,8 +7,8 @@ expression: errors
         code: AddingFieldWithDefault,
         message: "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock.",
         text_range: 40..78,
-        messages: [
+        help: Some(
             "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.",
-        ],
+        ),
     },
 ]

@@ -5,7 +5,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{text::trim_quotes, ErrorCode, Linter, Violation};
+use crate::{text::trim_quotes, Rule, Linter, Violation};
 
 #[derive(PartialEq)]
 enum Constraint {
@@ -92,7 +92,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     }
 
                     ctx.report(Violation::new(
-                        ErrorCode::PreferRobustStmts,
+                        Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                         action.syntax().text_range(),
                         None,
@@ -104,17 +104,17 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     && (create_index.concurrently_token().is_some() || !inside_transaction) =>
             {
                 ctx.report(Violation::new(
-                    ErrorCode::PreferRobustStmts,
+                    Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     create_index.syntax().text_range(),
-                    vec!["Use an explicit name for a concurrently created index".into()],
+                    "Use an explicit name for a concurrently created index".to_string(),
                 ));
             }
             ast::Item::CreateTable(create_table)
                 if create_table.if_not_exists().is_none() && !inside_transaction =>
             {
                 ctx.report(Violation::new(
-                    ErrorCode::PreferRobustStmts,
+                    Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     create_table.syntax().text_range(),
                     None,
@@ -124,7 +124,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if drop_index.if_exists().is_none() && !inside_transaction =>
             {
                 ctx.report(Violation::new(
-                    ErrorCode::PreferRobustStmts,
+                    Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     drop_index.syntax().text_range(),
                     None,
@@ -134,7 +134,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if drop_table.if_exists().is_none() && !inside_transaction =>
             {
                 ctx.report(Violation::new(
-                    ErrorCode::PreferRobustStmts,
+                    Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     drop_table.syntax().text_range(),
                     None,
@@ -144,7 +144,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 if drop_type.if_exists().is_none() && !inside_transaction =>
             {
                 ctx.report(Violation::new(
-                    ErrorCode::PreferRobustStmts,
+                    Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     drop_type.syntax().text_range(),
                     None,

@@ -3,9 +3,11 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+    let message = "Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.";
+    let help = "Add `NOT VALID` to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.";
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
     for item in file.items() {
@@ -24,10 +26,10 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                     | ast::Constraint::ReferencesConstraint(_)
                             ) {
                                 ctx.report(Violation::new(
-                                    ErrorCode::AddingForeignKeyConstraint,
-                                    "Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.".into(),
+                                    Rule::AddingForeignKeyConstraint,
+                                    message.into(),
                                     constraint.syntax().text_range(),
-                                    None,
+                                    help.to_string(),
                                 ))
                             }
                         }
@@ -40,10 +42,10 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                     | ast::Constraint::ReferencesConstraint(_)
                             ) {
                                 ctx.report(Violation::new(
-                                    ErrorCode::AddingForeignKeyConstraint,
-                                    "Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.".into(),
+                                    Rule::AddingForeignKeyConstraint,
+                                    message.into(),
                                     constraint.syntax().text_range(),
-                                    None,
+                                    help.to_string(),
                                 ))
                             }
                         }
@@ -57,7 +59,7 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
 
 #[cfg(test)]
 mod test {
-    use crate::{ErrorCode, Linter, Rule};
+    use crate::{Rule, Linter};
 
     #[test]
     fn create_table_with_foreign_key_constraint() {
@@ -110,7 +112,7 @@ COMMIT;
         let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 1);
-        assert_eq!(errors[0].code, ErrorCode::AddingForeignKeyConstraint);
+        assert_eq!(errors[0].code, Rule::AddingForeignKeyConstraint);
     }
 
     #[test]
@@ -125,6 +127,6 @@ COMMIT;
         let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 1);
-        assert_eq!(errors[0].code, ErrorCode::AddingForeignKeyConstraint);
+        assert_eq!(errors[0].code, Rule::AddingForeignKeyConstraint);
     }
 }

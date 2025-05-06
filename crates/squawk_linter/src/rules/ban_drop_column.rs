@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -12,7 +12,7 @@ pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::DropColumn(drop_column) = action {
                     ctx.report(Violation::new(
-                        ErrorCode::BanDropColumn,
+                        Rule::BanDropColumn,
                         "Dropping a column may break existing clients.".into(),
                         drop_column.syntax().text_range(),
                         None,

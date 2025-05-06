@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 pub(crate) fn adding_required_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -16,10 +16,10 @@ pub(crate) fn adding_required_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                     }
                     if has_not_null_and_no_default_constraint(add_column.constraints()) {
                         ctx.report(Violation::new(
-                            ErrorCode::AddingRequiredField,
+                            Rule::AddingRequiredField,
                             "Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.".into(),
                             add_column.syntax().text_range(),
-                            None,
+                            "Make the field nullable or add a non-VOLATILE DEFAULT".to_string(),
                         ));
                     }
                 }

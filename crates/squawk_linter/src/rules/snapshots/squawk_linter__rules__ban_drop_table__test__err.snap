@@ -7,18 +7,18 @@ expression: errors
         code: BanDropTable,
         message: "Dropping a table may break existing clients.",
         text_range: 1..24,
-        messages: [],
+        help: None,
     },
     Violation {
         code: BanDropTable,
         message: "Dropping a table may break existing clients.",
         text_range: 26..59,
-        messages: [],
+        help: None,
     },
     Violation {
         code: BanDropTable,
         message: "Dropping a table may break existing clients.",
         text_range: 61..94,
-        messages: [],
+        help: None,
     },
 ]

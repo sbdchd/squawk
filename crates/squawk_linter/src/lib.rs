@@ -12,8 +12,11 @@ use serde::{Deserialize, Serialize};
 
 use squawk_syntax::{Parse, SourceFile};
 
+pub use version::Version;
+
 mod ignore;
 mod ignore_index;
+mod version;
 
 mod rules;
 mod text;
@@ -27,6 +30,7 @@ use rules::ban_char_field;
 use rules::ban_concurrent_index_creation_in_transaction;
 use rules::ban_create_domain_with_constraint;
 use rules::ban_drop_column;
+use rules::ban_drop_database;
 use rules::ban_drop_not_null;
 use rules::ban_drop_table;
 use rules::changing_column_type;
@@ -45,10 +49,8 @@ use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 // xtask:new-lint:rule-import
 
-use rules::ban_drop_database;
-
-#[derive(Debug, PartialEq, Clone, Copy, Serialize, Hash, Eq, Deserialize)]
-pub enum ErrorCode {
+#[derive(Debug, PartialEq, Clone, Copy, Serialize, Hash, Eq, Deserialize, Sequence)]
+pub enum Rule {
     #[serde(rename = "require-concurrent-index-creation")]
     RequireConcurrentIndexCreation,
     #[serde(rename = "require-concurrent-index-deletion")]
@@ -110,378 +112,128 @@ pub enum ErrorCode {
     // xtask:new-lint:error-name
 }
 
-impl TryFrom<&str> for ErrorCode {
+impl TryFrom<&str> for Rule {
     type Error = String;
 
     fn try_from(s: &str) -> Result<Self, Self::Error> {
         match s {
-            "require-concurrent-index-creation" => Ok(ErrorCode::RequireConcurrentIndexCreation),
-            "require-concurrent-index-deletion" => Ok(ErrorCode::RequireConcurrentIndexDeletion),
-            "constraint-missing-not-valid" => Ok(ErrorCode::ConstraintMissingNotValid),
-            "adding-field-with-default" => Ok(ErrorCode::AddingFieldWithDefault),
-            "adding-foreign-key-constraint" => Ok(ErrorCode::AddingForeignKeyConstraint),
-            "changing-column-type" => Ok(ErrorCode::ChangingColumnType),
-            "adding-not-nullable-field" => Ok(ErrorCode::AddingNotNullableField),
-            "adding-serial-primary-key-field" => Ok(ErrorCode::AddingSerialPrimaryKeyField),
-            "renaming-column" => Ok(ErrorCode::RenamingColumn),
-            "renaming-table" => Ok(ErrorCode::RenamingTable),
-            "disallowed-unique-constraint" => Ok(ErrorCode::DisallowedUniqueConstraint),
-            "ban-drop-database" => Ok(ErrorCode::BanDropDatabase),
-            "prefer-big-int" => Ok(ErrorCode::PreferBigInt),
-            "prefer-bigint-over-int" => Ok(ErrorCode::PreferBigintOverInt),
-            "prefer-bigint-over-smallint" => Ok(ErrorCode::PreferBigintOverSmallint),
-            "prefer-identity" => Ok(ErrorCode::PreferIdentity),
-            "prefer-robust-stmts" => Ok(ErrorCode::PreferRobustStmts),
-            "prefer-text-field" => Ok(ErrorCode::PreferTextField),
-            "prefer-timestamptz" => Ok(ErrorCode::PreferTimestampTz),
-            "ban-char-field" => Ok(ErrorCode::BanCharField),
-            "ban-drop-column" => Ok(ErrorCode::BanDropColumn),
-            "ban-drop-table" => Ok(ErrorCode::BanDropTable),
-            "ban-drop-not-null" => Ok(ErrorCode::BanDropNotNull),
-            "transaction-nesting" => Ok(ErrorCode::TransactionNesting),
-            "adding-required-field" => Ok(ErrorCode::AddingRequiredField),
+            "require-concurrent-index-creation" => Ok(Rule::RequireConcurrentIndexCreation),
+            "require-concurrent-index-deletion" => Ok(Rule::RequireConcurrentIndexDeletion),
+            "constraint-missing-not-valid" => Ok(Rule::ConstraintMissingNotValid),
+            "adding-field-with-default" => Ok(Rule::AddingFieldWithDefault),
+            "adding-foreign-key-constraint" => Ok(Rule::AddingForeignKeyConstraint),
+            "changing-column-type" => Ok(Rule::ChangingColumnType),
+            "adding-not-nullable-field" => Ok(Rule::AddingNotNullableField),
+            "adding-serial-primary-key-field" => Ok(Rule::AddingSerialPrimaryKeyField),
+            "renaming-column" => Ok(Rule::RenamingColumn),
+            "renaming-table" => Ok(Rule::RenamingTable),
+            "disallowed-unique-constraint" => Ok(Rule::DisallowedUniqueConstraint),
+            "ban-drop-database" => Ok(Rule::BanDropDatabase),
+            "prefer-big-int" => Ok(Rule::PreferBigInt),
+            "prefer-bigint-over-int" => Ok(Rule::PreferBigintOverInt),
+            "prefer-bigint-over-smallint" => Ok(Rule::PreferBigintOverSmallint),
+            "prefer-identity" => Ok(Rule::PreferIdentity),
+            "prefer-robust-stmts" => Ok(Rule::PreferRobustStmts),
+            "prefer-text-field" => Ok(Rule::PreferTextField),
+            "prefer-timestamptz" => Ok(Rule::PreferTimestampTz),
+            "ban-char-field" => Ok(Rule::BanCharField),
+            "ban-drop-column" => Ok(Rule::BanDropColumn),
+            "ban-drop-table" => Ok(Rule::BanDropTable),
+            "ban-drop-not-null" => Ok(Rule::BanDropNotNull),
+            "transaction-nesting" => Ok(Rule::TransactionNesting),
+            "adding-required-field" => Ok(Rule::AddingRequiredField),
             "ban-concurrent-index-creation-in-transaction" => {
-                Ok(ErrorCode::BanConcurrentIndexCreationInTransaction)
+                Ok(Rule::BanConcurrentIndexCreationInTransaction)
             }
-            "ban-create-domain-with-constraint" => Ok(ErrorCode::BanCreateDomainWithConstraint),
-            "ban-alter-domain-with-add-constraint" => {
-                Ok(ErrorCode::BanAlterDomainWithAddConstraint)
-            }
+            "ban-create-domain-with-constraint" => Ok(Rule::BanCreateDomainWithConstraint),
+            "ban-alter-domain-with-add-constraint" => Ok(Rule::BanAlterDomainWithAddConstraint),
             // xtask:new-lint:str-name
             _ => Err(format!("Unknown violation name: {}", s)),
         }
     }
 }
 
-impl fmt::Display for ErrorCode {
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct UnknownRuleName {
+    val: String,
+}
+
+impl std::fmt::Display for UnknownRuleName {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(f, "invalid rule name {}", self.val)
+    }
+}
+
+impl std::str::FromStr for Rule {
+    type Err = UnknownRuleName;
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        serde_plain::from_str(s).map_err(|_| UnknownRuleName { val: s.to_string() })
+    }
+}
+
+impl fmt::Display for Rule {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let val = match &self {
-            ErrorCode::RequireConcurrentIndexCreation => "require-concurrent-index-creation",
-            ErrorCode::RequireConcurrentIndexDeletion => "require-concurrent-index-deletion",
-            ErrorCode::ConstraintMissingNotValid => "constraint-missing-not-valid",
-            ErrorCode::AddingFieldWithDefault => "adding-field-with-default",
-            ErrorCode::AddingForeignKeyConstraint => "adding-foreign-key-constraint",
-            ErrorCode::ChangingColumnType => "changing-column-type",
-            ErrorCode::AddingNotNullableField => "adding-not-nullable-field",
-            ErrorCode::AddingSerialPrimaryKeyField => "adding-serial-primary-key-field",
-            ErrorCode::RenamingColumn => "renaming-column",
-            ErrorCode::RenamingTable => "renaming-table",
-            ErrorCode::DisallowedUniqueConstraint => "disallowed-unique-constraint",
-            ErrorCode::BanDropDatabase => "ban-drop-database",
-            ErrorCode::PreferBigInt => "prefer-big-int",
-            ErrorCode::PreferBigintOverInt => "prefer-bigint-over-int",
-            ErrorCode::PreferBigintOverSmallint => "prefer-bigint-over-smallint",
-            ErrorCode::PreferIdentity => "prefer-identity",
-            ErrorCode::PreferRobustStmts => "prefer-robust-stmts",
-            ErrorCode::PreferTextField => "prefer-text-field",
-            ErrorCode::PreferTimestampTz => "prefer-timestamp-tz",
-            ErrorCode::BanCharField => "ban-char-field",
-            ErrorCode::BanDropColumn => "ban-drop-column",
-            ErrorCode::BanDropTable => "ban-drop-table",
-            ErrorCode::BanDropNotNull => "ban-drop-not-null",
-            ErrorCode::TransactionNesting => "transaction-nesting",
-            ErrorCode::AddingRequiredField => "adding-required-field",
-            ErrorCode::BanConcurrentIndexCreationInTransaction => {
+            Rule::RequireConcurrentIndexCreation => "require-concurrent-index-creation",
+            Rule::RequireConcurrentIndexDeletion => "require-concurrent-index-deletion",
+            Rule::ConstraintMissingNotValid => "constraint-missing-not-valid",
+            Rule::AddingFieldWithDefault => "adding-field-with-default",
+            Rule::AddingForeignKeyConstraint => "adding-foreign-key-constraint",
+            Rule::ChangingColumnType => "changing-column-type",
+            Rule::AddingNotNullableField => "adding-not-nullable-field",
+            Rule::AddingSerialPrimaryKeyField => "adding-serial-primary-key-field",
+            Rule::RenamingColumn => "renaming-column",
+            Rule::RenamingTable => "renaming-table",
+            Rule::DisallowedUniqueConstraint => "disallowed-unique-constraint",
+            Rule::BanDropDatabase => "ban-drop-database",
+            Rule::PreferBigInt => "prefer-big-int",
+            Rule::PreferBigintOverInt => "prefer-bigint-over-int",
+            Rule::PreferBigintOverSmallint => "prefer-bigint-over-smallint",
+            Rule::PreferIdentity => "prefer-identity",
+            Rule::PreferRobustStmts => "prefer-robust-stmts",
+            Rule::PreferTextField => "prefer-text-field",
+            Rule::PreferTimestampTz => "prefer-timestamp-tz",
+            Rule::BanCharField => "ban-char-field",
+            Rule::BanDropColumn => "ban-drop-column",
+            Rule::BanDropTable => "ban-drop-table",
+            Rule::BanDropNotNull => "ban-drop-not-null",
+            Rule::TransactionNesting => "transaction-nesting",
+            Rule::AddingRequiredField => "adding-required-field",
+            Rule::BanConcurrentIndexCreationInTransaction => {
                 "ban-concurrent-index-creation-in-transaction"
             }
-            ErrorCode::BanCreateDomainWithConstraint => "ban-create-domain-with-constraint",
-            ErrorCode::UnusedIgnore => "unused-ignore",
-            ErrorCode::BanAlterDomainWithAddConstraint => "ban-alter-domain-with-add-constraint",
+            Rule::BanCreateDomainWithConstraint => "ban-create-domain-with-constraint",
+            Rule::UnusedIgnore => "unused-ignore",
+            Rule::BanAlterDomainWithAddConstraint => "ban-alter-domain-with-add-constraint",
         };
         write!(f, "{}", val)
     }
 }
 
-impl ErrorCode {
-    pub fn meta(&self) -> ViolationMeta {
-        match self {
-        ErrorCode::RequireConcurrentIndexCreation => ViolationMeta::new(
-            "Require Concurrent Index Creation",
-            [
-                ViolationMessage::Note("Creating an index blocks writes."),
-                ViolationMessage::Help("Create the index CONCURRENTLY."),
-            ]
-        ),
-        ErrorCode::RequireConcurrentIndexDeletion => ViolationMeta::new(
-            "Require Concurrent Index Deletion", 
-            [
-                ViolationMessage::Note("Deleting an index blocks selects, inserts, updates, and deletes on the index's table."),
-                ViolationMessage::Help("Delete the index CONCURRENTLY."),
-            ]
-        ),
-        ErrorCode::ConstraintMissingNotValid => ViolationMeta::new(
-            "Constraint Missing Not Valid", 
-            [
-                ViolationMessage::Note("Requires a table scan to verify constraint and an ACCESS EXCLUSIVE lock which blocks reads."),
-                ViolationMessage::Help("Add NOT VALID to the constraint in one transaction and then VALIDATE the constraint in a separate transaction."),
-            ]
-        ),
-        ErrorCode::AddingFieldWithDefault => ViolationMeta::new(
-            "Adding Field With Default", 
-            [
-                ViolationMessage::Note("Adding a field with a VOLATILE DEFAULT requires a table rewrite with an ACCESS EXCLUSIVE lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite."),
-                ViolationMessage::Help("Add the field as nullable, then set a default, backfill, and remove nullabilty."),
-            ]
-        ),
-        ErrorCode::AddingForeignKeyConstraint => ViolationMeta::new(
-            "Adding Foreign Key Constraint", 
-            [
-                ViolationMessage::Note("Requires a table scan of the table you're altering and a SHARE ROW EXCLUSIVE lock on both tables, which blocks writes to both tables while your table is scanned."),
-                ViolationMessage::Help("Add NOT VALID to the constraint in one transaction and then VALIDATE the constraint in a separate transaction."),
-            ]
-        ),
-        ErrorCode::ChangingColumnType => ViolationMeta::new(
-            "Changing Column Type", 
-            [
-                ViolationMessage::Note("Requires an ACCESS EXCLUSIVE lock on the table which blocks reads."),
-                ViolationMessage::Note("Changing the type may break existing clients."),
-            ]
-        ),
-        ErrorCode::AddingNotNullableField => ViolationMeta::new(
-            "Adding Not Nullable Field", 
-            [
-                ViolationMessage::Note("Adding a NOT NULL field requires exclusive locks and table rewrites."),
-                ViolationMessage::Help("Make the field nullable."),
-            ]
-        ),
-        ErrorCode::AddingSerialPrimaryKeyField => ViolationMeta::new(
-            "Adding Serial Primary Key Field", 
-            [
-                ViolationMessage::Note("Adding a PRIMARY KEY constraint results in locks and table rewrites"),
-                ViolationMessage::Help("Add the PRIMARY KEY constraint USING an index."),
-            ]
-        ),
-        ErrorCode::RenamingColumn => ViolationMeta::new(
-            "Renaming Column", 
-            [ViolationMessage::Note("Renaming a column may break existing clients.")]
-        ),
-        ErrorCode::RenamingTable => ViolationMeta::new(
-            "Renaming Table", 
-            [ViolationMessage::Note("Renaming a table may break existing clients.")]
-        ),
-        ErrorCode::DisallowedUniqueConstraint => ViolationMeta::new(
-            "Disallowed Unique Constraint", 
-            [
-                ViolationMessage::Note("Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads."),
-                ViolationMessage::Help("Create an index CONCURRENTLY and create the constraint using the index."),
-            ]
-        ),
-        ErrorCode::BanDropDatabase => ViolationMeta::new(
-            "Ban Drop Database", 
-            [ViolationMessage::Note("Dropping a database may break existing clients.")]
-        ),
-        ErrorCode::PreferBigInt => ViolationMeta::new(
-            "Prefer Big Int", 
-            [
-                ViolationMessage::Note("Hitting the max 32 bit integer is possible and may break your application."),
-                ViolationMessage::Help("Use 64bit integer values instead to prevent hitting this limit."),
-            ]
-        ),
-        ErrorCode::PreferBigintOverSmallint => ViolationMeta::new(
-            "Prefer Bigint Over Smallint", 
-            [
-                ViolationMessage::Note("Hitting the max 16 bit integer is possible and may break your application."),
-                ViolationMessage::Help("Use 64bit integer values instead to prevent hitting this limit."),
-            ]
-        ),
-        ErrorCode::PreferIdentity => ViolationMeta::new(
-            "Prefer Identity", 
-            [
-                ViolationMessage::Note("Serial types have confusing behaviors that make schema management difficult."),
-                ViolationMessage::Help("Use identity columns instead for more features and better usability."),
-            ]
-        ),
-        ErrorCode::PreferRobustStmts => ViolationMeta::new(
-            "Prefer Robust Statements", 
-            [ViolationMessage::Help("Consider wrapping in a transaction or adding a IF NOT EXISTS clause if the statement supports it.")]
-        ),
-        ErrorCode::PreferTextField => ViolationMeta::new(
-            "Prefer Text Field", 
-            [
-                ViolationMessage::Note("Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock."),
-                ViolationMessage::Help("Use a text field with a check constraint."),
-            ]
-        ),
-        ErrorCode::PreferTimestampTz => ViolationMeta::new(
-            "Prefer Timestamp with Timezone", 
-            [
-                ViolationMessage::Note("A timestamp field without a timezone can lead to data loss, depending on your database session timezone."),
-                ViolationMessage::Help("Use timestamptz instead of timestamp for your column type."),
-            ]
-        ),
-        ErrorCode::BanCharField => ViolationMeta::new(
-            "Ban Char Field", 
-            [ViolationMessage::Help("Use text or varchar instead.")]
-        ),
-        ErrorCode::BanDropColumn => ViolationMeta::new(
-            "Dropping columns not allowed", 
-            [ViolationMessage::Note("Dropping a column may break existing clients.")]
-        ),
-        ErrorCode::BanDropTable => ViolationMeta::new(
-            "Ban Drop Table", 
-            [ViolationMessage::Note("Dropping a table may break existing clients.")]
-        ),
-        ErrorCode::BanDropNotNull => ViolationMeta::new(
-            "Ban Drop Not Null", 
-            [ViolationMessage::Note("Dropping a NOT NULL constraint may break existing clients.")]
-        ),
-        ErrorCode::TransactionNesting => ViolationMeta::new(
-            "Transaction Nesting", 
-            [
-                ViolationMessage::Note("There is an existing transaction already in progress."),
-                ViolationMessage::Help("COMMIT the previous transaction before issuing a BEGIN or START TRANSACTION statement."),
-            ]
-        ),
-        ErrorCode::AddingRequiredField => ViolationMeta::new(
-            "Adding Required Field", 
-            [
-                ViolationMessage::Note("Adding a NOT NULL field without a DEFAULT will fail for a populated table."),
-                ViolationMessage::Help("Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+)."),
-            ]
-        ),
-        ErrorCode::BanConcurrentIndexCreationInTransaction => ViolationMeta::new(
-            "Ban Concurrent Index Creation in Transaction", 
-            [
-                ViolationMessage::Note("Concurrent index creation is not allowed inside a transaction."),
-                ViolationMessage::Help("Build the index outside any transactions."),
-            ]
-        ),
-        ErrorCode::PreferBigintOverInt => ViolationMeta::new(
-            "Prefer Big Int Over Int",
-            [
-                ViolationMessage::Note(
-                    "Hitting the max 32 bit integer is possible and may break your application."
-                ),
-                ViolationMessage::Help(
-                    "Use 64bit integer values instead to prevent hitting this limit."
-                ),
-            ]
-        ),
-        ErrorCode::BanCreateDomainWithConstraint => ViolationMeta::new(
-            "Ban Create Domains with Constraints",
-            [
-                ViolationMessage::Note(
-                    "Domains with constraints have poor support for online migrations",
-                ),
-            ]
-        ),
-        ErrorCode::BanAlterDomainWithAddConstraint => ViolationMeta::new(
-            "Ban Alter Domain With Add Constraints",
-            [
-                ViolationMessage::Note(
-                    "Domains with constraints have poor support for online migrations",
-                )
-            ]
-        ),
-        ErrorCode::UnusedIgnore => ViolationMeta::new("Unused linter ignore", [])
-    }
-    }
-}
-
-#[derive(Debug)]
-pub enum ViolationMessage<'a> {
-    Note(&'a str),
-    Help(&'a str),
-}
-
-#[derive(Debug)]
-pub struct ViolationMeta<'a> {
-    /// A description of the rule that's used when rendering the error message
-    /// in on the CLI. It should be a slightly expanded version of the [`ViolationName`]
-    pub title: String,
-    /// Messages rendered for each error to provide context and offer advice on how to fix.
-    pub messages: Vec<ViolationMessage<'a>>,
-}
-
-impl<'a> ViolationMeta<'a> {
-    pub fn new(
-        title: impl Into<String>,
-        messages: impl Into<Vec<ViolationMessage<'a>>>,
-    ) -> ViolationMeta<'a> {
-        ViolationMeta {
-            title: title.into(),
-            messages: messages.into(),
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Violation {
-    pub code: ErrorCode,
+    // TODO: should this be String instead?
+    pub code: Rule,
     pub message: String,
     pub text_range: TextRange,
-    pub messages: Vec<String>,
+    pub help: Option<String>,
 }
 
 impl Violation {
     #[must_use]
-    pub(crate) fn new(
-        code: ErrorCode,
+    pub fn new(
+        code: Rule,
         message: String,
         text_range: TextRange,
-        messages: impl Into<Option<Vec<String>>>,
+        help: impl Into<Option<String>>,
     ) -> Self {
         Self {
             code,
             text_range,
             message,
-            messages: messages.into().unwrap_or_default(),
+            help: help.into(),
         }
     }
-}
-
-#[derive(Debug, PartialEq, PartialOrd, Clone, Copy)]
-pub struct Version {
-    major: i32,
-    minor: Option<i32>,
-    patch: Option<i32>,
-}
-
-impl Version {
-    #[must_use]
-    pub(crate) fn new(
-        major: i32,
-        minor: impl Into<Option<i32>>,
-        patch: impl Into<Option<i32>>,
-    ) -> Self {
-        Self {
-            major,
-            minor: minor.into(),
-            patch: patch.into(),
-        }
-    }
-}
-
-#[derive(PartialEq, Eq, Hash, Copy, Clone, Sequence)]
-pub enum Rule {
-    AddingFieldWithDefault,
-    AddingForeignKeyConstraint,
-    AddingNotNullField,
-    AddingPrimaryKeyConstraint,
-    AddingRequiredField,
-    BanDropDatabase,
-    BanCharField,
-    BanConcurrentIndexCreationInTransaction,
-    BanDropColumn,
-    BanDropNotNull,
-    BanDropTable,
-    ChangingColumnType,
-    ConstraintMissingNotValid,
-    DisallowUniqueConstraint,
-    PreferBigInt,
-    PreferBigintOverInt,
-    PreferBigintOverSmallint,
-    PreferIdentity,
-    PreferRobustStmts,
-    PreferTextField,
-    PreferTimestamptz,
-    RenamingColumn,
-    RenamingTable,
-    RequireConcurrentIndexCreation,
-    RequireConcurrentIndexDeletion,
-    BanCreateDomainWithConstraint,
-    BanAlterDomainWithAddConstraint,
-    // xtask:new-lint:name
 }
 
 pub struct LinterSettings {
@@ -510,17 +262,17 @@ impl Linter {
     }
 
     #[must_use]
-    pub fn lint(&mut self, file: Parse<SourceFile>, text: &str) -> Vec<&Violation> {
+    pub fn lint(&mut self, file: Parse<SourceFile>, text: &str) -> Vec<Violation> {
         if self.rules.contains(&Rule::AddingFieldWithDefault) {
             adding_field_with_default(self, &file);
         }
         if self.rules.contains(&Rule::AddingForeignKeyConstraint) {
             adding_foreign_key_constraint(self, &file);
         }
-        if self.rules.contains(&Rule::AddingNotNullField) {
+        if self.rules.contains(&Rule::AddingNotNullableField) {
             adding_not_null_field(self, &file);
         }
-        if self.rules.contains(&Rule::AddingPrimaryKeyConstraint) {
+        if self.rules.contains(&Rule::AddingSerialPrimaryKeyField) {
             adding_primary_key_constraint(self, &file);
         }
         if self.rules.contains(&Rule::AddingRequiredField) {
@@ -553,7 +305,7 @@ impl Linter {
         if self.rules.contains(&Rule::ConstraintMissingNotValid) {
             constraint_missing_not_valid(self, &file);
         }
-        if self.rules.contains(&Rule::DisallowUniqueConstraint) {
+        if self.rules.contains(&Rule::DisallowedUniqueConstraint) {
             disallow_unique_constraint(self, &file);
         }
         if self.rules.contains(&Rule::PreferBigInt) {
@@ -574,7 +326,7 @@ impl Linter {
         if self.rules.contains(&Rule::PreferTextField) {
             prefer_text_field(self, &file);
         }
-        if self.rules.contains(&Rule::PreferTimestamptz) {
+        if self.rules.contains(&Rule::PreferTimestampTz) {
             prefer_timestamptz(self, &file);
         }
         if self.rules.contains(&Rule::RenamingColumn) {
@@ -603,22 +355,38 @@ impl Linter {
         self.errors(text)
     }
 
-    fn errors(&mut self, text: &str) -> Vec<&Violation> {
-        // ensure we order them by where they appear in the file
-        self.errors.sort_by_key(|x| x.text_range.start());
-
+    fn errors(&mut self, text: &str) -> Vec<Violation> {
         let ignore_index = IgnoreIndex::new(text, &self.ignores);
-        // TODO: we should have errors for when there was an ignore but that
-        // ignore didn't actually ignore anything
-
-        self.errors
+        let mut errors: Vec<Violation> = self
+            .errors
             .iter()
+            // TODO: we should have errors for when there was an ignore but that
+            // ignore didn't actually ignore anything
             .filter(|err| !ignore_index.contains(err.text_range, err.code))
-            .collect::<Vec<_>>()
+            .cloned()
+            .collect::<Vec<_>>();
+        // ensure we order them by where they appear in the file
+        errors.sort_by_key(|x| x.text_range.start());
+        errors
     }
 
     pub fn with_all_rules() -> Self {
         let rules = all::<Rule>().collect::<HashSet<_>>();
+        Linter::from(rules)
+    }
+
+    pub fn without_rules(exclude: &[Rule]) -> Self {
+        let all_rules = all::<Rule>().collect::<HashSet<_>>();
+        let mut exclude_set = HashSet::with_capacity(exclude.len());
+        for e in exclude {
+            exclude_set.insert(e);
+        }
+
+        let rules = all_rules
+            .into_iter()
+            .filter(|x| !exclude_set.contains(x))
+            .collect::<HashSet<_>>();
+
         Linter::from(rules)
     }
 

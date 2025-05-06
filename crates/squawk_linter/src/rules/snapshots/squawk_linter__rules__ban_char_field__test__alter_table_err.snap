@@ -7,6 +7,6 @@ expression: errors
         code: BanCharField,
         message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 28..32,
-        messages: [],
+        help: None,
     },
 ]

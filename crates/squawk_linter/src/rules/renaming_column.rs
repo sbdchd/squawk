@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -12,7 +12,7 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::RenameColumn(rename_column) = action {
                     ctx.report(Violation::new(
-                        ErrorCode::RenamingColumn,
+                        Rule::RenamingColumn,
                         "Renaming a column may break existing clients.".into(),
                         rename_column.syntax().text_range(),
                         None,

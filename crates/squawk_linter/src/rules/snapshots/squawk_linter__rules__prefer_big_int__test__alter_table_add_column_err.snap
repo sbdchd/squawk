@@ -7,6 +7,8 @@ expression: errors
         code: PreferBigInt,
         message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
         text_range: 28..35,
-        messages: [],
+        help: Some(
+            "Use 64-bit integer values instead to prevent hitting this limit.",
+        ),
     },
 ]

@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -13,7 +13,7 @@ pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) 
                 if let ast::AlterTableAction::AlterColumn(alter_column) = action {
                     if let Some(ast::AlterColumnOption::SetType(set_type)) = alter_column.option() {
                         ctx.report(Violation::new(
-                            ErrorCode::ChangingColumnType,
+                            Rule::ChangingColumnType,
                             "Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten. Changing the type of the column may also break other clients reading from the table.".into(),
                             set_type.syntax().text_range(),
                             None,

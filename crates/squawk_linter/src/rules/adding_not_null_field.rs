@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Version, Violation};
+use crate::{Linter, Rule, Version, Violation};
 
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     if ctx.settings.pg_version >= Version::new(11, 0, 0) {
@@ -20,11 +20,12 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 
                     if matches!(option, ast::AlterColumnOption::SetNotNull(_)) {
                         ctx.report(Violation::new(
-                            ErrorCode::AddingNotNullableField,
-                            "Setting a column NOT NULL blocks reads while the table is scanned."
+                            Rule::AddingNotNullableField,
+                            "Setting a column `NOT NULL` blocks reads while the table is scanned."
                                 .into(),
                             option.syntax().text_range(),
-                            vec!["Use a check constraint instead.".into()],
+                            "Make the field nullable and use a `CHECK` constraint instead."
+                                .to_string(),
                         ));
                     }
                 }
@@ -45,7 +46,7 @@ mod test {
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingNotNullField]);
+        let mut linter = Linter::from([Rule::AddingNotNullableField]);
         linter.settings.pg_version = Version::new(10, 0, 0);
         let errors = linter.lint(file, sql);
         assert!(!errors.is_empty());
@@ -63,7 +64,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" DROP DEFAULT;
 COMMIT;
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingNotNullField]);
+        let mut linter = Linter::from([Rule::AddingNotNullableField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
     }
@@ -75,7 +76,7 @@ COMMIT;
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingNotNullField]);
+        let mut linter = Linter::from([Rule::AddingNotNullableField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
     }
@@ -91,7 +92,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL DEFAULT 10;
 COMMIT;
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingNotNullField]);
+        let mut linter = Linter::from([Rule::AddingNotNullableField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
     }

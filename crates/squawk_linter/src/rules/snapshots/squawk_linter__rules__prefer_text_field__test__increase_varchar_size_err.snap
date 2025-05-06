@@ -7,6 +7,8 @@ expression: errors
         code: PreferTextField,
         message: "Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.",
         text_range: 89..102,
-        messages: [],
+        help: Some(
+            "Use a `text` field with a `check` constraint.",
+        ),
     },
 ]

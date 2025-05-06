@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -15,8 +15,8 @@ pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         alter_column.option()
                     {
                         ctx.report(Violation::new(
-                            ErrorCode::BanDropNotNull,
-                            "Dropping a NOT NULL constraint may break existing clients.".into(),
+                            Rule::BanDropNotNull,
+                            "Dropping a `NOT NULL` constraint may break existing clients.".into(),
                             drop_not_null.syntax().text_range(),
                             None,
                         ));

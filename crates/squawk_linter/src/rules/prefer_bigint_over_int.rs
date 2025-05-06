@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{ast, Parse, SourceFile};
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 use crate::prefer_big_int::check_not_allowed_types;
 use crate::prefer_big_int::is_not_valid_int_type;
@@ -19,10 +19,10 @@ fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_valid_int_type(&ty, &INT_TYPES) {
             ctx.report(Violation::new(
-                ErrorCode::PreferBigintOverInt,
+                Rule::PreferBigintOverInt,
                 "Using 32-bit integer fields can result in hitting the max `int` limit.".into(),
                 ty.syntax().text_range(),
-                None,
+                "Use 64-bit integer values instead to prevent hitting this limit.".to_string(),
             ));
         };
     }
@@ -38,7 +38,7 @@ pub(crate) fn prefer_bigint_over_int(ctx: &mut Linter, parse: &Parse<SourceFile>
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{ErrorCode, Linter, Rule};
+    use crate::{Rule, Linter};
 
     #[test]
     fn err() {
@@ -64,7 +64,7 @@ create table users (
         assert_eq!(
             errors
                 .iter()
-                .filter(|x| x.code == ErrorCode::PreferBigintOverInt)
+                .filter(|x| x.code == Rule::PreferBigintOverInt)
                 .count(),
             4
         );

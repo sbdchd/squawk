@@ -7,6 +7,6 @@ expression: errors
         code: BanDropColumn,
         message: "Dropping a column may break existing clients.",
         text_range: 23..52,
-        messages: [],
+        help: None,
     },
 ]

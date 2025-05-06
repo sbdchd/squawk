@@ -1,0 +1,12 @@
+---
+source: crates/squawk_linter/src/version.rs
+expression: "Version::from_str(\"test\").unwrap_err()"
+---
+InvalidNumber(
+    InvalidNumber {
+        version: "test",
+        e: ParseIntError {
+            kind: InvalidDigit,
+        },
+    },
+)

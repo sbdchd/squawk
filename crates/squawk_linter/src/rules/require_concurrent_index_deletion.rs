@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -11,10 +11,10 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
         if let ast::Item::DropIndex(drop_index) = item {
             if drop_index.concurrently_token().is_none() {
                 ctx.report(Violation::new(
-                    ErrorCode::RequireConcurrentIndexDeletion,
-"A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can be completed.".into(),
+                    Rule::RequireConcurrentIndexDeletion,
+            "A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can complete.".into(),
                     drop_index.syntax().text_range(),
-                    None,
+                    "Drop the index `CONCURRENTLY`.".to_string(),
                 ));
             }
         }
@@ -25,7 +25,7 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{ErrorCode, Linter, Rule};
+    use crate::{Linter, Rule};
 
     #[test]
     fn drop_index_missing_concurrently_err() {
@@ -37,7 +37,7 @@ mod test {
         let mut linter = Linter::from([Rule::RequireConcurrentIndexDeletion]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 1);
-        assert_eq!(errors[0].code, ErrorCode::RequireConcurrentIndexDeletion);
+        assert_eq!(errors[0].code, Rule::RequireConcurrentIndexDeletion);
         assert_debug_snapshot!(errors);
     }
 

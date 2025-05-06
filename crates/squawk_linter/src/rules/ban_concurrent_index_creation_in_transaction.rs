@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Rule, Linter, Violation};
 
 pub(crate) fn ban_concurrent_index_creation_in_transaction(
     ctx: &mut Linter,
@@ -26,10 +26,10 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
                 if in_transaction {
                     if let Some(concurrently) = create_index.concurrently_token() {
                         errors.push(Violation::new(
-                            ErrorCode::BanConcurrentIndexCreationInTransaction,
-                            "While regular index creation can happen inside a transaction, this is not allowed when the CONCURRENTLY option is used.".into(),
+                            Rule::BanConcurrentIndexCreationInTransaction,
+                            "While regular index creation can happen inside a transaction, this is not allowed when the `CONCURRENTLY` option is used.".into(),
                             concurrently.text_range(),
-                            None,
+                            "Build the index outside any transactions.".to_string(),
                         ));
                     }
                 }

@@ -5,7 +5,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{text::trim_quotes, ErrorCode, Linter, Violation};
+use crate::{text::trim_quotes, Rule, Linter, Violation};
 
 pub fn tables_created_in_transaction(
     assume_in_transaction: bool,
@@ -58,12 +58,10 @@ fn not_valid_validate_in_transaction(
                                 {
                                     ctx.report(
                                         Violation::new(
-                                        ErrorCode::ConstraintMissingNotValid,
-                                        "Using NOT VALID and VALIDATE CONSTRAINT in the same transaction will block all reads while the constraint is validated.".into(),
+                                        Rule::ConstraintMissingNotValid,
+                                        "Using `NOT VALID` and `VALIDATE CONSTRAINT` in the same transaction will block all reads while the constraint is validated.".into(),
                                         validate_constraint.syntax().text_range(),
-                                        vec![
-                                            "Add constraint as NOT VALID in one transaction and VALIDATE CONSTRAINT in a separate transaction.".into(),
-                                        ]
+                                        "Add constraint as `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in a separate transaction.".to_string(),
                                     ))
                                 }
                             }
@@ -130,7 +128,7 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
                         }
 
                         ctx.report(Violation::new(
-                            ErrorCode::ConstraintMissingNotValid,
+                            Rule::ConstraintMissingNotValid,
                             "By default new constraints require a table scan and block writes to the table while that scan occurs.".into(),
                             add_constraint.syntax().text_range(),
                             None,

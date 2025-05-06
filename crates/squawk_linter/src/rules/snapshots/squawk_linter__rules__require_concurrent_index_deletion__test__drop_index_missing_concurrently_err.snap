@@ -5,8 +5,10 @@ expression: errors
 [
     Violation {
         code: RequireConcurrentIndexDeletion,
-        message: "A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can be completed.",
+        message: "A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can complete.",
         text_range: 19..56,
-        messages: [],
+        help: Some(
+            "Drop the index `CONCURRENTLY`.",
+        ),
     },
 ]
