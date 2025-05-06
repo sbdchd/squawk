@@ -54,6 +54,11 @@ module.exports = {
           position: "left",
         },
         {
+          href: "https://play.squawkhq.com",
+          label: "Playground",
+          position: "right",
+        },
+        {
           to: "docs/",
           label: "Quick Start",
           position: "right",

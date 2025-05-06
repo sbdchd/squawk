@@ -7,16 +7,14 @@ slug: /
 
 ## Install
 
-Note: due to `squawk`'s dependency on
-[`libpg_query`](https://github.com/lfittl/libpg_query/issues/44), `squawk`
-only supports Linux and macOS
-
 ```shell
 npm install -g squawk-cli
 
 # or install binaries directly via the releases page
 https://github.com/sbdchd/squawk/releases
 ```
+
+**NOTE**: You can also try Squawk in the browser via the [Squawk Playground](https://play.squawkhq.com)!
 
 ## Usage
 
@@ -40,19 +38,33 @@ squawk example-migration.sql
 
 <br/>
 
-```shell
+```
 ❯ squawk example-migration.sql
-example-migration.sql:2:1: warning: disallowed-unique-constraint
+warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+ --> example-migration.sql:2:24
+  |
+2 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+  |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
+ --> example-migration.sql:2:28
+  |
+2 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+  |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = help: Create an index CONCURRENTLY and create the constraint using the index.
 
-   2 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
-
-  note: Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.
-  help: Create an index CONCURRENTLY and create the constraint using the index.
+Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
+Found 2 issues in 1 file (checked 1 source file)
 ```
 
 See ["Running Migrations"](./safe_migrations.md#safety-requirements) for information about safely applying migrations in Postgres.
 
 The [CLI docs](./cli.md) have more information about the `squawk` CLI tool and the [GitHub Integration docs](./github_app.md) outline configuring Squawk to work with GitHub pull requests.
+
+## Playground
+
+You can also lint your SQL in the [Squawk Playground](https://play.squawkhq.com) using the WASM compiled version!
 
 ## GitHub Action
 
