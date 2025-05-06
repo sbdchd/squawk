@@ -5,7 +5,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{text::trim_quotes, Rule, Linter, Violation};
+use crate::{text::trim_quotes, Linter, Rule, Violation};
 
 pub fn tables_created_in_transaction(
     assume_in_transaction: bool,

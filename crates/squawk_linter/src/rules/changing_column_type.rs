@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{Rule, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();

@@ -5,7 +5,7 @@ use squawk_syntax::ast;
 use squawk_syntax::ast::{AstNode, HasArgList};
 use squawk_syntax::{ast::HasModuleItem, Parse, SourceFile};
 
-use crate::{Rule, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 fn is_const_expr(expr: &ast::Expr) -> bool {
     match expr {

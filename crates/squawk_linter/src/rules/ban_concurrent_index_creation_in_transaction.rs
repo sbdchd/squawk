@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{Rule, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn ban_concurrent_index_creation_in_transaction(
     ctx: &mut Linter,

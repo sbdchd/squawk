@@ -5,7 +5,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{text::trim_quotes, Rule, Linter, Violation};
+use crate::{text::trim_quotes, Linter, Rule, Violation};
 
 use crate::prefer_big_int::check_not_allowed_types;
 

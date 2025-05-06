@@ -5,7 +5,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{text::trim_quotes, Rule, Linter, Violation};
+use crate::{text::trim_quotes, Linter, Rule, Violation};
 use lazy_static::lazy_static;
 
 lazy_static! {
@@ -111,7 +111,7 @@ pub(crate) fn prefer_big_int(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Rule, Linter};
+    use crate::{Linter, Rule};
 
     #[test]
     fn err() {

@@ -4,7 +4,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{Rule, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();

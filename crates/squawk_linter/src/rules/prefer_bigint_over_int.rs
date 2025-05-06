@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{ast, Parse, SourceFile};
 
-use crate::{Rule, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 use crate::prefer_big_int::check_not_allowed_types;
 use crate::prefer_big_int::is_not_valid_int_type;
@@ -38,7 +38,7 @@ pub(crate) fn prefer_bigint_over_int(ctx: &mut Linter, parse: &Parse<SourceFile>
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Rule, Linter};
+    use crate::{Linter, Rule};
 
     #[test]
     fn err() {

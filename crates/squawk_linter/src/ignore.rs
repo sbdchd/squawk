@@ -108,7 +108,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
 #[cfg(test)]
 mod test {
 
-    use crate::{find_ignores, Linter, Rule, Violation};
+    use crate::{find_ignores, Linter, Rule};
 
     #[test]
     fn single_ignore() {

@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{Rule, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let message = "Adding a foreign key constraint requires a table scan and a `SHARE ROW EXCLUSIVE` lock on both tables, which blocks writes to each table.";
@@ -59,7 +59,7 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
 
 #[cfg(test)]
 mod test {
-    use crate::{Rule, Linter};
+    use crate::{Linter, Rule};
 
     #[test]
     fn create_table_with_foreign_key_constraint() {

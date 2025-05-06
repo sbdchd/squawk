@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{Rule, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 /// Brad's Rule aka ban dropping database statements.
 pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {

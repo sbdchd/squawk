@@ -4,7 +4,7 @@ use squawk_syntax::{
 };
 
 use crate::prefer_big_int::check_not_allowed_types;
-use crate::{Rule, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 fn is_char_type(x: TokenText<'_>) -> bool {
     if x == "char" || x == "character" || x == "bpchar" {
