@@ -2647,19 +2647,6 @@ dependencies = [
  "serde_repr",
 ]
 
-[[package]]
-name = "squawk_cli"
-version = "0.0.0"
-dependencies = [
- "annotate-snippets",
- "anyhow",
- "atty",
- "clap 4.5.37",
- "enum-iterator",
- "squawk_lexer",
- "squawk_linter",
- "squawk_syntax",
-]
 
 [[package]]
 name = "squawk_lexer"
