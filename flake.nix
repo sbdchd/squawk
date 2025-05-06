@@ -39,8 +39,6 @@
                 Security
               ]);
 
-              LIBPG_QUERY_PATH = final.libpg_query;
-
               meta = with lib; {
                 description = "Linter for PostgreSQL, focused on migrations";
                 homepage = "https://github.com/sbdchd/squawk";
