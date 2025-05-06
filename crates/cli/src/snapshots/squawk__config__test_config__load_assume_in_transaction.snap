@@ -1,5 +1,5 @@
 ---
-source: cli/src/config.rs
+source: crates/cli/src/config.rs
 expression: "Config::parse(Some(squawk_toml.path().to_path_buf()))"
 ---
 Ok(

@@ -1,5 +1,5 @@
 ---
-source: cli/src/reporter.rs
+source: crates/cli/src/github.rs
 expression: body
 ---
 # Squawk Report

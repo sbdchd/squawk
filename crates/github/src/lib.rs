@@ -3,6 +3,8 @@
 #![allow(clippy::single_match_else)]
 pub mod actions;
 pub mod app;
+use std::error::Error;
+
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -10,6 +12,15 @@ use serde::{Deserialize, Serialize};
 pub enum GithubError {
     JsonWebTokenCreation(jsonwebtoken::errors::Error),
     HttpError(reqwest::Error),
+}
+
+impl Error for GithubError {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            GithubError::JsonWebTokenCreation(err) => Some(err),
+            GithubError::HttpError(err) => Some(err),
+        }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]

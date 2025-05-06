@@ -41,7 +41,6 @@ squawk --config=~/.squawk.toml example.sql
 
 The `--exclude`, `--exclude-path`, and `--pg-version` flags will always be prioritized over the configuration file.
 
-
 ## example `.squawk.toml` configurations
 
 ### excluding rules
@@ -86,10 +85,7 @@ excluded_paths = [
 fail_on_violations = true
 ```
 
-
-
 See the [Squawk website](https://squawkhq.com/docs/rules) for documentation on each rule with examples and reasoning.
-
 
 ## `squawk --help`
 
@@ -108,9 +104,6 @@ FLAGS:
     -h, --help
             Prints help information
 
-        --list-rules
-            List all available rules
-
     -V, --version
             Prints version information
 
@@ -122,15 +115,13 @@ OPTIONS:
     -c, --config <config-path>
             Path to the squawk config file (.squawk.toml)
 
-        --dump-ast <ast-format>
-            Output AST in JSON [possible values: Raw, Parsed, Debug]
+        --debug <format>
+            Output debug format [possible values: Lex, Parsed]
 
     -e, --exclude <rule>...
             Exclude specific warnings
 
             For example: --exclude=require-concurrent-index-creation,ban-drop-database
-        --explain <rule>
-            Provide documentation on the given rule
 
         --pg-version <pg-version>
             Specify postgres version
