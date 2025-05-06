@@ -1,37 +1,75 @@
-#![allow(clippy::match_wildcard_for_single_variants)]
-#[allow(clippy::non_ascii_literal)]
-#[allow(clippy::cast_sign_loss)]
-#[allow(clippy::enum_variant_names)]
-#[allow(clippy::module_name_repetitions)]
 mod config;
+mod debug;
+mod file;
 mod file_finding;
+mod github;
 mod reporter;
-mod subcommand;
+use anyhow::{Context, Result};
+use debug::debug;
+use reporter::check_and_dump_files;
+use squawk_linter::{Rule, Version};
+use structopt::clap::arg_enum;
 
 use crate::file_finding::find_paths;
-use crate::reporter::{
-    check_files, dump_ast_for_paths, explain_rule, list_rules, print_violations, DumpAstOption,
-    Reporter,
-};
-use crate::subcommand::{check_and_comment_on_pr, Command};
 use atty::Stream;
 use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
-use squawk_linter::versions::Version;
-use squawk_linter::violations::RuleViolationKind;
 use std::io;
 use std::path::PathBuf;
-use std::process;
+use std::process::{self, ExitCode};
 use structopt::StructOpt;
 
-fn exit<E: std::fmt::Display, T>(res: Result<T, E>, msg: &str) -> ! {
-    match res {
-        Ok(_) => process::exit(0),
-        Err(err) => {
-            eprintln!("{msg}: {err}");
-            process::exit(1)
-        }
+#[derive(StructOpt, Debug)]
+pub enum Command {
+    /// Comment on a PR with Squawk's results.
+    UploadToGithub {
+        /// Paths to search
+        paths: Vec<String>,
+        /// Exits with an error if violations are found
+        #[structopt(long)]
+        fail_on_violations: bool,
+        #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
+        github_private_key: Option<String>,
+        #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
+        github_private_key_base64: Option<String>,
+        #[structopt(long, env = "SQUAWK_GITHUB_TOKEN")]
+        github_token: Option<String>,
+        /// GitHub App Id.
+        #[structopt(long, env = "SQUAWK_GITHUB_APP_ID")]
+        github_app_id: Option<i64>,
+        /// GitHub Install Id. The installation that squawk is acting on.
+        #[structopt(long, env = "SQUAWK_GITHUB_INSTALL_ID")]
+        github_install_id: Option<i64>,
+        /// GitHub Repo Owner
+        /// github.com/sbdchd/squawk, sbdchd is the owner
+        #[structopt(long, env = "SQUAWK_GITHUB_REPO_OWNER")]
+        github_repo_owner: String,
+        /// GitHub Repo Name
+        /// github.com/sbdchd/squawk, squawk is the name
+        #[structopt(long, env = "SQUAWK_GITHUB_REPO_NAME")]
+        github_repo_name: String,
+        /// GitHub Pull Request Number
+        /// github.com/sbdchd/squawk/pull/10, 10 is the PR number
+        #[structopt(long, env = "SQUAWK_GITHUB_PR_NUMBER")]
+        github_pr_number: i64,
+    },
+}
+
+arg_enum! {
+    #[derive(Debug, StructOpt)]
+    pub enum DebugOption {
+        Lex,
+        Parse
+    }
+}
+
+arg_enum! {
+    #[derive(Debug, StructOpt)]
+    pub enum Reporter {
+        Tty,
+        Gcc,
+        Json,
     }
 }
 
@@ -62,22 +100,16 @@ struct Opt {
         use_delimiter = true,
         global = true
     )]
-    excluded_rules: Option<Vec<RuleViolationKind>>,
+    excluded_rules: Option<Vec<Rule>>,
     /// Specify postgres version
     ///
     /// For example:
     /// --pg-version=13.0
     #[structopt(long, global = true)]
     pg_version: Option<Version>,
-    /// List all available rules
-    #[structopt(long)]
-    list_rules: bool,
-    /// Provide documentation on the given rule
-    #[structopt(long, value_name = "rule")]
-    explain: Option<String>,
-    /// Output AST in JSON
-    #[structopt(long,value_name ="ast-format", possible_values = &DumpAstOption::variants(), case_insensitive = true)]
-    dump_ast: Option<DumpAstOption>,
+    /// Output debug format
+    #[structopt(long,value_name ="format", possible_values = &DebugOption::variants(), case_insensitive = true)]
+    debug: Option<DebugOption>,
     /// Style of error reporting
     #[structopt(long, possible_values = &Reporter::variants(), case_insensitive = true)]
     reporter: Option<Reporter>,
@@ -107,14 +139,14 @@ struct Opt {
 }
 
 #[allow(clippy::too_many_lines)]
-fn main() {
+fn main() -> Result<ExitCode> {
     let opts = Opt::from_args();
 
     if opts.verbose {
         CombinedLogger::init(vec![simplelog::TermLogger::new(
             simplelog::LevelFilter::Info,
             simplelog::Config::default(),
-            simplelog::TerminalMode::Mixed,
+            simplelog::TerminalMode::Stderr,
             simplelog::ColorChoice::Auto,
         )])
         .expect("problem creating logger");
@@ -177,67 +209,38 @@ fn main() {
         process::exit(1);
     }
     if let Some(subcommand) = opts.cmd {
-        exit(
-            check_and_comment_on_pr(
-                subcommand,
-                &conf,
-                is_stdin,
-                opts.stdin_filepath,
-                &excluded_rules,
-                &excluded_paths,
-                pg_version,
-                assume_in_transaction,
-            ),
-            "Upload to GitHub failed",
-        );
+        github::check_and_comment_on_pr(
+            subcommand,
+            &conf,
+            is_stdin,
+            opts.stdin_filepath,
+            &excluded_rules,
+            &excluded_paths,
+            pg_version,
+            assume_in_transaction,
+        )
+        .context("Upload to GitHub failed")?;
     } else if !found_paths.is_empty() || is_stdin {
         let read_stdin = found_paths.is_empty() && is_stdin;
-        if let Some(dump_ast_kind) = opts.dump_ast {
-            exit(
-                dump_ast_for_paths(&mut handle, &found_paths, read_stdin, &dump_ast_kind),
-                "Failed to dump AST",
-            );
+        if let Some(kind) = opts.debug {
+            debug(&mut handle, &found_paths, read_stdin, &kind, opts.verbose)?;
         } else {
-            match check_files(
+            let reporter = opts.reporter.unwrap_or(Reporter::Tty);
+            let exit_code = check_and_dump_files(
+                &mut handle,
                 &found_paths,
                 read_stdin,
                 opts.stdin_filepath,
                 &excluded_rules,
                 pg_version,
                 assume_in_transaction,
-            ) {
-                Ok(file_reports) => {
-                    let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-                    let total_violations = file_reports
-                        .iter()
-                        .map(|f| f.violations.len())
-                        .sum::<usize>();
-                    match print_violations(&mut handle, file_reports, &reporter) {
-                        Ok(()) => {
-                            let exit_code = i32::from(total_violations > 0);
-                            process::exit(exit_code);
-                        }
-                        Err(e) => {
-                            eprintln!("Problem reporting violations: {e}");
-                            process::exit(1);
-                        }
-                    }
-                }
-                Err(e) => {
-                    eprintln!("Problem linting SQL files: {e}");
-                    process::exit(1)
-                }
-            }
+                &reporter,
+            )?;
+            return Ok(exit_code);
         }
-    } else if opts.list_rules {
-        exit(list_rules(&mut handle), "Could not list rules");
-    } else if let Some(rule_name) = opts.explain {
-        exit(
-            explain_rule(&mut handle, &rule_name),
-            "Could not explain rules",
-        );
     } else {
-        clap_app.print_long_help().expect("problem printing help");
+        clap_app.print_long_help()?;
         println!();
     }
+    Ok(ExitCode::SUCCESS)
 }

@@ -1,40 +1,10 @@
+use anyhow::{Context, Result};
 use log::info;
 use serde::Deserialize;
-use squawk_linter::{versions::Version, violations::RuleViolationKind};
-use std::{env, io, path::Path, path::PathBuf};
+use squawk_linter::{Rule, Version};
+use std::{env, path::Path, path::PathBuf};
 
 const FILE_NAME: &str = ".squawk.toml";
-
-#[derive(Debug)]
-pub enum ConfigError {
-    LookupError(io::Error),
-    ReadError(io::Error),
-    ParseError(toml::de::Error),
-}
-
-impl std::convert::From<io::Error> for ConfigError {
-    fn from(e: io::Error) -> Self {
-        Self::ReadError(e)
-    }
-}
-
-impl std::convert::From<toml::de::Error> for ConfigError {
-    fn from(e: toml::de::Error) -> Self {
-        Self::ParseError(e)
-    }
-}
-
-impl std::fmt::Display for ConfigError {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match *self {
-            Self::LookupError(ref err) => {
-                write!(f, "Error when finding configuration file: {err}")
-            }
-            Self::ReadError(ref err) => write!(f, "Failed to read configuration file: {err}"),
-            Self::ParseError(ref err) => write!(f, "Failed to parse configuration file: {err}"),
-        }
-    }
-}
 
 #[derive(Debug, Default, Deserialize)]
 pub struct UploadToGitHubConfig {
@@ -47,7 +17,7 @@ pub struct Config {
     #[serde(default)]
     pub excluded_paths: Vec<String>,
     #[serde(default)]
-    pub excluded_rules: Vec<RuleViolationKind>,
+    pub excluded_rules: Vec<Rule>,
     #[serde(default)]
     pub pg_version: Option<Version>,
     #[serde(default)]
@@ -57,7 +27,7 @@ pub struct Config {
 }
 
 impl Config {
-    pub fn parse(custom_path: Option<PathBuf>) -> Result<Option<Self>, ConfigError> {
+    pub fn parse(custom_path: Option<PathBuf>) -> Result<Option<Self>> {
         let path = if let Some(path) = custom_path {
             Some(path)
         } else {
@@ -90,8 +60,9 @@ fn recurse_directory(directory: &Path, file_name: &str) -> Result<Option<PathBuf
     }
 }
 
-fn find_by_traversing_back() -> Result<Option<PathBuf>, ConfigError> {
-    recurse_directory(&env::current_dir()?, FILE_NAME).map_err(ConfigError::LookupError)
+fn find_by_traversing_back() -> Result<Option<PathBuf>> {
+    recurse_directory(&env::current_dir()?, FILE_NAME)
+        .context("Error when finding configuration file")
 }
 
 #[cfg(test)]

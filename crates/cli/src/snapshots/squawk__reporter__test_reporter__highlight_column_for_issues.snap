@@ -1,8 +1,0 @@
----
-source: cli/src/reporter.rs
-expression: columns
----
-col1 varchar(255),
-col2 varchar(255),
-col3 varchar(255)
-

@@ -1,42 +1,102 @@
 ---
-source: cli/src/reporter.rs
-expression: "pretty_violations(violations, sql, filename)"
+source: crates/cli/src/reporter.rs
+expression: "check_sql(sql, filename, &[], None, false)"
 ---
-ViolationContent {
+CheckReport {
     filename: "main.sql",
     sql: "\n\n   ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;\nALTER TABLE \"core_foo\" ADD COLUMN \"bar\" integer NOT NULL;\nSELECT 1;\n",
     violations: [
         ReportViolation {
             file: "main.sql",
             line: 2,
-            column: 2,
+            column: 29,
+            range: 31..64,
             level: Warning,
-            messages: [
-                Note(
-                    "Adding a NOT NULL field without a DEFAULT will fail for a populated table.",
-                ),
-                Help(
-                    "Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).",
-                ),
-            ],
-            rule_name: AddingRequiredField,
-            sql: "   ALTER TABLE \"core_recipe\" ADD COLUMN \"foo\" integer NOT NULL;",
+            message: "Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.",
+            help: Some(
+                "Make the field nullable or add a non-VOLATILE DEFAULT",
+            ),
+            rule_name: "adding-required-field",
         },
         ReportViolation {
             file: "main.sql",
-            line: 4,
-            column: 1,
+            line: 2,
+            column: 29,
+            range: 31..64,
             level: Warning,
-            messages: [
-                Note(
-                    "Adding a NOT NULL field without a DEFAULT will fail for a populated table.",
-                ),
-                Help(
-                    "Make the field nullable or add a non-VOLATILE DEFAULT (Postgres 11+).",
-                ),
-            ],
-            rule_name: AddingRequiredField,
-            sql: "ALTER TABLE \"core_foo\" ADD COLUMN \"bar\" integer NOT NULL;",
+            message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+            help: None,
+            rule_name: "prefer-robust-stmts",
+        },
+        ReportViolation {
+            file: "main.sql",
+            line: 2,
+            column: 46,
+            range: 48..55,
+            level: Warning,
+            message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+            help: Some(
+                "Use 64-bit integer values instead to prevent hitting this limit.",
+            ),
+            rule_name: "prefer-big-int",
+        },
+        ReportViolation {
+            file: "main.sql",
+            line: 2,
+            column: 46,
+            range: 48..55,
+            level: Warning,
+            message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+            help: Some(
+                "Use 64-bit integer values instead to prevent hitting this limit.",
+            ),
+            rule_name: "prefer-bigint-over-int",
+        },
+        ReportViolation {
+            file: "main.sql",
+            line: 3,
+            column: 23,
+            range: 89..122,
+            level: Warning,
+            message: "Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.",
+            help: Some(
+                "Make the field nullable or add a non-VOLATILE DEFAULT",
+            ),
+            rule_name: "adding-required-field",
+        },
+        ReportViolation {
+            file: "main.sql",
+            line: 3,
+            column: 23,
+            range: 89..122,
+            level: Warning,
+            message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+            help: None,
+            rule_name: "prefer-robust-stmts",
+        },
+        ReportViolation {
+            file: "main.sql",
+            line: 3,
+            column: 40,
+            range: 106..113,
+            level: Warning,
+            message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+            help: Some(
+                "Use 64-bit integer values instead to prevent hitting this limit.",
+            ),
+            rule_name: "prefer-big-int",
+        },
+        ReportViolation {
+            file: "main.sql",
+            line: 3,
+            column: 40,
+            range: 106..113,
+            level: Warning,
+            message: "Using 32-bit integer fields can result in hitting the max `int` limit.",
+            help: Some(
+                "Use 64-bit integer values instead to prevent hitting this limit.",
+            ),
+            rule_name: "prefer-bigint-over-int",
         },
     ],
 }

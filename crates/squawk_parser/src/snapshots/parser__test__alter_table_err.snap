@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_parser/src/test.rs
-assertion_line: 88
 input_file: crates/squawk_parser/test_data/err/alter_table.sql
 ---
 SOURCE_FILE

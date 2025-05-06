@@ -1,5 +1,5 @@
 ---
-source: cli/src/reporter.rs
+source: crates/cli/src/github.rs
 expression: body
 ---
 # Squawk Report
@@ -20,12 +20,11 @@ SELECT 1;
 
 
 ```
-alpha.sql:1:0: warning: adding-not-nullable-field
-
-   1 | ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
-
-  note: Adding a NOT NULL field requires exclusive locks and table rewrites.
-  help: Make the field nullable.
+warning[adding-not-nullable-field]: Adding a NOT NULL field requires exclusive locks and table rewrites.
+--> alpha.sql:1:1
+ |
+ |
+ = help: Make the field nullable.
 ```
     
 ---

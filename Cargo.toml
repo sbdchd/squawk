@@ -63,6 +63,7 @@ needless_return = "allow"
 doc_markdown = "deny"
 manual_let_else = "deny"
 explicit_iter_loop = "deny"
+too_many_arguments = "allow"
 
 [profile.dev]
 debug = 0

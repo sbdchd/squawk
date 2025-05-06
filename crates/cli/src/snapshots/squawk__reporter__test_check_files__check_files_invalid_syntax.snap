@@ -1,5 +1,5 @@
 ---
-source: cli/src/reporter.rs
+source: crates/cli/src/reporter.rs
 expression: val
 ---
-[{"column":0,"file":"test.sql","level":"Error","line":0,"messages":[{"Note":"Postgres failed to parse query: syntax error at or near \"\\\""},{"Help":"Modify your Postgres statement to use valid syntax."}],"rule_name":"invalid-statement"}]
+[{"column":6,"file":"test.sql","help":null,"level":"Error","line":1,"message":"expected SEMICOLON","rule_name":"syntax-error"},{"column":7,"file":"test.sql","help":null,"level":"Error","line":1,"message":"expected command, found ERROR","rule_name":"syntax-error"}]
