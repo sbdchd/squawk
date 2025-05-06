@@ -1,15 +1,13 @@
 # squawk [![npm](https://img.shields.io/npm/v/squawk-cli)](https://www.npmjs.com/package/squawk-cli)
 
-> linter for Postgres migrations
+> Linter for Postgres migrations & SQL
 
-[quick start](https://squawkhq.com/docs/) | [rules documentation](https://squawkhq.com/docs/rules) | [github action](https://github.com/sbdchd/squawk-action) | [diy github integration](https://squawkhq.com/docs/github_app)
+[Quick Start](https://squawkhq.com/docs/) | [Playground](https://play.squawkhq.com) | [Rules Documentation](https://squawkhq.com/docs/rules) | [GitHub Action](https://github.com/sbdchd/squawk-action) | [DIY GitHub Integration](https://squawkhq.com/docs/github_app)
 
 ## Why?
 
 Prevent unexpected downtime caused by database migrations and encourage best
 practices around Postgres schemas and SQL.
-
-Also it seemed like a nice project to spend more time with Rust.
 
 ## Install
 
@@ -179,11 +177,11 @@ repos:
 
 Note the `files` parameter as it specifies the location of the files to be linted.
 
-## prior art
+## Prior Art
 
 - <https://github.com/erik/squabble>
 
-### related tools
+### Related Tools
 
 - <https://github.com/yandex/zero-downtime-migrations>
 - <https://github.com/tbicr/django-pg-zero-downtime-migrations>
@@ -195,7 +193,7 @@ Note the `files` parameter as it specifies the location of the files to be linte
 - <https://github.com/supabase-community/postgres-language-server>
 - <https://github.com/premium-minds/sonar-postgres-plugin>
 
-## related blog posts / SE Posts / PG Docs
+## Related Blog Posts / SE Posts / PG Docs
 
 - <https://www.braintreepayments.com/blog/safe-operations-for-high-volume-postgresql/>
 - <https://gocardless.com/blog/zero-downtime-postgres-migrations-the-hard-parts/>
@@ -207,7 +205,7 @@ Note the `files` parameter as it specifies the location of the files to be linte
 - <https://benchling.engineering/move-fast-and-migrate-things-how-we-automated-migrations-in-postgres-d60aba0fc3d4>
 - <https://medium.com/paypal-tech/postgresql-at-scale-database-schema-changes-without-downtime-20d3749ed680>
 
-## dev
+## Dev
 
 ```shell
 cargo install
@@ -228,7 +226,7 @@ $ nix develop
 [nix-shell]$ ./s/fmt
 ```
 
-### adding a new rule
+### Adding a New Rule
 
 When adding a new rule, the `s/new-rule` script will create stubs for your rule in Rust and in Documentation site.
 
@@ -236,7 +234,7 @@ When adding a new rule, the `s/new-rule` script will create stubs for your rule 
 s/new-rule 'prefer big serial'
 ```
 
-### releasing a new version
+### Releasing a New Version
 
 1. Update the `CHANGELOG.md`
 
@@ -253,17 +251,12 @@ s/new-rule 'prefer big serial'
 
    Use the text and version from the `CHANGELOG.md`
 
-### algolia
+### Algolia
 
 The squawkhq.com Algolia index can be found on [the crawler website](https://crawler.algolia.com/admin/crawlers/9bf0dffb-bc5a-4d46-9b8d-2f1197285213/overview). Algolia reindexes the site every day at 5:30 (UTC).
 
-## how it works
+## How it Works
 
-squawk wraps calls to [libpg_query-sys](https://github.com/tdbgamer/libpg_query-sys) in a safe
-interface and parses the JSON into easier to work with structures.
-libpg_query-sys in turn uses [bindgen](https://rust-lang.github.io/rust-bindgen/) to bind to
-[libpg_query](https://github.com/lfittl/libpg_query), which itself wraps Postgres' SQL
-parser in a bit of C code that outputs the parsed AST into a JSON string.
-
-Squawk then runs the rule functions over the parsed AST, gathers and pretty
-prints the rule violations.
+Squawk uses its parser (based on rust-analyzer's parser) to create a CST. The
+linters then use an AST layered on top of the CST to navigate and record
+warnings, which are then pretty printed!
