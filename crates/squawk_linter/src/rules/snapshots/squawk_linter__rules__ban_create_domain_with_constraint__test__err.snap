@@ -7,6 +7,6 @@ expression: errors
         code: BanCreateDomainWithConstraint,
         message: "Domains with constraints have poor support for online migrations. Use table and column constraints instead.",
         text_range: 46..63,
-        messages: [],
+        help: None,
     },
 ]

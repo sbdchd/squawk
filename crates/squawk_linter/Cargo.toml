@@ -15,6 +15,7 @@ lazy_static.workspace = true
 insta.workspace = true
 enum-iterator.workspace = true
 line-index.workspace = true
+serde_plain.workspace = true
 
 
 [lints]

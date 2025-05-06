@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 /// Brad's Rule aka ban dropping database statements.
 pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {
@@ -11,7 +11,7 @@ pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for item in file.items() {
         if let ast::Item::DropDatabase(drop_database) = item {
             ctx.report(Violation::new(
-                ErrorCode::BanDropDatabase,
+                Rule::BanDropDatabase,
                 "Dropping a database may break existing clients.".into(),
                 drop_database.syntax().text_range(),
                 None,

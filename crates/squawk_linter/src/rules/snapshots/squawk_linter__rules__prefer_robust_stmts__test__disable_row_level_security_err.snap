@@ -7,6 +7,6 @@ expression: errors
         code: PreferRobustStmts,
         message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
         text_range: 63..89,
-        messages: [],
+        help: None,
     },
 ]

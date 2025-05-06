@@ -5,7 +5,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{text::trim_quotes, ErrorCode, Linter, Violation};
+use crate::{text::trim_quotes, Linter, Rule, Violation};
 use lazy_static::lazy_static;
 
 lazy_static! {
@@ -93,10 +93,10 @@ fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_valid_int_type(&ty, &SMALL_INT_TYPES) {
             ctx.report(Violation::new(
-                ErrorCode::PreferBigInt,
+                Rule::PreferBigInt,
                 "Using 32-bit integer fields can result in hitting the max `int` limit.".into(),
                 ty.syntax().text_range(),
-                None,
+                "Use 64-bit integer values instead to prevent hitting this limit.".to_string(),
             ));
         };
     }
@@ -111,7 +111,7 @@ pub(crate) fn prefer_big_int(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{ErrorCode, Linter, Rule};
+    use crate::{Linter, Rule};
 
     #[test]
     fn err() {
@@ -149,7 +149,7 @@ create table users (
         assert_eq!(
             errors
                 .iter()
-                .filter(|x| x.code == ErrorCode::PreferBigInt)
+                .filter(|x| x.code == Rule::PreferBigInt)
                 .count(),
             8
         );

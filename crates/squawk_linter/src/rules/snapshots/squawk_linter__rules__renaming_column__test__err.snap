@@ -7,6 +7,6 @@ expression: errors
         code: RenamingColumn,
         message: "Renaming a column may break existing clients.",
         text_range: 26..74,
-        messages: [],
+        help: None,
     },
 ]

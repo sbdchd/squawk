@@ -5,8 +5,8 @@ expression: errors
 [
     Violation {
         code: BanDropNotNull,
-        message: "Dropping a NOT NULL constraint may break existing clients.",
+        message: "Dropping a `NOT NULL` constraint may break existing clients.",
         text_range: 46..59,
-        messages: [],
+        help: None,
     },
 ]

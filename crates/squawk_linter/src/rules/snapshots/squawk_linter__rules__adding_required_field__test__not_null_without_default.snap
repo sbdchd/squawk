@@ -7,6 +7,8 @@ expression: errors
         code: AddingRequiredField,
         message: "Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.",
         text_range: 22..58,
-        messages: [],
+        help: Some(
+            "Make the field nullable or add a non-VOLATILE DEFAULT",
+        ),
     },
 ]

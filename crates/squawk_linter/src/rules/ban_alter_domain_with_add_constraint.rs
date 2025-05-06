@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -13,7 +13,7 @@ pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, parse: &Par
             for action in actions {
                 if let ast::AlterDomainAction::AddConstraint(add_constraint) = action {
                     ctx.report(Violation::new(
-                    ErrorCode::BanAlterDomainWithAddConstraint,
+                    Rule::BanAlterDomainWithAddConstraint,
                         "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
                         add_constraint.syntax().text_range(),
                         None,

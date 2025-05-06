@@ -3,9 +3,11 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+    let message = "Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.";
+    let help = "Add the `PRIMARY KEY` constraint `USING` an index.";
     let file = parse.tree();
     for item in file.items() {
         if let ast::Item::AlterTable(alter_table) = item {
@@ -17,10 +19,10 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                         {
                             if primary_key_constraint.using_index().is_none() {
                                 ctx.report(Violation::new(
-                                    ErrorCode::AddingSerialPrimaryKeyField,
-                                    "Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.".into(),
+                                    Rule::AddingSerialPrimaryKeyField,
+                                    message.to_string(),
                                     primary_key_constraint.syntax().text_range(),
-                                    None,
+                                    help.to_string(),
                                 ));
                             }
                         }
@@ -32,10 +34,10 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                             {
                                 if primary_key_constraint.using_index().is_none() {
                                     ctx.report(Violation::new(
-                                        ErrorCode::AddingSerialPrimaryKeyField,
-                                    "Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.".into(),
+                                        Rule::AddingSerialPrimaryKeyField,
+                                        message.to_string(),
                                         primary_key_constraint.syntax().text_range(),
-                                        None,
+                                        help.to_string(),
                                     ));
                                 }
                             }
@@ -60,7 +62,7 @@ mod test {
         ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
     "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingPrimaryKeyConstraint]);
+        let mut linter = Linter::from([Rule::AddingSerialPrimaryKeyField]);
         let errors = linter.lint(file, sql);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
@@ -72,7 +74,7 @@ mod test {
 ALTER TABLE items ADD PRIMARY KEY (id);
     "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingPrimaryKeyConstraint]);
+        let mut linter = Linter::from([Rule::AddingSerialPrimaryKeyField]);
         let errors = linter.lint(file, sql);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
@@ -85,7 +87,7 @@ ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
         "#;
 
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingPrimaryKeyConstraint]);
+        let mut linter = Linter::from([Rule::AddingSerialPrimaryKeyField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
     }

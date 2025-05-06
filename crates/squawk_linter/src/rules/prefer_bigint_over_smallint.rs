@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{ast, Parse, SourceFile};
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 use crate::prefer_big_int::check_not_allowed_types;
 use crate::prefer_big_int::is_not_valid_int_type;
@@ -19,10 +19,10 @@ fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_valid_int_type(&ty, &SMALL_INT_TYPES) {
             ctx.report(Violation::new(
-                ErrorCode::PreferBigintOverSmallint,
+                Rule::PreferBigintOverSmallint,
                 "Using 16-bit integer fields can result in hitting the max `int` limit.".into(),
                 ty.syntax().text_range(),
-                None,
+                "Use 64-bit integer values instead to prevent hitting this limit.".to_string(),
             ));
         };
     }
@@ -37,7 +37,7 @@ pub(crate) fn prefer_bigint_over_smallint(ctx: &mut Linter, parse: &Parse<Source
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{ErrorCode, Linter, Rule};
+    use crate::{Linter, Rule};
 
     #[test]
     fn err() {
@@ -63,7 +63,7 @@ create table users (
         assert_eq!(
             errors
                 .iter()
-                .filter(|x| x.code == ErrorCode::PreferBigintOverSmallint)
+                .filter(|x| x.code == Rule::PreferBigintOverSmallint)
                 .count(),
             4
         );

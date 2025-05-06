@@ -5,7 +5,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 use lazy_static::lazy_static;
 
@@ -26,10 +26,10 @@ fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_valid_int_type(&ty, &SERIAL_TYPES) {
             ctx.report(Violation::new(
-                ErrorCode::PreferIdentity,
-                "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.".into(),
+                Rule::PreferIdentity,
+                "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.".into(),
                 ty.syntax().text_range(),
-                None,
+                "Use Identity columns instead.".to_string(),
             ));
         };
     }
@@ -44,7 +44,7 @@ pub(crate) fn prefer_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{ErrorCode, Linter, Rule};
+    use crate::{Linter, Rule};
 
     #[test]
     fn err() {
@@ -76,7 +76,7 @@ create table users (
         assert_eq!(
             errors
                 .iter()
-                .filter(|x| x.code == ErrorCode::PreferIdentity)
+                .filter(|x| x.code == Rule::PreferIdentity)
                 .count(),
             6
         );

@@ -5,7 +5,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{text::trim_quotes, ErrorCode, Linter, Violation};
+use crate::{text::trim_quotes, Linter, Rule, Violation};
 
 use crate::prefer_big_int::check_not_allowed_types;
 
@@ -51,10 +51,10 @@ fn check_ty_for_varchar(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_allowed_varchar(&ty) {
             ctx.report(Violation::new(
-                ErrorCode::PreferTextField,
+                Rule::PreferTextField,
                "Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.".to_string(),
                 ty.syntax().text_range(),
-                None,
+                "Use a `text` field with a `check` constraint.".to_string(),
             ));
         };
     }

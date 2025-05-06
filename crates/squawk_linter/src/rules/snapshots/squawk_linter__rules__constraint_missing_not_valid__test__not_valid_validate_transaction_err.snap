@@ -5,10 +5,10 @@ expression: errors
 [
     Violation {
         code: ConstraintMissingNotValid,
-        message: "Using NOT VALID and VALIDATE CONSTRAINT in the same transaction will block all reads while the constraint is validated.",
+        message: "Using `NOT VALID` and `VALIDATE CONSTRAINT` in the same transaction will block all reads while the constraint is validated.",
         text_range: 141..170,
-        messages: [
-            "Add constraint as NOT VALID in one transaction and VALIDATE CONSTRAINT in a separate transaction.",
-        ],
+        help: Some(
+            "Add constraint as `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in a separate transaction.",
+        ),
     },
 ]

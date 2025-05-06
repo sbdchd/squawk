@@ -4,7 +4,7 @@ use squawk_syntax::{
 };
 
 use crate::{prefer_big_int::check_not_allowed_types, text::trim_quotes};
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
     match ty {
@@ -47,10 +47,10 @@ fn check_ty_for_timestamp(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_allowed_timestamp(&ty) {
             ctx.report(Violation::new(
-                ErrorCode::PreferTimestampTz,
+                Rule::PreferTimestampTz,
             "When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.".into(),
                 ty.syntax().text_range(),
-                None,
+                "Use timestamptz instead of timestamp for your column type.".to_string(),
             ));
         };
     }
@@ -80,7 +80,7 @@ create table app.accounts
 );
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTimestamptz]);
+        let mut linter = Linter::from([Rule::PreferTimestampTz]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
@@ -95,7 +95,7 @@ alter table app.accounts
     alter column created_ts type timestamp without time zone;
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTimestamptz]);
+        let mut linter = Linter::from([Rule::PreferTimestampTz]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
@@ -114,7 +114,7 @@ create table app.accounts
 );
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTimestamptz]);
+        let mut linter = Linter::from([Rule::PreferTimestampTz]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
     }
@@ -132,7 +132,7 @@ create table app.accounts
 );
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTimestamptz]);
+        let mut linter = Linter::from([Rule::PreferTimestampTz]);
         let errors = linter.lint(file, sql);
         assert_eq!(errors.len(), 0);
     }

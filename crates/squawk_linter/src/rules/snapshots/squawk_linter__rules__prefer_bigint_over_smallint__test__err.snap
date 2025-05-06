@@ -7,24 +7,32 @@ expression: errors
         code: PreferBigintOverSmallint,
         message: "Using 16-bit integer fields can result in hitting the max `int` limit.",
         text_range: 29..37,
-        messages: [],
+        help: Some(
+            "Use 64-bit integer values instead to prevent hitting this limit.",
+        ),
     },
     Violation {
         code: PreferBigintOverSmallint,
         message: "Using 16-bit integer fields can result in hitting the max `int` limit.",
         text_range: 69..73,
-        messages: [],
+        help: Some(
+            "Use 64-bit integer values instead to prevent hitting this limit.",
+        ),
     },
     Violation {
         code: PreferBigintOverSmallint,
         message: "Using 16-bit integer fields can result in hitting the max `int` limit.",
         text_range: 105..116,
-        messages: [],
+        help: Some(
+            "Use 64-bit integer values instead to prevent hitting this limit.",
+        ),
     },
     Violation {
         code: PreferBigintOverSmallint,
         message: "Using 16-bit integer fields can result in hitting the max `int` limit.",
         text_range: 148..155,
-        messages: [],
+        help: Some(
+            "Use 64-bit integer values instead to prevent hitting this limit.",
+        ),
     },
 ]

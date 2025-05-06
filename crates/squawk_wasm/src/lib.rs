@@ -110,12 +110,18 @@ pub fn lint(text: String) -> Result<JsValue, Error> {
         let end = line_index
             .to_wide(line_index::WideEncoding::Utf16, end)
             .unwrap();
+
+        let messages = match x.help {
+            Some(help) => vec![help],
+            None => vec![],
+        };
+
         LintError {
             code: x.code.to_string(),
             range_start: x.text_range.start().into(),
             range_end: x.text_range.end().into(),
             message: x.message.clone(),
-            messages: x.messages.clone(),
+            messages,
             // parser errors should be error
             severity: Severity::Warning,
             start_line_number: start.line,

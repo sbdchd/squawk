@@ -5,7 +5,7 @@ use squawk_syntax::ast;
 use squawk_syntax::ast::{AstNode, HasArgList};
 use squawk_syntax::{ast::HasModuleItem, Parse, SourceFile};
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 fn is_const_expr(expr: &ast::Expr) -> bool {
     match expr {
@@ -52,6 +52,9 @@ fn is_non_volatile(expr: &ast::Expr) -> bool {
 const NON_VOLATILE_BUILT_IN_FUNCTIONS: &str = include_str!("non_volatile_built_in_functions.txt");
 
 pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+    let message =
+        "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock.";
+    let help = "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.";
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
     for item in file.items() {
@@ -68,22 +71,18 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                     continue;
                                 }
                                 ctx.report(Violation::new(
-                                    ErrorCode::AddingFieldWithDefault,
-                                    "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock.".into(),
+                                    Rule::AddingFieldWithDefault,
+                                    message.into(),
                                     expr.syntax().text_range(),
-                                    vec![
-                                        "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.".into(),
-                                    ],
+                                    help.to_string(),
                                 ))
                             }
                             ast::Constraint::GeneratedConstraint(generated) => {
                                 ctx.report(Violation::new(
-                                    ErrorCode::AddingFieldWithDefault,
-                                    "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock.".into(),
+                                    Rule::AddingFieldWithDefault,
+                                    message.into(),
                                     generated.syntax().text_range(),
-                                    vec![
-                                        "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.".into(),
-                                    ],
+                                    help.to_string(),
                                 ));
                             }
                             _ => (),

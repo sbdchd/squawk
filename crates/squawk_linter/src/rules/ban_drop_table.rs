@@ -3,14 +3,14 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn ban_drop_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for item in file.items() {
         if let ast::Item::DropTable(drop_table) = item {
             ctx.report(Violation::new(
-                ErrorCode::BanDropTable,
+                Rule::BanDropTable,
                 "Dropping a table may break existing clients.".into(),
                 drop_table.syntax().text_range(),
                 None,

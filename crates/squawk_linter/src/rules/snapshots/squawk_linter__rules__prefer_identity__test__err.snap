@@ -5,38 +5,50 @@ expression: errors
 [
     Violation {
         code: PreferIdentity,
-        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
         text_range: 29..35,
-        messages: [],
+        help: Some(
+            "Use Identity columns instead.",
+        ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
         text_range: 67..74,
-        messages: [],
+        help: Some(
+            "Use Identity columns instead.",
+        ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
         text_range: 106..113,
-        messages: [],
+        help: Some(
+            "Use Identity columns instead.",
+        ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
         text_range: 145..152,
-        messages: [],
+        help: Some(
+            "Use Identity columns instead.",
+        ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
         text_range: 184..195,
-        messages: [],
+        help: Some(
+            "Use Identity columns instead.",
+        ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make permissions and schema management difficult. Identity columns are standard SQL and have more features and better usability.",
+        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
         text_range: 227..236,
-        messages: [],
+        help: Some(
+            "Use Identity columns instead.",
+        ),
     },
 ]

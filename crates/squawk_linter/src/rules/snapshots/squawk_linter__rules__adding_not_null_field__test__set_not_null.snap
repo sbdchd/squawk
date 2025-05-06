@@ -5,10 +5,10 @@ expression: errors
 [
     Violation {
         code: AddingNotNullableField,
-        message: "Setting a column NOT NULL blocks reads while the table is scanned.",
+        message: "Setting a column `NOT NULL` blocks reads while the table is scanned.",
         text_range: 46..58,
-        messages: [
-            "Use a check constraint instead.",
-        ],
+        help: Some(
+            "Make the field nullable and use a `CHECK` constraint instead.",
+        ),
     },
 ]

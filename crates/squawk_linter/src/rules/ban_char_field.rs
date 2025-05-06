@@ -4,7 +4,7 @@ use squawk_syntax::{
 };
 
 use crate::prefer_big_int::check_not_allowed_types;
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 fn is_char_type(x: TokenText<'_>) -> bool {
     if x == "char" || x == "character" || x == "bpchar" {
@@ -21,7 +21,7 @@ fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
     {
         if is_char_type(name_ref.text()) {
             ctx.report(Violation::new(
-                ErrorCode::BanCharField,
+                Rule::BanCharField,
                 "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.".into(),
                 path_type.syntax().text_range(),
                 None,
@@ -33,7 +33,7 @@ fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
 fn check_char_type(ctx: &mut Linter, char_type: ast::CharType) {
     if is_char_type(char_type.text()) {
         ctx.report(Violation::new(
-            ErrorCode::BanCharField,
+            Rule::BanCharField,
             "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.".into(),
             char_type.syntax().text_range(),
             None,

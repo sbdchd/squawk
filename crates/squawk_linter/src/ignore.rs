@@ -3,12 +3,12 @@ use std::collections::HashSet;
 use rowan::{NodeOrToken, TextRange, TextSize};
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 
-use crate::{ErrorCode, Linter, Violation};
+use crate::{Linter, Rule, Violation};
 
 #[derive(Debug)]
 pub struct Ignore {
     pub range: TextRange,
-    pub violation_names: HashSet<ErrorCode>,
+    pub violation_names: HashSet<Rule>,
 }
 
 fn comment_body(token: &SyntaxToken) -> Option<(&str, TextRange)> {
@@ -71,7 +71,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                         if x.is_empty() {
                             continue;
                         }
-                        if let Ok(violation_name) = ErrorCode::try_from(x.trim()) {
+                        if let Ok(violation_name) = Rule::try_from(x.trim()) {
                             set.insert(violation_name);
                         } else {
                             let without_start = x.trim_start();
@@ -85,10 +85,10 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                             let range = TextRange::new(start, end);
 
                             ctx.report(Violation::new(
-                                ErrorCode::UnusedIgnore,
+                                Rule::UnusedIgnore,
                                 format!("unknown name {trimmed}"),
                                 range,
-                                vec![],
+                                None,
                             ));
                         }
 
@@ -108,7 +108,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
 #[cfg(test)]
 mod test {
 
-    use crate::{find_ignores, ErrorCode, Linter, Violation};
+    use crate::{find_ignores, Linter, Rule};
 
     #[test]
     fn single_ignore() {
@@ -123,7 +123,7 @@ alter table t drop column c cascade;
 
         assert_eq!(linter.ignores.len(), 1);
         let ignore = &linter.ignores[0];
-        assert!(ignore.violation_names.contains(&ErrorCode::BanDropColumn));
+        assert!(ignore.violation_names.contains(&Rule::BanDropColumn));
     }
 
     #[test]
@@ -140,7 +140,7 @@ alter table t drop column c cascade;
 
         assert_eq!(linter.ignores.len(), 1);
         let ignore = &linter.ignores[0];
-        assert!(ignore.violation_names.contains(&ErrorCode::BanDropColumn));
+        assert!(ignore.violation_names.contains(&Rule::BanDropColumn));
     }
 
     #[test]
@@ -157,9 +157,9 @@ alter table t drop column c cascade;
 
         assert_eq!(linter.ignores.len(), 1);
         let ignore = &linter.ignores[0];
-        assert!(ignore.violation_names.contains(&ErrorCode::BanDropColumn));
-        assert!(ignore.violation_names.contains(&ErrorCode::RenamingColumn));
-        assert!(ignore.violation_names.contains(&ErrorCode::BanDropDatabase));
+        assert!(ignore.violation_names.contains(&Rule::BanDropColumn));
+        assert!(ignore.violation_names.contains(&Rule::RenamingColumn));
+        assert!(ignore.violation_names.contains(&Rule::BanDropDatabase));
     }
 
     #[test]
@@ -176,9 +176,9 @@ alter table t drop column c cascade;
 
         assert_eq!(linter.ignores.len(), 1);
         let ignore = &linter.ignores[0];
-        assert!(ignore.violation_names.contains(&ErrorCode::BanDropColumn));
-        assert!(ignore.violation_names.contains(&ErrorCode::RenamingColumn));
-        assert!(ignore.violation_names.contains(&ErrorCode::BanDropDatabase));
+        assert!(ignore.violation_names.contains(&Rule::BanDropColumn));
+        assert!(ignore.violation_names.contains(&Rule::RenamingColumn));
+        assert!(ignore.violation_names.contains(&Rule::BanDropDatabase));
     }
 
     #[test]
@@ -199,7 +199,7 @@ create table users (
 "#;
 
         let parse = squawk_syntax::SourceFile::parse(sql);
-        let errors: Vec<&Violation> = linter.lint(parse, sql);
+        let errors = linter.lint(parse, sql);
         assert_eq!(errors.len(), 0);
     }
 
@@ -209,7 +209,7 @@ create table users (
         let sql = r#"alter table t add column c char;"#;
 
         let parse = squawk_syntax::SourceFile::parse(sql);
-        let errors: Vec<&Violation> = linter.lint(parse, sql);
+        let errors = linter.lint(parse, sql);
         assert_eq!(errors.len(), 1);
     }
 }

@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{text::trim_quotes, ErrorCode, Linter, Violation};
+use crate::{text::trim_quotes, Linter, Rule, Violation};
 
 use super::constraint_missing_not_valid::tables_created_in_transaction;
 
@@ -21,10 +21,8 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
                     && !tables_created.contains(trim_quotes(table_name.text().as_str()))
                 {
                     ctx.report(Violation::new(
-                        ErrorCode::RequireConcurrentIndexCreation,
-"During a normal index creation, table updates are blocked, but reads are still allowed. `CONCURRENTLY` avoids locking the table against writes during index creation.".into(),
-
-
+                        Rule::RequireConcurrentIndexCreation,
+                "During a normal index creation, table updates are blocked, but reads are still allowed. `CONCURRENTLY` avoids locking the table against writes during index creation.".into(),
                         create_index.syntax().text_range(),
                         None,
                     ));
