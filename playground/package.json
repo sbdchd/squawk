@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "wasm-pack build --target web ../crates/wasm --out-dir ../../playground/src/pkg && vite build",
-    "deploy": "netlify deploy --prod",
+    "build": "wasm-pack build --target web ../crates/squawk_wasm --out-dir ../../playground/src/pkg && vite build",
+    "deploy": "netlify deploy --prod --dir dist",
     "lint": "eslint .",
     "preview": "vite preview"
   },

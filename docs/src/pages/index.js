@@ -204,7 +204,9 @@ function Home() {
       <header className={clsx("hero hero--primary", styles.heroBanner)}>
         <div className="container">
           <h1 className="hero__title">Squawk</h1>
-          <p className="hero__subtitle">A linter for Postgres migrations</p>
+          <p className="hero__subtitle">
+            A linter for Postgres migrations & SQL
+          </p>
           <div className={styles.buttons}>
             <Link
               className={clsx(

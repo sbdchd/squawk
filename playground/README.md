@@ -1,5 +1,7 @@
 # playground
 
+> <https://play.squawkhq.com>
+
 ## dev
 
 ```shell
