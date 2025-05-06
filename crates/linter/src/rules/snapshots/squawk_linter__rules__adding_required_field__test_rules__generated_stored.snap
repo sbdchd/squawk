@@ -1,5 +1,0 @@
----
-source: linter/src/rules/adding_required_field.rs
-expression: lint_sql(ok_sql)
----
-[]
