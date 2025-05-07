@@ -192,6 +192,22 @@ SOURCE_FILE
               IDENT "c"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- type cast must use a string literal"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NUMERIC_KW "numeric"
+        WHITESPACE " "
+        TARGET
+          LITERAL
+            INT_NUMBER "1234"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
   WHITESPACE "\n"
   SELECT
@@ -215,4 +231,5 @@ ERROR@394: expected expression
 ERROR@395: expected expression
 ERROR@396: expected expression
 ERROR@397: expected expression
-ERROR@500: unexpected trailing comma
+ERROR@520: missing comma
+ERROR@561: unexpected trailing comma
