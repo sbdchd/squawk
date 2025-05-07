@@ -159,6 +159,22 @@ Individual rules can be disabled via the `--exclude` flag
 squawk --exclude=adding-field-with-default,disallowed-unique-constraint example.sql
 ```
 
+### Disabling rules via comments
+
+Rule violations can be ignored via the `squawk-ignore` comment:
+
+```sql
+-- squawk-ignore ban-drop-column
+alter table t drop column c cascade;
+```
+
+You can also ignore multiple rules by making a comma seperated list:
+
+```sql
+-- squawk-ignore ban-drop-column, renaming-column,ban-drop-database
+alter table t drop column c cascade;
+```
+
 ### Configuration file
 
 Rules can also be disabled with a configuration file.
