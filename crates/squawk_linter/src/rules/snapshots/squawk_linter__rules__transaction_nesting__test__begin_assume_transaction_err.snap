@@ -1,0 +1,30 @@
+---
+source: crates/squawk_linter/src/rules/transaction_nesting.rs
+expression: errors
+---
+[
+    Violation {
+        code: TransactionNesting,
+        message: "There is an existing transaction already in progress, managed by your migration tool.",
+        text_range: 1..6,
+        help: Some(
+            "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
+        ),
+    },
+    Violation {
+        code: TransactionNesting,
+        message: "There is an existing transaction already in progress, managed by your migration tool.",
+        text_range: 8..13,
+        help: Some(
+            "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
+        ),
+    },
+    Violation {
+        code: TransactionNesting,
+        message: "Attempting to end the transaction that is managed by your migration tool",
+        text_range: 25..31,
+        help: Some(
+            "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
+        ),
+    },
+]

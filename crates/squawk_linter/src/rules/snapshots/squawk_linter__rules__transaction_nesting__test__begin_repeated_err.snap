@@ -1,0 +1,14 @@
+---
+source: crates/squawk_linter/src/rules/transaction_nesting.rs
+expression: errors
+---
+[
+    Violation {
+        code: TransactionNesting,
+        message: "There is an existing transaction already in progress.",
+        text_range: 8..13,
+        help: Some(
+            "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
+        ),
+    },
+]

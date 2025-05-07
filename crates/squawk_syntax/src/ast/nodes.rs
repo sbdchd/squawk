@@ -3092,6 +3092,30 @@ impl AstNode for CreateAggregate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Rollback {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl AstNode for Rollback {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROLLBACK_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Item {
     AlterTable(AlterTable),
     AlterDomain(AlterDomain),
@@ -3099,6 +3123,7 @@ pub enum Item {
     CreateAggregate(CreateAggregate),
     Begin(Begin),
     Commit(Commit),
+    Rollback(Rollback),
     CreateFunc(CreateFunc),
     CreateIndex(CreateIndex),
     CreateTable(CreateTable),
@@ -3134,6 +3159,7 @@ impl AstNode for Item {
                 | SyntaxKind::ALTER_DOMAIN_STMT
                 | SyntaxKind::ALTER_AGGREGATE_STMT
                 | SyntaxKind::CREATE_AGGREGATE_STMT
+                | SyntaxKind::ROLLBACK_KW
         )
     }
     #[inline]
@@ -3155,6 +3181,7 @@ impl AstNode for Item {
             SyntaxKind::ALTER_AGGREGATE_STMT => Item::AlterAggregate(AlterAggregate { syntax }),
             SyntaxKind::CREATE_AGGREGATE_STMT => Item::CreateAggregate(CreateAggregate { syntax }),
             SyntaxKind::DROP_AGGREGATE_STMT => Item::DropAggregate(DropAggregate { syntax }),
+            SyntaxKind::ROLLBACK_STMT => Item::Rollback(Rollback { syntax }),
             _ => return None,
         };
         Some(res)
@@ -3178,6 +3205,7 @@ impl AstNode for Item {
             Item::AlterAggregate(it) => &it.syntax,
             Item::CreateAggregate(it) => &it.syntax,
             Item::DropAggregate(it) => &it.syntax,
+            Item::Rollback(it) => &it.syntax,
         }
     }
 }
