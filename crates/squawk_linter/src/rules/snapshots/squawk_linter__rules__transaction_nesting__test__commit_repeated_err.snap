@@ -1,0 +1,14 @@
+---
+source: crates/squawk_linter/src/rules/transaction_nesting.rs
+expression: errors
+---
+[
+    Violation {
+        code: TransactionNesting,
+        message: "There is no transaction to `COMMIT` or `ROLLBACK`.",
+        text_range: 26..32,
+        help: Some(
+            "`BEGIN` a transaction at an earlier point in the migration or remove this statement.",
+        ),
+    },
+]

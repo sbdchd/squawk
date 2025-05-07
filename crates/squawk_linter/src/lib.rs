@@ -47,6 +47,7 @@ use rules::renaming_column;
 use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
+use rules::transaction_nesting;
 // xtask:new-lint:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Serialize, Hash, Eq, Deserialize, Sequence)]
@@ -339,6 +340,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::BanAlterDomainWithAddConstraint) {
             ban_alter_domain_with_add_constraint(self, &file);
+        }
+        if self.rules.contains(&Rule::TransactionNesting) {
+            transaction_nesting(self, &file);
         }
         // xtask:new-lint:rule-call
 

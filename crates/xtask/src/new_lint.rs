@@ -15,13 +15,13 @@ use squawk_syntax::{{
     Parse, SourceFile,
 }};
 
-use crate::{{Linter, Violation, ErrorCode}};
+use crate::{{Linter, Violation, Rule}};
 
 pub(crate) fn {rule_name}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
     let file = parse.tree();
     for item in file.items() {{
+        todo!();
         match item {{
-            // TODO:
             _ => (),
         }}
     }}
@@ -31,7 +31,7 @@ pub(crate) fn {rule_name}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
 mod test {{
     use insta::assert_debug_snapshot;
 
-    use crate::{{Linter, Rule, ErrorCode}};
+    use crate::{{Linter, Rule}};
     use squawk_syntax::SourceFile;
 
     #[test]
@@ -42,8 +42,8 @@ mod test {{
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::{rule_name_pascal}]);
         let errors = linter.lint(file, sql);
-        assert_ne!(linter.errors.len(), 0);
-        assert_debug_snapshot!(linter.errors);
+        assert_ne!(errors.len(), 0);
+        assert_debug_snapshot!(errors);
     }}
 
     #[test]
@@ -54,7 +54,7 @@ mod test {{
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::{rule_name_pascal}]);
         let errors = linter.lint(file, sql);
-        assert_eq!(linter.errors.len(), 0);
+        assert_eq!(errors.len(), 0);
     }}
 }}
 "###,
@@ -77,6 +77,7 @@ fn crates_path() -> Result<PathBuf> {
 }
 
 fn create_rule_file(name: &str) -> Result<()> {
+    let name = name.to_case(Case::Snake);
     let crates = crates_path()?;
     let lint_path = crates.join(format!("squawk_linter/src/rules/{}.rs", name));
 
@@ -85,7 +86,7 @@ fn create_rule_file(name: &str) -> Result<()> {
         return Ok(());
     }
 
-    let lint_data = make_lint(name);
+    let lint_data = make_lint(&name);
     fs::write(&lint_path, lint_data)?;
     println!("created file");
     Ok(())
@@ -122,7 +123,7 @@ fn update_lib(name: &str) -> Result<()> {
         (
             "// xtask:new-lint:str-name",
             format!(
-                r#""{name_kebab}" => Ok(ErrorCode::{name_pascal}),
+                r#""{name_kebab}" => Ok(Rule::{name_pascal}),
     "#,
                 name_kebab = name_kebab,
                 name_pascal = name_pascal,
