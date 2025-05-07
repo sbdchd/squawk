@@ -131,7 +131,7 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
                             Rule::ConstraintMissingNotValid,
                             "By default new constraints require a table scan and block writes to the table while that scan occurs.".into(),
                             add_constraint.syntax().text_range(),
-                            None,
+                            "Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.".to_string(),
                         ));
                     }
                 }

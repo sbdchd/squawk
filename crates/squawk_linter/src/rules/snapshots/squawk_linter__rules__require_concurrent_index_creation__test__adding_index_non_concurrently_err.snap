@@ -5,8 +5,10 @@ expression: errors
 [
     Violation {
         code: RequireConcurrentIndexCreation,
-        message: "During a normal index creation, table updates are blocked, but reads are still allowed. `CONCURRENTLY` avoids locking the table against writes during index creation.",
+        message: "During normal index creation, table updates are blocked, but reads are still allowed.",
         text_range: 15..75,
-        help: None,
+        help: Some(
+            "Use `CONCURRENTLY` to avoid blocking writes.",
+        ),
     },
 ]

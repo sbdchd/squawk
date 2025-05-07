@@ -27,9 +27,9 @@ fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
         if is_not_valid_int_type(&ty, &SERIAL_TYPES) {
             ctx.report(Violation::new(
                 Rule::PreferIdentity,
-                "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.".into(),
+                "Serial types make schema, dependency, and permission management difficult.".into(),
                 ty.syntax().text_range(),
-                "Use Identity columns instead.".to_string(),
+                "Use an `IDENTITY` column instead.".to_string(),
             ));
         };
     }

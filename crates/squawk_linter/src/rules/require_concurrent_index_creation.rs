@@ -22,9 +22,9 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
                 {
                     ctx.report(Violation::new(
                         Rule::RequireConcurrentIndexCreation,
-                "During a normal index creation, table updates are blocked, but reads are still allowed. `CONCURRENTLY` avoids locking the table against writes during index creation.".into(),
+                "During normal index creation, table updates are blocked, but reads are still allowed.".into(),
                         create_index.syntax().text_range(),
-                        None,
+                        "Use `CONCURRENTLY` to avoid blocking writes.".to_string(),
                     ));
                 }
             }

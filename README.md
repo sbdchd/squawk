@@ -21,47 +21,70 @@ pip install squawk-cli
 https://github.com/sbdchd/squawk/releases
 ```
 
-### Without installation (Docker)
+### Or via Docker
 
-You can run Squawk without installation using Docker. The official image is available on GitHub Container Registry.
+You can also run Squawk using Docker. The official image is available on GitHub Container Registry.
 
 ```shell
 # Assuming you want to check sql files in the current directory
 docker run --rm -v $(pwd):/data ghcr.io/sbdchd/squawk:latest *.sql
 ```
 
+### Or via the Playground
+
+Use the WASM powered playground to check your SQL locally in the browser!
+
+<https://play.squawkhq.com>
+
 ## Usage
 
 ```shell
 ❯ squawk example.sql
-example.sql:2:1: warning: prefer-text-field
+warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+ --> example.sql:6:10
+  |
+6 |     "id" serial NOT NULL PRIMARY KEY,
+  |          ^^^^^^
+  |
+  = help: Use 64-bit integer values instead to prevent hitting this limit.
+warning[prefer-identity]: Serial types make schema, dependency, and permission management difficult.
+ --> example.sql:6:10
+  |
+6 |     "id" serial NOT NULL PRIMARY KEY,
+  |          ^^^^^^
+  |
+  = help: Use Identity columns instead.
+warning[prefer-text-field]: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
+ --> example.sql:7:13
+  |
+7 |     "alpha" varchar(100) NOT NULL
+  |             ^^^^^^^^^^^^
+  |
+  = help: Use a `TEXT` field with a `CHECK` constraint.
+warning[require-concurrent-index-creation]: During normal index creation, table updates are blocked, but reads are still allowed.
+  --> example.sql:10:1
+   |
+10 | CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
+   | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: Use `CONCURRENTLY` to avoid blocking writes.
+warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
+  --> example.sql:12:24
+   |
+12 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+   |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
+  --> example.sql:12:28
+   |
+12 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+   |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   |
+   = help: Create an index `CONCURRENTLY` and create the constraint using the index.
 
-   2 | --
-   3 | -- Create model Bar
-   4 | --
-   5 | CREATE TABLE "core_bar" (
-   6 |     "id" serial NOT NULL PRIMARY KEY,
-   7 |     "alpha" varchar(100) NOT NULL
-   8 | );
-
-  note: Changing the size of a varchar field requires an ACCESS EXCLUSIVE lock.
-  help: Use a text field with a check constraint.
-
-example.sql:9:2: warning: require-concurrent-index-creation
-
-   9 |
-  10 | CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
-
-  note: Creating an index blocks writes.
-  note: Create the index CONCURRENTLY.
-
-example.sql:11:2: warning: disallowed-unique-constraint
-
-  11 |
-  12 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
-
-  note: Adding a UNIQUE constraint requires an ACCESS EXCLUSIVE lock which blocks reads.
-  help: Create an index CONCURRENTLY and create the constraint using the index.
+Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
+Found 7 issues in 1 file (checked 1 source file)
 ```
 
 ### `squawk --help`
