@@ -1798,10 +1798,10 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.bump_any();
     }
     let cm = m.complete(p, NAME_REF);
-    // A path followed by a literal is a type cast so we insert a CAST_EXPR
+    // A path followed by a string is a type cast so we insert a CAST_EXPR
     // preceding it to wrap the previously parsed data.
     // e.g., `select numeric '12312'`
-    if !p.at(NULL_KW) && !p.at(DEFAULT_KW) && literal(p).is_some() {
+    if opt_string_literal(p).is_some() {
         if is_interval_cast {
             opt_interval_trailing(p);
         }
