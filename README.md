@@ -276,10 +276,10 @@ $ nix develop
 
 ### Adding a New Rule
 
-When adding a new rule, the `s/new-rule` script will create stubs for your rule in Rust and in Documentation site.
+When adding a new rule, running `cargo xtask new-rule` will create stubs for your rule in the Rust crate and in Documentation site.
 
 ```bash
-s/new-rule 'prefer big serial'
+cargo xtask new-rule 'prefer big serial'
 ```
 
 ### Releasing a New Version

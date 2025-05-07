@@ -10,8 +10,8 @@ See [the README's dev section](./README.md#dev) for development information.
 
 ## Adding new rules
 
-When adding a new rule, the `s/new-rule` script will create stubs for your rule in Rust and in Documentation site.
+When adding a new rule, running `cargo xtask new-rule` will create stubs for your rule in the Rust crate and in Documentation site.
 
 ```bash
-s/new-rule 'prefer big serial'
+cargo xtask new-rule 'prefer big serial'
 ```

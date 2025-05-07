@@ -188,7 +188,7 @@ const rules = [
     tags: ["schema", "locking"],
     description: "Domains with constraints have poor support for online migrations",
   },
-  // generator::new-rule-above
+  // xtask:new-rule:rule-doc-meta
 ]
 
 function Home() {
