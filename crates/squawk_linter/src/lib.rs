@@ -48,7 +48,7 @@ use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 use rules::transaction_nesting;
-// xtask:new-lint:rule-import
+// xtask:new-rule:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Serialize, Hash, Eq, Deserialize, Sequence)]
 pub enum Rule {
@@ -108,7 +108,7 @@ pub enum Rule {
     BanCreateDomainWithConstraint,
     #[serde(rename = "ban-alter-domain-with-add-constraint")]
     BanAlterDomainWithAddConstraint,
-    // xtask:new-lint:error-name
+    // xtask:new-rule:error-name
 }
 
 impl TryFrom<&str> for Rule {
@@ -145,7 +145,7 @@ impl TryFrom<&str> for Rule {
             }
             "ban-create-domain-with-constraint" => Ok(Rule::BanCreateDomainWithConstraint),
             "ban-alter-domain-with-add-constraint" => Ok(Rule::BanAlterDomainWithAddConstraint),
-            // xtask:new-lint:str-name
+            // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {}", s)),
         }
     }
@@ -202,6 +202,7 @@ impl fmt::Display for Rule {
             Rule::BanCreateDomainWithConstraint => "ban-create-domain-with-constraint",
             Rule::UnusedIgnore => "unused-ignore",
             Rule::BanAlterDomainWithAddConstraint => "ban-alter-domain-with-add-constraint",
+            // xtask:new-rule:variant-to-name
         };
         write!(f, "{}", val)
     }
@@ -344,7 +345,7 @@ impl Linter {
         if self.rules.contains(&Rule::TransactionNesting) {
             transaction_nesting(self, &file);
         }
-        // xtask:new-lint:rule-call
+        // xtask:new-rule:rule-call
 
         // locate any ignores in the file
         find_ignores(self, &file.syntax_node());

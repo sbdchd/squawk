@@ -14,7 +14,20 @@ npm install -g squawk-cli
 https://github.com/sbdchd/squawk/releases
 ```
 
-**NOTE**: You can also try Squawk in the browser via the [Squawk Playground](https://play.squawkhq.com)!
+### Or via Docker
+
+You can also run Squawk using Docker. The official image is available on GitHub Container Registry.
+
+```shell
+# Assuming you want to check sql files in the current directory
+docker run --rm -v $(pwd):/data ghcr.io/sbdchd/squawk:latest *.sql
+```
+
+### Or via the Playground
+
+Use the WASM powered playground to check your SQL locally in the browser!
+
+<https://play.squawkhq.com>
 
 ## Usage
 
