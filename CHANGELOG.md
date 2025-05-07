@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.0.0 - 2025-05-07
+
+### Added
+
+- [Ignore comments to disable a rule inline](https://squawkhq.com/docs/cli#disabling-rules-via-comments).
+- Fancier lint violation formatting in the terminal using [annotate-snippets](https://github.com/rust-lang/annotate-snippets-rs).
+- [WASM powered playground](https://play.squawkhq.com) to run Squawk locally in the browser.
+- [New parser with error recovery](https://github.com/sbdchd/squawk/blob/master/crates/squawk_parser/src/grammar.rs) -- it doesn't fail if you're missing a comma, semicolon, etc! This also means we've removed the dependency on libpg_query.
+- Dockerfile to run Squawk in a container (#422). Thanks @alphayax!
+
+### Removed
+
+- `prefer-big-int` rule, which has been deprecated in favor of `prefer-bigint-over-int` and `prefer-bigint-over-smallint` for a while now.
+
 ## v1.6.1 - 2025-05-02
 
 ### Fixed
