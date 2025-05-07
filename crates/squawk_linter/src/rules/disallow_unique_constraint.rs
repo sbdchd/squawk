@@ -9,7 +9,7 @@ use super::constraint_missing_not_valid::tables_created_in_transaction;
 
 pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let message = "Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.";
-    let help = "Create an index CONCURRENTLY and create the constraint using the index.";
+    let help = "Create an index `CONCURRENTLY` and create the constraint using the index.";
     let file = parse.tree();
     let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
     for item in file.items() {

@@ -5,50 +5,50 @@ expression: errors
 [
     Violation {
         code: PreferIdentity,
-        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
+        message: "Serial types make schema, dependency, and permission management difficult.",
         text_range: 29..35,
         help: Some(
-            "Use Identity columns instead.",
+            "Use an `IDENTITY` column instead.",
         ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
+        message: "Serial types make schema, dependency, and permission management difficult.",
         text_range: 67..74,
         help: Some(
-            "Use Identity columns instead.",
+            "Use an `IDENTITY` column instead.",
         ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
+        message: "Serial types make schema, dependency, and permission management difficult.",
         text_range: 106..113,
         help: Some(
-            "Use Identity columns instead.",
+            "Use an `IDENTITY` column instead.",
         ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
+        message: "Serial types make schema, dependency, and permission management difficult.",
         text_range: 145..152,
         help: Some(
-            "Use Identity columns instead.",
+            "Use an `IDENTITY` column instead.",
         ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
+        message: "Serial types make schema, dependency, and permission management difficult.",
         text_range: 184..195,
         help: Some(
-            "Use Identity columns instead.",
+            "Use an `IDENTITY` column instead.",
         ),
     },
     Violation {
         code: PreferIdentity,
-        message: "Serial types make schema, dependency, and permission management difficult. Use Identity columns instead.",
+        message: "Serial types make schema, dependency, and permission management difficult.",
         text_range: 227..236,
         help: Some(
-            "Use Identity columns instead.",
+            "Use an `IDENTITY` column instead.",
         ),
     },
 ]

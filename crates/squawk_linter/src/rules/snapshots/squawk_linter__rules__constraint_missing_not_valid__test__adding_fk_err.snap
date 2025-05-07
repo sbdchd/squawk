@@ -7,6 +7,8 @@ expression: errors
         code: ConstraintMissingNotValid,
         message: "By default new constraints require a table scan and block writes to the table while that scan occurs.",
         text_range: 40..114,
-        help: None,
+        help: Some(
+            "Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.",
+        ),
     },
 ]

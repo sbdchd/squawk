@@ -8,7 +8,7 @@ expression: errors
         message: "Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.",
         text_range: 28..80,
         help: Some(
-            "Create an index CONCURRENTLY and create the constraint using the index.",
+            "Create an index `CONCURRENTLY` and create the constraint using the index.",
         ),
     },
 ]
