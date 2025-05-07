@@ -3,7 +3,7 @@ id: cli
 title: CLI
 ---
 
-## usage
+## Usage
 
 ```bash
 # lint a file or multiple
@@ -13,7 +13,7 @@ squawk migration_001.sql migration_002.sql migration_003.sql 'migrations/*.sql'
 cat migration.sql | squawk
 ```
 
-## rules
+## Rules
 
 Individual rules can be disabled via the `--exclude` flag
 
@@ -21,7 +21,23 @@ Individual rules can be disabled via the `--exclude` flag
 squawk --exclude=adding-field-with-default,disallowed-unique-constraint example.sql
 ```
 
-## files
+### Disabling rules via comments
+
+Rule violations can be ignored via the `squawk-ignore` comment:
+
+```sql
+-- squawk-ignore ban-drop-column
+alter table t drop column c cascade;
+```
+
+You can also ignore multiple rules by making a comma seperated list:
+
+```sql
+-- squawk-ignore ban-drop-column, renaming-column,ban-drop-database
+alter table t drop column c cascade;
+```
+
+## Files
 
 Files can be excluded from linting via the `--exclude-path` flag. Glob matching is supported and the flag can be provided multiple times.
 
@@ -41,9 +57,9 @@ squawk --config=~/.squawk.toml example.sql
 
 The `--exclude`, `--exclude-path`, and `--pg-version` flags will always be prioritized over the configuration file.
 
-## example `.squawk.toml` configurations
+## Example `.squawk.toml` configurations
 
-### excluding rules
+### Excluding rules
 
 ```toml
 # .squawk.toml
@@ -53,21 +69,21 @@ excluded_rules = [
 ]
 ```
 
-### specifying postgres version
+### Specifying postgres version
 
 ```toml
 # .squawk.toml
 pg_version = "11.0"
 ```
 
-### specifying whether SQL files will be wrapped in a transaction
+### Specifying whether SQL files will be wrapped in a transaction
 
 ```toml
 # .squawk.toml
 assume_in_transaction = true
 ```
 
-### using all options
+### Using all options
 
 ```toml
 # .squawk.toml
