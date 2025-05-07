@@ -17,6 +17,7 @@ pub use version::Version;
 mod ignore;
 mod ignore_index;
 mod version;
+mod visitors;
 
 mod rules;
 mod text;
@@ -36,7 +37,6 @@ use rules::ban_drop_table;
 use rules::changing_column_type;
 use rules::constraint_missing_not_valid;
 use rules::disallow_unique_constraint;
-use rules::prefer_big_int;
 use rules::prefer_bigint_over_int;
 use rules::prefer_bigint_over_smallint;
 use rules::prefer_identity;
@@ -75,8 +75,6 @@ pub enum Rule {
     DisallowedUniqueConstraint,
     #[serde(rename = "ban-drop-database")]
     BanDropDatabase,
-    #[serde(rename = "prefer-big-int")]
-    PreferBigInt,
     #[serde(rename = "prefer-bigint-over-int")]
     PreferBigintOverInt,
     #[serde(rename = "prefer-bigint-over-smallint")]
@@ -129,7 +127,6 @@ impl TryFrom<&str> for Rule {
             "renaming-table" => Ok(Rule::RenamingTable),
             "disallowed-unique-constraint" => Ok(Rule::DisallowedUniqueConstraint),
             "ban-drop-database" => Ok(Rule::BanDropDatabase),
-            "prefer-big-int" => Ok(Rule::PreferBigInt),
             "prefer-bigint-over-int" => Ok(Rule::PreferBigintOverInt),
             "prefer-bigint-over-smallint" => Ok(Rule::PreferBigintOverSmallint),
             "prefer-identity" => Ok(Rule::PreferIdentity),
@@ -186,7 +183,6 @@ impl fmt::Display for Rule {
             Rule::RenamingTable => "renaming-table",
             Rule::DisallowedUniqueConstraint => "disallowed-unique-constraint",
             Rule::BanDropDatabase => "ban-drop-database",
-            Rule::PreferBigInt => "prefer-big-int",
             Rule::PreferBigintOverInt => "prefer-bigint-over-int",
             Rule::PreferBigintOverSmallint => "prefer-bigint-over-smallint",
             Rule::PreferIdentity => "prefer-identity",
@@ -307,9 +303,6 @@ impl Linter {
         }
         if self.rules.contains(&Rule::DisallowedUniqueConstraint) {
             disallow_unique_constraint(self, &file);
-        }
-        if self.rules.contains(&Rule::PreferBigInt) {
-            prefer_big_int(self, &file);
         }
         if self.rules.contains(&Rule::PreferBigintOverInt) {
             prefer_bigint_over_int(self, &file);

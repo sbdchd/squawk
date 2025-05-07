@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{prefer_big_int::check_not_allowed_types, text::trim_quotes};
+use crate::{text::trim_quotes, visitors::check_not_allowed_types};
 use crate::{Linter, Rule, Violation};
 
 pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
