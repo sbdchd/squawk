@@ -7,7 +7,7 @@ use squawk_syntax::{
 
 use crate::{text::trim_quotes, Linter, Rule, Violation};
 
-use crate::prefer_big_int::check_not_allowed_types;
+use crate::visitors::check_not_allowed_types;
 
 use lazy_static::lazy_static;
 

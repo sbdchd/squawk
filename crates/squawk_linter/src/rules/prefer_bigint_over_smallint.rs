@@ -5,8 +5,8 @@ use squawk_syntax::{ast, Parse, SourceFile};
 
 use crate::{Linter, Rule, Violation};
 
-use crate::prefer_big_int::check_not_allowed_types;
-use crate::prefer_big_int::is_not_valid_int_type;
+use crate::visitors::check_not_allowed_types;
+use crate::visitors::is_not_valid_int_type;
 
 use lazy_static::lazy_static;
 

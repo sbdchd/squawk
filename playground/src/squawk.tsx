@@ -1,5 +1,9 @@
 import { useEffect, useState } from "react"
-import initWasm, { dump_cst, dump_tokens, lint as lint_ } from "./pkg/wasm"
+import initWasm, {
+  dump_cst,
+  dump_tokens,
+  lint as lint_,
+} from "./pkg/squawk_wasm"
 
 export type LintError = {
   code: string

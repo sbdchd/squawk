@@ -116,11 +116,6 @@ const rules = [
     description: "Prevent blocking reads/writes to table while index is built.",
   },
   {
-    name: "prefer-big-int",
-    tags: ["schema"],
-    description: "Deprecated. See prefer-bigint-over-int and prefer-bigint-over-smallint instead.",
-  },
-  {
     name: "prefer-bigint-over-int",
     tags: ["schema"],
     description: "Prevent hitting the 32 bit max int limit.",

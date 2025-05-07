@@ -15,7 +15,7 @@ type Mode = (typeof modes)[number]
 
 const DEFAULT_CONTENT = `\
 create table users (
-  -- squawk-ignore prefer-big-int,prefer-bigint-over-int
+  -- squawk-ignore prefer-bigint-over-int
   id serial
 );
 

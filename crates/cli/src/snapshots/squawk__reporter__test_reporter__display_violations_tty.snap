@@ -15,13 +15,6 @@ warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be re
 2 |    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
   |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   |
-warning[prefer-big-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
- --> main.sql:2:47
-  |
-2 |    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
-  |                                               ^^^^^^^
-  |
-  = help: Use 64-bit integer values instead to prevent hitting this limit.
 warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
  --> main.sql:2:47
   |
@@ -42,13 +35,6 @@ warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be re
 3 | ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
   |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   |
-warning[prefer-big-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
- --> main.sql:3:41
-  |
-3 | ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
-  |                                         ^^^^^^^
-  |
-  = help: Use 64-bit integer values instead to prevent hitting this limit.
 warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
  --> main.sql:3:41
   |
@@ -58,4 +44,4 @@ warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitti
   = help: Use 64-bit integer values instead to prevent hitting this limit.
 
 Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
-Found 8 issues in 1 file (checked 1 source file)
+Found 6 issues in 1 file (checked 1 source file)

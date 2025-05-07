@@ -17,7 +17,6 @@ module.exports = {
       "changing-column-type",
       "constraint-missing-not-valid",
       "disallowed-unique-constraint",
-      "prefer-big-int",
       "prefer-bigint-over-int",
       "prefer-bigint-over-smallint",
       "prefer-identity",

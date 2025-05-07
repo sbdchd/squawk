@@ -3,7 +3,7 @@ use squawk_syntax::{
     Parse, SourceFile, TokenText,
 };
 
-use crate::prefer_big_int::check_not_allowed_types;
+use crate::visitors::check_not_allowed_types;
 use crate::{Linter, Rule, Violation};
 
 fn is_char_type(x: TokenText<'_>) -> bool {

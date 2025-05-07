@@ -9,7 +9,7 @@ use crate::{Linter, Rule, Violation};
 
 use lazy_static::lazy_static;
 
-use crate::prefer_big_int::{check_not_allowed_types, is_not_valid_int_type};
+use crate::visitors::{check_not_allowed_types, is_not_valid_int_type};
 
 lazy_static! {
     static ref SERIAL_TYPES: HashSet<&'static str> = HashSet::from([
