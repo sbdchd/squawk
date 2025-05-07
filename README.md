@@ -21,6 +21,15 @@ pip install squawk-cli
 https://github.com/sbdchd/squawk/releases
 ```
 
+### Without installation (Docker)
+
+You can run Squawk without installation using Docker. The official image is available on GitHub Container Registry.
+
+```shell
+# Assuming you want to check sql files in the current directory
+docker run --rm -v $(pwd):/data ghcr.io/sbdchd/squawk:latest *.sql
+```
+
 ## Usage
 
 ```shell
