@@ -22,5 +22,8 @@ select f(a,,,,,);
 -- in can only be used with tuples / sub queries
 select 1 in c;
 
+-- type cast must use a string literal
+select numeric 1234;
+
 -- trailing comma at EOF
 select 1,
