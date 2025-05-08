@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.1.0 - 2025-05-08
+
+### Added
+
+- `ban-truncate-cascade` rule (#453)
+
 ## v2.0.0 - 2025-05-07
 
 ### Added
