@@ -188,6 +188,11 @@ const rules = [
     tags: ["schema", "locking"],
     description: "Domains with constraints have poor support for online migrations",
   },
+  {
+    name: "ban-truncate-cascade",
+    tags: ["backwards compatibility"],
+    description: "Truncate cascade will recursively truncate all related tables!",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 

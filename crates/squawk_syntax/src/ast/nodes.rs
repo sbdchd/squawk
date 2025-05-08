@@ -3116,6 +3116,65 @@ impl AstNode for Rollback {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct TableList {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl AstNode for TableList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TABLE_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Truncate {
+    pub(crate) syntax: SyntaxNode,
+}
+
+impl Truncate {
+    #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
+    pub fn table_list(&self) -> Option<TableList> {
+        support::child(&self.syntax)
+    }
+}
+
+impl AstNode for Truncate {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TRUNCATE_STMT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Item {
     AlterTable(AlterTable),
     AlterDomain(AlterDomain),
@@ -3134,6 +3193,7 @@ pub enum Item {
     DropIndex(DropIndex),
     DropType(DropType),
     Select(Select),
+    Truncate(Truncate),
 }
 // impl ast::HasAttrs for Item {}
 // impl ast::HasDocComments for Item {}
@@ -3159,7 +3219,8 @@ impl AstNode for Item {
                 | SyntaxKind::ALTER_DOMAIN_STMT
                 | SyntaxKind::ALTER_AGGREGATE_STMT
                 | SyntaxKind::CREATE_AGGREGATE_STMT
-                | SyntaxKind::ROLLBACK_KW
+                | SyntaxKind::ROLLBACK_STMT
+                | SyntaxKind::TRUNCATE_STMT
         )
     }
     #[inline]
@@ -3182,6 +3243,7 @@ impl AstNode for Item {
             SyntaxKind::CREATE_AGGREGATE_STMT => Item::CreateAggregate(CreateAggregate { syntax }),
             SyntaxKind::DROP_AGGREGATE_STMT => Item::DropAggregate(DropAggregate { syntax }),
             SyntaxKind::ROLLBACK_STMT => Item::Rollback(Rollback { syntax }),
+            SyntaxKind::TRUNCATE_STMT => Item::Truncate(Truncate { syntax }),
             _ => return None,
         };
         Some(res)
@@ -3206,6 +3268,7 @@ impl AstNode for Item {
             Item::CreateAggregate(it) => &it.syntax,
             Item::DropAggregate(it) => &it.syntax,
             Item::Rollback(it) => &it.syntax,
+            Item::Truncate(it) => &it.syntax,
         }
     }
 }

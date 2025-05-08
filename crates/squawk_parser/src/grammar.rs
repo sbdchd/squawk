@@ -9781,11 +9781,7 @@ fn lock_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(LOCK_KW);
     // [ TABLE ]
     p.eat(TABLE_KW);
-    // [ ONLY ] name [ * ] [, ...]
-    relation_name(p);
-    while !p.at(EOF) && p.eat(COMMA) {
-        relation_name(p);
-    }
+    table_list(p);
     // [ IN lockmode MODE ]
     if p.eat(IN_KW) {
         match (p.current(), p.nth(1)) {
@@ -9826,6 +9822,16 @@ fn lock_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     // [ NOWAIT ]
     p.eat(NOWAIT_KW);
     m.complete(p, LOCK_STMT)
+}
+
+// [ ONLY ] name [ * ] [, ... ]
+fn table_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    relation_name(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        relation_name(p);
+    }
+    m.complete(p, TABLE_LIST);
 }
 
 // [ WITH with_query [, ...] ]
@@ -11098,12 +11104,7 @@ fn truncate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(TRUNCATE_KW);
     p.eat(TABLE_KW);
-    while !p.at(EOF) {
-        relation_name(p);
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
+    table_list(p);
     if p.eat(RESTART_KW) {
         p.expect(IDENTITY_KW);
     }

@@ -34,6 +34,7 @@ use rules::ban_drop_column;
 use rules::ban_drop_database;
 use rules::ban_drop_not_null;
 use rules::ban_drop_table;
+use rules::ban_truncate_cascade;
 use rules::changing_column_type;
 use rules::constraint_missing_not_valid;
 use rules::disallow_unique_constraint;
@@ -108,6 +109,8 @@ pub enum Rule {
     BanCreateDomainWithConstraint,
     #[serde(rename = "ban-alter-domain-with-add-constraint")]
     BanAlterDomainWithAddConstraint,
+    #[serde(rename = "ban-truncate-cascade")]
+    BanTruncateCascade,
     // xtask:new-rule:error-name
 }
 
@@ -145,6 +148,7 @@ impl TryFrom<&str> for Rule {
             }
             "ban-create-domain-with-constraint" => Ok(Rule::BanCreateDomainWithConstraint),
             "ban-alter-domain-with-add-constraint" => Ok(Rule::BanAlterDomainWithAddConstraint),
+            "ban-truncate-cascade" => Ok(Rule::BanTruncateCascade),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {}", s)),
         }
@@ -202,6 +206,7 @@ impl fmt::Display for Rule {
             Rule::BanCreateDomainWithConstraint => "ban-create-domain-with-constraint",
             Rule::UnusedIgnore => "unused-ignore",
             Rule::BanAlterDomainWithAddConstraint => "ban-alter-domain-with-add-constraint",
+            Rule::BanTruncateCascade => "ban-truncate-cascade",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{}", val)
@@ -344,6 +349,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::TransactionNesting) {
             transaction_nesting(self, &file);
+        }
+        if self.rules.contains(&Rule::BanTruncateCascade) {
+            ban_truncate_cascade(self, &file);
         }
         // xtask:new-rule:rule-call
 

@@ -30,6 +30,7 @@ module.exports = {
       "transaction-nesting",
       "ban-create-domain-with-constraint",
       "ban-alter-domain-with-add-constraint",
+      "ban-truncate-cascade",
       // xtask:new-rule:error-name
     ],
   },
