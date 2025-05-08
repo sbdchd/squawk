@@ -224,7 +224,7 @@ fn docs_create_rule(name: &str) -> Result<()> {
         println!("skipping rule doc file creation, it already exists {rule_doc_path}");
         return Ok(());
     }
-    let doc = make_doc(&name);
+    let doc = make_doc(name);
     fs::write(&rule_doc_path, doc)?;
     println!("created rule doc {rule_doc_path}");
     Ok(())
