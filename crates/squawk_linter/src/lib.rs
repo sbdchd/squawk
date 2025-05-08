@@ -34,6 +34,7 @@ use rules::ban_drop_column;
 use rules::ban_drop_database;
 use rules::ban_drop_not_null;
 use rules::ban_drop_table;
+use rules::ban_truncate_cascade;
 use rules::changing_column_type;
 use rules::constraint_missing_not_valid;
 use rules::disallow_unique_constraint;
@@ -48,7 +49,6 @@ use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 use rules::transaction_nesting;
-use rules::ban_truncate_cascade;
 // xtask:new-rule:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Serialize, Hash, Eq, Deserialize, Sequence)]
