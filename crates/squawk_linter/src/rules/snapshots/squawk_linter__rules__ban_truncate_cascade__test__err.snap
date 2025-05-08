@@ -1,0 +1,14 @@
+---
+source: crates/squawk_linter/src/rules/ban_truncate_cascade.rs
+expression: errors
+---
+[
+    Violation {
+        code: BanTruncateCascade,
+        message: "Using `CASCADE` will recursively truncate any tables that foreign key to the referenced tables! So if you had foreign keys setup as `a <- b <- c` and truncated `a`, then `b` & `c` would also be truncated!",
+        text_range: 26..33,
+        help: Some(
+            "Remove the `CASCADE` and specify exactly which tables you want to truncate.",
+        ),
+    },
+]
