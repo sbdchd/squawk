@@ -1,10 +1,13 @@
 use anyhow::Result;
+use camino::Utf8PathBuf;
 use convert_case::{Case, Casing};
 
 use crate::NewRuleArgs;
-use std::{env, fs, path::PathBuf};
+use std::{env, fs};
 
 fn make_lint(name: &str) -> String {
+    let rule_name_snake = name.to_case(Case::Snake);
+    let rule_name_pascal = name.to_case(Case::Pascal);
     format!(
         r###"
 use squawk_syntax::{{
@@ -14,11 +17,20 @@ use squawk_syntax::{{
 
 use crate::{{Linter, Violation, Rule}};
 
-pub(crate) fn {rule_name}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
+pub(crate) fn {rule_name_snake}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
     let file = parse.tree();
     for item in file.items() {{
-        todo!();
         match item {{
+            // TODO: update to the item you want to check
+            ast::Item::CreateTable(create_table) => {{
+                ctx.report(Violation::new(
+                    Rule::{rule_name_pascal},
+                    "todo".to_string(),
+                    create_table.syntax().text_range(),
+                    "todo or none".to_string(),
+                ));
+                todo!();
+            }}
             _ => (),
         }}
     }}
@@ -54,15 +66,13 @@ mod test {{
         assert_eq!(errors.len(), 0);
     }}
 }}
-"###,
-        rule_name = name,
-        rule_name_pascal = name.to_case(Case::Pascal),
+"###
     )
 }
 
-fn root_path() -> PathBuf {
-    let binding = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    PathBuf::from(binding.parent().unwrap().parent().unwrap())
+fn root_path() -> Utf8PathBuf {
+    let binding = Utf8PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    Utf8PathBuf::from(binding.parent().unwrap().parent().unwrap())
 }
 
 fn create_rule_file(name: &str) -> Result<()> {
@@ -71,13 +81,13 @@ fn create_rule_file(name: &str) -> Result<()> {
     let lint_path = root.join(format!("crates/squawk_linter/src/rules/{}.rs", name));
 
     if fs::exists(&lint_path)? {
-        println!("skipping rule definition file creation, it already exists");
+        println!("skipping rule file creation, it already exists {lint_path}");
         return Ok(());
     }
 
     let lint_data = make_lint(&name);
     fs::write(&lint_path, lint_data)?;
-    println!("created rule file");
+    println!("created rule file {lint_path}");
     Ok(())
 }
 
@@ -211,12 +221,12 @@ fn docs_create_rule(name: &str) -> Result<()> {
     let name_kebab = name.to_case(Case::Kebab);
     let rule_doc_path = docs.join(format!("docs/{name_kebab}.md"));
     if fs::exists(&rule_doc_path)? {
-        println!("skipping rule doc file creation, it already exists");
+        println!("skipping rule doc file creation, it already exists {rule_doc_path}");
         return Ok(());
     }
     let doc = make_doc(&name);
     fs::write(&rule_doc_path, doc)?;
-    println!("created rule doc");
+    println!("created rule doc {rule_doc_path}");
     Ok(())
 }
 
