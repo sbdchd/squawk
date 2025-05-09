@@ -293,8 +293,8 @@ jobs:
           deploy-message: "Deploy from GitHub Actions"
           fails-without-credentials: true
         env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_AUTH_TOKEN: ${{ secrets.PLAYGROUND_NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.PLAYGROUND_NETLIFY_SITE_ID }}
 
   lint:
     needs: pre_job
