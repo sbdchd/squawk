@@ -254,6 +254,50 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+  deploy-playground:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
+
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: "playground/package.json"
+          cache-dependency-path: "playground/pnpm-lock.yaml"
+          cache: "pnpm"
+
+      - name: Install JS dependencies
+        working-directory: "playground"
+        run: pnpm install
+
+      - name: Build
+        working-directory: "playground"
+        run: pnpm build
+
+      - name: Deploy to Netlify
+        uses: nwtgck/actions-netlify@v2
+        with:
+          publish-dir: "playground/dist"
+          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          deploy-message: "Deploy from GitHub Actions"
+          fails-without-credentials: true
+          enable-pull-request-comment: false
+          enable-commit-comment: false
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.PLAYGROUND_NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.PLAYGROUND_NETLIFY_SITE_ID }}
+
   lint:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true'

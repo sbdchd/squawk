@@ -29,7 +29,7 @@ select * from users;
 
 const SETTINGS = {
   value: DEFAULT_CONTENT,
-  language: "sql",
+  language: "pgsql",
   tabSize: 2,
   theme: "vs-dark",
   minimap: { enabled: false },
