@@ -17,11 +17,25 @@ init()
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Sentry.ErrorBoundary
-      fallback={
-        <div className="flex items-center justify-center h-screen text-5xl text-orange-700">
-          Error encounted. Please try refreshing the page.
-        </div>
-      }
+      fallback={() => {
+        return (
+          <div className="flex items-center justify-center h-screen text-5xl text-orange-700 ">
+            <div className="flex flex-col">
+              <div>An internal error with Squawk has occured.</div>
+              <div>
+                Please open an issue at{" "}
+                <a
+                  href="https://github.com/sbdchd/squawk/issues/new"
+                  className="underline"
+                >
+                  github.com/sbdchd/squawk
+                </a>
+                !
+              </div>
+            </div>
+          </div>
+        )
+      }}
     >
       <App />
     </Sentry.ErrorBoundary>
