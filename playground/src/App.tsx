@@ -246,7 +246,7 @@ function Editor({
     }
     const model = editorRef.current?.getModel()
     if (model != null) {
-      monaco.editor.setModelMarkers(model, "tea", markers)
+      monaco.editor.setModelMarkers(model, "squawk", markers)
     }
   }, [markers])
 
@@ -375,7 +375,7 @@ function useMarkers(text: string): Array<Marker> {
       // https://github.com/microsoft/monaco-editor/issues/1264
       // https://stackoverflow.com/questions/62362741/using-markdown-in-imarkerdata
       message: x.message,
-      source: "tea",
+      source: "squawk",
     }
   })
 }
