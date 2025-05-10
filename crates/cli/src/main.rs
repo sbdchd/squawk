@@ -16,6 +16,7 @@ use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
 use std::io;
+use std::panic;
 use std::path::PathBuf;
 use std::process::{self, ExitCode};
 use structopt::StructOpt;
@@ -140,6 +141,22 @@ struct Opt {
 
 #[allow(clippy::too_many_lines)]
 fn main() -> Result<ExitCode> {
+    let version = env!("CARGO_PKG_VERSION");
+
+    // via: https://github.com/astral-sh/ruff/blob/40fd52dde0ddf0b95a3433163f51560b4827ab75/crates/ruff_server/src/server.rs#L140
+    panic::set_hook(Box::new(move |panic_info| {
+        use std::io::Write;
+        let backtrace = std::backtrace::Backtrace::force_capture();
+        // Don't use `eprintln` because `eprintln` itself may panic if the pipe is broken.
+        let mut stderr = std::io::stderr().lock();
+        let open_an_issue = format!(
+            r#"An internal error has occured with Squawk v{version}!
+Please open an issue at https://github.com/sbdchd/squawk/issues/new with the logs above!
+"#
+        );
+        writeln!(stderr, "{panic_info}\n{backtrace}\n{open_an_issue}").ok();
+    }));
+
     let opts = Opt::from_args();
 
     if opts.verbose {
