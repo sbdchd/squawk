@@ -18,7 +18,7 @@ jobs:
       - id: skip_check
         uses: fkirc/skip-duplicate-actions@c449d86cf33a2a6c7a4193264cc2578e2c3266d4 # pin@v4
         with:
-          paths_ignore: '["cli/**", "github/**", "linter/**","parser/**"]'
+          paths_ignore: '["crates/**"]'
 
   typescript:
     needs: pre_job

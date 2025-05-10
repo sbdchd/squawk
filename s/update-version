@@ -6,7 +6,7 @@
 function main {
     NEW_VERSION="$1"
     echo "updating version to '$NEW_VERSION'..."
-    fastmod '^version = ".*"' 'version = "'$NEW_VERSION'"' crates/cli/Cargo.toml
+    fastmod '^version = ".*"' 'version = "'$NEW_VERSION'"' crates/squawk/Cargo.toml
     fastmod -m '(name = "squawk"\n)version = ".*?"' '${1}version = "'$NEW_VERSION'"' Cargo.lock
     fastmod '"version": ".*"' '"version": "'$NEW_VERSION'"' package.json
     fastmod -m '(pname = "squawk";.*?)version = ".*?"' '${1}version = "'$NEW_VERSION'"' flake.nix

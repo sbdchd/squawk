@@ -47,7 +47,7 @@ convert_case = "0.7.1"
 clap = { version = "4.5.8", features = ["derive"] }
 
 # local
-squawk-github = { version = "0.0.0", path = "./crates/github" }
+squawk_github = { version = "0.0.0", path = "./crates/squawk_github" }
 squawk_lexer = { version = "0.0.0", path = "./crates/squawk_lexer" }
 squawk_parser = { version = "0.0.0", path = "./crates/squawk_parser" }
 squawk_syntax = { version = "0.0.0", path = "./crates/squawk_syntax" }
