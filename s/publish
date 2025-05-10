@@ -1,8 +1,0 @@
-#!/bin/bash
-
-set -eux
-
-cargo publish --manifest-path parser/Cargo.toml
-cargo publish --manifest-path linter/Cargo.toml
-cargo publish --manifest-path github/Cargo.toml
-cargo publish --manifest-path cli/Cargo.toml

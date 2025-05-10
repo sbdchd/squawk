@@ -1,5 +1,5 @@
 [package]
-name = "squawk-github"
+name = "squawk_github"
 version = "0.0.0"
 authors = ["Steve Dignam <steve@dignam.xyz>"]
 edition = "2018"

@@ -2558,7 +2558,7 @@ dependencies = [
  "serde",
  "serde_json",
  "simplelog",
- "squawk-github",
+ "squawk_github",
  "squawk_lexer",
  "squawk_linter",
  "squawk_syntax",
@@ -2568,7 +2568,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "squawk-github"
+name = "squawk_github"
 version = "0.0.0"
 dependencies = [
  "jsonwebtoken",
