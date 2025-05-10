@@ -30,6 +30,12 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         return;
     }
 
+    enum ActionErrorMessage {
+        IfExists,
+        IfNotExists,
+        None,
+    }
+
     for item in file.items() {
         match item {
             ast::Item::Begin(_) => {
@@ -40,7 +46,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             }
             ast::Item::AlterTable(alter_table) => {
                 for action in alter_table.actions() {
-                    match &action {
+                    let message_type = match &action {
                         ast::AlterTableAction::DropConstraint(drop_constraint) => {
                             if let Some(constraint_name) = drop_constraint.name_ref() {
                                 constraint_names.insert(
@@ -51,11 +57,13 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                             if drop_constraint.if_exists().is_some() {
                                 continue;
                             }
+                            ActionErrorMessage::IfExists
                         }
                         ast::AlterTableAction::AddColumn(add_column) => {
                             if add_column.if_not_exists().is_some() {
                                 continue;
                             }
+                            ActionErrorMessage::IfNotExists
                         }
                         ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
                             if let Some(constraint_name) = validate_constraint.name_ref() {
@@ -65,6 +73,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                     continue;
                                 }
                             }
+                            ActionErrorMessage::None
                         }
                         ast::AlterTableAction::AddConstraint(add_constraint) => {
                             let constraint = add_constraint.constraint();
@@ -78,22 +87,36 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                     }
                                 }
                             }
+                            ActionErrorMessage::None
                         }
                         ast::AlterTableAction::DropColumn(drop_column) => {
                             if drop_column.if_exists().is_some() {
                                 continue;
                             }
+                            ActionErrorMessage::IfExists
                         }
-                        _ => (),
-                    }
+                        _ => ActionErrorMessage::None,
+                    };
 
                     if inside_transaction {
                         continue;
                     }
 
+                    let message =  match message_type {
+                        ActionErrorMessage::IfExists => {
+                            "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".to_string()
+                        },
+                        ActionErrorMessage::IfNotExists => {
+                            "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".to_string()
+                        },
+                        ActionErrorMessage::None => {
+                            "Missing transaction, the migration can't be rerun if it fails part way through.".to_string()
+                        },
+                    };
+
                     ctx.report(Violation::new(
                         Rule::PreferRobustStmts,
-                    "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
+                        message,
                         action.syntax().text_range(),
                         None,
                     ));
@@ -547,7 +570,20 @@ ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
 -- this second add constraint should error because it's not robust
-ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+ALTER TABLE "app_email" ADD CONSTRAIN "email_uniq" UNIQUE USING INDEX "email_idx";
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::PreferRobustStmts]);
+        let errors = linter.lint(file, sql);
+        assert_ne!(errors.len(), 0);
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn alter_column_set_not_null() {
+        let sql = r#"
+select 1; -- so we don't skip checking
+alter table t alter column c set not null;
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferRobustStmts]);

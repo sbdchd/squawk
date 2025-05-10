@@ -5,7 +5,7 @@ expression: errors
 [
     Violation {
         code: PreferRobustStmts,
-        message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+        message: "Missing transaction, the migration can't be rerun if it fails part way through.",
         text_range: 63..88,
         help: None,
     },
