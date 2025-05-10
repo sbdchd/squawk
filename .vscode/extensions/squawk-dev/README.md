@@ -4,10 +4,6 @@ Extension to make developing squawk a little nicer.
 
 ## Install
 
-```shell
-
-```
-
 1. install deps and build
 
 ```sh
