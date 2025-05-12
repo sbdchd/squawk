@@ -1,31 +1,38 @@
 # linter
 
-## rules
+## Error message style guide
 
-| name                                         | done? |
-| -------------------------------------------- | ----- |
-| adding_field_with_default                    | y     |
-| adding_foreign_key_constraint                | y     |
-| adding_not_null_field                        | y     |
-| adding_primary_key_constraint                | y     |
-| adding_required_field                        | y     |
-| ban_char_field                               | y     |
-| ban_concurrent_index_creation_in_transaction | y     |
-| ban_drop_column                              | y     |
-| ban_drop_database                            | y     |
-| ban_drop_not_null                            | y     |
-| ban_drop_table                               | y     |
-| changing_column_type                         | y     |
-| constraint_missing_not_valid                 | y     |
-| disallow_unique_constraint                   | y     |
-| prefer_big_int                               | y     |
-| prefer_bigint_over_int                       | y     |
-| prefer_bigint_over_smallint                  | y     |
-| prefer_identity                              | y     |
-| prefer_robust_stmts                          | y     |
-| prefer_text_field                            | y     |
-| prefer_timestamptz                           | y     |
-| renaming_column                              | y     |
-| renaming_table                               | y     |
-| require_concurrent_index_creation            | y     |
-| require_concurrent_index_deletion            | y     |
+### Lock messages
+
+Each lock name should be:
+
+- accompanied by an explanation of its meaning in simple terms
+- tables that are affected
+
+Instead of:
+
+```
+Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock.
+```
+
+include a lock description & table name:
+
+```
+Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, which prevents reads and writes to `users`.
+```
+
+### Help
+
+A help message should be short an actionable.
+
+Instead of:
+
+```
+You can remove the `CASCADE` keyword and then specify exactly which tables you want to truncate directly.
+```
+
+tell the user what to change (add, update, remove):
+
+```
+Remove the `CASCADE` and specify exactly which tables you want to truncate.
+```
