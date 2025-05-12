@@ -2332,7 +2332,15 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
     if !p.eat(ALL_KW) {
         p.eat(DISTINCT_KW);
     }
-    select_stmt(p, None);
+    if p.at(L_PAREN) {
+        tuple_expr(p);
+    } else {
+        if p.at_ts(SELECT_FIRST) {
+            select_stmt(p, None);
+        } else {
+            p.error("expected start of a select statement")
+        }
+    }
     m.complete(p, COMPOUND_SELECT)
 }
 

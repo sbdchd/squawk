@@ -1,0 +1,256 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/select_compound_union_select.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            WHITESPACE "\n    "
+            COMPOUND_SELECT
+              PAREN_EXPR
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "SELECT"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        NAME_REF
+                          IDENT "id"
+                  WHITESPACE " "
+                  FROM_CLAUSE
+                    FROM_KW "FROM"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "code_categories"
+                  WHITESPACE " "
+                  WHERE_CLAUSE
+                    WHERE_KW "WHERE"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "\"language\""
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      PREFIX_EXPR
+                        CUSTOM_OP
+                          AT "@"
+                        CAST_EXPR
+                          NAME_REF
+                            LANGUAGE_KW "language"
+                          COLON2 "::"
+                          CHAR_TYPE
+                            CHAR_KW "char"
+                            L_PAREN "("
+                            ARG_LIST
+                              ARG
+                                LITERAL
+                                  INT_NUMBER "4"
+                              R_PAREN ")"
+                  WHITESPACE " "
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"id\""
+                    WHITESPACE " "
+                    ASC_KW "ASC"
+                  WHITESPACE " "
+                  LIMIT_CLAUSE
+                    LIMIT_KW "LIMIT"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1"
+                R_PAREN ")"
+              WHITESPACE "\n    "
+              UNION_KW "UNION"
+              WHITESPACE "\n    "
+              PAREN_EXPR
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "SELECT"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        NAME_REF
+                          IDENT "id"
+                  WHITESPACE " "
+                  FROM_CLAUSE
+                    FROM_KW "FROM"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "code_categories"
+                  WHITESPACE " "
+                  WHERE_CLAUSE
+                    WHERE_KW "WHERE"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "\"language\""
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'nl-NL'"
+                  WHITESPACE " "
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"id\""
+                    WHITESPACE " "
+                    ASC_KW "ASC"
+                  WHITESPACE " "
+                  LIMIT_CLAUSE
+                    LIMIT_KW "LIMIT"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1"
+                R_PAREN ")"
+            WHITESPACE "\n"
+            R_PAREN ")"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- version without parentheses."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            WHITESPACE "\n    "
+            COMPOUND_SELECT
+              PAREN_EXPR
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "SELECT"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        NAME_REF
+                          IDENT "id"
+                  WHITESPACE " "
+                  FROM_CLAUSE
+                    FROM_KW "FROM"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "code_categories"
+                  WHITESPACE " "
+                  WHERE_CLAUSE
+                    WHERE_KW "WHERE"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "\"language\""
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      PREFIX_EXPR
+                        CUSTOM_OP
+                          AT "@"
+                        CAST_EXPR
+                          NAME_REF
+                            LANGUAGE_KW "language"
+                          COLON2 "::"
+                          CHAR_TYPE
+                            CHAR_KW "char"
+                            L_PAREN "("
+                            ARG_LIST
+                              ARG
+                                LITERAL
+                                  INT_NUMBER "4"
+                              R_PAREN ")"
+                  WHITESPACE " "
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"id\""
+                    WHITESPACE " "
+                    ASC_KW "ASC"
+                  WHITESPACE " "
+                  LIMIT_CLAUSE
+                    LIMIT_KW "LIMIT"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1"
+                R_PAREN ")"
+              WHITESPACE "\n    "
+              UNION_KW "UNION"
+              WHITESPACE "\n    "
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "SELECT"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      NAME_REF
+                        IDENT "id"
+                WHITESPACE " "
+                FROM_CLAUSE
+                  FROM_KW "FROM"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "code_categories"
+                WHITESPACE " "
+                WHERE_CLAUSE
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "\"language\""
+                    WHITESPACE " "
+                    EQ "="
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'nl-NL'"
+                WHITESPACE " "
+                ORDER_BY_CLAUSE
+                  ORDER_KW "ORDER"
+                  WHITESPACE " "
+                  BY_KW "BY"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "\"id\""
+                  WHITESPACE " "
+                  ASC_KW "ASC"
+                WHITESPACE " "
+                LIMIT_CLAUSE
+                  LIMIT_KW "LIMIT"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
+            WHITESPACE "\n"
+            R_PAREN ")"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
