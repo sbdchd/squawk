@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.2.0 - 2025-05-12
+
+### Added
+
+- Style guide for linter error messages
+
+### Fixed
+
+- Error messages for `prefer-robust-statements` to be less confusing. We were saying to add `if not exists` every time, even when the statement didn't have that option.
+
+- Fixed parsing nested compound select that has parens (#464).
+  The following now parses:
+
+  ```sql
+  SELECT (
+    (SELECT id FROM code_categories WHERE "language" = @language::char(4) ORDER BY "id" ASC LIMIT 1)
+    UNION
+    (SELECT id FROM code_categories WHERE "language" = 'nl-NL' ORDER BY "id" ASC LIMIT 1)
+  ) LIMIT 1;
+  ```
+
 ## v2.1.0 - 2025-05-08
 
 ### Added
