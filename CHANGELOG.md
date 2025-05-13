@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.3.0 - 2025-05-13
+
+### Fixed
+
+- Parsing `grant` and `revoke` statements with schema specified names, aka the following parses correctly: (#469)
+
+  ```sql
+  GRANT ALL ON SEQUENCE public.s TO u;
+  ```
+
 ## v2.2.0 - 2025-05-12
 
 ### Added
