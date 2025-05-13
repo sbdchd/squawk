@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed parsing `create view` with nested parens.
+- Fixed parsing `create view` with nested parens (#468).
 
 ## v2.2.0 - 2025-05-12
 
