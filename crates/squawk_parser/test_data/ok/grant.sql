@@ -10,6 +10,10 @@ grant all privileges
   with grant option
   granted by public;
 
+grant all privileges 
+  on table s.t
+  to current_user;
+
 grant all privileges
   on t
   to current_user;
@@ -49,6 +53,9 @@ grant all(a)
 grant select on sequence s
   to current_user;
 
+grant select on sequence public.s
+  to current_user;
+
 grant usage on sequence a, b, c
   to current_user;
 
@@ -83,6 +90,10 @@ grant usage
 
 grant all privileges
   on domain d
+  to current_user;
+
+grant all privileges
+  on domain s.d
   to current_user;
 
 -- foreign_data
@@ -209,6 +220,10 @@ grant all
   on type t
   to current_user;
 
+grant all 
+  on type s.t
+  to current_user;
+
 -- option
 grant public
   to current_user
@@ -232,4 +247,3 @@ grant public, t(a, b)
 
 grant public
   to current_user;
-
