@@ -5225,35 +5225,36 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      L_PAREN "("
-      WHITESPACE "\n  "
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "SELECT"
-          WHITESPACE " "
-          DISTINCT_CLAUSE
-            DISTINCT_KW "DISTINCT"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              NAME_REF
-                IDENT "user_id"
-        WHITESPACE " \n  "
-        FROM_CLAUSE
-          FROM_KW "FROM"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "events"
-        WHITESPACE " \n  "
-        ORDER_BY_CLAUSE
-          ORDER_KW "ORDER"
-          WHITESPACE " "
-          BY_KW "BY"
-          WHITESPACE " "
-          NAME_REF
-            TIMESTAMP_KW "timestamp"
-      WHITESPACE "\n"
-      R_PAREN ")"
+      PAREN_EXPR
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            DISTINCT_CLAUSE
+              DISTINCT_KW "DISTINCT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "user_id"
+          WHITESPACE " \n  "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "events"
+          WHITESPACE " \n  "
+          ORDER_BY_CLAUSE
+            ORDER_KW "ORDER"
+            WHITESPACE " "
+            BY_KW "BY"
+            WHITESPACE " "
+            NAME_REF
+              TIMESTAMP_KW "timestamp"
+        WHITESPACE "\n"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         NAME
@@ -5292,27 +5293,28 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      L_PAREN "("
-      WHITESPACE "\n  "
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "SELECT"
-          WHITESPACE " "
-          DISTINCT_CLAUSE
-            DISTINCT_KW "DISTINCT"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              NAME_REF
-                IDENT "user_id"
-        WHITESPACE " \n  "
-        FROM_CLAUSE
-          FROM_KW "FROM"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "events"
-      WHITESPACE "\n"
-      R_PAREN ")"
+      PAREN_EXPR
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            DISTINCT_CLAUSE
+              DISTINCT_KW "DISTINCT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "user_id"
+          WHITESPACE " \n  "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "events"
+        WHITESPACE "\n"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         NAME
