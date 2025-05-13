@@ -289,6 +289,7 @@ jobs:
         with:
           publish-dir: "playground/dist"
           production-branch: main
+          production-deploy: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           deploy-message: "Deploy from GitHub Actions"
           fails-without-credentials: true
