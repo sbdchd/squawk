@@ -11,8 +11,19 @@ revoke grant option for
   granted by public
   cascade;
 
+revoke grant option for 
+  all privileges 
+  on table s.t
+  from current_user, current_role
+  granted by public
+  cascade;
+
 revoke grant option for all privileges
   on t
+  from current_user;
+
+revoke grant option for all privileges
+  on s.t, b.t
   from current_user;
 
 -- on_all_tables
@@ -202,6 +213,10 @@ revoke usage
 
 revoke all 
   on type t
+  from current_user;
+
+revoke all 
+  on type s.t
   from current_user;
 
 -- option

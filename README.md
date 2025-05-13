@@ -291,7 +291,7 @@ cargo xtask new-rule 'prefer big serial'
 2. Run `s/update-version`
 
    ```bash
-   # update version in cli/Cargo.toml, package.json, flake.nix to 4.5.3
+   # update version in squawk/Cargo.toml, package.json, flake.nix to 4.5.3
    s/update-version 4.5.3
    ```
 
