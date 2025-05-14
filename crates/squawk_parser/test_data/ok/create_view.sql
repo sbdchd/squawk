@@ -43,3 +43,6 @@ create temporary view foo
 as select 1, 2, 3
 with local check option;
 
+-- regression test
+create or replace view my_view as
+select x from foo;

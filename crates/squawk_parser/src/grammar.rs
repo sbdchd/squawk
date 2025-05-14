@@ -4836,6 +4836,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
                 RECURSIVE_KW | TEMP_KW | TEMPORARY_KW => Some(create_view_stmt(p)),
                 RULE_KW => Some(create_rule_stmt(p)),
                 TRANSFORM_KW => Some(create_transform_stmt(p)),
+                VIEW_KW => Some(create_view_stmt(p)),
                 _ => Some(create_function_stmt(p)),
             }
         }
