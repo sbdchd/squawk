@@ -79,6 +79,12 @@ pub fn comment_on_pr(
     match comments.iter().find(|x| {
         x.user.r#type == "Bot"
             && x.user.login == bot_name
+            // NOTE: We filter comments by their contents so we don't accidentally
+            // overwrite a comment made by some other tool. This happens often in
+            // GitHub repos that reuse the default GHA bot for all linters.
+            //
+            // This only works if `existing_comment_text_includes` is a "stable"
+            // piece of text included in all comments made by squawk!
             && x.body.contains(existing_comment_text_includes)
     }) {
         Some(prev_comment) => {
