@@ -1020,27 +1020,28 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "SELECT"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              NAME_REF
-                IDENT "customer_id"
-            COMMA ","
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
             WHITESPACE " "
-            TARGET
-              NAME_REF
-                IDENT "transaction_value"
-        WHITESPACE " "
-        FROM_CLAUSE
-          FROM_KW "FROM"
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "customer_id"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                NAME_REF
+                  IDENT "transaction_value"
           WHITESPACE " "
-          NAME_REF
-            IDENT "recent_transactions"
-      R_PAREN ")"
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "recent_transactions"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "AS"

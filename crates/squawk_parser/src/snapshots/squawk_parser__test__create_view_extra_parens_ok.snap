@@ -1,0 +1,73 @@
+---
+source: crates/squawk_parser/src/test.rs
+input_file: crates/squawk_parser/test_data/ok/create_view_extra_parens.sql
+---
+SOURCE_FILE
+  CREATE_VIEW_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " \n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "b"
+              DOT "."
+              NAME_REF
+                IDENT "y"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          PAREN_EXPR
+            L_PAREN "("
+            WHITESPACE " "
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "select"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    NAME_REF
+                      IDENT "y"
+              WHITESPACE " "
+              FROM_CLAUSE
+                FROM_KW "from"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "bar"
+            WHITESPACE " "
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "b"
+      WHITESPACE "\n  "
+      ORDER_BY_CLAUSE
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "y"
+        WHITESPACE " "
+        DESC_KW "desc"
+  SEMICOLON ";"
+  WHITESPACE "\n"

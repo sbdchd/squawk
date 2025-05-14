@@ -195,28 +195,29 @@ SOURCE_FILE
           IDENT "f"
       COMMA ","
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        VALUES_KW "VALUES"
+      PAREN_EXPR
         L_PAREN "("
-        LITERAL
-          STRING "'MGM'"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          STRING "'Horror'"
+        SELECT
+          VALUES_KW "VALUES"
+          L_PAREN "("
+          LITERAL
+            STRING "'MGM'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'Horror'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'UA'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'Sci-Fi'"
+          R_PAREN ")"
         R_PAREN ")"
-        COMMA ","
-        WHITESPACE " "
-        L_PAREN "("
-        LITERAL
-          STRING "'UA'"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          STRING "'Sci-Fi'"
-        R_PAREN ")"
-      R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "AS"
@@ -310,36 +311,37 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        VALUES_KW "VALUES"
+      PAREN_EXPR
         L_PAREN "("
-        LITERAL
-          INT_NUMBER "1"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "200000"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          FLOAT_NUMBER "1.2"
+        SELECT
+          VALUES_KW "VALUES"
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "200000"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            FLOAT_NUMBER "1.2"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "400000"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            FLOAT_NUMBER "1.4"
+          R_PAREN ")"
         R_PAREN ")"
-        COMMA ","
-        WHITESPACE " "
-        L_PAREN "("
-        LITERAL
-          INT_NUMBER "2"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "400000"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          FLOAT_NUMBER "1.4"
-        R_PAREN ")"
-      R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "AS"

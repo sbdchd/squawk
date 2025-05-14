@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed parsing `create view` with nested parens (#468).
+
 ## v2.3.0 - 2025-05-13
 
 ### Fixed

@@ -334,22 +334,23 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "id"
           WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              NAME_REF
-                IDENT "id"
-        WHITESPACE " "
-        FROM_CLAUSE
-          FROM_KW "from"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "bar"
-      R_PAREN ")"
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "bar"
+        R_PAREN ")"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -396,53 +397,54 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "id"
           WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              NAME_REF
-                IDENT "id"
-        WHITESPACE " "
-        FROM_CLAUSE
-          FROM_KW "from"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "bar"
-          WHITESPACE " "
-          JOIN
-            JOIN_KW "join"
+          FROM_CLAUSE
+            FROM_KW "from"
             WHITESPACE " "
             NAME_REF
-              IDENT "foo"
+              IDENT "bar"
             WHITESPACE " "
-            ALIAS
-              AS_KW "as"
+            JOIN
+              JOIN_KW "join"
               WHITESPACE " "
-              NAME
-                IDENT "f"
-            WHITESPACE " "
-            ON_KW "on"
-            WHITESPACE " "
-            BIN_EXPR
-              FIELD_EXPR
-                NAME_REF
+              NAME_REF
+                IDENT "foo"
+              WHITESPACE " "
+              ALIAS
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
                   IDENT "f"
-                DOT "."
-                NAME_REF
-                  IDENT "id"
               WHITESPACE " "
-              EQ "="
+              ON_KW "on"
               WHITESPACE " "
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "bar"
-                DOT "."
-                NAME_REF
-                  IDENT "id"
-      R_PAREN ")"
+              BIN_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "f"
+                  DOT "."
+                  NAME_REF
+                    IDENT "id"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "bar"
+                  DOT "."
+                  NAME_REF
+                    IDENT "id"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "as"
@@ -495,22 +497,23 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "id"
           WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              NAME_REF
-                IDENT "id"
-        WHITESPACE " "
-        FROM_CLAUSE
-          FROM_KW "from"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "bar"
-      R_PAREN ")"
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "bar"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         NAME

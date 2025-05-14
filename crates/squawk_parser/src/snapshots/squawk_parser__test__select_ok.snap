@@ -151,26 +151,27 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-            COMMA ","
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
             WHITESPACE " "
-            TARGET
-              LITERAL
-                INT_NUMBER "2"
-            COMMA ","
-            WHITESPACE " "
-            TARGET
-              LITERAL
-                INT_NUMBER "3"
-      R_PAREN ")"
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                LITERAL
+                  INT_NUMBER "3"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "as"
@@ -232,26 +233,27 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-            COMMA ","
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
             WHITESPACE " "
-            TARGET
-              LITERAL
-                INT_NUMBER "2"
-            COMMA ","
-            WHITESPACE " "
-            TARGET
-              LITERAL
-                INT_NUMBER "3"
-      R_PAREN ")"
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                LITERAL
+                  INT_NUMBER "3"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "as"
@@ -319,26 +321,27 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-            COMMA ","
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
             WHITESPACE " "
-            TARGET
-              LITERAL
-                INT_NUMBER "2"
-            COMMA ","
-            WHITESPACE " "
-            TARGET
-              LITERAL
-                INT_NUMBER "3"
-      R_PAREN ")"
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                LITERAL
+                  INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                LITERAL
+                  INT_NUMBER "3"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         NAME
@@ -1621,16 +1624,17 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-      R_PAREN ")"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1646,16 +1650,17 @@ SOURCE_FILE
       WHITESPACE " "
       LATERAL_KW "lateral"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-      R_PAREN ")"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "as"
@@ -2554,16 +2559,17 @@ SOURCE_FILE
       WHITESPACE " "
       LATERAL_KW "lateral"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-      R_PAREN ")"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "as"
@@ -2599,16 +2605,17 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-      R_PAREN ")"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         AS_KW "as"
@@ -2644,16 +2651,17 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-      R_PAREN ")"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
       WHITESPACE " "
       ALIAS
         NAME
@@ -2671,16 +2679,17 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      L_PAREN "("
-      SELECT
-        SELECT_CLAUSE
-          SELECT_KW "select"
-          WHITESPACE " "
-          TARGET_LIST
-            TARGET
-              LITERAL
-                INT_NUMBER "1"
-      R_PAREN ")"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- lateral function_name"

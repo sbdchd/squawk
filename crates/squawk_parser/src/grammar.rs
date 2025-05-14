@@ -2709,10 +2709,8 @@ fn data_source(p: &mut Parser<'_>) {
     p.eat(LATERAL_KW);
     match p.current() {
         L_PAREN => {
-            p.bump(L_PAREN);
-            // we're at the start of a nested select statement
-            select_stmt(p, None);
-            p.expect(R_PAREN);
+            // TODO: this should be `paren_select` instead of a general `tuple_expr`, since only a select statement is allowed inside
+            tuple_expr(p);
             opt_alias(p);
         }
         JSON_TABLE_KW => {
