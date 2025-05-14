@@ -518,3 +518,38 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- regression test"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "my_view"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "x"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
