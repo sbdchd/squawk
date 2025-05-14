@@ -11,6 +11,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed parsing `create or replace view` (#474).
+
+  Previously, the following would error:
+
+  ```sql
+  create or replace view my_view as
+    select x from foo;
+  ```
+
+## v2.4.0 - 2025-05-13
+
+### Fixed
+
 - Fixed parsing `create view` with nested parens (#468).
 
 ## v2.3.0 - 2025-05-13
