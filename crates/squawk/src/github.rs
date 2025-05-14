@@ -66,6 +66,8 @@ fn create_gh_app(
     )
 }
 
+const COMMENT_HEADER: &str = "# Squawk Report";
+
 pub fn check_and_comment_on_pr(
     cmd: Command,
     cfg: &Config,
@@ -130,6 +132,7 @@ pub fn check_and_comment_on_pr(
         &github_repo_name,
         github_pr_number,
         &comment_body,
+        COMMENT_HEADER,
     )?;
 
     let violations: usize = file_results.iter().map(|f| f.violations.len()).sum();
@@ -149,7 +152,7 @@ fn get_comment_body(files: &[CheckReport], version: &str) -> String {
 
     format!(
         r"
-# Squawk Report
+{COMMENT_HEADER}
 
 ### **{violations_emoji} {violation_count}** violations across **{file_count}** file(s)
 

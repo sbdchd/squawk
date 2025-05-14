@@ -69,16 +69,18 @@ pub fn comment_on_pr(
     repo: &str,
     issue: i64,
     body: &str,
+    existing_comment_text_includes: &str,
 ) -> Result<(), GithubError> {
     let comments = gh.list_issue_comments(owner, repo, issue)?;
 
     let bot_name = gh.app_slug();
 
     info!("checking for existing comment");
-    match comments
-        .iter()
-        .find(|x| x.user.r#type == "Bot" && x.user.login == bot_name)
-    {
+    match comments.iter().find(|x| {
+        x.user.r#type == "Bot"
+            && x.user.login == bot_name
+            && x.body.contains(existing_comment_text_includes)
+    }) {
         Some(prev_comment) => {
             info!("updating comment");
             gh.update_issue_comment(owner, repo, prev_comment.id, body)
