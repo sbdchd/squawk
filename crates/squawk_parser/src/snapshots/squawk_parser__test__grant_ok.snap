@@ -33,8 +33,10 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -54,16 +56,22 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -91,11 +99,39 @@ SOURCE_FILE
     ALL_KW "all"
     WHITESPACE " "
     PRIVILEGES_KW "privileges"
+    WHITESPACE " \n  "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT_STMT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    PRIVILEGES_KW "privileges"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -164,8 +200,10 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE " \n  "
     TO_KW "to"
     WHITESPACE " "
@@ -195,8 +233,10 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE " \n  "
     TO_KW "to"
     WHITESPACE " "
@@ -226,8 +266,10 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE " \n  "
     TO_KW "to"
     WHITESPACE " "
@@ -257,8 +299,10 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE " \n  "
     TO_KW "to"
     WHITESPACE " "
@@ -280,8 +324,10 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE " \n  "
     TO_KW "to"
     WHITESPACE " "
@@ -301,8 +347,10 @@ SOURCE_FILE
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE " \n  "
     TO_KW "to"
     WHITESPACE " "
@@ -320,8 +368,34 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    NAME_REF
-      IDENT "s"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT_STMT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    SELECT_KW "select"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "public"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "s"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -337,16 +411,22 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -362,8 +442,10 @@ SOURCE_FILE
     WHITESPACE " "
     SEQUENCE_KW "sequence"
     WHITESPACE " "
-    NAME_REF
-      IDENT "x"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "x"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -513,16 +595,22 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    NAME_REF
-      IDENT "a"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -546,8 +634,36 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    NAME_REF
-      IDENT "d"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT_STMT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    PRIVILEGES_KW "privileges"
+    WHITESPACE "\n  "
+    ON_KW "on"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "s"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -1091,16 +1207,22 @@ SOURCE_FILE
     WHITESPACE " "
     PARAMETER_KW "parameter"
     WHITESPACE " "
-    NAME_REF
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "bar"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "buzz"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "buzz"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -1118,8 +1240,10 @@ SOURCE_FILE
     WHITESPACE " "
     PARAMETER_KW "parameter"
     WHITESPACE " "
-    NAME_REF
-      BEGIN_KW "begin"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          BEGIN_KW "begin"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -1135,8 +1259,10 @@ SOURCE_FILE
     WHITESPACE " "
     PARAMETER_KW "parameter"
     WHITESPACE " "
-    NAME_REF
-      BEGIN_KW "begin"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          BEGIN_KW "begin"
     WHITESPACE "\n  "
     TO_KW "to"
     WHITESPACE " "
@@ -1377,6 +1503,31 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  GRANT_STMT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " \n  "
+    ON_KW "on"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "s"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE "\n  "
+    TO_KW "to"
+    WHITESPACE " "
+    CURRENT_USER_KW "current_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- option"
   WHITESPACE "\n"
   GRANT_STMT
@@ -1482,4 +1633,4 @@ SOURCE_FILE
     WHITESPACE " "
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n"

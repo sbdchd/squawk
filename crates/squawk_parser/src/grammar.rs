@@ -6557,7 +6557,7 @@ fn alter_default_privileges_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.bump(GRANT_KW);
             privileges(p);
             p.expect(ON_KW);
-            privilege_target(p);
+            privilege_target_type(p);
             p.expect(TO_KW);
             role(p);
             while !p.at(EOF) && p.eat(COMMA) {
@@ -6576,7 +6576,7 @@ fn alter_default_privileges_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             }
             privileges(p);
             p.expect(ON_KW);
-            privilege_target(p);
+            privilege_target_type(p);
             p.expect(FROM_KW);
             role(p);
             while !p.at(EOF) && p.eat(COMMA) {
@@ -6591,7 +6591,7 @@ fn alter_default_privileges_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, ALTER_DEFAULT_PRIVILEGES_STMT)
 }
 
-fn privilege_target(p: &mut Parser<'_>) {
+fn privilege_target_type(p: &mut Parser<'_>) {
     match p.current() {
         TABLES_KW | FUNCTIONS_KW | ROUTINES_KW | SEQUENCES_KW | TYPES_KW | SCHEMAS_KW => {
             p.bump_any();
@@ -10049,90 +10049,7 @@ fn grant_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     //       | ALL { FUNCTIONS | PROCEDURES | ROUTINES } IN SCHEMA schema_name [, ...] }
     // ON PARAMETER configuration_parameter [, ...]
     if p.eat(ON_KW) {
-        if p.eat(ALL_KW) {
-            match p.current() {
-                TABLES_KW | SEQUENCES_KW | FUNCTIONS_KW | PROCEDURES_KW | ROUTINES_KW => {
-                    p.bump_any();
-                    p.expect(IN_KW);
-                    p.expect(SCHEMA_KW);
-                    // schema_name [, ...]
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                _ => p.error("expected TABLE"),
-            }
-        } else {
-            match p.current() {
-                PARAMETER_KW => {
-                    p.bump(PARAMETER_KW);
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => {
-                    p.bump_any();
-                    // function_name [ ( [ [ argmode ] [ arg_name ] arg_type [, ...] ] ) ] [, ...]
-                    path_name_ref(p);
-                    opt_param_list(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        // function_name [ ( [ [ argmode ] [ arg_name ] arg_type [, ...] ] ) ] [, ...]
-                        path_name_ref(p);
-                        opt_param_list(p);
-                    }
-                }
-                // TYPE type_name [, ...]
-                TYPE_KW => {
-                    p.bump(TYPE_KW);
-                    type_name(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        type_name(p);
-                    }
-                }
-                TABLE_KW | SEQUENCE_KW | DATABASE_KW | TABLESPACE_KW | SCHEMA_KW | LANGUAGE_KW
-                | DOMAIN_KW => {
-                    p.bump_any();
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                FOREIGN_KW => {
-                    p.bump(FOREIGN_KW);
-                    if p.eat(DATA_KW) {
-                        p.expect(WRAPPER_KW);
-                    } else {
-                        p.expect(SERVER_KW);
-                    }
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                LARGE_KW => {
-                    p.bump(LARGE_KW);
-                    p.expect(OBJECT_KW);
-                    if opt_numeric_literal(p).is_none() {
-                        p.error("expected large_object_oid")
-                    }
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        if opt_numeric_literal(p).is_none() {
-                            p.error("expected large_object_oid")
-                        }
-                    }
-                }
-                // table_name [, ...]
-                _ if p.at_ts(COL_LABEL_FIRST) => {
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                _ => (),
-            }
-        }
+        privilege_target(p);
     }
     // TO role_specification [, ...]
     p.expect(TO_KW);
@@ -10160,6 +10077,101 @@ fn grant_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     }
     opt_granted_by(p);
     m.complete(p, GRANT_STMT)
+}
+
+fn privilege_target(p: &mut Parser<'_>) {
+    if p.eat(ALL_KW) {
+        match p.current() {
+            TABLES_KW | SEQUENCES_KW | FUNCTIONS_KW | PROCEDURES_KW | ROUTINES_KW => {
+                p.bump_any();
+                p.expect(IN_KW);
+                p.expect(SCHEMA_KW);
+                // schema_name [, ...]
+                name_ref(p);
+                while !p.at(EOF) && p.eat(COMMA) {
+                    name_ref(p);
+                }
+            }
+            _ => p.error("expected TABLE"),
+        }
+    } else {
+        match p.current() {
+            PARAMETER_KW => {
+                p.bump(PARAMETER_KW);
+                path_name_ref(p);
+                while !p.at(EOF) && p.eat(COMMA) {
+                    path_name_ref(p);
+                }
+            }
+            FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => {
+                p.bump_any();
+                // function_name [ ( [ [ argmode ] [ arg_name ] arg_type [, ...] ] ) ] [, ...]
+                path_name_ref(p);
+                opt_param_list(p);
+                while !p.at(EOF) && p.eat(COMMA) {
+                    // function_name [ ( [ [ argmode ] [ arg_name ] arg_type [, ...] ] ) ] [, ...]
+                    path_name_ref(p);
+                    opt_param_list(p);
+                }
+            }
+            // TYPE type_name [, ...]
+            TYPE_KW => {
+                p.bump(TYPE_KW);
+                type_name(p);
+                while !p.at(EOF) && p.eat(COMMA) {
+                    type_name(p);
+                }
+            }
+            // no schema allowed for the name
+            DATABASE_KW | TABLESPACE_KW | SCHEMA_KW | LANGUAGE_KW => {
+                p.bump_any();
+                name_ref(p);
+                while !p.at(EOF) && p.eat(COMMA) {
+                    name_ref(p);
+                }
+            }
+            // these allow schema
+            TABLE_KW | SEQUENCE_KW | DOMAIN_KW => {
+                p.bump_any();
+                path_name_ref(p);
+                while !p.at(EOF) && p.eat(COMMA) {
+                    path_name_ref(p);
+                }
+            }
+            FOREIGN_KW => {
+                p.bump(FOREIGN_KW);
+                if p.eat(DATA_KW) {
+                    p.expect(WRAPPER_KW);
+                } else {
+                    p.expect(SERVER_KW);
+                }
+                name_ref(p);
+                while !p.at(EOF) && p.eat(COMMA) {
+                    name_ref(p);
+                }
+            }
+            LARGE_KW => {
+                p.bump(LARGE_KW);
+                p.expect(OBJECT_KW);
+                if opt_numeric_literal(p).is_none() {
+                    p.error("expected large_object_oid")
+                }
+                while !p.at(EOF) && p.eat(COMMA) {
+                    if opt_numeric_literal(p).is_none() {
+                        p.error("expected large_object_oid")
+                    }
+                }
+            }
+            // table_name [, ...]
+            _ if p.at_ts(COL_LABEL_FIRST) => {
+                path_name_ref(p);
+                while !p.at(EOF) && p.eat(COMMA) {
+                    path_name_ref(p);
+                }
+            }
+            _ => (),
+        }
+    }
 }
 
 // [ GRANTED BY role_specification ]
@@ -10211,88 +10223,7 @@ fn revoke_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     //       | ALL { FUNCTIONS | PROCEDURES | ROUTINES } IN SCHEMA schema_name [, ...] }
     // ON PARAMETER configuration_parameter [, ...]
     if p.eat(ON_KW) {
-        if p.eat(ALL_KW) {
-            match p.current() {
-                TABLES_KW | SEQUENCES_KW | FUNCTIONS_KW | PROCEDURES_KW | ROUTINES_KW => {
-                    p.bump_any();
-                    p.expect(IN_KW);
-                    p.expect(SCHEMA_KW);
-                    // schema_name [, ...]
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                _ => p.error("expected TABLE"),
-            }
-        } else {
-            match p.current() {
-                PARAMETER_KW => {
-                    p.bump(PARAMETER_KW);
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => {
-                    p.bump_any();
-                    path_name_ref(p);
-                    opt_param_list(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        path_name_ref(p);
-                        opt_param_list(p);
-                    }
-                }
-                // TYPE type_name [, ...]
-                TYPE_KW => {
-                    p.bump(TYPE_KW);
-                    type_name(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        type_name(p);
-                    }
-                }
-                TABLE_KW | SEQUENCE_KW | DATABASE_KW | TABLESPACE_KW | SCHEMA_KW | LANGUAGE_KW
-                | DOMAIN_KW => {
-                    p.bump_any();
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                FOREIGN_KW => {
-                    p.bump(FOREIGN_KW);
-                    if p.eat(DATA_KW) {
-                        p.expect(WRAPPER_KW);
-                    } else {
-                        p.expect(SERVER_KW);
-                    }
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                LARGE_KW => {
-                    p.bump(LARGE_KW);
-                    p.expect(OBJECT_KW);
-                    if opt_numeric_literal(p).is_none() {
-                        p.error("expected large_object_oid")
-                    }
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        if opt_numeric_literal(p).is_none() {
-                            p.error("expected large_object_oid")
-                        }
-                    }
-                }
-                // table_name [, ...]
-                _ if p.at_ts(COL_LABEL_FIRST) => {
-                    name_ref(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        name_ref(p);
-                    }
-                }
-                _ => (),
-            }
-        }
+        privilege_target(p);
     }
     // FROM role_specification [, ...]
     p.expect(FROM_KW);
