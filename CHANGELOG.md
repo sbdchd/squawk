@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.6.0 - 2025-05-14
+
+### Fixed
+
+- Fix the GitHub commenting overwriting comments made by other bots sharing the same name, i.e., the default GitHub Action bot. (#477) Thanks @danxmoran!
+
 ## v2.5.0 - 2025-05-14
 
 ### Fixed
