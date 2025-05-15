@@ -264,3 +264,8 @@ alter table t detach partition f concurrently;
 
 -- finalize
 alter table t detach partition f finalize;
+
+-- references on update on delete
+alter table foo
+  add constraint foo_bar_id_fkey foreign key (bar_id)
+  references bar (id) on update cascade on delete cascade;

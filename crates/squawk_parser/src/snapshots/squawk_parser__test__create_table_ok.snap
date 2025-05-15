@@ -1178,6 +1178,58 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
+    COMMENT "-- order swapped"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "references"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "foo"
+          WHITESPACE "\n   "
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          NO_KW "no"
+          WHITESPACE " "
+          ACTION_KW "action"
+          WHITESPACE "\n   "
+          ON_KW "on"
+          WHITESPACE " "
+          UPDATE_KW "update"
+          WHITESPACE " "
+          NO_KW "no"
+          WHITESPACE " "
+          ACTION_KW "action"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
     COMMENT "-- primary key"
     WHITESPACE "\n"
     CREATE_KW "create"
