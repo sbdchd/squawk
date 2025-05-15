@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.7.0 - 2025-05-14
+
+### Fixed
+
+- Fix parsing table constraint foreign key actions. (#480)
+
+  Previously, the following would error:
+
+  ```sql
+  alter table foo
+  add constraint foo_bar_id_fkey foreign key (bar_id)
+  references bar (id) on update cascade on delete cascade;
+  ```
+
 ## v2.6.0 - 2025-05-14
 
 ### Fixed
