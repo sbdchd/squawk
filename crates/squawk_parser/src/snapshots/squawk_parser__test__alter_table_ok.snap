@@ -3619,4 +3619,61 @@ SOURCE_FILE
       WHITESPACE " "
       FINALIZE_KW "finalize"
   SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- references on update on delete"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE "\n  "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        CONSTRAINT_KW "constraint"
+        WHITESPACE " "
+        NAME
+          IDENT "foo_bar_id_fkey"
+        WHITESPACE " "
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "bar_id"
+          R_PAREN ")"
+        WHITESPACE "\n  "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bar"
+        WHITESPACE " "
+        L_PAREN "("
+        NAME_REF
+          IDENT "id"
+        R_PAREN ")"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        UPDATE_KW "update"
+        WHITESPACE " "
+        CASCADE_KW "cascade"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        DELETE_KW "delete"
+        WHITESPACE " "
+        CASCADE_KW "cascade"
+  SEMICOLON ";"
   WHITESPACE "\n"

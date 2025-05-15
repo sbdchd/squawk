@@ -140,6 +140,13 @@ create table t (
     on delete no action
 );
 
+-- order swapped
+create table t (
+  b int references foo
+   on delete no action
+   on update no action
+);
+
 -- primary key
 create table t (
   a int primary key with ( autovacuum_enabled ),

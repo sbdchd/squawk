@@ -3323,24 +3323,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                     p.error("expected FULL, PARTIAL, or SIMPLE");
                 }
             }
-            // [ ON DELETE referential_action ]
-            if p.at(ON_KW) && p.nth_at(1, DELETE_KW) {
-                p.expect(ON_KW);
-                p.expect(DELETE_KW);
-                referential_action(p);
-            }
-            // [ ON UPDATE referential_action ]
-            if p.at(ON_KW) && p.nth_at(1, UPDATE_KW) {
-                p.expect(ON_KW);
-                p.expect(UPDATE_KW);
-                referential_action(p);
-            }
-            // [ ON DELETE referential_action ]
-            if p.at(ON_KW) && p.nth_at(1, DELETE_KW) {
-                p.expect(ON_KW);
-                p.expect(DELETE_KW);
-                referential_action(p);
-            }
+            foreign_key_actions(p);
             REFERENCES_CONSTRAINT
         }
         _ => {
@@ -3348,6 +3331,29 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         }
     };
     Some(kind)
+}
+
+// [ ON DELETE referential_action ]
+// [ ON UPDATE referential_action ]
+fn foreign_key_actions(p: &mut Parser<'_>) {
+    // [ ON DELETE referential_action ]
+    if p.at(ON_KW) && p.nth_at(1, DELETE_KW) {
+        p.expect(ON_KW);
+        p.expect(DELETE_KW);
+        referential_action(p);
+    }
+    // [ ON UPDATE referential_action ]
+    if p.at(ON_KW) && p.nth_at(1, UPDATE_KW) {
+        p.expect(ON_KW);
+        p.expect(UPDATE_KW);
+        referential_action(p);
+    }
+    // [ ON DELETE referential_action ]
+    if p.at(ON_KW) && p.nth_at(1, DELETE_KW) {
+        p.expect(ON_KW);
+        p.expect(DELETE_KW);
+        referential_action(p);
+    }
 }
 
 const LIKE_OPTION: TokenSet = TokenSet::new(&[
@@ -3591,16 +3597,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
                     p.error("expected FULL, PARTIAL, or SIMPLE");
                 }
             }
-            // [ ON DELETE referential_action ]
-            if p.eat(ON_KW) {
-                p.expect(DELETE_KW);
-                referential_action(p);
-            }
-            // [ ON UPDATE referential_action ]
-            if p.eat(ON_KW) {
-                p.expect(UPDATE_KW);
-                referential_action(p);
-            }
+            foreign_key_actions(p);
             FOREIGN_KEY_CONSTRAINT
         }
     };
