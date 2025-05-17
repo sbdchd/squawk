@@ -58,7 +58,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
     for item in file.items() {
-        if let ast::Item::AlterTable(alter_table) = item {
+        if let ast::Stmt::AlterTable(alter_table) = item {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddColumn(add_column) = action {
                     for constraint in add_column.constraints() {

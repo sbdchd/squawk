@@ -13,7 +13,7 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
     let file = parse.tree();
     let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
     for item in file.items() {
-        if let ast::Item::AlterTable(alter_table) = item {
+        if let ast::Stmt::AlterTable(alter_table) = item {
             let Some(table_name) = alter_table
                 .path()
                 .and_then(|x| x.segment())

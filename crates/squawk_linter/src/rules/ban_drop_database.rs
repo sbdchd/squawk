@@ -9,7 +9,7 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for item in file.items() {
-        if let ast::Item::DropDatabase(drop_database) = item {
+        if let ast::Stmt::DropDatabase(drop_database) = item {
             ctx.report(Violation::new(
                 Rule::BanDropDatabase,
                 "Dropping a database may break existing clients.".into(),

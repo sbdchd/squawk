@@ -38,13 +38,13 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
     for item in file.items() {
         match item {
-            ast::Item::Begin(_) => {
+            ast::Stmt::Begin(_) => {
                 inside_transaction = true;
             }
-            ast::Item::Commit(_) => {
+            ast::Stmt::Commit(_) => {
                 inside_transaction = false;
             }
-            ast::Item::AlterTable(alter_table) => {
+            ast::Stmt::AlterTable(alter_table) => {
                 for action in alter_table.actions() {
                     let message_type = match &action {
                         ast::AlterTableAction::DropConstraint(drop_constraint) => {
@@ -122,7 +122,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     ));
                 }
             }
-            ast::Item::CreateIndex(create_index)
+            ast::Stmt::CreateIndex(create_index)
                 if create_index.if_not_exists().is_none()
                     && (create_index.concurrently_token().is_some() || !inside_transaction) =>
             {
@@ -133,7 +133,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     "Use an explicit name for a concurrently created index".to_string(),
                 ));
             }
-            ast::Item::CreateTable(create_table)
+            ast::Stmt::CreateTable(create_table)
                 if create_table.if_not_exists().is_none() && !inside_transaction =>
             {
                 ctx.report(Violation::new(
@@ -143,7 +143,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     None,
                 ));
             }
-            ast::Item::DropIndex(drop_index)
+            ast::Stmt::DropIndex(drop_index)
                 if drop_index.if_exists().is_none() && !inside_transaction =>
             {
                 ctx.report(Violation::new(
@@ -153,7 +153,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     None,
                 ));
             }
-            ast::Item::DropTable(drop_table)
+            ast::Stmt::DropTable(drop_table)
                 if drop_table.if_exists().is_none() && !inside_transaction =>
             {
                 ctx.report(Violation::new(
@@ -163,7 +163,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     None,
                 ));
             }
-            ast::Item::DropType(drop_type)
+            ast::Stmt::DropType(drop_type)
                 if drop_type.if_exists().is_none() && !inside_transaction =>
             {
                 ctx.report(Violation::new(
