@@ -1,0 +1,109 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/init_privs.sql
+---
+SOURCE_FILE
+  COMMENT "-- Test initial privileges"
+  WHITESPACE "\n\n"
+  COMMENT "-- There should always be some initial privileges, set up by initdb"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "count"
+              ARG_LIST
+                L_PAREN "("
+                STAR "*"
+                R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_init_privs"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Intentionally include some non-initial privs for pg_dump to dump out"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_proc"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    CURRENT_USER_KW "CURRENT_USER"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "prosrc"
+      R_PAREN ")"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_proc"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    CURRENT_USER_KW "CURRENT_USER"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "rolname"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "rolsuper"
+      R_PAREN ")"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_authid"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    CURRENT_USER_KW "CURRENT_USER"
+  SEMICOLON ";"
+  WHITESPACE "\n"

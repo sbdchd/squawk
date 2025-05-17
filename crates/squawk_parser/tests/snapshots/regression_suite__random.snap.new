@@ -1,0 +1,3014 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/random.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- RANDOM"
+  WHITESPACE "\n"
+  COMMENT "-- Test random() and allies"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Tests in this file may have a small probability of failure,"
+  WHITESPACE "\n"
+  COMMENT "-- since we are dealing with randomness.  Try to keep the failure"
+  WHITESPACE "\n"
+  COMMENT "-- risk for any one test case under 1e-9."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- There should be no duplicates in 1000 random() values."
+  WHITESPACE "\n"
+  COMMENT "-- (Assuming 52 random bits in the float8 results, we could"
+  WHITESPACE "\n"
+  COMMENT "-- take as many as 3000 values and still have less than 1e-9 chance"
+  WHITESPACE "\n"
+  COMMENT "-- of failure, per https://en.wikipedia.org/wiki/Birthday_problem)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "count"
+          ARG_LIST
+            L_PAREN "("
+            STAR "*"
+            R_PAREN ")"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- The range should be [0, 1).  We can expect that at least one out of 2000"
+  WHITESPACE "\n"
+  COMMENT "-- random values is in the lowest or highest 1% of the range with failure"
+  WHITESPACE "\n"
+  COMMENT "-- probability less than about 1e-9."
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+            WHITESPACE " "
+            FILTER_CLAUSE
+              FILTER_KW "FILTER"
+              WHITESPACE " "
+              L_PAREN "("
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "r"
+                  WHITESPACE " "
+                  L_ANGLE "<"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "0"
+                WHITESPACE " "
+                OR_KW "OR"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "r"
+                  WHITESPACE " "
+                  GTEQ ">="
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "out_of_range"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    L_ANGLE "<"
+                    WHITESPACE " "
+                    LITERAL
+                      FLOAT_NUMBER "0.01"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_small"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    R_ANGLE ">"
+                    WHITESPACE " "
+                    LITERAL
+                      FLOAT_NUMBER "0.99"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_large"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check for uniform distribution using the Kolmogorov-Smirnov test."
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ks_test_uniform_random"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BOOLEAN_KW "boolean"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE\n  n int := 1000;        -- Number of samples\n  c float8 := 1.94947;  -- Critical value for 99.9% confidence\n  ok boolean;\nBEGIN\n  ok := (\n    WITH samples AS (\n      SELECT random() r FROM generate_series(1, n) ORDER BY 1\n    ), indexed_samples AS (\n      SELECT (row_number() OVER())-1.0 i, r FROM samples\n    )\n    SELECT max(abs(i/n-r)) < c / sqrt(n) FROM indexed_samples\n  );\n  RETURN ok;\nEND\n$$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- As written, ks_test_uniform_random() returns true about 99.9%"
+  WHITESPACE "\n"
+  COMMENT "-- of the time.  To get down to a roughly 1e-9 test failure rate,"
+  WHITESPACE "\n"
+  COMMENT "-- just run it 3 times and accept if any one of them passes."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_uniform_random"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE "\n       "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_uniform_random"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE "\n       "
+            CALL_EXPR
+              NAME_REF
+                IDENT "ks_test_uniform_random"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "uniform"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- now test random_normal()"
+  WHITESPACE "\n\n"
+  COMMENT "-- As above, there should be no duplicates in 1000 random_normal() values."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random_normal"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "count"
+          ARG_LIST
+            L_PAREN "("
+            STAR "*"
+            R_PAREN ")"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ... unless we force the range (standard deviation) to zero."
+  WHITESPACE "\n"
+  COMMENT "-- This is a good place to check that the mean input does something, too."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random_normal"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "10"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "0"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "100"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random_normal"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "10"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "0"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "100"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check standard normal distribution using the Kolmogorov-Smirnov test."
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ks_test_normal_random"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BOOLEAN_KW "boolean"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE\n  n int := 1000;        -- Number of samples\n  c float8 := 1.94947;  -- Critical value for 99.9% confidence\n  ok boolean;\nBEGIN\n  ok := (\n    WITH samples AS (\n      SELECT random_normal() r FROM generate_series(1, n) ORDER BY 1\n    ), indexed_samples AS (\n      SELECT (row_number() OVER())-1.0 i, r FROM samples\n    )\n    SELECT max(abs((1+erf(r/sqrt(2)))/2 - i/n)) < c / sqrt(n)\n    FROM indexed_samples\n  );\n  RETURN ok;\nEND\n$$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- As above, ks_test_normal_random() returns true about 99.9%"
+  WHITESPACE "\n"
+  COMMENT "-- of the time, so try it 3 times and accept if any test passes."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_normal_random"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE "\n       "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_normal_random"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE "\n       "
+            CALL_EXPR
+              NAME_REF
+                IDENT "ks_test_normal_random"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "standard_normal"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test random(min, max)"
+  WHITESPACE "\n\n"
+  COMMENT "-- invalid range bounds"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1000000000001"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1000000000000"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  FLOAT_NUMBER "2.0"
+              COMMA ","
+              WHITESPACE " "
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  FLOAT_NUMBER "3.0"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'NaN'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        NUMERIC_KW "numeric"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'-Inf'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        NUMERIC_KW "numeric"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  STRING "'NaN'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        NUMERIC_KW "numeric"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  STRING "'Inf'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        NUMERIC_KW "numeric"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- empty range is OK"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "101"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "101"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1000000000001"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1000000000001"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                FLOAT_NUMBER "3.14"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                FLOAT_NUMBER "3.14"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- There should be no triple duplicates in 1000 full-range 32-bit random()"
+  WHITESPACE "\n"
+  COMMENT "-- values.  (Each of the C(1000, 3) choices of triplets from the 1000 values"
+  WHITESPACE "\n"
+  COMMENT "-- has a probability of 1/(2^32)^2 of being a triple duplicate, so the"
+  WHITESPACE "\n"
+  COMMENT "-- average number of triple duplicates is 1000 * 999 * 998 / 6 / 2^64, which"
+  WHITESPACE "\n"
+  COMMENT "-- is roughly 9e-12.)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "2147483648"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "2147483647"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE "\n      "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "count"
+          ARG_LIST
+            L_PAREN "("
+            STAR "*"
+            R_PAREN ")"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- There should be no duplicates in 1000 full-range 64-bit random() values."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random_normal"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "9223372036854775808"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "9223372036854775807"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE "\n      "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "count"
+          ARG_LIST
+            L_PAREN "("
+            STAR "*"
+            R_PAREN ")"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- There should be no duplicates in 1000 15-digit random() numeric values."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "r"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random_normal"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "0"
+                    COMMA ","
+                    WHITESPACE " "
+                    BIN_EXPR
+                      LITERAL
+                        INT_NUMBER "1"
+                      WHITESPACE " "
+                      MINUS "-"
+                      WHITESPACE " "
+                      LITERAL
+                        FLOAT_NUMBER "1e-15"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE "\n      "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "r"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "count"
+          ARG_LIST
+            L_PAREN "("
+            STAR "*"
+            R_PAREN ")"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Expect at least one out of 2000 random values to be in the lowest and"
+  WHITESPACE "\n"
+  COMMENT "-- highest 1% of the range."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    L_ANGLE "<"
+                    WHITESPACE " "
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "2104533975"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_small"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    R_ANGLE ">"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "2104533974"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_large"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "2147483648"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "2147483647"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+            WHITESPACE " "
+            FILTER_CLAUSE
+              FILTER_KW "FILTER"
+              WHITESPACE " "
+              L_PAREN "("
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "r"
+                  WHITESPACE " "
+                  L_ANGLE "<"
+                  WHITESPACE " "
+                  PREFIX_EXPR
+                    MINUS "-"
+                    LITERAL
+                      INT_NUMBER "1500000000"
+                WHITESPACE " "
+                OR_KW "OR"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "r"
+                  WHITESPACE " "
+                  R_ANGLE ">"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1500000000"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "out_of_range"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    L_ANGLE "<"
+                    WHITESPACE " "
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "1470000000"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_small"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    R_ANGLE ">"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1470000000"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_large"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "1500000000"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1500000000"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    L_ANGLE "<"
+                    WHITESPACE " "
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "9038904596117680292"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_small"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    R_ANGLE ">"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "9038904596117680291"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_large"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "9223372036854775808"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "9223372036854775807"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE "\n      "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+            WHITESPACE " "
+            FILTER_CLAUSE
+              FILTER_KW "FILTER"
+              WHITESPACE " "
+              L_PAREN "("
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "r"
+                  WHITESPACE " "
+                  L_ANGLE "<"
+                  WHITESPACE " "
+                  PREFIX_EXPR
+                    MINUS "-"
+                    LITERAL
+                      INT_NUMBER "1500000000000000"
+                WHITESPACE " "
+                OR_KW "OR"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "r"
+                  WHITESPACE " "
+                  R_ANGLE ">"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1500000000000000"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "out_of_range"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    L_ANGLE "<"
+                    WHITESPACE " "
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "1470000000000000"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_small"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    R_ANGLE ">"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1470000000000000"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_large"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "1500000000000000"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1500000000000000"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE "\n      "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+            WHITESPACE " "
+            FILTER_CLAUSE
+              FILTER_KW "FILTER"
+              WHITESPACE " "
+              L_PAREN "("
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "r"
+                  WHITESPACE " "
+                  L_ANGLE "<"
+                  WHITESPACE " "
+                  PREFIX_EXPR
+                    MINUS "-"
+                    LITERAL
+                      FLOAT_NUMBER "1.5"
+                WHITESPACE " "
+                OR_KW "OR"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "r"
+                  WHITESPACE " "
+                  R_ANGLE ">"
+                  WHITESPACE " "
+                  LITERAL
+                    FLOAT_NUMBER "1.5"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "out_of_range"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    L_ANGLE "<"
+                    WHITESPACE " "
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        FLOAT_NUMBER "1.47"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_small"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "count"
+                ARG_LIST
+                  L_PAREN "("
+                  STAR "*"
+                  R_PAREN ")"
+                WHITESPACE " "
+                FILTER_CLAUSE
+                  FILTER_KW "FILTER"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "r"
+                    WHITESPACE " "
+                    R_ANGLE ">"
+                    WHITESPACE " "
+                    LITERAL
+                      FLOAT_NUMBER "1.47"
+                  R_PAREN ")"
+              R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "has_large"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        FLOAT_NUMBER "1.500000000000000"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      FLOAT_NUMBER "1.500000000000000"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE "\n      "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2000"
+                R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Every possible value should occur at least once in 2500 random() values"
+  WHITESPACE "\n"
+  COMMENT "-- chosen from a range with 100 distinct values."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            DISTINCT_CLAUSE
+              DISTINCT_KW "DISTINCT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        INT_NUMBER "50"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "49"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2500"
+                R_PAREN ")"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            DISTINCT_CLAUSE
+              DISTINCT_KW "DISTINCT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "123000000000"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "123000000099"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE "\n  "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2500"
+                R_PAREN ")"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "r"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            DISTINCT_CLAUSE
+              DISTINCT_KW "DISTINCT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "random"
+                  ARG_LIST
+                    L_PAREN "("
+                    PREFIX_EXPR
+                      MINUS "-"
+                      LITERAL
+                        FLOAT_NUMBER "0.5"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      FLOAT_NUMBER "0.49"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "r"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2500"
+                R_PAREN ")"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check for uniform distribution using the Kolmogorov-Smirnov test."
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ks_test_uniform_random_int_in_range"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BOOLEAN_KW "boolean"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE\n  n int := 1000;        -- Number of samples\n  c float8 := 1.94947;  -- Critical value for 99.9% confidence\n  ok boolean;\nBEGIN\n  ok := (\n    WITH samples AS (\n      SELECT random(0, 999999) / 1000000.0 r FROM generate_series(1, n) ORDER BY 1\n    ), indexed_samples AS (\n      SELECT (row_number() OVER())-1.0 i, r FROM samples\n    )\n    SELECT max(abs(i/n-r)) < c / sqrt(n) FROM indexed_samples\n  );\n  RETURN ok;\nEND\n$$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_uniform_random_int_in_range"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE "\n       "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_uniform_random_int_in_range"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE "\n       "
+            CALL_EXPR
+              NAME_REF
+                IDENT "ks_test_uniform_random_int_in_range"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "uniform_int"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ks_test_uniform_random_bigint_in_range"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BOOLEAN_KW "boolean"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE\n  n int := 1000;        -- Number of samples\n  c float8 := 1.94947;  -- Critical value for 99.9% confidence\n  ok boolean;\nBEGIN\n  ok := (\n    WITH samples AS (\n      SELECT random(0, 999999999999) / 1000000000000.0 r FROM generate_series(1, n) ORDER BY 1\n    ), indexed_samples AS (\n      SELECT (row_number() OVER())-1.0 i, r FROM samples\n    )\n    SELECT max(abs(i/n-r)) < c / sqrt(n) FROM indexed_samples\n  );\n  RETURN ok;\nEND\n$$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_uniform_random_bigint_in_range"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE "\n       "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_uniform_random_bigint_in_range"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE "\n       "
+            CALL_EXPR
+              NAME_REF
+                IDENT "ks_test_uniform_random_bigint_in_range"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "uniform_bigint"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ks_test_uniform_random_numeric_in_range"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BOOLEAN_KW "boolean"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nDECLARE\n  n int := 1000;        -- Number of samples\n  c float8 := 1.94947;  -- Critical value for 99.9% confidence\n  ok boolean;\nBEGIN\n  ok := (\n    WITH samples AS (\n      SELECT random(0, 0.999999) r FROM generate_series(1, n) ORDER BY 1\n    ), indexed_samples AS (\n      SELECT (row_number() OVER())-1.0 i, r FROM samples\n    )\n    SELECT max(abs(i/n-r)) < c / sqrt(n) FROM indexed_samples\n  );\n  RETURN ok;\nEND\n$$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_uniform_random_numeric_in_range"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE "\n       "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "ks_test_uniform_random_numeric_in_range"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE "\n       "
+            CALL_EXPR
+              NAME_REF
+                IDENT "ks_test_uniform_random_numeric_in_range"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "uniform_numeric"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- setseed() should produce a reproducible series of random() values."
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "setseed"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                FLOAT_NUMBER "0.5"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Likewise for random_normal(); however, since its implementation relies"
+  WHITESPACE "\n"
+  COMMENT "-- on libm functions that have different roundoff behaviors on different"
+  WHITESPACE "\n"
+  COMMENT "-- machines, we have to round off the results a bit to get consistent output."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "extra_float_digits"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PREFIX_EXPR
+      MINUS "-"
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random_normal"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random_normal"
+            ARG_LIST
+              L_PAREN "("
+              NAMED_ARG
+                NAME_REF
+                  IDENT "mean"
+                WHITESPACE " "
+                FAT_ARROW "=>"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              NAMED_ARG
+                NAME_REF
+                  IDENT "stddev"
+                WHITESPACE " "
+                FAT_ARROW "=>"
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.1"
+              R_PAREN ")"
+          WHITESPACE " "
+          NAME
+            IDENT "r"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Reproducible random(min, max) values."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "6"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  INT_NUMBER "2147483648"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2147483647"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  INT_NUMBER "9223372036854775808"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "9223372036854775807"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  FLOAT_NUMBER "1e30"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                FLOAT_NUMBER "1e30"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  FLOAT_NUMBER "0.4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                FLOAT_NUMBER "0.4"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              BIN_EXPR
+                LITERAL
+                  INT_NUMBER "1"
+                WHITESPACE " "
+                MINUS "-"
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "1e-30"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "n"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "random"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "trim_scale"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "abs"
+                    ARG_LIST
+                      L_PAREN "("
+                      BIN_EXPR
+                        LITERAL
+                          INT_NUMBER "1"
+                        WHITESPACE " "
+                        MINUS "-"
+                        WHITESPACE " "
+                        BIN_EXPR
+                          LITERAL
+                            FLOAT_NUMBER "10.0"
+                          CARET "^"
+                          PAREN_EXPR
+                            L_PAREN "("
+                            PREFIX_EXPR
+                              MINUS "-"
+                              NAME_REF
+                                IDENT "n"
+                            R_PAREN ")"
+                      R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          PREFIX_EXPR
+            MINUS "-"
+            LITERAL
+              INT_NUMBER "20"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "20"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "n"
+  SEMICOLON ";"
+  WHITESPACE "\n"

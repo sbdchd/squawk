@@ -1,0 +1,3647 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/guc.sql
+---
+SOURCE_FILE
+  COMMENT "-- pg_regress should ensure that this default value applies; however"
+  WHITESPACE "\n"
+  COMMENT "-- we can't rely on any specific default value of vacuum_cost_delay"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check output style of CamelCase enum options"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "intervalstyle"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      STRING "'asd'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SET to some nondefault value"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "40"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'ISO, YMD'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SET LOCAL has no effect outside of a transaction"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "50"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'SQL'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SET LOCAL within a transaction that commits"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "50"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'SQL'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SET should be reverted after ROLLBACK"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "60"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'German'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Some tests with subtransactions"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "70"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'MDY'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "first_sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      FLOAT_NUMBER "80.1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'German, DMY'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "first_sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "second_sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      STRING "'900us'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'SQL, YMD'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "third_sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "100"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'Postgres, MDY'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "third_sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "second_sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SET LOCAL with Savepoints"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "30"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'Postgres, MDY'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SET LOCAL persists through RELEASE (which was not true in 8.0-8.2)"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "30"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'Postgres, MDY'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RELEASE_SAVEPOINT_STMT
+    RELEASE_KW "RELEASE"
+    WHITESPACE " "
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "sp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SET followed by SET LOCAL"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "40"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "50"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'ISO, DMY'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'Postgres, MDY'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test RESET.  We use datestyle because the reset value is forced by"
+  WHITESPACE "\n"
+  COMMENT "-- pg_regress, so it doesn't depend on the installation's configuration."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    IDENT "iso"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "ymd"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datestyle"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'2006-08-13 12:34:56'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timestamptz"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test some simple error cases"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "seq_page_cost"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      STRING "'NaN'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      STRING "'10s'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_variable"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "42"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test \"custom\" GUCs created on the fly (which aren't really an"
+  WHITESPACE "\n"
+  COMMENT "-- intended feature, but many people use them)."
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "my_guc"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- error, not known yet"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "my_guc"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    INT_NUMBER "42"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "my_guc"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "my_guc"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- this makes it go to empty, not become unknown again"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "my_guc"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "my"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "qualified"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "guc"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    STRING "'foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "my"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "qualified"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "guc"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "\"bad-guc\""
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    INT_NUMBER "42"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- disallowed because -c cannot set this name"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "custom"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "\"bad-guc\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "special"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "\"weird name\""
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    STRING "'foo'"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- could be allowed, but we choose not to"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "special"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "\"weird name\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check what happens when you try to set a \"custom\" GUC within the"
+  WHITESPACE "\n"
+  COMMENT "-- namespace of an extension."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "plpgsql"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "extra_foo_warnings"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- allowed if plpgsql is not loaded yet"
+  WHITESPACE "\n"
+  LOAD_STMT
+    LOAD_KW "LOAD"
+    WHITESPACE " "
+    LITERAL
+      STRING "'plpgsql'"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- this will throw a warning and delete the variable"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "plpgsql"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "extra_foo_warnings"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- now, it's an error"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "plpgsql"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "extra_foo_warnings"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "--"
+    WHITESPACE "\n"
+    COMMENT "-- Test DISCARD TEMP"
+    WHITESPACE "\n"
+    COMMENT "--"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "reset_test"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          DATA_KW "data"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE " "
+      R_PAREN ")"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    COMMIT_KW "COMMIT"
+    WHITESPACE " "
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    ROWS_KW "ROWS"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'reset_test'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DISCARD_STMT
+    DISCARD_KW "DISCARD"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'reset_test'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test DISCARD ALL"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- do changes"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    HOLD_KW "HOLD"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "PREPARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LISTEN_STMT
+    LISTEN_KW "LISTEN"
+    WHITESPACE " "
+    NAME
+      IDENT "foo_event"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "13"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tmp_foo"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          DATA_KW "data"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    COMMIT_KW "COMMIT"
+    WHITESPACE " "
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    ROWS_KW "ROWS"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_guc_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_guc_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- look changes"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_listening_channels"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_prepared_statements"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'tmp_foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              CURRENT_USER_KW "current_user"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'regress_guc_user'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- discard everything"
+  WHITESPACE "\n"
+  DISCARD_STMT
+    DISCARD_KW "DISCARD"
+    WHITESPACE " "
+    ALL_KW "ALL"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- look again"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_listening_channels"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_prepared_statements"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_cost_delay"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'tmp_foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              CURRENT_USER_KW "current_user"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'regress_guc_user'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_guc_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- search_path should react to changes in pg_namespace"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    IDENT "foo"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "public"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "not_there_initially"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_schemas"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                FALSE_KW "false"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "not_there_initially"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_schemas"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                FALSE_KW "false"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAME
+      IDENT "not_there_initially"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_schemas"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                FALSE_KW "false"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Tests for function-local GUC settings"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'3MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "report_guc"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select current_setting($1) $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "work_mem"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "report_guc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "report_guc"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "work_mem"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'2MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "report_guc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "report_guc"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      RESET_FUNC_OPTION
+        RESET_KW "reset"
+        WHITESPACE " "
+        ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "report_guc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SET LOCAL is restricted by a function SET option"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "myfunc"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nbegin\n  set local work_mem = '2MB';\n  return current_setting('work_mem');\nend $$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "work_mem"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "myfunc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_FUNCTION_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "myfunc"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      RESET_FUNC_OPTION
+        RESET_KW "reset"
+        WHITESPACE " "
+        ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "myfunc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'3MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- but SET isn't"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "myfunc"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nbegin\n  set work_mem = '2MB';\n  return current_setting('work_mem');\nend $$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "work_mem"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "myfunc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'3MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- it should roll back on error, though"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "myfunc"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nbegin\n  set work_mem = '2MB';\n  perform 1/$1;\n  return current_setting('work_mem');\nend $$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "work_mem"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "myfunc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "myfunc"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'work_mem'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check current_setting()'s behavior with invalid setting name"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'nosuch.setting'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- FAIL"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'nosuch.setting'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                FALSE_KW "false"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- FAIL"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "current_setting"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'nosuch.setting'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  TRUE_KW "true"
+                R_PAREN ")"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- after this, all three cases should yield 'nada'"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "nosuch"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "setting"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    STRING "'nada'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'nosuch.setting'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'nosuch.setting'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                FALSE_KW "false"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'nosuch.setting'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                TRUE_KW "true"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Normally, CREATE FUNCTION should complain about invalid values in"
+  WHITESPACE "\n"
+  COMMENT "-- function SET options; but not if check_function_bodies is off,"
+  WHITESPACE "\n"
+  COMMENT "-- because that creates ordering hazards for pg_dump"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "func_with_bad_set"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select 1 $$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "default_text_search_config"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        IDENT "no_such_config"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "check_function_bodies"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "func_with_bad_set"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select 1 $$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n"
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "default_text_search_config"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        IDENT "no_such_config"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "func_with_bad_set"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "check_function_bodies"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_with_oids"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Should not allow to set it to true."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_with_oids"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test that disabling track_activities disables query ID reporting in"
+  WHITESPACE "\n"
+  COMMENT "-- pg_stat_activity."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "compute_query_id"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "track_activities"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "query_id"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "qid_set"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_activity"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "pid"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "pg_backend_pid"
+          ARG_LIST
+            L_PAREN "("
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "track_activities"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "query_id"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "qid_set"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_activity"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "pid"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "pg_backend_pid"
+          ARG_LIST
+            L_PAREN "("
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "track_activities"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "compute_query_id"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test GUC categories and flag patterns"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_settings_get_flags"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_settings_get_flags"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'does_not_exist'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tab_settings_flags"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              NAME_KW "name"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "category"
+          COMMA ","
+          WHITESPACE "\n    "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'EXPLAIN'"
+              WHITESPACE "          "
+              EQ "="
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  ANY_KW "ANY"
+                L_PAREN "("
+                NAME_REF
+                  IDENT "flags"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              EXPLAIN_KW "explain"
+          COMMA ","
+          WHITESPACE "\n    "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'NO_RESET'"
+              WHITESPACE "         "
+              EQ "="
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  ANY_KW "ANY"
+                L_PAREN "("
+                NAME_REF
+                  IDENT "flags"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "no_reset"
+          COMMA ","
+          WHITESPACE "\n    "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'NO_RESET_ALL'"
+              WHITESPACE "     "
+              EQ "="
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  ANY_KW "ANY"
+                L_PAREN "("
+                NAME_REF
+                  IDENT "flags"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "no_reset_all"
+          COMMA ","
+          WHITESPACE "\n    "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'NOT_IN_SAMPLE'"
+              WHITESPACE "    "
+              EQ "="
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  ANY_KW "ANY"
+                L_PAREN "("
+                NAME_REF
+                  IDENT "flags"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "not_in_sample"
+          COMMA ","
+          WHITESPACE "\n    "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'RUNTIME_COMPUTED'"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  ANY_KW "ANY"
+                L_PAREN "("
+                NAME_REF
+                  IDENT "flags"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "runtime_computed"
+      WHITESPACE "\n  "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "pg_show_all_settings"
+          ARG_LIST
+            L_PAREN "("
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "psas"
+        COMMA ","
+        WHITESPACE "\n    "
+        CALL_EXPR
+          NAME_REF
+            IDENT "pg_settings_get_flags"
+          ARG_LIST
+            L_PAREN "("
+            FIELD_EXPR
+              NAME_REF
+                IDENT "psas"
+              DOT "."
+              NAME_REF
+                NAME_KW "name"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "flags"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Developer GUCs should be flagged with GUC_NOT_IN_SAMPLE:"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tab_settings_flags"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "category"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'Developer Options'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        PREFIX_EXPR
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "not_in_sample"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Most query-tuning GUCs are flagged as valid for EXPLAIN."
+  WHITESPACE "\n"
+  COMMENT "-- default_statistics_target is an exception."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tab_settings_flags"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "category"
+          WHITESPACE " "
+          CUSTOM_OP
+            TILDE "~"
+          WHITESPACE " "
+          LITERAL
+            STRING "'^Query Tuning'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        PREFIX_EXPR
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NAME_REF
+            EXPLAIN_KW "explain"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Runtime-computed GUCs should be part of the preset category."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tab_settings_flags"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        PREFIX_EXPR
+          NOT_KW "NOT"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "category"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'Preset Options'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "runtime_computed"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Preset GUCs are flagged as NOT_IN_SAMPLE."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tab_settings_flags"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "category"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'Preset Options'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        PREFIX_EXPR
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "not_in_sample"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- NO_RESET implies NO_RESET_ALL."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tab_settings_flags"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "no_reset"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        PREFIX_EXPR
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "no_reset_all"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tab_settings_flags"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@4100: expected SEMICOLON
+ERROR@4100: expected command, found DOT
+ERROR@4101: expected command, found IDENT
+ERROR@4144: expected EQ
+ERROR@4144: expected config value, got DOT
+ERROR@4144: expected SEMICOLON
+ERROR@4144: expected command, found DOT
+ERROR@4145: expected command, found IDENT
+ERROR@4152: expected command, found EQ
+ERROR@4154: expected command, found INT_NUMBER
+ERROR@4169: expected SEMICOLON
+ERROR@4169: expected command, found DOT
+ERROR@4170: expected command, found IDENT
+ERROR@4190: expected SEMICOLON
+ERROR@4190: expected command, found DOT
+ERROR@4191: expected command, found IDENT
+ERROR@4266: expected SEMICOLON
+ERROR@4266: expected command, found DOT
+ERROR@4267: expected command, found IDENT
+ERROR@4285: expected EQ
+ERROR@4285: expected config value, got DOT
+ERROR@4285: expected SEMICOLON
+ERROR@4285: expected command, found DOT
+ERROR@4286: expected command, found IDENT
+ERROR@4288: expected command, found DOT
+ERROR@4289: expected command, found IDENT
+ERROR@4298: expected command, found DOT
+ERROR@4299: expected command, found IDENT
+ERROR@4303: expected command, found EQ
+ERROR@4305: expected command, found STRING
+ERROR@4323: expected SEMICOLON
+ERROR@4323: expected command, found DOT
+ERROR@4324: expected command, found IDENT
+ERROR@4326: expected command, found DOT
+ERROR@4327: expected command, found IDENT
+ERROR@4336: expected command, found DOT
+ERROR@4337: expected command, found IDENT
+ERROR@4352: expected EQ
+ERROR@4352: expected config value, got DOT
+ERROR@4352: expected SEMICOLON
+ERROR@4352: expected command, found DOT
+ERROR@4353: expected command, found IDENT
+ERROR@4363: expected command, found EQ
+ERROR@4365: expected command, found INT_NUMBER
+ERROR@4427: expected SEMICOLON
+ERROR@4427: expected command, found DOT
+ERROR@4428: expected command, found IDENT
+ERROR@4450: expected EQ
+ERROR@4450: expected config value, got DOT
+ERROR@4450: expected SEMICOLON
+ERROR@4450: expected command, found DOT
+ERROR@4451: expected command, found IDENT
+ERROR@4464: expected command, found EQ
+ERROR@4466: expected command, found STRING
+ERROR@4528: expected SEMICOLON
+ERROR@4528: expected command, found DOT
+ERROR@4529: expected command, found IDENT
+ERROR@4653: expected EQ
+ERROR@4653: expected config value, got DOT
+ERROR@4653: expected SEMICOLON
+ERROR@4653: expected command, found DOT
+ERROR@4654: expected command, found IDENT
+ERROR@4673: expected command, found EQ
+ERROR@4675: expected command, found TRUE_KW
+ERROR@4803: expected EQ
+ERROR@4803: expected config value, got DOT
+ERROR@4803: expected SEMICOLON
+ERROR@4803: expected command, found DOT
+ERROR@4804: expected command, found IDENT
+ERROR@4823: expected command, found EQ
+ERROR@4825: expected command, found TRUE_KW
+ERROR@4866: expected SEMICOLON
+ERROR@4866: expected command, found DOT
+ERROR@4867: expected command, found IDENT
+ERROR@7985: expected EQ
+ERROR@7985: expected config value, got DOT
+ERROR@7985: expected SEMICOLON
+ERROR@7985: expected command, found DOT
+ERROR@7986: expected command, found IDENT
+ERROR@7994: expected command, found EQ
+ERROR@7996: expected command, found STRING
+ERROR@8895: expected config value, got ON_KW
+ERROR@8895: expected SEMICOLON
+ERROR@8896: expected command, found ON_KW
+ERROR@8922: expected config value, got ON_KW
+ERROR@8922: expected SEMICOLON
+ERROR@8923: expected command, found ON_KW

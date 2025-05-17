@@ -1,0 +1,5682 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/collate.sql
+---
+SOURCE_FILE
+  COMMENT "/*\n * This test is intended to pass on all platforms supported by Postgres.\n * We can therefore only assume that the default, C, and POSIX collations\n * are available --- and since the regression tests are often run in a\n * C-locale database, these may well all have the same behavior.  But\n * fortunately, the system doesn't know that and will treat them as\n * incompatible collations.  It is therefore at least possible to test\n * parser behaviors such as collation conflict resolution.  This test will,\n * however, be more revealing when run in a database with non-C locale,\n * since any departure from C sorting behavior will show as a failure.\n */"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "collate_tests"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    IDENT "collate_tests"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test1"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NULL_KW "NULL"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test_fail"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test_like"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      LIKE_CLAUSE
+        LIKE_KW "LIKE"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "collate_test1"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test2"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"POSIX\""
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'abc'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'Abc'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'bbc'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'ABD'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test2"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"C\""
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        LITERAL
+          STRING "'abc'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        BIN_EXPR
+          LITERAL
+            STRING "'abc'"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"C\""
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        BIN_EXPR
+          LITERAL
+            STRING "'abc'"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"C\""
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        BIN_EXPR
+          LITERAL
+            STRING "'bbc'"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"POSIX\""
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n\n"
+  CREATE_DOMAIN_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    DOMAIN_KW "DOMAIN"
+    WHITESPACE " "
+    NAME
+      IDENT "testdomain_p"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    WHITESPACE " "
+    COLLATE
+      COLLATE_KW "COLLATE"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_DOMAIN_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    DOMAIN_KW "DOMAIN"
+    WHITESPACE " "
+    NAME
+      IDENT "testdomain_i"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    WHITESPACE " "
+    COLLATE
+      COLLATE_KW "COLLATE"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+  SEMICOLON ";"
+  WHITESPACE " "
+  CREATE_TABLE
+    COMMENT "-- fail"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test4"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "testdomain_p"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test4"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test4"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test5"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "testdomain_p"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test5"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test5"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- star expansion"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- constant expression folding"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              LITERAL
+                STRING "'bbc'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'Abc'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              LITERAL
+                STRING "'bbc'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"POSIX\""
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'Abc'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"POSIX\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- upper/lower"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test10"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "y"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"POSIX\""
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test10"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'hij'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'hij'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'HIJ'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'HIJ'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "x"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "y"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "upper"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "x"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "upper"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "y"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "initcap"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "x"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "initcap"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "y"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "x"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "\"C\""
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "y"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "\"C\""
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "x"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "y"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "lower"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "y"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- backwards parsing"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collview1"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            COLLATE_KW "COLLATE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+          WHITESPACE " "
+          GTEQ ">="
+          WHITESPACE " "
+          LITERAL
+            STRING "'bbc'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collview2"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collview3"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "lower"
+              ARG_LIST
+                L_PAREN "("
+                BIN_EXPR
+                  PAREN_EXPR
+                    L_PAREN "("
+                    BIN_EXPR
+                      NAME_REF
+                        IDENT "x"
+                      WHITESPACE " "
+                      CUSTOM_OP
+                        PIPE "|"
+                        PIPE "|"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "x"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  COLLATE_KW "COLLATE"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "\"POSIX\""
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "table_name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "view_definition"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "information_schema"
+        DOT "."
+        NAME_REF
+          VIEWS_KW "views"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "table_name"
+        WHITESPACE " "
+        LIKE_KW "LIKE"
+        WHITESPACE " "
+        LITERAL
+          STRING "'collview%'"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- collation propagation in various expression types"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              COALESCE_KW "coalesce"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'foo'"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              COALESCE_KW "coalesce"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'foo'"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  COALESCE_KW "coalesce"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "x"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'foo'"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  COALESCE_KW "coalesce"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "y"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'foo'"
+                  R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              GREATEST_KW "greatest"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'CCC'"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              GREATEST_KW "greatest"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'CCC'"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "x"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "y"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  GREATEST_KW "greatest"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "x"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'foo'"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  GREATEST_KW "greatest"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "y"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'foo'"
+                  R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NULLIF_KW "nullif"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'abc'"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NULLIF_KW "nullif"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'abc'"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  NULLIF_KW "nullif"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "x"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'foo'"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  NULLIF_KW "nullif"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "y"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'foo'"
+                  R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CASE_EXPR
+            CASE_KW "CASE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            WHEN_CLAUSE
+              WHEN_KW "WHEN"
+              WHITESPACE " "
+              LITERAL
+                STRING "'abc'"
+              WHITESPACE " "
+              THEN_KW "THEN"
+              WHITESPACE " "
+              LITERAL
+                STRING "'abcd'"
+            WHITESPACE " "
+            ELSE_KW "ELSE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            END_KW "END"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CASE_EXPR
+            CASE_KW "CASE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            WHEN_CLAUSE
+              WHEN_KW "WHEN"
+              WHITESPACE " "
+              LITERAL
+                STRING "'abc'"
+              WHITESPACE " "
+              THEN_KW "THEN"
+              WHITESPACE " "
+              LITERAL
+                STRING "'abcd'"
+            WHITESPACE " "
+            ELSE_KW "ELSE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            END_KW "END"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_DOMAIN_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    DOMAIN_KW "DOMAIN"
+    WHITESPACE " "
+    NAME
+      IDENT "testdomain"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "b"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "testdomain"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "b"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "testdomain"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "b"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "testdomain_p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "x"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "testdomain"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "y"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "testdomain"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              ORDER_BY_CLAUSE
+                ORDER_KW "ORDER"
+                WHITESPACE " "
+                BY_KW "BY"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              ORDER_BY_CLAUSE
+                ORDER_KW "ORDER"
+                WHITESPACE " "
+                BY_KW "BY"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- In aggregates, ORDER BY expressions don't affect aggregate's collation"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "string_agg"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "x"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "\"C\""
+              COMMA ","
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "y"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "\"POSIX\""
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "x"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "\"C\""
+                WHITESPACE " "
+                ORDER_BY_CLAUSE
+                  ORDER_KW "ORDER"
+                  WHITESPACE " "
+                  BY_KW "BY"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "y"
+                    WHITESPACE " "
+                    COLLATE_KW "COLLATE"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"POSIX\""
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              ORDER_BY_CLAUSE
+                ORDER_KW "ORDER"
+                WHITESPACE " "
+                BY_KW "BY"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "x"
+                  WHITESPACE " "
+                  COLLATE_KW "COLLATE"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "\"C\""
+                COMMA ","
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "y"
+                  WHITESPACE " "
+                  COLLATE_KW "COLLATE"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "\"POSIX\""
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              ORDER_BY_CLAUSE
+                ORDER_KW "ORDER"
+                WHITESPACE " "
+                BY_KW "BY"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "x"
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  NAME_REF
+                    IDENT "y"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail"
+  WHITESPACE "\n\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          L_ANGLE "<"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "4"
+    WHITESPACE " "
+    INTERSECT_KW "INTERSECT"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+    WHITESPACE " "
+    EXCEPT_KW "EXCEPT"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          L_ANGLE "<"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- ok"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- ok"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    INTERSECT_KW "INTERSECT"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    EXCEPT_KW "EXCEPT"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "collate_test2"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_u"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    COMPOUND_SELECT
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              NAME_REF
+                IDENT "b"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "collate_test1"
+      WHITESPACE " "
+      UNION_KW "UNION"
+      WHITESPACE " "
+      ALL_KW "ALL"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              NAME_REF
+                IDENT "b"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "collate_test2"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n\n"
+  COMMENT "-- ideally this would be a parse-time error, but for now it must be run-time:"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "x"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "y"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "x"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "y"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- ok, because || is not collation aware"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "x"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "y"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        CUSTOM_OP
+          PIPE "|"
+          PIPE "|"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "y"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- not so ok"
+  WHITESPACE "\n\n"
+  COMMENT "-- collation mismatch between recursive and non-recursive term"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      RECURSIVE_KW "RECURSIVE"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "foo"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "x"
+          R_PAREN ")"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE "\n   "
+        L_PAREN "("
+        COMPOUND_SELECT
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "x"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              PAREN_EXPR
+                L_PAREN "("
+                SELECT
+                  VALUES_KW "VALUES"
+                  L_PAREN "("
+                  BIN_EXPR
+                    LITERAL
+                      STRING "'a'"
+                    WHITESPACE " "
+                    COLLATE_KW "COLLATE"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"C\""
+                  R_PAREN ")"
+                  COMMA ","
+                  L_PAREN "("
+                  LITERAL
+                    STRING "'b'"
+                  R_PAREN ")"
+                R_PAREN ")"
+              WHITESPACE " "
+              ALIAS
+                NAME
+                  IDENT "t"
+                COLUMN_LIST
+                  L_PAREN "("
+                  COLUMN
+                    NAME
+                      IDENT "x"
+                  R_PAREN ")"
+          WHITESPACE "\n   "
+          UNION_KW "UNION"
+          WHITESPACE " "
+          ALL_KW "ALL"
+          WHITESPACE "\n   "
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  BIN_EXPR
+                    PAREN_EXPR
+                      L_PAREN "("
+                      BIN_EXPR
+                        NAME_REF
+                          IDENT "x"
+                        WHITESPACE " "
+                        CUSTOM_OP
+                          PIPE "|"
+                          PIPE "|"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'c'"
+                      R_PAREN ")"
+                    WHITESPACE " "
+                    COLLATE_KW "COLLATE"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"POSIX\""
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "foo"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "length"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "x"
+                    R_PAREN ")"
+                WHITESPACE " "
+                L_ANGLE "<"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "10"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "lt"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'a'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'B'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'A'"
+          COMMA ","
+          WHITESPACE " "
+          BIN_EXPR
+            LITERAL
+              STRING "'b'"
+            WHITESPACE " "
+            COLLATE_KW "COLLATE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "v"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "a"
+          COMMA ","
+          COLUMN
+            NAME
+              IDENT "b"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- collation mismatch in subselects"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        TUPLE_EXPR
+          L_PAREN "("
+          NAME_REF
+            IDENT "x"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            IDENT "y"
+          R_PAREN ")"
+        WHITESPACE " "
+        NOT_IN
+          NOT_KW "NOT"
+          WHITESPACE " "
+          IN_KW "IN"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "y"
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  NAME_REF
+                    IDENT "x"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "collate_test10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- now it works with overrides"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        TUPLE_EXPR
+          L_PAREN "("
+          BIN_EXPR
+            NAME_REF
+              IDENT "x"
+            WHITESPACE " "
+            COLLATE_KW "COLLATE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"POSIX\""
+          COMMA ","
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "y"
+            WHITESPACE " "
+            COLLATE_KW "COLLATE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+          R_PAREN ")"
+        WHITESPACE " "
+        NOT_IN
+          NOT_KW "NOT"
+          WHITESPACE " "
+          IN_KW "IN"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "y"
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  NAME_REF
+                    IDENT "x"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "collate_test10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        TUPLE_EXPR
+          L_PAREN "("
+          NAME_REF
+            IDENT "x"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            IDENT "y"
+          R_PAREN ")"
+        WHITESPACE " "
+        NOT_IN
+          NOT_KW "NOT"
+          WHITESPACE " "
+          IN_KW "IN"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "y"
+                    WHITESPACE " "
+                    COLLATE_KW "COLLATE"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"C\""
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "x"
+                    WHITESPACE " "
+                    COLLATE_KW "COLLATE"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "\"POSIX\""
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "collate_test10"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- casting"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              CAST_KW "CAST"
+              L_PAREN "("
+              LITERAL
+                STRING "'42'"
+              WHITESPACE " "
+              AS_KW "AS"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            WHITESPACE " "
+            COLLATE_KW "COLLATE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            CAST_KW "CAST"
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            CHAR_TYPE
+              VARCHAR_KW "varchar"
+            R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            CAST_KW "CAST"
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            CHAR_TYPE
+              VARCHAR_KW "varchar"
+            R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- result of a SQL function"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vc"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE "\n    "
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select $1::varchar'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "vc"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "b"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- polymorphism"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "unnest"
+        ARG_LIST
+          L_PAREN "("
+          PAREN_EXPR
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "SELECT"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    CALL_EXPR
+                      NAME_REF
+                        IDENT "array_agg"
+                      ARG_LIST
+                        L_PAREN "("
+                        NAME_REF
+                          IDENT "b"
+                        WHITESPACE " "
+                        ORDER_BY_CLAUSE
+                          ORDER_KW "ORDER"
+                          WHITESPACE " "
+                          BY_KW "BY"
+                          WHITESPACE " "
+                          NAME_REF
+                            IDENT "b"
+                        R_PAREN ")"
+              WHITESPACE " "
+              FROM_CLAUSE
+                FROM_KW "FROM"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "collate_test1"
+            R_PAREN ")"
+          R_PAREN ")"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "unnest"
+        ARG_LIST
+          L_PAREN "("
+          PAREN_EXPR
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "SELECT"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    CALL_EXPR
+                      NAME_REF
+                        IDENT "array_agg"
+                      ARG_LIST
+                        L_PAREN "("
+                        NAME_REF
+                          IDENT "b"
+                        WHITESPACE " "
+                        ORDER_BY_CLAUSE
+                          ORDER_KW "ORDER"
+                          WHITESPACE " "
+                          BY_KW "BY"
+                          WHITESPACE " "
+                          NAME_REF
+                            IDENT "b"
+                        R_PAREN ")"
+              WHITESPACE " "
+              FROM_CLAUSE
+                FROM_KW "FROM"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "collate_test2"
+            R_PAREN ")"
+          R_PAREN ")"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "dup"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "anyelement"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "anyelement"
+    WHITESPACE "\n    "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select $1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "dup"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "dup"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- indexes"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "collate_test1_idx1"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "collate_test1_idx2"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"POSIX\""
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "collate_test1_idx3"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"POSIX\""
+        R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- this is different grammatically"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "collate_test1_idx4"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        BIN_EXPR
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "b"
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              LITERAL
+                STRING "'foo'"
+            R_PAREN ")"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"POSIX\""
+        R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "collate_test1_idx5"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"POSIX\""
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "collate_test1_idx6"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test1"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        BIN_EXPR
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"POSIX\""
+        R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_get_indexdef"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "oid"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        LIKE_KW "LIKE"
+        WHITESPACE " "
+        LITERAL
+          STRING "'collate_test%_idx%'"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- foreign keys"
+  WHITESPACE "\n\n"
+  COMMENT "-- force indexes and mergejoins to be used for FK checking queries,"
+  WHITESPACE "\n"
+  COMMENT "-- else they might not exercise collation-dependent operators"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashjoin"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_nestloop"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test20"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test20"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'foo'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'bar'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test21"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"POSIX\""
+        WHITESPACE " "
+        REFERENCES_CONSTRAINT
+          REFERENCES_KW "REFERENCES"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "collate_test20"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test21"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'foo'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'bar'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test21"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'baz'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  CREATE_TABLE
+    COMMENT "-- fail"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test22"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"POSIX\""
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test22"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'foo'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'bar'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'baz'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test22"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "ADD"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "FOREIGN"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "f2"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "REFERENCES"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "collate_test20"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test22"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f2"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'baz'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "collate_test22"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "ADD"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "FOREIGN"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "f2"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "REFERENCES"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "collate_test20"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashjoin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_nestloop"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- EXPLAIN"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "x"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "y"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test10"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "x"
+      WHITESPACE " "
+      DESC_KW "DESC"
+      COMMA ","
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "y"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"C\""
+      WHITESPACE " "
+      ASC_KW "ASC"
+      WHITESPACE " "
+      NULLS_KW "NULLS"
+      WHITESPACE " "
+      FIRST_KW "FIRST"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- CREATE/DROP COLLATION"
+  WHITESPACE "\n\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "builtin_c"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    NAME
+      IDENT "PROVIDER"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"C\""
+    WHITESPACE " "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "collate_test1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "builtin_c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "builtin2"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    NAME
+      IDENT "PROVIDER"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    WHITESPACE " "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fails"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "builtin2"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    NAME
+      IDENT "PROVIDER"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"en_US\""
+    WHITESPACE " "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fails"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "builtin2"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    NAME
+      IDENT "PROVIDER"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_CTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"C\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_COLLATE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"C\""
+    WHITESPACE " "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fails"
+  WHITESPACE "\n\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "mycoll1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "mycoll2"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE " "
+    NAME
+      IDENT "LC_COLLATE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_CTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    WHITESPACE " "
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "mycoll3"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"default\""
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- intentionally unsupported"
+  WHITESPACE "\n\n"
+  DROP_COLLATION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "mycoll1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_test23"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "mycoll2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_COLLATION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "mycoll2"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail"
+  WHITESPACE "\n\n"
+  COMMENT "-- invalid: non-lowercase quoted identifiers"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "case_coll"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "\"Lc_Collate\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "\"Lc_Ctype\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- 9.1 bug with useless COLLATE in an expression subject to length coercion"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vctable"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "25"
+            R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vctable"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      BIN_EXPR
+        LITERAL
+          STRING "'foo'"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"C\""
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              COLLATION_KW "collation"
+              WHITESPACE " "
+              FOR_KW "for"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foo'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- unknown type - null"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              COLLATION_KW "collation"
+              WHITESPACE " "
+              FOR_KW "for"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'foo'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              COLLATION_KW "collation"
+              WHITESPACE " "
+              FOR_KW "for"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              PAREN_EXPR
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "SELECT"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        NAME_REF
+                          IDENT "a"
+                  WHITESPACE " "
+                  FROM_CLAUSE
+                    FROM_KW "FROM"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "collate_test1"
+                  WHITESPACE " "
+                  LIMIT_CLAUSE
+                    LIMIT_KW "LIMIT"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1"
+                R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- non-collatable type - error"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              COLLATION_KW "collation"
+              WHITESPACE " "
+              FOR_KW "for"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              PAREN_EXPR
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "SELECT"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        NAME_REF
+                          IDENT "b"
+                  WHITESPACE " "
+                  FROM_CLAUSE
+                    FROM_KW "FROM"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "collate_test1"
+                  WHITESPACE " "
+                  LIMIT_CLAUSE
+                    LIMIT_KW "LIMIT"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1"
+                R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- old bug with not dropping COLLATE when coercing to non-collatable type"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "collate_on_int"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            BIN_EXPR
+              NAME_REF
+                IDENT "c1"
+              PLUS "+"
+              LITERAL
+                INT_NUMBER "1"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "c1p"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE "\n  "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  CAST_EXPR
+                    PAREN_EXPR
+                      L_PAREN "("
+                      BIN_EXPR
+                        LITERAL
+                          STRING "'4'"
+                        WHITESPACE " "
+                        COLLATE_KW "COLLATE"
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "\"C\""
+                      R_PAREN ")"
+                    COLON2 "::"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            INT_KW "INT"
+                  WHITESPACE " "
+                  AS_KW "AS"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "c1"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check conflicting or redundant options in CREATE COLLATION"
+  WHITESPACE "\n"
+  COMMENT "-- LC_COLLATE"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "LC_COLLATE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_COLLATE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"NONSENSE\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_CTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- LC_CTYPE"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "LC_CTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_CTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"NONSENSE\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_COLLATE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- PROVIDER"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "PROVIDER"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "icu"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "PROVIDER"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "NONSENSE"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_COLLATE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_CTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- LOCALE"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "case_sensitive"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"NONSENSE\""
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- DETERMINISTIC"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "DETERMINISTIC"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "DETERMINISTIC"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "NONSENSE"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- VERSION"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      VERSION_KW "VERSION"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'1'"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      VERSION_KW "VERSION"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"NONSENSE\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- LOCALE conflicts with LC_COLLATE and LC_CTYPE"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "LC_COLLATE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LC_CTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- LOCALE conflicts with LC_COLLATE"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "LC_COLLATE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- LOCALE conflicts with LC_CTYPE"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "LC_CTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"POSIX\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LOCALE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- FROM conflicts with any other option"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "coll_dup_chk"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      FROM_KW "FROM"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"C\""
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      VERSION_KW "VERSION"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"1\""
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Clean up.  Many of these table names will be re-used if the user is"
+  WHITESPACE "\n"
+  COMMENT "-- trying to run any platform-specific collation tests later, so we"
+  WHITESPACE "\n"
+  COMMENT "-- must get rid of them."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "collate_tests"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@6741: expected R_PAREN
+ERROR@6753: expected SEMICOLON
+ERROR@6753: expected command, found R_PAREN
+ERROR@8945: expected R_PAREN
+ERROR@8946: expected command, found OFF_KW
+ERROR@8949: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@8949: expected SEMICOLON
+ERROR@8949: expected command, found R_PAREN
+ERROR@9011: expected R_PAREN
+ERROR@9012: expected command, found OFF_KW
+ERROR@9015: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@9015: expected SEMICOLON
+ERROR@9015: expected command, found R_PAREN

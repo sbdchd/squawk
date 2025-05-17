@@ -1,0 +1,794 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/create_schema.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- CREATE_SCHEMA"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Schema creation with elements."
+  WHITESPACE "\n\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_create_schema_role"
+    WHITESPACE " "
+    IDENT "SUPERUSER"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Cases where schema creation fails as objects are qualified with a schema"
+  WHITESPACE "\n"
+  COMMENT "-- that does not match with what's expected."
+  WHITESPACE "\n"
+  COMMENT "-- This checks all the object types that include schema qualifications."
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_create_schema_role"
+    WHITESPACE "\n  "
+    CREATE_SEQUENCE_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      SEQUENCE_KW "SEQUENCE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "seq"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_create_schema_role"
+    WHITESPACE "\n  "
+    CREATE_TABLE
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "tab"
+      WHITESPACE " "
+      TABLE_ARGS
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "id"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_create_schema_role"
+    WHITESPACE "\n  "
+    CREATE_VIEW_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      VIEW_KW "VIEW"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            VIEW_KW "view"
+      WHITESPACE " "
+      AS_KW "AS"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_create_schema_role"
+  WHITESPACE "\n  "
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "schema_not_existing"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tab"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "id"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_create_schema_role"
+    WHITESPACE "\n  "
+    CREATE_TRIGGER_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TRIGGER_KW "TRIGGER"
+      WHITESPACE " "
+      NAME
+        IDENT "schema_trig"
+      WHITESPACE " "
+      BEFORE_KW "BEFORE"
+      WHITESPACE " "
+      INSERT_KW "INSERT"
+      WHITESPACE " "
+      ON_KW "ON"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "tab"
+      WHITESPACE "\n  "
+      EXECUTE_KW "EXECUTE"
+      WHITESPACE " "
+      FUNCTION_KW "FUNCTION"
+      WHITESPACE " "
+      CALL_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "schema_trig"
+          DOT "."
+          NAME_REF
+            IDENT "no_func"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Again, with a role specification and no schema names."
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_create_schema_role"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_SEQUENCE_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      SEQUENCE_KW "SEQUENCE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "seq"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_TABLE
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "tab"
+      WHITESPACE " "
+      TABLE_ARGS
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "id"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_VIEW_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      VIEW_KW "VIEW"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            VIEW_KW "view"
+      WHITESPACE " "
+      AS_KW "AS"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+  WHITESPACE "\n  "
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "schema_not_existing"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tab"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "id"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_TRIGGER_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TRIGGER_KW "TRIGGER"
+      WHITESPACE " "
+      NAME
+        IDENT "schema_trig"
+      WHITESPACE " "
+      BEFORE_KW "BEFORE"
+      WHITESPACE " "
+      INSERT_KW "INSERT"
+      WHITESPACE " "
+      ON_KW "ON"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "tab"
+      WHITESPACE "\n  "
+      EXECUTE_KW "EXECUTE"
+      WHITESPACE " "
+      FUNCTION_KW "FUNCTION"
+      WHITESPACE " "
+      CALL_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "schema_trig"
+          DOT "."
+          NAME_REF
+            IDENT "no_func"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Again, with a schema name and a role specification."
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_schema_1"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_SEQUENCE_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      SEQUENCE_KW "SEQUENCE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "seq"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_schema_1"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_TABLE
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "tab"
+      WHITESPACE " "
+      TABLE_ARGS
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "id"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_schema_1"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_VIEW_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      VIEW_KW "VIEW"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            VIEW_KW "view"
+      WHITESPACE " "
+      AS_KW "AS"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_schema_1"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+  WHITESPACE "\n  "
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "schema_not_existing"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tab"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "id"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_schema_1"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_TRIGGER_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TRIGGER_KW "TRIGGER"
+      WHITESPACE " "
+      NAME
+        IDENT "schema_trig"
+      WHITESPACE " "
+      BEFORE_KW "BEFORE"
+      WHITESPACE " "
+      INSERT_KW "INSERT"
+      WHITESPACE " "
+      ON_KW "ON"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "schema_not_existing"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "tab"
+      WHITESPACE "\n  "
+      EXECUTE_KW "EXECUTE"
+      WHITESPACE " "
+      FUNCTION_KW "FUNCTION"
+      WHITESPACE " "
+      CALL_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "schema_trig"
+          DOT "."
+          NAME_REF
+            IDENT "no_func"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Cases where the schema creation succeeds."
+  WHITESPACE "\n"
+  COMMENT "-- The schema created matches the role name."
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_create_schema_role"
+    WHITESPACE "\n  "
+    CREATE_TABLE
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "regress_create_schema_role"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "tab"
+      WHITESPACE " "
+      TABLE_ARGS
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "id"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_create_schema_role"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Again, with a different role specification and no schema names."
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_create_schema_role"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_TABLE
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "regress_create_schema_role"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "tab"
+      WHITESPACE " "
+      TABLE_ARGS
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "id"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_create_schema_role"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Again, with a schema name and a role specification."
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_schema_1"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    CURRENT_ROLE_KW "CURRENT_ROLE"
+    WHITESPACE "\n  "
+    CREATE_TABLE
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "regress_schema_1"
+        DOT "."
+        PATH_SEGMENT
+          NAME
+            IDENT "tab"
+      WHITESPACE " "
+      TABLE_ARGS
+        L_PAREN "("
+        COLUMN
+          NAME_REF
+            IDENT "id"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_schema_1"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Clean up"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_create_schema_role"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@666: expected SEMICOLON
+ERROR@1283: expected SEMICOLON
+ERROR@1915: expected SEMICOLON

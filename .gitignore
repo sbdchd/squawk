@@ -7,3 +7,5 @@
 # IntelliJ IDE users
 .idea
 dist
+
+.DS_Store

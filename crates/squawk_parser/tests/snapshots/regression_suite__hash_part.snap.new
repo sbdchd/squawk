@@ -1,0 +1,1232 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/hash_part.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Hash partitioning."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Use hand-rolled hash functions and operator classes to get predictable"
+  WHITESPACE "\n"
+  COMMENT "-- result on different machines.  See the definitions of"
+  WHITESPACE "\n"
+  COMMENT "-- part_test_int4_ops and part_test_text_ops in test_setup.sql."
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "mchash"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "jsonb"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "HASH"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    IDENT "part_test_int4_ops"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    WHITESPACE " "
+    IDENT "part_test_text_ops"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "mchash1"
+    WHITESPACE "\n  "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "mchash"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "4"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "0"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- invalid OID, no such table"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- not partitioned"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'tenk1'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- partition rather than the parent"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash1'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- invalid modulus"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remainder too small"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              PREFIX_EXPR
+                MINUS "-"
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remainder too large"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- modulus is null"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- remainder is null"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- too many arguments"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  NULL_KW "NULL"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        INT_KW "int"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  NULL_KW "NULL"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  NULL_KW "NULL"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        JSON_KW "json"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- too few arguments"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "3"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  NULL_KW "NULL"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        INT_KW "int"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- wrong argument type"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  NULL_KW "NULL"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        INT_KW "int"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  NULL_KW "NULL"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        INT_KW "int"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ok, should be false"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  STRING "''"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ok, should be true"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  STRING "''"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- argument via variadic syntax, should fail because not all partitioning"
+  WHITESPACE "\n"
+  COMMENT "-- columns are of the correct type"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mchash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE "\n\t\t\t\t\t\t\t\t"
+              VARIADIC_KW "variadic"
+              WHITESPACE " "
+              CAST_EXPR
+                ARRAY_EXPR
+                  ARRAY_KW "array"
+                  L_BRACK "["
+                  LITERAL
+                    INT_NUMBER "1"
+                  COMMA ","
+                  LITERAL
+                    INT_NUMBER "2"
+                  R_BRACK "]"
+                COLON2 "::"
+                ARRAY_TYPE
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          INT_KW "int"
+                  L_BRACK "["
+                  R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- multiple partitioning columns of the same type"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "mcinthash"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "jsonb"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "HASH"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    IDENT "part_test_int4_ops"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    WHITESPACE " "
+    IDENT "part_test_int4_ops"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- now variadic should work, should be false"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mcinthash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE "\n\t\t\t\t\t\t\t\t"
+              VARIADIC_KW "variadic"
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "array"
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "0"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- should be true"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mcinthash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE "\n\t\t\t\t\t\t\t\t"
+              VARIADIC_KW "variadic"
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "array"
+                L_BRACK "["
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- wrong length"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mcinthash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE "\n\t\t\t\t\t\t\t\t"
+              VARIADIC_KW "variadic"
+              WHITESPACE " "
+              CAST_EXPR
+                ARRAY_EXPR
+                  ARRAY_KW "array"
+                  L_BRACK "["
+                  R_BRACK "]"
+                COLON2 "::"
+                ARRAY_TYPE
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          INT_KW "int"
+                  L_BRACK "["
+                  R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- wrong type"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "satisfies_hash_partition"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'mcinthash'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "regclass"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "4"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+              COMMA ","
+              WHITESPACE "\n\t\t\t\t\t\t\t\t"
+              VARIADIC_KW "variadic"
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "array"
+                L_BRACK "["
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "now"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                COMMA ","
+                WHITESPACE " "
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "now"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- check satisfies_hash_partition passes correct collation"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "text_hashp"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    IDENT "hash"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "text_hashp0"
+    WHITESPACE " "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "text_hashp"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "modulus"
+    WHITESPACE " "
+    INT_NUMBER "2"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "remainder"
+    WHITESPACE " "
+    INT_NUMBER "0"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "text_hashp1"
+    WHITESPACE " "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "text_hashp"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "modulus"
+    WHITESPACE " "
+    INT_NUMBER "2"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "remainder"
+    WHITESPACE " "
+    INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- The result here should always be true, because 'xxx' must belong to"
+  WHITESPACE "\n"
+  COMMENT "-- one of the two defined partitions"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "satisfies_hash_partition"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  LITERAL
+                    STRING "'text_hashp'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "regclass"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                WHITESPACE " "
+                CAST_EXPR
+                  LITERAL
+                    STRING "'xxx'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+                R_PAREN ")"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE "\n\t   "
+            CALL_EXPR
+              NAME_REF
+                IDENT "satisfies_hash_partition"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  LITERAL
+                    STRING "'text_hashp'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "regclass"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                CAST_EXPR
+                  LITERAL
+                    STRING "'xxx'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+                R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "satisfies"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cleanup"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "mchash"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "mcinthash"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "text_hashp"
+  SEMICOLON ";"
+  WHITESPACE "\n"

@@ -1,0 +1,1249 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/explain.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- EXPLAIN"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- There are many test cases elsewhere that use EXPLAIN as a vehicle for"
+  WHITESPACE "\n"
+  COMMENT "-- checking something else (usually planner behavior).  This file is"
+  WHITESPACE "\n"
+  COMMENT "-- concerned with testing EXPLAIN in its own right."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- To produce stable regression test output, it's usually necessary to"
+  WHITESPACE "\n"
+  COMMENT "-- ignore details such as exact costs or row counts.  These filter"
+  WHITESPACE "\n"
+  COMMENT "-- functions replace changeable output details with fixed strings."
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "explain_filter"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\ndeclare\n    ln text;\nbegin\n    for ln in execute $1\n    loop\n        -- Replace any numeric word with just 'N'\n        ln := regexp_replace(ln, '-?\\m\\d+\\M', 'N', 'g');\n        -- In sort output, the above won't match units-suffixed numbers\n        ln := regexp_replace(ln, '\\m\\d+kB', 'NkB', 'g');\n        -- Ignore text-mode buffers output because it varies depending\n        -- on the system state\n        CONTINUE WHEN (ln ~ ' +Buffers: .*');\n        -- Ignore text-mode \"Planning:\" line because whether it's output\n        -- varies depending on the system state\n        CONTINUE WHEN (ln = 'Planning:');\n        return next ln;\n    end loop;\nend;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- To produce valid JSON output, replace numbers with \"0\" or \"0.0\" not \"N\""
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "explain_filter_to_json"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "jsonb"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\ndeclare\n    data text := '';\n    ln text;\nbegin\n    for ln in execute $1\n    loop\n        -- Replace any numeric word with just '0'\n        ln := regexp_replace(ln, '\\m\\d+\\M', '0', 'g');\n        data := data || ln;\n    end loop;\n    return data::jsonb;\nend;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Disable JIT, or we'll get different output on machines where that's been"
+  WHITESPACE "\n"
+  COMMENT "-- forced on"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "jit"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Similarly, disable track_io_timing, to avoid output differences when"
+  WHITESPACE "\n"
+  COMMENT "-- enabled."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "track_io_timing"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Simple cases"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze, buffers off) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze, buffers off, verbose) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze, buffers, format text) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze, buffers, format xml) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze, serialize, buffers, format yaml) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (buffers, format text) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (buffers, format json) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check expansion of window definitions"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain verbose select sum(unique1) over w, sum(unique2) over (w order by hundred), sum(tenthous) over (w order by hundred) from tenk1 window w as (partition by ten)'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain verbose select sum(unique1) over w1, sum(unique2) over (w1 order by hundred), sum(tenthous) over (w1 order by hundred rows 10 preceding) from tenk1 window w1 as (partition by ten)'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check output including I/O timings.  These fields are conditional"
+  WHITESPACE "\n"
+  COMMENT "-- but always set in JSON format, so check them only in this case."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "track_io_timing"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze, buffers, format json) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "track_io_timing"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SETTINGS option"
+  WHITESPACE "\n"
+  COMMENT "-- We have to ignore other settings that might be imposed by the environment,"
+  WHITESPACE "\n"
+  COMMENT "-- so printing the whole Settings field unfortunately won't do."
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    LOCAL_KW "local"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "plan_cache_mode"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    IDENT "force_generic_plan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            TRUE_KW "true"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"OK\""
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "explain_filter"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'explain (settings) select * from int8_tbl i8'"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ln"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "ln"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^ *Settings: .*plan_cache_mode = ''force_generic_plan'''"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "explain_filter_to_json"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'explain (settings, format json) select * from int8_tbl i8'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              POUND "#"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{0,Settings,plan_cache_mode}'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "rollback"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- GENERIC_PLAN option"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (generic_plan) select unique1 from tenk1 where thousand = $1'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- should fail"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze, generic_plan) select unique1 from tenk1 where thousand = $1'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- MEMORY option"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (memory) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (memory, analyze, buffers off) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (memory, summary, format yaml) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (memory, analyze, format json) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME
+      IDENT "int8_query"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "int8_tbl"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "i8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (memory) execute int8_query'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Test EXPLAIN (GENERIC_PLAN) with partition pruning"
+    WHITESPACE "\n"
+    COMMENT "-- partitions should be pruned at plan time, based on constants,"
+    WHITESPACE "\n"
+    COMMENT "-- but there should be no pruning based on parameter placeholders"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gen_part"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "key1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "not"
+          WHITESPACE " "
+          NULL_KW "null"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "key2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "not"
+          WHITESPACE " "
+          NULL_KW "null"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    IDENT "list"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "key1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gen_part_1"
+    WHITESPACE "\n  "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gen_part"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+    WHITESPACE "\n  "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    RANGE_KW "range"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "key2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gen_part_1_1"
+    WHITESPACE "\n  "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gen_part_1"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gen_part_1_2"
+    WHITESPACE "\n  "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gen_part_1"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "3"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gen_part_2"
+    WHITESPACE "\n  "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gen_part"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- should scan gen_part_1_1 and gen_part_1_2, but not gen_part_2"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (generic_plan) select key1, key2 from gen_part where key1 = 1 and key2 = $1'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gen_part"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test production of per-worker data"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Unfortunately, because we don't know how many worker processes we'll"
+  WHITESPACE "\n"
+  COMMENT "-- actually get (maybe none at all), we can't examine the \"Workers\" output"
+  WHITESPACE "\n"
+  COMMENT "-- in any detail.  We can check that it parses correctly as JSON, and then"
+  WHITESPACE "\n"
+  COMMENT "-- remove it from the displayed results."
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- encourage use of parallel plans"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_setup_cost"
+    EQ "="
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_tuple_cost"
+    EQ "="
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "min_parallel_table_scan_size"
+    EQ "="
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_workers_per_gather"
+    EQ "="
+    LITERAL
+      INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "jsonb_pretty"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE "\n  "
+              BIN_EXPR
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "explain_filter_to_json"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'explain (analyze, verbose, buffers, format json)\n                         select * from tenk1 order by tenthous'"
+                    R_PAREN ")"
+                WHITESPACE "\n  "
+                COMMENT "-- remove \"Workers\" node of the Seq Scan plan node"
+                WHITESPACE "\n  "
+                CUSTOM_OP
+                  POUND "#"
+                  MINUS "-"
+                WHITESPACE " "
+                BIN_EXPR
+                  LITERAL
+                    STRING "'{0,Plan,Plans,0,Plans,0,Workers}'"
+                  WHITESPACE "\n  "
+                  COMMENT "-- remove \"Workers\" node of the Sort plan node"
+                  WHITESPACE "\n  "
+                  CUSTOM_OP
+                    POUND "#"
+                    MINUS "-"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    LITERAL
+                      STRING "'{0,Plan,Plans,0,Workers}'"
+                    WHITESPACE "\n  "
+                    COMMENT "-- Also remove its sort-type fields, as those aren't 100% stable"
+                    WHITESPACE "\n  "
+                    CUSTOM_OP
+                      POUND "#"
+                      MINUS "-"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      LITERAL
+                        STRING "'{0,Plan,Plans,0,Sort Method}'"
+                      WHITESPACE "\n  "
+                      CUSTOM_OP
+                        POUND "#"
+                        MINUS "-"
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'{0,Plan,Plans,0,Sort Space Type}'"
+              WHITESPACE "\n"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "rollback"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Test display of temporary objects"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMP_KW "temp"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t1"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pg_temp"
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "mysin"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "float8"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "float8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'begin return sin($1); end'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (verbose) select * from t1 where pg_temp.mysin(f1) < 0.5'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test compute_query_id"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "compute_query_id"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (verbose) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test compute_query_id with utility statements containing plannable query"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (verbose) declare test_cur cursor for select * from int8_tbl'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (verbose) create table test_ctas as select 1'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test SERIALIZE option"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze,buffers off,serialize) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze,serialize text,buffers,timing off) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze,serialize binary,buffers,timing) select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- this tests an edge case where we have no data to return"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze,buffers off,serialize) create temp table explain_temp as select * from int8_tbl i8'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test tuplestore storage usage in Window aggregate (memory case)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze,buffers off,costs off) select sum(n) over() from generate_series(1,10) a(n)'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Test tuplestore storage usage in Window aggregate (disk case)"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "64"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze,buffers off,costs off) select sum(n) over() from generate_series(1,2500) a(n)'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Test tuplestore storage usage in Window aggregate (memory and disk case, final result is disk)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "explain_filter"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'explain (analyze,buffers off,costs off) select sum(n) over(partition by m) from (SELECT n < 3 as m, n from generate_series(1,2500) a(n))'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@3104: expected config value, got ON_KW
+ERROR@3104: expected SEMICOLON
+ERROR@3105: expected command, found ON_KW
+ERROR@6549: expected config value, got ON_KW
+ERROR@6549: expected SEMICOLON
+ERROR@6550: expected command, found ON_KW

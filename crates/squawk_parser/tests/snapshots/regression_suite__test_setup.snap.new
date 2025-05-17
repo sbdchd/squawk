@@ -1,0 +1,2461 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/test_setup.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- TEST_SETUP --- prepare environment expected by regression test scripts"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- directory paths and dlsuffix are passed to us in environment variables"
+  WHITESPACE "\n\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- synchronous_commit=off delays when hint bits may be set. Some plans change"
+  WHITESPACE "\n"
+  COMMENT "-- depending on the number of all-visible pages, which in turn can be"
+  WHITESPACE "\n"
+  COMMENT "-- influenced by the delayed hint bits. Force synchronous_commit=on to avoid"
+  WHITESPACE "\n"
+  COMMENT "-- that source of variability."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "synchronous_commit"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Postgres formerly made the public schema read/write by default,"
+  WHITESPACE "\n"
+  COMMENT "-- and most of the core regression tests still expect that."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "public"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "public"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Create a tablespace we can use in tests."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "allow_in_place_tablespaces"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLESPACE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLESPACE_KW "TABLESPACE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_tblspace"
+    WHITESPACE " "
+    LOCATION_KW "LOCATION"
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- These tables have traditionally been referenced by many tests,"
+  WHITESPACE "\n"
+  COMMENT "-- so create and populate them.  Insert only non-error values here."
+  WHITESPACE "\n"
+  COMMENT "-- (Some subsequent tests try to insert erroneous values.  That's okay"
+  WHITESPACE "\n"
+  COMMENT "-- because the table won't actually change.  Do not change the contents"
+  WHITESPACE "\n"
+  COMMENT "-- of these tables in later tests, as it may affect other tests.)"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "CHAR_TBL"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        CHAR_TYPE
+          CHAR_KW "char"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "4"
+            R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "CHAR_TBL"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'a'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ab'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'abcd'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'abcd    '"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "CHAR_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "FLOAT8_TBL"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT8_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'0.0'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'-34.84'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'-1004.30'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'-1.2345678901234e+200'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'-1.2345678901234e-200'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT8_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "INT2_TBL"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "INT2_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'0   '"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'  1234 '"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'    -1234'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'32767'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "  "
+      COMMENT "-- largest and smallest values"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'-32767'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "INT2_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "INT4_TBL"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "INT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'   0  '"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'123456     '"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'    -123456'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'2147483647'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "  "
+      COMMENT "-- largest and smallest values"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'-2147483647'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "INT4_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "INT8_TBL"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "q1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "q2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "INT8_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'  123   '"
+      COMMA ","
+      LITERAL
+        STRING "'  456'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'123   '"
+      COMMA ","
+      LITERAL
+        STRING "'4567890123456789'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'4567890123456789'"
+      COMMA ","
+      LITERAL
+        STRING "'123'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      PREFIX_EXPR
+        PLUS "+"
+        LITERAL
+          INT_NUMBER "4567890123456789"
+      COMMA ","
+      LITERAL
+        STRING "'4567890123456789'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'+4567890123456789'"
+      COMMA ","
+      LITERAL
+        STRING "'-4567890123456789'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "INT8_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "POINT_TBL"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "point"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "POINT_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'(0.0,0.0)'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'(-10.0,0.0)'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'(-3.0,4.0)'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'(5.1, 34.5)'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'(-5.0,-12.0)'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'(1e-300,-1e-300)'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "  "
+      COMMENT "-- To underflow"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'(1e+300,Inf)'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "  "
+      COMMENT "-- To overflow"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'(Inf,1e+300)'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "  "
+      COMMENT "-- Transposed"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "' ( Nan , NaN ) '"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'10.0,10.0'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- We intentionally don't vacuum point_tbl here; geometry depends on that"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "TEXT_TBL"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TEXT_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'doh!'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'hi de ho neighbor'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TEXT_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "VARCHAR_TBL"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "4"
+            R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "VARCHAR_TBL"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'a'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ab'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'abcd'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'abcd    '"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "VARCHAR_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "onek"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "unique1"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "unique2"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "two"
+        WHITESPACE "\t\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "four"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "ten"
+        WHITESPACE "\t\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "twenty"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "hundred"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "thousand"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "twothousand"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "fivethous"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "tenthous"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "odd"
+        WHITESPACE "\t\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "even"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "stringu1"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NAME_KW "name"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "stringu2"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NAME_KW "name"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "string4"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NAME_KW "name"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "onek"
+    WHITESPACE " "
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "onek"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "onek2"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "onek"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "onek2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tenk1"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "unique1"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "unique2"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "two"
+        WHITESPACE "\t\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "four"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "ten"
+        WHITESPACE "\t\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "twenty"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "hundred"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "thousand"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "twothousand"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "fivethous"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "tenthous"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "odd"
+        WHITESPACE "\t\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "even"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "stringu1"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NAME_KW "name"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "stringu2"
+        WHITESPACE "\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NAME_KW "name"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "string4"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NAME_KW "name"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tenk1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tenk2"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "person"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+        WHITESPACE " \t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "age"
+        WHITESPACE "\t\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          LOCATION_KW "location"
+        WHITESPACE " \t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "point"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "person"
+    WHITESPACE " "
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "person"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "emp"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "salary"
+        WHITESPACE " \t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "manager"
+        WHITESPACE " \t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NAME_KW "name"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "person"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "emp"
+    WHITESPACE " "
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "emp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "student"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "gpa"
+        WHITESPACE " \t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "person"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "student"
+    WHITESPACE " "
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "student"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "stud_emp"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "percent"
+        WHITESPACE " \t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "emp"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "student"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "stud_emp"
+    WHITESPACE " "
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "stud_emp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "road"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "thepath"
+        WHITESPACE " \t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                PATH_KW "path"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "road"
+    WHITESPACE " "
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "road"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ihighway"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "road"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ihighway"
+    WHITESPACE "\n   "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE "\n   "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        ONLY_KW "ONLY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "road"
+      WHITESPACE "\n   "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            NAME_KW "name"
+          WHITESPACE " "
+          CUSTOM_OP
+            TILDE "~"
+          WHITESPACE " "
+          LITERAL
+            STRING "'I- .*'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ihighway"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "shighway"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "surface"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "road"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "shighway"
+    WHITESPACE "\n   "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              STRING "'asphalt'"
+      WHITESPACE "\n   "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        ONLY_KW "ONLY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "road"
+      WHITESPACE "\n   "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            NAME_KW "name"
+          WHITESPACE " "
+          CUSTOM_OP
+            TILDE "~"
+          WHITESPACE " "
+          LITERAL
+            STRING "'State Hwy.*'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "shighway"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- We must have some enum type in the database for opr_sanity and type_sanity."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "stoplight"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    ENUM_KW "enum"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'red'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'yellow'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'green'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Also create some non-built-in range types."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "float8range"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RANGE_KW "range"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "subtype"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "float8"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "subtype_diff"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "float8mi"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "textrange"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RANGE_KW "range"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "subtype"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      COLLATION_KW "collation"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"C\""
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Create some C functions that will be used by various tests."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "binary_coercible"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "oid"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "oid"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bool"
+    WHITESPACE "\n    "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'regresslib'"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    STRING "'binary_coercible'"
+  WHITESPACE "\n    "
+  ERROR
+    LANGUAGE_KW "LANGUAGE"
+  WHITESPACE " "
+  ERROR
+    IDENT "C"
+  WHITESPACE " "
+  ERROR
+    STRICT_KW "STRICT"
+  WHITESPACE " "
+  ERROR
+    STABLE_KW "STABLE"
+  WHITESPACE " "
+  ERROR
+    PARALLEL_KW "PARALLEL"
+  WHITESPACE " "
+  ERROR
+    IDENT "SAFE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Use hand-rolled hash functions and operator classes to get predictable"
+  WHITESPACE "\n"
+  COMMENT "-- result on different machines.  The hash function for int4 simply returns"
+  WHITESPACE "\n"
+  COMMENT "-- the sum of the values passed to it and the one for text returns the length"
+  WHITESPACE "\n"
+  COMMENT "-- of the non-empty string value passed to it or 0."
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "part_hashint4_noop"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          VALUE_KW "value"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        NAME
+          IDENT "seed"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n    select value + seed;\n    $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR_CLASS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "part_test_int4_ops"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "hash"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n    "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    EQ "="
+    COMMA ","
+    WHITESPACE "\n    "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "part_hashint4_noop"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "part_hashtext_length"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          VALUE_KW "value"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        NAME
+          IDENT "seed"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n    select length(coalesce(value, ''))::int8\n    $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR_CLASS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    CLASS_KW "class"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "part_test_text_ops"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "hash"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE "\n    "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    EQ "="
+    COMMA ","
+    WHITESPACE "\n    "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "part_hashtext_length"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- These functions are used in tests that used to use md5(), which we now"
+  WHITESPACE "\n"
+  COMMENT "-- mostly avoid so that the tests will pass in FIPS mode."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fipshash"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "bytea"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE "\n    "
+    FUNC_OPTION_LIST
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+      WHITESPACE " "
+      LEAKPROOF_FUNC_OPTION
+        LEAKPROOF_KW "leakproof"
+      WHITESPACE "\n    "
+      RETURN_FUNC_OPTION
+        RETURN_KW "return"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "substr"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "encode"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "sha256"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      PARAM "$1"
+                    R_PAREN ")"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'hex'"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "32"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fipshash"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE "\n    "
+    FUNC_OPTION_LIST
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+      WHITESPACE " "
+      LEAKPROOF_FUNC_OPTION
+        LEAKPROOF_KW "leakproof"
+      WHITESPACE "\n    "
+      RETURN_FUNC_OPTION
+        RETURN_KW "return"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "substr"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "encode"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "sha256"
+                  ARG_LIST
+                    L_PAREN "("
+                    CAST_EXPR
+                      LITERAL
+                        PARAM "$1"
+                      COLON2 "::"
+                      PATH_TYPE
+                        PATH
+                          PATH_SEGMENT
+                            NAME_REF
+                              IDENT "bytea"
+                    R_PAREN ")"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'hex'"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "32"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@443: expected config value, got ON_KW
+ERROR@443: expected SEMICOLON
+ERROR@444: expected command, found ON_KW
+ERROR@3011: expected string literal
+ERROR@3011: expected SEMICOLON
+ERROR@3012: expected command, found COLON
+ERROR@3013: expected command, found STRING
+ERROR@3395: expected string literal
+ERROR@3395: expected SEMICOLON
+ERROR@3396: expected command, found COLON
+ERROR@3397: expected command, found STRING
+ERROR@3584: expected string literal
+ERROR@3584: expected SEMICOLON
+ERROR@3585: expected command, found COLON
+ERROR@3586: expected command, found STRING
+ERROR@3707: expected string literal
+ERROR@3707: expected SEMICOLON
+ERROR@3708: expected command, found COLON
+ERROR@3709: expected command, found STRING
+ERROR@3818: expected string literal
+ERROR@3818: expected SEMICOLON
+ERROR@3819: expected command, found COLON
+ERROR@3820: expected command, found STRING
+ERROR@3942: expected string literal
+ERROR@3942: expected SEMICOLON
+ERROR@3943: expected command, found COLON
+ERROR@3944: expected command, found STRING
+ERROR@4048: expected string literal
+ERROR@4048: expected SEMICOLON
+ERROR@4049: expected command, found COLON
+ERROR@4050: expected command, found STRING
+ERROR@4887: expected string literal
+ERROR@4887: expected SEMICOLON
+ERROR@4888: expected command, found COLON
+ERROR@4889: expected command, found STRING
+ERROR@4901: expected command, found COMMA
+ERROR@4903: expected command, found STRING
+ERROR@4926: expected command, found LANGUAGE_KW
+ERROR@4935: expected command, found IDENT
+ERROR@4937: expected command, found STRICT_KW
+ERROR@4944: expected command, found STABLE_KW
+ERROR@4951: expected command, found PARALLEL_KW
+ERROR@4960: expected command, found IDENT

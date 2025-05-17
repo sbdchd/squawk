@@ -1,0 +1,1069 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/json_encoding.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- encoding-sensitive tests for json and jsonb"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- We provide expected-results files for UTF8 (json_encoding.out)"
+  WHITESPACE "\n"
+  COMMENT "-- and for SQL_ASCII (json_encoding_1.out).  Skip otherwise."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "getdatabaseencoding"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            WHITESPACE " "
+            NOT_IN
+              NOT_KW "NOT"
+              WHITESPACE " "
+              IN_KW "IN"
+            WHITESPACE " "
+            TUPLE_EXPR
+              L_PAREN "("
+              LITERAL
+                STRING "'UTF8'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'SQL_ASCII'"
+              R_PAREN ")"
+          WHITESPACE "\n       "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "skip_test"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "getdatabaseencoding"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "           "
+  COMMENT "-- just to label the results files"
+  WHITESPACE "\n\n"
+  COMMENT "-- first json"
+  WHITESPACE "\n\n"
+  COMMENT "-- basic unicode input"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    JSON_KW "json"
+  SEMICOLON ";"
+  WHITESPACE "\t\t\t"
+  COMMENT "-- ERROR, incomplete escape"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u00\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    JSON_KW "json"
+  SEMICOLON ";"
+  WHITESPACE "\t\t\t"
+  COMMENT "-- ERROR, incomplete escape"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u000g\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    JSON_KW "json"
+  SEMICOLON ";"
+  WHITESPACE "\t\t"
+  COMMENT "-- ERROR, g is not a hex digit"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u0000\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    JSON_KW "json"
+  SEMICOLON ";"
+  WHITESPACE "\t\t"
+  COMMENT "-- OK, legal escape"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\uaBcD\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    JSON_KW "json"
+  SEMICOLON ";"
+  WHITESPACE "\t\t"
+  COMMENT "-- OK, uppercase and lower case both OK"
+  WHITESPACE "\n\n"
+  COMMENT "-- handling of unicode surrogate pairs"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ud83d\\ude04\\ud83d\\udc36\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_in_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ud83d\\ud83d\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 2 high surrogates in a row"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ude04\\ud83d\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- surrogates in wrong order"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ud83dX\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- orphan high surrogate"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ude04X\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- orphan low surrogate"
+  WHITESPACE "\n\n"
+  COMMENT "--handling of simple unicode escapes"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              JSON_KW "json"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"the Copyright \\u00a9 sign\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_in_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              JSON_KW "json"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"dollar \\u0024 character\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_everywhere"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              JSON_KW "json"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"dollar \\\\u0024 character\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_an_escape"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              JSON_KW "json"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"null \\u0000 escape\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_unescaped"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              JSON_KW "json"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"null \\\\u0000 escape\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_an_escape"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"the Copyright \\u00a9 sign\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_in_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"dollar \\u0024 character\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_everywhere"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"dollar \\\\u0024 character\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_an_escape"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"null \\u0000 escape\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "fails"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                JSON_KW "json"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"null \\\\u0000 escape\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_an_escape"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- then jsonb"
+  WHITESPACE "\n\n"
+  COMMENT "-- basic unicode input"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\t\t\t"
+  COMMENT "-- ERROR, incomplete escape"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u00\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\t\t\t"
+  COMMENT "-- ERROR, incomplete escape"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u000g\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\t\t"
+  COMMENT "-- ERROR, g is not a hex digit"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u0045\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\t\t"
+  COMMENT "-- OK, legal escape"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'\"\\u0000\"'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "jsonb"
+  SEMICOLON ";"
+  WHITESPACE "\t\t"
+  COMMENT "-- ERROR, we don't support U+0000"
+  WHITESPACE "\n"
+  COMMENT "-- use octet_length here so we don't get an odd unicode char in the"
+  WHITESPACE "\n"
+  COMMENT "-- output"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "octet_length"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                CAST_EXPR
+                  LITERAL
+                    STRING "'\"\\uaBcD\"'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "jsonb"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- OK, uppercase and lower case both OK"
+  WHITESPACE "\n\n"
+  COMMENT "-- handling of unicode surrogate pairs"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "octet_length"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                PAREN_EXPR
+                  L_PAREN "("
+                  BIN_EXPR
+                    CAST_EXPR
+                      NAME_REF
+                        IDENT "jsonb"
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'{ \"a\":  \"\\ud83d\\ude04\\ud83d\\udc36\" }'"
+                    WHITESPACE " "
+                    CUSTOM_OP
+                      MINUS "-"
+                      R_ANGLE ">"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'a'"
+                  R_PAREN ")"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_in_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ud83d\\ud83d\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 2 high surrogates in a row"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ude04\\ud83d\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- surrogates in wrong order"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ud83dX\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- orphan high surrogate"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"\\ude04X\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- orphan low surrogate"
+  WHITESPACE "\n\n"
+  COMMENT "-- handling of simple unicode escapes"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "jsonb"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"the Copyright \\u00a9 sign\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_in_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "jsonb"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"dollar \\u0024 character\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_everywhere"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "jsonb"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"dollar \\\\u0024 character\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_an_escape"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "jsonb"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"null \\u0000 escape\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "fails"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "jsonb"
+            WHITESPACE " "
+            LITERAL
+              STRING "'{ \"a\":  \"null \\\\u0000 escape\" }'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_an_escape"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"the Copyright \\u00a9 sign\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_in_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"dollar \\u0024 character\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct_everywhere"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"dollar \\\\u0024 character\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_an_escape"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"null \\u0000 escape\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "fails"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "jsonb"
+              WHITESPACE " "
+              LITERAL
+                STRING "'{ \"a\":  \"null \\\\u0000 escape\" }'"
+            WHITESPACE " "
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+              R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "not_an_escape"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- soft error for input-time failure"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'{ \"a\":  \"\\ud83d\\ude04\\ud83d\\udc36\" }'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'jsonb'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

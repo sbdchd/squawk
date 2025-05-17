@@ -1,0 +1,2150 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/advisory_lock.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- ADVISORY LOCKS"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "oid"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "datoid"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_database"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "datname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "current_database"
+          ARG_LIST
+            L_PAREN "("
+            R_PAREN ")"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "locktype"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "classid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objsubid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            MODE_KW "mode"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            GRANTED_KW "granted"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  WHITESPACE "\n\t"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "classid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- pg_advisory_unlock_all() shouldn't release xact locks"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_all"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- can't unlock xact locks"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- automatically release xact locks at commit"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- holding both session and xact locks on the same objects, xact first"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "locktype"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "classid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objsubid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            MODE_KW "mode"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            GRANTED_KW "granted"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  WHITESPACE "\n\t"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "classid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "locktype"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "classid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objsubid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            MODE_KW "mode"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            GRANTED_KW "granted"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  WHITESPACE "\n\t"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "classid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- unlocking session locks"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- holding both session and xact locks on the same objects, session first"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "locktype"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "classid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objsubid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            MODE_KW "mode"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            GRANTED_KW "granted"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  WHITESPACE "\n\t"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "classid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "locktype"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "classid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objsubid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            MODE_KW "mode"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            GRANTED_KW "granted"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  WHITESPACE "\n\t"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "classid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- releasing all session locks"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_all"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- grabbing txn locks multiple times"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_xact_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "locktype"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "classid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objsubid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            MODE_KW "mode"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            GRANTED_KW "granted"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  WHITESPACE "\n\t"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "classid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- grabbing session locks multiple times"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "locktype"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "classid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objsubid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            MODE_KW "mode"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            GRANTED_KW "granted"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  WHITESPACE "\n\t"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "classid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- .. and releasing them all at once"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n\t"
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n\t"
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_lock_shared"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "locktype"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "classid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "objsubid"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            MODE_KW "mode"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            GRANTED_KW "granted"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  WHITESPACE "\n\t"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "classid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objid"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_advisory_unlock_all"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_locks"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "locktype"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'advisory'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            DATABASE_KW "database"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ERROR
+            COLON ":"
+  ERROR
+    IDENT "datoid"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@358: expected an expression, found COLON
+ERROR@359: expected SEMICOLON
+ERROR@359: expected command, found IDENT
+ERROR@367: expected command, found ORDER_KW
+ERROR@373: expected command, found BY_KW
+ERROR@376: expected command, found IDENT
+ERROR@383: expected command, found COMMA
+ERROR@385: expected command, found IDENT
+ERROR@390: expected command, found COMMA
+ERROR@392: expected command, found IDENT
+ERROR@568: expected an expression, found COLON
+ERROR@569: expected SEMICOLON
+ERROR@569: expected command, found IDENT
+ERROR@857: expected an expression, found COLON
+ERROR@858: expected SEMICOLON
+ERROR@858: expected command, found IDENT
+ERROR@1196: expected an expression, found COLON
+ERROR@1197: expected SEMICOLON
+ERROR@1197: expected command, found IDENT
+ERROR@1205: expected command, found ORDER_KW
+ERROR@1211: expected command, found BY_KW
+ERROR@1214: expected command, found IDENT
+ERROR@1221: expected command, found COMMA
+ERROR@1223: expected command, found IDENT
+ERROR@1228: expected command, found COMMA
+ERROR@1230: expected command, found IDENT
+ERROR@1481: expected an expression, found COLON
+ERROR@1482: expected SEMICOLON
+ERROR@1482: expected command, found IDENT
+ERROR@1490: expected command, found ORDER_KW
+ERROR@1496: expected command, found BY_KW
+ERROR@1499: expected command, found IDENT
+ERROR@1506: expected command, found COMMA
+ERROR@1508: expected command, found IDENT
+ERROR@1513: expected command, found COMMA
+ERROR@1515: expected command, found IDENT
+ERROR@1863: expected an expression, found COLON
+ERROR@1864: expected SEMICOLON
+ERROR@1864: expected command, found IDENT
+ERROR@2185: expected an expression, found COLON
+ERROR@2186: expected SEMICOLON
+ERROR@2186: expected command, found IDENT
+ERROR@2194: expected command, found ORDER_KW
+ERROR@2200: expected command, found BY_KW
+ERROR@2203: expected command, found IDENT
+ERROR@2210: expected command, found COMMA
+ERROR@2212: expected command, found IDENT
+ERROR@2217: expected command, found COMMA
+ERROR@2219: expected command, found IDENT
+ERROR@2490: expected an expression, found COLON
+ERROR@2491: expected SEMICOLON
+ERROR@2491: expected command, found IDENT
+ERROR@2499: expected command, found ORDER_KW
+ERROR@2505: expected command, found BY_KW
+ERROR@2508: expected command, found IDENT
+ERROR@2515: expected command, found COMMA
+ERROR@2517: expected command, found IDENT
+ERROR@2522: expected command, found COMMA
+ERROR@2524: expected command, found IDENT
+ERROR@2674: expected an expression, found COLON
+ERROR@2675: expected SEMICOLON
+ERROR@2675: expected command, found IDENT
+ERROR@3106: expected an expression, found COLON
+ERROR@3107: expected SEMICOLON
+ERROR@3107: expected command, found IDENT
+ERROR@3115: expected command, found ORDER_KW
+ERROR@3121: expected command, found BY_KW
+ERROR@3124: expected command, found IDENT
+ERROR@3131: expected command, found COMMA
+ERROR@3133: expected command, found IDENT
+ERROR@3138: expected command, found COMMA
+ERROR@3140: expected command, found IDENT
+ERROR@3233: expected an expression, found COLON
+ERROR@3234: expected SEMICOLON
+ERROR@3234: expected command, found IDENT
+ERROR@3620: expected an expression, found COLON
+ERROR@3621: expected SEMICOLON
+ERROR@3621: expected command, found IDENT
+ERROR@3629: expected command, found ORDER_KW
+ERROR@3635: expected command, found BY_KW
+ERROR@3638: expected command, found IDENT
+ERROR@3645: expected command, found COMMA
+ERROR@3647: expected command, found IDENT
+ERROR@3652: expected command, found COMMA
+ERROR@3654: expected command, found IDENT
+ERROR@3974: expected an expression, found COLON
+ERROR@3975: expected SEMICOLON
+ERROR@3975: expected command, found IDENT
+ERROR@4357: expected an expression, found COLON
+ERROR@4358: expected SEMICOLON
+ERROR@4358: expected command, found IDENT
+ERROR@4366: expected command, found ORDER_KW
+ERROR@4372: expected command, found BY_KW
+ERROR@4375: expected command, found IDENT
+ERROR@4382: expected command, found COMMA
+ERROR@4384: expected command, found IDENT
+ERROR@4389: expected command, found COMMA
+ERROR@4391: expected command, found IDENT
+ERROR@4509: expected an expression, found COLON
+ERROR@4510: expected SEMICOLON
+ERROR@4510: expected command, found IDENT

@@ -1,0 +1,1461 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/dbsize.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "size"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "size"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                PREFIX_EXPR
+                  MINUS "-"
+                  LITERAL
+                    INT_NUMBER "1"
+                WHITESPACE " "
+                STAR "*"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "size"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000000000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000000000000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000000000000000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "size"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "size"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "size"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                PREFIX_EXPR
+                  MINUS "-"
+                  LITERAL
+                    INT_NUMBER "1"
+                WHITESPACE " "
+                STAR "*"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "size"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000000000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000000000000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1000000000000000"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              FLOAT_NUMBER "10.5"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              FLOAT_NUMBER "1000.5"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              FLOAT_NUMBER "1000000.5"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              FLOAT_NUMBER "1000000000.5"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              FLOAT_NUMBER "1000000000000.5"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              FLOAT_NUMBER "1000000000000000.5"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "size"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test where units change up"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "size"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "size"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                PREFIX_EXPR
+                  MINUS "-"
+                  LITERAL
+                    INT_NUMBER "1"
+                WHITESPACE " "
+                STAR "*"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "size"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10239"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10240"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10485247"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10485248"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10736893951"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10736893952"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10994579406847"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10994579406848"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "11258449312612351"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "11258449312612352"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BIGINT_KW "bigint"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "size"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "size"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "size"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                PREFIX_EXPR
+                  MINUS "-"
+                  LITERAL
+                    INT_NUMBER "1"
+                WHITESPACE " "
+                STAR "*"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "size"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10239"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10240"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10485247"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10485248"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10736893951"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10736893952"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10994579406847"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "10994579406848"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "11258449312612351"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "11258449312612352"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "11528652096115048447"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "11528652096115048448"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    NUMERIC_KW "numeric"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "size"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure we get the expected results when passing the extremities of bigint"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'-9223372036854775808'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        BIGINT_KW "bigint"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_pretty"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'9223372036854775807'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        BIGINT_KW "bigint"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- pg_size_bytes() tests"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "size"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "size"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'123bytes'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'256 B'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1kB'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1MB'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "' 1 GB'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1.5 GB '"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          LITERAL
+            STRING "'1TB'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'3000 TB'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1e6 MB'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'99 PB'"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "size"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- case-insensitive units are supported"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "size"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "size"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'123bYteS'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1kb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1mb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "' 1 Gb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1.5 gB '"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          LITERAL
+            STRING "'1tb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'3000 tb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'1e6 mb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'99 pb'"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "size"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- negative numbers are supported"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "size"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "size"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-123bytes'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-1kb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-1mb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "' -1 Gb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-1.5 gB '"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n            "
+          L_PAREN "("
+          LITERAL
+            STRING "'-1tb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-3000 TB'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-10e-1 MB'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-99 PB'"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "size"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- different cases with allowed points"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "size"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "size"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n     "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-1.'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-1.kb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-1. kb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-0. gb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n             "
+          L_PAREN "("
+          LITERAL
+            STRING "'-.1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-.1kb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-.1 kb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            STRING "'-.0 gb'"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "size"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- invalid inputs"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'1 AB'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'1 AB A'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'1 AB A    '"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'9223372036854775807.9'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'1e100'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'1e1000000000000000000'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'1 byte'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- the singular \"byte\" is not supported"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "''"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'kb'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'..'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'-.'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'-.kb'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'-. kb'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'.+912'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'+912+ kB'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_size_bytes"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'++123 kB'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

@@ -5,6 +5,7 @@ use generate_keywords::generate_keywords;
 use new_rule::new_lint;
 use sync_kwlist::sync_kwlist;
 
+mod download_regression_tests;
 mod generate_keywords;
 mod new_rule;
 mod path_util;
@@ -18,6 +19,8 @@ enum TaskName {
     SyncKwlist,
     #[command(long_about = "Create a new linter rule")]
     NewRule(NewRuleArgs),
+    #[command(long_about = "Download and process regression tests from Postgres")]
+    DownloadRegressionTests,
 }
 
 #[derive(Args, Debug)]
@@ -40,5 +43,6 @@ fn main() -> Result<()> {
         TaskName::GenerateKeywords => generate_keywords(),
         TaskName::SyncKwlist => sync_kwlist(),
         TaskName::NewRule(args) => new_lint(args),
+        TaskName::DownloadRegressionTests => download_regression_tests::download_regression_tests(),
     }
 }

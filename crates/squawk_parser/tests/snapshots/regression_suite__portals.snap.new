@@ -1,0 +1,6422 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/portals.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Cursor regression tests"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo1"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo2"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo3"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo4"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo5"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo6"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo7"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo8"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo9"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo10"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo11"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo12"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo13"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo14"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo15"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo16"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo17"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo18"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo19"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo20"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo21"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo22"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo23"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "3"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "4"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "5"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "6"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo6"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "7"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo7"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "8"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo8"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "9"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo9"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "11"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo11"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "12"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo12"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "13"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo13"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "14"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo14"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "15"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo15"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "16"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo16"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "17"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo17"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "18"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo18"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "19"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo19"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "20"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo20"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "21"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo21"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "22"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo22"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "23"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo23"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo23"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo22"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "3"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo21"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "4"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo20"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "5"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo19"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "6"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo18"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "7"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo17"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "8"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo16"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "9"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo15"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo14"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "11"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo13"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "12"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo12"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "13"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo11"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "14"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "15"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo9"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "16"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo8"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "17"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo7"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "18"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo6"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "19"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "20"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "21"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "22"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "23"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "foo1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo6"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo7"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo8"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo9"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo11"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo12"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- leave some cursors open, to test that auto-close works."
+  WHITESPACE "\n\n"
+  COMMENT "-- record this in the system view as well (don't query the time field there"
+  WHITESPACE "\n"
+  COMMENT "-- however)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            STATEMENT_KW "statement"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_holdable"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_binary"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_scrollable"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    END_KW "END"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            STATEMENT_KW "statement"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_holdable"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_binary"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_scrollable"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- NO SCROLL disallows backward fetching"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo24"
+    WHITESPACE " "
+    NO_KW "NO"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo24"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo24"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- should fail"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    END_KW "END"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo24"
+    WHITESPACE " "
+    NO_KW "NO"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo24"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo24"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- allowed"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo24"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- should fail"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    END_KW "END"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Cursors outside transaction blocks"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            STATEMENT_KW "statement"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_holdable"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_binary"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_scrollable"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    HOLD_KW "HOLD"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    PREFIX_EXPR
+      MINUS "-"
+      LITERAL
+        INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            STATEMENT_KW "statement"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_holdable"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_binary"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_scrollable"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25ns"
+    WHITESPACE " "
+    NO_KW "NO"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    HOLD_KW "HOLD"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25ns"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25ns"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25ns"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "4"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25ns"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "4"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25ns"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            STATEMENT_KW "statement"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_holdable"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_binary"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_scrollable"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo25ns"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- ROLLBACK should close holdable cursors"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo26"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    HOLD_KW "HOLD"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "unique2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- should fail"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "foo26"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Parameterized DECLARE needs to insert param values into the cursor portal"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "declares_cursor"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'DECLARE c CURSOR FOR SELECT stringu1 FROM tenk1 WHERE stringu1 LIKE $1;'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "declares_cursor"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'AB%'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test behavior of both volatile and stable functions inside a cursor;"
+  WHITESPACE "\n"
+  COMMENT "-- in particular we want to see what happens during commit of a holdable"
+  WHITESPACE "\n"
+  COMMENT "-- cursor"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMP_KW "temp"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tt1"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "count_tt1_v"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          STRING "'select count(*) from tt1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        VOLATILE_KW "volatile"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "count_tt1_s"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          STRING "'select count(*) from tt1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        STABLE_KW "stable"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tt1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "values"
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "count_tt1_v"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "count_tt1_s"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tt1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "values"
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "rollback"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tt1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "values"
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c2"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    HOLD_KW "hold"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "count_tt1_v"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "count_tt1_s"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tt1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "values"
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "commit"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tt1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    NAME
+      IDENT "c2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "count_tt1_v"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "count_tt1_s"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- Create a cursor with the BINARY option and check the pg_cursors view"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            STATEMENT_KW "statement"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_holdable"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_binary"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_scrollable"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "bc"
+    WHITESPACE " "
+    BINARY_KW "BINARY"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            STATEMENT_KW "statement"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_holdable"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_binary"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "is_scrollable"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- We should not see the portal that is created internally to"
+  WHITESPACE "\n"
+  COMMENT "-- implement EXECUTE in pg_cursors"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "PREPARE"
+    WHITESPACE " "
+    NAME
+      IDENT "cprep"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              NAME_KW "name"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              STATEMENT_KW "statement"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "is_holdable"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "is_binary"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "is_scrollable"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_cursors"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXECUTE_STMT
+    EXECUTE_KW "EXECUTE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cprep"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test CLOSE ALL;"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    ALL_KW "ALL"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    HOLD_KW "HOLD"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "foo2"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    WITHOUT_KW "WITHOUT"
+    WHITESPACE " "
+    HOLD_KW "HOLD"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLOSE_STMT
+    CLOSE_KW "CLOSE"
+    WHITESPACE " "
+    ALL_KW "ALL"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_cursors"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Tests for updatable cursors"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "uctest"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "f2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'one'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'two'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'three'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check DELETE WHERE CURRENT"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- should show deletion"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- cursor did not move"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- cursor is insensitive"
+  WHITESPACE "\n"
+  MOVE_STMT
+    MOVE_KW "MOVE"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- should still see deletion"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check UPDATE WHERE CURRENT; this time use FOR UPDATE"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "FOR"
+        WHITESPACE " "
+        UPDATE_KW "UPDATE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "8"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check repeated-update and update-then-delete cases"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- insensitive cursor should not show effects of updates or deletes"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    RELATIVE_KW "RELATIVE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- no-op"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- no-op"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    RELATIVE_KW "RELATIVE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "FOR"
+        WHITESPACE " "
+        UPDATE_KW "UPDATE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- no-op"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- no-op"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "--- FOR UPDATE cursors can't currently scroll back, so this is an error:"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    RELATIVE_KW "RELATIVE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check insensitive cursor with INSERT"
+  WHITESPACE "\n"
+  COMMENT "-- (The above tests don't test the SQL notion of an insensitive cursor"
+  WHITESPACE "\n"
+  COMMENT "-- correctly, because per SQL standard, changes from WHERE CURRENT OF"
+  WHITESPACE "\n"
+  COMMENT "-- commands should be visible in the cursor.  So here we make the"
+  WHITESPACE "\n"
+  COMMENT "-- changes with a command that is independent of the cursor.)"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    INSENSITIVE_KW "INSENSITIVE"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "10"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'ten'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- insert not visible"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- restore test table state"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Check inheritance cases"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ucchild"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "inherits"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ucchild"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "values"
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "100"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'hundred'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "FOR"
+        WHITESPACE " "
+        UPDATE_KW "UPDATE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Can update from a self-join, but only if FOR UPDATE says which to use"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "b"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "b"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "b"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "b"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "5"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "FOR"
+        WHITESPACE " "
+        UPDATE_KW "UPDATE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "b"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "b"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "5"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "FOR"
+        WHITESPACE " "
+        SHARE_KW "SHARE"
+        WHITESPACE " "
+        OF_KW "OF"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "f1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "10"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check various error cases"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail, no such cursor"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "cx"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    HOLD_KW "HOLD"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "cx"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail, can't use held cursor"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail, cursor on wrong table"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk2"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "FOR"
+        WHITESPACE " "
+        SHARE_KW "SHARE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail, cursor on wrong table"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+        WHITESPACE " "
+        JOIN
+          JOIN_KW "JOIN"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "tenk2"
+          WHITESPACE " "
+          USING_CLAUSE
+            USING_KW "USING"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              NAME_REF
+                IDENT "unique1"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail, cursor is on a join"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "f1"
+          COMMA ","
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "count"
+              ARG_LIST
+                L_PAREN "("
+                STAR "*"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+      WHITESPACE " "
+      GROUP_BY_CLAUSE
+        GROUP_KW "GROUP"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- fail, cursor is on aggregation"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "uctest"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail, no current row"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "MIN"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "f1"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "FOR"
+        WHITESPACE " "
+        UPDATE_KW "UPDATE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- WHERE CURRENT OF may someday work with views, but today is not that day."
+  WHITESPACE "\n"
+  COMMENT "-- For now, just make sure it errors out cleanly."
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ucview"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "uctest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME
+      IDENT "ucrule"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ucview"
+    WHITESPACE " "
+    DO_KW "DO"
+    WHITESPACE " "
+    INSTEAD_KW "INSTEAD"
+    WHITESPACE "\n  "
+    DELETE_STMT
+      DELETE_KW "DELETE"
+      WHITESPACE " "
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "uctest"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "f1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              OLD_KW "OLD"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "ucview"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ucview"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail, views not supported"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check WHERE CURRENT OF with an index-only scan"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "stringu1"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "onek"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "stringu1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'DZAAAA'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "stringu1"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "onek"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "stringu1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'DZAAAA'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "onek"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "stringu1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "onek"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "stringu1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'DZAAAA'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check behavior with rewinding to a previous child scan node,"
+  WHITESPACE "\n"
+  COMMENT "-- as per bug #15395"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "current_check"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "currentid"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "payload"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "current_check_1"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "current_check"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "current_check_2"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "current_check"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "current_check_1"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "i"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'p'"
+              WHITESPACE " "
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "i"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "9"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "current_check_2"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "i"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'P'"
+              WHITESPACE " "
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "i"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "10"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "19"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "current_check"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- This tests the fetch-backwards code path"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "12"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "8"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "current_check"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+    WHITESPACE " "
+    RETURNING_KW "RETURNING"
+    WHITESPACE " "
+    STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- This tests the ExecutorRewind code path"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "13"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ABSOLUTE_KW "ABSOLUTE"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "current_check"
+    WHITESPACE " "
+    WHERE_KW "WHERE"
+    WHITESPACE " "
+    CURRENT_KW "CURRENT"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    IDENT "c1"
+    WHITESPACE " "
+    RETURNING_KW "RETURNING"
+    WHITESPACE " "
+    STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "current_check"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Make sure snapshot management works okay, per bug report in"
+  WHITESPACE "\n"
+  COMMENT "-- 235395b90909301035v7228ce63q392931f15aa74b31@mail.gmail.com"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_TRANSACTION_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+    WHITESPACE " "
+    ISOLATION_KW "ISOLATION"
+    WHITESPACE " "
+    LEVEL_KW "LEVEL"
+    WHITESPACE " "
+    SERIALIZABLE_KW "SERIALIZABLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          CURSOR_KW "cursor"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          CURSOR_KW "cursor"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    NO_KW "NO"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          CURSOR_KW "cursor"
+      WHITESPACE " "
+      LOCKING_CLAUSE
+        FOR_KW "FOR"
+        WHITESPACE " "
+        UPDATE_KW "UPDATE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          CURSOR_KW "cursor"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          CURSOR_KW "cursor"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check rewinding a cursor containing a stable function in LIMIT,"
+  WHITESPACE "\n"
+  COMMENT "-- per bug report in 8336843.9833.1399385291498.JavaMail.root@quick"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "nochange"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE "\n  "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select $1 limit 1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        STABLE_KW "stable"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "int8_tbl"
+      WHITESPACE " "
+      LIMIT_CLAUSE
+        LIMIT_KW "limit"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "nochange"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "3"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  MOVE_STMT
+    MOVE_KW "move"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "rollback"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check handling of non-backwards-scan-capable plans with scroll cursors"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "42"
+              R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "x"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    SCROLL_KW "scroll"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "42"
+              R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "x"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+    WHITESPACE " "
+    SCROLL_KW "scroll"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "42"
+              R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "x"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "c1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "rollback"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c2"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "3"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c2"
+    WHITESPACE " "
+    SCROLL_KW "scroll"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "3"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "c2"
+    WHITESPACE " "
+    SCROLL_KW "scroll"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "3"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "c2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    BACKWARD_KW "backward"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "c2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "rollback"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check fetching of toasted datums via cursors."
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Other compression algorithms may cause the compressed data to be stored"
+  WHITESPACE "\n"
+  COMMENT "-- inline.  Use pglz to ensure consistent results."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_toast_compression"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'pglz'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "toasted_data"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+          L_BRACK "["
+          R_BRACK "]"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "toasted_data"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "array_agg"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "i"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "12345678"
+            COMMA ","
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                INT_NUMBER "12345678"
+              WHITESPACE " "
+              PLUS "+"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "local_portal"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "toasted_data"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "local_portal"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DECLARE_STMT
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    NAME
+      IDENT "held_portal"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    HOLD_KW "hold"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "toasted_data"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "commit"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "toasted_data"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  FETCH_STMT
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    ALL_KW "all"
+    WHITESPACE " "
+    IN_KW "in"
+    WHITESPACE " "
+    NAME
+      IDENT "held_portal"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_toast_compression"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@11396: expected R_PAREN
+ERROR@11397: expected command, found OFF_KW
+ERROR@11400: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11400: expected SEMICOLON
+ERROR@11400: expected command, found R_PAREN
+ERROR@13337: expected R_PAREN
+ERROR@13338: expected command, found OFF_KW
+ERROR@13341: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@13341: expected SEMICOLON
+ERROR@13341: expected command, found R_PAREN
+ERROR@13404: expected R_PAREN
+ERROR@13405: expected command, found OFF_KW
+ERROR@13408: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@13408: expected SEMICOLON
+ERROR@13408: expected command, found R_PAREN
+ERROR@13592: expected R_PAREN
+ERROR@13593: expected command, found OFF_KW
+ERROR@13596: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@13596: expected SEMICOLON
+ERROR@13596: expected command, found R_PAREN
+ERROR@13668: expected R_PAREN
+ERROR@13669: expected command, found OFF_KW
+ERROR@13672: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@13672: expected SEMICOLON
+ERROR@13672: expected command, found R_PAREN

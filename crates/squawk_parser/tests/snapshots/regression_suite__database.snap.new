@@ -1,0 +1,265 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/database.sql
+---
+SOURCE_FILE
+  CREATE_DATABASE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME
+      IDENT "regression_tbd"
+    WHITESPACE "\n\t"
+    ENCODING_KW "ENCODING"
+    WHITESPACE " "
+    IDENT "utf8"
+    WHITESPACE " "
+    IDENT "LC_COLLATE"
+    WHITESPACE " "
+    IDENT "\"C\""
+    WHITESPACE " "
+    IDENT "LC_CTYPE"
+    WHITESPACE " "
+    IDENT "\"C\""
+    WHITESPACE " "
+    TEMPLATE_KW "TEMPLATE"
+    WHITESPACE " "
+    IDENT "template0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regression_tbd"
+    WHITESPACE " "
+    RENAME_KW "RENAME"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    NAME
+      IDENT "regression_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regression_utf8"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    TABLESPACE_KW "TABLESPACE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_tblspace"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regression_utf8"
+    WHITESPACE " "
+    RESET_KW "RESET"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          TABLESPACE_KW "TABLESPACE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regression_utf8"
+    WHITESPACE " "
+    IDENT "CONNECTION_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "123"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test PgDatabaseToastTable.  Doing this with GRANT would be slow."
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_database"
+    WHITESPACE "\n"
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "datacl"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "array_fill"
+      ARG_LIST
+        L_PAREN "("
+        CALL_EXPR
+          NAME_REF
+            IDENT "makeaclitem"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "10"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'USAGE'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FALSE_KW "false"
+            R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "ARRAY"
+          L_BRACK "["
+          CAST_EXPR
+            LITERAL
+              FLOAT_NUMBER "5e5"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+          R_BRACK "]"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "datname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'regression_utf8'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- load catcache entry, if nothing else does"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regression_utf8"
+    WHITESPACE " "
+    RESET_KW "RESET"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          TABLESPACE_KW "TABLESPACE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_datdba_before"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_datdba_after"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regression_utf8"
+    WHITESPACE " "
+    OWNER_KW "OWNER"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_datdba_before"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REASSIGN_STMT
+    REASSIGN_KW "REASSIGN"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_datdba_before"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_datdba_after"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DATABASE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regression_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_datdba_before"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_datdba_after"
+  SEMICOLON ";"
+  WHITESPACE "\n"

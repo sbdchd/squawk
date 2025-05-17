@@ -1,0 +1,2506 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/create_operator.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- CREATE_OPERATOR"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            PATH_KW "path"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            PATH_KW "path"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      FUNCTION_KW "function"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "path_inter"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      IDENT "commutator"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      POUND "#"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      AT "@"
+      POUND "#"
+      AT "@"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\t\t"
+    COMMENT "-- prefix"
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "factorial"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      PERCENT "%"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\t\t"
+    COMMENT "-- fail, postfix is no longer supported"
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "factorial"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test operator created above"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              AT "@"
+              POUND "#"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "24"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test comments"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "COMMENT"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            NONE_KW "NONE"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "IS"
+    WHITESPACE " "
+    LITERAL
+      STRING "'bad prefix'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "COMMENT"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            NONE_KW "NONE"
+    R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "IS"
+    WHITESPACE " "
+    LITERAL
+      STRING "'bad postfix'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT_STMT
+    COMMENT_KW "COMMENT"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "IS"
+    WHITESPACE " "
+    LITERAL
+      STRING "'bad infix'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check that DROP on a nonexistent op behaves sanely, too"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    NONE_KW "NONE"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            NONE_KW "NONE"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- => is disallowed as an operator name now"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    FAT_ARROW "=>"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "factorial"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- lexing of <=, >=, <>, != has a number of edge cases"
+  WHITESPACE "\n"
+  COMMENT "-- (=> is tested elsewhere)"
+  WHITESPACE "\n\n"
+  COMMENT "-- this is legal because ! is not allowed in sql ops"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      BANG "!"
+      EQ "="
+      MINUS "-"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "factorial"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              BANG "!"
+              EQ "="
+              MINUS "-"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- postfix operators don't work anymore"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "10"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              EQ "="
+              MINUS "-"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- make sure lexer returns != as <> even in edge cases"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            NEQ "!="
+            COMMENT "/**/"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            NEQ "!="
+            COMMENT "/**/"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            NEQ "!="
+            COMMENT "-- comment to be removed by psql"
+            WHITESPACE "\n  "
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DO_STMT
+    DO_KW "DO"
+    WHITESPACE " "
+    LITERAL
+      DOLLAR_QUOTED_STRING "$$ -- use DO to protect -- from psql\n  declare r boolean;\n  begin\n    execute $e$ select 2 !=-- comment\n      1 $e$ into r;\n    raise info 'r = %', r;\n  end;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check that <= etc. followed by more operator characters are returned"
+  WHITESPACE "\n"
+  COMMENT "-- as the correct token with correct precedence"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              TRUE_KW "true"
+            CUSTOM_OP
+              L_ANGLE "<"
+              R_ANGLE ">"
+              MINUS "-"
+            BETWEEN_EXPR
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              BETWEEN_KW "BETWEEN"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- BETWEEN has prec. above <> but below Op"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              FALSE_KW "false"
+            NEQB "<>"
+            COMMENT "/**/"
+            BETWEEN_EXPR
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              BETWEEN_KW "BETWEEN"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              FALSE_KW "false"
+            CUSTOM_OP
+              L_ANGLE "<"
+              EQ "="
+              MINUS "-"
+            BETWEEN_EXPR
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              BETWEEN_KW "BETWEEN"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              FALSE_KW "false"
+            CUSTOM_OP
+              R_ANGLE ">"
+              EQ "="
+              MINUS "-"
+            BETWEEN_EXPR
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              BETWEEN_KW "BETWEEN"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            LTEQ "<="
+            COMMENT "/**/"
+            LITERAL
+              INT_NUMBER "3"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "3"
+            GTEQ ">="
+            COMMENT "/**/"
+            LITERAL
+              INT_NUMBER "2"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            NEQB "<>"
+            COMMENT "/**/"
+            LITERAL
+              INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "3"
+            LTEQ "<="
+            COMMENT "/**/"
+            LITERAL
+              INT_NUMBER "2"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            GTEQ ">="
+            COMMENT "/**/"
+            LITERAL
+              INT_NUMBER "3"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            NEQB "<>"
+            COMMENT "/**/"
+            LITERAL
+              INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. CREATE OPERATOR requires USAGE on SCHEMA"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_rol_op1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "schema_op1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    IDENT "USAGE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "schema_op1"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "PUBLIC"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    IDENT "USAGE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "schema_op1"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "regress_rol_op1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_rol_op1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "schema_op1"
+      DOT "."
+      PATH_SEGMENT
+    CUSTOM_OP
+      POUND "#"
+      STAR "*"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "factorial"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- Should fail. SETOF type functions not allowed as argument (testing leftarg)"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      STAR "*"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            SETOF_KW "SETOF"
+  WHITESPACE " "
+  ERROR
+    IDENT "int8"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n   "
+  ERROR
+    PROCEDURE_KW "procedure"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    IDENT "factorial"
+  WHITESPACE "\n"
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- Should fail. SETOF type functions not allowed as argument (testing rightarg)"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      STAR "*"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            SETOF_KW "SETOF"
+  WHITESPACE " "
+  ERROR
+    IDENT "int8"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n   "
+  ERROR
+    PROCEDURE_KW "procedure"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    IDENT "factorial"
+  WHITESPACE "\n"
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- Should work. Sample text-book case"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "OR"
+      WHITESPACE " "
+      REPLACE_KW "REPLACE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fn_op2"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BOOLEAN_KW "boolean"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                BOOLEAN_KW "boolean"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              BOOLEAN_KW "boolean"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n    SELECT NULL::BOOLEAN;\n$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "IMMUTABLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      IDENT "LEFTARG"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            BOOLEAN_KW "boolean"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "RIGHTARG"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            BOOLEAN_KW "boolean"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fn_op2"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "COMMUTATOR"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "NEGATOR"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CUSTOM_OP
+      BANG "!"
+      EQ "="
+      EQ "="
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      RESTRICT_KW "RESTRICT"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "contsel"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      JOIN_KW "JOIN"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "contjoinsel"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "SORT1"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "SORT2"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "LTCMP"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "GTCMP"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "HASHES"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "MERGES"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. Invalid attribute"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      AT "@"
+      PERCENT "%"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "factorial"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      IDENT "invalid_att"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. At least rightarg should be mandatorily specified"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      AT "@"
+      PERCENT "%"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "factorial"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. Procedure should be mandatorily specified"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      AT "@"
+      PERCENT "%"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. CREATE OPERATOR requires USAGE on TYPE"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_rol_op3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "type_op3"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    ENUM_KW "ENUM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'new'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'open'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'closed'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fn_op3"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "type_op3"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n    SELECT NULL::int8;\n$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "IMMUTABLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    IDENT "USAGE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "type_op3"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "regress_rol_op3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    IDENT "USAGE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "type_op3"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "PUBLIC"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- Need to do this so that regress_rol_op3 is not allowed USAGE via PUBLIC"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_rol_op3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      STAR "*"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "type_op3"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fn_op3"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. CREATE OPERATOR requires USAGE on TYPE (need to check separately for rightarg)"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_rol_op4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "type_op4"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    ENUM_KW "ENUM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'new'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'open'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'closed'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fn_op4"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "type_op4"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n    SELECT NULL::int8;\n$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "IMMUTABLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    IDENT "USAGE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "type_op4"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "regress_rol_op4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    IDENT "USAGE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "type_op4"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "PUBLIC"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- Need to do this so that regress_rol_op3 is not allowed USAGE via PUBLIC"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_rol_op4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      STAR "*"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "type_op4"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fn_op4"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. CREATE OPERATOR requires EXECUTE on function"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_rol_op5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "type_op5"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    ENUM_KW "ENUM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'new'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'open'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'closed'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fn_op5"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "int8"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n    SELECT NULL::int8;\n$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "IMMUTABLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    EXECUTE_KW "EXECUTE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "fn_op5"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "regress_rol_op5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    EXECUTE_KW "EXECUTE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "fn_op5"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "PUBLIC"
+  SEMICOLON ";"
+  COMMENT "-- Need to do this so that regress_rol_op3 is not allowed EXECUTE via PUBLIC"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_rol_op5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      STAR "*"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fn_op5"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. CREATE OPERATOR requires USAGE on return TYPE"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_rol_op6"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "type_op6"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    ENUM_KW "ENUM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'new'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'open'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'closed'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fn_op6"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int8"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "type_op6"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n    SELECT NULL::type_op6;\n$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "IMMUTABLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    IDENT "USAGE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "type_op6"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "regress_rol_op6"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    IDENT "USAGE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "type_op6"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "PUBLIC"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- Need to do this so that regress_rol_op3 is not allowed USAGE via PUBLIC"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_rol_op6"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+      STAR "*"
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n   "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE "\n   "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fn_op6"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. An operator cannot be its own negator."
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4eq"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "negator"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. An operator cannot be its own negator. Here we check that"
+  WHITESPACE "\n"
+  COMMENT "-- this error is detected when replacing a shell operator."
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- create a shell operator for ===!!! by referencing it as a commutator"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4eq"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "commutator"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+      BANG "!"
+      BANG "!"
+      BANG "!"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+      BANG "!"
+      BANG "!"
+      BANG "!"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4ne"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "negator"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+      BANG "!"
+      BANG "!"
+      BANG "!"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test that we can't use part of an existing commutator or negator pair"
+  WHITESPACE "\n"
+  COMMENT "-- as a commutator or negator"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4eq"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "commutator"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n    "
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4eq"
+    COMMA ","
+    WHITESPACE "\n    "
+    NAME
+      IDENT "negator"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    NEQB "<>"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- invalid: non-lowercase quoted identifiers"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    WHITESPACE "\n"
+    L_PAREN "("
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Leftarg\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "box"
+    COMMA ","
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Rightarg\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "box"
+    COMMA ","
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Procedure\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "area_equal_function"
+    COMMA ","
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Commutator\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CUSTOM_OP
+      EQ "="
+      EQ "="
+      EQ "="
+    COMMA ","
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Negator\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CUSTOM_OP
+      BANG "!"
+      EQ "="
+      EQ "="
+    COMMA ","
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Restrict\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "area_restriction_function"
+    COMMA ","
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Join\""
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "area_join_function"
+    COMMA ","
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Hashes\""
+    COMMA ","
+    WHITESPACE "\n\t"
+    NAME
+      IDENT "\"Merges\""
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@1118: expected an expression, found SEMICOLON
+ERROR@2286: expected R_PAREN
+ERROR@2286: expected SEMICOLON
+ERROR@2287: expected command, found IDENT
+ERROR@2291: expected command, found COMMA
+ERROR@2296: expected command, found PROCEDURE_KW
+ERROR@2306: expected command, found EQ
+ERROR@2308: expected command, found IDENT
+ERROR@2318: expected command, found R_PAREN
+ERROR@2473: expected R_PAREN
+ERROR@2473: expected SEMICOLON
+ERROR@2474: expected command, found IDENT
+ERROR@2478: expected command, found COMMA
+ERROR@2483: expected command, found PROCEDURE_KW
+ERROR@2493: expected command, found EQ
+ERROR@2495: expected command, found IDENT
+ERROR@2505: expected command, found R_PAREN
