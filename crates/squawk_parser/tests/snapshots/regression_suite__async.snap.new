@@ -1,0 +1,177 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/async.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- ASYNC"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "--Should work. Send a valid message via a valid channel name"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_notify"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'notify_async1'"
+              COMMA ","
+              LITERAL
+                STRING "'sample message1'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_notify"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'notify_async1'"
+              COMMA ","
+              LITERAL
+                STRING "''"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_notify"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'notify_async1'"
+              COMMA ","
+              LITERAL
+                NULL_KW "NULL"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should fail. Send a valid message via an invalid channel name"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_notify"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "''"
+              COMMA ","
+              LITERAL
+                STRING "'sample message1'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_notify"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                NULL_KW "NULL"
+              COMMA ","
+              LITERAL
+                STRING "'sample message1'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_notify"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'notify_async_channel_name_too_long______________________________'"
+              COMMA ","
+              LITERAL
+                STRING "'sample_message1'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--Should work. Valid NOTIFY/LISTEN/UNLISTEN commands"
+  WHITESPACE "\n"
+  NOTIFY_STMT
+    NOTIFY_KW "NOTIFY"
+    WHITESPACE " "
+    NAME
+      IDENT "notify_async2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LISTEN_STMT
+    LISTEN_KW "LISTEN"
+    WHITESPACE " "
+    NAME
+      IDENT "notify_async2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UNLISTEN_STMT
+    UNLISTEN_KW "UNLISTEN"
+    WHITESPACE " "
+    NAME
+      IDENT "notify_async2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UNLISTEN_STMT
+    UNLISTEN_KW "UNLISTEN"
+    WHITESPACE " "
+    STAR "*"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Should return zero while there are no pending notifications."
+  WHITESPACE "\n"
+  COMMENT "-- src/test/isolation/specs/async-notify.spec tests for actual usage."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_notification_queue_usage"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

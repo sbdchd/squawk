@@ -1,0 +1,329 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/sanity_check.sql
+---
+SOURCE_FILE
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Sanity check: every system catalog that has OIDs should have"
+  WHITESPACE "\n"
+  COMMENT "-- a unique index on OID.  This ensures that the OIDs will be unique,"
+  WHITESPACE "\n"
+  COMMENT "-- even after the OID counter wraps around."
+  WHITESPACE "\n"
+  COMMENT "-- We exclude non-system tables from the check by looking at nspname."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "nspname"
+    WHITESPACE "\n "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      WHITESPACE " "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_namespace"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "n"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "n"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          NAME_REF
+            IDENT "relnamespace"
+      WHITESPACE " "
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_attribute"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "a"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "attrelid"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "c"
+                DOT "."
+                NAME_REF
+                  IDENT "oid"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "attname"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                STRING "'oid'"
+          R_PAREN ")"
+    WHITESPACE "\n "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "relkind"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                STRING "'r'"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "c"
+                DOT "."
+                NAME_REF
+                  IDENT "oid"
+              WHITESPACE " "
+              L_ANGLE "<"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "16384"
+          WHITESPACE "\n     "
+          AND_KW "AND"
+          WHITESPACE " "
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "nspname"
+                  WHITESPACE " "
+                  CUSTOM_OP
+                    TILDE "~"
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'^pg_'"
+                R_PAREN ")"
+              WHITESPACE " "
+              IS_NOT
+                IS_KW "IS"
+                WHITESPACE " "
+                NOT_KW "NOT"
+              WHITESPACE " "
+              LITERAL
+                FALSE_KW "FALSE"
+            R_PAREN ")"
+        WHITESPACE "\n     "
+        AND_KW "AND"
+        WHITESPACE " "
+        PREFIX_EXPR
+          NOT_KW "NOT"
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              EXISTS_KW "EXISTS"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "SELECT"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "1"
+                WHITESPACE " "
+                FROM_CLAUSE
+                  FROM_KW "FROM"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "pg_index"
+                  WHITESPACE " "
+                  ALIAS
+                    NAME
+                      IDENT "i"
+                WHITESPACE " "
+                WHERE_CLAUSE
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    BIN_EXPR
+                      BIN_EXPR
+                        BIN_EXPR
+                          BIN_EXPR
+                            NAME_REF
+                              IDENT "indrelid"
+                            WHITESPACE " "
+                            EQ "="
+                            WHITESPACE " "
+                            FIELD_EXPR
+                              NAME_REF
+                                IDENT "c"
+                              DOT "."
+                              NAME_REF
+                                IDENT "oid"
+                          WHITESPACE "\n                     "
+                          AND_KW "AND"
+                          WHITESPACE " "
+                          BIN_EXPR
+                            INDEX_EXPR
+                              NAME_REF
+                                IDENT "indkey"
+                              L_BRACK "["
+                              LITERAL
+                                INT_NUMBER "0"
+                              R_BRACK "]"
+                            WHITESPACE " "
+                            EQ "="
+                            WHITESPACE " "
+                            FIELD_EXPR
+                              NAME_REF
+                                IDENT "a"
+                              DOT "."
+                              NAME_REF
+                                IDENT "attnum"
+                        WHITESPACE " "
+                        AND_KW "AND"
+                        WHITESPACE " "
+                        BIN_EXPR
+                          NAME_REF
+                            IDENT "indnatts"
+                          WHITESPACE " "
+                          EQ "="
+                          WHITESPACE " "
+                          LITERAL
+                            INT_NUMBER "1"
+                      WHITESPACE "\n                     "
+                      AND_KW "AND"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "indisunique"
+                    WHITESPACE " "
+                    AND_KW "AND"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "indimmediate"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check that relations without storage don't have relfilenode"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "relkind"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE "\n "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "relkind"
+          WHITESPACE " "
+          IN_KW "IN"
+          WHITESPACE " "
+          TUPLE_EXPR
+            L_PAREN "("
+            LITERAL
+              STRING "'v'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'c'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'f'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'p'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'I'"
+            R_PAREN ")"
+        WHITESPACE "\n       "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "relfilenode"
+          WHITESPACE " "
+          NEQB "<>"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"

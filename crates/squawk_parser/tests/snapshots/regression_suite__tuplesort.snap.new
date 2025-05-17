@@ -1,0 +1,3910 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/tuplesort.sql
+---
+SOURCE_FILE
+  COMMENT "-- only use parallelism when explicitly intending to do so"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_maintenance_workers"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_workers"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- A table with contents that, when sorted, triggers abbreviated"
+    WHITESPACE "\n"
+    COMMENT "-- key aborts. One easy way to achieve that is to use uuids that all"
+    WHITESPACE "\n"
+    COMMENT "-- have the same prefix, as abbreviated keys for uuids just use the"
+    WHITESPACE "\n"
+    COMMENT "-- first sizeof(Datum) bytes."
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "serial"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "not"
+          WHITESPACE " "
+          NULL_KW "null"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "abort_increasing"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "uuid"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "abort_decreasing"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "uuid"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "noabort_increasing"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "uuid"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME_REF
+          IDENT "noabort_decreasing"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "uuid"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "abort_increasing"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "abort_decreasing"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "noabort_increasing"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "noabort_decreasing"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE "\n        "
+        TARGET_LIST
+          TARGET
+            CAST_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  LITERAL
+                    STRING "'00000000-0000-0000-0000-'"
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "to_char"
+                    ARG_LIST
+                      L_PAREN "("
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "g"
+                        DOT "."
+                        NAME_REF
+                          IDENT "i"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'000000000000FM'"
+                      R_PAREN ")"
+                R_PAREN ")"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "uuid"
+            WHITESPACE " "
+            NAME
+              IDENT "abort_increasing"
+          COMMA ","
+          WHITESPACE "\n        "
+          TARGET
+            CAST_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  LITERAL
+                    STRING "'00000000-0000-0000-0000-'"
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "to_char"
+                    ARG_LIST
+                      L_PAREN "("
+                      BIN_EXPR
+                        LITERAL
+                          INT_NUMBER "20000"
+                        WHITESPACE " "
+                        MINUS "-"
+                        WHITESPACE " "
+                        FIELD_EXPR
+                          NAME_REF
+                            IDENT "g"
+                          DOT "."
+                          NAME_REF
+                            IDENT "i"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'000000000000FM'"
+                      R_PAREN ")"
+                R_PAREN ")"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "uuid"
+            WHITESPACE " "
+            NAME
+              IDENT "abort_decreasing"
+          COMMA ","
+          WHITESPACE "\n        "
+          TARGET
+            CAST_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "to_char"
+                    ARG_LIST
+                      L_PAREN "("
+                      BIN_EXPR
+                        FIELD_EXPR
+                          NAME_REF
+                            IDENT "g"
+                          DOT "."
+                          NAME_REF
+                            IDENT "i"
+                        WHITESPACE " "
+                        PERCENT "%"
+                        WHITESPACE " "
+                        LITERAL
+                          INT_NUMBER "10009"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'00000000FM'"
+                      R_PAREN ")"
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  BIN_EXPR
+                    LITERAL
+                      STRING "'-0000-0000-0000-'"
+                    CUSTOM_OP
+                      PIPE "|"
+                      PIPE "|"
+                    CALL_EXPR
+                      NAME_REF
+                        IDENT "to_char"
+                      ARG_LIST
+                        L_PAREN "("
+                        FIELD_EXPR
+                          NAME_REF
+                            IDENT "g"
+                          DOT "."
+                          NAME_REF
+                            IDENT "i"
+                        COMMA ","
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'000000000000FM'"
+                        R_PAREN ")"
+                R_PAREN ")"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "uuid"
+            WHITESPACE " "
+            NAME
+              IDENT "noabort_increasing"
+          COMMA ","
+          WHITESPACE "\n        "
+          TARGET
+            CAST_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                BIN_EXPR
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "to_char"
+                    ARG_LIST
+                      L_PAREN "("
+                      PAREN_EXPR
+                        L_PAREN "("
+                        BIN_EXPR
+                          PAREN_EXPR
+                            L_PAREN "("
+                            BIN_EXPR
+                              LITERAL
+                                INT_NUMBER "20000"
+                              WHITESPACE " "
+                              MINUS "-"
+                              WHITESPACE " "
+                              FIELD_EXPR
+                                NAME_REF
+                                  IDENT "g"
+                                DOT "."
+                                NAME_REF
+                                  IDENT "i"
+                            R_PAREN ")"
+                          WHITESPACE " "
+                          PERCENT "%"
+                          WHITESPACE " "
+                          LITERAL
+                            INT_NUMBER "10009"
+                        R_PAREN ")"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'00000000FM'"
+                      R_PAREN ")"
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  BIN_EXPR
+                    LITERAL
+                      STRING "'-0000-0000-0000-'"
+                    CUSTOM_OP
+                      PIPE "|"
+                      PIPE "|"
+                    CALL_EXPR
+                      NAME_REF
+                        IDENT "to_char"
+                      ARG_LIST
+                        L_PAREN "("
+                        BIN_EXPR
+                          LITERAL
+                            INT_NUMBER "20000"
+                          WHITESPACE " "
+                          MINUS "-"
+                          WHITESPACE " "
+                          FIELD_EXPR
+                            NAME_REF
+                              IDENT "g"
+                            DOT "."
+                            NAME_REF
+                              IDENT "i"
+                        COMMA ","
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'000000000000FM'"
+                        R_PAREN ")"
+                R_PAREN ")"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "uuid"
+            WHITESPACE " "
+            NAME
+              IDENT "noabort_decreasing"
+      WHITESPACE "\n    "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "0"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "20000"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "i"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- and a few NULLs"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "id"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- add just a few duplicates"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "abort_increasing"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "abort_decreasing"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "noabort_increasing"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "noabort_decreasing"
+      R_PAREN ")"
+    WHITESPACE "\n    "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "abort_increasing"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "abort_decreasing"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "noabort_increasing"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "noabort_decreasing"
+      WHITESPACE "\n    "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+      WHITESPACE "\n    "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              BIN_EXPR
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "id"
+                  WHITESPACE " "
+                  L_ANGLE "<"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "10"
+                WHITESPACE " "
+                OR_KW "OR"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "id"
+                  WHITESPACE " "
+                  R_ANGLE ">"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "19990"
+              R_PAREN ")"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            BIN_EXPR
+              BIN_EXPR
+                NAME_REF
+                  IDENT "id"
+                WHITESPACE " "
+                PERCENT "%"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "3"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "0"
+          WHITESPACE " "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "abort_increasing"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "----"
+  WHITESPACE "\n"
+  COMMENT "-- Check sort node uses of tuplesort wrt. abbreviated keys"
+  WHITESPACE "\n"
+  COMMENT "----"
+  WHITESPACE "\n\n"
+  COMMENT "-- plain sort triggering abbreviated abort"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abort_increasing"
+    WHITESPACE " "
+    OFFSET_CLAUSE
+      OFFSET_KW "OFFSET"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "20000"
+        WHITESPACE " "
+        MINUS "-"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abort_decreasing"
+      WHITESPACE " "
+      NULLS_KW "NULLS"
+      WHITESPACE " "
+      FIRST_KW "FIRST"
+    WHITESPACE " "
+    OFFSET_CLAUSE
+      OFFSET_KW "OFFSET"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "20000"
+        WHITESPACE " "
+        MINUS "-"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- plain sort not triggering abbreviated abort"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "noabort_increasing"
+    WHITESPACE " "
+    OFFSET_CLAUSE
+      OFFSET_KW "OFFSET"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "20000"
+        WHITESPACE " "
+        MINUS "-"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "noabort_decreasing"
+      WHITESPACE " "
+      NULLS_KW "NULLS"
+      WHITESPACE " "
+      FIRST_KW "FIRST"
+    WHITESPACE " "
+    OFFSET_CLAUSE
+      OFFSET_KW "OFFSET"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "20000"
+        WHITESPACE " "
+        MINUS "-"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bounded sort (disables abbreviated keys)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abort_increasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "noabort_increasing"
+      WHITESPACE " "
+      NULLS_KW "NULLS"
+      WHITESPACE " "
+      FIRST_KW "FIRST"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "----"
+  WHITESPACE "\n"
+  COMMENT "-- Check index creation uses of tuplesort wrt. abbreviated keys"
+  WHITESPACE "\n"
+  COMMENT "----"
+  WHITESPACE "\n\n"
+  COMMENT "-- index creation using abbreviated keys successfully"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "abbrev_abort_uuids__noabort_increasing_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "noabort_increasing"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "abbrev_abort_uuids__noabort_decreasing_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "noabort_decreasing"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- verify"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "noabort_increasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "noabort_increasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "noabort_decreasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "noabort_decreasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- index creation using abbreviated keys, hitting abort"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "abbrev_abort_uuids__abort_increasing_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "abort_increasing"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "abbrev_abort_uuids__abort_decreasing_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "abort_decreasing"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- verify"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abort_increasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abort_increasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abort_decreasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abort_decreasing"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "----"
+  WHITESPACE "\n"
+  COMMENT "-- Check CLUSTER uses of tuplesort wrt. abbreviated keys"
+  WHITESPACE "\n"
+  COMMENT "----"
+  WHITESPACE "\n\n"
+  COMMENT "-- when aborting, increasing order"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "abbrev_abort_uuids__abort_increasing_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- head"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ctid"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- tail"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ctid"
+      WHITESPACE " "
+      DESC_KW "DESC"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- when aborting, decreasing order"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "abbrev_abort_uuids__abort_decreasing_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- head"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ctid"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- tail"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ctid"
+      WHITESPACE " "
+      DESC_KW "DESC"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- when not aborting, increasing order"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "abbrev_abort_uuids__noabort_increasing_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- head"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ctid"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- tail"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ctid"
+      WHITESPACE " "
+      DESC_KW "DESC"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- when no aborting, decreasing order"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "abbrev_abort_uuids__noabort_decreasing_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- head"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ctid"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- tail"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "abort_decreasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_increasing"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "noabort_decreasing"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "abbrev_abort_uuids"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ctid"
+      WHITESPACE " "
+      DESC_KW "DESC"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "LIMIT"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "----"
+  WHITESPACE "\n"
+  COMMENT "-- test sorting of large datums VALUES"
+  WHITESPACE "\n"
+  COMMENT "----"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the order is correct and values look intact"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              LEFT_KW "LEFT"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE "\n    "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "VALUES"
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "REPEAT"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a'"
+              COMMA ","
+              WHITESPACE " "
+              BIN_EXPR
+                LITERAL
+                  INT_NUMBER "512"
+                WHITESPACE " "
+                STAR "*"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1024"
+              R_PAREN ")"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+          COMMA ","
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "REPEAT"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'b'"
+              COMMA ","
+              WHITESPACE " "
+              BIN_EXPR
+                LITERAL
+                  INT_NUMBER "512"
+                WHITESPACE " "
+                STAR "*"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1024"
+              R_PAREN ")"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "v"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "a"
+          COMMA ","
+          COLUMN
+            NAME
+              IDENT "b"
+          R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "v"
+        DOT "."
+        NAME_REF
+          IDENT "a"
+      WHITESPACE " "
+      DESC_KW "DESC"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "----"
+  WHITESPACE "\n"
+  COMMENT "-- test forward and backward scans for in-memory and disk based tuplesort"
+  WHITESPACE "\n"
+  COMMENT "----"
+  WHITESPACE "\n\n"
+  COMMENT "-- in-memory"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- unfortunately can't show analyze output confirming sort method,"
+  WHITESPACE "\n"
+  COMMENT "-- the memory used output wouldn't be stable"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "noabort_decreasing"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "noabort_decreasing"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "noabort_decreasing"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "noabort_decreasing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first and second"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- scroll beyond beginning"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- scroll beyond end"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LAST_KW "LAST"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- disk based"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'100kB'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- unfortunately can't show analyze output confirming sort method,"
+  WHITESPACE "\n"
+  COMMENT "-- the memory used output wouldn't be stable"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "noabort_decreasing"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "noabort_decreasing"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DECLARE_STMT
+    DECLARE_KW "DECLARE"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+    WHITESPACE " "
+    SCROLL_KW "SCROLL"
+    WHITESPACE " "
+    CURSOR_KW "CURSOR"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "noabort_decreasing"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "abbrev_abort_uuids"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "noabort_decreasing"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- first and second"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- scroll beyond beginning"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- scroll beyond end"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    LAST_KW "LAST"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH_STMT
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    NEXT_KW "NEXT"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    NAME
+      IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "----"
+  WHITESPACE "\n"
+  COMMENT "-- test tuplesort using both in-memory and disk sort"
+  WHITESPACE "\n"
+  COMMENT "---"
+  WHITESPACE "\n\n"
+  COMMENT "-- memory based"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      COMMENT "-- fixed-width by-value datum"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "array_agg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "id"
+                  WHITESPACE " "
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "id"
+                    WHITESPACE " "
+                    DESC_KW "DESC"
+                    WHITESPACE " "
+                    NULLS_KW "NULLS"
+                    WHITESPACE " "
+                    FIRST_KW "FIRST"
+                  R_PAREN ")"
+              R_PAREN ")"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "0"
+            COLON ":"
+            LITERAL
+              INT_NUMBER "5"
+            R_BRACK "]"
+        COMMA ","
+        WHITESPACE "\n    "
+        COMMENT "-- fixed-width by-ref datum"
+        WHITESPACE "\n    "
+        TARGET
+          INDEX_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "array_agg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "abort_increasing"
+                  WHITESPACE " "
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "abort_increasing"
+                    WHITESPACE " "
+                    DESC_KW "DESC"
+                    WHITESPACE " "
+                    NULLS_KW "NULLS"
+                    WHITESPACE " "
+                    LAST_KW "LAST"
+                  R_PAREN ")"
+              R_PAREN ")"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "0"
+            COLON ":"
+            LITERAL
+              INT_NUMBER "5"
+            R_BRACK "]"
+        COMMA ","
+        WHITESPACE "\n    "
+        COMMENT "-- variable-width datum"
+        WHITESPACE "\n    "
+        TARGET
+          TUPLE_EXPR
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "array_agg"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  NAME_REF
+                    IDENT "id"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+            WHITESPACE " "
+            ERROR
+              ORDER_KW "ORDER"
+          WHITESPACE " "
+          NAME
+            BY_KW "BY"
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "id"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          WHITESPACE " "
+          NAME
+            DESC_KW "DESC"
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            NULLS_KW "NULLS"
+          WHITESPACE " "
+          NAME
+            LAST_KW "LAST"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    L_BRACK "["
+  ERROR
+    INT_NUMBER "0"
+  ERROR
+    COLON ":"
+  ERROR
+    INT_NUMBER "5"
+  ERROR
+    R_BRACK "]"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  COMMENT "-- fixed width by-value datum tuplesort"
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "percentile_disc"
+  ERROR
+    L_PAREN "("
+  ERROR
+    FLOAT_NUMBER "0.99"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  COMMENT "-- ensure state is shared"
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "percentile_disc"
+  ERROR
+    L_PAREN "("
+  ERROR
+    FLOAT_NUMBER "0.01"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  COMMENT "-- fixed width by-ref datum tuplesort"
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "percentile_disc"
+  ERROR
+    L_PAREN "("
+  ERROR
+    FLOAT_NUMBER "0.8"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "abort_increasing"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  COMMENT "-- variable width by-ref datum tuplesort"
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "percentile_disc"
+  ERROR
+    L_PAREN "("
+  ERROR
+    FLOAT_NUMBER "0.2"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    COLON ":"
+  ERROR
+    COLON ":"
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  COMMENT "-- multi-column tuplesort"
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "rank"
+  ERROR
+    L_PAREN "("
+  ERROR
+    STRING "'00000000-0000-0000-0000-000000000000'"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    STRING "'2'"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    STRING "'2'"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "noabort_increasing"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    COLON ":"
+  ERROR
+    COLON ":"
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  ERROR
+    FROM_KW "FROM"
+  WHITESPACE " "
+  PAREN_EXPR
+    L_PAREN "("
+    WHITESPACE "\n    "
+    COMPOUND_SELECT
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              STAR "*"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "abbrev_abort_uuids"
+      WHITESPACE "\n    "
+      UNION_KW "UNION"
+      WHITESPACE " "
+      ALL_KW "ALL"
+      WHITESPACE "\n    "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- disk based (see also above)"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'100kB'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          INDEX_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "array_agg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "id"
+                  WHITESPACE " "
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "id"
+                    WHITESPACE " "
+                    DESC_KW "DESC"
+                    WHITESPACE " "
+                    NULLS_KW "NULLS"
+                    WHITESPACE " "
+                    FIRST_KW "FIRST"
+                  R_PAREN ")"
+              R_PAREN ")"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "0"
+            COLON ":"
+            LITERAL
+              INT_NUMBER "5"
+            R_BRACK "]"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          INDEX_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "array_agg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "abort_increasing"
+                  WHITESPACE " "
+                  ORDER_BY_CLAUSE
+                    ORDER_KW "ORDER"
+                    WHITESPACE " "
+                    BY_KW "BY"
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "abort_increasing"
+                    WHITESPACE " "
+                    DESC_KW "DESC"
+                    WHITESPACE " "
+                    NULLS_KW "NULLS"
+                    WHITESPACE " "
+                    LAST_KW "LAST"
+                  R_PAREN ")"
+              R_PAREN ")"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "0"
+            COLON ":"
+            LITERAL
+              INT_NUMBER "5"
+            R_BRACK "]"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          TUPLE_EXPR
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "array_agg"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  NAME_REF
+                    IDENT "id"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+            WHITESPACE " "
+            ERROR
+              ORDER_KW "ORDER"
+          WHITESPACE " "
+          NAME
+            BY_KW "BY"
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "id"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          WHITESPACE " "
+          NAME
+            DESC_KW "DESC"
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            NULLS_KW "NULLS"
+          WHITESPACE " "
+          NAME
+            LAST_KW "LAST"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    L_BRACK "["
+  ERROR
+    INT_NUMBER "0"
+  ERROR
+    COLON ":"
+  ERROR
+    INT_NUMBER "5"
+  ERROR
+    R_BRACK "]"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "percentile_disc"
+  ERROR
+    L_PAREN "("
+  ERROR
+    FLOAT_NUMBER "0.99"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "percentile_disc"
+  ERROR
+    L_PAREN "("
+  ERROR
+    FLOAT_NUMBER "0.01"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "percentile_disc"
+  ERROR
+    L_PAREN "("
+  ERROR
+    FLOAT_NUMBER "0.8"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "abort_increasing"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "percentile_disc"
+  ERROR
+    L_PAREN "("
+  ERROR
+    FLOAT_NUMBER "0.2"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    COLON ":"
+  ERROR
+    COLON ":"
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "rank"
+  ERROR
+    L_PAREN "("
+  ERROR
+    STRING "'00000000-0000-0000-0000-000000000000'"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    STRING "'2'"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    STRING "'2'"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    WITHIN_KW "WITHIN"
+  WHITESPACE " "
+  ERROR
+    GROUP_KW "GROUP"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "noabort_increasing"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "id"
+  ERROR
+    COLON ":"
+  ERROR
+    COLON ":"
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  ERROR
+    FROM_KW "FROM"
+  WHITESPACE " "
+  PAREN_EXPR
+    L_PAREN "("
+    WHITESPACE "\n    "
+    COMPOUND_SELECT
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              STAR "*"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "abbrev_abort_uuids"
+      WHITESPACE "\n    "
+      UNION_KW "UNION"
+      WHITESPACE " "
+      ALL_KW "ALL"
+      WHITESPACE "\n    "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              LITERAL
+                NULL_KW "NULL"
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "----"
+  WHITESPACE "\n"
+  COMMENT "-- test tuplesort mark/restore"
+  WHITESPACE "\n"
+  COMMENT "---"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_mark_restore"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "col1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col12"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- need a few duplicates for mark/restore to matter"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_mark_restore"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "col1"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col2"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col12"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "a"
+              DOT "."
+              NAME_REF
+                IDENT "i"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "b"
+              DOT "."
+              NAME_REF
+                IDENT "i"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "a"
+                DOT "."
+                NAME_REF
+                  IDENT "i"
+              WHITESPACE " "
+              STAR "*"
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "b"
+                DOT "."
+                NAME_REF
+                  IDENT "i"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "500"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "a"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "i"
+            R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "5"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "b"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "i"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_nestloop"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashjoin"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_material"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- set query into variable once, to avoid repetition of the fairly long query"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$\n    SELECT col12, count(distinct a.col1), count(distinct a.col2), count(distinct b.col1), count(distinct b.col2), count(*)\n    FROM test_mark_restore a\n        JOIN test_mark_restore b USING(col12)\n    GROUP BY 1\n    HAVING count(*) > 1\n    ORDER BY 2 DESC, 1 DESC, 3 DESC, 4 DESC, 5 DESC, 6 DESC\n    LIMIT 10\n$$"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "qry"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test mark/restore with in-memory sorts"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    IDENT "qry"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ERROR
+    COLON ":"
+  ERROR
+    IDENT "qry"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test mark/restore with on-disk sorts"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'100kB'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    IDENT "qry"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ERROR
+    COLON ":"
+  ERROR
+    IDENT "qry"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@2917: expected R_PAREN
+ERROR@2918: expected command, found OFF_KW
+ERROR@2921: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2921: expected SEMICOLON
+ERROR@2921: expected command, found R_PAREN
+ERROR@3159: expected R_PAREN
+ERROR@3160: expected command, found OFF_KW
+ERROR@3163: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3163: expected SEMICOLON
+ERROR@3163: expected command, found R_PAREN
+ERROR@3661: expected R_PAREN
+ERROR@3662: expected command, found OFF_KW
+ERROR@3665: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3665: expected SEMICOLON
+ERROR@3665: expected command, found R_PAREN
+ERROR@3891: expected R_PAREN
+ERROR@3892: expected command, found OFF_KW
+ERROR@3895: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3895: expected SEMICOLON
+ERROR@3895: expected command, found R_PAREN
+ERROR@6491: expected R_PAREN
+ERROR@6492: expected command, found OFF_KW
+ERROR@6495: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@6495: expected SEMICOLON
+ERROR@6495: expected command, found R_PAREN
+ERROR@7295: expected R_PAREN
+ERROR@7296: expected command, found OFF_KW
+ERROR@7299: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@7299: expected SEMICOLON
+ERROR@7299: expected command, found R_PAREN
+ERROR@8227: expected R_PAREN
+ERROR@8227: expected COMMA
+ERROR@8228: expected an expression, found ORDER_KW
+ERROR@8233: expected R_PAREN
+ERROR@8236: missing comma
+ERROR@8250: missing comma
+ERROR@8261: expected SEMICOLON
+ERROR@8261: expected command, found R_PAREN
+ERROR@8262: expected command, found R_PAREN
+ERROR@8263: expected command, found L_BRACK
+ERROR@8264: expected command, found INT_NUMBER
+ERROR@8265: expected command, found COLON
+ERROR@8266: expected command, found INT_NUMBER
+ERROR@8267: expected command, found R_BRACK
+ERROR@8268: expected command, found COMMA
+ERROR@8318: expected command, found IDENT
+ERROR@8333: expected command, found L_PAREN
+ERROR@8334: expected command, found FLOAT_NUMBER
+ERROR@8338: expected command, found R_PAREN
+ERROR@8340: expected command, found WITHIN_KW
+ERROR@8347: expected command, found GROUP_KW
+ERROR@8353: expected command, found L_PAREN
+ERROR@8354: expected command, found ORDER_KW
+ERROR@8360: expected command, found BY_KW
+ERROR@8363: expected command, found IDENT
+ERROR@8365: expected command, found R_PAREN
+ERROR@8366: expected command, found COMMA
+ERROR@8402: expected command, found IDENT
+ERROR@8417: expected command, found L_PAREN
+ERROR@8418: expected command, found FLOAT_NUMBER
+ERROR@8422: expected command, found R_PAREN
+ERROR@8424: expected command, found WITHIN_KW
+ERROR@8431: expected command, found GROUP_KW
+ERROR@8437: expected command, found L_PAREN
+ERROR@8438: expected command, found ORDER_KW
+ERROR@8444: expected command, found BY_KW
+ERROR@8447: expected command, found IDENT
+ERROR@8449: expected command, found R_PAREN
+ERROR@8450: expected command, found COMMA
+ERROR@8498: expected command, found IDENT
+ERROR@8513: expected command, found L_PAREN
+ERROR@8514: expected command, found FLOAT_NUMBER
+ERROR@8517: expected command, found R_PAREN
+ERROR@8519: expected command, found WITHIN_KW
+ERROR@8526: expected command, found GROUP_KW
+ERROR@8532: expected command, found L_PAREN
+ERROR@8533: expected command, found ORDER_KW
+ERROR@8539: expected command, found BY_KW
+ERROR@8542: expected command, found IDENT
+ERROR@8558: expected command, found R_PAREN
+ERROR@8559: expected command, found COMMA
+ERROR@8610: expected command, found IDENT
+ERROR@8625: expected command, found L_PAREN
+ERROR@8626: expected command, found FLOAT_NUMBER
+ERROR@8629: expected command, found R_PAREN
+ERROR@8631: expected command, found WITHIN_KW
+ERROR@8638: expected command, found GROUP_KW
+ERROR@8644: expected command, found L_PAREN
+ERROR@8645: expected command, found ORDER_KW
+ERROR@8651: expected command, found BY_KW
+ERROR@8654: expected command, found IDENT
+ERROR@8656: expected command, found COLON
+ERROR@8657: expected command, found COLON
+ERROR@8658: expected command, found TEXT_KW
+ERROR@8662: expected command, found R_PAREN
+ERROR@8663: expected command, found COMMA
+ERROR@8699: expected command, found IDENT
+ERROR@8703: expected command, found L_PAREN
+ERROR@8704: expected command, found STRING
+ERROR@8742: expected command, found COMMA
+ERROR@8744: expected command, found STRING
+ERROR@8747: expected command, found COMMA
+ERROR@8749: expected command, found STRING
+ERROR@8752: expected command, found R_PAREN
+ERROR@8754: expected command, found WITHIN_KW
+ERROR@8761: expected command, found GROUP_KW
+ERROR@8767: expected command, found L_PAREN
+ERROR@8768: expected command, found ORDER_KW
+ERROR@8774: expected command, found BY_KW
+ERROR@8777: expected command, found IDENT
+ERROR@8795: expected command, found COMMA
+ERROR@8797: expected command, found IDENT
+ERROR@8799: expected command, found COMMA
+ERROR@8801: expected command, found IDENT
+ERROR@8803: expected command, found COLON
+ERROR@8804: expected command, found COLON
+ERROR@8805: expected command, found TEXT_KW
+ERROR@8809: expected command, found R_PAREN
+ERROR@8811: expected command, found FROM_KW
+ERROR@8909: expected SEMICOLON
+ERROR@8910: expected command, found IDENT
+ERROR@9150: expected R_PAREN
+ERROR@9150: expected COMMA
+ERROR@9151: expected an expression, found ORDER_KW
+ERROR@9156: expected R_PAREN
+ERROR@9159: missing comma
+ERROR@9173: missing comma
+ERROR@9184: expected SEMICOLON
+ERROR@9184: expected command, found R_PAREN
+ERROR@9185: expected command, found R_PAREN
+ERROR@9186: expected command, found L_BRACK
+ERROR@9187: expected command, found INT_NUMBER
+ERROR@9188: expected command, found COLON
+ERROR@9189: expected command, found INT_NUMBER
+ERROR@9190: expected command, found R_BRACK
+ERROR@9191: expected command, found COMMA
+ERROR@9197: expected command, found IDENT
+ERROR@9212: expected command, found L_PAREN
+ERROR@9213: expected command, found FLOAT_NUMBER
+ERROR@9217: expected command, found R_PAREN
+ERROR@9219: expected command, found WITHIN_KW
+ERROR@9226: expected command, found GROUP_KW
+ERROR@9232: expected command, found L_PAREN
+ERROR@9233: expected command, found ORDER_KW
+ERROR@9239: expected command, found BY_KW
+ERROR@9242: expected command, found IDENT
+ERROR@9244: expected command, found R_PAREN
+ERROR@9245: expected command, found COMMA
+ERROR@9251: expected command, found IDENT
+ERROR@9266: expected command, found L_PAREN
+ERROR@9267: expected command, found FLOAT_NUMBER
+ERROR@9271: expected command, found R_PAREN
+ERROR@9273: expected command, found WITHIN_KW
+ERROR@9280: expected command, found GROUP_KW
+ERROR@9286: expected command, found L_PAREN
+ERROR@9287: expected command, found ORDER_KW
+ERROR@9293: expected command, found BY_KW
+ERROR@9296: expected command, found IDENT
+ERROR@9298: expected command, found R_PAREN
+ERROR@9299: expected command, found COMMA
+ERROR@9305: expected command, found IDENT
+ERROR@9320: expected command, found L_PAREN
+ERROR@9321: expected command, found FLOAT_NUMBER
+ERROR@9324: expected command, found R_PAREN
+ERROR@9326: expected command, found WITHIN_KW
+ERROR@9333: expected command, found GROUP_KW
+ERROR@9339: expected command, found L_PAREN
+ERROR@9340: expected command, found ORDER_KW
+ERROR@9346: expected command, found BY_KW
+ERROR@9349: expected command, found IDENT
+ERROR@9365: expected command, found R_PAREN
+ERROR@9366: expected command, found COMMA
+ERROR@9372: expected command, found IDENT
+ERROR@9387: expected command, found L_PAREN
+ERROR@9388: expected command, found FLOAT_NUMBER
+ERROR@9391: expected command, found R_PAREN
+ERROR@9393: expected command, found WITHIN_KW
+ERROR@9400: expected command, found GROUP_KW
+ERROR@9406: expected command, found L_PAREN
+ERROR@9407: expected command, found ORDER_KW
+ERROR@9413: expected command, found BY_KW
+ERROR@9416: expected command, found IDENT
+ERROR@9418: expected command, found COLON
+ERROR@9419: expected command, found COLON
+ERROR@9420: expected command, found TEXT_KW
+ERROR@9424: expected command, found R_PAREN
+ERROR@9425: expected command, found COMMA
+ERROR@9431: expected command, found IDENT
+ERROR@9435: expected command, found L_PAREN
+ERROR@9436: expected command, found STRING
+ERROR@9474: expected command, found COMMA
+ERROR@9476: expected command, found STRING
+ERROR@9479: expected command, found COMMA
+ERROR@9481: expected command, found STRING
+ERROR@9484: expected command, found R_PAREN
+ERROR@9486: expected command, found WITHIN_KW
+ERROR@9493: expected command, found GROUP_KW
+ERROR@9499: expected command, found L_PAREN
+ERROR@9500: expected command, found ORDER_KW
+ERROR@9506: expected command, found BY_KW
+ERROR@9509: expected command, found IDENT
+ERROR@9527: expected command, found COMMA
+ERROR@9529: expected command, found IDENT
+ERROR@9531: expected command, found COMMA
+ERROR@9533: expected command, found IDENT
+ERROR@9535: expected command, found COLON
+ERROR@9536: expected command, found COLON
+ERROR@9537: expected command, found TEXT_KW
+ERROR@9541: expected command, found R_PAREN
+ERROR@9543: expected command, found FROM_KW
+ERROR@9641: expected SEMICOLON
+ERROR@9642: expected command, found IDENT
+ERROR@10537: expected R_PAREN
+ERROR@10538: expected command, found OFF_KW
+ERROR@10541: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@10541: expected SEMICOLON
+ERROR@10541: expected command, found R_PAREN
+ERROR@10543: expected command, found COLON
+ERROR@10544: expected command, found IDENT
+ERROR@10549: expected command, found COLON
+ERROR@10550: expected command, found IDENT
+ERROR@10640: expected R_PAREN
+ERROR@10641: expected command, found OFF_KW
+ERROR@10644: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@10644: expected SEMICOLON
+ERROR@10644: expected command, found R_PAREN
+ERROR@10646: expected command, found COLON
+ERROR@10647: expected command, found IDENT
+ERROR@10652: expected command, found COLON
+ERROR@10653: expected command, found IDENT

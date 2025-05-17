@@ -1,0 +1,1123 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/dependency.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- DEPENDENCIES"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_USER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_dep_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_USER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_USER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_dep_user3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_GROUP_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_dep_group"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "serial"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "f2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    IDENT "regress_dep_group"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- can't drop neither because they have privileges somewhere"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_GROUP_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_group"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- if we revoke the privileges we can drop the group"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    IDENT "regress_dep_group"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_GROUP_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_group"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- can't drop the user if we revoke the privileges partially"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    COMMA ","
+    WHITESPACE " "
+    INSERT_KW "INSERT"
+    COMMA ","
+    WHITESPACE " "
+    UPDATE_KW "UPDATE"
+    COMMA ","
+    WHITESPACE " "
+    DELETE_KW "DELETE"
+    COMMA ","
+    WHITESPACE " "
+    TRUNCATE_KW "TRUNCATE"
+    COMMA ","
+    WHITESPACE " "
+    REFERENCES_KW "REFERENCES"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "MAINTAIN"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "regress_dep_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- now we are OK to drop him"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "regress_dep_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- we are OK too if we drop the privileges all at once"
+  WHITESPACE "\n"
+  REVOKE_STMT
+    REVOKE_KW "REVOKE"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- can't drop the owner of an object"
+  WHITESPACE "\n"
+  COMMENT "-- the error message detail here would include a pg_toast_nnn name that"
+  WHITESPACE "\n"
+  COMMENT "-- is not constant, so suppress it"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "regress_dep_user3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- if we drop the object, we can drop the user too"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test DROP OWNED"
+  WHITESPACE "\n"
+  CREATE_USER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_dep_user0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_USER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_USER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_dep_user0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- permission denied"
+  WHITESPACE "\n"
+  DROP_OWNED_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OWNED_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user0"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REASSIGN_STMT
+    REASSIGN_KW "REASSIGN"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user0"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REASSIGN_STMT
+    REASSIGN_KW "REASSIGN"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- this one is allowed"
+  WHITESPACE "\n"
+  DROP_OWNED_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest1"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        UNIQUE_CONSTRAINT
+          UNIQUE_KW "unique"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest1"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    OPTION_KW "OPTION"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_SESSION_AUTH_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "serial"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest1"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_OWNED_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- all grants revoked"
+  WHITESPACE "\n"
+  COMMENT "-- table was dropped"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test REASSIGN OWNED"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest1"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    DATABASE_KW "DATABASE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regression"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_SESSION_AUTH_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "deptest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "serial"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DEFAULT_PRIVILEGES_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    PRIVILEGES_KW "PRIVILEGES"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "deptest"
+    WHITESPACE "\n  "
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    TABLES_KW "TABLES"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest_func"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE "\n  "
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ BEGIN END; $$"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest_enum"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    ENUM_KW "ENUM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'red'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest_range"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    RANGE_KW "RANGE"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "SUBTYPE"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest2"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- make a serial column the hard way"
+  WHITESPACE "\n"
+  CREATE_SEQUENCE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ss1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "deptest2"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "ALTER"
+      WHITESPACE " "
+      IDENT "f1"
+      WHITESPACE " "
+      SET_DEFAULT
+        SET_KW "SET"
+        WHITESPACE " "
+        DEFAULT_KW "DEFAULT"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "nextval"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              STRING "'ss1'"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_SEQUENCE_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ss1"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "deptest2"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- When reassigning ownership of a composite type, its pg_class entry"
+  WHITESPACE "\n"
+  COMMENT "-- should match"
+  WHITESPACE "\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "deptest_t"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "typowner"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            NAME_REF
+              IDENT "relowner"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_type"
+      WHITESPACE " "
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_class"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "c"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "typrelid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "typname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'deptest_t'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_SESSION_AUTH_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REASSIGN_STMT
+    REASSIGN_KW "REASSIGN"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "typowner"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            NAME_REF
+              IDENT "relowner"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_type"
+      WHITESPACE " "
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_class"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "c"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "typrelid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "typname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'deptest_t'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- doesn't work: grant still exists"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OWNED_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OWNED_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OWNED_KW "OWNED"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "regress_dep_user2"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "regress_dep_user0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_dep_user0"
+  SEMICOLON ";"
+  WHITESPACE "\n"

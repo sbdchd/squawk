@@ -1,0 +1,2349 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/gin.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test GIN indexes."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- There are other tests to test different GIN opclasses. This is for testing"
+  WHITESPACE "\n"
+  COMMENT "-- GIN itself."
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Create and populate a test table with a GIN index."
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gin_test_tbl"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int4"
+          L_BRACK "["
+          R_BRACK "]"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "autovacuum_enabled"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              OFF_KW "off"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gin_test_idx"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gin"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fastupdate"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      ON_KW "on"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "gin_pending_list_limit"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4096"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "g"
+              R_BRACK "]"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "20000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "3"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "g"
+              R_BRACK "]"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "gin_clean_pending_list"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'gin_test_idx'"
+                R_PAREN ")"
+            R_ANGLE ">"
+            LITERAL
+              INT_NUMBER "10"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "many"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- flush the fastupdate buffers"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "3"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "g"
+              R_BRACK "]"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM_STMT
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- flush the fastupdate buffers"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "gin_clean_pending_list"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'gin_test_idx'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- nothing to flush"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test vacuuming"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "2"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Disable fastupdate, and do more insertions. With fastupdate enabled, most"
+  WHITESPACE "\n"
+  COMMENT "-- insertions (by flushing the list pages) cause page splits. Without"
+  WHITESPACE "\n"
+  COMMENT "-- fastupdate, we get more churn in the GIN data leaf pages, and exercise the"
+  WHITESPACE "\n"
+  COMMENT "-- recompression codepaths."
+  WHITESPACE "\n"
+  ALTER_INDEX_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_idx"
+    WHITESPACE " "
+    SET_KW "set"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "fastupdate"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            OFF_KW "off"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "g"
+              R_BRACK "]"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "3"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "g"
+              R_BRACK "]"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "2"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gin_test_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test for \"rare && frequent\" searches"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "999"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "999"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Very weak test for gin_fuzzy_search_limit"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gin_fuzzy_search_limit"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1000"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "count"
+              ARG_LIST
+                L_PAREN "("
+                STAR "*"
+                R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "ok"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "1"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "count"
+              ARG_LIST
+                L_PAREN "("
+                STAR "*"
+                R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "ok"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "1"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gin_fuzzy_search_limit"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Test optimization of empty queries"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMP_KW "temp"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t_gin_test_tbl"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int4"
+          L_BRACK "["
+          R_BRACK "]"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int4"
+          L_BRACK "["
+          R_BRACK "]"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gin"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "j"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+    WHITESPACE "\n"
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        NULL_KW "null"
+      COMMA ","
+      WHITESPACE "    "
+      LITERAL
+        NULL_KW "null"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{}'"
+      COMMA ","
+      WHITESPACE "    "
+      LITERAL
+        NULL_KW "null"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{1}'"
+      COMMA ","
+      WHITESPACE "   "
+      LITERAL
+        NULL_KW "null"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{1,2}'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        NULL_KW "null"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        NULL_KW "null"
+      COMMA ","
+      WHITESPACE "    "
+      LITERAL
+        STRING "'{}'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        NULL_KW "null"
+      COMMA ","
+      WHITESPACE "    "
+      LITERAL
+        STRING "'{10}'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{1,2}'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'{10}'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{2}'"
+      COMMA ","
+      WHITESPACE "   "
+      LITERAL
+        STRING "'{10}'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{1,3}'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'{}'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{1,1}'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'{10}'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "0"
+          R_BRACK "]"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "0"
+          R_BRACK "]"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          ARRAY_EXPR
+            ARRAY_KW "array"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "0"
+            R_BRACK "]"
+          WHITESPACE " "
+          CUSTOM_OP
+            L_ANGLE "<"
+            AT "@"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "i"
+        WHITESPACE " "
+        AND_KW "and"
+        WHITESPACE " "
+        BIN_EXPR
+          CAST_EXPR
+            LITERAL
+              STRING "'{}'"
+            COLON2 "::"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "int4"
+              L_BRACK "["
+              R_BRACK "]"
+          WHITESPACE " "
+          CUSTOM_OP
+            L_ANGLE "<"
+            AT "@"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "j"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'{}'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'{}'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "explain_query_json"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "query_sql"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "explain_line"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              JSON_KW "json"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nbegin\n  set enable_seqscan = off;\n  set enable_bitmapscan = on;\n  return query execute 'EXPLAIN (ANALYZE, FORMAT json) ' || query_sql;\nend;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "execute_text_query_index"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "query_sql"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nbegin\n  set enable_seqscan = off;\n  set enable_bitmapscan = on;\n  return query execute query_sql;\nend;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "execute_text_query_heap"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "query_sql"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE "\n"
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nbegin\n  set enable_seqscan = on;\n  set enable_bitmapscan = off;\n  return query execute query_sql;\nend;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check number of rows returned by index and removed by recheck"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "\n  "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "query"
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "js"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            BIN_EXPR
+              LITERAL
+                INT_NUMBER "0"
+              CUSTOM_OP
+                MINUS "-"
+                R_ANGLE ">"
+              BIN_EXPR
+                LITERAL
+                  STRING "'Plan'"
+                CUSTOM_OP
+                  MINUS "-"
+                  R_ANGLE ">"
+                BIN_EXPR
+                  LITERAL
+                    STRING "'Plans'"
+                  CUSTOM_OP
+                    MINUS "-"
+                    R_ANGLE ">"
+                  BIN_EXPR
+                    LITERAL
+                      INT_NUMBER "0"
+                    CUSTOM_OP
+                      MINUS "-"
+                      R_ANGLE ">"
+                    LITERAL
+                      STRING "'Actual Rows'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"return by index\""
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "js"
+            CUSTOM_OP
+              MINUS "-"
+              R_ANGLE ">"
+            BIN_EXPR
+              LITERAL
+                INT_NUMBER "0"
+              CUSTOM_OP
+                MINUS "-"
+                R_ANGLE ">"
+              BIN_EXPR
+                LITERAL
+                  STRING "'Plan'"
+                CUSTOM_OP
+                  MINUS "-"
+                  R_ANGLE ">"
+                LITERAL
+                  STRING "'Rows Removed by Index Recheck'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"removed by recheck\""
+        COMMA ","
+        WHITESPACE "\n  "
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "res_index"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              NAME_REF
+                IDENT "res_heap"
+            R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"match\""
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "values"
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ i @> '{}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ j @> '{}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ i @> '{}' and j @> '{}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ i @> '{1}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ i @> '{1}' and j @> '{}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ i @> '{1}' and i @> '{}' and j @> '{}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ j @> '{10}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ j @> '{10}' and i @> '{}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ j @> '{10}' and j @> '{}' and i @> '{}' $$"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n    "
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$ i @> '{1}' and j @> '{10}' $$"
+          R_PAREN ")"
+        WHITESPACE "\n  "
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "q"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "query"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      LATERAL_KW "lateral"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "explain_query_json"
+        ARG_LIST
+          L_PAREN "("
+          BIN_EXPR
+            LITERAL
+              DOLLAR_QUOTED_STRING "$$select * from t_gin_test_tbl where $$"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "query"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "js"
+      COMMA ","
+      WHITESPACE "\n  "
+      LATERAL_KW "lateral"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "execute_text_query_index"
+        ARG_LIST
+          L_PAREN "("
+          BIN_EXPR
+            LITERAL
+              DOLLAR_QUOTED_STRING "$$select string_agg((i, j)::text, ' ') from t_gin_test_tbl where $$"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "query"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "res_index"
+      COMMA ","
+      WHITESPACE "\n  "
+      LATERAL_KW "lateral"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "execute_text_query_heap"
+        ARG_LIST
+          L_PAREN "("
+          BIN_EXPR
+            LITERAL
+              DOLLAR_QUOTED_STRING "$$select string_agg((i, j)::text, ' ') from t_gin_test_tbl where $$"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "query"
+          R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "res_heap"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- re-purpose t_gin_test_tbl to test scans involving posting trees"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "g"
+              COMMA ","
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "g"
+                SLASH "/"
+                LITERAL
+                  INT_NUMBER "10"
+              R_BRACK "]"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "g"
+              COMMA ","
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "g"
+                SLASH "/"
+                LITERAL
+                  INT_NUMBER "10"
+              R_BRACK "]"
+      WHITESPACE "\n  "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "20000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "gin_clean_pending_list"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'t_gin_test_tbl_i_j_idx'"
+                R_PAREN ")"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "is"
+              WHITESPACE " "
+              NOT_KW "not"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ANALYZE_STMT
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "50"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "50"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "2"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "2"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'{}'"
+          COLON2 "::"
+          ARRAY_TYPE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+            L_BRACK "["
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'{}'"
+          COLON2 "::"
+          ARRAY_TYPE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+            L_BRACK "["
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test vacuuming of posting trees"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "2"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "50"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        ARRAY_EXPR
+          ARRAY_KW "array"
+          L_BRACK "["
+          LITERAL
+            INT_NUMBER "2"
+          R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'{}'"
+          COLON2 "::"
+          ARRAY_TYPE
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    INT_KW "int"
+            L_BRACK "["
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- test an unlogged table, mostly to get coverage of ginbuildempty"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    UNLOGGED_KW "unlogged"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t_gin_test_tbl"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int4"
+          L_BRACK "["
+          R_BRACK "]"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int4"
+          L_BRACK "["
+          R_BRACK "]"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gin"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "j"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+    WHITESPACE "\n"
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        NULL_KW "null"
+      COMMA ","
+      WHITESPACE "    "
+      LITERAL
+        NULL_KW "null"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{}'"
+      COMMA ","
+      WHITESPACE "    "
+      LITERAL
+        NULL_KW "null"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'{1}'"
+      COMMA ","
+      WHITESPACE "   "
+      LITERAL
+        STRING "'{2,3}'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t_gin_test_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@1485: expected R_PAREN
+ERROR@1486: expected command, found OFF_KW
+ERROR@1489: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1489: expected SEMICOLON
+ERROR@1489: expected command, found R_PAREN
+ERROR@1708: expected R_PAREN
+ERROR@1709: expected command, found OFF_KW
+ERROR@1712: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1712: expected SEMICOLON
+ERROR@1712: expected command, found R_PAREN
+ERROR@2291: expected R_PAREN
+ERROR@2292: expected command, found OFF_KW
+ERROR@2295: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2295: expected SEMICOLON
+ERROR@2295: expected command, found R_PAREN
+ERROR@2484: expected R_PAREN
+ERROR@2485: expected command, found OFF_KW
+ERROR@2488: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2488: expected SEMICOLON
+ERROR@2488: expected command, found R_PAREN
+ERROR@4584: expected config value, got ON_KW
+ERROR@4584: expected SEMICOLON
+ERROR@4585: expected command, found ON_KW
+ERROR@4604: expected R_PAREN
+ERROR@4605: expected command, found OFF_KW
+ERROR@4608: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4608: expected SEMICOLON
+ERROR@4608: expected command, found R_PAREN
+ERROR@4740: expected R_PAREN
+ERROR@4741: expected command, found OFF_KW
+ERROR@4744: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4744: expected SEMICOLON
+ERROR@4744: expected command, found R_PAREN
+ERROR@4874: expected R_PAREN
+ERROR@4875: expected command, found OFF_KW
+ERROR@4878: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4878: expected SEMICOLON
+ERROR@4878: expected command, found R_PAREN

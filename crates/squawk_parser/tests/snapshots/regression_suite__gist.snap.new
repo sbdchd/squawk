@@ -1,0 +1,3392 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/gist.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test GiST indexes."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- There are other tests to test different GiST opclasses. This is for"
+  WHITESPACE "\n"
+  COMMENT "-- testing GiST code itself. Vacuuming in particular."
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gist_point_tbl"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "point"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pointidx"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify the fillfactor and buffering options"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pointidx2"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "buffering"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      ON_KW "on"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fillfactor"
+      EQ "="
+      LITERAL
+        INT_NUMBER "50"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pointidx3"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "buffering"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              OFF_KW "off"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pointidx4"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "buffering"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "auto"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_pointidx2"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_pointidx3"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_pointidx4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Make sure bad values are refused"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pointidx5"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "buffering"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "invalid_value"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pointidx5"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fillfactor"
+      EQ "="
+      LITERAL
+        INT_NUMBER "9"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pointidx5"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fillfactor"
+      EQ "="
+      LITERAL
+        INT_NUMBER "101"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Insert enough data to create a tree that's a couple of levels deep."
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "id"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "p"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "g"
+          COMMA ","
+          WHITESPACE "        "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "g"
+                  STAR "*"
+                  LITERAL
+                    INT_NUMBER "10"
+                COMMA ","
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "g"
+                  STAR "*"
+                  LITERAL
+                    INT_NUMBER "10"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "id"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "p"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            BIN_EXPR
+              NAME_REF
+                IDENT "g"
+              PLUS "+"
+              LITERAL
+                INT_NUMBER "100000"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                BIN_EXPR
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "g"
+                    STAR "*"
+                    LITERAL
+                      INT_NUMBER "10"
+                  PLUS "+"
+                  LITERAL
+                    INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                BIN_EXPR
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "g"
+                    STAR "*"
+                    LITERAL
+                      INT_NUMBER "10"
+                  PLUS "+"
+                  LITERAL
+                    INT_NUMBER "1"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- To test vacuum, delete some entries from all over the index."
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "id"
+          WHITESPACE " "
+          PERCENT "%"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- And also delete some concentration of values."
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "id"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "5000"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM_STMT
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_point_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rebuild the index with a different fillfactor"
+  WHITESPACE "\n"
+  ALTER_INDEX_STMT
+    ALTER_KW "alter"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_pointidx"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "fillfactor"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "40"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REINDEX_STMT
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pointidx"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test Index-only plans on GiST indexes"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gist_tbl"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "box"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "point"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "circle"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "box"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "point"
+                  ARG_LIST
+                    L_PAREN "("
+                    BIN_EXPR
+                      LITERAL
+                        FLOAT_NUMBER "0.05"
+                      STAR "*"
+                      NAME_REF
+                        IDENT "i"
+                    COMMA ","
+                    WHITESPACE " "
+                    BIN_EXPR
+                      LITERAL
+                        FLOAT_NUMBER "0.05"
+                      STAR "*"
+                      NAME_REF
+                        IDENT "i"
+                    R_PAREN ")"
+                COMMA ","
+                WHITESPACE " "
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "point"
+                  ARG_LIST
+                    L_PAREN "("
+                    BIN_EXPR
+                      LITERAL
+                        FLOAT_NUMBER "0.05"
+                      STAR "*"
+                      NAME_REF
+                        IDENT "i"
+                    COMMA ","
+                    WHITESPACE " "
+                    BIN_EXPR
+                      LITERAL
+                        FLOAT_NUMBER "0.05"
+                      STAR "*"
+                      NAME_REF
+                        IDENT "i"
+                    R_PAREN ")"
+                R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n       "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                BIN_EXPR
+                  LITERAL
+                    FLOAT_NUMBER "0.05"
+                  STAR "*"
+                  NAME_REF
+                    IDENT "i"
+                COMMA ","
+                WHITESPACE " "
+                BIN_EXPR
+                  LITERAL
+                    FLOAT_NUMBER "0.05"
+                  STAR "*"
+                  NAME_REF
+                    IDENT "i"
+                R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n       "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "circle"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "point"
+                  ARG_LIST
+                    L_PAREN "("
+                    BIN_EXPR
+                      LITERAL
+                        FLOAT_NUMBER "0.05"
+                      STAR "*"
+                      NAME_REF
+                        IDENT "i"
+                    COMMA ","
+                    WHITESPACE " "
+                    BIN_EXPR
+                      LITERAL
+                        FLOAT_NUMBER "0.05"
+                      STAR "*"
+                      NAME_REF
+                        IDENT "i"
+                    R_PAREN ")"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "1.0"
+                R_PAREN ")"
+      WHITESPACE "\n"
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "0"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "10000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM_STMT
+    VACUUM_KW "vacuum"
+    WHITESPACE " "
+    ANALYZE_KW "analyze"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    EQ "="
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+    EQ "="
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexonlyscan"
+    EQ "="
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test index-only scan with point opclass"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_tbl_point_index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check that the planner chooses an index-only scan"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- execute the same"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Also test an index-only knn-search"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              FLOAT_NUMBER "0.201"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "0.201"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              FLOAT_NUMBER "0.201"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "0.201"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check commuted case as well"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              FLOAT_NUMBER "0.101"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "0.101"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "0.5"
+                R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              FLOAT_NUMBER "0.101"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "0.101"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check case with multiple rescans (bug #14641)"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "values"
+          WHITESPACE " "
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "box"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    INT_NUMBER "0"
+                  COMMA ","
+                  LITERAL
+                    INT_NUMBER "0"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "0.5"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "0.5"
+                  R_PAREN ")"
+              R_PAREN ")"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n          "
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "box"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "0.5"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "0.5"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "0.75"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "0.75"
+                  R_PAREN ")"
+              R_PAREN ")"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n          "
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "box"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "0.8"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "0.8"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "1.0"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "1.0"
+                  R_PAREN ")"
+              R_PAREN ")"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "as"
+        WHITESPACE " "
+        NAME
+          IDENT "v"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "bb"
+          R_PAREN ")"
+      WHITESPACE "\n"
+      JOIN
+        CROSS_KW "cross"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        LATERAL_KW "lateral"
+        WHITESPACE "\n  "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "p"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "gist_tbl"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "where"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "p"
+                WHITESPACE " "
+                CUSTOM_OP
+                  L_ANGLE "<"
+                  AT "@"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "bb"
+            WHITESPACE " "
+            ORDER_BY_CLAUSE
+              ORDER_KW "order"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "p"
+                WHITESPACE " "
+                CUSTOM_OP
+                  L_ANGLE "<"
+                  MINUS "-"
+                  R_ANGLE ">"
+                WHITESPACE " "
+                INDEX_EXPR
+                  NAME_REF
+                    IDENT "bb"
+                  L_BRACK "["
+                  LITERAL
+                    INT_NUMBER "0"
+                  R_BRACK "]"
+            WHITESPACE " "
+            LIMIT_CLAUSE
+              LIMIT_KW "limit"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          VALUES_KW "values"
+          WHITESPACE " "
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "box"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    INT_NUMBER "0"
+                  COMMA ","
+                  LITERAL
+                    INT_NUMBER "0"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "0.5"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "0.5"
+                  R_PAREN ")"
+              R_PAREN ")"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n          "
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "box"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "0.5"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "0.5"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "0.75"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "0.75"
+                  R_PAREN ")"
+              R_PAREN ")"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n          "
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              IDENT "box"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "0.8"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "0.8"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "1.0"
+                  COMMA ","
+                  LITERAL
+                    FLOAT_NUMBER "1.0"
+                  R_PAREN ")"
+              R_PAREN ")"
+          R_PAREN ")"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "as"
+        WHITESPACE " "
+        NAME
+          IDENT "v"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "bb"
+          R_PAREN ")"
+      WHITESPACE "\n"
+      JOIN
+        CROSS_KW "cross"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        LATERAL_KW "lateral"
+        WHITESPACE "\n  "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "p"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "gist_tbl"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "where"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "p"
+                WHITESPACE " "
+                CUSTOM_OP
+                  L_ANGLE "<"
+                  AT "@"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "bb"
+            WHITESPACE " "
+            ORDER_BY_CLAUSE
+              ORDER_KW "order"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "p"
+                WHITESPACE " "
+                CUSTOM_OP
+                  L_ANGLE "<"
+                  MINUS "-"
+                  R_ANGLE ">"
+                WHITESPACE " "
+                INDEX_EXPR
+                  NAME_REF
+                    IDENT "bb"
+                  L_BRACK "["
+                  LITERAL
+                    INT_NUMBER "0"
+                  R_BRACK "]"
+            WHITESPACE " "
+            LIMIT_CLAUSE
+              LIMIT_KW "limit"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "ss"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl_point_index"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test index-only scan with box opclass"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_tbl_box_index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check that the planner chooses an index-only scan"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "6"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "6"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- execute the same"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "6"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "6"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Also test an index-only knn-search"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "6"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "6"
+                R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              FLOAT_NUMBER "5.2"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "5.91"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "6"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "6"
+                R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              FLOAT_NUMBER "5.2"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "5.91"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check commuted case as well"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "6"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "6"
+                R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              FLOAT_NUMBER "5.2"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "5.91"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "6"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "6"
+                R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              FLOAT_NUMBER "5.2"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "5.91"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl_box_index"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test that an index-only scan is not chosen, when the query involves the"
+  WHITESPACE "\n"
+  COMMENT "-- circle column (the circle opclass does not support index-only scans)."
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_tbl_multi_index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "6"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "6"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- execute the same"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          CUSTOM_OP
+            L_ANGLE "<"
+            AT "@"
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              IDENT "box"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "4.5"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    FLOAT_NUMBER "4.5"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    FLOAT_NUMBER "5.5"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    FLOAT_NUMBER "5.5"
+                  R_PAREN ")"
+              R_PAREN ")"
+        WHITESPACE "\n"
+        AND_KW "and"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "p"
+          WHITESPACE " "
+          CUSTOM_OP
+            L_ANGLE "<"
+            AT "@"
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              IDENT "box"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    INT_NUMBER "5"
+                  COMMA ","
+                  LITERAL
+                    INT_NUMBER "5"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "point"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    INT_NUMBER "6"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "6"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl_multi_index"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test that we don't try to return the value of a non-returnable"
+  WHITESPACE "\n"
+  COMMENT "-- column in an index-only scan.  (This isn't GIST-specific, but"
+  WHITESPACE "\n"
+  COMMENT "-- it only applies to index AMs that can return some columns and not"
+  WHITESPACE "\n"
+  COMMENT "-- others, so GIST with appropriate opclasses is a convenient test case.)"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_tbl_multi_index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "circle"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "p"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "verbose"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "circle"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "p"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "5.3"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "5.3"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "circle"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "p"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "5"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "5"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  FLOAT_NUMBER "5.3"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "5.3"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Similarly, test that index rechecks involving a non-returnable column"
+  WHITESPACE "\n"
+  COMMENT "-- are done correctly."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "verbose"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "circle"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "p"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "circle"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
+            COMMA ","
+            LITERAL
+              FLOAT_NUMBER "0.95"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "circle"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "p"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          AT "@"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "circle"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "0"
+                COMMA ","
+                LITERAL
+                  INT_NUMBER "0"
+                R_PAREN ")"
+            COMMA ","
+            LITERAL
+              FLOAT_NUMBER "0.95"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Also check that use_physical_tlist doesn't trigger in such cases."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "verbose"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- This case isn't supported, but it should at least EXPLAIN correctly."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "verbose"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "circle"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "p"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "0"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "0"
+            R_PAREN ")"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "p"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "gist_tbl"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "circle"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "p"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "point"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "0"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "0"
+            R_PAREN ")"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Force an index build using buffering."
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_tbl_box_index_forcing_buffering"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "buffering"
+      EQ "="
+      ON_KW "on"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fillfactor"
+      EQ "="
+      LITERAL
+        INT_NUMBER "50"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Clean up"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexonlyscan"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- test an unlogged table, mostly to get coverage of gistbuildempty"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    UNLOGGED_KW "unlogged"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gist_tbl"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "box"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_tbl_box_index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "box"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "point"
+                  ARG_LIST
+                    L_PAREN "("
+                    BIN_EXPR
+                      LITERAL
+                        FLOAT_NUMBER "0.05"
+                      STAR "*"
+                      NAME_REF
+                        IDENT "i"
+                    COMMA ","
+                    WHITESPACE " "
+                    BIN_EXPR
+                      LITERAL
+                        FLOAT_NUMBER "0.05"
+                      STAR "*"
+                      NAME_REF
+                        IDENT "i"
+                    R_PAREN ")"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "0"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "10"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@1969: expected config value, got ON_KW
+ERROR@1969: expected SEMICOLON
+ERROR@1969: expected command, found ON_KW
+ERROR@2147: expected R_PAREN
+ERROR@2148: expected command, found OFF_KW
+ERROR@2151: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2151: expected SEMICOLON
+ERROR@2151: expected command, found R_PAREN
+ERROR@2363: expected R_PAREN
+ERROR@2364: expected command, found OFF_KW
+ERROR@2367: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2367: expected SEMICOLON
+ERROR@2367: expected command, found R_PAREN
+ERROR@2622: expected R_PAREN
+ERROR@2623: expected command, found OFF_KW
+ERROR@2626: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2626: expected SEMICOLON
+ERROR@2626: expected command, found R_PAREN
+ERROR@2899: expected R_PAREN
+ERROR@2900: expected command, found OFF_KW
+ERROR@2903: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2903: expected SEMICOLON
+ERROR@2903: expected command, found R_PAREN
+ERROR@3632: expected R_PAREN
+ERROR@3633: expected command, found OFF_KW
+ERROR@3636: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3636: expected SEMICOLON
+ERROR@3636: expected command, found R_PAREN
+ERROR@3838: expected R_PAREN
+ERROR@3839: expected command, found OFF_KW
+ERROR@3842: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3842: expected SEMICOLON
+ERROR@3842: expected command, found R_PAREN
+ERROR@4081: expected R_PAREN
+ERROR@4082: expected command, found OFF_KW
+ERROR@4085: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4085: expected SEMICOLON
+ERROR@4085: expected command, found R_PAREN
+ERROR@4539: expected R_PAREN
+ERROR@4540: expected command, found OFF_KW
+ERROR@4543: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4543: expected SEMICOLON
+ERROR@4543: expected command, found R_PAREN
+ERROR@5154: expected R_PAREN
+ERROR@5155: expected command, found OFF_KW
+ERROR@5158: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@5158: expected SEMICOLON
+ERROR@5158: expected command, found R_PAREN
+ERROR@5438: expected R_PAREN
+ERROR@5439: expected command, found OFF_KW
+ERROR@5442: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@5442: expected SEMICOLON
+ERROR@5442: expected command, found R_PAREN
+ERROR@5675: expected R_PAREN
+ERROR@5676: expected command, found OFF_KW
+ERROR@5679: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@5679: expected SEMICOLON
+ERROR@5679: expected command, found R_PAREN
+ERROR@5839: expected R_PAREN
+ERROR@5840: expected command, found OFF_KW
+ERROR@5843: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@5843: expected SEMICOLON
+ERROR@5843: expected command, found R_PAREN

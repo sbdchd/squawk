@@ -1,0 +1,1024 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/namespace.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Regression tests for schemas (namespaces)"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- set the whitespace-only search_path to test that the"
+  WHITESPACE "\n"
+  COMMENT "-- GUC list syntax is preserved during a schema creation"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_catalog"
+              DOT "."
+              NAME_REF
+                IDENT "set_config"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'search_path'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "' '"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                FALSE_KW "false"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_1"
+  WHITESPACE "\n       "
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    UNIQUE_KW "UNIQUE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "abc_a_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abc"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      R_PAREN ")"
+  WHITESPACE "\n\n       "
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "abc_view"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n              "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              PLUS "+"
+              LITERAL
+                INT_NUMBER "1"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              NAME_REF
+                IDENT "b"
+              PLUS "+"
+              LITERAL
+                INT_NUMBER "1"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "abc"
+  WHITESPACE "\n\n       "
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "abc"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n              "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "serial"
+      COMMA ","
+      WHITESPACE "\n              "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        UNIQUE_CONSTRAINT
+          UNIQUE_KW "UNIQUE"
+      WHITESPACE "\n       "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- verify that the correct search_path restored on abort"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "public"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "public"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "test_ns_schema_1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_2"
+    WHITESPACE "\n       "
+    CREATE_VIEW_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      VIEW_KW "VIEW"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "abc_view"
+      WHITESPACE " "
+      AS_KW "AS"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "c"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "abc"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- verify that the correct search_path preserved"
+  WHITESPACE "\n"
+  COMMENT "-- after creating the schema and on commit"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    IDENT "public"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "test_ns_schema_1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_2"
+    WHITESPACE "\n       "
+    CREATE_VIEW_STMT
+      CREATE_KW "CREATE"
+      WHITESPACE " "
+      VIEW_KW "VIEW"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "abc_view"
+      WHITESPACE " "
+      AS_KW "AS"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "a"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "abc"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW_STMT
+    SHOW_KW "SHOW"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_2"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- verify that the objects were created"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relnamespace"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE "\n    "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "oid"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "pg_namespace"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "nspname"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'test_ns_schema_1'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_ns_schema_1"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abc"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_ns_schema_1"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abc"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_ns_schema_1"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "abc"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "test_ns_schema_1"
+        DOT "."
+        NAME_REF
+          IDENT "abc"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "test_ns_schema_1"
+        DOT "."
+        NAME_REF
+          IDENT "abc_view"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_SCHEMA_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_ns_schema_1"
+    WHITESPACE " "
+    RENAME_KW "RENAME"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_renamed"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relnamespace"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE "\n    "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "oid"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "pg_namespace"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "nspname"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'test_ns_schema_1'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test IF NOT EXISTS cases"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_renamed"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fail, already exists"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      NOT_KW "NOT"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_renamed"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- ok with notice"
+  WHITESPACE "\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      NOT_KW "NOT"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_renamed"
+  WHITESPACE " "
+  CREATE_TABLE
+    COMMENT "-- fail, disallowed"
+    WHITESPACE "\n       "
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "abc"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n              "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "serial"
+      COMMA ","
+      WHITESPACE "\n              "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        UNIQUE_CONSTRAINT
+          UNIQUE_KW "UNIQUE"
+      WHITESPACE "\n       "
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_ns_schema_renamed"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- verify that the objects were dropped"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relnamespace"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE "\n    "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "oid"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "pg_namespace"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "nspname"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  STRING "'test_ns_schema_renamed'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Verify that search_path is set to a safe value during maintenance"
+  WHITESPACE "\n"
+  COMMENT "-- commands."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_maint_search_path"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    IDENT "test_maint_search_path"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fn"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "INT"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "IMMUTABLE"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n  BEGIN\n    RAISE NOTICE 'current search_path: %', current_setting('search_path');\n    RETURN $1;\n  END;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_maint"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_maint"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_maint_mv"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "fn"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "i"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "test_maint"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- the following commands should see search_path as pg_catalog, pg_temp"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "test_maint_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_maint_search_path"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_maint"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "fn"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "i"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REINDEX_STMT
+    REINDEX_KW "REINDEX"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    NAME
+      IDENT "test_maint_search_path"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "test_maint"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_maint_search_path"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_maint"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_maint_search_path"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_maint"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_maint_search_path"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_maint"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_maint_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  REFRESH_STMT
+    REFRESH_KW "REFRESH"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_maint_search_path"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_maint_mv"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "search_path"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_maint_search_path"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@253: expected SEMICOLON
+ERROR@301: expected SEMICOLON
+ERROR@382: expected SEMICOLON
+ERROR@1810: expected SEMICOLON
+ERROR@2810: expected SEMICOLON
+ERROR@2810: expected command, found DOT
+ERROR@2811: expected command, found IDENT

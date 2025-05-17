@@ -1,0 +1,1526 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/timetz.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- TIMETZ"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        TIME_TYPE
+          NAME_REF
+            TIME_KW "time"
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
+          WHITESPACE " "
+          WITH_TIMEZONE
+            WITH_KW "with"
+            WHITESPACE " "
+            TIME_KW "time"
+            WHITESPACE " "
+            ZONE_KW "zone"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'00:01 PDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'01:00 PDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'02:03 PDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'07:07 PST'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'08:08 EDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'11:59 PDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'12:00 PDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'12:01 PDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'23:59 PDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'11:59:59.99 PM PDT'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'2003-03-07 15:36:39 America/New_York'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'2003-07-07 15:36:39 America/New_York'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- this should fail (the timezone offset is not known)"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'15:36:39 America/New_York'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- this should fail (timezone not specified without a date)"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'15:36:39 m2'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- this should fail (dynamic timezone abbreviation without a date)"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'15:36:39 MSK m2'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"Time TZ\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "TIMETZ_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"Three\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          STRING "'05:06:07-07'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"Seven\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'05:06:07-07'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"None\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          STRING "'00:00-07'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"Ten\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "TIMETZ_TBL"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        LITERAL
+          STRING "'00:00-07'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check edge cases"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'23:59:59.999999 PDT'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timetz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'23:59:59.9999999 PDT'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timetz"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- rounds up"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'23:59:60 PDT'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timetz"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- rounds up"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'24:00:00 PDT'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timetz"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- allowed"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'24:00:00.01 PDT'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timetz"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- not allowed"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'23:59:60.01 PDT'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timetz"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- not allowed"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'24:01:00 PDT'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timetz"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- not allowed"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'25:00:00 PDT'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "timetz"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- not allowed"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test non-error-throwing API"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'12:00:00 PDT'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'timetz'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'25:00:00 PDT'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'timetz'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'15:36:39 America/New_York'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'timetz'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'25:00:00 PDT'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'timetz'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'15:36:39 America/New_York'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'timetz'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- TIME simple math"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- We now make a distinction between time and intervals,"
+  WHITESPACE "\n"
+  COMMENT "-- and adding two times together makes no sense at all."
+  WHITESPACE "\n"
+  COMMENT "-- Leave in one query to show that it is rejected,"
+  WHITESPACE "\n"
+  COMMENT "-- and do the rest of the testing in horology.sql"
+  WHITESPACE "\n"
+  COMMENT "-- where we do mixed-type arithmetic. - thomas 2000-12-02"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "f1"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                TIME_KW "time"
+                WHITESPACE " "
+                WITH_KW "with"
+                WHITESPACE " "
+                TIME_KW "time"
+                WHITESPACE " "
+                ZONE_KW "zone"
+              WHITESPACE " "
+              LITERAL
+                STRING "'00:01'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"Illegal\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "TIMETZ_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- test EXTRACT"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              IDENT "MICROSECOND"
+              WHITESPACE " "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              IDENT "MILLISECOND"
+              WHITESPACE " "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              SECOND_KW "SECOND"
+              WHITESPACE "      "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              MINUTE_KW "MINUTE"
+              WHITESPACE "      "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              HOUR_KW "HOUR"
+              WHITESPACE "        "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              DAY_KW "DAY"
+              WHITESPACE "         "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- error"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              IDENT "FORTNIGHT"
+              WHITESPACE "   "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- error"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              IDENT "TIMEZONE"
+              WHITESPACE "    "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04:30'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              IDENT "TIMEZONE_HOUR"
+              WHITESPACE "   "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04:30'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              IDENT "TIMEZONE_MINUTE"
+              WHITESPACE " "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04:30'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "EXTRACT"
+            ARG_LIST
+              L_PAREN "("
+              IDENT "EPOCH"
+              WHITESPACE "       "
+              FROM_KW "FROM"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- date_part implementation is mostly the same as extract, so only"
+  WHITESPACE "\n"
+  COMMENT "-- test a few cases for additional coverage."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "date_part"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'microsecond'"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "date_part"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'millisecond'"
+              COMMA ","
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "date_part"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'second'"
+              COMMA ","
+              WHITESPACE "      "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "date_part"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'epoch'"
+              COMMA ","
+              WHITESPACE "       "
+              CAST_EXPR
+                NAME_REF
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  TIME_KW "TIME"
+                  WHITESPACE " "
+                  ZONE_KW "ZONE"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'2020-05-26 13:30:25.575401-04'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test timetz_zone, timetz_izone, AT LOCAL"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "TimeZone"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      STRING "'UTC'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "timetz_local_view"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "f1"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "dat"
+          COMMA ","
+          WHITESPACE "\n       "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "timezone"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "f1"
+                R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "dat_func"
+          COMMA ","
+          WHITESPACE "\n       "
+          TARGET
+            POSTFIX_EXPR
+              NAME_REF
+                IDENT "f1"
+              WHITESPACE " "
+              AT_KW "AT"
+              WHITESPACE " "
+              LOCAL_KW "LOCAL"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "dat_at_local"
+          COMMA ","
+          WHITESPACE "\n       "
+          TARGET
+            BIN_EXPR
+              NAME_REF
+                IDENT "f1"
+              WHITESPACE " "
+              AT_TIME_ZONE
+                AT_KW "AT"
+                WHITESPACE " "
+                TIME_KW "TIME"
+                WHITESPACE " "
+                ZONE_KW "ZONE"
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "current_setting"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    STRING "'TimeZone'"
+                  R_PAREN ")"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "dat_at_tz"
+          COMMA ","
+          WHITESPACE "\n       "
+          TARGET
+            BIN_EXPR
+              NAME_REF
+                IDENT "f1"
+              WHITESPACE " "
+              AT_TIME_ZONE
+                AT_KW "AT"
+                WHITESPACE " "
+                TIME_KW "TIME"
+                WHITESPACE " "
+                ZONE_KW "ZONE"
+              WHITESPACE " "
+              CAST_EXPR
+                NAME_REF
+                  INTERVAL_KW "INTERVAL"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'00:00'"
+            WHITESPACE " "
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "dat_at_int"
+      WHITESPACE "\n  "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "TIMETZ_TBL"
+      WHITESPACE "\n  "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_get_viewdef"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'timetz_local_view'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                TRUE_KW "true"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "timetz_local_view"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "dat"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "f1"
+            WHITESPACE " "
+            AT_TIME_ZONE
+              AT_KW "AT"
+              WHITESPACE " "
+              TIME_KW "TIME"
+              WHITESPACE " "
+              ZONE_KW "ZONE"
+            WHITESPACE " "
+            LITERAL
+              STRING "'UTC+10'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "dat_at_tz"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "f1"
+            WHITESPACE " "
+            AT_TIME_ZONE
+              AT_KW "AT"
+              WHITESPACE " "
+              TIME_KW "TIME"
+              WHITESPACE " "
+              ZONE_KW "ZONE"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                INTERVAL_KW "INTERVAL"
+              WHITESPACE " "
+              LITERAL
+                STRING "'-10:00'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "dat_at_int"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "TIMETZ_TBL"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"

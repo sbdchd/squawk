@@ -1,0 +1,657 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/unicode.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "getdatabaseencoding"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            WHITESPACE " "
+            NEQB "<>"
+            WHITESPACE " "
+            LITERAL
+              STRING "'UTF8'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "skip_test"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\0061\\0308bc'"
+            WHITESPACE " "
+            NEQB "<>"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                BYTE_STRING "U&'\\00E4bc'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "sanity_check"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "unicode_version"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "unicode_assigned"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                BYTE_STRING "U&'abc'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "unicode_assigned"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                BYTE_STRING "U&'abc\\+10FFFF'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NORMALIZE_KW "normalize"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "''"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                NORMALIZE_KW "normalize"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  BYTE_STRING "U&'\\0061\\0308\\24D1c'"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                BYTE_STRING "U&'\\00E4\\24D1c'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "test_default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                NORMALIZE_KW "normalize"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  BYTE_STRING "U&'\\0061\\0308\\24D1c'"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  NFC_KW "NFC"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                BYTE_STRING "U&'\\00E4\\24D1c'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "test_nfc"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                NORMALIZE_KW "normalize"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  BYTE_STRING "U&'\\00E4bc'"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  NFC_KW "NFC"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                BYTE_STRING "U&'\\00E4bc'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "test_nfc_idem"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                NORMALIZE_KW "normalize"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  BYTE_STRING "U&'\\00E4\\24D1c'"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  NFD_KW "NFD"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                BYTE_STRING "U&'\\0061\\0308\\24D1c'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "test_nfd"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                NORMALIZE_KW "normalize"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  BYTE_STRING "U&'\\0061\\0308\\24D1c'"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  NFKC_KW "NFKC"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                BYTE_STRING "U&'\\00E4bc'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "test_nfkc"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                NORMALIZE_KW "normalize"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  BYTE_STRING "U&'\\00E4\\24D1c'"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  NFKD_KW "NFKD"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                BYTE_STRING "U&'\\0061\\0308bc'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "test_nfkd"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "\"normalize\""
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abc'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'def'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- run-time error"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\00E4\\24D1c'"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            NAME_REF
+              NORMALIZED_KW "NORMALIZED"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "test_default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\00E4\\24D1c'"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            NAME_REF
+              NFC_KW "NFC"
+          WHITESPACE " "
+          NAME
+            NORMALIZED_KW "NORMALIZED"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    IDENT "test_nfc"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "num"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "val"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "val"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            NAME_REF
+              NFC_KW "NFC"
+          WHITESPACE " "
+          NAME
+            NORMALIZED_KW "NORMALIZED"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    NFC_KW "NFC"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "val"
+  WHITESPACE " "
+  ERROR
+    IS_KW "IS"
+  WHITESPACE " "
+  ERROR
+    NFD_KW "NFD"
+  WHITESPACE " "
+  ERROR
+    NORMALIZED_KW "NORMALIZED"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    NFD_KW "NFD"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "val"
+  WHITESPACE " "
+  ERROR
+    IS_KW "IS"
+  WHITESPACE " "
+  ERROR
+    NFKC_KW "NFKC"
+  WHITESPACE " "
+  ERROR
+    NORMALIZED_KW "NORMALIZED"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    NFKC_KW "NFKC"
+  ERROR
+    COMMA ","
+  WHITESPACE "\n    "
+  ERROR
+    IDENT "val"
+  WHITESPACE " "
+  ERROR
+    IS_KW "IS"
+  WHITESPACE " "
+  ERROR
+    NFKD_KW "NFKD"
+  WHITESPACE " "
+  ERROR
+    NORMALIZED_KW "NORMALIZED"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    NFKD_KW "NFKD"
+  WHITESPACE "\n"
+  ERROR
+    FROM_KW "FROM"
+  WHITESPACE "\n  "
+  ERROR
+    L_PAREN "("
+  SELECT
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      BYTE_STRING "U&'\\00E4bc'"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n          "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "2"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      BYTE_STRING "U&'\\0061\\0308bc'"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n          "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "3"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      BYTE_STRING "U&'\\00E4\\24D1c'"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n          "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "4"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      BYTE_STRING "U&'\\0061\\0308\\24D1c'"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n          "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "5"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+    R_PAREN ")"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    IDENT "vals"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    IDENT "num"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "val"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  ERROR
+    ORDER_KW "ORDER"
+  WHITESPACE " "
+  ERROR
+    BY_KW "BY"
+  WHITESPACE " "
+  ERROR
+    IDENT "num"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "is_normalized"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abc'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'def'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- run-time error"
+  WHITESPACE "\n"
+---
+ERROR@919: expected SEMICOLON
+ERROR@920: expected command, found AS_KW
+ERROR@923: expected command, found IDENT
+ERROR@976: expected SEMICOLON
+ERROR@977: expected command, found AS_KW
+ERROR@980: expected command, found NFC_KW
+ERROR@983: expected command, found COMMA
+ERROR@989: expected command, found IDENT
+ERROR@993: expected command, found IS_KW
+ERROR@996: expected command, found NFD_KW
+ERROR@1000: expected command, found NORMALIZED_KW
+ERROR@1011: expected command, found AS_KW
+ERROR@1014: expected command, found NFD_KW
+ERROR@1017: expected command, found COMMA
+ERROR@1023: expected command, found IDENT
+ERROR@1027: expected command, found IS_KW
+ERROR@1030: expected command, found NFKC_KW
+ERROR@1035: expected command, found NORMALIZED_KW
+ERROR@1046: expected command, found AS_KW
+ERROR@1049: expected command, found NFKC_KW
+ERROR@1053: expected command, found COMMA
+ERROR@1059: expected command, found IDENT
+ERROR@1063: expected command, found IS_KW
+ERROR@1066: expected command, found NFKD_KW
+ERROR@1071: expected command, found NORMALIZED_KW
+ERROR@1082: expected command, found AS_KW
+ERROR@1085: expected command, found NFKD_KW
+ERROR@1090: expected command, found FROM_KW
+ERROR@1097: expected command, found L_PAREN
+ERROR@1242: expected SEMICOLON
+ERROR@1242: expected command, found R_PAREN
+ERROR@1244: expected command, found IDENT
+ERROR@1249: expected command, found L_PAREN
+ERROR@1250: expected command, found IDENT
+ERROR@1253: expected command, found COMMA
+ERROR@1255: expected command, found IDENT
+ERROR@1258: expected command, found R_PAREN
+ERROR@1260: expected command, found ORDER_KW
+ERROR@1266: expected command, found BY_KW
+ERROR@1269: expected command, found IDENT

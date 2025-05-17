@@ -1,0 +1,2340 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/predicate.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Tests for predicate handling"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "--"
+    WHITESPACE "\n"
+    COMMENT "-- Test that restrictions that are always true are ignored, and that are always"
+    WHITESPACE "\n"
+    COMMENT "-- false are replaced with constant-FALSE"
+    WHITESPACE "\n"
+    COMMENT "--"
+    WHITESPACE "\n"
+    COMMENT "-- Currently we only check for NullTest quals and OR clauses that include"
+    WHITESPACE "\n"
+    COMMENT "-- NullTest quals.  We may extend it in the future."
+    WHITESPACE "\n"
+    COMMENT "--"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "pred_tab"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NULL_KW "NULL"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NULL_KW "NULL"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test restriction clauses"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NOT_NULL qual is ignored when the column is non-nullable"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "IS"
+          WHITESPACE " "
+          NOT_KW "NOT"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NOT_NULL qual is not ignored on a nullable column"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "b"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "IS"
+          WHITESPACE " "
+          NOT_KW "NOT"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NULL qual is reduced to constant-FALSE for non-nullable"
+  WHITESPACE "\n"
+  COMMENT "-- columns"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NULL qual is not reduced to constant-FALSE on nullable"
+  WHITESPACE "\n"
+  COMMENT "-- columns"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t"
+          DOT "."
+          NAME_REF
+            IDENT "b"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Tests for OR clauses in restriction clauses"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the OR clause is ignored when an OR branch is always true"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          IS_NOT
+            IS_KW "IS"
+            WHITESPACE " "
+            NOT_KW "NOT"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the OR clause is not ignored for NullTests that can't be proven"
+  WHITESPACE "\n"
+  COMMENT "-- always true"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          IS_NOT
+            IS_KW "IS"
+            WHITESPACE " "
+            NOT_KW "NOT"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the OR clause is reduced to constant-FALSE when all branches are"
+  WHITESPACE "\n"
+  COMMENT "-- provably false"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          IS_KW "IS"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "c"
+          WHITESPACE " "
+          IS_KW "IS"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the OR clause is not reduced to constant-FALSE when not all branches"
+  WHITESPACE "\n"
+  COMMENT "-- are provably false"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          IS_KW "IS"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "c"
+          WHITESPACE " "
+          IS_KW "IS"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test join clauses"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NOT_NULL qual is ignored, since a) it's on a NOT NULL column,"
+  WHITESPACE "\n"
+  COMMENT "-- and b) its Var is not nullable by any outer joins"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t1"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          IS_NOT
+            IS_KW "IS"
+            WHITESPACE " "
+            NOT_KW "NOT"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NOT_NULL qual is not ignored when columns are made nullable"
+  WHITESPACE "\n"
+  COMMENT "-- by an outer join"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        FULL_KW "FULL"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t1"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t3"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          IS_NOT
+            IS_KW "IS"
+            WHITESPACE " "
+            NOT_KW "NOT"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NULL qual is reduced to constant-FALSE, since a) it's on a NOT"
+  WHITESPACE "\n"
+  COMMENT "-- NULL column, and b) its Var is not nullable by any outer joins"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t1"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          IS_KW "IS"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NULL qual is not reduced to constant-FALSE when the column is"
+  WHITESPACE "\n"
+  COMMENT "-- nullable by an outer join"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t1"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t3"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          IS_KW "IS"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Tests for OR clauses in join clauses"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the OR clause is ignored when an OR branch is provably always true"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t1"
+              DOT "."
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          OR_KW "OR"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t2"
+              DOT "."
+              NAME_REF
+                IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the NullTest is not ignored when the column is nullable by an outer"
+  WHITESPACE "\n"
+  COMMENT "-- join"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        FULL_KW "FULL"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t1"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t3"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t2"
+              DOT "."
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          OR_KW "OR"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t2"
+              DOT "."
+              NAME_REF
+                IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the OR clause is reduced to constant-FALSE when all OR branches are"
+  WHITESPACE "\n"
+  COMMENT "-- provably false"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          BIN_EXPR
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "t1"
+                DOT "."
+                NAME_REF
+                  IDENT "a"
+              WHITESPACE " "
+              IS_KW "IS"
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE " "
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "t1"
+                DOT "."
+                NAME_REF
+                  IDENT "c"
+              WHITESPACE " "
+              IS_KW "IS"
+              WHITESPACE " "
+              LITERAL
+                NULL_KW "NULL"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the OR clause is not reduced to constant-FALSE when a column is"
+  WHITESPACE "\n"
+  COMMENT "-- made nullable from an outer join"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t1"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t3"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t2"
+              DOT "."
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          OR_KW "OR"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t2"
+              DOT "."
+              NAME_REF
+                IDENT "c"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Validate we handle IS NULL and IS NOT NULL quals correctly with inheritance"
+    WHITESPACE "\n"
+    COMMENT "-- parents."
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "pred_parent"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "pred_child"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_parent"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    ONLY_KW "ONLY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_parent"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "ALTER"
+      WHITESPACE " "
+      IDENT "a"
+      WHITESPACE " "
+      SET_NOT_NULL
+        SET_KW "SET"
+        WHITESPACE " "
+        NOT_KW "NOT"
+        WHITESPACE " "
+        NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure that the scan on pred_child contains the IS NOT NULL qual."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_parent"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "IS"
+          WHITESPACE " "
+          NOT_KW "NOT"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure we only scan pred_child and not pred_parent"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_parent"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_parent"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "ALTER"
+      WHITESPACE " "
+      IDENT "a"
+      WHITESPACE " "
+      DROP_NOT_NULL
+        DROP_KW "DROP"
+        WHITESPACE " "
+        NOT_KW "NOT"
+        WHITESPACE " "
+        NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_child"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "ALTER"
+      WHITESPACE " "
+      IDENT "a"
+      WHITESPACE " "
+      SET_NOT_NULL
+        SET_KW "SET"
+        WHITESPACE " "
+        NOT_KW "NOT"
+        WHITESPACE " "
+        NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS NOT NULL qual is removed from the pred_child scan."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_parent"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "IS"
+          WHITESPACE " "
+          NOT_KW "NOT"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure we only scan pred_parent and not pred_child"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_parent"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_parent"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_child"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Validate we do not reduce a clone clause to a constant true or false"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "pred_tab"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "pred_tab_notnull"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NULL_KW "NULL"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab_notnull"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab_notnull"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab_notnull"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NOT_NULL qual is not reduced to constant true and removed"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab_notnull"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t3"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t3"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t4"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t3"
+            DOT "."
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          IS_NOT
+            IS_KW "IS"
+            WHITESPACE " "
+            NOT_KW "NOT"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab_notnull"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t3"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t3"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t4"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t3"
+            DOT "."
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          IS_NOT
+            IS_KW "IS"
+            WHITESPACE " "
+            NOT_KW "NOT"
+          WHITESPACE " "
+          LITERAL
+            NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the IS_NULL qual is not reduced to constant false"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab_notnull"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t3"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t3"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t4"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t3"
+              DOT "."
+              NAME_REF
+                IDENT "b"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t3"
+              DOT "."
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pred_tab"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab_notnull"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t3"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t2"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t3"
+            DOT "."
+            NAME_REF
+              IDENT "a"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pred_tab"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t4"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t3"
+              DOT "."
+              NAME_REF
+                IDENT "b"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t3"
+              DOT "."
+              NAME_REF
+                IDENT "a"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pred_tab_notnull"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@483: expected R_PAREN
+ERROR@484: expected command, found OFF_KW
+ERROR@487: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@487: expected SEMICOLON
+ERROR@487: expected command, found R_PAREN
+ERROR@619: expected R_PAREN
+ERROR@620: expected command, found OFF_KW
+ERROR@623: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@623: expected SEMICOLON
+ERROR@623: expected command, found R_PAREN
+ERROR@772: expected R_PAREN
+ERROR@773: expected command, found OFF_KW
+ERROR@776: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@776: expected SEMICOLON
+ERROR@776: expected command, found R_PAREN
+ERROR@920: expected R_PAREN
+ERROR@921: expected command, found OFF_KW
+ERROR@924: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@924: expected SEMICOLON
+ERROR@924: expected command, found R_PAREN
+ERROR@1107: expected R_PAREN
+ERROR@1108: expected command, found OFF_KW
+ERROR@1111: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1111: expected SEMICOLON
+ERROR@1111: expected command, found R_PAREN
+ERROR@1276: expected R_PAREN
+ERROR@1277: expected command, found OFF_KW
+ERROR@1280: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1280: expected SEMICOLON
+ERROR@1280: expected command, found R_PAREN
+ERROR@1449: expected R_PAREN
+ERROR@1450: expected command, found OFF_KW
+ERROR@1453: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1453: expected SEMICOLON
+ERROR@1453: expected command, found R_PAREN
+ERROR@1630: expected R_PAREN
+ERROR@1631: expected command, found OFF_KW
+ERROR@1634: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1634: expected SEMICOLON
+ERROR@1634: expected command, found R_PAREN
+ERROR@1870: expected R_PAREN
+ERROR@1871: expected command, found OFF_KW
+ERROR@1874: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1874: expected SEMICOLON
+ERROR@1874: expected command, found R_PAREN
+ERROR@2061: expected R_PAREN
+ERROR@2062: expected command, found OFF_KW
+ERROR@2065: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2065: expected SEMICOLON
+ERROR@2065: expected command, found R_PAREN
+ERROR@2342: expected R_PAREN
+ERROR@2343: expected command, found OFF_KW
+ERROR@2346: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2346: expected SEMICOLON
+ERROR@2346: expected command, found R_PAREN
+ERROR@2540: expected R_PAREN
+ERROR@2541: expected command, found OFF_KW
+ERROR@2544: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2544: expected SEMICOLON
+ERROR@2544: expected command, found R_PAREN
+ERROR@2792: expected R_PAREN
+ERROR@2793: expected command, found OFF_KW
+ERROR@2796: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2796: expected SEMICOLON
+ERROR@2796: expected command, found R_PAREN
+ERROR@2984: expected R_PAREN
+ERROR@2985: expected command, found OFF_KW
+ERROR@2988: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2988: expected SEMICOLON
+ERROR@2988: expected command, found R_PAREN
+ERROR@3227: expected R_PAREN
+ERROR@3228: expected command, found OFF_KW
+ERROR@3231: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3231: expected SEMICOLON
+ERROR@3231: expected command, found R_PAREN
+ERROR@3445: expected R_PAREN
+ERROR@3446: expected command, found OFF_KW
+ERROR@3449: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3449: expected SEMICOLON
+ERROR@3449: expected command, found R_PAREN
+ERROR@3908: expected R_PAREN
+ERROR@3909: expected command, found OFF_KW
+ERROR@3912: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3912: expected SEMICOLON
+ERROR@3912: expected command, found R_PAREN
+ERROR@4030: expected R_PAREN
+ERROR@4031: expected command, found OFF_KW
+ERROR@4034: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4034: expected SEMICOLON
+ERROR@4034: expected command, found R_PAREN
+ERROR@4255: expected R_PAREN
+ERROR@4256: expected command, found OFF_KW
+ERROR@4259: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4259: expected SEMICOLON
+ERROR@4259: expected command, found R_PAREN
+ERROR@4377: expected R_PAREN
+ERROR@4378: expected command, found OFF_KW
+ERROR@4381: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4381: expected SEMICOLON
+ERROR@4381: expected command, found R_PAREN
+ERROR@4926: expected R_PAREN
+ERROR@4927: expected command, found OFF_KW
+ERROR@4930: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4930: expected SEMICOLON
+ERROR@4930: expected command, found R_PAREN
+ERROR@5320: expected R_PAREN
+ERROR@5321: expected command, found OFF_KW
+ERROR@5324: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@5324: expected SEMICOLON
+ERROR@5324: expected command, found R_PAREN

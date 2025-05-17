@@ -1,0 +1,25 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/oidjoins.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Verify system catalog foreign key relationships"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  DO_STMT
+    DO_KW "DO"
+    WHITESPACE " "
+    LITERAL
+      DOLLAR_QUOTED_STRING "$doblock$\ndeclare\n  fk record;\n  nkeys integer;\n  cmd text;\n  err record;\nbegin\n  for fk in select * from pg_get_catalog_foreign_keys()\n  loop\n    raise notice 'checking % % => % %',\n      fk.fktable, fk.fkcols, fk.pktable, fk.pkcols;\n    nkeys := array_length(fk.fkcols, 1);\n    cmd := 'SELECT ctid';\n    for i in 1 .. nkeys loop\n      cmd := cmd || ', ' || quote_ident(fk.fkcols[i]);\n    end loop;\n    if fk.is_array then\n      cmd := cmd || ' FROM (SELECT ctid';\n      for i in 1 .. nkeys-1 loop\n        cmd := cmd || ', ' || quote_ident(fk.fkcols[i]);\n      end loop;\n      cmd := cmd || ', unnest(' || quote_ident(fk.fkcols[nkeys]);\n      cmd := cmd || ') as ' || quote_ident(fk.fkcols[nkeys]);\n      cmd := cmd || ' FROM ' || fk.fktable::text || ') fk WHERE ';\n    else\n      cmd := cmd || ' FROM ' || fk.fktable::text || ' fk WHERE ';\n    end if;\n    if fk.is_opt then\n      for i in 1 .. nkeys loop\n        cmd := cmd || quote_ident(fk.fkcols[i]) || ' != 0 AND ';\n      end loop;\n    end if;\n    cmd := cmd || 'NOT EXISTS(SELECT 1 FROM ' || fk.pktable::text || ' pk WHERE ';\n    for i in 1 .. nkeys loop\n      if i > 1 then cmd := cmd || ' AND '; end if;\n      cmd := cmd || 'pk.' || quote_ident(fk.pkcols[i]);\n      cmd := cmd || ' = fk.' || quote_ident(fk.fkcols[i]);\n    end loop;\n    cmd := cmd || ')';\n    -- raise notice 'cmd = %', cmd;\n    for err in execute cmd loop\n      raise warning 'FK VIOLATION IN %(%): %', fk.fktable, fk.fkcols, err;\n    end loop;\n  end loop;\nend\n$"
+  ERROR
+    IDENT "doblock$"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@1549: expected SEMICOLON
+ERROR@1549: expected command, found IDENT
+ERROR@60: Unterminated dollar quoted string literal

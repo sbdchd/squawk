@@ -1,0 +1,5563 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/create_am.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Create access method tests"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Make gist2 over gisthandler. In fact, it would be a synonym to gist."
+  WHITESPACE "\n"
+  CREATE_ACCESS_METHOD_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gist2"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    HANDLER_KW "HANDLER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "gisthandler"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify return type checks for handlers"
+  WHITESPACE "\n"
+  CREATE_ACCESS_METHOD_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "bogus"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    HANDLER_KW "HANDLER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "int4in"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ACCESS_METHOD_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "bogus"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    HANDLER_KW "HANDLER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "heap_tableam_handler"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- Try to create gist2 index on fast_emp4000: fail because opclass doesn't exist"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "grect2ind2"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "fast_emp4000"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist2"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "home_base"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Make operator class for boxes using gist2"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_CLASS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CLASS_KW "CLASS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "box_ops"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE "\n\t"
+    FOR_KW "FOR"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "box"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist2"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      L_ANGLE "<"
+      L_ANGLE "<"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      AMP "&"
+      L_ANGLE "<"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "3"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      AMP "&"
+      AMP "&"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "4"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      AMP "&"
+      R_ANGLE ">"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "5"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      R_ANGLE ">"
+      R_ANGLE ">"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "6"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      TILDE "~"
+      EQ "="
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "7"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      AT "@"
+      R_ANGLE ">"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "8"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      L_ANGLE "<"
+      AT "@"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "9"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      AMP "&"
+      L_ANGLE "<"
+      PIPE "|"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      L_ANGLE "<"
+      L_ANGLE "<"
+      PIPE "|"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "11"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      PIPE "|"
+      R_ANGLE ">"
+      R_ANGLE ">"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "12"
+    WHITESPACE "\t"
+    CUSTOM_OP
+      PIPE "|"
+      AMP "&"
+      R_ANGLE ">"
+    COMMA ","
+    WHITESPACE "\n\t"
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE "\t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_box_consistent"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "box"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                SMALLINT_KW "smallint"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "oid"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n\t"
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE "\t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_box_union"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n\t"
+    COMMENT "-- don't need compress, decompress, or fetch functions"
+    WHITESPACE "\n\t"
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "5"
+    WHITESPACE "\t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_box_penalty"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n\t"
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "6"
+    WHITESPACE "\t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_box_picksplit"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n\t"
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "7"
+    WHITESPACE "\t"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "gist_box_same"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "box"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "box"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Create gist2 index on fast_emp4000"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "grect2ind2"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "fast_emp4000"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist2"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "home_base"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Now check the results from plain indexscan; temporarily drop existing"
+  WHITESPACE "\n"
+  COMMENT "-- index grect2ind to ensure it doesn't capture the plan"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_INDEX_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "grect2ind"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "OFF"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "ON"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "OFF"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "fast_emp4000"
+    WHITESPACE "\n    "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "home_base"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'(200,200),(2000,1000)'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "box"
+    WHITESPACE "\n    "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      INDEX_EXPR
+        PAREN_EXPR
+          L_PAREN "("
+          INDEX_EXPR
+            NAME_REF
+              IDENT "home_base"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "0"
+            R_BRACK "]"
+          R_PAREN ")"
+        L_BRACK "["
+        LITERAL
+          INT_NUMBER "0"
+        R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "fast_emp4000"
+    WHITESPACE "\n    "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "home_base"
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          AT "@"
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'(200,200),(2000,1000)'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "box"
+    WHITESPACE "\n    "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      INDEX_EXPR
+        PAREN_EXPR
+          L_PAREN "("
+          INDEX_EXPR
+            NAME_REF
+              IDENT "home_base"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "0"
+            R_BRACK "]"
+          R_PAREN ")"
+        L_BRACK "["
+        LITERAL
+          INT_NUMBER "0"
+        R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "fast_emp4000"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "home_base"
+        WHITESPACE " "
+        CUSTOM_OP
+          AMP "&"
+          AMP "&"
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'(1000,1000,0,0)'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "box"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "fast_emp4000"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "home_base"
+        WHITESPACE " "
+        CUSTOM_OP
+          AMP "&"
+          AMP "&"
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'(1000,1000,0,0)'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "box"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "fast_emp4000"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "home_base"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "fast_emp4000"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "home_base"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Try to drop access method: fail because of dependent objects"
+  WHITESPACE "\n"
+  DROP_ACCESS_METHOD_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Drop access method cascade"
+  WHITESPACE "\n"
+  COMMENT "-- To prevent a (rare) deadlock against autovacuum,"
+  WHITESPACE "\n"
+  COMMENT "-- we must lock the table that owns the index that will be dropped"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  LOCK_STMT
+    LOCK_KW "LOCK"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    TABLE_LIST
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "fast_emp4000"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ACCESS_METHOD_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist2"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test table access methods"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- prevent empty values"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "''"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- prevent nonexistent values"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'I do not exist AM'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- prevent setting it to an index AM"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'btree'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- Create a heap2 table am handler with heapam handler"
+  WHITESPACE "\n"
+  CREATE_ACCESS_METHOD_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "heap2"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    HANDLER_KW "HANDLER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "heap_tableam_handler"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify return type checks for handlers"
+  WHITESPACE "\n"
+  CREATE_ACCESS_METHOD_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "bogus"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    HANDLER_KW "HANDLER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "int4in"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ACCESS_METHOD_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "bogus"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    HANDLER_KW "HANDLER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "bthandler"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "amname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "amhandler"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "amtype"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "amtype"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'t'"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- First create tables employing the new AM using USING"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- plain CREATE TABLE"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_tbl_heap2"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_tbl_heap2"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tableam_tbl_heap2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- CREATE TABLE AS"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_tblas_heap2"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heap2"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tableam_tbl_heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tableam_tbl_heap2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SELECT INTO doesn't support USING"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        ERROR
+          INTO_KW "INTO"
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "tableam_tblselectinto_heap2"
+          WHITESPACE " "
+          NAME
+            USING_KW "USING"
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "heap2"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tableam_tbl_heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- CREATE VIEW doesn't support USING"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_view_heap2"
+    WHITESPACE " "
+    ERROR
+      USING_KW "USING"
+  WHITESPACE " "
+  ERROR
+    IDENT "heap2"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tableam_tbl_heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- CREATE SEQUENCE doesn't support USING"
+  WHITESPACE "\n"
+  CREATE_SEQUENCE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_seq_heap2"
+  WHITESPACE " "
+  ERROR
+    USING_KW "USING"
+  WHITESPACE " "
+  ERROR
+    IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- CREATE MATERIALIZED VIEW does support USING"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_tblmv_heap2"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "heap2"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tableam_tbl_heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tableam_tblmv_heap2"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- CREATE TABLE ..  PARTITION BY supports USING."
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_heap2"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "list"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'tableam_parted_heap2'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_parted_heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_heap2"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "list"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- new partitions will inherit from the current default, rather the partition root"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_a_heap2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_parted_heap2"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'a'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap2'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_b_heap2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_parted_heap2"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'b'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    COMMENT "-- but the method can be explicitly specified"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_c_heap2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_parted_heap2"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'c'"
+    R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heap"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_d_heap2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_parted_heap2"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'d'"
+    R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- List all objects in AM"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pc"
+            DOT "."
+            NAME_REF
+              IDENT "relkind"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pa"
+            DOT "."
+            NAME_REF
+              IDENT "amname"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            CASE_EXPR
+              CASE_KW "CASE"
+              WHITESPACE " "
+              WHEN_CLAUSE
+                WHEN_KW "WHEN"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "relkind"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'t'"
+                WHITESPACE " "
+                THEN_KW "THEN"
+                WHITESPACE "\n        "
+                PAREN_EXPR
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "SELECT"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          BIN_EXPR
+                            LITERAL
+                              STRING "'toast for '"
+                            WHITESPACE " "
+                            CUSTOM_OP
+                              PIPE "|"
+                              PIPE "|"
+                            WHITESPACE " "
+                            CAST_EXPR
+                              NAME_REF
+                                IDENT "relname"
+                              COLON2 "::"
+                              PATH_TYPE
+                                PATH
+                                  PATH_SEGMENT
+                                    NAME_REF
+                                      IDENT "regclass"
+                    WHITESPACE " "
+                    FROM_CLAUSE
+                      FROM_KW "FROM"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "pg_class"
+                      WHITESPACE " "
+                      ALIAS
+                        NAME
+                          IDENT "pcm"
+                    WHITESPACE " "
+                    WHERE_CLAUSE
+                      WHERE_KW "WHERE"
+                      WHITESPACE " "
+                      BIN_EXPR
+                        FIELD_EXPR
+                          NAME_REF
+                            IDENT "pcm"
+                          DOT "."
+                          NAME_REF
+                            IDENT "reltoastrelid"
+                        WHITESPACE " "
+                        EQ "="
+                        WHITESPACE " "
+                        FIELD_EXPR
+                          NAME_REF
+                            IDENT "pc"
+                          DOT "."
+                          NAME_REF
+                            IDENT "oid"
+                  R_PAREN ")"
+              WHITESPACE "\n    "
+              ELSE_KW "ELSE"
+              WHITESPACE "\n        "
+              CAST_EXPR
+                CAST_EXPR
+                  NAME_REF
+                    IDENT "relname"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "regclass"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              WHITESPACE "\n    "
+              END_KW "END"
+            WHITESPACE " "
+            COLLATE_KW "COLLATE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "relname"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "pc"
+      COMMA ","
+      WHITESPACE "\n    "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "pa"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pa"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pc"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+        WHITESPACE "\n   "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pa"
+            DOT "."
+            NAME_REF
+              IDENT "amname"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'heap2'"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Show dependencies onto AM - there shouldn't be any for toast"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "classid"
+              COMMA ","
+              NAME_REF
+                IDENT "objid"
+              COMMA ","
+              NAME_REF
+                IDENT "objsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "obj"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_depend"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refclassid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'pg_am'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "regclass"
+          WHITESPACE "\n    "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_am"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refobjid"
+        WHITESPACE "\n    "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pg_am"
+            DOT "."
+            NAME_REF
+              IDENT "amname"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'heap2'"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "classid"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "objid"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "objsubid"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ALTER TABLE SET ACCESS METHOD"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "heaptable"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heap"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "repeat"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  NAME_REF
+                    IDENT "a"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "100"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "9"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "am"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'heaptable'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Switching to heap2 adds new dependency entry to the AM."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heaptable"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "classid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "obj"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "refclassid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "objref"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          NAME_REF
+            IDENT "deptype"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_depend"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "classid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'pg_class'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE "\n        "
+        BIN_EXPR
+          NAME_REF
+            IDENT "objid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'heaptable'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Switching to heap should not have a dependency entry to the AM."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heaptable"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "classid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "obj"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "refclassid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "objref"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          NAME_REF
+            IDENT "deptype"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_depend"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "classid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'pg_class'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE "\n        "
+        BIN_EXPR
+          NAME_REF
+            IDENT "objid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'heaptable'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heaptable"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "am"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'heaptable'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+            WHITESPACE " "
+            FILTER_CLAUSE
+              FILTER_KW "FILTER"
+              L_PAREN "("
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "a"
+                EQ "="
+                LITERAL
+                  INT_NUMBER "1"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heaptable"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- DEFAULT access method"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heaptable"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      DEFAULT_KW "DEFAULT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "am"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'heaptable'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "heap"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heaptable"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      DEFAULT_KW "DEFAULT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "am"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'heaptable'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- ALTER MATERIALIZED VIEW SET ACCESS METHOD"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "heapmv"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "heap"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "heaptable"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "am"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'heapmv'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heapmv"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "am"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'heapmv'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              R_PAREN ")"
+            WHITESPACE " "
+            FILTER_CLAUSE
+              FILTER_KW "FILTER"
+              L_PAREN "("
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "a"
+                EQ "="
+                LITERAL
+                  INT_NUMBER "1"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heapmv"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- No support for multiple subcommands"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heaptable"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap"
+    COMMA ","
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heaptable"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      DEFAULT_KW "DEFAULT"
+    COMMA ","
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_MATERIALIZED_VIEW_STMT
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heapmv"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap"
+    COMMA ","
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_MATERIALIZED_VIEW_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heapmv"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heaptable"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Partitioned table with USING"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "y"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "hash"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "x"
+    R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "classid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "obj"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "refclassid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "refobj"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_depend"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refclassid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'pg_am'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "regclass"
+          WHITESPACE "\n    "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_am"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refobjid"
+        WHITESPACE "\n    "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pg_depend"
+            DOT "."
+            NAME_REF
+              IDENT "objid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'am_partitioned'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Partition hierarchies with access methods"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "y"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "hash"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "x"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- pg_class.relam is 0, no dependency recorded between the AM and the"
+  WHITESPACE "\n"
+  COMMENT "-- partitioned table."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relam"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'am_partitioned'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "classid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "obj"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "refclassid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "refobj"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_depend"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refclassid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'pg_am'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "regclass"
+          WHITESPACE "\n    "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_am"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refobjid"
+        WHITESPACE "\n    "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pg_depend"
+            DOT "."
+            NAME_REF
+              IDENT "objid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'am_partitioned'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- New default is set, with dependency added."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'am_partitioned'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "classid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "obj"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "refclassid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "refobj"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_depend"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refclassid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'pg_am'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "regclass"
+          WHITESPACE "\n    "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_am"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refobjid"
+        WHITESPACE "\n    "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pg_depend"
+            DOT "."
+            NAME_REF
+              IDENT "objid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'am_partitioned'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Default is set, with dependency updated."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap2'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'am_partitioned'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Dependency pinned, hence removed."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "classid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "objsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "obj"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_describe_object"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "refclassid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjid"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "refobjsubid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "refobj"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_depend"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refclassid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'pg_am'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "regclass"
+          WHITESPACE "\n    "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_am"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_depend"
+              DOT "."
+              NAME_REF
+                IDENT "refobjid"
+        WHITESPACE "\n    "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pg_depend"
+            DOT "."
+            NAME_REF
+              IDENT "objid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'am_partitioned'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Default and AM set in the clause are the same, relam should be set."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap2'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "amname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_am"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'am_partitioned'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relam"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Reset to default"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      DEFAULT_KW "DEFAULT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relam"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'am_partitioned'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Upon ALTER TABLE SET ACCESS METHOD on a partitioned table, new partitions"
+  WHITESPACE "\n"
+  COMMENT "-- will inherit the AM set.  Existing partitioned are unchanged."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relam"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'am_partitioned'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned_0"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "0"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap2'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned_1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned_2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      DEFAULT_KW "DEFAULT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relam"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'am_partitioned'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned_3"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "3"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Partitioned table with relam at 0"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      DEFAULT_KW "DEFAULT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned_5p"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "5"
+    R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "hash"
+    L_PAREN "("
+    NAME_REF
+      IDENT "y"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    COMMENT "-- Partitions of this partitioned table inherit default AM at creation"
+    WHITESPACE "\n"
+    COMMENT "-- time."
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned_5p1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned_5p"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Partitioned table with relam set."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE " "
+    SET_ACCESS_METHOD
+      SET_KW "SET"
+      WHITESPACE " "
+      ACCESS_KW "ACCESS"
+      WHITESPACE " "
+      METHOD_KW "METHOD"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned_6p"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "6"
+    R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "hash"
+    L_PAREN "("
+    NAME_REF
+      IDENT "y"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    COMMENT "-- Partitions of this partitioned table inherit its AM."
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "am_partitioned_6p1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned_6p"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "10"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "a"
+              DOT "."
+              NAME_REF
+                IDENT "amname"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_class"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "c"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_am"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "a"
+      WHITESPACE "\n  "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "relam"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "a"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+          WHITESPACE " "
+          AND_KW "AND"
+          WHITESPACE "\n        "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+            WHITESPACE " "
+            LIKE_KW "LIKE"
+            WHITESPACE " "
+            LITERAL
+              STRING "'am_partitioned%'"
+    WHITESPACE "\n"
+    UNION_KW "UNION"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              STRING "'default'"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_class"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "c"
+      WHITESPACE "\n  "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "relam"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          WHITESPACE "\n        "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+            WHITESPACE " "
+            LIKE_KW "LIKE"
+            WHITESPACE " "
+            LITERAL
+              STRING "'am_partitioned%'"
+      WHITESPACE " "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "am_partitioned"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Second, create objects in the new AM by changing the default AM"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_table_access_method"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'heap2'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- following tests should all respect the default AM"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_tbl_heapx"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_tblas_heapx"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tableam_tbl_heapx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        ERROR
+          INTO_KW "INTO"
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "tableam_tblselectinto_heapx"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tableam_tbl_heapx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_tblmv_heapx"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "heap2"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tableam_tbl_heapx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_heapx"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "list"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_1_heapx"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_parted_heapx"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'a'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'b'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- but an explicitly set AM overrides it"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_parted_2_heapx"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_parted_heapx"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'c'"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'d'"
+    R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "heap"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- sequences, views and foreign servers shouldn't have an AM"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_view_heapx"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tableam_tbl_heapx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SEQUENCE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_seq_heapx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FOREIGN_DATA_WRAPPER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    DATA_KW "DATA"
+    WHITESPACE " "
+    WRAPPER_KW "WRAPPER"
+    WHITESPACE " "
+    NAME
+      IDENT "fdw_heap2"
+    WHITESPACE " "
+    VALIDATOR_KW "VALIDATOR"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "postgresql_fdw_validator"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_SERVER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    NAME
+      IDENT "fs_heap2"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    DATA_KW "DATA"
+    WHITESPACE " "
+    WRAPPER_KW "WRAPPER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "fdw_heap2"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FOREIGN_TABLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tableam_fdw_heapx"
+    WHITESPACE " "
+    L_PAREN "("
+    R_PAREN ")"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "fs_heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify that new AM was used for tables, matviews, but not for sequences, views and fdws"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pc"
+            DOT "."
+            NAME_REF
+              IDENT "relkind"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pa"
+            DOT "."
+            NAME_REF
+              IDENT "amname"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            CASE_EXPR
+              CASE_KW "CASE"
+              WHITESPACE " "
+              WHEN_CLAUSE
+                WHEN_KW "WHEN"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "relkind"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'t'"
+                WHITESPACE " "
+                THEN_KW "THEN"
+                WHITESPACE "\n        "
+                PAREN_EXPR
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "SELECT"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          BIN_EXPR
+                            LITERAL
+                              STRING "'toast for '"
+                            WHITESPACE " "
+                            CUSTOM_OP
+                              PIPE "|"
+                              PIPE "|"
+                            WHITESPACE " "
+                            CAST_EXPR
+                              NAME_REF
+                                IDENT "relname"
+                              COLON2 "::"
+                              PATH_TYPE
+                                PATH
+                                  PATH_SEGMENT
+                                    NAME_REF
+                                      IDENT "regclass"
+                    WHITESPACE " "
+                    FROM_CLAUSE
+                      FROM_KW "FROM"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "pg_class"
+                      WHITESPACE " "
+                      ALIAS
+                        NAME
+                          IDENT "pcm"
+                    WHITESPACE " "
+                    WHERE_CLAUSE
+                      WHERE_KW "WHERE"
+                      WHITESPACE " "
+                      BIN_EXPR
+                        FIELD_EXPR
+                          NAME_REF
+                            IDENT "pcm"
+                          DOT "."
+                          NAME_REF
+                            IDENT "reltoastrelid"
+                        WHITESPACE " "
+                        EQ "="
+                        WHITESPACE " "
+                        FIELD_EXPR
+                          NAME_REF
+                            IDENT "pc"
+                          DOT "."
+                          NAME_REF
+                            IDENT "oid"
+                  R_PAREN ")"
+              WHITESPACE "\n    "
+              ELSE_KW "ELSE"
+              WHITESPACE "\n        "
+              CAST_EXPR
+                CAST_EXPR
+                  NAME_REF
+                    IDENT "relname"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "regclass"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+              WHITESPACE "\n    "
+              END_KW "END"
+            WHITESPACE " "
+            COLLATE_KW "COLLATE"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "\"C\""
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "relname"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "pc"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_am"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "pa"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pa"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pc"
+              DOT "."
+              NAME_REF
+                IDENT "relam"
+          R_PAREN ")"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "pc"
+          DOT "."
+          NAME_REF
+            IDENT "relname"
+        WHITESPACE " "
+        LIKE_KW "LIKE"
+        WHITESPACE " "
+        LITERAL
+          STRING "'tableam_%_heapx'"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- don't want to keep those tables, nor the default"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Third, check that we can neither create a table using a nonexistent"
+    WHITESPACE "\n"
+    COMMENT "-- AM, nor using an index AM"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "i_am_a_failure"
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "i_am_a_failure"
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "i_do_not_exist_am"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "i_am_a_failure"
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"I do not exist AM\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "i_am_a_failure"
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "\"btree\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Other weird invalid cases that cause problems"
+  WHITESPACE "\n"
+  CREATE_FOREIGN_TABLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fp"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tableam_parted_a_heap2"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "x"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Drop table access method, which fails as objects depends on it"
+  WHITESPACE "\n"
+  DROP_ACCESS_METHOD_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "heap2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- we intentionally leave the objects created above alive, to verify pg_dump support"
+  WHITESPACE "\n"
+---
+ERROR@1441: expected config value, got ON_KW
+ERROR@1441: expected SEMICOLON
+ERROR@1442: expected command, found ON_KW
+ERROR@1490: expected R_PAREN
+ERROR@1491: expected command, found OFF_KW
+ERROR@1494: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1494: expected SEMICOLON
+ERROR@1494: expected command, found R_PAREN
+ERROR@1733: expected R_PAREN
+ERROR@1734: expected command, found OFF_KW
+ERROR@1737: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1737: expected SEMICOLON
+ERROR@1737: expected command, found R_PAREN
+ERROR@1908: expected R_PAREN
+ERROR@1909: expected command, found OFF_KW
+ERROR@1912: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1912: expected SEMICOLON
+ERROR@1912: expected command, found R_PAREN
+ERROR@3395: expected an expression, found INTO_KW
+ERROR@3399: expected an expression in target_el, found IDENT
+ERROR@3433: missing comma
+ERROR@3532: expected AS_KW
+ERROR@3533: expected command, found USING_KW
+ERROR@3538: expected SELECT
+ERROR@3538: expected SEMICOLON
+ERROR@3539: expected command, found IDENT
+ERROR@3545: expected command, found AS_KW
+ERROR@3656: expected SEMICOLON
+ERROR@3657: expected command, found USING_KW
+ERROR@3663: expected command, found IDENT
+ERROR@12694: expected an expression, found INTO_KW
+ERROR@12698: expected an expression in target_el, found IDENT

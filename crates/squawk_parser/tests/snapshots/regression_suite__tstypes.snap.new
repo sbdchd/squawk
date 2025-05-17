@@ -1,0 +1,6569 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/tstypes.sql
+---
+SOURCE_FILE
+  COMMENT "-- deal with numeric instability of ts_rank"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "extra_float_digits"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--Base tsvector test"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1 '"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "' 1'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "' 1 '"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1 2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'''1 2'''"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              ESC_STRING "E'''1 \\\\''2'''"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              ESC_STRING "E'''1 \\\\''2''3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              ESC_STRING "E'''1 \\\\''2'' 3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              ESC_STRING "E'''1 \\\\''2'' '' 3'' 4 '"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              DOLLAR_QUOTED_STRING "$$'\\\\as' ab\\c ab\\\\c AB\\\\\\c ab\\\\\\\\c$$"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "tsvectorin"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "tsvectorout"
+                ARG_LIST
+                  L_PAREN "("
+                  CAST_EXPR
+                    LITERAL
+                      DOLLAR_QUOTED_STRING "$$'\\\\as' ab\\c ab\\\\c AB\\\\\\c ab\\\\\\\\c$$"
+                    COLON2 "::"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "tsvector"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'''w'':4A,3B,2C,1D,5 a:8'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:3A b:2a'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              STRING "'ba:1234 a:1B'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              DOLLAR_QUOTED_STRING "$$'' '1' '2'$$"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- error, empty lexeme is not allowed"
+  WHITESPACE "\n\n"
+  COMMENT "-- Also try it with non-error-throwing API"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foo'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'tsvector'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                DOLLAR_QUOTED_STRING "$$''$$"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'tsvector'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            DOLLAR_QUOTED_STRING "$$''$$"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'tsvector'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--Base tsquery test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1 '"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "' 1'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "' 1 '"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'''1 2'''"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              ESC_STRING "E'''1 \\\\''2'''"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!1'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1|2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1|!2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!1|2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!1|!2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!(!1|!2)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!(!1|2)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!(1|!2)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!(1|2)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1&2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!1&2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1&!2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!1&!2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'(1&2)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1&(2)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!(1)&2'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!(1&2)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1|2&3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1|(2&3)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'(1|2)&3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1|2&!3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1|!2&3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!1|2&3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!1|(2&3)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!(1|2)&3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'(!1|2)&3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1|(2|(4|(5|6)))'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1|2|4|5|6'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1&(2&(4&(5&6)))'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1&2&4&5&6'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1&(2&(4&(5|6)))'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'1&(2&(4&(5|!6)))'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              ESC_STRING "E'1&(''2''&('' 4''&(\\\\|5 | ''6 \\\\'' !|&'')))'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              DOLLAR_QUOTED_STRING "$$'\\\\as'$$"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'a:* & nbb:*ac | doo:a* | goo'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!!b'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!!!b'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!(!b)'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'a & !!b'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!!a & b'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'!!a & !!b'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Also try it with non-error-throwing API"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foo'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'tsquery'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foo!'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'tsquery'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'foo!'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'tsquery'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'a <100000> b'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'tsquery'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--comparisons"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b & c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b & c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a | f'"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b & c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a | ff'"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b & c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a | f | g'"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b & c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--concatenation"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "numnode"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  STRING "'new'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsquery"
+              WHITESPACE " "
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "numnode"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  STRING "'new & york'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsquery"
+              WHITESPACE " "
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "numnode"
+            ARG_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              CAST_EXPR
+                LITERAL
+                  STRING "'new & york | qwery'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsquery"
+              WHITESPACE " "
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'foo & bar'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+            WHITESPACE " "
+            LITERAL
+              STRING "'asd'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'foo & bar'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              STRING "'asd & fg'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'foo & bar'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            PREFIX_EXPR
+              CUSTOM_OP
+                BANG "!"
+                BANG "!"
+              CAST_EXPR
+                LITERAL
+                  STRING "'asd & fg'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'foo & bar'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
+            WHITESPACE " "
+            LITERAL
+              STRING "'asd | fg'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b & d'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a & g'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b & d'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a & g'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b | d'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a & g'"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'b <-> d'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "tsquery_phrase"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a <3> g'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'b & d'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- tsvector-tsquery operations"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & ca'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & ca:B'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & ca:A'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & ca:C'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & ca:CB'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & c:*C'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & c:*CB'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64b cb:80c d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & c:*C'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64c cb:80b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & c:*C'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a b:89  ca:23A,64c cb:80b d:34c'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'d:AC & c:*B'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'wa:1D wb:2A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'w:*D & w:*A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'wa:1D wb:2A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'w:*D <-> w:*A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'wa:1A wb:2D'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'w:*D <-> w:*A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'wa:1A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'w:*A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'wa:1A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'w:*D'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'wa:1A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'!w:*A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'wa:1A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'!w:*D'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- historically, a stripped tsvector matches queries ignoring weights:"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  LITERAL
+                    STRING "'wa:1A'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "tsvector"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'w:*A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  LITERAL
+                    STRING "'wa:1A'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "tsvector"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'w:*D'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  LITERAL
+                    STRING "'wa:1A'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "tsvector"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'!w:*A'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  LITERAL
+                    STRING "'wa:1A'"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "tsvector"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'!w:*D'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'supernova'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'super'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'supeanova supernova'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'super'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'supeznova supernova'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'super'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'supernova'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'super:*'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'supeanova supernova'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'super:*'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'supeznova supernova'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'super:*'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--phrase search"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 3 1'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <-> 2'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 3 1'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <2> 2'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 3 1'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <-> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 3 1'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <2> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 1 2'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <3> 2'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 11 3'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <-> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 11 3'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1:* <-> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 3 4'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <-> 2 <-> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 3 4'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(1 <-> 2) <-> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 3 4'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <-> (2 <-> 3)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 3 4'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <2> (2 <-> 3)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 1 2 3 4'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(1 <-> 2) <-> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'1 2 1 2 3 4'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <-> 2 <-> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- without position data, phrase search does not match"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "to_tsvector"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'simple'"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'1 2 3 4'"
+                    R_PAREN ")"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 <-> 2 <-> 3'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'q x q y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'q <-> (x & y)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'q x'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'q <-> (x | y <-> z)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'q y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'q <-> (x | y <-> z)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'q y z'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'q <-> (x | y <-> z)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'q y x'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'q <-> (x | y <-> z)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'q x y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'q <-> (x | y <-> z)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'q x'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y z'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y z q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'y z q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'y y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'y y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(!x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(!x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'y y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> !z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | y <-> !z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(!x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'z q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(!x | y <-> z) <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(!x | y) <-> y <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(!x | !y) <-> y <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | !y) <-> y <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(x | !!z) <-> y <-> q'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!x <-> y'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!x <-> !y'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!x <-> !!y'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!(x <-> y)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!(x <2> y)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "to_tsvector"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'simple'"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'x y q y'"
+                    R_PAREN ")"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!x <-> y'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "to_tsvector"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'simple'"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'x y q y'"
+                    R_PAREN ")"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!x <-> !y'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "to_tsvector"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'simple'"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'x y q y'"
+                    R_PAREN ")"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!x <-> !!y'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "to_tsvector"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'simple'"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'x y q y'"
+                    R_PAREN ")"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!(x <-> y)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                STRIP_KW "strip"
+              ARG_LIST
+                L_PAREN "("
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "to_tsvector"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'simple'"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'x y q y'"
+                    R_PAREN ")"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!(x <2> y)'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'x y q y'"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!foo'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'simple'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "''"
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            LITERAL
+              STRING "'!foo'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--ranking"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s:*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | sa:*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2B d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2 d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a & s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2B d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a & s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2 d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a & s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s:*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | sa:*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:3C sab:2c d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | sa:*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2B d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2 d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a | s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a & s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2B d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a & s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2 d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a & s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2A d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <-> s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2C d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <-> s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2 d g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <-> s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2 d:2A g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <-> s'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 s:2,3A d:2A g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <2> s:A'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 b:2 s:3A d:2A g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <2> s:A'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2D sb:2A g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <-> s:*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2A sb:2D g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <-> s:*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2A sb:2D g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <-> s:* <-> sa:A'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "' a:1 sa:2A sb:2D g'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a <-> s:* <-> sa:B'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:2'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <-> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:2'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <0> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:2'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <1> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:2'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <2> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:3'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <-> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:3'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <0> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:3'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <1> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:3'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <2> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:3'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <3> b'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"false\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'a:1 b:3'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsvector"
+            WHITESPACE " "
+            CUSTOM_OP
+              AT "@"
+              AT "@"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'a <0> a:*'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"true\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- tsvector editing operations"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              STRIP_KW "strip"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'w:12B w:13* w:12,5,6 a:1,3* a:3 w asd:1dc asd'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              STRIP_KW "strip"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              STRIP_KW "strip"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "to_tsvector"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    STRING "'english'"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'Rebel spaceships, striking from a hidden base'"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'spaceship'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'base'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'bas'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'bases'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'spaceship'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'spaceship'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'spaceship'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'spaceships'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'spaceshi'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'spaceship'"
+                COMMA ","
+                LITERAL
+                  STRING "'leya'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'spaceship'"
+                COMMA ","
+                LITERAL
+                  STRING "'leya'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'spaceship'"
+                COMMA ","
+                LITERAL
+                  STRING "'leya'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_delete"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'spaceship'"
+                COMMA ","
+                LITERAL
+                  STRING "'leya'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "''"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  NULL_KW "NULL"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "unnest"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "unnest"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "unnest"
+        ARG_LIST
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "unnest"
+        ARG_LIST
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'base hidden rebel spaceship strike'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "lexeme"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          INDEX_EXPR
+            NAME_REF
+              IDENT "positions"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+            R_BRACK "]"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "unnest"
+        ARG_LIST
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "tsvector"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "tsvector_to_array"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7 hidden:6 rebel:1 spaceship:2,33A,34B,35C,36D strike:3'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "tsvector_to_array"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_to_tsvector"
+            ARG_LIST
+              L_PAREN "("
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'base'"
+                COMMA ","
+                LITERAL
+                  STRING "'hidden'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                COMMA ","
+                LITERAL
+                  STRING "'spaceship'"
+                COMMA ","
+                LITERAL
+                  STRING "'strike'"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- null and empty string are disallowed, since we mustn't make an empty lexeme"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_to_tsvector"
+            ARG_LIST
+              L_PAREN "("
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'base'"
+                COMMA ","
+                LITERAL
+                  STRING "'hidden'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                COMMA ","
+                LITERAL
+                  STRING "'spaceship'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  NULL_KW "NULL"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_to_tsvector"
+            ARG_LIST
+              L_PAREN "("
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'base'"
+                COMMA ","
+                LITERAL
+                  STRING "'hidden'"
+                COMMA ","
+                LITERAL
+                  STRING "'rebel'"
+                COMMA ","
+                LITERAL
+                  STRING "'spaceship'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "''"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- array_to_tsvector must sort and de-dup"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_to_tsvector"
+            ARG_LIST
+              L_PAREN "("
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'foo'"
+                COMMA ","
+                LITERAL
+                  STRING "'bar'"
+                COMMA ","
+                LITERAL
+                  STRING "'baz'"
+                COMMA ","
+                LITERAL
+                  STRING "'bar'"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "setweight"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'w:12B w:13* w:12,5,6 a:1,3* a:3 w asd:1dc asd zxc:81,567,222A'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'c'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "setweight"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'a:1,3A asd:1C w:5,6,12B,13A zxc:81,222A,567'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'c'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "setweight"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'a:1,3A asd:1C w:5,6,12B,13A zxc:81,222A,567'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'c'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'{a}'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "setweight"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'a:1,3A asd:1C w:5,6,12B,13A zxc:81,222A,567'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'c'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'{a}'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "setweight"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'a:1,3A asd:1C w:5,6,12B,13A zxc:81,222A,567'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'c'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'{a,zxc}'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "setweight"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'a asd w:5,6,12B,13A zxc'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'c'"
+              COMMA ","
+              WHITESPACE " "
+              ARRAY_EXPR
+                ARRAY_KW "ARRAY"
+                L_BRACK "["
+                LITERAL
+                  STRING "'a'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'zxc'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "''"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  NULL_KW "NULL"
+                R_BRACK "]"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_filter"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base:7A empir:17 evil:15 first:11 galact:16 hidden:6A rebel:1A spaceship:2A strike:3A victori:12 won:9'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'{a}'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_filter"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'{a}'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_filter"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'base hidden rebel spaceship strike'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "tsvector"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'{a,b,NULL}'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

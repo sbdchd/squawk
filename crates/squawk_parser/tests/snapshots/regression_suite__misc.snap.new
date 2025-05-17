@@ -1,0 +1,2683 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/misc.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- MISC"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- directory paths and dlsuffix are passed to us in environment variables"
+  WHITESPACE "\n\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "overpaid"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "emp"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "bool"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'regresslib'"
+  WHITESPACE "\n   "
+  ERROR
+    LANGUAGE_KW "LANGUAGE"
+  WHITESPACE " "
+  ERROR
+    IDENT "C"
+  WHITESPACE " "
+  ERROR
+    STRICT_KW "STRICT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "reverse_name"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          NAME_KW "name"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              NAME_KW "name"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'regresslib'"
+  WHITESPACE "\n   "
+  ERROR
+    LANGUAGE_KW "LANGUAGE"
+  WHITESPACE " "
+  ERROR
+    IDENT "C"
+  WHITESPACE " "
+  ERROR
+    STRICT_KW "STRICT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- BTREE"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "onek"
+    WHITESPACE "\n   "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "unique1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      FIELD_EXPR
+        NAME_REF
+          IDENT "onek"
+        DOT "."
+        NAME_REF
+          IDENT "unique1"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "onek"
+    WHITESPACE "\n   "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "unique1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      FIELD_EXPR
+        NAME_REF
+          IDENT "onek"
+        DOT "."
+        NAME_REF
+          IDENT "unique1"
+      WHITESPACE " "
+      MINUS "-"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- BTREE partial"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- UPDATE onek2"
+  WHITESPACE "\n"
+  COMMENT "--   SET unique1 = onek2.unique1 + 1;"
+  WHITESPACE "\n\n"
+  COMMENT "--UPDATE onek2"
+  WHITESPACE "\n"
+  COMMENT "--   SET unique1 = onek2.unique1 - 1;"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- BTREE shutting out non-functional updates"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- the following two tests seem to take a long time on some"
+  WHITESPACE "\n"
+  COMMENT "-- systems.    This non-func update stuff needs to be examined"
+  WHITESPACE "\n"
+  COMMENT "-- more closely.  \t\t\t- jolly (2/22/96)"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT_INTO_STMT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "two"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "stringu1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "ten"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "string4"
+    WHITESPACE "\n   "
+    INTO_CLAUSE
+      INTO_KW "INTO"
+      WHITESPACE " "
+      TABLE_KW "TABLE"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME
+            IDENT "tmp"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "onek"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tmp"
+    WHITESPACE "\n   "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "stringu1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "reverse_name"
+      ARG_LIST
+        L_PAREN "("
+        FIELD_EXPR
+          NAME_REF
+            IDENT "onek"
+          DOT "."
+          NAME_REF
+            IDENT "stringu1"
+        R_PAREN ")"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "onek"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "onek"
+            DOT "."
+            NAME_REF
+              IDENT "stringu1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'JBAAAA'"
+        WHITESPACE " "
+        AND_KW "and"
+        WHITESPACE "\n\t  "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "onek"
+            DOT "."
+            NAME_REF
+              IDENT "stringu1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tmp"
+            DOT "."
+            NAME_REF
+              IDENT "stringu1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tmp"
+    WHITESPACE "\n   "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "stringu1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "reverse_name"
+      ARG_LIST
+        L_PAREN "("
+        FIELD_EXPR
+          NAME_REF
+            IDENT "onek2"
+          DOT "."
+          NAME_REF
+            IDENT "stringu1"
+        R_PAREN ")"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "onek2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "onek2"
+            DOT "."
+            NAME_REF
+              IDENT "stringu1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'JCAAAA'"
+        WHITESPACE " "
+        AND_KW "and"
+        WHITESPACE "\n\t  "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "onek2"
+            DOT "."
+            NAME_REF
+              IDENT "stringu1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tmp"
+            DOT "."
+            NAME_REF
+              IDENT "stringu1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tmp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--UPDATE person*"
+  WHITESPACE "\n"
+  COMMENT "--   SET age = age + 1;"
+  WHITESPACE "\n\n"
+  COMMENT "--UPDATE person*"
+  WHITESPACE "\n"
+  COMMENT "--   SET age = age + 3"
+  WHITESPACE "\n"
+  COMMENT "--   WHERE name = 'linda';"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- copy"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "onek"
+    WHITESPACE " "
+    TO_KW "TO"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "onek_copy"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      LIKE_CLAUSE
+        LIKE_KW "LIKE"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "onek"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "onek_copy"
+    WHITESPACE " "
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "onek"
+    WHITESPACE " "
+    EXCEPT_KW "EXCEPT"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "onek_copy"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "onek_copy"
+    WHITESPACE " "
+    EXCEPT_KW "EXCEPT"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "onek"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          BINARY_KW "BINARY"
+  WHITESPACE " "
+  ERROR
+    IDENT "stud_emp"
+  WHITESPACE " "
+  ERROR
+    TO_KW "TO"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "stud_emp_copy"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      LIKE_CLAUSE
+        LIKE_KW "LIKE"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "stud_emp"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY_STMT
+    COPY_KW "COPY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          BINARY_KW "BINARY"
+  WHITESPACE " "
+  ERROR
+    IDENT "stud_emp_copy"
+  WHITESPACE " "
+  ERROR
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    STRING "'filename'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "stud_emp_copy"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- test data for postquel functions"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "hobbies_r"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "person"
+        WHITESPACE " \t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "equipment_r"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+        WHITESPACE " \t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "hobby"
+        WHITESPACE "\t\t"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "hobbies_r"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "person"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              STRING "'posthacking'"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                NAME_KW "name"
+      WHITESPACE "\n   "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "person"
+        STAR "*"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "p"
+      WHITESPACE "\n   "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                NAME_KW "name"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'mike'"
+          WHITESPACE " "
+          OR_KW "or"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                NAME_KW "name"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'jeff'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "hobbies_r"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "person"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              STRING "'basketball'"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                NAME_KW "name"
+      WHITESPACE "\n   "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "person"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "p"
+      WHITESPACE "\n   "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                NAME_KW "name"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'joe'"
+          WHITESPACE " "
+          OR_KW "or"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                NAME_KW "name"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'sally'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "hobbies_r"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'skywalking'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "equipment_r"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "hobby"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'advil'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'posthacking'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "equipment_r"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "hobby"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'peet''s coffee'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'posthacking'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "equipment_r"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "hobby"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'hightops'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'basketball'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "equipment_r"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          NAME_KW "name"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "hobby"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'guts'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'skywalking'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- postquel functions"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "hobbies"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "person"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "hobbies_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select * from hobbies_r where person = $1.name'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "hobby_construct"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "hobbies_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select $1 as name, $2 as hobby'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "hobby_construct_named"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          NAME_KW "name"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        NAME
+          IDENT "hobby"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "hobbies_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select name, hobby'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "hobbies_by_name"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "hobbies_r"
+  ERROR
+    DOT "."
+  ERROR
+    NAME_KW "name"
+  ERROR
+    PERCENT "%"
+  ERROR
+    TYPE_KW "TYPE"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n   "
+  ERROR
+    RETURNS_KW "RETURNS"
+  WHITESPACE " "
+  ERROR
+    IDENT "hobbies_r"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "person"
+  ERROR
+    PERCENT "%"
+  ERROR
+    TYPE_KW "TYPE"
+  WHITESPACE "\n   "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    STRING "'select person from hobbies_r where name = $1'"
+  WHITESPACE "\n   "
+  ERROR
+    LANGUAGE_KW "LANGUAGE"
+  WHITESPACE " "
+  ERROR
+    SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "equipment"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "hobbies_r"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "equipment_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select * from equipment_r where hobby = $1.name'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "equipment_named"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "hobby"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "hobbies_r"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "equipment_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select * from equipment_r where equipment_r.hobby = equipment_named.hobby.name'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "equipment_named_ambiguous_1a"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "hobby"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "hobbies_r"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "equipment_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select * from equipment_r where hobby = equipment_named_ambiguous_1a.hobby.name'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "equipment_named_ambiguous_1b"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "hobby"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "hobbies_r"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "equipment_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select * from equipment_r where equipment_r.hobby = hobby.name'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "equipment_named_ambiguous_1c"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "hobby"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "hobbies_r"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "equipment_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select * from equipment_r where hobby = hobby.name'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "equipment_named_ambiguous_2a"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "hobby"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "equipment_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select * from equipment_r where hobby = equipment_named_ambiguous_2a.hobby'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "equipment_named_ambiguous_2b"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "hobby"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "equipment_r"
+    WHITESPACE "\n   "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'select * from equipment_r where equipment_r.hobby = hobby'"
+      WHITESPACE "\n   "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- mike does post_hacking,"
+  WHITESPACE "\n"
+  COMMENT "-- joe and sally play basketball, and"
+  WHITESPACE "\n"
+  COMMENT "-- everyone else does nothing."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "hobbies"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      ONLY_KW "ONLY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "person"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- as above, but jeff also does post_hacking."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "hobbies"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "person"
+      STAR "*"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- the next two queries demonstrate how functions generate bogus duplicates."
+  WHITESPACE "\n"
+  COMMENT "-- this is a \"feature\" .."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      DISTINCT_CLAUSE
+        DISTINCT_KW "DISTINCT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "hobbies_r"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "hobbies_r"
+                DOT "."
+                NAME_REF
+                  IDENT "equipment"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "hobbies_r"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      LITERAL
+        INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "hobbies_r"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "hobbies_r"
+                DOT "."
+                NAME_REF
+                  IDENT "equipment"
+              R_PAREN ")"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "hobbies_r"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- mike needs advil and peet's coffee,"
+  WHITESPACE "\n"
+  COMMENT "-- joe and sally need hightops, and"
+  WHITESPACE "\n"
+  COMMENT "-- everyone else is fine."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "hobbies"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "p"
+                    DOT "."
+                    NAME_REF
+                      IDENT "hobbies"
+                  R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      ONLY_KW "ONLY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "person"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- as above, but jeff needs advil and peet's coffee as well."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "hobbies"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "p"
+                    DOT "."
+                    NAME_REF
+                      IDENT "hobbies"
+                  R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "person"
+      STAR "*"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- just like the last two, but make sure that the target list fixup and"
+  WHITESPACE "\n"
+  COMMENT "-- unflattening is being done correctly."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "p"
+                    DOT "."
+                    NAME_REF
+                      IDENT "hobbies"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "hobbies"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      ONLY_KW "ONLY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "person"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            FIELD_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "p"
+                  DOT "."
+                  NAME_REF
+                    IDENT "hobbies"
+                R_PAREN ")"
+              DOT "."
+              NAME_REF
+                IDENT "equipment"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "hobbies"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "person"
+      STAR "*"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            FIELD_EXPR
+              PAREN_EXPR
+                L_PAREN "("
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "p"
+                  DOT "."
+                  NAME_REF
+                    IDENT "hobbies"
+                R_PAREN ")"
+              DOT "."
+              NAME_REF
+                IDENT "equipment"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "hobbies"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      ONLY_KW "ONLY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "person"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "p"
+                    DOT "."
+                    NAME_REF
+                      IDENT "hobbies"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "hobbies"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "person"
+      STAR "*"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "p"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "hobby_construct"
+                    ARG_LIST
+                      L_PAREN "("
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'skywalking'"
+                      COMMA ","
+                      WHITESPACE " "
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'mer'"
+                      R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "hobby_construct_named"
+                    ARG_LIST
+                      L_PAREN "("
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'skywalking'"
+                      COMMA ","
+                      WHITESPACE " "
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'mer'"
+                      R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment_named"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "hobby_construct_named"
+                    ARG_LIST
+                      L_PAREN "("
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'skywalking'"
+                      COMMA ","
+                      WHITESPACE " "
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'mer'"
+                      R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment_named_ambiguous_1a"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "hobby_construct_named"
+                    ARG_LIST
+                      L_PAREN "("
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'skywalking'"
+                      COMMA ","
+                      WHITESPACE " "
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'mer'"
+                      R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment_named_ambiguous_1b"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "hobby_construct_named"
+                    ARG_LIST
+                      L_PAREN "("
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'skywalking'"
+                      COMMA ","
+                      WHITESPACE " "
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'mer'"
+                      R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment_named_ambiguous_1c"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "hobby_construct_named"
+                    ARG_LIST
+                      L_PAREN "("
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'skywalking'"
+                      COMMA ","
+                      WHITESPACE " "
+                      CAST_EXPR
+                        NAME_REF
+                          TEXT_KW "text"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'mer'"
+                      R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment_named_ambiguous_2a"
+                ARG_LIST
+                  L_PAREN "("
+                  CAST_EXPR
+                    NAME_REF
+                      TEXT_KW "text"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'skywalking'"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment_named_ambiguous_2b"
+                ARG_LIST
+                  L_PAREN "("
+                  CAST_EXPR
+                    NAME_REF
+                      TEXT_KW "text"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'skywalking'"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "hobbies_by_name"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'basketball'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "overpaid"
+            ARG_LIST
+              L_PAREN "("
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "emp"
+                DOT "."
+                STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "emp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Try a few cases with SQL-spec row constructor expressions"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "equipment"
+        ARG_LIST
+          L_PAREN "("
+          CALL_EXPR
+            NAME_REF
+              ROW_KW "ROW"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'skywalking'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'mer'"
+              R_PAREN ")"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      ROW_KW "ROW"
+                    ARG_LIST
+                      L_PAREN "("
+                      LITERAL
+                        STRING "'skywalking'"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'mer'"
+                      R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              NAME_KW "name"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "h"
+                    DOT "."
+                    STAR "*"
+                  R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "hobbies_r"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "h"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "equipment"
+                ARG_LIST
+                  L_PAREN "("
+                  CAST_EXPR
+                    CAST_KW "CAST"
+                    L_PAREN "("
+                    PAREN_EXPR
+                      L_PAREN "("
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "h"
+                        DOT "."
+                        STAR "*"
+                      R_PAREN ")"
+                    WHITESPACE " "
+                    AS_KW "AS"
+                    WHITESPACE " "
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "hobbies_r"
+                    R_PAREN ")"
+                  R_PAREN ")"
+              R_PAREN ")"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "hobbies_r"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "h"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- functional joins"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- instance rules"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- rewrite rules"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+---
+ERROR@142: expected string literal
+ERROR@142: expected SEMICOLON
+ERROR@143: expected command, found COLON
+ERROR@144: expected command, found STRING
+ERROR@160: expected command, found LANGUAGE_KW
+ERROR@169: expected command, found IDENT
+ERROR@171: expected command, found STRICT_KW
+ERROR@236: expected string literal
+ERROR@236: expected SEMICOLON
+ERROR@237: expected command, found COLON
+ERROR@238: expected command, found STRING
+ERROR@254: expected command, found LANGUAGE_KW
+ERROR@263: expected command, found IDENT
+ERROR@265: expected command, found STRICT_KW
+ERROR@1242: expected string literal
+ERROR@1242: expected SEMICOLON
+ERROR@1243: expected command, found COLON
+ERROR@1244: expected command, found STRING
+ERROR@1318: expected string literal
+ERROR@1318: expected SEMICOLON
+ERROR@1319: expected command, found COLON
+ERROR@1320: expected command, found STRING
+ERROR@1456: expected SEMICOLON
+ERROR@1457: expected command, found IDENT
+ERROR@1466: expected command, found TO_KW
+ERROR@1469: expected command, found COLON
+ERROR@1470: expected command, found STRING
+ERROR@1544: expected SEMICOLON
+ERROR@1545: expected command, found IDENT
+ERROR@1559: expected command, found FROM_KW
+ERROR@1564: expected command, found COLON
+ERROR@1565: expected command, found STRING
+ERROR@2831: expected R_PAREN
+ERROR@2831: expected function option
+ERROR@2831: expected SEMICOLON
+ERROR@2831: expected command, found DOT
+ERROR@2832: expected command, found NAME_KW
+ERROR@2836: expected command, found PERCENT
+ERROR@2837: expected command, found TYPE_KW
+ERROR@2841: expected command, found R_PAREN
+ERROR@2846: expected command, found RETURNS_KW
+ERROR@2854: expected command, found IDENT
+ERROR@2863: expected command, found DOT
+ERROR@2864: expected command, found IDENT
+ERROR@2870: expected command, found PERCENT
+ERROR@2871: expected command, found TYPE_KW
+ERROR@2879: expected command, found AS_KW
+ERROR@2882: expected command, found STRING
+ERROR@2932: expected command, found LANGUAGE_KW
+ERROR@2941: expected command, found SQL_KW

@@ -1,0 +1,8237 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/select_parallel.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- PARALLEL"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Save parallel worker stats, used for comparison at the end"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_stat_force_next_flush"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "parallel_workers_to_launch"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "parallel_workers_to_launch_before"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          NAME_REF
+            IDENT "parallel_workers_launched"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "parallel_workers_launched_before"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_database"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "datname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "current_database"
+          ARG_LIST
+            L_PAREN "("
+            R_PAREN ")"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "sp_parallel_restricted"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n  "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$begin return $1; end$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "restricted"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- encourage use of parallel plans"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_setup_cost"
+    EQ "="
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_tuple_cost"
+    EQ "="
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "min_parallel_table_scan_size"
+    EQ "="
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_workers_per_gather"
+    EQ "="
+    LITERAL
+      INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Parallel Append with partial-subplans"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "round"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "avg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "aa"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "aa"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a_star"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "round"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "avg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "aa"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "aa"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a_star"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Parallel Append with both partial and non-partial subplans"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c_star"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d_star"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "round"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "avg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "aa"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "aa"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a_star"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "round"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "avg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "aa"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "aa"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a_star"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Parallel Append with only non-partial subplans"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a_star"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b_star"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "e_star"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f_star"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "round"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "avg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "aa"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "aa"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a_star"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "round"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "avg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "aa"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "aa"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a_star"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Disable Parallel Append"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "a_star"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b_star"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c_star"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d_star"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "e_star"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "f_star"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_parallel_append"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "round"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "avg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "aa"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "aa"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a_star"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "round"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "avg"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "aa"
+                  R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "aa"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a_star"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_parallel_append"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Parallel Append that runs serially"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "sp_test_func"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select 'foo'::varchar union all select 'bar'::varchar $$"
+      WHITESPACE "\n"
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        STABLE_KW "stable"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sp_test_func"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Parallel Append is not to be used when the subpath depends on the outer param"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "part_pa_test"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    BY_KW "by"
+    WHITESPACE " "
+    RANGE_KW "range"
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "part_pa_test_p1"
+    WHITESPACE " "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "part_pa_test"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      MINVALUE_KW "minvalue"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "0"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "part_pa_test_p2"
+    WHITESPACE " "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "part_pa_test"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "0"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      MAXVALUE_KW "maxvalue"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "select"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    CALL_EXPR
+                      NAME_REF
+                        IDENT "max"
+                      ARG_LIST
+                        L_PAREN "("
+                        PAREN_EXPR
+                          L_PAREN "("
+                          SELECT
+                            SELECT_CLAUSE
+                              SELECT_KW "select"
+                              WHITESPACE " "
+                              TARGET_LIST
+                                TARGET
+                                  FIELD_EXPR
+                                    NAME_REF
+                                      IDENT "pa1"
+                                    DOT "."
+                                    NAME_REF
+                                      IDENT "b"
+                            WHITESPACE " "
+                            FROM_CLAUSE
+                              FROM_KW "from"
+                              WHITESPACE " "
+                              NAME_REF
+                                IDENT "part_pa_test"
+                              WHITESPACE " "
+                              ALIAS
+                                NAME
+                                  IDENT "pa1"
+                            WHITESPACE " "
+                            WHERE_CLAUSE
+                              WHERE_KW "where"
+                              WHITESPACE " "
+                              BIN_EXPR
+                                FIELD_EXPR
+                                  NAME_REF
+                                    IDENT "pa1"
+                                  DOT "."
+                                  NAME_REF
+                                    IDENT "a"
+                                WHITESPACE " "
+                                EQ "="
+                                WHITESPACE " "
+                                FIELD_EXPR
+                                  NAME_REF
+                                    IDENT "pa2"
+                                  DOT "."
+                                  NAME_REF
+                                    IDENT "a"
+                          R_PAREN ")"
+                        R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n\t"
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "part_pa_test"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "pa2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "part_pa_test"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test with leader participation disabled"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_leader_participation"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "stringu1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'GRAAAA'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "stringu1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'GRAAAA'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test with leader participation disabled, but no workers available (so"
+  WHITESPACE "\n"
+  COMMENT "-- the leader will have to run the plan despite the setting)"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_workers"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "stringu1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'GRAAAA'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "stringu1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'GRAAAA'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_workers"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_leader_participation"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test that parallel_restricted function doesn't run in worker"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk1"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "verbose"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sp_parallel_restricted"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "unique1"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "stringu1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'GRAAAA'"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test parallel plan when group by expression is in target list."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "stringu1"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "length"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "stringu1"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "stringu1"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "length"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "stringu1"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "stringu1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "stringu1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "stringu1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test that parallel plan for aggregates is not selected when"
+  WHITESPACE "\n"
+  COMMENT "-- target list contains parallel restricted clause."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "  "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sum"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "sp_parallel_restricted"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "unique1"
+                  R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE "\n\t"
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      PAREN_EXPR
+        L_PAREN "("
+        CALL_EXPR
+          NAME_REF
+            IDENT "sp_parallel_restricted"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "unique1"
+            R_PAREN ")"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test prepared statement"
+  WHITESPACE "\n"
+  PREPARE_STMT
+    PREPARE_KW "prepare"
+    WHITESPACE " "
+    NAME
+      IDENT "tenk1_count"
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "As"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE "  "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "count"
+              ARG_LIST
+                L_PAREN "("
+                PAREN_EXPR
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "unique1"
+                  R_PAREN ")"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "where"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "hundred"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            PARAM "$1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  EXECUTE_STMT
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "tenk1_count"
+    ARG_LIST
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXECUTE_STMT
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "tenk1_count"
+    ARG_LIST
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DEALLOCATE_STMT
+    DEALLOCATE_KW "deallocate"
+    WHITESPACE " "
+    NAME
+      IDENT "tenk1_count"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test parallel plans for queries containing un-correlated subplans."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        TUPLE_EXPR
+          L_PAREN "("
+          NAME_REF
+            IDENT "two"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            IDENT "four"
+          R_PAREN ")"
+        WHITESPACE " "
+        NOT_IN
+          NOT_KW "not"
+          WHITESPACE " "
+          IN_KW "in"
+        WHITESPACE "\n\t"
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "hundred"
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  NAME_REF
+                    IDENT "thousand"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk2"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "where"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "thousand"
+                WHITESPACE " "
+                R_ANGLE ">"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "100"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        TUPLE_EXPR
+          L_PAREN "("
+          NAME_REF
+            IDENT "two"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            IDENT "four"
+          R_PAREN ")"
+        WHITESPACE " "
+        NOT_IN
+          NOT_KW "not"
+          WHITESPACE " "
+          IN_KW "in"
+        WHITESPACE "\n\t"
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "hundred"
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  NAME_REF
+                    IDENT "thousand"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk2"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "where"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "thousand"
+                WHITESPACE " "
+                R_ANGLE ">"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "100"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- this is not parallel-safe due to use of random() within SubLink's testexpr:"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        CAST_EXPR
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "unique1"
+              WHITESPACE " "
+              PLUS "+"
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "random"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+            R_PAREN ")"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INTEGER_KW "integer"
+        WHITESPACE " "
+        NOT_IN
+          NOT_KW "not"
+          WHITESPACE " "
+          IN_KW "in"
+        WHITESPACE "\n\t"
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "ten"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk2"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test parallel plan for a query containing initplan."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexonlyscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE "\n        "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "tenk1"
+          DOT "."
+          NAME_REF
+            IDENT "unique1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "Select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "max"
+                    ARG_LIST
+                      L_PAREN "("
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "tenk2"
+                        DOT "."
+                        NAME_REF
+                          IDENT "unique1"
+                      R_PAREN ")"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk2"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE "\n    "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "tenk1"
+          DOT "."
+          NAME_REF
+            IDENT "unique1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "Select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "max"
+                    ARG_LIST
+                      L_PAREN "("
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "tenk2"
+                        DOT "."
+                        NAME_REF
+                          IDENT "unique1"
+                      R_PAREN ")"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk2"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexonlyscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test parallel index scans."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "random_page_cost"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "  "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              PAREN_EXPR
+                L_PAREN "("
+                NAME_REF
+                  IDENT "unique1"
+                R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "hundred"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "  "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              PAREN_EXPR
+                L_PAREN "("
+                NAME_REF
+                  IDENT "unique1"
+                R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "hundred"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Parallel ScalarArrayOp index scan"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              PAREN_EXPR
+                L_PAREN "("
+                NAME_REF
+                  IDENT "unique1"
+                R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "hundred"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            ANY_KW "any"
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      CALL_EXPR
+                        NAME_REF
+                          IDENT "array_agg"
+                        ARG_LIST
+                          L_PAREN "("
+                          NAME_REF
+                            IDENT "i"
+                          R_PAREN ")"
+                WHITESPACE " "
+                FROM_CLAUSE
+                  FROM_KW "from"
+                  WHITESPACE " "
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "generate_series"
+                    ARG_LIST
+                      L_PAREN "("
+                      LITERAL
+                        INT_NUMBER "1"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "100"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "15"
+                      R_PAREN ")"
+                  WHITESPACE " "
+                  ALIAS
+                    NAME
+                      IDENT "i"
+              R_PAREN ")"
+            COLON2 "::"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INT_KW "int"
+              L_BRACK "["
+              R_BRACK "]"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              PAREN_EXPR
+                L_PAREN "("
+                NAME_REF
+                  IDENT "unique1"
+                R_PAREN ")"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "hundred"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            ANY_KW "any"
+          WHITESPACE " "
+          L_PAREN "("
+          CAST_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      CALL_EXPR
+                        NAME_REF
+                          IDENT "array_agg"
+                        ARG_LIST
+                          L_PAREN "("
+                          NAME_REF
+                            IDENT "i"
+                          R_PAREN ")"
+                WHITESPACE " "
+                FROM_CLAUSE
+                  FROM_KW "from"
+                  WHITESPACE " "
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "generate_series"
+                    ARG_LIST
+                      L_PAREN "("
+                      LITERAL
+                        INT_NUMBER "1"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "100"
+                      COMMA ","
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "15"
+                      R_PAREN ")"
+                  WHITESPACE " "
+                  ALIAS
+                    NAME
+                      IDENT "i"
+              R_PAREN ")"
+            COLON2 "::"
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      INT_KW "int"
+              L_BRACK "["
+              R_BRACK "]"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test parallel index-only scans."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "  "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "thousand"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "95"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "  "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "thousand"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "95"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test rescan cases too"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_material"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "count"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "unique1"
+                    R_PAREN ")"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "tenk1"
+          WHITESPACE " "
+          WHERE_CLAUSE
+            WHERE_KW "where"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "hundred"
+              WHITESPACE " "
+              R_ANGLE ">"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+      WHITESPACE "\n  "
+      JOIN
+        RIGHT_KW "right"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            VALUES_KW "values"
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "3"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "v"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "x"
+            R_PAREN ")"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "count"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "unique1"
+                    R_PAREN ")"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "tenk1"
+          WHITESPACE " "
+          WHERE_CLAUSE
+            WHERE_KW "where"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "hundred"
+              WHITESPACE " "
+              R_ANGLE ">"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+      WHITESPACE "\n  "
+      JOIN
+        RIGHT_KW "right"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            VALUES_KW "values"
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "3"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "v"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "x"
+            R_PAREN ")"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "count"
+                  ARG_LIST
+                    L_PAREN "("
+                    STAR "*"
+                    R_PAREN ")"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "tenk1"
+          WHITESPACE " "
+          WHERE_CLAUSE
+            WHERE_KW "where"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "thousand"
+              WHITESPACE " "
+              R_ANGLE ">"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "99"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+      WHITESPACE "\n  "
+      JOIN
+        RIGHT_KW "right"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            VALUES_KW "values"
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "3"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "v"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "x"
+            R_PAREN ")"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "count"
+                  ARG_LIST
+                    L_PAREN "("
+                    STAR "*"
+                    R_PAREN ")"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "tenk1"
+          WHITESPACE " "
+          WHERE_CLAUSE
+            WHERE_KW "where"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "thousand"
+              WHITESPACE " "
+              R_ANGLE ">"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "99"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+      WHITESPACE "\n  "
+      JOIN
+        RIGHT_KW "right"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            VALUES_KW "values"
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "3"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "v"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "x"
+            R_PAREN ")"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test rescans for a Limit node with a parallel node beneath it."
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexonlyscan"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk1"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      WHITESPACE "\n  "
+      JOIN
+        LEFT_KW "left"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "tenk2"
+                    DOT "."
+                    NAME_REF
+                      IDENT "unique1"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk2"
+            WHITESPACE " "
+            ORDER_BY_CLAUSE
+              ORDER_KW "order"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+            WHITESPACE " "
+            LIMIT_CLAUSE
+              LIMIT_KW "limit"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1000"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "ss"
+        WHITESPACE "\n  "
+        ON_KW "on"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tenk1"
+            DOT "."
+            NAME_REF
+              IDENT "unique1"
+          WHITESPACE " "
+          L_ANGLE "<"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "ss"
+              DOT "."
+              NAME_REF
+                IDENT "unique1"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "tenk1"
+          DOT "."
+          NAME_REF
+            IDENT "unique1"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      WHITESPACE "\n  "
+      JOIN
+        LEFT_KW "left"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "tenk2"
+                    DOT "."
+                    NAME_REF
+                      IDENT "unique1"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk2"
+            WHITESPACE " "
+            ORDER_BY_CLAUSE
+              ORDER_KW "order"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+            WHITESPACE " "
+            LIMIT_CLAUSE
+              LIMIT_KW "limit"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1000"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "ss"
+        WHITESPACE "\n  "
+        ON_KW "on"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tenk1"
+            DOT "."
+            NAME_REF
+              IDENT "unique1"
+          WHITESPACE " "
+          L_ANGLE "<"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "ss"
+              DOT "."
+              NAME_REF
+                IDENT "unique1"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "tenk1"
+          DOT "."
+          NAME_REF
+            IDENT "unique1"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "--reset the value of workers for each table as it was before this test."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk1"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_material"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexonlyscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test parallel bitmap heap scan."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashjoin"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_mergejoin"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_material"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- test prefetching, if the platform allows it"
+  WHITESPACE "\n"
+  DO_STMT
+    DO_KW "DO"
+    WHITESPACE " "
+    LITERAL
+      DOLLAR_QUOTED_STRING "$$\nBEGIN\n SET effective_io_concurrency = 50;\nEXCEPTION WHEN invalid_parameter_value THEN\nEND $$"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+    EQ "="
+    LITERAL
+      STRING "'64kB'"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "--set small work mem to force lossy pages"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk2"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tenk1"
+            DOT "."
+            NAME_REF
+              IDENT "hundred"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+        WHITESPACE " "
+        AND_KW "and"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tenk2"
+            DOT "."
+            NAME_REF
+              IDENT "thousand"
+          EQ "="
+          LITERAL
+            INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk2"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tenk1"
+            DOT "."
+            NAME_REF
+              IDENT "hundred"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+        WHITESPACE " "
+        AND_KW "and"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tenk2"
+            DOT "."
+            NAME_REF
+              IDENT "thousand"
+          EQ "="
+          LITERAL
+            INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "bmscantest"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "t"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bmscantest"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "r"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            LITERAL
+              STRING "'fooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo'"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "100000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "r"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "i_bmtest"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bmscantest"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bmscantest"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        R_ANGLE ">"
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test accumulation of stats for parallel nodes"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "analyze"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "timing"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "summary"
+  WHITESPACE " "
+  ERROR
+    OFF_KW "off"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "costs"
+  WHITESPACE " "
+  ERROR
+    OFF_KW "off"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "buffers"
+  WHITESPACE " "
+  ERROR
+    OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n   "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk2"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tenk1"
+            DOT "."
+            NAME_REF
+              IDENT "hundred"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+        WHITESPACE "\n        "
+        AND_KW "and"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "tenk2"
+            DOT "."
+            NAME_REF
+              IDENT "thousand"
+          EQ "="
+          LITERAL
+            INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "work_mem"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "explain_parallel_sort_stats"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\ndeclare ln text;\nbegin\n    for ln in\n        explain (analyze, timing off, summary off, costs off, buffers off)\n          select * from\n          (select ten from tenk1 where ten < 100 order by ten) ss\n          right join (values (1),(2),(3)) v(x) on true\n    loop\n        ln := regexp_replace(ln, 'Memory: \\S*',  'Memory: xxx');\n        return next ln;\n    end loop;\nend;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "explain_parallel_sort_stats"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashjoin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_mergejoin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_material"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "effective_io_concurrency"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bmscantest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "explain_parallel_sort_stats"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test parallel merge join path."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashjoin"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_nestloop"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n\t"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "  "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk2"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "tenk1"
+          DOT "."
+          NAME_REF
+            IDENT "unique1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "tenk2"
+          DOT "."
+          NAME_REF
+            IDENT "unique1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE "  "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk2"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "tenk1"
+          DOT "."
+          NAME_REF
+            IDENT "unique1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "tenk2"
+          DOT "."
+          NAME_REF
+            IDENT "unique1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashjoin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_nestloop"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test parallel nestloop join path with materialization of the inner path"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "set"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk2"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t2"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t1"
+          DOT "."
+          NAME_REF
+            IDENT "two"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t2"
+          DOT "."
+          NAME_REF
+            IDENT "two"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test that parallel nestloop join is not generated if the inner path is"
+  WHITESPACE "\n"
+  COMMENT "-- not parallel-safe"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE "\n    "
+      JOIN
+        LEFT_KW "left"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        LATERAL_KW "lateral"
+        WHITESPACE "\n      "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "t1"
+                    DOT "."
+                    NAME_REF
+                      IDENT "unique1"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "x"
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  STAR "*"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk2"
+              WHITESPACE " "
+              ALIAS
+                NAME
+                  IDENT "t2"
+            WHITESPACE " "
+            ORDER_BY_CLAUSE
+              ORDER_KW "order"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE "\n    "
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t1"
+          DOT "."
+          NAME_REF
+            IDENT "two"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "t2"
+          DOT "."
+          NAME_REF
+            IDENT "two"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tenk2"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "reset"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "parallel_workers"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test gather merge"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashagg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n   "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "twenty"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "twenty"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--test expressions in targetlist are pushed down for gather merge"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "sp_simple_func"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "var1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INTEGER_KW "integer"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nbegin\n        return var1 + 10;\nend;\n$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "PARALLEL"
+        WHITESPACE " "
+        IDENT "SAFE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    VERBOSE_KW "verbose"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n    "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "ten"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "sp_simple_func"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "ten"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "ten"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "ten"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "sp_simple_func"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INTEGER_KW "integer"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test handling of SRFs in targetlist (bug in 10.0)"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n   "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "generate_series"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "twenty"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "generate_series"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "2"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "twenty"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test gather merge with parallel leader participation disabled"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_leader_participation"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n   "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "twenty"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "twenty"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_leader_participation"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--test rescan behavior of gather merge"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_material"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "string4"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "count"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "unique2"
+                    R_PAREN ")"
+          WHITESPACE "\n   "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "tenk1"
+          WHITESPACE " "
+          GROUP_BY_CLAUSE
+            GROUP_KW "group"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "string4"
+          WHITESPACE " "
+          ORDER_BY_CLAUSE
+            ORDER_KW "order"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "string4"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+      WHITESPACE "\n  "
+      JOIN
+        RIGHT_KW "right"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            VALUES_KW "values"
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "3"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "v"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "x"
+            R_PAREN ")"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n  "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "string4"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "count"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "unique2"
+                    R_PAREN ")"
+          WHITESPACE "\n   "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "tenk1"
+          WHITESPACE " "
+          GROUP_BY_CLAUSE
+            GROUP_KW "group"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "string4"
+          WHITESPACE " "
+          ORDER_BY_CLAUSE
+            ORDER_KW "order"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "string4"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+      WHITESPACE "\n  "
+      JOIN
+        RIGHT_KW "right"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            VALUES_KW "values"
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
+            COMMA ","
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "3"
+            R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "v"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "x"
+            R_PAREN ")"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_material"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_hashagg"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check parallelized int8 aggregate (bug #14897)"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "avg"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "unique1"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "int8"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "avg"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                NAME_REF
+                  IDENT "unique1"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "int8"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- gather merge test with a LIMIT"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "fivethous"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "fivethous"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "fivethous"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "fivethous"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- gather merge test with 0 worker"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_workers"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n   "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "string4"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "string4"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "string4"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "string4"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- gather merge test with 0 workers, with parallel leader"
+  WHITESPACE "\n"
+  COMMENT "-- participation disabled (the leader will have to run the plan"
+  WHITESPACE "\n"
+  COMMENT "-- despite the setting)"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_leader_participation"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n   "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "string4"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "string4"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "string4"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "string4"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "5"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_leader_participation"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "max_parallel_workers"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "parallel_safe_volatile"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n  "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ begin return a; end; $$"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+      WHITESPACE " "
+      VOLATILITY_FUNC_OPTION
+        VOLATILE_KW "volatile"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test gather merge atop of a sort of a partial path"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "four"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "four"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "hundred"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "parallel_safe_volatile"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "thousand"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test gather merge atop of an incremental sort a of partial path"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "min_parallel_index_scan_size"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "four"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "four"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "hundred"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "parallel_safe_volatile"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "thousand"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "min_parallel_index_scan_size"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test GROUP BY with a gather merge path atop of a sort of a partial path"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "twenty"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "parallel_safe_volatile"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "two"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "parallel_safe_volatile"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "stringu1"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int2"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "unique1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- exercise record typmod remapping between backends"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "make_record"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "n"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "RECORD"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "PARALLEL"
+        WHITESPACE " "
+        IDENT "SAFE"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\nBEGIN\n  RETURN CASE n\n           WHEN 1 THEN ROW(1)\n           WHEN 2 THEN ROW(1, 2)\n           WHEN 3 THEN ROW(1, 2, 3)\n           WHEN 4 THEN ROW(1, 2, 3, 4)\n           ELSE ROW(1, 2, 3, 4, 5)\n         END;\nEND;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "make_record"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "x"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "generate_series"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "1"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "5"
+                    R_PAREN ")"
+                WHITESPACE " "
+                NAME
+                  IDENT "x"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "x"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "make_record"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "n"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test the sanity of parallel query after the active role is dropped."
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    SESSION_KW "session"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    ROLE_KW "role"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Window function calculation can't be pushed to workers."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    VERBOSE_KW "verbose"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        TUPLE_EXPR
+          L_PAREN "("
+          NAME_REF
+            IDENT "unique1"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            IDENT "two"
+          R_PAREN ")"
+        WHITESPACE " "
+        IN_KW "in"
+        WHITESPACE "\n    "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "unique1"
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "row_number"
+                    ARG_LIST
+                      L_PAREN "("
+                      R_PAREN ")"
+                    WHITESPACE " "
+                    OVER_CLAUSE
+                      OVER_KW "over"
+                      L_PAREN "("
+                      R_PAREN ")"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk1"
+              WHITESPACE " "
+              ALIAS
+                NAME
+                  IDENT "b"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- LIMIT/OFFSET within sub-selects can't be pushed to workers."
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n  "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "two"
+        WHITESPACE " "
+        IN_KW "in"
+        WHITESPACE "\n    "
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "two"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk1"
+              WHITESPACE " "
+              ALIAS
+                NAME
+                  IDENT "b"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "where"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "stringu1"
+                WHITESPACE " "
+                LIKE_KW "like"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'%AAAA'"
+            WHITESPACE " "
+            LIMIT_CLAUSE
+              LIMIT_KW "limit"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "3"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- to increase the parallel query test coverage"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "analyze"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "timing"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "summary"
+  WHITESPACE " "
+  ERROR
+    OFF_KW "off"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "costs"
+  WHITESPACE " "
+  ERROR
+    OFF_KW "off"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "buffers"
+  WHITESPACE " "
+  ERROR
+    OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- provoke error in worker"
+  WHITESPACE "\n"
+  COMMENT "-- (make the error message long enough to require multiple bufferloads)"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "stringu1"
+                WHITESPACE " "
+                CUSTOM_OP
+                  PIPE "|"
+                  PIPE "|"
+                WHITESPACE " "
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "repeat"
+                  ARG_LIST
+                    L_PAREN "("
+                    LITERAL
+                      STRING "'abcd'"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "5000"
+                    R_PAREN ")"
+              R_PAREN ")"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int2"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "unique1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test interaction with set-returning functions"
+  WHITESPACE "\n"
+  SAVEPOINT_STMT
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiple subqueries under a single Gather node"
+  WHITESPACE "\n"
+  COMMENT "-- must set parallel_setup_cost > 0 to discourage multiple Gather nodes"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "parallel_setup_cost"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "unique1"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "fivethous"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "tenthous"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+    WHITESPACE "\n"
+    UNION_KW "UNION"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "unique1"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "fivethous"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "tenthous"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    SAVEPOINT_KW "SAVEPOINT"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "settings"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- can't use multiple subqueries under a single Gather node due to initPlans"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "unique1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "fivethous"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE "\n\t"
+        COMPOUND_SELECT
+          PAREN_EXPR
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "SELECT"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    NAME_REF
+                      IDENT "unique1"
+              WHITESPACE " "
+              FROM_CLAUSE
+                FROM_KW "FROM"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "tenk1"
+              WHITESPACE " "
+              WHERE_CLAUSE
+                WHERE_KW "WHERE"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "fivethous"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
+              WHITESPACE " "
+              LIMIT_CLAUSE
+                LIMIT_KW "LIMIT"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+            R_PAREN ")"
+          WHITESPACE "\n"
+          UNION_KW "UNION"
+          WHITESPACE " "
+          ALL_KW "ALL"
+          WHITESPACE "\n"
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "unique1"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "tenk1"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "fivethous"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE "\n\t"
+                PAREN_EXPR
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "SELECT"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          NAME_REF
+                            IDENT "unique2"
+                    WHITESPACE " "
+                    FROM_CLAUSE
+                      FROM_KW "FROM"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "tenk1"
+                    WHITESPACE " "
+                    WHERE_CLAUSE
+                      WHERE_KW "WHERE"
+                      WHITESPACE " "
+                      BIN_EXPR
+                        NAME_REF
+                          IDENT "fivethous"
+                        WHITESPACE " "
+                        EQ "="
+                        WHITESPACE " "
+                        LITERAL
+                          INT_NUMBER "1"
+                    WHITESPACE " "
+                    LIMIT_CLAUSE
+                      LIMIT_KW "LIMIT"
+                      WHITESPACE " "
+                      LITERAL
+                        INT_NUMBER "1"
+                  R_PAREN ")"
+            WHITESPACE "\n"
+            ORDER_BY_CLAUSE
+              ORDER_KW "ORDER"
+              WHITESPACE " "
+              BY_KW "BY"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test interaction with SRFs"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "information_schema"
+        DOT "."
+        NAME_REF
+          IDENT "foreign_data_wrapper_options"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "VERBOSE"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "generate_series"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "two"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          ARRAY_EXPR
+            ARRAY_KW "array"
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "select"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    CALL_EXPR
+                      NAME_REF
+                        IDENT "generate_series"
+                      ARG_LIST
+                        L_PAREN "("
+                        LITERAL
+                          INT_NUMBER "1"
+                        COMMA ","
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "two"
+                        R_PAREN ")"
+            R_PAREN ")"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenthous"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- must disallow pushing sort below gather when pathkey contains an SRF"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "VERBOSE"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "unnest"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  ARRAY_EXPR
+                    ARRAY_KW "ARRAY"
+                    L_BRACK "["
+                    R_BRACK "]"
+                  COLON2 "::"
+                  ARRAY_TYPE
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            INTEGER_KW "integer"
+                    L_BRACK "["
+                    R_BRACK "]"
+                R_PAREN ")"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "pathkey"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t1"
+      WHITESPACE " "
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "t2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pathkey"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test passing expanded-value representations to workers"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "make_some_array"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      ARRAY_TYPE
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        L_BRACK "["
+        R_BRACK "]"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$declare x int[];\n  begin\n    x[1] := $1;\n    x[2] := $2;\n    return x;\n  end$$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "fooarr"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "f2"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+          L_BRACK "["
+          R_BRACK "]"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "f3"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "fooarr"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'1'"
+      COMMA ","
+      WHITESPACE " "
+      ARRAY_EXPR
+        ARRAY_KW "ARRAY"
+        L_BRACK "["
+        LITERAL
+          INT_NUMBER "1"
+        COMMA ","
+        LITERAL
+          INT_NUMBER "2"
+        R_BRACK "]"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'one'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  PREPARE_STMT
+    PREPARE_KW "PREPARE"
+    WHITESPACE " "
+    NAME
+      IDENT "pstmt"
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    COMMA ","
+    WHITESPACE " "
+    ARRAY_TYPE
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+      L_BRACK "["
+      R_BRACK "]"
+    R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "fooarr"
+      WHITESPACE " "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            NAME_REF
+              IDENT "f1"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              PARAM "$1"
+          WHITESPACE " "
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "f2"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              PARAM "$2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  EXECUTE_STMT
+    EXECUTE_KW "EXECUTE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "pstmt"
+    ARG_LIST
+      L_PAREN "("
+      LITERAL
+        STRING "'1'"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "make_some_array"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXECUTE_STMT
+    EXECUTE_KW "EXECUTE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "pstmt"
+    ARG_LIST
+      L_PAREN "("
+      LITERAL
+        STRING "'1'"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "make_some_array"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DEALLOCATE_STMT
+    DEALLOCATE_KW "DEALLOCATE"
+    WHITESPACE " "
+    NAME
+      IDENT "pstmt"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test interaction between subquery and partial_paths"
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tenk1_vw_sec"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "WITH"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "security_barrier"
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenk1_vw_sec"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "sum"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "f1"
+                      R_PAREN ")"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "int4_tbl"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "f1"
+                WHITESPACE " "
+                L_ANGLE "<"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "unique1"
+          R_PAREN ")"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "rollback"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test that a newly-created session role propagates to workers."
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "begin"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    SESSION_KW "session"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+    WHITESPACE " "
+    IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'session_authorization'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "current_setting"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'session_authorization'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "rollback"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test that function option SET ROLE works in parallel workers."
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "set_and_report_role"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n  "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select current_setting('role') $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+      WHITESPACE "\n  "
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              ROLE_KW "role"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "set_role_and_error"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n  "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select 1 / $1 $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      PARALLEL_FUNC_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        IDENT "safe"
+      WHITESPACE "\n  "
+      SET_FUNC_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              ROLE_KW "role"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "set_and_report_role"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "set_role_and_error"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "set_and_report_role"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "set_role_and_error"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "set_and_report_role"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "set_role_and_error"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_parallel_worker"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- don't freeze in ParallelFinish while holding an LWLock"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "my_cmp"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "sql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE "\n"
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$\n\tSELECT\n\t\tCASE WHEN $1 < $2 THEN -1\n\t\t\t\tWHEN $1 > $2 THEN  1\n\t\t\t\tELSE 0\n\t\tEND;\n$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "parallel_hang"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "parallel_hang"
+    WHITESPACE "\n\t"
+    COLUMN_LIST
+      L_PAREN "("
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "400"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "gs"
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_OPERATOR_CLASS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CLASS_KW "CLASS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "int4_custom_ops"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    L_ANGLE "<"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    WHITESPACE " "
+    LTEQ "<="
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "3"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "4"
+    WHITESPACE " "
+    GTEQ ">="
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE "\n\t"
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "5"
+    WHITESPACE " "
+    R_ANGLE ">"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int4"
+    R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "my_cmp"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "int4"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    UNIQUE_KW "UNIQUE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "parallel_hang_idx"
+    WHITESPACE "\n\t\t\t\t\t"
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "parallel_hang"
+    WHITESPACE "\n\t\t\t\t\t"
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      WHITESPACE " "
+      IDENT "int4_custom_ops"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "debug_parallel_query"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "parallel_hang"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          LITERAL
+            INT_NUMBER "380"
+          WHITESPACE " "
+          LTEQ "<="
+          WHITESPACE " "
+          NAME_REF
+            IDENT "i"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "i"
+          WHITESPACE " "
+          LTEQ "<="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "420"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check parallel worker stats"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_stat_force_next_flush"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "parallel_workers_to_launch"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            ERROR
+              COLON ":"
+        TARGET
+          LITERAL
+            STRING "'parallel_workers_to_launch_before'"
+          WHITESPACE "  "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "wrk_to_launch"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "parallel_workers_launched"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            ERROR
+              COLON ":"
+        TARGET
+          LITERAL
+            STRING "'parallel_workers_launched_before'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "wrk_launched"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_database"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "datname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "current_database"
+          ARG_LIST
+            L_PAREN "("
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@674: expected R_PAREN
+ERROR@675: expected command, found OFF_KW
+ERROR@678: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@678: expected SEMICOLON
+ERROR@678: expected command, found R_PAREN
+ERROR@944: expected R_PAREN
+ERROR@945: expected command, found OFF_KW
+ERROR@948: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@948: expected SEMICOLON
+ERROR@948: expected command, found R_PAREN
+ERROR@1296: expected R_PAREN
+ERROR@1297: expected command, found OFF_KW
+ERROR@1300: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1300: expected SEMICOLON
+ERROR@1300: expected command, found R_PAREN
+ERROR@1742: expected R_PAREN
+ERROR@1743: expected command, found OFF_KW
+ERROR@1746: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@1746: expected SEMICOLON
+ERROR@1746: expected command, found R_PAREN
+ERROR@2417: expected R_PAREN
+ERROR@2418: expected command, found OFF_KW
+ERROR@2421: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2421: expected SEMICOLON
+ERROR@2421: expected command, found R_PAREN
+ERROR@2650: expected R_PAREN
+ERROR@2651: expected command, found OFF_KW
+ERROR@2654: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2654: expected SEMICOLON
+ERROR@2654: expected command, found R_PAREN
+ERROR@2945: expected R_PAREN
+ERROR@2946: expected command, found OFF_KW
+ERROR@2949: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2949: expected SEMICOLON
+ERROR@2949: expected command, found R_PAREN
+ERROR@3261: expected R_PAREN
+ERROR@3262: expected command, found OFF_KW
+ERROR@3265: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3265: expected SEMICOLON
+ERROR@3265: expected command, found R_PAREN
+ERROR@3438: expected R_PAREN
+ERROR@3439: expected command, found OFF_KW
+ERROR@3442: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3442: expected SEMICOLON
+ERROR@3442: expected command, found R_PAREN
+ERROR@3584: expected R_PAREN
+ERROR@3585: expected command, found OFF_KW
+ERROR@3588: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3588: expected SEMICOLON
+ERROR@3588: expected command, found R_PAREN
+ERROR@3795: expected R_PAREN
+ERROR@3796: expected command, found OFF_KW
+ERROR@3799: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3799: expected SEMICOLON
+ERROR@3799: expected command, found R_PAREN
+ERROR@4032: expected R_PAREN
+ERROR@4033: expected command, found OFF_KW
+ERROR@4036: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4036: expected SEMICOLON
+ERROR@4036: expected command, found R_PAREN
+ERROR@4241: expected R_PAREN
+ERROR@4242: expected command, found OFF_KW
+ERROR@4245: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4245: expected SEMICOLON
+ERROR@4245: expected command, found R_PAREN
+ERROR@4567: expected R_PAREN
+ERROR@4568: expected command, found OFF_KW
+ERROR@4571: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4571: expected SEMICOLON
+ERROR@4571: expected command, found R_PAREN
+ERROR@4913: expected R_PAREN
+ERROR@4914: expected command, found OFF_KW
+ERROR@4917: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@4917: expected SEMICOLON
+ERROR@4917: expected command, found R_PAREN
+ERROR@5361: expected R_PAREN
+ERROR@5362: expected command, found OFF_KW
+ERROR@5365: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@5365: expected SEMICOLON
+ERROR@5365: expected command, found R_PAREN
+ERROR@5530: expected R_PAREN
+ERROR@5531: expected command, found OFF_KW
+ERROR@5534: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@5534: expected SEMICOLON
+ERROR@5534: expected command, found R_PAREN
+ERROR@5834: expected R_PAREN
+ERROR@5835: expected command, found OFF_KW
+ERROR@5838: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@5838: expected SEMICOLON
+ERROR@5838: expected command, found R_PAREN
+ERROR@6009: expected R_PAREN
+ERROR@6010: expected command, found OFF_KW
+ERROR@6013: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@6013: expected SEMICOLON
+ERROR@6013: expected command, found R_PAREN
+ERROR@6272: expected R_PAREN
+ERROR@6273: expected command, found OFF_KW
+ERROR@6276: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@6276: expected SEMICOLON
+ERROR@6276: expected command, found R_PAREN
+ERROR@6767: expected R_PAREN
+ERROR@6768: expected command, found OFF_KW
+ERROR@6771: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@6771: expected SEMICOLON
+ERROR@6771: expected command, found R_PAREN
+ERROR@7760: expected R_PAREN
+ERROR@7761: expected command, found OFF_KW
+ERROR@7764: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@7764: expected SEMICOLON
+ERROR@7764: expected command, found R_PAREN
+ERROR@8328: expected R_PAREN
+ERROR@8329: expected command, found OFF_KW
+ERROR@8332: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@8332: expected SEMICOLON
+ERROR@8332: expected command, found COMMA
+ERROR@8334: expected command, found IDENT
+ERROR@8342: expected command, found OFF_KW
+ERROR@8345: expected command, found COMMA
+ERROR@8347: expected command, found IDENT
+ERROR@8353: expected command, found OFF_KW
+ERROR@8356: expected command, found COMMA
+ERROR@8358: expected command, found IDENT
+ERROR@8366: expected command, found OFF_KW
+ERROR@8369: expected command, found R_PAREN
+ERROR@9335: expected R_PAREN
+ERROR@9336: expected command, found OFF_KW
+ERROR@9339: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@9339: expected SEMICOLON
+ERROR@9339: expected command, found R_PAREN
+ERROR@9669: expected R_PAREN
+ERROR@9670: expected command, found OFF_KW
+ERROR@9673: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@9673: expected SEMICOLON
+ERROR@9673: expected command, found R_PAREN
+ERROR@9841: expected R_PAREN
+ERROR@9842: expected command, found OFF_KW
+ERROR@9845: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@9845: expected SEMICOLON
+ERROR@9845: expected command, found R_PAREN
+ERROR@10098: expected R_PAREN
+ERROR@10099: expected command, found OFF_KW
+ERROR@10102: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@10102: expected SEMICOLON
+ERROR@10102: expected command, found R_PAREN
+ERROR@10417: expected R_PAREN
+ERROR@10418: expected command, found OFF_KW
+ERROR@10421: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@10421: expected SEMICOLON
+ERROR@10421: expected command, found COMMA
+ERROR@10423: expected command, found VERBOSE_KW
+ERROR@10430: expected command, found R_PAREN
+ERROR@10618: expected R_PAREN
+ERROR@10619: expected command, found OFF_KW
+ERROR@10622: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@10622: expected SEMICOLON
+ERROR@10622: expected command, found R_PAREN
+ERROR@10882: expected R_PAREN
+ERROR@10883: expected command, found OFF_KW
+ERROR@10886: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@10886: expected SEMICOLON
+ERROR@10886: expected command, found R_PAREN
+ERROR@11102: expected R_PAREN
+ERROR@11103: expected command, found OFF_KW
+ERROR@11106: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11106: expected SEMICOLON
+ERROR@11106: expected command, found R_PAREN
+ERROR@11517: expected R_PAREN
+ERROR@11518: expected command, found OFF_KW
+ERROR@11521: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11521: expected SEMICOLON
+ERROR@11521: expected command, found R_PAREN
+ERROR@11649: expected R_PAREN
+ERROR@11650: expected command, found OFF_KW
+ERROR@11653: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11653: expected SEMICOLON
+ERROR@11653: expected command, found R_PAREN
+ERROR@11850: expected R_PAREN
+ERROR@11851: expected command, found OFF_KW
+ERROR@11854: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11854: expected SEMICOLON
+ERROR@11854: expected command, found R_PAREN
+ERROR@12165: expected R_PAREN
+ERROR@12166: expected command, found OFF_KW
+ERROR@12169: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@12169: expected SEMICOLON
+ERROR@12169: expected command, found R_PAREN
+ERROR@12545: expected R_PAREN
+ERROR@12546: expected command, found OFF_KW
+ERROR@12549: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@12549: expected SEMICOLON
+ERROR@12549: expected command, found R_PAREN
+ERROR@12791: expected R_PAREN
+ERROR@12792: expected command, found OFF_KW
+ERROR@12795: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@12795: expected SEMICOLON
+ERROR@12795: expected command, found R_PAREN
+ERROR@13039: expected R_PAREN
+ERROR@13040: expected command, found OFF_KW
+ERROR@13043: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@13043: expected SEMICOLON
+ERROR@13043: expected command, found R_PAREN
+ERROR@13233: expected R_PAREN
+ERROR@13234: expected command, found OFF_KW
+ERROR@13237: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@13237: expected SEMICOLON
+ERROR@13237: expected command, found R_PAREN
+ERROR@14307: expected R_PAREN
+ERROR@14308: expected command, found OFF_KW
+ERROR@14311: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@14311: expected SEMICOLON
+ERROR@14311: expected command, found COMMA
+ERROR@14313: expected command, found VERBOSE_KW
+ERROR@14320: expected command, found R_PAREN
+ERROR@14512: expected R_PAREN
+ERROR@14513: expected command, found OFF_KW
+ERROR@14516: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@14516: expected SEMICOLON
+ERROR@14516: expected command, found R_PAREN
+ERROR@14751: expected R_PAREN
+ERROR@14752: expected command, found OFF_KW
+ERROR@14755: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@14755: expected SEMICOLON
+ERROR@14755: expected command, found COMMA
+ERROR@14757: expected command, found IDENT
+ERROR@14765: expected command, found OFF_KW
+ERROR@14768: expected command, found COMMA
+ERROR@14770: expected command, found IDENT
+ERROR@14776: expected command, found OFF_KW
+ERROR@14779: expected command, found COMMA
+ERROR@14781: expected command, found IDENT
+ERROR@14789: expected command, found OFF_KW
+ERROR@14792: expected command, found R_PAREN
+ERROR@15356: expected R_PAREN
+ERROR@15357: expected command, found OFF_KW
+ERROR@15360: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@15360: expected SEMICOLON
+ERROR@15360: expected command, found R_PAREN
+ERROR@15611: expected R_PAREN
+ERROR@15612: expected command, found OFF_KW
+ERROR@15615: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@15615: expected SEMICOLON
+ERROR@15615: expected command, found R_PAREN
+ERROR@15976: expected R_PAREN
+ERROR@15977: expected command, found OFF_KW
+ERROR@15980: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@15980: expected SEMICOLON
+ERROR@15980: expected command, found R_PAREN
+ERROR@16180: expected R_PAREN
+ERROR@16181: expected command, found OFF_KW
+ERROR@16184: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@16184: expected SEMICOLON
+ERROR@16184: expected command, found R_PAREN
+ERROR@16716: expected R_PAREN
+ERROR@16717: expected command, found OFF_KW
+ERROR@16720: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@16720: expected SEMICOLON
+ERROR@16720: expected command, found R_PAREN
+ERROR@16967: expected R_PAREN
+ERROR@16968: expected command, found OFF_KW
+ERROR@16971: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@16971: expected SEMICOLON
+ERROR@16971: expected command, found R_PAREN
+ERROR@18384: expected R_PAREN
+ERROR@18424: expected SEMICOLON
+ERROR@18424: expected command, found R_PAREN
+ERROR@18792: expected config value, got ON_KW
+ERROR@18792: expected SEMICOLON
+ERROR@18793: expected command, found ON_KW
+ERROR@18966: expected an expression, found COLON
+ERROR@18967: missing comma
+ERROR@19057: expected an expression, found COLON
+ERROR@19058: missing comma

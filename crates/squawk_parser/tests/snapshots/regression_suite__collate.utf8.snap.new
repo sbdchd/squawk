@@ -1,0 +1,1799 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/collate.utf8.sql
+---
+SOURCE_FILE
+  COMMENT "/*\n * This test is for collations and character operations when using the\n * builtin provider with the C.UTF-8 locale.\n */"
+  WHITESPACE "\n\n"
+  COMMENT "/* skip test if not UTF8 server encoding */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "getdatabaseencoding"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            WHITESPACE " "
+            NEQB "<>"
+            WHITESPACE " "
+            LITERAL
+              STRING "'UTF8'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "skip_test"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "client_encoding"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test builtin \"C\""
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "regress_builtin_c"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "provider"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "locale"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'C'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- non-ASCII characters are unchanged"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "LOWER"
+              ARG_LIST
+                L_PAREN "("
+                BIN_EXPR
+                  LITERAL
+                    BYTE_STRING "U&'\\00C1'"
+                  WHITESPACE " "
+                  COLLATE_KW "COLLATE"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "regress_builtin_c"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              BYTE_STRING "U&'\\00C1'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "UPPER"
+              ARG_LIST
+                L_PAREN "("
+                BIN_EXPR
+                  LITERAL
+                    BYTE_STRING "U&'\\00E1'"
+                  WHITESPACE " "
+                  COLLATE_KW "COLLATE"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "regress_builtin_c"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              BYTE_STRING "U&'\\00E1'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- non-ASCII characters are not alphabetic"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              BYTE_STRING "U&'\\00C1\\00E1'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:alpha:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "regress_builtin_c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_COLLATION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "regress_builtin_c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test PG_C_UTF8"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "regress_pg_c_utf8"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "provider"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "locale"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'C_UTF8'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fails"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "regress_pg_c_utf8"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "provider"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "locale"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'C.UTF8'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_COLLATION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "regress_pg_c_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "regress_pg_c_utf8"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "provider"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "locale"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'C.UTF-8'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_pg_c_utf8"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "t"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "PG_C_UTF8"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_pg_c_utf8"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'abc DEF 123abc'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ábc sßs ßss DÉF'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ǄxxǄ ǆxxǅ ǅxxǆ'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        BYTE_STRING "U&'Λλ 1a \\FF11a'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ȺȺȺ'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ⱥⱥⱥ'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ⱥȺ'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "t"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "t"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "initcap"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "t"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "upper"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "t"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "convert_to"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "t"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'UTF8'"
+                  R_PAREN ")"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "t_bytes"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "convert_to"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "lower"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "t"
+                      R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'UTF8'"
+                  R_PAREN ")"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "lower_t_bytes"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "convert_to"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "initcap"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "t"
+                      R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'UTF8'"
+                  R_PAREN ")"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "initcap_t_bytes"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "convert_to"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "upper"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "t"
+                      R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'UTF8'"
+                  R_PAREN ")"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "upper_t_bytes"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_pg_c_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_pg_c_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- negative test: Final_Sigma not used for builtin locale C.UTF-8"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'ΑΣ'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_C_UTF8"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'ΑͺΣͺ'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_C_UTF8"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'Α΄Σ΄'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_C_UTF8"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- properties"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:alnum:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:upper:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'@'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:alnum:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'='"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:punct:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- symbols are punctuation in posix"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a8a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:digit:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'൧'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'\\d'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- only 0-9 considered digits in posix"
+  WHITESPACE "\n\n"
+  COMMENT "-- case mapping"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xYz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'XyZ'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xAb'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[W-Y]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xAb'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[c-d]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'Δ'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[γ-λ]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'δ'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[Γ-Λ]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_C_UTF8"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- same as above with cases reversed"
+  WHITESPACE "\n\n"
+  COMMENT "-- case folding"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "casefold"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'AbCd 123 #$% ıiIİ ẞ ß Ǆǅǆ Σσς'"
+                WHITESPACE " "
+                COLLATE_KW "collate"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_C_UTF8"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Test PG_UNICODE_FAST"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "regress_pg_unicode_fast"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "provider"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "locale"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'unicode'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fails"
+  WHITESPACE "\n"
+  CREATE_COLLATION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "regress_pg_unicode_fast"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    NAME
+      IDENT "provider"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "builtin"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "locale"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'PG_UNICODE_FAST'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_pg_unicode_fast"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "t"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_pg_unicode_fast"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'abc DEF 123abc'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ábc sßs ßss DÉF'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ǄxxǄ ǆxxǅ ǅxxǆ'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        BYTE_STRING "U&'Λλ 1a \\FF11a'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ȺȺȺ'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ⱥⱥⱥ'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      L_PAREN "("
+      LITERAL
+        STRING "'ⱥȺ'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "t"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "t"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "initcap"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "t"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "upper"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "t"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "convert_to"
+                ARG_LIST
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "t"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'UTF8'"
+                  R_PAREN ")"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "t_bytes"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "convert_to"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "lower"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "t"
+                      R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'UTF8'"
+                  R_PAREN ")"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "lower_t_bytes"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "convert_to"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "initcap"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "t"
+                      R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'UTF8'"
+                  R_PAREN ")"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "initcap_t_bytes"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "convert_to"
+                ARG_LIST
+                  L_PAREN "("
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "upper"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "t"
+                      R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    STRING "'UTF8'"
+                  R_PAREN ")"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "upper_t_bytes"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_pg_unicode_fast"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_pg_unicode_fast"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test Final_Sigma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'ΑΣ'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 0391 03A3"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'ΑΣ0'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 0391 03A3 0030"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'Α\u{343}Σ\u{343}'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 0391 0343 03A3 0343"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'Α\u{345}Σ\u{345}'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 0391 0345 03A3 0345"
+  WHITESPACE "\n\n"
+  COMMENT "-- test !Final_Sigma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'Σ'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 03A3"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'0Σ'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 0030 03A3"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'ΑΣΑ'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 0391 03A3 0391"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'Α\u{343}Σ\u{343}Α'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 0391 0343 03A3 0343 0391"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'Α\u{345}Σ\u{345}Α'"
+                WHITESPACE " "
+                COLLATE_KW "COLLATE"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- 0391 0345 03A3 0345 0391"
+  WHITESPACE "\n\n"
+  COMMENT "-- properties"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:alnum:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:upper:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'@'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:alnum:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'='"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:punct:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- symbols are not punctuation"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a8a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[[:digit:]]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'൧'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'\\d'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- case mapping"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xYz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'XyZ'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xAb'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[W-Y]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xAb'"
+            WHITESPACE " "
+            CUSTOM_OP
+              BANG "!"
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[c-d]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'Δ'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[γ-λ]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'δ'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+              STAR "*"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'[Γ-Λ]'"
+              WHITESPACE " "
+              COLLATE_KW "COLLATE"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "PG_UNICODE_FAST"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- same as above with cases reversed"
+  WHITESPACE "\n\n"
+  COMMENT "-- case folding"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "casefold"
+            ARG_LIST
+              L_PAREN "("
+              BIN_EXPR
+                LITERAL
+                  STRING "'AbCd 123 #$% ıiIİ ẞ ß Ǆǅǆ Σσς'"
+                WHITESPACE " "
+                COLLATE_KW "collate"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "PG_UNICODE_FAST"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

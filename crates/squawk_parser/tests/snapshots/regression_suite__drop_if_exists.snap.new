@@ -1,0 +1,3328 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/drop_if_exists.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- IF EXISTS tests"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- table (will be really dropped at the end)"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_exists"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- view"
+  WHITESPACE "\n\n"
+  DROP_VIEW_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_view_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_VIEW_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_view_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_view_exists"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_VIEW_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_view_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_VIEW_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_view_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- index"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_index_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_index_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "test_index_exists"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_index_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_INDEX_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_index_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- sequence"
+  WHITESPACE "\n\n"
+  DROP_SEQUENCE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_sequence_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SEQUENCE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_sequence_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SEQUENCE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_sequence_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SEQUENCE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_sequence_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SEQUENCE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_sequence_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- schema"
+  WHITESPACE "\n\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_schema_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME
+      IDENT "test_schema_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_schema_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME
+      IDENT "test_schema_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_SCHEMA_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SCHEMA_KW "SCHEMA"
+    WHITESPACE " "
+    NAME
+      IDENT "test_schema_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- type"
+  WHITESPACE "\n\n"
+  DROP_TYPE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_type_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TYPE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_type_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_type_exists"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TYPE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_type_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TYPE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_type_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- domain"
+  WHITESPACE "\n\n"
+  DROP_DOMAIN_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    DOMAIN_KW "DOMAIN"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_domain_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DOMAIN_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    DOMAIN_KW "DOMAIN"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_domain_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_DOMAIN_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    DOMAIN_KW "domain"
+    WHITESPACE " "
+    NAME
+      IDENT "test_domain_exists"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    WHITESPACE " "
+    NOT_NULL_CONSTRAINT
+      NOT_KW "not"
+      WHITESPACE " "
+      NULL_KW "null"
+    WHITESPACE " "
+    CHECK_CONSTRAINT
+      CHECK_KW "check"
+      WHITESPACE " "
+      L_PAREN "("
+      BIN_EXPR
+        NAME_REF
+          VALUE_KW "value"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DOMAIN_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    DOMAIN_KW "DOMAIN"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_domain_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_DOMAIN_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    DOMAIN_KW "DOMAIN"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_domain_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "---"
+  WHITESPACE "\n"
+  COMMENT "--- role/user/group"
+  WHITESPACE "\n"
+  COMMENT "---"
+  WHITESPACE "\n\n"
+  CREATE_USER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_test_u1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_test_r1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_GROUP_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_test_g1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_u2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_u1"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_u2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_u1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_r2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_r1"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_r2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_r1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_GROUP_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_g2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_GROUP_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_g1"
+    COMMA ","
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_g2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_GROUP_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    GROUP_KW "GROUP"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_test_g1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- collation"
+  WHITESPACE "\n"
+  DROP_COLLATION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_collation_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- conversion"
+  WHITESPACE "\n"
+  DROP_CONVERSION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CONVERSION_KW "CONVERSION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_conversion_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CONVERSION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CONVERSION_KW "CONVERSION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_conversion_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_CONVERSION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    CONVERSION_KW "CONVERSION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_conversion_exists"
+    WHITESPACE "\n    "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    LITERAL
+      STRING "'LATIN1'"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      STRING "'UTF8'"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "iso8859_1_to_utf8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CONVERSION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CONVERSION_KW "CONVERSION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_conversion_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- text search parser"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_PARSER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    PARSER_KW "PARSER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tsparser_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_PARSER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    PARSER_KW "PARSER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tsparser_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- text search dictionary"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_DICT_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    DICTIONARY_KW "DICTIONARY"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tsdict_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_DICT_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    DICTIONARY_KW "DICTIONARY"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tsdict_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TEXT_SEARCH_PARSER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    DICTIONARY_KW "DICTIONARY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_tsdict_exists"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n        "
+    NAME
+      TEMPLATE_KW "Template"
+    EQ "="
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "ispell"
+    COMMA ","
+    WHITESPACE "\n        "
+    NAME
+      IDENT "DictFile"
+    EQ "="
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "ispell_sample"
+    COMMA ","
+    WHITESPACE "\n        "
+    NAME
+      IDENT "AffFile"
+    EQ "="
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "ispell_sample"
+    WHITESPACE "\n"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_DICT_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    DICTIONARY_KW "DICTIONARY"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tsdict_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test search template"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_TEMPLATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    TEMPLATE_KW "TEMPLATE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tstemplate_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_TEMPLATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    TEMPLATE_KW "TEMPLATE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tstemplate_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- text search configuration"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_CONFIG_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    CONFIGURATION_KW "CONFIGURATION"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tsconfig_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_CONFIG_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    CONFIGURATION_KW "CONFIGURATION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tsconfig_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TEXT_SEARCH_PARSER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    CONFIGURATION_KW "CONFIGURATION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_tsconfig_exists"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      COPY_KW "COPY"
+    EQ "="
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "english"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_CONFIG_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    CONFIGURATION_KW "CONFIGURATION"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_tsconfig_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extension"
+  WHITESPACE "\n"
+  DROP_EXTENSION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    EXTENSION_KW "EXTENSION"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_extension_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_EXTENSION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    EXTENSION_KW "EXTENSION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_extension_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- functions"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_function_exists"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_function_exists"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_function_exists"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+          L_BRACK "["
+          R_BRACK "]"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_function_exists"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+          L_BRACK "["
+          R_BRACK "]"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- aggregate"
+  WHITESPACE "\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    AGGREGATE_KW "AGGREGATE"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_aggregate_exists"
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    AGGREGATE_KW "AGGREGATE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_aggregate_exists"
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    AGGREGATE_KW "AGGREGATE"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_aggregate_exists"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    AGGREGATE_KW "AGGREGATE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_aggregate_exists"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operator"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      AT "@"
+      POUND "#"
+      AT "@"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    CUSTOM_OP
+      AT "@"
+      POUND "#"
+      AT "@"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_OPERATOR_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      AT "@"
+      POUND "#"
+      AT "@"
+    WHITESPACE "\n        "
+    L_PAREN "("
+    NAME
+      IDENT "leftarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "rightarg"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8xor"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CUSTOM_OP
+      AT "@"
+      POUND "#"
+      AT "@"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "int8"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- language"
+  WHITESPACE "\n"
+  DROP_LANGUAGE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    LANGUAGE_KW "LANGUAGE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_language_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_LANGUAGE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    LANGUAGE_KW "LANGUAGE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_language_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cast"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CAST_KW "CAST"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CAST_KW "CAST"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- trigger"
+  WHITESPACE "\n"
+  DROP_TRIGGER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_trigger_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TRIGGER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_trigger_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TRIGGER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_trigger_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_such_table"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TRIGGER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_trigger_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_such_table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TRIGGER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_trigger_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_such_table"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TRIGGER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_trigger_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_such_table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TRIGGER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    NAME
+      IDENT "test_trigger_exists"
+    WHITESPACE "\n    "
+    BEFORE_KW "BEFORE"
+    WHITESPACE " "
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+    WHITESPACE "\n    "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    EACH_KW "EACH"
+    WHITESPACE " "
+    ROW_KW "ROW"
+    WHITESPACE " "
+    EXECUTE_KW "EXECUTE"
+    WHITESPACE " "
+    PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "suppress_redundant_updates_trigger"
+      ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TRIGGER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_trigger_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rule"
+  WHITESPACE "\n"
+  DROP_RULE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_rule_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_RULE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_rule_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_RULE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_rule_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_such_table"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_RULE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_rule_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_such_table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_RULE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_rule_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_such_table"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_RULE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_rule_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_such_table"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_RULE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME
+      IDENT "test_rule_exists"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+    WHITESPACE "\n    "
+    DO_KW "DO"
+    WHITESPACE " "
+    INSTEAD_KW "INSTEAD"
+    WHITESPACE "\n    "
+    INSERT_STMT
+      INSERT_KW "INSERT"
+      WHITESPACE " "
+      INTO_KW "INTO"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "test_exists"
+      WHITESPACE " "
+      SELECT
+        VALUES_KW "VALUES"
+        WHITESPACE " "
+        L_PAREN "("
+        FIELD_EXPR
+          NAME_REF
+            NEW_KW "NEW"
+          DOT "."
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              NEW_KW "NEW"
+            DOT "."
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          CUSTOM_OP
+            PIPE "|"
+            PIPE "|"
+          WHITESPACE " "
+          CAST_EXPR
+            FIELD_EXPR
+              NAME_REF
+                NEW_KW "NEW"
+              DOT "."
+              NAME_REF
+                IDENT "a"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_RULE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_rule_exists"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- foreign data wrapper"
+  WHITESPACE "\n"
+  DROP_FOREIGN_DATA_WRAPPER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    DATA_KW "DATA"
+    WHITESPACE " "
+    WRAPPER_KW "WRAPPER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_fdw_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FOREIGN_DATA_WRAPPER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    DATA_KW "DATA"
+    WHITESPACE " "
+    WRAPPER_KW "WRAPPER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_fdw_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- foreign server"
+  WHITESPACE "\n"
+  DROP_SERVER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_server_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SERVER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SERVER_KW "SERVER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_server_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operator class"
+  WHITESPACE "\n"
+  DROP_OPERATOR_CLASS_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CLASS_KW "CLASS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_operator_class"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_CLASS_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CLASS_KW "CLASS"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_operator_class"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_OPERATOR_CLASS_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CLASS_KW "CLASS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_operator_class"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_am"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_CLASS_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CLASS_KW "CLASS"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_operator_class"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_am"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operator family"
+  WHITESPACE "\n"
+  DROP_OPERATOR_FAMILY_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    FAMILY_KW "FAMILY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_operator_family"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_FAMILY_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    FAMILY_KW "FAMILY"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_operator_family"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_OPERATOR_FAMILY_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    FAMILY_KW "FAMILY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_operator_family"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_am"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_FAMILY_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    FAMILY_KW "FAMILY"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_operator_family"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_am"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- access method"
+  WHITESPACE "\n"
+  DROP_ACCESS_METHOD_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_am"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ACCESS_METHOD_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ACCESS_KW "ACCESS"
+    WHITESPACE " "
+    METHOD_KW "METHOD"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_am"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- drop the table"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_exists"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- be tolerant with missing schemas, types, etc"
+  WHITESPACE "\n\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    AGGREGATE_KW "AGGREGATE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "no_such_schema"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    AGGREGATE_KW "AGGREGATE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            IDENT "no_such_type"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_AGGREGATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    AGGREGATE_KW "AGGREGATE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    CALL_EXPR
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            IDENT "no_such_schema"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "no_such_type"
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CAST_KW "CAST"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "INTEGER"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_type2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CAST_KW "CAST"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_type1"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "INTEGER"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CAST_KW "CAST"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "INTEGER"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "no_such_schema"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CAST_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CAST_KW "CAST"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "no_such_schema"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "INTEGER"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_COLLATION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    COLLATION_KW "COLLATION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_CONVERSION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    CONVERSION_KW "CONVERSION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_DOMAIN_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    DOMAIN_KW "DOMAIN"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FOREIGN_TABLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FOREIGN_KW "FOREIGN"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "no_such_type"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "no_such_schema"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "no_such_type"
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_INDEX_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_MATERIALIZED_VIEW_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+    PLUS "+"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PLUS "+"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_type"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_type"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PLUS "+"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "no_such_schema"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_type"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "no_such_schema"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_type"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    CUSTOM_OP
+      POUND "#"
+    WHITESPACE " "
+    L_PAREN "("
+    NONE_KW "NONE"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "no_such_schema"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_type"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_CLASS_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    CLASS_KW "CLASS"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "widget_ops"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_OPERATOR_FAMILY_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    OPERATOR_KW "OPERATOR"
+    WHITESPACE " "
+    FAMILY_KW "FAMILY"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "float_ops"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_RULE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    RULE_KW "RULE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "foo"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_SEQUENCE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    SEQUENCE_KW "SEQUENCE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_CONFIG_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    CONFIGURATION_KW "CONFIGURATION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_schema"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_DICT_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    DICTIONARY_KW "DICTIONARY"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_schema"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_PARSER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    PARSER_KW "PARSER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_schema"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TEXT_SEARCH_TEMPLATE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TEXT_KW "TEXT"
+    WHITESPACE " "
+    SEARCH_KW "SEARCH"
+    WHITESPACE " "
+    TEMPLATE_KW "TEMPLATE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "no_such_schema"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TRIGGER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TRIGGER_KW "TRIGGER"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TYPE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TYPE_KW "TYPE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_VIEW_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "no_such_schema"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check we receive an ambiguous function error when there are"
+  WHITESPACE "\n"
+  COMMENT "-- multiple matching functions."
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_ambiguous_funcname"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select $1; $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_ambiguous_funcname"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ select $1; $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_funcname"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_funcname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cleanup"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_funcname"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_funcname"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Likewise for procedures."
+  WHITESPACE "\n"
+  CREATE_PROCEDURE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_ambiguous_procname"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ begin end; $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_PROCEDURE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_ambiguous_procname"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          DOLLAR_QUOTED_STRING "$$ begin end; $$"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "plpgsql"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_PROCEDURE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_procname"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_PROCEDURE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_procname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check we get a similar error if we use ROUTINE instead of PROCEDURE."
+  WHITESPACE "\n"
+  DROP_ROUTINE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROUTINE_KW "ROUTINE"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "IF"
+      WHITESPACE " "
+      EXISTS_KW "EXISTS"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_procname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cleanup"
+  WHITESPACE "\n"
+  DROP_PROCEDURE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_procname"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_PROCEDURE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    PROCEDURE_KW "PROCEDURE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_ambiguous_procname"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- This test checks both the functionality of 'if exists' and the syntax"
+  WHITESPACE "\n"
+  COMMENT "-- of the drop database command."
+  WHITESPACE "\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_database_exists"
+    WHITESPACE " "
+    L_PAREN "("
+    FORCE_KW "force"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_database_exists"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    L_PAREN "("
+    FORCE_KW "force"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_database_exists"
+    WHITESPACE " "
+    L_PAREN "("
+    FORCE_KW "force"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_DATABASE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "test_database_exists"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    L_PAREN "("
+    FORCE_KW "force"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@6109: expected R_PAREN
+ERROR@6109: expected SEMICOLON
+ERROR@6109: expected command, found DOT
+ERROR@6110: expected command, found IDENT
+ERROR@6122: expected command, found R_PAREN
+ERROR@6640: expected R_PAREN
+ERROR@6640: expected SEMICOLON
+ERROR@6640: expected command, found DOT
+ERROR@6641: expected command, found IDENT
+ERROR@6653: expected command, found R_PAREN
+ERROR@7333: expected SEMICOLON
+ERROR@7333: expected command, found DOT
+ERROR@7334: expected command, found IDENT
+ERROR@7391: expected SEMICOLON
+ERROR@7391: expected command, found DOT
+ERROR@7392: expected command, found IDENT
+ERROR@7445: expected SEMICOLON
+ERROR@7445: expected command, found DOT
+ERROR@7446: expected command, found IDENT
+ERROR@7501: expected SEMICOLON
+ERROR@7501: expected command, found DOT
+ERROR@7502: expected command, found IDENT

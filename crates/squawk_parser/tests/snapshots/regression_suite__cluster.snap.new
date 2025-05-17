@@ -1,0 +1,6140 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/cluster.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "--  CLUSTER"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_tst_s"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "rf_a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "SERIAL"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "SERIAL"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "d"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      COMMA ","
+      WHITESPACE "\n\t"
+      FOREIGN_KEY_CONSTRAINT
+        CONSTRAINT_KW "CONSTRAINT"
+        WHITESPACE " "
+        NAME
+          IDENT "clstr_tst_con"
+        WHITESPACE " "
+        FOREIGN_KW "FOREIGN"
+        WHITESPACE " "
+        KEY_KW "KEY"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "REFERENCES"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "clstr_tst_s"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clstr_tst_b"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clstr_tst_c"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "c"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clstr_tst_c_b"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "c"
+      COMMA ","
+      NAME_REF
+        IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clstr_tst_b_c"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "b"
+      COMMA ","
+      NAME_REF
+        IDENT "c"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst_s"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst_s"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "clstr_tst_s"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst_s"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "clstr_tst_s"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst_s"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "clstr_tst_s"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst_s"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "clstr_tst_s"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst_s"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "b"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "clstr_tst_s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_tst_inh"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "11"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'once'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "10"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'diez'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "31"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'treinta y uno'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "22"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veintidos'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'tres'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "20"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veinte'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "23"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veintitres'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "21"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veintiuno'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'cuatro'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "14"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'catorce'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'dos'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "18"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'dieciocho'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "27"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veintisiete'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "25"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veinticinco'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "13"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'trece'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "28"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veintiocho'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "32"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'treinta y dos'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "5"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'cinco'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "29"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veintinueve'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'uno'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "24"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veinticuatro'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "30"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'treinta'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "12"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'doce'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "17"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'diecisiete'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "9"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'nueve'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "19"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'diecinueve'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "26"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'veintiseis'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "15"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'quince'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "7"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'siete'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "16"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'dieciseis'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "8"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'ocho'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- This entry is needed to test that TOASTED values are copied correctly."
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "d"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "6"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'seis'"
+      COMMA ","
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "repeat"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'xyzzy'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "100000"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst_c"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "c"
+        COMMA ","
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              SUBSTRING_KW "substring"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              WHITESPACE " "
+              FOR_KW "for"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "30"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_tst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "c"
+        COMMA ","
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              SUBSTRING_KW "substring"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              WHITESPACE " "
+              FOR_KW "for"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "30"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_tst"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "c"
+        COMMA ","
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              SUBSTRING_KW "substring"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              WHITESPACE " "
+              FOR_KW "for"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "30"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_tst"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "c"
+        COMMA ","
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              SUBSTRING_KW "substring"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              WHITESPACE " "
+              FOR_KW "for"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "30"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_tst"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify that inheritance link still works"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst_inh"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "0"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "100"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'in child table'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        TARGET
+          NAME_REF
+            IDENT "c"
+        COMMA ","
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              SUBSTRING_KW "substring"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              WHITESPACE " "
+              FOR_KW "for"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "30"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "length"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "d"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_tst"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify that foreign key link still works"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1111"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'this should fail'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "conname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_constraint"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "conrelid"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'clstr_tst'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "regclass"
+    WHITESPACE "\n"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "relkind"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              EXISTS_KW "EXISTS"
+            ARG_LIST
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "SELECT"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "1"
+                WHITESPACE " "
+                FROM_CLAUSE
+                  FROM_KW "FROM"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "pg_class"
+                WHITESPACE " "
+                WHERE_CLAUSE
+                  WHERE_KW "WHERE"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "oid"
+                    WHITESPACE " "
+                    EQ "="
+                    WHITESPACE " "
+                    FIELD_EXPR
+                      NAME_REF
+                        IDENT "c"
+                      DOT "."
+                      NAME_REF
+                        IDENT "reltoastrelid"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "hastoast"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        LIKE_KW "LIKE"
+        WHITESPACE " "
+        LITERAL
+          STRING "'clstr_tst%'"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify that indisclustered is correctly set"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pg_class"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_index"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "pg_class_2"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "pg_class"
+                DOT "."
+                NAME_REF
+                  IDENT "oid"
+              EQ "="
+              NAME_REF
+                IDENT "indexrelid"
+            WHITESPACE "\n\t"
+            AND_KW "AND"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "indrelid"
+              EQ "="
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "pg_class_2"
+                DOT "."
+                NAME_REF
+                  IDENT "oid"
+          WHITESPACE "\n\t"
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_class_2"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'clstr_tst'"
+        WHITESPACE "\n\t"
+        AND_KW "AND"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "indisclustered"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Try changing indisclustered"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    DISABLE_CLUSTER
+      CLUSTER_KW "CLUSTER"
+      WHITESPACE " "
+      ON_KW "ON"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_tst_b_c"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pg_class"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_index"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "pg_class_2"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "pg_class"
+                DOT "."
+                NAME_REF
+                  IDENT "oid"
+              EQ "="
+              NAME_REF
+                IDENT "indexrelid"
+            WHITESPACE "\n\t"
+            AND_KW "AND"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "indrelid"
+              EQ "="
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "pg_class_2"
+                DOT "."
+                NAME_REF
+                  IDENT "oid"
+          WHITESPACE "\n\t"
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_class_2"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'clstr_tst'"
+        WHITESPACE "\n\t"
+        AND_KW "AND"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "indisclustered"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Try turning off all clustering"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_tst"
+    WHITESPACE " "
+    SET_WITHOUT_CLUSTER
+      SET_KW "SET"
+      WHITESPACE " "
+      WITHOUT_KW "WITHOUT"
+      WHITESPACE " "
+      CLUSTER_KW "CLUSTER"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "pg_class"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_index"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          IDENT "pg_class_2"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "pg_class"
+                DOT "."
+                NAME_REF
+                  IDENT "oid"
+              EQ "="
+              NAME_REF
+                IDENT "indexrelid"
+            WHITESPACE "\n\t"
+            AND_KW "AND"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "indrelid"
+              EQ "="
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "pg_class_2"
+                DOT "."
+                NAME_REF
+                  IDENT "oid"
+          WHITESPACE "\n\t"
+          AND_KW "AND"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "pg_class_2"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'clstr_tst'"
+        WHITESPACE "\n\t"
+        AND_KW "AND"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "indisclustered"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify that toast tables are clusterable"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pg_toast"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_toast_826"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "pg_toast_826_index"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Verify that clustering all tables does in fact cluster the right ones"
+  WHITESPACE "\n"
+  CREATE_USER_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_clstr_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_1"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_2"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_3"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "regress_clstr_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_3"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "regress_clstr_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  GRANT_STMT
+    GRANT_KW "GRANT"
+    WHITESPACE " "
+    SELECT_KW "SELECT"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    IDENT "regress_clstr_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_3"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_3"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- \"CLUSTER <tablename>\" on a table that hasn't been clustered"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1_pkey"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "clstr_2_pkey"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE "\n  "
+    COMPOUND_SELECT
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              STAR "*"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "clstr_2"
+      WHITESPACE " "
+      UNION_KW "UNION"
+      WHITESPACE " "
+      ALL_KW "ALL"
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              STAR "*"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "clstr_3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- revert to the original state"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_3"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_3"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- this user can only cluster clstr_1 and clstr_3, but the latter"
+  WHITESPACE "\n"
+  COMMENT "-- has not been clustered"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_clstr_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "client_min_messages"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    ERROR_KW "ERROR"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- order of \"skipping\" warnings may vary"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "client_min_messages"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMPOUND_SELECT
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    UNION_KW "UNION"
+    WHITESPACE " "
+    ALL_KW "ALL"
+    WHITESPACE "\n  "
+    COMPOUND_SELECT
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              STAR "*"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "clstr_2"
+      WHITESPACE " "
+      UNION_KW "UNION"
+      WHITESPACE " "
+      ALL_KW "ALL"
+      WHITESPACE "\n  "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "SELECT"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              STAR "*"
+        WHITESPACE " "
+        FROM_CLAUSE
+          FROM_KW "FROM"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "clstr_3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- cluster a single table using the indisclustered bit previously set"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test MVCC-safety of cluster. There isn't much we can do to verify the"
+  WHITESPACE "\n"
+  COMMENT "-- results with a single backend..."
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clustertest"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          KEY_KW "key"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "10"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "20"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "30"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "40"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "50"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Use a transaction so that updates are not committed when CLUSTER sees 'em"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test update where the old row version is found first in the scan"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      KEY_KW "key"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "100"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          KEY_KW "key"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test update where the new row version is found first in the scan"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      KEY_KW "key"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "35"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          KEY_KW "key"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "40"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test longer update chain"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      KEY_KW "key"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "60"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          KEY_KW "key"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "50"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      KEY_KW "key"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "70"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          KEY_KW "key"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "60"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      KEY_KW "key"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "80"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          KEY_KW "key"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "70"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clustertest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest_pkey"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clustertest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clustertest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- check that temp tables can be clustered"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMP_KW "temp"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_temp"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "col1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "col2"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_temp"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "values"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'two'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'one'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "cluster"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_temp"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "clstr_temp_pkey"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_temp"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_temp"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_SESSION_AUTH_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check clustering an empty table"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clustertest"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "clustertest_pkey"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Check that partitioned tables can be clustered"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstrpart"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    RANGE_KW "RANGE"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstrpart1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "10"
+    R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    RANGE_KW "RANGE"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstrpart11"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart1"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "5"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstrpart12"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart1"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "5"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "10"
+    R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    RANGE_KW "RANGE"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstrpart2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "10"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "20"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstrpart3"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    RANGE_KW "RANGE"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstrpart33"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart3"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clstrpart_only_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    ONLY_KW "ONLY"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "clstrpart_only_idx"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- fails"
+  WHITESPACE "\n"
+  DROP_INDEX_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart_only_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clstrpart_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Check that clustering sets new relfilenodes:"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "old_cluster_info"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "relname"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              LEVEL_KW "level"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "relfilenode"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "relkind"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "pg_partition_tree"
+          ARG_LIST
+            L_PAREN "("
+            CAST_EXPR
+              LITERAL
+                STRING "'clstrpart'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "regclass"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "tree"
+        WHITESPACE " "
+        JOIN
+          JOIN_KW "JOIN"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "pg_class"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "c"
+          WHITESPACE " "
+          ON_KW "ON"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            EQ "="
+            FIELD_EXPR
+              NAME_REF
+                IDENT "tree"
+              DOT "."
+              NAME_REF
+                IDENT "relid"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "clstrpart_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "new_cluster_info"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "relname"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              LEVEL_KW "level"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "relfilenode"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "relkind"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "pg_partition_tree"
+          ARG_LIST
+            L_PAREN "("
+            CAST_EXPR
+              LITERAL
+                STRING "'clstrpart'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "regclass"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "tree"
+        WHITESPACE " "
+        JOIN
+          JOIN_KW "JOIN"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "pg_class"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "c"
+          WHITESPACE " "
+          ON_KW "ON"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            EQ "="
+            FIELD_EXPR
+              NAME_REF
+                IDENT "tree"
+              DOT "."
+              NAME_REF
+                IDENT "relid"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              OLD_KW "old"
+            DOT "."
+            NAME_REF
+              LEVEL_KW "level"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              OLD_KW "old"
+            DOT "."
+            NAME_REF
+              IDENT "relkind"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                OLD_KW "old"
+              DOT "."
+              NAME_REF
+                IDENT "relfilenode"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                NEW_KW "new"
+              DOT "."
+              NAME_REF
+                IDENT "relfilenode"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "old_cluster_info"
+      WHITESPACE " "
+      ALIAS
+        AS_KW "AS"
+        WHITESPACE " "
+        NAME
+          OLD_KW "old"
+      WHITESPACE " "
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "new_cluster_info"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            NEW_KW "new"
+        WHITESPACE " "
+        USING_CLAUSE
+          USING_KW "USING"
+          WHITESPACE " "
+          PAREN_EXPR
+            L_PAREN "("
+            NAME_REF
+              IDENT "relname"
+            R_PAREN ")"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Partitioned indexes aren't and can't be marked un/clustered:"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    SET_WITHOUT_CLUSTER
+      SET_KW "SET"
+      WHITESPACE " "
+      WITHOUT_KW "WITHOUT"
+      WHITESPACE " "
+      CLUSTER_KW "CLUSTER"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+    WHITESPACE " "
+    DISABLE_CLUSTER
+      CLUSTER_KW "CLUSTER"
+      WHITESPACE " "
+      ON_KW "ON"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstrpart_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstrpart"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Ownership of partitions is checked"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ptnowner"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        UNIQUE_CONSTRAINT
+          UNIQUE_KW "unique"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "LIST"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "i"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "ptnowner_i_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ptnowner"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ptnowner1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ptnowner"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_ptnowner"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ptnowner2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ptnowner"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ptnowner1"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "regress_ptnowner"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_ptnowner"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ptnowner"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "ptnowner_i_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ptnowner"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "regress_ptnowner"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "ptnowner_oldnodes"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "oid"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "relname"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            NAME_REF
+              IDENT "relfilenode"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "pg_partition_tree"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              STRING "'ptnowner'"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "tree"
+        WHITESPACE "\n  "
+        JOIN
+          JOIN_KW "JOIN"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "pg_class"
+          WHITESPACE " "
+          ALIAS
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "c"
+          WHITESPACE " "
+          ON_KW "ON"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "oid"
+            EQ "="
+            FIELD_EXPR
+              NAME_REF
+                IDENT "tree"
+              DOT "."
+              NAME_REF
+                IDENT "relid"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+    WHITESPACE " "
+    IDENT "regress_ptnowner"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ptnowner"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "ptnowner_i_idx"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    SESSION_KW "SESSION"
+    WHITESPACE " "
+    AUTHORIZATION_KW "AUTHORIZATION"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "a"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "a"
+              DOT "."
+              NAME_REF
+                IDENT "relfilenode"
+            EQ "="
+            FIELD_EXPR
+              NAME_REF
+                IDENT "b"
+              DOT "."
+              NAME_REF
+                IDENT "relfilenode"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "a"
+      WHITESPACE "\n  "
+      JOIN
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "ptnowner_oldnodes"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "b"
+        WHITESPACE " "
+        USING_CLAUSE
+          USING_KW "USING"
+          WHITESPACE " "
+          PAREN_EXPR
+            L_PAREN "("
+            NAME_REF
+              IDENT "oid"
+            R_PAREN ")"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "a"
+          DOT "."
+          NAME_REF
+            IDENT "relname"
+        WHITESPACE " "
+        COLLATE_KW "COLLATE"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "\"C\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "ptnowner"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_ptnowner"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test CLUSTER with external tuplesorting"
+  WHITESPACE "\n\n"
+  CREATE_TABLE_AS_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_4"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "tenk1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "cluster_sort"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_4"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "hundred"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "thousand"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "tenthous"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- ensure we don't use the index in CLUSTER nor the checking SELECTs"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    OFF_KW "off"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Use external sort:"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "maintenance_work_mem"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'1MB'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "cluster"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_4"
+    WHITESPACE " "
+    USING_KW "using"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "cluster_sort"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n"
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "hundred"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "lag"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "hundred"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  OVER_CLAUSE
+                    OVER_KW "over"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "lhundred"
+              COMMA ","
+              WHITESPACE "\n        "
+              TARGET
+                NAME_REF
+                  IDENT "thousand"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "lag"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "thousand"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  OVER_CLAUSE
+                    OVER_KW "over"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "lthousand"
+              COMMA ","
+              WHITESPACE "\n        "
+              TARGET
+                NAME_REF
+                  IDENT "tenthous"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "lag"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "tenthous"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  OVER_CLAUSE
+                    OVER_KW "over"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "ltenthous"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "clstr_4"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "ss"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            ROW_KW "row"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "hundred"
+            COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              IDENT "thousand"
+            COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              IDENT "tenthous"
+            R_PAREN ")"
+        WHITESPACE " "
+        LTEQ "<="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            ROW_KW "row"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "lhundred"
+            COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              IDENT "lthousand"
+            COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              IDENT "ltenthous"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexscan"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "reset"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "maintenance_work_mem"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- test CLUSTER on expression index"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clstr_expression"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "serial"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"C\""
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_expression"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "g"
+                DOT "."
+                NAME_REF
+                  IDENT "i"
+              WHITESPACE " "
+              PERCENT "%"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "42"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'prefix'"
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "g"
+                DOT "."
+                NAME_REF
+                  IDENT "i"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "133"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "i"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clstr_expression_minus_a"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_expression"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        PREFIX_EXPR
+          MINUS "-"
+          NAME_REF
+            IDENT "a"
+        R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clstr_expression_upper_b"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_expression"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      PAREN_EXPR
+        L_PAREN "("
+        CALL_EXPR
+          NAME_REF
+            IDENT "upper"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            R_PAREN ")"
+        R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- verify indexes work before cluster"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "upper"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'PREFIX3'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "upper"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'PREFIX3'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        PREFIX_EXPR
+          MINUS "-"
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "3"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        PREFIX_EXPR
+          MINUS "-"
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "3"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- and after clustering on clstr_expression_minus_a"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_expression"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "clstr_expression_minus_a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          ROWS_KW "rows"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE "\n  "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "ctid"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "lag"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "a"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  OVER_CLAUSE
+                    OVER_KW "OVER"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    WINDOW_DEF
+                      ORDER_BY_CLAUSE
+                        ORDER_KW "ORDER"
+                        WHITESPACE " "
+                        BY_KW "BY"
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "ctid"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "la"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                NAME_REF
+                  IDENT "a"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "clstr_expression"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      ROWS_KW "rows"
+      WHITESPACE " "
+      ERROR
+        WHERE_KW "WHERE"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "la"
+  WHITESPACE " "
+  ERROR
+    L_ANGLE "<"
+  WHITESPACE " "
+  ERROR
+    IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "upper"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'PREFIX3'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "upper"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'PREFIX3'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        PREFIX_EXPR
+          MINUS "-"
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "3"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        PREFIX_EXPR
+          MINUS "-"
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "3"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- and after clustering on clstr_expression_upper_b"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_expression"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "clstr_expression_upper_b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          ROWS_KW "rows"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE "\n  "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "ctid"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "lag"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "b"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  OVER_CLAUSE
+                    OVER_KW "OVER"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    WINDOW_DEF
+                      ORDER_BY_CLAUSE
+                        ORDER_KW "ORDER"
+                        WHITESPACE " "
+                        BY_KW "BY"
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "ctid"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "lb"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                NAME_REF
+                  IDENT "b"
+          WHITESPACE " "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "clstr_expression"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      ROWS_KW "rows"
+      WHITESPACE " "
+      ERROR
+        WHERE_KW "WHERE"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "upper"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "lb"
+          R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    R_ANGLE ">"
+  WHITESPACE " "
+  ERROR
+    IDENT "upper"
+  ERROR
+    L_PAREN "("
+  ERROR
+    IDENT "b"
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "upper"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'PREFIX3'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "upper"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "b"
+            R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'PREFIX3'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        PREFIX_EXPR
+          MINUS "-"
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "3"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "clstr_expression"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        PREFIX_EXPR
+          MINUS "-"
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "3"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- clean up"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clustertest"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_3"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clstr_expression"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_USER_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    USER_KW "USER"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_clstr_user"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@11026: expected R_PAREN
+ERROR@11027: expected command, found OFF_KW
+ERROR@11030: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11030: expected SEMICOLON
+ERROR@11030: expected command, found R_PAREN
+ERROR@11164: expected R_PAREN
+ERROR@11165: expected command, found OFF_KW
+ERROR@11168: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11168: expected SEMICOLON
+ERROR@11168: expected command, found R_PAREN
+ERROR@11517: expected FROM_KW
+ERROR@11517: expected L_PAREN
+ERROR@11518: expected an expression, found WHERE_KW
+ERROR@11523: expected call expression
+ERROR@11526: expected R_PAREN
+ERROR@11526: expected SEMICOLON
+ERROR@11527: expected command, found L_ANGLE
+ERROR@11529: expected command, found IDENT
+ERROR@11587: expected R_PAREN
+ERROR@11588: expected command, found OFF_KW
+ERROR@11591: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11591: expected SEMICOLON
+ERROR@11591: expected command, found R_PAREN
+ERROR@11725: expected R_PAREN
+ERROR@11726: expected command, found OFF_KW
+ERROR@11729: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@11729: expected SEMICOLON
+ERROR@11729: expected command, found R_PAREN
+ERROR@12078: expected FROM_KW
+ERROR@12078: expected L_PAREN
+ERROR@12079: expected an expression, found WHERE_KW
+ERROR@12084: expected call expression
+ERROR@12094: expected R_PAREN
+ERROR@12094: expected SEMICOLON
+ERROR@12095: expected command, found R_ANGLE
+ERROR@12097: expected command, found IDENT
+ERROR@12102: expected command, found L_PAREN
+ERROR@12103: expected command, found IDENT
+ERROR@12104: expected command, found R_PAREN
+ERROR@12162: expected R_PAREN
+ERROR@12163: expected command, found OFF_KW
+ERROR@12166: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@12166: expected SEMICOLON
+ERROR@12166: expected command, found R_PAREN
+ERROR@12300: expected R_PAREN
+ERROR@12301: expected command, found OFF_KW
+ERROR@12304: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@12304: expected SEMICOLON
+ERROR@12304: expected command, found R_PAREN

@@ -1,0 +1,2915 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/boolean.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- BOOLEAN"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- sanity check - if this fails go insane!"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "one"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- ******************testing built-in type bool********************"
+  WHITESPACE "\n\n"
+  COMMENT "-- check bool input syntax"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            TRUE_KW "true"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            FALSE_KW "false"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'t'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'   f           '"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'true'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'test'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'false'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'foo'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'y'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'yes'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'yeah'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'n'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'no'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'nay'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'on'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'off'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'of'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'o'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'on_'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'off_'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'11'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'0'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'000'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "''"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            ERROR_KW "error"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Also try it with non-error-throwing API"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'true'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'bool'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'asdf'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'bool'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'junk'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'bool'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- and, or, not in qualifications"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'t'"
+            WHITESPACE " "
+            OR_KW "or"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'t'"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PREFIX_EXPR
+            NOT_KW "not"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'t'"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'t'"
+            WHITESPACE " "
+            NEQB "<>"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'t'"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'t'"
+            WHITESPACE " "
+            GTEQ ">="
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+            WHITESPACE " "
+            L_ANGLE "<"
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'t'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'f'"
+            WHITESPACE " "
+            LTEQ "<="
+            WHITESPACE " "
+            CAST_EXPR
+              NAME_REF
+                IDENT "bool"
+              WHITESPACE " "
+              LITERAL
+                STRING "'t'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- explicit casts to/from text"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'TrUe'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'fAlse'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'    true   '"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'     FALSE'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                TRUE_KW "true"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      BOOLEAN_KW "boolean"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            TRUE_KW "true"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                FALSE_KW "false"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      BOOLEAN_KW "boolean"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    TEXT_KW "text"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'  tru e '"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "invalid"
+  SEMICOLON ";"
+  WHITESPACE "    "
+  COMMENT "-- error"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "''"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "invalid"
+  SEMICOLON ";"
+  WHITESPACE "            "
+  COMMENT "-- error"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "BOOLTBL1"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bool"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'t'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'True'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'true'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- BOOLTBL1 should be full of true's at this point"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CAST_EXPR
+          NAME_REF
+            IDENT "bool"
+          WHITESPACE " "
+          LITERAL
+            STRING "'true'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        NEQB "<>"
+        WHITESPACE " "
+        CAST_EXPR
+          NAME_REF
+            IDENT "bool"
+          WHITESPACE " "
+          LITERAL
+            STRING "'false'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "booleq"
+        ARG_LIST
+          L_PAREN "("
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'false'"
+          COMMA ","
+          WHITESPACE " "
+          NAME_REF
+            IDENT "f1"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'f'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CAST_EXPR
+          NAME_REF
+            IDENT "bool"
+          WHITESPACE " "
+          LITERAL
+            STRING "'false'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "BOOLTBL2"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bool"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL2"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'f'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL2"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'false'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL2"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'False'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL2"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'FALSE'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- This is now an invalid expression"
+  WHITESPACE "\n"
+  COMMENT "-- For pre-v6.3 this evaluated to false - thomas 1997-10-23"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL2"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE "\n   "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        NAME_REF
+          IDENT "bool"
+        WHITESPACE " "
+        LITERAL
+          STRING "'XXX'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- BOOLTBL2 should be full of false's at this point"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL2"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL2"
+            DOT "."
+            STAR "*"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "BOOLTBL2"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        NEQB "<>"
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "BOOLTBL1"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL2"
+            DOT "."
+            STAR "*"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "boolne"
+        ARG_LIST
+          L_PAREN "("
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL2"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          COMMA ","
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL2"
+            DOT "."
+            STAR "*"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL2"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+        WHITESPACE " "
+        AND_KW "and"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'false'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL2"
+            DOT "."
+            STAR "*"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL2"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+        WHITESPACE " "
+        OR_KW "or"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "BOOLTBL1"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CAST_EXPR
+            NAME_REF
+              IDENT "bool"
+            WHITESPACE " "
+            LITERAL
+              STRING "'true'"
+    WHITESPACE "\n   "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "BOOLTBL1"
+        DOT "."
+        NAME_REF
+          IDENT "f1"
+      COMMA ","
+      WHITESPACE " "
+      FIELD_EXPR
+        NAME_REF
+          IDENT "BOOLTBL2"
+        DOT "."
+        NAME_REF
+          IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- SQL syntax"
+  WHITESPACE "\n"
+  COMMENT "-- Try all combinations to ensure that we get nothing when we expect nothing"
+  WHITESPACE "\n"
+  COMMENT "-- - thomas 2000-01-04"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "IS"
+          WHITESPACE " "
+          NOT_KW "NOT"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "FALSE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "FALSE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL1"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "IS"
+          WHITESPACE " "
+          NOT_KW "NOT"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "IS"
+          WHITESPACE " "
+          NOT_KW "NOT"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "FALSE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "FALSE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+    WHITESPACE "\n   "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "BOOLTBL2"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE " "
+        IS_NOT
+          IS_KW "IS"
+          WHITESPACE " "
+          NOT_KW "NOT"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "TRUE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "--"
+    WHITESPACE "\n"
+    COMMENT "-- Tests for BooleanTest"
+    WHITESPACE "\n"
+    COMMENT "--"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "BOOLTBL3"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "d"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bool"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "o"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL3"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "d"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "o"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'true'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL3"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "d"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "o"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'false'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL3"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "d"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "o"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'null'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        NULL_KW "null"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE "\n    "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "d"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "TRUE"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "istrue"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "TRUE"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "isnottrue"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            LITERAL
+              FALSE_KW "FALSE"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "isfalse"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              FALSE_KW "FALSE"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "isnotfalse"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            IS_KW "IS"
+            WHITESPACE " "
+            NAME_REF
+              UNKNOWN_KW "UNKNOWN"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "isunknown"
+        COMMA ","
+        WHITESPACE "\n    "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            NAME_REF
+              UNKNOWN_KW "UNKNOWN"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "isnotunknown"
+    WHITESPACE "\n"
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl3"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "o"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  CREATE_TABLE
+    COMMENT "-- Test to make sure short-circuiting and NULL handling is"
+    WHITESPACE "\n"
+    COMMENT "-- correct. Use a table as source to prevent constant simplification"
+    WHITESPACE "\n"
+    COMMENT "-- from interfering."
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "booltbl4"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "isfalse"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bool"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "istrue"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bool"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "isnul"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bool"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "booltbl4"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        FALSE_KW "false"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        NULL_KW "null"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- AND expression need to return null if there's any nulls and not all"
+  WHITESPACE "\n"
+  COMMENT "-- of the value are true"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "istrue"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "isnul"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "istrue"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "istrue"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "istrue"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "isnul"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "isnul"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "istrue"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "istrue"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "isfalse"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "isnul"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "istrue"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "istrue"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "isfalse"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "isnul"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "isnul"
+              WHITESPACE " "
+              AND_KW "AND"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "istrue"
+            WHITESPACE " "
+            AND_KW "AND"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "isfalse"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- OR expression need to return null if there's any nulls and none"
+  WHITESPACE "\n"
+  COMMENT "-- of the value is true"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "isfalse"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "isnul"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "isfalse"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "isfalse"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "isfalse"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "isnul"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "isnul"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "isfalse"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "isfalse"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "isfalse"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "isnul"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "istrue"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "istrue"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "isfalse"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "isnul"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "isnul"
+              WHITESPACE " "
+              OR_KW "OR"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "istrue"
+            WHITESPACE " "
+            OR_KW "OR"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "isfalse"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "booltbl4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Casts"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "0"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              INT_NUMBER "2"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    BOOLEAN_KW "boolean"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Clean up"
+  WHITESPACE "\n"
+  COMMENT "-- Many tables are retained by the regression test, but these do not seem"
+  WHITESPACE "\n"
+  COMMENT "--  particularly useful so just get rid of them for now."
+  WHITESPACE "\n"
+  COMMENT "--  - thomas 1997-11-30"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE "  "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE "  "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE "  "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE "  "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "BOOLTBL4"
+  SEMICOLON ";"
+  WHITESPACE "\n"

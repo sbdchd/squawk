@@ -1,0 +1,274 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/mvcc.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Verify that index scans encountering dead rows produced by an"
+  WHITESPACE "\n"
+  COMMENT "-- aborted subtransaction of the current transaction can utilize the"
+  WHITESPACE "\n"
+  COMMENT "-- kill_prior_tuple optimization"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- NB: The table size is currently *not* expected to stay the same, we"
+  WHITESPACE "\n"
+  COMMENT "-- don't have logic to trigger opportunistic pruning in cases like"
+  WHITESPACE "\n"
+  COMMENT "-- this."
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_seqscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_indexonlyscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    LOCAL_KW "LOCAL"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "enable_bitmapscan"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Can't easily use a unique index, since dead tuples can be found"
+    WHITESPACE "\n"
+    COMMENT "-- independent of the kill_prior_tuples optimization."
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "clean_aborted_self"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          KEY_KW "key"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          DATA_KW "data"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "clean_aborted_self_key"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clean_aborted_self"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        KEY_KW "key"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "clean_aborted_self"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          DATA_KW "data"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      PREFIX_EXPR
+        MINUS "-"
+        LITERAL
+          INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'just to allocate metapage'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- save index size from before the changes, for comparison"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_relation_size"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'clean_aborted_self_key'"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "clean_aborted_self_key_before"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DO_STMT
+    DO_KW "DO"
+    WHITESPACE " "
+    LITERAL
+      DOLLAR_QUOTED_STRING "$$\nBEGIN\n    -- iterate often enough to see index growth even on larger-than-default page sizes\n    FOR i IN 1..100 LOOP\n        BEGIN\n\t    -- perform index scan over all the inserted keys to get them to be seen as dead\n            IF EXISTS(SELECT * FROM clean_aborted_self WHERE key > 0 AND key < 100) THEN\n\t        RAISE data_corrupted USING MESSAGE = 'these rows should not exist';\n            END IF;\n            INSERT INTO clean_aborted_self SELECT g.i, 'rolling back in a sec' FROM generate_series(1, 100) g(i);\n\t    -- just some error that's not normally thrown\n\t    RAISE reading_sql_data_not_permitted USING MESSAGE = 'round and round again';\n\tEXCEPTION WHEN reading_sql_data_not_permitted THEN END;\n    END LOOP;\nEND;$$"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- show sizes only if they differ"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    IDENT "clean_aborted_self_key_before"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    IDENT "size_before"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "pg_relation_size"
+  ERROR
+    L_PAREN "("
+  ERROR
+    STRING "'clean_aborted_self_key'"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    IDENT "size_after"
+  WHITESPACE "\n"
+  ERROR
+    WHERE_KW "WHERE"
+  WHITESPACE " "
+  ERROR
+    COLON ":"
+  ERROR
+    IDENT "clean_aborted_self_key_before"
+  WHITESPACE " "
+  ERROR
+    BANG "!"
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    IDENT "pg_relation_size"
+  ERROR
+    L_PAREN "("
+  ERROR
+    STRING "'clean_aborted_self_key'"
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ROLLBACK_STMT
+    ROLLBACK_KW "ROLLBACK"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@1686: expected SEMICOLON
+ERROR@1687: expected command, found COLON
+ERROR@1688: expected command, found IDENT
+ERROR@1718: expected command, found AS_KW
+ERROR@1721: expected command, found IDENT
+ERROR@1732: expected command, found COMMA
+ERROR@1734: expected command, found IDENT
+ERROR@1750: expected command, found L_PAREN
+ERROR@1751: expected command, found STRING
+ERROR@1775: expected command, found R_PAREN
+ERROR@1777: expected command, found IDENT
+ERROR@1788: expected command, found WHERE_KW
+ERROR@1794: expected command, found COLON
+ERROR@1795: expected command, found IDENT
+ERROR@1825: expected command, found BANG
+ERROR@1826: expected command, found EQ
+ERROR@1828: expected command, found IDENT
+ERROR@1844: expected command, found L_PAREN
+ERROR@1845: expected command, found STRING
+ERROR@1869: expected command, found R_PAREN

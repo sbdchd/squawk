@@ -1,0 +1,2146 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/uuid.sql
+---
+SOURCE_FILE
+  CREATE_TABLE
+    COMMENT "-- regression test for the uuid datatype"
+    WHITESPACE "\n"
+    COMMENT "-- creating test tables"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "guid1"
+    WHITESPACE "\n"
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "UUID"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "text_field"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+        WHITESPACE " "
+        DEFAULT_CONSTRAINT
+          DEFAULT_KW "DEFAULT"
+          PAREN_EXPR
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "now"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            R_PAREN ")"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "guid2"
+    WHITESPACE "\n"
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "UUID"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "text_field"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+        WHITESPACE " "
+        DEFAULT_CONSTRAINT
+          DEFAULT_KW "DEFAULT"
+          PAREN_EXPR
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "now"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            R_PAREN ")"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "guid3"
+    WHITESPACE "\n"
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "id"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "SERIAL"
+      COMMA ","
+      WHITESPACE "\n\t"
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "UUID"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- inserting invalid data tests"
+  WHITESPACE "\n"
+  COMMENT "-- too long"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'11111111-1111-1111-1111-111111111111F'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- too short"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'{11111111-1111-1111-1111-11111111111}'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- valid data but invalid format"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'111-11111-1111-1111-1111-111111111111'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'{22222222-2222-2222-2222-222222222222 '"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- invalid data"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'11111111-1111-1111-G111-111111111111'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'11+11111-1111-1111-1111-111111111111'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test non-error-throwing API"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'11'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'uuid'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'11'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'uuid'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--inserting three input formats"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'11111111-1111-1111-1111-111111111111'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'{22222222-2222-2222-2222-222222222222}'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'3f3e3c3b3a3039383736353433a2313e'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- retrieving the inserted data"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "guid_field"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ordering test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "guid_field"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid_field"
+      WHITESPACE " "
+      ASC_KW "ASC"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "guid_field"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid_field"
+      WHITESPACE " "
+      DESC_KW "DESC"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- = operator test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'3f3e3c3b-3a30-3938-3736-353433a2313e'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- <> operator test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        NEQB "<>"
+        WHITESPACE " "
+        LITERAL
+          STRING "'11111111111111111111111111111111'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- < operator test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          STRING "'22222222-2222-2222-2222-222222222222'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- <= operator test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        LTEQ "<="
+        WHITESPACE " "
+        LITERAL
+          STRING "'22222222-2222-2222-2222-222222222222'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- > operator test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'22222222-2222-2222-2222-222222222222'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- >= operator test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "guid_field"
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        LITERAL
+          STRING "'22222222-2222-2222-2222-222222222222'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- btree and hash index creation test"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "guid1_btree"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "BTREE"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "guid_field"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "guid1_hash"
+    WHITESPACE "  "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "HASH"
+    WHITESPACE "  "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "guid_field"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- unique index test"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    UNIQUE_KW "UNIQUE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "guid1_unique_BTREE"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "BTREE"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "guid_field"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "guid_field"
+          WHITESPACE " "
+          NEQB "<>"
+          WHITESPACE " "
+          LITERAL
+            STRING "'11111111111111111111111111111111'"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE "\n\t\t\t\t\t\t\t"
+        BIN_EXPR
+          NAME_REF
+            IDENT "guid_field"
+          WHITESPACE " "
+          NEQB "<>"
+          WHITESPACE " "
+          LITERAL
+            STRING "'3f3e3c3b-3a30-3938-3736-353433a2313e'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          BIN_EXPR
+            NAME_REF
+              IDENT "guid_field"
+            WHITESPACE " "
+            LTEQ "<="
+            WHITESPACE " "
+            LITERAL
+              STRING "'22222222-2222-2222-2222-222222222222'"
+          WHITESPACE " "
+          OR_KW "OR"
+          WHITESPACE "\n\t\t\t\t\t\t\t\t\t"
+          BIN_EXPR
+            NAME_REF
+              IDENT "guid_field"
+            WHITESPACE " "
+            LTEQ "<="
+            WHITESPACE " "
+            LITERAL
+              STRING "'11111111111111111111111111111111'"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE "\n\t\t\t\t\t\t\t\t\t"
+        BIN_EXPR
+          NAME_REF
+            IDENT "guid_field"
+          WHITESPACE " "
+          LTEQ "<="
+          WHITESPACE " "
+          LITERAL
+            STRING "'3f3e3c3b-3a30-3938-3736-353433a2313e'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "EXPLAIN"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "COSTS"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "OFF"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "guid_field"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'3f3e3c3b-3a30-3938-3736-353433a2313e'"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE "\n\t\t\t\t\t\t\t"
+        BIN_EXPR
+          NAME_REF
+            IDENT "guid_field"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'11111111111111111111111111111111'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- should fail"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'11111111-1111-1111-1111-111111111111'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check to see whether the new indexes are actually there"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "relkind"
+          EQ "="
+          LITERAL
+            STRING "'i'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "relname"
+          WHITESPACE " "
+          LIKE_KW "LIKE"
+          WHITESPACE " "
+          LITERAL
+            STRING "'guid%'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- populating the test tables with additional records"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'44444444-4444-4444-4444-444444444444'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid2"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'11111111-1111-1111-1111-111111111111'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid2"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'{22222222-2222-2222-2222-222222222222}'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid2"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      L_PAREN "("
+      LITERAL
+        STRING "'3f3e3c3b3a3039383736353433a2313e'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- join test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "g1"
+      WHITESPACE " "
+      JOIN
+        INNER_KW "INNER"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "guid2"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "g1"
+            DOT "."
+            NAME_REF
+              IDENT "guid_field"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "g2"
+            DOT "."
+            NAME_REF
+              IDENT "guid_field"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "COUNT"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "g1"
+      WHITESPACE " "
+      JOIN
+        LEFT_KW "LEFT"
+        WHITESPACE " "
+        JOIN_KW "JOIN"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "guid2"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "g2"
+        WHITESPACE " "
+        ON_KW "ON"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "g1"
+            DOT "."
+            NAME_REF
+              IDENT "guid_field"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "g2"
+            DOT "."
+            NAME_REF
+              IDENT "guid_field"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "g2"
+          DOT "."
+          NAME_REF
+            IDENT "guid_field"
+        WHITESPACE " "
+        IS_KW "IS"
+        WHITESPACE " "
+        LITERAL
+          NULL_KW "NULL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- generation test"
+  WHITESPACE "\n"
+  TRUNCATE_STMT
+    TRUNCATE_KW "TRUNCATE"
+    WHITESPACE " "
+    TABLE_LIST
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "guid1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "gen_random_uuid"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "gen_random_uuid"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              DISTINCT_KW "DISTINCT"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "guid_field"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test of uuidv4() alias"
+  WHITESPACE "\n"
+  TRUNCATE_STMT
+    TRUNCATE_KW "TRUNCATE"
+    WHITESPACE " "
+    TABLE_LIST
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "guid1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "uuidv4"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "uuidv4"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              DISTINCT_KW "DISTINCT"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "guid_field"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- generation test for v7"
+  WHITESPACE "\n"
+  TRUNCATE_STMT
+    TRUNCATE_KW "TRUNCATE"
+    WHITESPACE " "
+    TABLE_LIST
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "guid1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "uuidv7"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "uuidv7"
+        ARG_LIST
+          L_PAREN "("
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "uuidv7"
+        ARG_LIST
+          L_PAREN "("
+          CAST_EXPR
+            NAME_REF
+              INTERVAL_KW "INTERVAL"
+            WHITESPACE " "
+            LITERAL
+              STRING "'1 day'"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              DISTINCT_KW "DISTINCT"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "guid_field"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test sortability of v7"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid3"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "guid_field"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "uuidv7"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "array_agg"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "id"
+              WHITESPACE " "
+              ORDER_BY_CLAUSE
+                ORDER_KW "ORDER"
+                WHITESPACE " "
+                BY_KW "BY"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "guid_field"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "guid3"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Check the timestamp offsets for v7."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- generate UUIDv7 values with timestamps ranging from 1970 (the Unix epoch year)"
+  WHITESPACE "\n"
+  COMMENT "-- to 10888 (one year before the maximum possible year), and then verify that"
+  WHITESPACE "\n"
+  COMMENT "-- the extracted timestamps from these UUIDv7 values have not overflowed."
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "uuidts"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n    "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "y"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                NAME_REF
+                  IDENT "ts"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "ts"
+              COMMA ","
+              WHITESPACE " "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "lag"
+                  ARG_LIST
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "ts"
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  OVER_CLAUSE
+                    OVER_KW "OVER"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    WINDOW_DEF
+                      ORDER_BY_CLAUSE
+                        ORDER_KW "ORDER"
+                        WHITESPACE " "
+                        BY_KW "BY"
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "y"
+                    R_PAREN ")"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "prev_ts"
+          WHITESPACE "\n    "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "SELECT"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      NAME_REF
+                        IDENT "y"
+                    COMMA ","
+                    WHITESPACE " "
+                    TARGET
+                      CALL_EXPR
+                        NAME_REF
+                          IDENT "uuid_extract_timestamp"
+                        ARG_LIST
+                          L_PAREN "("
+                          CALL_EXPR
+                            NAME_REF
+                              IDENT "uuidv7"
+                            ARG_LIST
+                              L_PAREN "("
+                              CAST_EXPR
+                                PAREN_EXPR
+                                  L_PAREN "("
+                                  BIN_EXPR
+                                    NAME_REF
+                                      IDENT "y"
+                                    WHITESPACE " "
+                                    CUSTOM_OP
+                                      PIPE "|"
+                                      PIPE "|"
+                                    WHITESPACE " "
+                                    LITERAL
+                                      STRING "' years'"
+                                  R_PAREN ")"
+                                COLON2 "::"
+                                INTERVAL_TYPE
+                                  INTERVAL_KW "interval"
+                              R_PAREN ")"
+                          R_PAREN ")"
+                      WHITESPACE " "
+                      AS_KW "AS"
+                      WHITESPACE " "
+                      NAME
+                        IDENT "ts"
+                WHITESPACE "\n        "
+                FROM_CLAUSE
+                  FROM_KW "FROM"
+                  WHITESPACE " "
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "generate_series"
+                    ARG_LIST
+                      L_PAREN "("
+                      BIN_EXPR
+                        LITERAL
+                          INT_NUMBER "1970"
+                        WHITESPACE " "
+                        MINUS "-"
+                        WHITESPACE " "
+                        CAST_EXPR
+                          CALL_EXPR
+                            NAME_REF
+                              EXTRACT_KW "extract"
+                            ARG_LIST
+                              L_PAREN "("
+                              YEAR_KW "year"
+                              WHITESPACE " "
+                              FROM_KW "from"
+                              WHITESPACE " "
+                              CALL_EXPR
+                                NAME_REF
+                                  IDENT "now"
+                                ARG_LIST
+                                  L_PAREN "("
+                                  R_PAREN ")"
+                              R_PAREN ")"
+                          COLON2 "::"
+                          PATH_TYPE
+                            PATH
+                              PATH_SEGMENT
+                                NAME_REF
+                                  INT_KW "int"
+                      COMMA ","
+                      WHITESPACE " "
+                      BIN_EXPR
+                        LITERAL
+                          INT_NUMBER "10888"
+                        WHITESPACE " "
+                        MINUS "-"
+                        WHITESPACE " "
+                        CAST_EXPR
+                          CALL_EXPR
+                            NAME_REF
+                              EXTRACT_KW "extract"
+                            ARG_LIST
+                              L_PAREN "("
+                              YEAR_KW "year"
+                              WHITESPACE " "
+                              FROM_KW "from"
+                              WHITESPACE " "
+                              CALL_EXPR
+                                NAME_REF
+                                  IDENT "now"
+                                ARG_LIST
+                                  L_PAREN "("
+                                  R_PAREN ")"
+                              R_PAREN ")"
+                          COLON2 "::"
+                          PATH_TYPE
+                            PATH
+                              PATH_SEGMENT
+                                NAME_REF
+                                  INT_KW "int"
+                      R_PAREN ")"
+                  WHITESPACE " "
+                  ALIAS
+                    NAME
+                      IDENT "y"
+              R_PAREN ")"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "y"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "ts"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "prev_ts"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "uuidts"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "ts"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "prev_ts"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extract functions"
+  WHITESPACE "\n\n"
+  COMMENT "-- version"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "uuid_extract_version"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'11111111-1111-5111-8111-111111111111'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- 5"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "uuid_extract_version"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "gen_random_uuid"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- 4"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "uuid_extract_version"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'11111111-1111-1111-1111-111111111111'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- null"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "uuid_extract_version"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "uuidv4"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- 4"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "uuid_extract_version"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "uuidv7"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- 7"
+  WHITESPACE "\n\n"
+  COMMENT "-- timestamp"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "uuid_extract_timestamp"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'C232AB00-9414-11EC-B3C8-9F6BDECED846'"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'Tuesday, February 22, 2022 2:22:22.00 PM GMT+05:00'"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- RFC 9562 test vector for v1"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "uuid_extract_timestamp"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'017F22E2-79B0-7CC3-98C4-DC0C0C07398F'"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'Tuesday, February 22, 2022 2:22:22.00 PM GMT+05:00'"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- RFC 9562 test vector for v7"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "uuid_extract_timestamp"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "gen_random_uuid"
+                ARG_LIST
+                  L_PAREN "("
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- null"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "uuid_extract_timestamp"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'11111111-1111-1111-1111-111111111111'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- null"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- clean up"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid1"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid2"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "guid3"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@2330: expected R_PAREN
+ERROR@2331: expected command, found OFF_KW
+ERROR@2334: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2334: expected SEMICOLON
+ERROR@2334: expected command, found R_PAREN
+ERROR@2496: expected R_PAREN
+ERROR@2497: expected command, found OFF_KW
+ERROR@2500: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2500: expected SEMICOLON
+ERROR@2500: expected command, found R_PAREN
+ERROR@2729: expected R_PAREN
+ERROR@2730: expected command, found OFF_KW
+ERROR@2733: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2733: expected SEMICOLON
+ERROR@2733: expected command, found R_PAREN

@@ -1,0 +1,2359 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/regex.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Regular expression tests"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- Don't want to have to double backslashes in regexes"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "set"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "standard_conforming_strings"
+    WHITESPACE " "
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test simple quantified backrefs"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'bbbbb'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^([bc])\\1*$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'ccc'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^([bc])\\1*$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xxx'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^([bc])\\1*$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'bbc'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^([bc])\\1*$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'b'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^([bc])\\1*$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test quantified backref within a larger expression"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc abc abc'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^(\\w+)( \\1)+$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc abd abc'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^(\\w+)( \\1)+$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc abc abd'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^(\\w+)( \\1)+$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc abc abc'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^(.+)( \\1)+$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc abd abc'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^(.+)( \\1)+$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc abc abd'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^(.+)( \\1)+$'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test some cases that crashed in 9.2beta1 due to pmatch[] array overrun"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              SUBSTRING_KW "substring"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'asd TO foo'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              LITERAL
+                STRING "' TO (([a-z0-9._]+|\"([^\"]+|\"\")+\")+)'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              SUBSTRING_KW "substring"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((a))+'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              SUBSTRING_KW "substring"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              LITERAL
+                STRING "'((a)+)'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test regexp_match()"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abc'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "''"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abc'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'bc'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "regexp_match"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'abc'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'d'"
+                R_PAREN ")"
+            WHITESPACE " "
+            IS_KW "is"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abc'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(B)(c)'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'i'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abc'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'Bd'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'ig'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- error"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test lookahead constraints"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'ab'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?=b)b*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?=b)b*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abc'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?=b)b*(?=c)c*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'ab'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?=b)b*(?=c)c*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'ab'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?!b)b*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?!b)b*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'b'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?=b)b'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?=b)b'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test lookbehind constraints"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abb'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?<=a)b*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?<=a)b*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'abc'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?<=a)b*(?<=b)c*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'ab'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?<=a)b*(?<=b)c*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'ab'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a*(?<!a)b*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'ab'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a*(?<!a)b+'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'b'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a*(?<!a)b+'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'a'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'a(?<!a)b*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'b'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?<=b)b'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foobar'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?<=f)b+'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foobar'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?<=foo)b+'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foobar'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?<=oo)b+'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test optimization of single-chr-or-bracket-expression lookaround constraints"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x(?=[xy])'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xy'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x(?=[xy])'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x(?![xy])'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xy'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x(?![xy])'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'x'"
+            WHITESPACE "  "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x(?![xy])'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyy'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(?<=[xy])yy+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'zyy'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(?<=[xy])yy+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyy'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(?<![xy])yy+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'zyy'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(?<![xy])yy+'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test conversion of regex patterns to indexable conditions"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'abc'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^abc'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^abc$'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^abcd*e'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^abc+d'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^(abc)(def)'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^(abc)$'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^(abc)?d'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    ERROR
+      OFF_KW "off"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_proc"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "proname"
+        WHITESPACE " "
+        CUSTOM_OP
+          TILDE "~"
+        WHITESPACE " "
+        LITERAL
+          STRING "'^abcd(x|(?=\\w\\w)q)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test for infinite loop in pullback() (CVE-2007-4772)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'($|^)*'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- These cases expose a bug in the original fix for CVE-2007-4772"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(^)+^'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'$($$)+'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- More cases of infinite loop in pullback(), not fixed by CVE-2007-4772 fix"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'($^)+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(^$)*'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'aa bb cc'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(^(?!aa))+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'aa x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(^(?!aa)(?!bb)(?!cc))+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'bb x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(^(?!aa)(?!bb)(?!cc))+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'cc x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(^(?!aa)(?!bb)(?!cc))+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'dd x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(^(?!aa)(?!bb)(?!cc))+'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test for infinite loop in fixempties() (Tcl bugs 3604074, 3606683)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'((((((a)*)*)*)*)*)*'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'((((((a+|)+|)+|)+|)+|)+|)'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- These cases used to give too-many-states failures"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'abcd(\\m)+xyz'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^abcd*(((((^(a c(e?d)a+|)+|)+|)+|)+|a)+|)'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'a^(^)bcd*xy(((((($a+|)+|)+|)+$|)+|)+|)^$'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'xyz(\\Y\\Y)+'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x|(?:\\M)+'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- This generates O(N) states but O(N^2) arcs, so it causes problems"
+  WHITESPACE "\n"
+  COMMENT "-- if arc count is not constrained"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'x'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "repeat"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'x*y*z*'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1000"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test backref in combination with non-greedy quantifier"
+  WHITESPACE "\n"
+  COMMENT "-- https://core.tcl.tk/tcl/tktview/6585b21ca8fa6f3678d442b97241fdd43dba2ec0"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'Programmer'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(\\w).*?\\1'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'Programmer'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(\\w)(.*?\\1)'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'g'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test for proper matching of non-greedy iteration (bug #11478)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foo/bar/baz'"
+              COMMA ","
+              WHITESPACE "\n                      "
+              LITERAL
+                STRING "'^([^/]+?)(?:/([^/]+?))(?:/([^/]+?))?$'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "''"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test that greediness can be overridden by outer quantifier"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'llmmmfff'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'^(l*)(.*)(f*)$'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'llmmmfff'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'^(l*){1,1}(.*)(f*)$'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'llmmmfff'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'^(l*){1,1}?(.*)(f*)$'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'llmmmfff'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'^(l*){1,1}?(.*){1,1}?(f*)$'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'llmmmfff'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'^(l*?)(.*)(f*)$'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'llmmmfff'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'^(l*?){1,1}(.*)(f*)$'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'llmmmfff'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'^(l*?){1,1}?(.*)(f*)$'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_matches"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'llmmmfff'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'^(l*?){1,1}?(.*){1,1}?(f*)$'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test for infinite loop in cfindloop with zero-length possible match"
+  WHITESPACE "\n"
+  COMMENT "-- but no actual match (can only happen in the presence of backrefs)"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'$()|^\\1'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'.. ()|\\1'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'()*\\1'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'()+\\1'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test incorrect removal of capture groups within {0}"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xxx'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'(.){0}(\\1)'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xxx'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'((.)){0}(\\2)'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'((.)){0}(\\2){0}'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test ancient oversight in when to apply zaptreesubs"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abcdef'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^(.)\\1|\\1.'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abadef'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'^((.)\\2|..)\\2'"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Add coverage for some cases in checkmatchall"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'xy'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'.|...'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'xyz'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'.|...'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'xy'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'.*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'fooba'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?:..)*'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'xyz'"
+              COMMA ","
+              WHITESPACE " "
+              CALL_EXPR
+                NAME_REF
+                  IDENT "repeat"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    STRING "'.'"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "260"
+                  R_PAREN ")"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "regexp_match"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'foo'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'(?:.|){99}'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Error conditions"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x(\\w)(?=\\1)'"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- no backrefs in LACONs"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'xyz'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x(\\w)(?=(\\1))'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'\\x7fffffff'"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- invalid chr code"
+  WHITESPACE "\n"
+---
+ERROR@123: expected config value, got ON_KW
+ERROR@123: expected SEMICOLON
+ERROR@124: expected command, found ON_KW
+ERROR@2451: expected R_PAREN
+ERROR@2452: expected command, found OFF_KW
+ERROR@2455: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2455: expected SEMICOLON
+ERROR@2455: expected command, found R_PAREN
+ERROR@2516: expected R_PAREN
+ERROR@2517: expected command, found OFF_KW
+ERROR@2520: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2520: expected SEMICOLON
+ERROR@2520: expected command, found R_PAREN
+ERROR@2582: expected R_PAREN
+ERROR@2583: expected command, found OFF_KW
+ERROR@2586: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2586: expected SEMICOLON
+ERROR@2586: expected command, found R_PAREN
+ERROR@2649: expected R_PAREN
+ERROR@2650: expected command, found OFF_KW
+ERROR@2653: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2653: expected SEMICOLON
+ERROR@2653: expected command, found R_PAREN
+ERROR@2718: expected R_PAREN
+ERROR@2719: expected command, found OFF_KW
+ERROR@2722: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2722: expected SEMICOLON
+ERROR@2722: expected command, found R_PAREN
+ERROR@2786: expected R_PAREN
+ERROR@2787: expected command, found OFF_KW
+ERROR@2790: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2790: expected SEMICOLON
+ERROR@2790: expected command, found R_PAREN
+ERROR@2859: expected R_PAREN
+ERROR@2860: expected command, found OFF_KW
+ERROR@2863: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2863: expected SEMICOLON
+ERROR@2863: expected command, found R_PAREN
+ERROR@2928: expected R_PAREN
+ERROR@2929: expected command, found OFF_KW
+ERROR@2932: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@2932: expected SEMICOLON
+ERROR@2932: expected command, found R_PAREN
+ERROR@2998: expected R_PAREN
+ERROR@2999: expected command, found OFF_KW
+ERROR@3002: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@3002: expected SEMICOLON
+ERROR@3002: expected command, found R_PAREN

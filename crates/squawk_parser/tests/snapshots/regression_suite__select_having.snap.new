@@ -1,0 +1,1011 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/select_having.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- SELECT_HAVING"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- load test data"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "test_having"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        CHAR_TYPE
+          CHAR_KW "char"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "8"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "d"
+        WHITESPACE " "
+        CHAR_TYPE
+          CHAR_KW "char"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "0"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'XXXX'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'A'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'AAAA'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'b'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'AAAA'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'c'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'BBBB'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'D'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'BBBB'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'e'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "5"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'bbbb'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'F'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "6"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'cccc'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'g'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "7"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'cccc'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'h'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "8"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'CCCC'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'I'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "9"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "4"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'CCCC'"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'j'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE "\n\t"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "count"
+          ARG_LIST
+            L_PAREN "("
+            STAR "*"
+            R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- HAVING is effectively equivalent to WHERE in this case"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "c"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE "\n\t"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "3"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "c"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "c"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE "\n\t"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "lower"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "c"
+          R_PAREN ")"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE " "
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    WHITESPACE "\n\t"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "lower"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "c"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "c"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE "\n\t"
+    GROUP_BY_CLAUSE
+      GROUP_KW "GROUP"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+          WHITESPACE " "
+          R_ANGLE ">"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+        WHITESPACE " "
+        OR_KW "OR"
+        WHITESPACE " "
+        BIN_EXPR
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    WHITESPACE "\n\t"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test degenerate cases involving HAVING without GROUP BY"
+  WHITESPACE "\n"
+  COMMENT "-- Per SQL spec, these should generate 0 or 1 row, even without aggregates"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "min"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "a"
+            R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "max"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "a"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "min"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "max"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "a"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "min"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "a"
+            R_PAREN ")"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "max"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "a"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- errors: ungrouped column references"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        CALL_EXPR
+          NAME_REF
+            IDENT "min"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "a"
+            R_PAREN ")"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "max"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              IDENT "a"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "one"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- the really degenerate case: need not scan table at all"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "one"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "one"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- and just to prove that we aren't scanning the table:"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "one"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "test_having"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          LITERAL
+            INT_NUMBER "1"
+          SLASH "/"
+          NAME_REF
+            IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    WHITESPACE " "
+    HAVING_CLAUSE
+      HAVING_KW "HAVING"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "test_having"
+  SEMICOLON ";"
+  WHITESPACE "\n"

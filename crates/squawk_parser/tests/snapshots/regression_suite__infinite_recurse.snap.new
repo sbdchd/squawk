@@ -1,0 +1,106 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/infinite_recurse.sql
+---
+SOURCE_FILE
+  COMMENT "-- Check that stack depth detection mechanism works and"
+  WHITESPACE "\n"
+  COMMENT "-- max_stack_depth is not set too high."
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "infinite_recurse"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE "\n"
+        LITERAL
+          STRING "'select infinite_recurse()'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Unfortunately, up till mid 2020 the Linux kernel had a bug in PPC64"
+  WHITESPACE "\n"
+  COMMENT "-- signal handling that would cause this test to crash if it happened"
+  WHITESPACE "\n"
+  COMMENT "-- to receive an sinval catchup interrupt while the stack is deep:"
+  WHITESPACE "\n"
+  COMMENT "-- https://bugzilla.kernel.org/show_bug.cgi?id=205183"
+  WHITESPACE "\n"
+  COMMENT "-- It is likely to be many years before that bug disappears from all"
+  WHITESPACE "\n"
+  COMMENT "-- production kernels, so disable this test on such platforms."
+  WHITESPACE "\n"
+  COMMENT "-- (We still create the function, so as not to have a cross-platform"
+  WHITESPACE "\n"
+  COMMENT "-- difference in the end state of the regression database.)"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                VERSION_KW "version"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              TILDE "~"
+            WHITESPACE " "
+            LITERAL
+              STRING "'powerpc64[^,]*-linux-gnu'"
+          WHITESPACE "\n       "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "skip_test"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- The full error report is not very stable, so we show only SQLSTATE"
+  WHITESPACE "\n"
+  COMMENT "-- and primary error message."
+  WHITESPACE "\n\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "infinite_recurse"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

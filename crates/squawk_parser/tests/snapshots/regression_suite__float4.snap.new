@@ -1,0 +1,4796 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/float4.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- FLOAT4"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "FLOAT4_TBL"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+        WHITESPACE "  "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float4"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'    0.0'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'1004.30   '"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'     -34.84    '"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'1.2345678901234e+20'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'1.2345678901234e-20'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test for over and under flow"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'10e70'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'-10e70'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'10e-70'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'-10e-70'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        LITERAL
+          STRING "'10e70'"
+        COLON2 "::"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        LITERAL
+          STRING "'-10e70'"
+        COLON2 "::"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        LITERAL
+          STRING "'10e-70'"
+        COLON2 "::"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CAST_EXPR
+        LITERAL
+          STRING "'-10e-70'"
+        COLON2 "::"
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'10e400'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'-10e400'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'10e-400'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'-10e-400'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- bad input"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "''"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'       '"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'xyz'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'5.0.0'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'5 . 0'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'5.   0'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'     - 3.0'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "f1"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'123            5'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Also try it with non-error-throwing API"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'34.5'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'float4'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'xyz'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'float4'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "pg_input_is_valid"
+            ARG_LIST
+              L_PAREN "("
+              LITERAL
+                STRING "'1e400'"
+              COMMA ","
+              WHITESPACE " "
+              LITERAL
+                STRING "'float4'"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      CALL_EXPR
+        NAME_REF
+          IDENT "pg_input_error_info"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'1e400'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'float4'"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- special inputs"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'NaN'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'nan'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'   NAN  '"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'infinity'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'          -INFINiTY   '"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- bad special inputs"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'N A N'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'NaN x'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "' INFINITY    x'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'Infinity'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "100.0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'Infinity'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'Infinity'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'42'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'Infinity'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'nan'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'nan'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'nan'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            CAST_EXPR
+              LITERAL
+                STRING "'0'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'nan'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      NUMERIC_KW "numeric"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        NEQB "<>"
+        WHITESPACE " "
+        LITERAL
+          STRING "'1004.3'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1004.3'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          STRING "'1004.3'"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE "  "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          STRING "'1004.3'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        LITERAL
+          STRING "'1004.3'"
+        WHITESPACE " "
+        GTEQ ">="
+        WHITESPACE " "
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE "  "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        LTEQ "<="
+        WHITESPACE " "
+        LITERAL
+          STRING "'1004.3'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "f"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            LITERAL
+              STRING "'-10'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "x"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'0.0'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "f"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              STRING "'-10'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "x"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'0.0'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "f"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            LITERAL
+              STRING "'-10'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "x"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'0.0'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "f"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+            WHITESPACE " "
+            MINUS "-"
+            WHITESPACE " "
+            LITERAL
+              STRING "'-10'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "x"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "f"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'0.0'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test divide by zero"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "f"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+            WHITESPACE " "
+            SLASH "/"
+            WHITESPACE " "
+            LITERAL
+              STRING "'0.0'"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test the unary float4abs operator"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "f"
+            DOT "."
+            NAME_REF
+              IDENT "f1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          PREFIX_EXPR
+            CUSTOM_OP
+              AT "@"
+            FIELD_EXPR
+              NAME_REF
+                IDENT "f"
+              DOT "."
+              NAME_REF
+                IDENT "f1"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "abs_f1"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "f"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+    WHITESPACE "\n   "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "f1"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      FIELD_EXPR
+        NAME_REF
+          IDENT "FLOAT4_TBL"
+        DOT "."
+        NAME_REF
+          IDENT "f1"
+      WHITESPACE " "
+      STAR "*"
+      WHITESPACE " "
+      LITERAL
+        STRING "'-1'"
+    WHITESPACE "\n   "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        FIELD_EXPR
+          NAME_REF
+            IDENT "FLOAT4_TBL"
+          DOT "."
+          NAME_REF
+            IDENT "f1"
+        WHITESPACE " "
+        R_ANGLE ">"
+        WHITESPACE " "
+        LITERAL
+          STRING "'0.0'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "FLOAT4_TBL"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test edge-case coercions to integer"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'32767.4'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'32767.6'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'-32768.4'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'-32768.6'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'2147483520'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'2147483647'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'-2147483648.5'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'-2147483900'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'9223369837831520256'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'9223372036854775807'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'-9223372036854775808.5'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int8"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              LITERAL
+                STRING "'-9223380000000000000'"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "float4"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "int8"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test for correct input rounding in edge cases."
+  WHITESPACE "\n"
+  COMMENT "-- These lists are from Paxson 1991, excluding subnormals and"
+  WHITESPACE "\n"
+  COMMENT "-- inputs of over 9 sig. digits."
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'5e-20'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'67e14'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'985e15'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'55895e-16'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'7038531e-32'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'702990899e-20'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'3e-23'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'57e18'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'789e-35'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'2539e-18'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'76173e28'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'887745e-11'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'5382571e-37'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'82381273e-35'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'750486563e-38'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test that the smallest possible normalized input value inputs"
+  WHITESPACE "\n"
+  COMMENT "-- correctly, either in 9-significant-digit or shortest-decimal"
+  WHITESPACE "\n"
+  COMMENT "-- format."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- exact val is             1.1754943508..."
+  WHITESPACE "\n"
+  COMMENT "-- shortest val is          1.1754944000"
+  WHITESPACE "\n"
+  COMMENT "-- midpoint to next val is  1.1754944208..."
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'1.17549435e-38'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                LITERAL
+                  STRING "'1.1754944e-38'"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- test output (and round-trip safety) of various values."
+  WHITESPACE "\n"
+  COMMENT "-- To ensure we're testing what we think we're testing, start with"
+  WHITESPACE "\n"
+  COMMENT "-- float values specified by bit patterns (as a useful side effect,"
+  WHITESPACE "\n"
+  COMMENT "-- this means we'll fail on non-IEEE platforms)."
+  WHITESPACE "\n\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "xfloat4"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "xfloat4in"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "cstring"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "xfloat4"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE " "
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE "\n  "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "internal"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'int4in'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "xfloat4out"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "xfloat4"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "cstring"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "immutable"
+      WHITESPACE " "
+      STRICT_FUNC_OPTION
+        STRICT_KW "strict"
+      WHITESPACE "\n  "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        IDENT "internal"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "'int4out'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TYPE_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "xfloat4"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      INPUT_KW "input"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "xfloat4in"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      IDENT "output"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "xfloat4out"
+    COMMA ","
+    WHITESPACE " "
+    NAME
+      LIKE_KW "like"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "float4"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_CAST_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "xfloat4"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "float4"
+    R_PAREN ")"
+    WHITESPACE " "
+    WITHOUT_KW "without"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_CAST_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "float4"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "xfloat4"
+    R_PAREN ")"
+    WHITESPACE " "
+    WITHOUT_KW "without"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_CAST_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "xfloat4"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    R_PAREN ")"
+    WHITESPACE " "
+    WITHOUT_KW "without"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_CAST_STMT
+    CREATE_KW "create"
+    WHITESPACE " "
+    CAST_KW "cast"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INTEGER_KW "integer"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "xfloat4"
+    R_PAREN ")"
+    WHITESPACE " "
+    WITHOUT_KW "without"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- float4: seeeeeee emmmmmmm mmmmmmmm mmmmmmmm"
+  WHITESPACE "\n\n"
+  COMMENT "-- we don't care to assume the platform's strtod() handles subnormals"
+  WHITESPACE "\n"
+  COMMENT "-- correctly; those are \"use at your own risk\". However we do test"
+  WHITESPACE "\n"
+  COMMENT "-- subnormal outputs, since those are under our control."
+  WHITESPACE "\n\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "testdata"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "bits"
+          R_PAREN ")"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          VALUES_KW "values"
+          WHITESPACE "\n  "
+          COMMENT "-- small subnormals"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000002'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000003'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000010'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000011'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000100'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000101'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00004000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00004001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00080000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00080001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- stress values"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'0053c4f4'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 7693e-42"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'006c85c4'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 996622e-44"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'0041ca76'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 60419369e-46"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'004b7678'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 6930161142e-48"
+          WHITESPACE "\n  "
+          COMMENT "-- taken from upstream testsuite"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000007'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00424fe2'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- borderline between subnormal and normal"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'007ffff0'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'007ffff1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'007ffffe'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'007fffff'"
+          R_PAREN ")"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "flt"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "ibits"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          NAME_REF
+            IDENT "flt"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CAST_EXPR
+                  CAST_EXPR
+                    CAST_EXPR
+                      NAME_REF
+                        IDENT "bits"
+                      COLON2 "::"
+                      PATH_TYPE
+                        PATH
+                          PATH_SEGMENT
+                            NAME_REF
+                              INTEGER_KW "integer"
+                    COLON2 "::"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "xfloat4"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "float4"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "flt"
+          WHITESPACE "\n          "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "testdata"
+          WHITESPACE "\n\t"
+          OFFSET_CLAUSE
+            OFFSET_KW "offset"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "testdata"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "bits"
+          R_PAREN ")"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          VALUES_KW "values"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00000000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- smallest normal values"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00800000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00800001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00800004'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00800005'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00800006'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- small normal values chosen for short vs. long output"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'008002f1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'008002f2'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'008002f3'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00800e17'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00800e18'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00800e19'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- assorted values (random mantissae)"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'01000001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'01102843'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'01a52c98'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'0219c229'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'02e4464d'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'037343c1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'03a91b36'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'047ada65'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'0496fe87'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'0550844f'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'05999da3'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'060ea5e2'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'06e63c45'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'07f1e548'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'0fc5282b'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'1f850283'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'2874a9d6'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- values around 5e-08"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3356bf94'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3356bf95'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3356bf96'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- around 1e-07"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'33d6bf94'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'33d6bf95'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'33d6bf96'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- around 3e-07 .. 1e-04"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'34a10faf'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'34a10fb0'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'34a10fb1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'350637bc'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'350637bd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'350637be'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'35719786'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'35719787'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'35719788'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'358637bc'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'358637bd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'358637be'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'36a7c5ab'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'36a7c5ac'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'36a7c5ad'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3727c5ab'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3727c5ac'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3727c5ad'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- format crossover at 1e-04"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b714'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b715'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b716'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b717'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b718'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b719'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b71a'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b71b'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b71c'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38d1b71d'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "--"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38dffffe'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38dfffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38e00000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38efffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38f00000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'38f00001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3a83126e'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3a83126f'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3a831270'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3c23d709'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3c23d70a'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3c23d70b'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3dcccccc'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3dcccccd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3dccccce'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- chosen to need 9 digits for 3dcccd70"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3dcccd6f'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3dcccd70'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3dcccd71'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "--"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3effffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f000000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f000001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f333332'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f333333'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f333334'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- approach 1.0 with increasing numbers of 9s"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f666665'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f666666'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f666667'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7d70a3'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7d70a4'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7d70a5'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fbe76'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fbe77'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fbe78'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ff971'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ff972'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ff973'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fff57'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fff58'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fff59'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fffee'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fffef'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- values very close to 1"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff0'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff2'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff3'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff4'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff5'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff6'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff7'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff8'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffff9'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffffa'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffffb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffffc'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffffd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7ffffe'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f7fffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800002'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800003'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800004'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800005'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800006'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800007'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800008'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800009'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- values 1 to 1.1"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f80000f'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800010'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800011'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800012'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800013'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800014'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800017'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800018'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800019'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f80001a'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f80001b'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f80001c'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800029'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f80002a'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f80002b'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800053'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800054'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800055'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800346'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800347'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f800348'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8020c4'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8020c5'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8020c6'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8147ad'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8147ae'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8147af'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8ccccc'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8ccccd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f8cccce'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "--"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3fc90fdb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          COMMENT "-- pi/2"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'402df854'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          COMMENT "-- e"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'40490fdb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          COMMENT "-- pi"
+          WHITESPACE "\n  "
+          COMMENT "--"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'409fffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'40a00000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'40a00001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'40afffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'40b00000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'40b00001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'411fffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'41200000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'41200001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'42c7ffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'42c80000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'42c80001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4479ffff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'447a0000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'447a0001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'461c3fff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'461c4000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'461c4001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'47c34fff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'47c35000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'47c35001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'497423ff'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'49742400'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'49742401'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4b18967f'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4b189680'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4b189681'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4cbebc1f'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4cbebc20'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4cbebc21'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4e6e6b27'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4e6e6b28'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4e6e6b29'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'501502f8'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'501502f9'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'501502fa'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'51ba43b6'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'51ba43b7'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'51ba43b8'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- stress values"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'1f6c1e4a'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 5e-20"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'59be6cea'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 67e14"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5d5ab6c4'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 985e15"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'2cc4a9bd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 55895e-16"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'15ae43fd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 7038531e-32"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'2cf757ca'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 702990899e-20"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'665ba998'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 25933168707e13"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'743c3324'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "  "
+          COMMENT "-- 596428896559e20"
+          WHITESPACE "\n  "
+          COMMENT "-- exercise fixed-point memmoves"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'47f1205a'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4640e6ae'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'449a5225'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'42f6e9d5'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'414587dd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f9e064b'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- these cases come from the upstream's testsuite"
+          WHITESPACE "\n  "
+          COMMENT "-- BoundaryRoundEven"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4c000004'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'50061c46'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'510006a8'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- ExactValueRoundEven"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'48951f84'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'45fd1840'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- LotsOfTrailingZeros"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'39800000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3b200000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3b900000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3bd00000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- Regression"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'63800000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4b000000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4b800000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4c000001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4c800b0d'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00d24584'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'00d90b88'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'45803f34'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4f9f24f7'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3a8722c3'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5c800041'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'15ae43fd'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5d4cccfb'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4c800001'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'57800ed8'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5f000000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'700000f0'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5f23e9ac'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5e9502f9'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5e8012b1'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3c000028'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'60cde861'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'03aa2a50'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'43480000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'4c000000'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- LooksLikePow5"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5D1502F9'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5D9502F9'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'5E1502F9'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          COMMENT "-- OutputLength"
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f99999a'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f9d70a4'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f9df3b6'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f9e0419'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f9e0610'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f9e064b'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'3f9e0651'"
+          R_PAREN ")"
+          COMMA ","
+          WHITESPACE "\n  "
+          L_PAREN "("
+          LITERAL
+            BYTE_STRING "x'03d20cfe'"
+          R_PAREN ")"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "flt"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "ibits"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          NAME_REF
+            IDENT "flt"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CAST_EXPR
+            CAST_EXPR
+              NAME_REF
+                IDENT "flt"
+              COLON2 "::"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "float4"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "r_flt"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "float4send"
+            ARG_LIST
+              L_PAREN "("
+              CAST_EXPR
+                CAST_EXPR
+                  NAME_REF
+                    IDENT "flt"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
+                COLON2 "::"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float4"
+              R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "obits"
+        COMMA ","
+        WHITESPACE "\n       "
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "float4send"
+              ARG_LIST
+                L_PAREN "("
+                CAST_EXPR
+                  CAST_EXPR
+                    NAME_REF
+                      IDENT "flt"
+                    COLON2 "::"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "float4"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CALL_EXPR
+              NAME_REF
+                IDENT "float4send"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "flt"
+                R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "correct"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      PAREN_EXPR
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                CAST_EXPR
+                  CAST_EXPR
+                    CAST_EXPR
+                      NAME_REF
+                        IDENT "bits"
+                      COLON2 "::"
+                      PATH_TYPE
+                        PATH
+                          PATH_SEGMENT
+                            NAME_REF
+                              INTEGER_KW "integer"
+                    COLON2 "::"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "xfloat4"
+                  COLON2 "::"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "float4"
+                WHITESPACE " "
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "flt"
+          WHITESPACE "\n          "
+          FROM_CLAUSE
+            FROM_KW "from"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "testdata"
+          WHITESPACE "\n\t"
+          OFFSET_CLAUSE
+            OFFSET_KW "offset"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+        R_PAREN ")"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- clean up, lest opr_sanity complain"
+  WHITESPACE "\n"
+  DROP_TYPE_STMT
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "xfloat4"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"

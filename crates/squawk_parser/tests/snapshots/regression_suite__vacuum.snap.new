@@ -1,0 +1,7222 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/vacuum.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- VACUUM"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vactst"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        NEQ "!="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    BIN_EXPR
+      NAME_REF
+        IDENT "i"
+      WHITESPACE " "
+      PLUS "+"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "0"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        NEQ "!="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FULL_KW "FULL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FULL_KW "FULL"
+    COMMA ","
+    WHITESPACE " "
+    FREEZE_KW "FREEZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vaccluster"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+    WHITESPACE " "
+    DISABLE_CLUSTER
+      CLUSTER_KW "CLUSTER"
+      WHITESPACE " "
+      ON_KW "ON"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vaccluster_pkey"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLUSTER_STMT
+    CLUSTER_KW "CLUSTER"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "do_analyze"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "VOID"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        VOLATILE_KW "VOLATILE"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+      WHITESPACE "\n\t"
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'ANALYZE pg_am'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    FUNCTION_KW "FUNCTION"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "wrap_do_analyze"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        NAME
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "RETURNS"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "INT"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      VOLATILITY_FUNC_OPTION
+        IMMUTABLE_KW "IMMUTABLE"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "LANGUAGE"
+        WHITESPACE " "
+        SQL_KW "SQL"
+      WHITESPACE "\n\t"
+      AS_FUNC_OPTION
+        AS_KW "AS"
+        WHITESPACE " "
+        LITERAL
+          STRING "'SELECT $1 FROM public.do_analyze()'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+    INDEX_PARAMS
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "wrap_do_analyze"
+        ARG_LIST
+          L_PAREN "("
+          NAME_REF
+            IDENT "i"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test ANALYZE in transaction, where the transaction surrounding"
+  WHITESPACE "\n"
+  COMMENT "-- analyze performed modifications. This tests for the bug at"
+  WHITESPACE "\n"
+  COMMENT "-- https://postgr.es/m/c7988239-d42c-ddc4-41db-171b23b35e4f%40ssinger.info"
+  WHITESPACE "\n"
+  COMMENT "-- (which hopefully is unlikely to be reintroduced), but also seems"
+  WHITESPACE "\n"
+  COMMENT "-- independently worthwhile to cover."
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "300"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "i"
+          WHITESPACE " "
+          PERCENT "%"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "7"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- delete a few rows outside"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "301"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "400"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "i"
+          WHITESPACE " "
+          PERCENT "%"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "5"
+        WHITESPACE " "
+        NEQB "<>"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- delete a few rows inside"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test ANALYZE setting relhassubclass=f for non-partitioning inheritance"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "past_inh_parent"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "past_inh_child"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_inh_parent"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_inh_child"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_inh_child"
+    WHITESPACE " "
+    DEFAULT_KW "DEFAULT"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_inh_parent"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "reltuples"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "relhassubclass"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "oid"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'past_inh_parent'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_inh_child"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_inh_parent"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "reltuples"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "relhassubclass"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "oid"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'past_inh_parent'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test ANALYZE setting relhassubclass=f for partitioning"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "past_parted"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "LIST"
+    L_PAREN "("
+    NAME_REF
+      IDENT "i"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "past_part"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_parted"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_parted"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+      COMMA ","
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_part"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "reltuples"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "relhassubclass"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "oid"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'past_parted'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "past_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "reltuples"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "relhassubclass"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "oid"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CAST_EXPR
+          LITERAL
+            STRING "'past_parted'"
+          COLON2 "::"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "regclass"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_am"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_class"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_database"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "DISABLE_PAGE_SKIPPING"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- PARALLEL option"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "pvactst"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "INT"
+          L_BRACK "["
+          R_BRACK "]"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "p"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "POINT"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "autovacuum_enabled"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              OFF_KW "off"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "i"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            ARRAY_EXPR
+              ARRAY_KW "array"
+              L_BRACK "["
+              LITERAL
+                INT_NUMBER "1"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "2"
+              COMMA ","
+              LITERAL
+                INT_NUMBER "3"
+              R_BRACK "]"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "point"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "i"
+                COMMA ","
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "i"
+                  PLUS "+"
+                  LITERAL
+                    INT_NUMBER "1"
+                R_PAREN ")"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "1000"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "btree_pvactst"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "btree"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "hash_pvactst"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "hash"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "brin_pvactst"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "brin"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "gin_pvactst"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gin"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "gist_pvactst"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "gist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "spgist_pvactst"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    USING_KW "USING"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "spgist"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "p"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "pvactst2"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      R_PAREN ")"
+    WHITESPACE " "
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "WITH"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "autovacuum_enabled"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              OFF_KW "off"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst2"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "generate_series"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1000"
+                R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst2"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst2"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "i"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- VACUUM invokes parallel index cleanup"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "min_parallel_index_scan_size"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- VACUUM invokes parallel bulk-deletion"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1000"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    NAME_REF
+      IDENT "i"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1000"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- disable parallel vacuum"
+  WHITESPACE "\n\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    PREFIX_EXPR
+      MINUS "-"
+      LITERAL
+        INT_NUMBER "1"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- error"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "INDEX_CLEANUP"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- error, cannot use both PARALLEL and FULL"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- error, cannot use PARALLEL option without parallel degree"
+  WHITESPACE "\n\n"
+  COMMENT "-- Test parallel vacuum using the minimum maintenance_work_mem with and without"
+  WHITESPACE "\n"
+  COMMENT "-- dead tuples."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "maintenance_work_mem"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "64"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst2"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1000"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "maintenance_work_mem"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- Test different combinations of parallel and full options for temporary tables"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMPORARY_KW "TEMPORARY"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "tmp"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "tmp_idx1"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tmp"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tmp"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- parallel vacuum disabled for temp tables"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    PARALLEL_KW "PARALLEL"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "tmp"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- can specify parallel disabled (even though that's implied by FULL)"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "min_parallel_index_scan_size"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pvactst2"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- INDEX_CLEANUP option"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "PRIMARY"
+          WHITESPACE " "
+          KEY_KW "KEY"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "t"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Use uncompressed data stored in toast."
+  WHITESPACE "\n"
+  CREATE_INDEX_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    INDEX_KW "INDEX"
+    WHITESPACE " "
+    NAME
+      IDENT "no_index_cleanup_idx"
+    WHITESPACE " "
+    ON_KW "ON"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    INDEX_PARAMS
+      L_PAREN "("
+      NAME_REF
+        IDENT "t"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "ALTER"
+      WHITESPACE " "
+      COLUMN_KW "COLUMN"
+      WHITESPACE " "
+      IDENT "t"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "SET"
+        WHITESPACE " "
+        STORAGE_KW "STORAGE"
+        WHITESPACE " "
+        EXTERNAL_KW "EXTERNAL"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "t"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "30"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      CALL_EXPR
+        NAME_REF
+          IDENT "repeat"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'1234567890'"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "269"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- index cleanup option is ignored if VACUUM FULL"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "INDEX_CLEANUP"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FULL_KW "FULL"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Toast inherits the value from its parent table."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "SET"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_index_cleanup"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "15"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Nothing is cleaned up."
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Both parent relation and toast are cleaned up."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "SET"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_index_cleanup"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "SET"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_index_cleanup"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "auto"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Parameter is set for both the parent table and its toast relation."
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "t"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      CALL_EXPR
+        NAME_REF
+          IDENT "generate_series"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "31"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "60"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n    "
+      CALL_EXPR
+        NAME_REF
+          IDENT "repeat"
+        ARG_LIST
+          L_PAREN "("
+          LITERAL
+            STRING "'1234567890'"
+          COMMA ","
+          LITERAL
+            INT_NUMBER "269"
+          R_PAREN ")"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE_STMT
+    DELETE_KW "DELETE"
+    WHITESPACE " "
+    FROM_KW "FROM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        L_ANGLE "<"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "45"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Only toast index is cleaned up."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "SET"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_index_cleanup"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              OFF_KW "off"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "toast"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_index_cleanup"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              YES_KW "yes"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Only parent is cleaned up."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+    WHITESPACE " "
+    SET_STORAGE_PARAMS
+      SET_KW "SET"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_index_cleanup"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "toast"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_index_cleanup"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        FALSE_KW "false"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Test some extra relations."
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "INDEX_CLEANUP"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "INDEX_CLEANUP"
+    WHITESPACE " "
+    IDENT "AUTO"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- index cleanup option is ignored if no indexes"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "INDEX_CLEANUP"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    COMMA ","
+    WHITESPACE " "
+    FREEZE_KW "FREEZE"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- TRUNCATE option"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TEMP_KW "TEMP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vac_truncate_test"
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "NOT"
+          WHITESPACE " "
+          NULL_KW "NULL"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "j"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE "\n\t"
+    CONSTRAINT_STORAGE_PARAMS
+      WITH_KW "WITH"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_truncate"
+      EQ "="
+      LITERAL
+        TRUE_KW "true"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "autovacuum_enabled"
+      EQ "="
+      LITERAL
+        FALSE_KW "false"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        NULL_KW "NULL"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        NULL_KW "NULL"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        NULL_KW "NULL"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    TRUNCATE_KW "TRUNCATE"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "DISABLE_PAGE_SKIPPING"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "pg_relation_size"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'vac_truncate_test'"
+                R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_truncate"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "DISABLE_PAGE_SKIPPING"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "pg_relation_size"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'vac_truncate_test'"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    TRUNCATE_KW "TRUNCATE"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+    WHITESPACE " "
+    RESET_STORAGE_PARAMS
+      RESET_KW "RESET"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "vacuum_truncate"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        NULL_KW "NULL"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        NULL_KW "NULL"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        NULL_KW "NULL"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "DISABLE_PAGE_SKIPPING"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "pg_relation_size"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'vac_truncate_test'"
+                R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "vacuum_truncate"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    TRUNCATE_KW "TRUNCATE"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "DISABLE_PAGE_SKIPPING"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "pg_relation_size"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'vac_truncate_test'"
+                R_PAREN ")"
+            WHITESPACE " "
+            R_ANGLE ">"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "DISABLE_PAGE_SKIPPING"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            CALL_EXPR
+              NAME_REF
+                IDENT "pg_relation_size"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'vac_truncate_test'"
+                R_PAREN ")"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_truncate_test"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- partitioned table"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacparted"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CHAR_TYPE
+          CHAR_KW "char"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "LIST"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacparted1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'a'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  UPDATE_STMT
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    WHITESPACE " "
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "b"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    LITERAL
+      STRING "'b'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FULL_KW "FULL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FREEZE_KW "FREEZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- check behavior with duplicate column mentions"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- partitioned table with index"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacparted_i"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "HASH"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacparted_i1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted_i"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "2"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "0"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacparted_i2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted_i"
+    WHITESPACE "\n  "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    WITH_KW "WITH"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "MODULUS"
+    WHITESPACE " "
+    INT_NUMBER "2"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "REMAINDER"
+    WHITESPACE " "
+    INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted_i"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "i"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'test_'"
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "i"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "10"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted_i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FULL_KW "FULL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted_i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FREEZE_KW "FREEZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted_i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "relhasindex"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          NAME_REF
+            IDENT "relname"
+          WHITESPACE " "
+          LIKE_KW "LIKE"
+          WHITESPACE " "
+          LITERAL
+            STRING "'vacparted_i%'"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          NAME_REF
+            IDENT "relkind"
+          WHITESPACE " "
+          IN_KW "IN"
+          WHITESPACE " "
+          TUPLE_EXPR
+            L_PAREN "("
+            LITERAL
+              STRING "'p'"
+            COMMA ","
+            LITERAL
+              STRING "'r'"
+            R_PAREN ")"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relname"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted_i"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- multiple tables specified"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "does_not_exist"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FREEZE_KW "FREEZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    FREEZE_KW "FREEZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "does_not_exist"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "does_not_exist"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    FULL_KW "FULL"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "does_not_exist"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+      R_PAREN ")"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "does_not_exist"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- ANALYZE behaves differently inside a transaction block"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+    COMMA ","
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "--"
+    WHITESPACE "\n"
+    COMMENT "-- Tests for ANALYZE ONLY / VACUUM ONLY on partitioned tables"
+    WHITESPACE "\n"
+    COMMENT "--"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "only_parted"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "LIST"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "only_parted1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_parted"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_parted"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'a'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure only the partitioned table is analyzed"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          ONLY_KW "ONLY"
+  WHITESPACE " "
+  ERROR
+    IDENT "only_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_analyze"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "analyzed"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_vacuum"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "vacuumed"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_user_tables"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relid"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        TUPLE_EXPR
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'only_parted'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          COMMA ","
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'only_parted1'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          R_PAREN ")"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure partitioned table and the partitions are analyzed"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_analyze"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "analyzed"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_vacuum"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "vacuumed"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_user_tables"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relid"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        TUPLE_EXPR
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'only_parted'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          COMMA ","
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'only_parted1'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          R_PAREN ")"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- VACUUM ONLY on a partitioned table does nothing, ensure we get a warning."
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          ONLY_KW "ONLY"
+  WHITESPACE " "
+  ERROR
+    IDENT "vacparted"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Try ANALYZE ONLY with a column list"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          ONLY_KW "ONLY"
+  WHITESPACE " "
+  ERROR
+    IDENT "vacparted"
+  ERROR
+    L_PAREN "("
+  ERROR
+    IDENT "a"
+  ERROR
+    COMMA ","
+  ERROR
+    IDENT "b"
+  ERROR
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "--"
+    WHITESPACE "\n"
+    COMMENT "-- Tests for VACUUM ONLY / ANALYZE ONLY on inheritance tables"
+    WHITESPACE "\n"
+    COMMENT "--"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "only_inh_parent"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        PRIMARY_KEY_CONSTRAINT
+          PRIMARY_KW "primary"
+          WHITESPACE " "
+          KEY_KW "key"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "only_inh_child"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    INHERITS_KW "INHERITS"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_inh_parent"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_inh_child"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'aaa'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "2"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'bbb'"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "3"
+      COMMA ","
+      WHITESPACE " "
+      LITERAL
+        STRING "'ccc'"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure only parent is analyzed"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          ONLY_KW "ONLY"
+  WHITESPACE " "
+  ERROR
+    IDENT "only_inh_parent"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_analyze"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "analyzed"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_vacuum"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "vacuumed"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_user_tables"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relid"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        TUPLE_EXPR
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'only_inh_parent'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          COMMA ","
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'only_inh_child'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          R_PAREN ")"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure the parent and child are analyzed"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_inh_parent"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_analyze"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "analyzed"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_vacuum"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "vacuumed"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_user_tables"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relid"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        TUPLE_EXPR
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'only_inh_parent'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          COMMA ","
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'only_inh_child'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          R_PAREN ")"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure only the parent is vacuumed"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          ONLY_KW "ONLY"
+  WHITESPACE " "
+  ERROR
+    IDENT "only_inh_parent"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_analyze"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "analyzed"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_vacuum"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "vacuumed"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_user_tables"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relid"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        TUPLE_EXPR
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'only_inh_parent'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          COMMA ","
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'only_inh_child'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          R_PAREN ")"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Ensure parent and child are vacuumed"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_inh_parent"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relname"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_analyze"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "analyzed"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "last_vacuum"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "vacuumed"
+    WHITESPACE "\n  "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_stat_user_tables"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relid"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        TUPLE_EXPR
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'only_inh_parent'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          COMMA ","
+          WHITESPACE " "
+          CAST_EXPR
+            LITERAL
+              STRING "'only_inh_child'"
+            COLON2 "::"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "regclass"
+          R_PAREN ")"
+    WHITESPACE "\n  "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "relname"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "only_inh_parent"
+    WHITESPACE " "
+    CASCADE_KW "CASCADE"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- parenthesized syntax for ANALYZE"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "VERBOSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "does_not_exist"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "nonexistent"
+  ERROR
+    MINUS "-"
+  ERROR
+    IDENT "arg"
+  ERROR
+    R_PAREN ")"
+  WHITESPACE " "
+  ERROR
+    IDENT "does_not_exist"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "nonexistentarg"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "does_not_exit"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ensure argument order independence, and that SKIP_LOCKED on non-existing"
+  WHITESPACE "\n"
+  COMMENT "-- relation still errors out.  Suppress WARNING messages caused by concurrent"
+  WHITESPACE "\n"
+  COMMENT "-- autovacuums."
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "client_min_messages"
+    WHITESPACE " "
+    TO_KW "TO"
+    WHITESPACE " "
+    LITERAL
+      STRING "'ERROR'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "SKIP_LOCKED"
+    COMMA ","
+    WHITESPACE " "
+    VERBOSE_KW "VERBOSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "does_not_exist"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    L_PAREN "("
+    VERBOSE_KW "VERBOSE"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "SKIP_LOCKED"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "does_not_exist"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SKIP_LOCKED option"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "SKIP_LOCKED"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "SKIP_LOCKED"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "SKIP_LOCKED"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "client_min_messages"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ensure VACUUM and ANALYZE don't have a problem with serializable"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_transaction_isolation"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    SERIALIZABLE_KW "serializable"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "default_transaction_isolation"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  BEGIN_STMT
+    BEGIN_KW "BEGIN"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+    WHITESPACE " "
+    ISOLATION_KW "ISOLATION"
+    WHITESPACE " "
+    LEVEL_KW "LEVEL"
+    WHITESPACE " "
+    SERIALIZABLE_KW "SERIALIZABLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMIT_STMT
+    COMMIT_KW "COMMIT"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- PROCESS_TOAST option"
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vac_option_tab"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "INT"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "t"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "TEXT"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  INSERT_STMT
+    INSERT_KW "INSERT"
+    WHITESPACE " "
+    INTO_KW "INTO"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          TARGET
+            BIN_EXPR
+              LITERAL
+                STRING "'t'"
+              WHITESPACE " "
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "a"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10"
+            R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "ALTER"
+      WHITESPACE " "
+      COLUMN_KW "COLUMN"
+      WHITESPACE " "
+      IDENT "t"
+      WHITESPACE " "
+      SET_STORAGE
+        SET_KW "SET"
+        WHITESPACE " "
+        STORAGE_KW "STORAGE"
+        WHITESPACE " "
+        EXTERNAL_KW "EXTERNAL"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Check the number of vacuums done on table vac_option_tab and on its"
+  WHITESPACE "\n"
+  COMMENT "-- toast relation, to check that PROCESS_TOAST and PROCESS_MAIN work on"
+  WHITESPACE "\n"
+  COMMENT "-- what they should."
+  WHITESPACE "\n"
+  CREATE_VIEW_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vac_option_tab_counts"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n  "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "SELECT"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CASE_EXPR
+              CASE_KW "CASE"
+              WHITESPACE " "
+              WHEN_CLAUSE
+                WHEN_KW "WHEN"
+                WHITESPACE " "
+                BIN_EXPR
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "c"
+                    DOT "."
+                    NAME_REF
+                      IDENT "relname"
+                  WHITESPACE " "
+                  IS_KW "IS"
+                  WHITESPACE " "
+                  LITERAL
+                    NULL_KW "NULL"
+                WHITESPACE "\n    "
+                THEN_KW "THEN"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'main'"
+              WHITESPACE " "
+              ELSE_KW "ELSE"
+              WHITESPACE " "
+              LITERAL
+                STRING "'toast'"
+              WHITESPACE " "
+              END_KW "END"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "rel"
+          COMMA ","
+          WHITESPACE "\n  "
+          TARGET
+            FIELD_EXPR
+              NAME_REF
+                IDENT "s"
+              DOT "."
+              NAME_REF
+                IDENT "vacuum_count"
+      WHITESPACE "\n  "
+      FROM_CLAUSE
+        FROM_KW "FROM"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "pg_stat_all_tables"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "s"
+        WHITESPACE "\n  "
+        JOIN
+          LEFT_KW "LEFT"
+          WHITESPACE " "
+          JOIN_KW "JOIN"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "pg_class"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "c"
+          WHITESPACE " "
+          ON_KW "ON"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "s"
+              DOT "."
+              NAME_REF
+                IDENT "relid"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "reltoastrelid"
+      WHITESPACE "\n  "
+      WHERE_CLAUSE
+        WHERE_KW "WHERE"
+        WHITESPACE " "
+        BIN_EXPR
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "c"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'vac_option_tab'"
+          WHITESPACE " "
+          OR_KW "OR"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "s"
+              DOT "."
+              NAME_REF
+                IDENT "relname"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'vac_option_tab'"
+      WHITESPACE "\n  "
+      ORDER_BY_CLAUSE
+        ORDER_KW "ORDER"
+        WHITESPACE " "
+        BY_KW "BY"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "rel"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "PROCESS_TOAST"
+    WHITESPACE " "
+    LITERAL
+      TRUE_KW "TRUE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vac_option_tab_counts"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "PROCESS_TOAST"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vac_option_tab_counts"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "PROCESS_TOAST"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- error"
+  WHITESPACE "\n\n"
+  COMMENT "-- PROCESS_MAIN option"
+  WHITESPACE "\n"
+  COMMENT "-- Only the toast table is processed."
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "PROCESS_MAIN"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vac_option_tab_counts"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Nothing is processed."
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "PROCESS_MAIN"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    COMMA ","
+    WHITESPACE " "
+    IDENT "PROCESS_TOAST"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "vac_option_tab_counts"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Check if the filenodes nodes have been updated as wanted after FULL."
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "relfilenode"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "main_filenode"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "relname"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'vac_option_tab'"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "relfilenode"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "toast_filenode"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "FROM"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "pg_class"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "t"
+    WHITESPACE "\n  "
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "reltoastrelid"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "oid"
+        WHITESPACE " "
+        AND_KW "AND"
+        WHITESPACE " "
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "c"
+            DOT "."
+            NAME_REF
+              IDENT "relname"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'vac_option_tab'"
+  WHITESPACE " "
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Only the toast relation is processed."
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "PROCESS_MAIN"
+    WHITESPACE " "
+    LITERAL
+      FALSE_KW "FALSE"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "relfilenode"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            ERROR
+              COLON ":"
+          NAME
+            IDENT "main_filenode"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    IDENT "is_same_main_filenode"
+  WHITESPACE "\n  "
+  ERROR
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    IDENT "pg_class"
+  WHITESPACE " "
+  ERROR
+    WHERE_KW "WHERE"
+  WHITESPACE " "
+  ERROR
+    IDENT "relname"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    STRING "'vac_option_tab'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "t"
+              DOT "."
+              NAME_REF
+                IDENT "relfilenode"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            ERROR
+              COLON ":"
+          NAME
+            IDENT "toast_filenode"
+  WHITESPACE " "
+  ERROR
+    AS_KW "AS"
+  WHITESPACE " "
+  ERROR
+    IDENT "is_same_toast_filenode"
+  WHITESPACE "\n  "
+  ERROR
+    FROM_KW "FROM"
+  WHITESPACE " "
+  ERROR
+    IDENT "pg_class"
+  WHITESPACE " "
+  ERROR
+    IDENT "c"
+  ERROR
+    COMMA ","
+  WHITESPACE " "
+  ERROR
+    IDENT "pg_class"
+  WHITESPACE " "
+  ERROR
+    IDENT "t"
+  WHITESPACE "\n  "
+  ERROR
+    WHERE_KW "WHERE"
+  WHITESPACE " "
+  ERROR
+    IDENT "c"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "reltoastrelid"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    IDENT "t"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "oid"
+  WHITESPACE " "
+  ERROR
+    AND_KW "AND"
+  WHITESPACE " "
+  ERROR
+    IDENT "c"
+  ERROR
+    DOT "."
+  ERROR
+    IDENT "relname"
+  WHITESPACE " "
+  ERROR
+    EQ "="
+  WHITESPACE " "
+  ERROR
+    STRING "'vac_option_tab'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- BUFFER_USAGE_LIMIT option"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "BUFFER_USAGE_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      STRING "'512 kB'"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "BUFFER_USAGE_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      STRING "'512 kB'"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- try disabling the buffer usage limit"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "BUFFER_USAGE_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "BUFFER_USAGE_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "0"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- value exceeds max size error"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "BUFFER_USAGE_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "16777220"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- value is less than min size error"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "BUFFER_USAGE_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "120"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- integer overflow error"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "BUFFER_USAGE_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "10000000000"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- incompatible with VACUUM FULL error"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "BUFFER_USAGE_LIMIT"
+    WHITESPACE " "
+    LITERAL
+      STRING "'512 kB'"
+    COMMA ","
+    WHITESPACE " "
+    FULL_KW "FULL"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- SKIP_DATABASE_STATS option"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "SKIP_DATABASE_STATS"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ONLY_DATABASE_STATS option"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "ONLY_DATABASE_STATS"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "ONLY_DATABASE_STATS"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "  "
+  COMMENT "-- error"
+  WHITESPACE "\n\n"
+  DROP_VIEW_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab_counts"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vac_option_tab"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vaccluster"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vactst"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacparted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "no_index_cleanup"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- relation ownership, WARNING logs generated as all are skipped."
+    WHITESPACE "\n"
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacowned"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacowned_parted"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    BY_KW "BY"
+    WHITESPACE " "
+    IDENT "LIST"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME_REF
+      IDENT "a"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacowned_part1"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "1"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "vacowned_part2"
+    WHITESPACE " "
+    PARTITION_KW "PARTITION"
+    WHITESPACE " "
+    OF_KW "OF"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+    WHITESPACE " "
+    FOR_KW "FOR"
+    WHITESPACE " "
+    VALUES_KW "VALUES"
+    WHITESPACE " "
+    IN_KW "IN"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      INT_NUMBER "2"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_ROLE_STMT
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME
+      IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Simple table"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Catalog"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pg_catalog"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_class"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pg_catalog"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_class"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pg_catalog"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_class"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Shared catalog"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pg_catalog"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_authid"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pg_catalog"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_authid"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "pg_catalog"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "pg_authid"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Partitioned table and its partitions, nothing owned by other user."
+  WHITESPACE "\n"
+  COMMENT "-- Relations are not listed in a single command to test ownership"
+  WHITESPACE "\n"
+  COMMENT "-- independently."
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Partitioned table and one partition owned by other user."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Only one partition owned by other user."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      CURRENT_USER_KW "CURRENT_USER"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- Only partitioned table owned by other user."
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "OWNER"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      CURRENT_USER_KW "CURRENT_USER"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ANALYZE_STMT
+    ANALYZE_KW "ANALYZE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  VACUUM_STMT
+    VACUUM_KW "VACUUM"
+    WHITESPACE " "
+    L_PAREN "("
+    ANALYZE_KW "ANALYZE"
+    R_PAREN ")"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_part2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_ROLE_STMT
+    RESET_KW "RESET"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "DROP"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "vacowned_parted"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_ROLE_STMT
+    DROP_KW "DROP"
+    WHITESPACE " "
+    ROLE_KW "ROLE"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "regress_vacuum"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@10085: expected SEMICOLON
+ERROR@10086: expected command, found IDENT
+ERROR@10707: expected SEMICOLON
+ERROR@10708: expected command, found IDENT
+ERROR@10771: expected SEMICOLON
+ERROR@10772: expected command, found IDENT
+ERROR@10781: expected command, found L_PAREN
+ERROR@10782: expected command, found IDENT
+ERROR@10783: expected command, found COMMA
+ERROR@10784: expected command, found IDENT
+ERROR@10785: expected command, found R_PAREN
+ERROR@11096: expected SEMICOLON
+ERROR@11097: expected command, found IDENT
+ERROR@11658: expected SEMICOLON
+ERROR@11659: expected command, found IDENT
+ERROR@12293: expected R_PAREN
+ERROR@12293: expected SEMICOLON
+ERROR@12293: expected command, found MINUS
+ERROR@12294: expected command, found IDENT
+ERROR@12297: expected command, found R_PAREN
+ERROR@12299: expected command, found IDENT
+ERROR@14632: expected an expression, found COLON
+ERROR@14646: expected SEMICOLON
+ERROR@14647: expected command, found AS_KW
+ERROR@14650: expected command, found IDENT
+ERROR@14674: expected command, found FROM_KW
+ERROR@14679: expected command, found IDENT
+ERROR@14688: expected command, found WHERE_KW
+ERROR@14694: expected command, found IDENT
+ERROR@14702: expected command, found EQ
+ERROR@14704: expected command, found STRING
+ERROR@14745: expected an expression, found COLON
+ERROR@14760: expected SEMICOLON
+ERROR@14761: expected command, found AS_KW
+ERROR@14764: expected command, found IDENT
+ERROR@14789: expected command, found FROM_KW
+ERROR@14794: expected command, found IDENT
+ERROR@14803: expected command, found IDENT
+ERROR@14804: expected command, found COMMA
+ERROR@14806: expected command, found IDENT
+ERROR@14815: expected command, found IDENT
+ERROR@14819: expected command, found WHERE_KW
+ERROR@14825: expected command, found IDENT
+ERROR@14826: expected command, found DOT
+ERROR@14827: expected command, found IDENT
+ERROR@14841: expected command, found EQ
+ERROR@14843: expected command, found IDENT
+ERROR@14844: expected command, found DOT
+ERROR@14845: expected command, found IDENT
+ERROR@14849: expected command, found AND_KW
+ERROR@14853: expected command, found IDENT
+ERROR@14854: expected command, found DOT
+ERROR@14855: expected command, found IDENT
+ERROR@14863: expected command, found EQ
+ERROR@14865: expected command, found STRING

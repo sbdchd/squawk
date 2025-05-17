@@ -1,0 +1,1752 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/strings.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- STRINGS"
+  WHITESPACE "\n"
+  COMMENT "-- Test various data entry syntaxes."
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "-- SQL string continuation syntax"
+  WHITESPACE "\n"
+  COMMENT "-- E021-03 character string literals"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'first line'"
+        WHITESPACE "\n"
+        TARGET
+          LITERAL
+            STRING "' - next line'"
+        WHITESPACE "\n\t"
+        TARGET
+          LITERAL
+            STRING "' - third line'"
+          WHITESPACE "\n\t"
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"Three lines to one\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- illegal string continuation syntax"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'first line'"
+        WHITESPACE "\n"
+        TARGET
+          LITERAL
+            STRING "' - next line'"
+        WHITESPACE " "
+        COMMENT "/* this comment is not allowed here */"
+        WHITESPACE "\n"
+        TARGET
+          LITERAL
+            STRING "' - third line'"
+          WHITESPACE "\n\t"
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"Illegal comment within continuation\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- Unicode escapes"
+  WHITESPACE "\n"
+  SET_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "standard_conforming_strings"
+    WHITESPACE " "
+    TO_KW "TO"
+  WHITESPACE " "
+  ERROR
+    ON_KW "on"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            BYTE_STRING "U&'d\\0061t\\+000061'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          ERROR
+            BYTE_STRING "U&\"d\\0061t\\+000061\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            BYTE_STRING "U&'d!0061t\\+000061'"
+          WHITESPACE " "
+          NAME
+            UESCAPE_KW "UESCAPE"
+        WHITESPACE " "
+        TARGET
+          LITERAL
+            STRING "'!'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          ERROR
+            BYTE_STRING "U&\"d*0061t\\+000061\""
+        WHITESPACE " "
+        TARGET
+          CAST_EXPR
+            NAME_REF
+              UESCAPE_KW "UESCAPE"
+            WHITESPACE " "
+            LITERAL
+              STRING "'*'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            BYTE_STRING "U&'a\\\\b'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"a\\b\""
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            BYTE_STRING "U&' \\'"
+          WHITESPACE " "
+          NAME
+            UESCAPE_KW "UESCAPE"
+        WHITESPACE " "
+        TARGET
+          LITERAL
+            STRING "'!'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "\"tricky\""
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'tricky'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          ERROR
+            BYTE_STRING "U&\"\\\" UESCAPE '!';\n\nSELECT U&'wrong: \\061';\nSELECT U&'wrong: \\+0061';\nSELECT U&'wrong: +0061' UESCAPE +;\nSELECT U&'wrong: +0061' UESCAPE '+';\n\nSELECT U&'wrong: \\db99';\nSELECT U&'wrong: \\db99xy';\nSELECT U&'wrong: \\db99\\\\';\nSELECT U&'wrong: \\db99\\0061';\nSELECT U&'wrong: \\+00db99\\+000061';\nSELECT U&'wrong: \\+2FFFFF';\n\n-- while we're here, check the same cases in E-style literals\nSELECT E'd\\u0061t\\U00000061' AS \""
+        TARGET
+          NAME_REF
+            DATA_KW "data"
+          NAME
+            IDENT "\";\nSELECT E'a\\\\b' AS \""
+        TARGET
+          NAME_REF
+            IDENT "a"
+  ERROR
+    ERROR "\\"
+  ERROR
+    IDENT "b"
+  ERROR
+    IDENT "\";\nSELECT E'wrong: \\u061';\nSELECT E'wrong: \\U0061';\nSELECT E'wrong: \\udb99';\nSELECT E'wrong: \\udb99xy';\nSELECT E'wrong: \\udb99\\\\';\nSELECT E'wrong: \\udb99\\u0061';\nSELECT E'wrong: \\U0000db99\\U00000061';\nSELECT E'wrong: \\U002FFFFF';\n\nSET standard_conforming_strings TO off;\n\nSELECT U&'d\\0061t\\+000061' AS U&\""
+  ERROR
+    IDENT "d"
+  ERROR
+    ERROR "\\"
+  ERROR
+    INT_NUMBER "0061"
+  ERROR
+    IDENT "t"
+  ERROR
+    ERROR "\\"
+  ERROR
+    PLUS "+"
+  ERROR
+    INT_NUMBER "000061"
+  ERROR
+    IDENT "\";\nSELECT U&'d!0061t\\+000061' UESCAPE '!' AS U&\""
+  ERROR
+    IDENT "d"
+  ERROR
+    STAR "*"
+  ERROR
+    INT_NUMBER "0061"
+  ERROR
+    IDENT "t"
+  ERROR
+    ERROR "\\"
+  ERROR
+    PLUS "+"
+  ERROR
+    INT_NUMBER "000061"
+  ERROR
+    IDENT "\" UESCAPE '*';\n\nSELECT U&' \\' UESCAPE '!' AS \""
+  ERROR
+    IDENT "tricky"
+  ERROR
+    IDENT "\";\nSELECT 'tricky' AS U&\""
+  ERROR
+    ERROR "\\"
+  ERROR
+    IDENT "\" UESCAPE '!';\n\nSELECT U&'wrong: \\061';\nSELECT U&'wrong: \\+0061';\nSELECT U&'wrong: +0061' UESCAPE '+';\n\nRESET standard_conforming_strings;\n\n-- bytea\nSET bytea_output TO hex;\nSELECT E'\\\\xDeAdBeEf'::bytea;\nSELECT E'\\\\x De Ad Be Ef '::bytea;\nSELECT E'\\\\xDeAdBeE'::bytea;\nSELECT E'\\\\xDeAdBeEx'::bytea;\nSELECT E'\\\\xDe00BeEf'::bytea;\nSELECT E'DeAdBeEf'::bytea;\nSELECT E'De\\\\000dBeEf'::bytea;\nSELECT E'De\\123dBeEf'::bytea;\nSELECT E'De\\\\123dBeEf'::bytea;\nSELECT E'De\\\\678dBeEf'::bytea;\n\nSELECT reverse(''::bytea);\nSELECT reverse('\\xaa'::bytea);\nSELECT reverse('\\xabcd'::bytea);\n\nSET bytea_output TO escape;\nSELECT E'\\\\xDeAdBeEf'::bytea;\nSELECT E'\\\\x De Ad Be Ef '::bytea;\nSELECT E'\\\\xDe00BeEf'::bytea;\nSELECT E'DeAdBeEf'::bytea;\nSELECT E'De\\\\000dBeEf'::bytea;\nSELECT E'De\\\\123dBeEf'::bytea;\n\n-- Test non-error-throwing API too\nSELECT pg_input_is_valid(E'\\\\xDeAdBeE', 'bytea');\nSELECT * FROM pg_input_error_info(E'\\\\xDeAdBeE', 'bytea');\nSELECT * FROM pg_input_error_info(E'\\\\xDeAdBeEx', 'bytea');\nSELECT * FROM pg_input_error_info(E'foo\\\\99bar', 'bytea');\n\n--\n-- test conversions between various string types\n-- E021-10 implicit casting among the character data types\n--\n\nSELECT CAST(f1 AS text) AS \""
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    L_PAREN "("
+  ERROR
+    CHAR_KW "char"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\" FROM CHAR_TBL;\n\nSELECT CAST(f1 AS text) AS \""
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    L_PAREN "("
+  ERROR
+    VARCHAR_KW "varchar"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\" FROM VARCHAR_TBL;\n\nSELECT CAST(name 'namefield' AS text) AS \""
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    L_PAREN "("
+  ERROR
+    NAME_KW "name"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\";\n\n-- since this is an explicit cast, it should truncate w/o error:\nSELECT CAST(f1 AS char(10)) AS \""
+  ERROR
+    CHAR_KW "char"
+  ERROR
+    L_PAREN "("
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\" FROM TEXT_TBL;\n-- note: implicit-cast case is tested in char.sql\n\nSELECT CAST(f1 AS char(20)) AS \""
+  ERROR
+    CHAR_KW "char"
+  ERROR
+    L_PAREN "("
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\" FROM TEXT_TBL;\n\nSELECT CAST(f1 AS char(10)) AS \""
+  ERROR
+    CHAR_KW "char"
+  ERROR
+    L_PAREN "("
+  ERROR
+    VARCHAR_KW "varchar"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\" FROM VARCHAR_TBL;\n\nSELECT CAST(name 'namefield' AS char(10)) AS \""
+  ERROR
+    CHAR_KW "char"
+  ERROR
+    L_PAREN "("
+  ERROR
+    NAME_KW "name"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\";\n\nSELECT CAST(f1 AS varchar) AS \""
+  ERROR
+    VARCHAR_KW "varchar"
+  ERROR
+    L_PAREN "("
+  ERROR
+    TEXT_KW "text"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\" FROM TEXT_TBL;\n\nSELECT CAST(f1 AS varchar) AS \""
+  ERROR
+    VARCHAR_KW "varchar"
+  ERROR
+    L_PAREN "("
+  ERROR
+    CHAR_KW "char"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\" FROM CHAR_TBL;\n\nSELECT CAST(name 'namefield' AS varchar) AS \""
+  ERROR
+    VARCHAR_KW "varchar"
+  ERROR
+    L_PAREN "("
+  ERROR
+    NAME_KW "name"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    IDENT "\";\n\n--\n-- test SQL string functions\n-- E### and T### are feature reference numbers from SQL99\n--\n\n-- E021-09 trim function\nSELECT TRIM(BOTH FROM '  bunch o blanks  ') = 'bunch o blanks' AS \""
+  ERROR
+    IDENT "bunch"
+  WHITESPACE " "
+  ERROR
+    IDENT "o"
+  WHITESPACE " "
+  ERROR
+    IDENT "blanks"
+  ERROR
+    IDENT "\";\n\nSELECT TRIM(LEADING FROM '  bunch o blanks  ') = 'bunch o blanks  ' AS \""
+  ERROR
+    IDENT "bunch"
+  WHITESPACE " "
+  ERROR
+    IDENT "o"
+  WHITESPACE " "
+  ERROR
+    IDENT "blanks"
+  WHITESPACE "  "
+  ERROR
+    IDENT "\";\n\nSELECT TRIM(TRAILING FROM '  bunch o blanks  ') = '  bunch o blanks' AS \""
+  WHITESPACE "  "
+  ERROR
+    IDENT "bunch"
+  WHITESPACE " "
+  ERROR
+    IDENT "o"
+  WHITESPACE " "
+  ERROR
+    IDENT "blanks"
+  ERROR
+    IDENT "\";\n\nSELECT TRIM(BOTH 'x' FROM 'xxxxxsome Xsxxxxx') = 'some Xs' AS \""
+  ERROR
+    SOME_KW "some"
+  WHITESPACE " "
+  ERROR
+    IDENT "Xs"
+  ERROR
+    IDENT "\";\n\n-- E021-06 substring expression\nSELECT SUBSTRING('1234567890' FROM 3) = '34567890' AS \""
+  ERROR
+    INT_NUMBER "34567890"
+  ERROR
+    IDENT "\";\n\nSELECT SUBSTRING('1234567890' FROM 4 FOR 3) = '456' AS \""
+  ERROR
+    INT_NUMBER "456"
+  ERROR
+    IDENT "\";\n\n-- test overflow cases\nSELECT SUBSTRING('string' FROM 2 FOR 2147483646) AS \""
+  ERROR
+    IDENT "tring"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('string' FROM -10 FOR 2147483646) AS \""
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('string' FROM -10 FOR -2147483646) AS \""
+  ERROR
+    IDENT "error"
+  ERROR
+    IDENT "\";\n\n-- T581 regular expression substring (with SQL's bizarre regexp syntax)\nSELECT SUBSTRING('abcdefg' SIMILAR 'a#\""
+  ERROR
+    L_PAREN "("
+  ERROR
+    IDENT "b_d"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"%' ESCAPE '#') AS \""
+  ERROR
+    IDENT "bcd"
+  ERROR
+    IDENT "\";\n-- obsolete SQL99 syntax\nSELECT SUBSTRING('abcdefg' FROM 'a#\""
+  ERROR
+    L_PAREN "("
+  ERROR
+    IDENT "b_d"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"%' FOR '#') AS \""
+  ERROR
+    IDENT "bcd"
+  ERROR
+    IDENT "\";\n\n-- No match should return NULL\nSELECT SUBSTRING('abcdefg' SIMILAR '#\""
+  ERROR
+    L_PAREN "("
+  ERROR
+    IDENT "b_d"
+  ERROR
+    R_PAREN ")"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"%' ESCAPE '#') IS NULL AS \""
+  ERROR
+    TRUE_KW "True"
+  ERROR
+    IDENT "\";\n\n-- Null inputs should return NULL\nSELECT SUBSTRING('abcdefg' SIMILAR '%' ESCAPE NULL) IS NULL AS \""
+  ERROR
+    TRUE_KW "True"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING(NULL SIMILAR '%' ESCAPE '#') IS NULL AS \""
+  ERROR
+    TRUE_KW "True"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('abcdefg' SIMILAR NULL ESCAPE '#') IS NULL AS \""
+  ERROR
+    TRUE_KW "True"
+  ERROR
+    IDENT "\";\n\n-- The first and last parts should act non-greedy\nSELECT SUBSTRING('abcdefg' SIMILAR 'a#\""
+  ERROR
+    PERCENT "%"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"g' ESCAPE '#') AS \""
+  ERROR
+    IDENT "bcdef"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('abcdefg' SIMILAR 'a*#\""
+  ERROR
+    PERCENT "%"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"g*' ESCAPE '#') AS \""
+  ERROR
+    IDENT "abcdefg"
+  ERROR
+    IDENT "\";\n\n-- Vertical bar in any part affects only that part\nSELECT SUBSTRING('abcdefg' SIMILAR 'a|b#\""
+  ERROR
+    PERCENT "%"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"g' ESCAPE '#') AS \""
+  ERROR
+    IDENT "bcdef"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('abcdefg' SIMILAR 'a#\""
+  ERROR
+    PERCENT "%"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"x|g' ESCAPE '#') AS \""
+  ERROR
+    IDENT "bcdef"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('abcdefg' SIMILAR 'a#\""
+  ERROR
+    PERCENT "%"
+  ERROR
+    PIPE "|"
+  ERROR
+    IDENT "ab"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"g' ESCAPE '#') AS \""
+  ERROR
+    IDENT "bcdef"
+  ERROR
+    IDENT "\";\n\n-- Can't have more than two part separators\nSELECT SUBSTRING('abcdefg' SIMILAR 'a*#\""
+  ERROR
+    PERCENT "%"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"g*#\""
+  ERROR
+    BYTE_STRING "x' ESCAPE '"
+  ERROR
+    POUND "#"
+  ERROR
+    STRING "') AS \"error\";\n\n-- Postgres extension: with 0 or 1 separator, assume parts 1 and 3 are empty\nSELECT SUBSTRING('"
+  ERROR
+    IDENT "abcdefg"
+  ERROR
+    STRING "' SIMILAR '"
+  ERROR
+    IDENT "a"
+  ERROR
+    POUND "#"
+  ERROR
+    IDENT "\"%g' ESCAPE '#') AS \""
+  ERROR
+    IDENT "bcdefg"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('abcdefg' SIMILAR 'a%g' ESCAPE '#') AS \""
+  ERROR
+    IDENT "abcdefg"
+  ERROR
+    IDENT "\";\n\n-- substring() with just two arguments is not allowed by SQL spec;\n-- we accept it, but we interpret the pattern as a POSIX regexp not SQL\nSELECT SUBSTRING('abcdefg' FROM 'c.e') AS \""
+  ERROR
+    IDENT "cde"
+  ERROR
+    IDENT "\";\n\n-- With a parenthesized subexpression, return only what matches the subexpr\nSELECT SUBSTRING('abcdefg' FROM 'b(.*)f') AS \""
+  ERROR
+    IDENT "cde"
+  ERROR
+    IDENT "\";\n-- Check case where we have a match, but not a subexpression match\nSELECT SUBSTRING('foo' FROM 'foo(bar)?') IS NULL AS t;\n\n-- Check behavior of SIMILAR TO, which uses largely the same regexp variant\nSELECT 'abcdefg' SIMILAR TO '_bcd%' AS true;\nSELECT 'abcdefg' SIMILAR TO 'bcd%' AS false;\nSELECT 'abcdefg' SIMILAR TO '_bcd#%' ESCAPE '#' AS false;\nSELECT 'abcd%' SIMILAR TO '_bcd#%' ESCAPE '#' AS true;\n-- Postgres uses '\\' as the default escape character, which is not per spec\nSELECT 'abcdefg' SIMILAR TO '_bcd\\%' AS false;\n-- and an empty string to mean \""
+  ERROR
+    NO_KW "no"
+  WHITESPACE " "
+  ERROR
+    IDENT "escape"
+  ERROR
+    IDENT "\", which is also not per spec\nSELECT 'abcd\\efg' SIMILAR TO '_bcd\\%' ESCAPE '' AS true;\n-- these behaviors are per spec, though:\nSELECT 'abcdefg' SIMILAR TO '_bcd%' ESCAPE NULL AS null;\nSELECT 'abcdefg' SIMILAR TO '_bcd#%' ESCAPE '##' AS error;\n\n-- Test backslash escapes in regexp_replace's replacement string\nSELECT regexp_replace('1112223333', E'(\\\\d{3})(\\\\d{3})(\\\\d{4})', E'(\\\\1) \\\\2-\\\\3');\nSELECT regexp_replace('foobarrbazz', E'(.)\\\\1', E'X\\\\&Y', 'g');\nSELECT regexp_replace('foobarrbazz', E'(.)\\\\1', E'X\\\\\\\\Y', 'g');\n-- not an error, though perhaps it should be:\nSELECT regexp_replace('foobarrbazz', E'(.)\\\\1', E'X\\\\Y\\\\1Z\\\\');\n\nSELECT regexp_replace('AAA   BBB   CCC   ', E'\\\\s+', ' ', 'g');\nSELECT regexp_replace('AAA', '^|$', 'Z', 'g');\nSELECT regexp_replace('AAA aaa', 'A+', 'Z', 'gi');\n-- invalid regexp option\nSELECT regexp_replace('AAA aaa', 'A+', 'Z', 'z');\n\n-- extended regexp_replace tests\nSELECT regexp_replace('A PostgreSQL function', 'A|e|i|o|u', 'X', 1);\nSELECT regexp_replace('A PostgreSQL function', 'A|e|i|o|u', 'X', 1, 2);\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', 1, 0, 'i');\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', 1, 1, 'i');\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', 1, 2, 'i');\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', 1, 3, 'i');\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', 1, 9, 'i');\nSELECT regexp_replace('A PostgreSQL function', 'A|e|i|o|u', 'X', 7, 0, 'i');\n-- 'g' flag should be ignored when N is specified\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', 1, 1, 'g');\n-- errors\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', -1, 0, 'i');\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', 1, -1, 'i');\n-- erroneous invocation of non-extended form\nSELECT regexp_replace('A PostgreSQL function', 'a|e|i|o|u', 'X', '1');\n\n--  regexp_count tests\nSELECT regexp_count('123123123123123', '(12)3');\nSELECT regexp_count('123123123123', '123', 1);\nSELECT regexp_count('123123123123', '123', 3);\nSELECT regexp_count('123123123123', '123', 33);\nSELECT regexp_count('ABCABCABCABC', 'Abc', 1, '');\nSELECT regexp_count('ABCABCABCABC', 'Abc', 1, 'i');\n-- errors\nSELECT regexp_count('123123123123', '123', 0);\nSELECT regexp_count('123123123123', '123', -3);\n\n-- regexp_like tests\nSELECT regexp_like('Steven', '^Ste(v|ph)en$');\nSELECT regexp_like('a'||CHR(10)||'d', 'a.d', 'n');\nSELECT regexp_like('a'||CHR(10)||'d', 'a.d', 's');\nSELECT regexp_like('abc', ' a . c ', 'x');\nSELECT regexp_like('abc', 'a.c', 'g');  -- error\n\n-- regexp_instr tests\nSELECT regexp_instr('abcdefghi', 'd.f');\nSELECT regexp_instr('abcdefghi', 'd.q');\nSELECT regexp_instr('abcabcabc', 'a.c');\nSELECT regexp_instr('abcabcabc', 'a.c', 2);\nSELECT regexp_instr('abcabcabc', 'a.c', 1, 3);\nSELECT regexp_instr('abcabcabc', 'a.c', 1, 4);\nSELECT regexp_instr('abcabcabc', 'A.C', 1, 2, 0, 'i');\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 0, 'i', 0);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 0, 'i', 1);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 0, 'i', 2);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 0, 'i', 3);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 0, 'i', 4);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 0, 'i', 5);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 1, 'i', 0);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 1, 'i', 1);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 1, 'i', 2);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 1, 'i', 3);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 1, 'i', 4);\nSELECT regexp_instr('1234567890', '(123)(4(56)(78))', 1, 1, 1, 'i', 5);\n-- Check case where we have a match, but not a subexpression match\nSELECT regexp_instr('foo', 'foo(bar)?', 1, 1, 0, '', 1);\n-- errors\nSELECT regexp_instr('abcabcabc', 'a.c', 0, 1);\nSELECT regexp_instr('abcabcabc', 'a.c', 1, 0);\nSELECT regexp_instr('abcabcabc', 'a.c', 1, 1, -1);\nSELECT regexp_instr('abcabcabc', 'a.c', 1, 1, 2);\nSELECT regexp_instr('abcabcabc', 'a.c', 1, 1, 0, 'g');\nSELECT regexp_instr('abcabcabc', 'a.c', 1, 1, 0, '', -1);\n\n-- regexp_substr tests\nSELECT regexp_substr('abcdefghi', 'd.f');\nSELECT regexp_substr('abcdefghi', 'd.q') IS NULL AS t;\nSELECT regexp_substr('abcabcabc', 'a.c');\nSELECT regexp_substr('abcabcabc', 'a.c', 2);\nSELECT regexp_substr('abcabcabc', 'a.c', 1, 3);\nSELECT regexp_substr('abcabcabc', 'a.c', 1, 4) IS NULL AS t;\nSELECT regexp_substr('abcabcabc', 'A.C', 1, 2, 'i');\nSELECT regexp_substr('1234567890', '(123)(4(56)(78))', 1, 1, 'i', 0);\nSELECT regexp_substr('1234567890', '(123)(4(56)(78))', 1, 1, 'i', 1);\nSELECT regexp_substr('1234567890', '(123)(4(56)(78))', 1, 1, 'i', 2);\nSELECT regexp_substr('1234567890', '(123)(4(56)(78))', 1, 1, 'i', 3);\nSELECT regexp_substr('1234567890', '(123)(4(56)(78))', 1, 1, 'i', 4);\nSELECT regexp_substr('1234567890', '(123)(4(56)(78))', 1, 1, 'i', 5) IS NULL AS t;\n-- Check case where we have a match, but not a subexpression match\nSELECT regexp_substr('foo', 'foo(bar)?', 1, 1, '', 1) IS NULL AS t;\n-- errors\nSELECT regexp_substr('abcabcabc', 'a.c', 0, 1);\nSELECT regexp_substr('abcabcabc', 'a.c', 1, 0);\nSELECT regexp_substr('abcabcabc', 'a.c', 1, 1, 'g');\nSELECT regexp_substr('abcabcabc', 'a.c', 1, 1, '', -1);\n\n-- set so we can tell NULL from empty string\n\n-- return all matches from regexp\nSELECT regexp_matches('foobarbequebaz', $re$(bar)(beque)$re$);\n\n-- test case insensitive\nSELECT regexp_matches('foObARbEqUEbAz', $re$(bar)(beque)$re$, 'i');\n\n-- global option - more than one match\nSELECT regexp_matches('foobarbequebazilbarfbonk', $re$(b[^b]+)(b[^b]+)$re$, 'g');\n\n-- empty capture group (matched empty string)\nSELECT regexp_matches('foobarbequebaz', $re$(bar)(.*)(beque)$re$);\n-- no match\nSELECT regexp_matches('foobarbequebaz', $re$(bar)(.+)(beque)$re$);\n-- optional capture group did not match, null entry in array\nSELECT regexp_matches('foobarbequebaz', $re$(bar)(.+)?(beque)$re$);\n\n-- no capture groups\nSELECT regexp_matches('foobarbequebaz', $re$barbeque$re$);\n\n-- start/end-of-line matches are of zero length\nSELECT regexp_matches('foo' || chr(10) || 'bar' || chr(10) || 'bequq' || chr(10) || 'baz', '^', 'mg');\nSELECT regexp_matches('foo' || chr(10) || 'bar' || chr(10) || 'bequq' || chr(10) || 'baz', '$', 'mg');\nSELECT regexp_matches('1' || chr(10) || '2' || chr(10) || '3' || chr(10) || '4' || chr(10), '^.?', 'mg');\nSELECT regexp_matches(chr(10) || '1' || chr(10) || '2' || chr(10) || '3' || chr(10) || '4' || chr(10), '.?$', 'mg');\nSELECT regexp_matches(chr(10) || '1' || chr(10) || '2' || chr(10) || '3' || chr(10) || '4', '.?$', 'mg');\n\n-- give me errors\nSELECT regexp_matches('foobarbequebaz', $re$(bar)(beque)$re$, 'gz');\nSELECT regexp_matches('foobarbequebaz', $re$(barbeque$re$);\nSELECT regexp_matches('foobarbequebaz', $re$(bar)(beque){2,1}$re$);\n\n-- split string on regexp\nSELECT foo, length(foo) FROM regexp_split_to_table('the quick brown fox jumps over the lazy dog', $re$\\s+$re$) AS foo;\nSELECT regexp_split_to_array('the quick brown fox jumps over the lazy dog', $re$\\s+$re$);\n\nSELECT foo, length(foo) FROM regexp_split_to_table('the quick brown fox jumps over the lazy dog', $re$\\s*$re$) AS foo;\nSELECT regexp_split_to_array('the quick brown fox jumps over the lazy dog', $re$\\s*$re$);\nSELECT foo, length(foo) FROM regexp_split_to_table('the quick brown fox jumps over the lazy dog', '') AS foo;\nSELECT regexp_split_to_array('the quick brown fox jumps over the lazy dog', '');\n-- case insensitive\nSELECT foo, length(foo) FROM regexp_split_to_table('thE QUick bROWn FOx jUMPs ovEr The lazy dOG', 'e', 'i') AS foo;\nSELECT regexp_split_to_array('thE QUick bROWn FOx jUMPs ovEr The lazy dOG', 'e', 'i');\n-- no match of pattern\nSELECT foo, length(foo) FROM regexp_split_to_table('the quick brown fox jumps over the lazy dog', 'nomatch') AS foo;\nSELECT regexp_split_to_array('the quick brown fox jumps over the lazy dog', 'nomatch');\n-- some corner cases\nSELECT regexp_split_to_array('123456','1');\nSELECT regexp_split_to_array('123456','6');\nSELECT regexp_split_to_array('123456','.');\nSELECT regexp_split_to_array('123456','');\nSELECT regexp_split_to_array('123456','(?:)');\nSELECT regexp_split_to_array('1','');\n-- errors\nSELECT foo, length(foo) FROM regexp_split_to_table('thE QUick bROWn FOx jUMPs ovEr The lazy dOG', 'e', 'zippy') AS foo;\nSELECT regexp_split_to_array('thE QUick bROWn FOx jUMPs ovEr The lazy dOG', 'e', 'iz');\n-- global option meaningless for regexp_split\nSELECT foo, length(foo) FROM regexp_split_to_table('thE QUick bROWn FOx jUMPs ovEr The lazy dOG', 'e', 'g') AS foo;\nSELECT regexp_split_to_array('thE QUick bROWn FOx jUMPs ovEr The lazy dOG', 'e', 'g');\n\n-- change NULL-display back\n\n-- E021-11 position expression\nSELECT POSITION('4' IN '1234567890') = '4' AS \""
+  ERROR
+    INT_NUMBER "4"
+  ERROR
+    IDENT "\";\n\nSELECT POSITION('5' IN '1234567890') = '5' AS \""
+  ERROR
+    INT_NUMBER "5"
+  ERROR
+    IDENT "\";\n\nSELECT POSITION('\\x11'::bytea IN ''::bytea) = 0 AS \""
+  ERROR
+    INT_NUMBER "0"
+  ERROR
+    IDENT "\";\nSELECT POSITION('\\x33'::bytea IN '\\x1122'::bytea) = 0 AS \""
+  ERROR
+    INT_NUMBER "0"
+  ERROR
+    IDENT "\";\nSELECT POSITION(''::bytea IN '\\x1122'::bytea) = 1 AS \""
+  ERROR
+    INT_NUMBER "1"
+  ERROR
+    IDENT "\";\nSELECT POSITION('\\x22'::bytea IN '\\x1122'::bytea) = 2 AS \""
+  ERROR
+    INT_NUMBER "2"
+  ERROR
+    IDENT "\";\nSELECT POSITION('\\x5678'::bytea IN '\\x1234567890'::bytea) = 3 AS \""
+  ERROR
+    INT_NUMBER "3"
+  ERROR
+    IDENT "\";\n\n-- T312 character overlay function\nSELECT OVERLAY('abcdef' PLACING '45' FROM 4) AS \""
+  ERROR
+    IDENT "abc45f"
+  ERROR
+    IDENT "\";\n\nSELECT OVERLAY('yabadoo' PLACING 'daba' FROM 5) AS \""
+  ERROR
+    IDENT "yabadaba"
+  ERROR
+    IDENT "\";\n\nSELECT OVERLAY('yabadoo' PLACING 'daba' FROM 5 FOR 0) AS \""
+  ERROR
+    IDENT "yabadabadoo"
+  ERROR
+    IDENT "\";\n\nSELECT OVERLAY('babosa' PLACING 'ubb' FROM 2 FOR 4) AS \""
+  ERROR
+    IDENT "bubba"
+  ERROR
+    IDENT "\";\n\n--\n-- test LIKE\n-- Be sure to form every test as a LIKE/NOT LIKE pair.\n--\n\n-- simplest examples\n-- E061-04 like predicate\nSELECT 'hawkeye' LIKE 'h%' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'hawkeye' NOT LIKE 'h%' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'hawkeye' LIKE 'H%' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\nSELECT 'hawkeye' NOT LIKE 'H%' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\n\nSELECT 'hawkeye' LIKE 'indio%' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\nSELECT 'hawkeye' NOT LIKE 'indio%' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\n\nSELECT 'hawkeye' LIKE 'h%eye' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'hawkeye' NOT LIKE 'h%eye' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'indio' LIKE '_ndio' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'indio' NOT LIKE '_ndio' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'indio' LIKE 'in__o' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'indio' NOT LIKE 'in__o' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'indio' LIKE 'in_o' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\nSELECT 'indio' NOT LIKE 'in_o' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\n\nSELECT 'abc'::name LIKE '_b_' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'abc'::name NOT LIKE '_b_' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'abc'::bytea LIKE '_b_'::bytea AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'abc'::bytea NOT LIKE '_b_'::bytea AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\n-- unused escape character\nSELECT 'hawkeye' LIKE 'h%' ESCAPE '#' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'hawkeye' NOT LIKE 'h%' ESCAPE '#' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'indio' LIKE 'ind_o' ESCAPE '$' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'indio' NOT LIKE 'ind_o' ESCAPE '$' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\n-- escape character\n-- E061-05 like predicate with escape clause\nSELECT 'h%' LIKE 'h#%' ESCAPE '#' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'h%' NOT LIKE 'h#%' ESCAPE '#' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'h%wkeye' LIKE 'h#%' ESCAPE '#' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\nSELECT 'h%wkeye' NOT LIKE 'h#%' ESCAPE '#' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\n\nSELECT 'h%wkeye' LIKE 'h#%%' ESCAPE '#' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'h%wkeye' NOT LIKE 'h#%%' ESCAPE '#' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'h%awkeye' LIKE 'h#%a%k%e' ESCAPE '#' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'h%awkeye' NOT LIKE 'h#%a%k%e' ESCAPE '#' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'indio' LIKE '_ndio' ESCAPE '$' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'indio' NOT LIKE '_ndio' ESCAPE '$' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'i_dio' LIKE 'i$_d_o' ESCAPE '$' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'i_dio' NOT LIKE 'i$_d_o' ESCAPE '$' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'i_dio' LIKE 'i$_nd_o' ESCAPE '$' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\nSELECT 'i_dio' NOT LIKE 'i$_nd_o' ESCAPE '$' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\n\nSELECT 'i_dio' LIKE 'i$_d%o' ESCAPE '$' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'i_dio' NOT LIKE 'i$_d%o' ESCAPE '$' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'a_c'::bytea LIKE 'a$__'::bytea ESCAPE '$'::bytea AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'a_c'::bytea NOT LIKE 'a$__'::bytea ESCAPE '$'::bytea AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\n-- escape character same as pattern character\nSELECT 'maca' LIKE 'm%aca' ESCAPE '%' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'maca' NOT LIKE 'm%aca' ESCAPE '%' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'ma%a' LIKE 'm%a%%a' ESCAPE '%' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'ma%a' NOT LIKE 'm%a%%a' ESCAPE '%' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'bear' LIKE 'b_ear' ESCAPE '_' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'bear' NOT LIKE 'b_ear' ESCAPE '_' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'be_r' LIKE 'b_e__r' ESCAPE '_' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'be_r' NOT LIKE 'b_e__r' ESCAPE '_' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'be_r' LIKE '__e__r' ESCAPE '_' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\nSELECT 'be_r' NOT LIKE '__e__r' ESCAPE '_' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\n\n\n--\n-- test ILIKE (case-insensitive LIKE)\n-- Be sure to form every test as an ILIKE/NOT ILIKE pair.\n--\n\nSELECT 'hawkeye' ILIKE 'h%' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'hawkeye' NOT ILIKE 'h%' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'hawkeye' ILIKE 'H%' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'hawkeye' NOT ILIKE 'H%' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'hawkeye' ILIKE 'H%Eye' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'hawkeye' NOT ILIKE 'H%Eye' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'Hawkeye' ILIKE 'h%' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'Hawkeye' NOT ILIKE 'h%' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\nSELECT 'ABC'::name ILIKE '_b_' AS \""
+  ERROR
+    TRUE_KW "true"
+  ERROR
+    IDENT "\";\nSELECT 'ABC'::name NOT ILIKE '_b_' AS \""
+  ERROR
+    FALSE_KW "false"
+  ERROR
+    IDENT "\";\n\n--\n-- test %/_ combination cases, cf bugs #4821 and #5478\n--\n\nSELECT 'foo' LIKE '_%' as t, 'f' LIKE '_%' as t, '' LIKE '_%' as f;\nSELECT 'foo' LIKE '%_' as t, 'f' LIKE '%_' as t, '' LIKE '%_' as f;\n\nSELECT 'foo' LIKE '__%' as t, 'foo' LIKE '___%' as t, 'foo' LIKE '____%' as f;\nSELECT 'foo' LIKE '%__' as t, 'foo' LIKE '%___' as t, 'foo' LIKE '%____' as f;\n\nSELECT 'jack' LIKE '%____%' AS t;\n\n\n--\n-- basic tests of LIKE with indexes\n--\n\nCREATE TABLE texttest (a text PRIMARY KEY, b int);\nSELECT * FROM texttest WHERE a LIKE '%1%';\n\nCREATE TABLE byteatest (a bytea PRIMARY KEY, b int);\nSELECT * FROM byteatest WHERE a LIKE '%1%';\n\nDROP TABLE texttest, byteatest;\n\n\n--\n-- test implicit type conversion\n--\n\n-- E021-07 character concatenation\nSELECT 'unknown' || ' and unknown' AS \""
+  ERROR
+    IDENT "Concat"
+  WHITESPACE " "
+  ERROR
+    UNKNOWN_KW "unknown"
+  WHITESPACE " "
+  ERROR
+    TYPES_KW "types"
+  ERROR
+    IDENT "\";\n\nSELECT text 'text' || ' and unknown' AS \""
+  ERROR
+    IDENT "Concat"
+  WHITESPACE " "
+  ERROR
+    TEXT_KW "text"
+  WHITESPACE " "
+  ERROR
+    TO_KW "to"
+  WHITESPACE " "
+  ERROR
+    UNKNOWN_KW "unknown"
+  WHITESPACE " "
+  ERROR
+    TYPE_KW "type"
+  ERROR
+    IDENT "\";\n\nSELECT char(20) 'characters' || ' and text' AS \""
+  ERROR
+    IDENT "Concat"
+  WHITESPACE " "
+  ERROR
+    CHAR_KW "char"
+  WHITESPACE " "
+  ERROR
+    TO_KW "to"
+  WHITESPACE " "
+  ERROR
+    UNKNOWN_KW "unknown"
+  WHITESPACE " "
+  ERROR
+    TYPE_KW "type"
+  ERROR
+    IDENT "\";\n\nSELECT text 'text' || char(20) ' and characters' AS \""
+  ERROR
+    IDENT "Concat"
+  WHITESPACE " "
+  ERROR
+    TEXT_KW "text"
+  WHITESPACE " "
+  ERROR
+    TO_KW "to"
+  WHITESPACE " "
+  ERROR
+    CHAR_KW "char"
+  ERROR
+    IDENT "\";\n\nSELECT text 'text' || varchar ' and varchar' AS \""
+  ERROR
+    IDENT "Concat"
+  WHITESPACE " "
+  ERROR
+    TEXT_KW "text"
+  WHITESPACE " "
+  ERROR
+    TO_KW "to"
+  WHITESPACE " "
+  ERROR
+    VARCHAR_KW "varchar"
+  ERROR
+    IDENT "\";\n\n--\n-- test substr with toasted text values\n--\nCREATE TABLE toasttest(f1 text);\n\ninsert into toasttest values(repeat('1234567890',10000));\ninsert into toasttest values(repeat('1234567890',10000));\n\n--\n-- Ensure that some values are uncompressed, to test the faster substring\n-- operation used in that case\n--\nalter table toasttest alter column f1 set storage external;\ninsert into toasttest values(repeat('1234567890',10000));\ninsert into toasttest values(repeat('1234567890',10000));\n\n-- If the starting position is zero or less, then return from the start of the string\n-- adjusting the length to be consistent with the \""
+  ERROR
+    IDENT "negative"
+  WHITESPACE " "
+  ERROR
+    START_KW "start"
+  ERROR
+    IDENT "\" per SQL.\nSELECT substr(f1, -1, 5) from toasttest;\n\n-- If the length is less than zero, an ERROR is thrown.\nSELECT substr(f1, 5, -1) from toasttest;\n\n-- If no third argument (length) is provided, the length to the end of the\n-- string is assumed.\nSELECT substr(f1, 99995) from toasttest;\n\n-- If start plus length is > string length, the result is truncated to\n-- string length\nSELECT substr(f1, 99995, 10) from toasttest;\n\nTRUNCATE TABLE toasttest;\nINSERT INTO toasttest values (repeat('1234567890',300));\nINSERT INTO toasttest values (repeat('1234567890',300));\nINSERT INTO toasttest values (repeat('1234567890',300));\nINSERT INTO toasttest values (repeat('1234567890',300));\n-- expect >0 blocks\nSELECT pg_relation_size(reltoastrelid) = 0 AS is_empty\n  FROM pg_class where relname = 'toasttest';\n\nTRUNCATE TABLE toasttest;\nALTER TABLE toasttest set (toast_tuple_target = 4080);\nINSERT INTO toasttest values (repeat('1234567890',300));\nINSERT INTO toasttest values (repeat('1234567890',300));\nINSERT INTO toasttest values (repeat('1234567890',300));\nINSERT INTO toasttest values (repeat('1234567890',300));\n-- expect 0 blocks\nSELECT pg_relation_size(reltoastrelid) = 0 AS is_empty\n  FROM pg_class where relname = 'toasttest';\n\nDROP TABLE toasttest;\n\n--\n-- test substr with toasted bytea values\n--\nCREATE TABLE toasttest(f1 bytea);\n\ninsert into toasttest values(decode(repeat('1234567890',10000),'escape'));\ninsert into toasttest values(decode(repeat('1234567890',10000),'escape'));\n\n--\n-- Ensure that some values are uncompressed, to test the faster substring\n-- operation used in that case\n--\nalter table toasttest alter column f1 set storage external;\ninsert into toasttest values(decode(repeat('1234567890',10000),'escape'));\ninsert into toasttest values(decode(repeat('1234567890',10000),'escape'));\n\n-- If the starting position is zero or less, then return from the start of the string\n-- adjusting the length to be consistent with the \""
+  ERROR
+    IDENT "negative"
+  WHITESPACE " "
+  ERROR
+    START_KW "start"
+  ERROR
+    IDENT "\" per SQL.\nSELECT substr(f1, -1, 5) from toasttest;\n\n-- If the length is less than zero, an ERROR is thrown.\nSELECT substr(f1, 5, -1) from toasttest;\n\n-- If no third argument (length) is provided, the length to the end of the\n-- string is assumed.\nSELECT substr(f1, 99995) from toasttest;\n\n-- If start plus length is > string length, the result is truncated to\n-- string length\nSELECT substr(f1, 99995, 10) from toasttest;\n\nDROP TABLE toasttest;\n\n-- test internally compressing datums\n\n-- this tests compressing a datum to a very small size which exercises a\n-- corner case in packed-varlena handling: even though small, the compressed\n-- datum must be given a 4-byte header because there are no bits to indicate\n-- compression in a 1-byte header\n\nCREATE TABLE toasttest (c char(4096));\nINSERT INTO toasttest VALUES('x');\nSELECT length(c), c::text FROM toasttest;\nSELECT c FROM toasttest;\nDROP TABLE toasttest;\n\n--\n-- test length\n--\n\nSELECT length('abcdef') AS \""
+  ERROR
+    IDENT "length_6"
+  ERROR
+    IDENT "\";\n\n--\n-- test strpos\n--\n\nSELECT strpos('abcdef', 'cd') AS \""
+  ERROR
+    IDENT "pos_3"
+  ERROR
+    IDENT "\";\n\nSELECT strpos('abcdef', 'xy') AS \""
+  ERROR
+    IDENT "pos_0"
+  ERROR
+    IDENT "\";\n\nSELECT strpos('abcdef', '') AS \""
+  ERROR
+    IDENT "pos_1"
+  ERROR
+    IDENT "\";\n\nSELECT strpos('', 'xy') AS \""
+  ERROR
+    IDENT "pos_0"
+  ERROR
+    IDENT "\";\n\nSELECT strpos('', '') AS \""
+  ERROR
+    IDENT "pos_1"
+  ERROR
+    IDENT "\";\n\n--\n-- test replace\n--\nSELECT replace('abcdef', 'de', '45') AS \""
+  ERROR
+    IDENT "abc45f"
+  ERROR
+    IDENT "\";\n\nSELECT replace('yabadabadoo', 'ba', '123') AS \""
+  ERROR
+    IDENT "ya123da123doo"
+  ERROR
+    IDENT "\";\n\nSELECT replace('yabadoo', 'bad', '') AS \""
+  ERROR
+    IDENT "yaoo"
+  ERROR
+    IDENT "\";\n\n--\n-- test split_part\n--\nselect split_part('','@',1) AS \""
+  ERROR
+    EMPTY_KW "empty"
+  WHITESPACE " "
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\n\nselect split_part('','@',-1) AS \""
+  ERROR
+    EMPTY_KW "empty"
+  WHITESPACE " "
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','',1) AS \""
+  ERROR
+    IDENT "joeuser"
+  ERROR
+    AT "@"
+  ERROR
+    IDENT "mydatabase"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','',2) AS \""
+  ERROR
+    EMPTY_KW "empty"
+  WHITESPACE " "
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','',-1) AS \""
+  ERROR
+    IDENT "joeuser"
+  ERROR
+    AT "@"
+  ERROR
+    IDENT "mydatabase"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','',-2) AS \""
+  ERROR
+    EMPTY_KW "empty"
+  WHITESPACE " "
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@',0) AS \""
+  ERROR
+    IDENT "an"
+  WHITESPACE " "
+  ERROR
+    IDENT "error"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@@',1) AS \""
+  ERROR
+    IDENT "joeuser"
+  ERROR
+    AT "@"
+  ERROR
+    IDENT "mydatabase"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@@',2) AS \""
+  ERROR
+    EMPTY_KW "empty"
+  WHITESPACE " "
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@',1) AS \""
+  ERROR
+    IDENT "joeuser"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@',2) AS \""
+  ERROR
+    IDENT "mydatabase"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@',3) AS \""
+  ERROR
+    EMPTY_KW "empty"
+  WHITESPACE " "
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\n\nselect split_part('@joeuser@mydatabase@','@',2) AS \""
+  ERROR
+    IDENT "joeuser"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@',-1) AS \""
+  ERROR
+    IDENT "mydatabase"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@',-2) AS \""
+  ERROR
+    IDENT "joeuser"
+  ERROR
+    IDENT "\";\n\nselect split_part('joeuser@mydatabase','@',-3) AS \""
+  ERROR
+    EMPTY_KW "empty"
+  WHITESPACE " "
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\n\nselect split_part('@joeuser@mydatabase@','@',-2) AS \""
+  ERROR
+    IDENT "mydatabase"
+  ERROR
+    IDENT "\";\n\n--\n-- test to_bin, to_oct, and to_hex\n--\nselect to_bin(-1234) AS \""
+  ERROR
+    INT_NUMBER "11111111111111111111101100101110"
+  ERROR
+    IDENT "\";\nselect to_bin(-1234::bigint);\nselect to_bin(256*256*256 - 1) AS \""
+  ERROR
+    INT_NUMBER "111111111111111111111111"
+  ERROR
+    IDENT "\";\nselect to_bin(256::bigint*256::bigint*256::bigint*256::bigint - 1) AS \""
+  ERROR
+    INT_NUMBER "11111111111111111111111111111111"
+  ERROR
+    IDENT "\";\n\nselect to_oct(-1234) AS \""
+  ERROR
+    INT_NUMBER "37777775456"
+  ERROR
+    IDENT "\";\nselect to_oct(-1234::bigint) AS \""
+  ERROR
+    INT_NUMBER "1777777777777777775456"
+  ERROR
+    IDENT "\";\nselect to_oct(256*256*256 - 1) AS \""
+  ERROR
+    INT_NUMBER "77777777"
+  ERROR
+    IDENT "\";\nselect to_oct(256::bigint*256::bigint*256::bigint*256::bigint - 1) AS \""
+  ERROR
+    INT_NUMBER "37777777777"
+  ERROR
+    IDENT "\";\n\nselect to_hex(-1234) AS \""
+  ERROR
+    IDENT "fffffb2e"
+  ERROR
+    IDENT "\";\nselect to_hex(-1234::bigint) AS \""
+  ERROR
+    IDENT "fffffffffffffb2e"
+  ERROR
+    IDENT "\";\nselect to_hex(256*256*256 - 1) AS \""
+  ERROR
+    IDENT "ffffff"
+  ERROR
+    IDENT "\";\nselect to_hex(256::bigint*256::bigint*256::bigint*256::bigint - 1) AS \""
+  ERROR
+    IDENT "ffffffff"
+  ERROR
+    IDENT "\";\n\n--\n-- SHA-2\n--\nSET bytea_output TO hex;\n\nSELECT sha224('');\nSELECT sha224('The quick brown fox jumps over the lazy dog.');\n\nSELECT sha256('');\nSELECT sha256('The quick brown fox jumps over the lazy dog.');\n\nSELECT sha384('');\nSELECT sha384('The quick brown fox jumps over the lazy dog.');\n\nSELECT sha512('');\nSELECT sha512('The quick brown fox jumps over the lazy dog.');\n\n--\n-- CRC\n--\nSELECT crc32('');\nSELECT crc32('The quick brown fox jumps over the lazy dog.');\n\nSELECT crc32c('');\nSELECT crc32c('The quick brown fox jumps over the lazy dog.');\n\nSELECT crc32c(repeat('A', 127)::bytea);\nSELECT crc32c(repeat('A', 128)::bytea);\nSELECT crc32c(repeat('A', 129)::bytea);\nSELECT crc32c(repeat('A', 800)::bytea);\n\n--\n-- encode/decode\n--\nSELECT encode('\\x1234567890abcdef00', 'hex');\nSELECT decode('1234567890abcdef00', 'hex');\nSELECT encode(('\\x' || repeat('1234567890abcdef0001', 7))::bytea, 'base64');\nSELECT decode(encode(('\\x' || repeat('1234567890abcdef0001', 7))::bytea,\n                     'base64'), 'base64');\nSELECT encode('\\x1234567890abcdef00', 'escape');\nSELECT decode(encode('\\x1234567890abcdef00', 'escape'), 'escape');\n\n--\n-- get_bit/set_bit etc\n--\nSELECT get_bit('\\x1234567890abcdef00'::bytea, 43);\nSELECT get_bit('\\x1234567890abcdef00'::bytea, 99);  -- error\nSELECT set_bit('\\x1234567890abcdef00'::bytea, 43, 0);\nSELECT set_bit('\\x1234567890abcdef00'::bytea, 99, 0);  -- error\nSELECT get_byte('\\x1234567890abcdef00'::bytea, 3);\nSELECT get_byte('\\x1234567890abcdef00'::bytea, 99);  -- error\nSELECT set_byte('\\x1234567890abcdef00'::bytea, 7, 11);\nSELECT set_byte('\\x1234567890abcdef00'::bytea, 99, 11);  -- error\n\n--\n-- conversions between bytea and integer types\n--\nSELECT 0x1234::int2::bytea AS \""
+  ERROR
+    ERROR "\\"
+  ERROR
+    IDENT "x1234"
+  ERROR
+    IDENT "\", (-0x1234)::int2::bytea AS \""
+  ERROR
+    ERROR "\\"
+  ERROR
+    IDENT "xedcc"
+  ERROR
+    IDENT "\";\nSELECT 0x12345678::int4::bytea AS \""
+  ERROR
+    ERROR "\\"
+  ERROR
+    IDENT "x12345678"
+  ERROR
+    IDENT "\", (-0x12345678)::int4::bytea AS \""
+  ERROR
+    ERROR "\\"
+  ERROR
+    IDENT "xedcba988"
+  ERROR
+    IDENT "\";\nSELECT 0x1122334455667788::int8::bytea AS \""
+  ERROR
+    ERROR "\\"
+  ERROR
+    IDENT "x1122334455667788"
+  ERROR
+    IDENT "\",\n       (-0x1122334455667788)::int8::bytea AS \""
+  ERROR
+    ERROR "\\"
+  ERROR
+    IDENT "xeeddccbbaa998878"
+  ERROR
+    IDENT "\";\n\nSELECT ''::bytea::int2 AS \""
+  ERROR
+    INT_NUMBER "0"
+  ERROR
+    IDENT "\";\nSELECT '\\x12'::bytea::int2 AS \""
+  ERROR
+    INT_NUMBER "18"
+  ERROR
+    IDENT "\";\nSELECT '\\x1234'::bytea::int2 AS \""
+  ERROR
+    INT_NUMBER "4460"
+  ERROR
+    IDENT "\";\nSELECT '\\x123456'::bytea::int2; -- error\n\nSELECT ''::bytea::int4 AS \""
+  ERROR
+    INT_NUMBER "0"
+  ERROR
+    IDENT "\";\nSELECT '\\x12'::bytea::int4 AS \""
+  ERROR
+    INT_NUMBER "18"
+  ERROR
+    IDENT "\";\nSELECT '\\x12345678'::bytea::int4 AS \""
+  ERROR
+    INT_NUMBER "305419896"
+  ERROR
+    IDENT "\";\nSELECT '\\x123456789A'::bytea::int4; -- error\n\nSELECT ''::bytea::int8 AS \""
+  ERROR
+    INT_NUMBER "0"
+  ERROR
+    IDENT "\";\nSELECT '\\x12'::bytea::int8 AS \""
+  ERROR
+    INT_NUMBER "18"
+  ERROR
+    IDENT "\";\nSELECT '\\x1122334455667788'::bytea::int8 AS \""
+  ERROR
+    INT_NUMBER "1234605616436508552"
+  ERROR
+    IDENT "\";\nSELECT '\\x112233445566778899'::bytea::int8; -- error\n\n-- min/max integer values\nSELECT '\\x8000'::bytea::int2 AS \""
+  ERROR
+    MINUS "-"
+  ERROR
+    INT_NUMBER "32768"
+  ERROR
+    IDENT "\", '\\x7FFF'::bytea::int2 AS \""
+  ERROR
+    INT_NUMBER "32767"
+  ERROR
+    IDENT "\";\nSELECT '\\x80000000'::bytea::int4 AS \""
+  ERROR
+    MINUS "-"
+  ERROR
+    INT_NUMBER "2147483648"
+  ERROR
+    IDENT "\", '\\x7FFFFFFF'::bytea::int4 AS \""
+  ERROR
+    INT_NUMBER "2147483647"
+  ERROR
+    IDENT "\";\nSELECT '\\x8000000000000000'::bytea::int8 AS \""
+  ERROR
+    MINUS "-"
+  ERROR
+    INT_NUMBER "9223372036854775808"
+  ERROR
+    IDENT "\",\n       '\\x7FFFFFFFFFFFFFFF'::bytea::int8 AS \""
+  ERROR
+    INT_NUMBER "9223372036854775807"
+  ERROR
+    IDENT "\";\n\n--\n-- test behavior of escape_string_warning and standard_conforming_strings options\n--\nset escape_string_warning = off;\nset standard_conforming_strings = off;\n\nshow escape_string_warning;\nshow standard_conforming_strings;\n\nset escape_string_warning = on;\nset standard_conforming_strings = on;\n\nshow escape_string_warning;\nshow standard_conforming_strings;\n\nselect 'a\\bcd' as f1, 'a\\b''cd' as f2, 'a\\b''''cd' as f3, 'abcd\\'   as f4, 'ab\\''cd' as f5, '\\\\' as f6;\n\nset standard_conforming_strings = off;\n\nselect 'a\\\\bcd' as f1, 'a\\\\b\\'cd' as f2, 'a\\\\b\\'''cd' as f3, 'abcd\\\\'   as f4, 'ab\\\\\\'cd' as f5, '\\\\\\\\' as f6;\n\nset escape_string_warning = off;\nset standard_conforming_strings = on;\n\nselect 'a\\bcd' as f1, 'a\\b''cd' as f2, 'a\\b''''cd' as f3, 'abcd\\'   as f4, 'ab\\''cd' as f5, '\\\\' as f6;\n\nset standard_conforming_strings = off;\n\nselect 'a\\\\bcd' as f1, 'a\\\\b\\'cd' as f2, 'a\\\\b\\'''cd' as f3, 'abcd\\\\'   as f4, 'ab\\\\\\'cd' as f5, '\\\\\\\\' as f6;\n\nreset standard_conforming_strings;\n\n\n--\n-- Additional string functions\n--\nSET bytea_output TO escape;\n\nSELECT initcap('hi THOMAS');\n\nSELECT lpad('hi', 5, 'xy');\nSELECT lpad('hi', 5);\nSELECT lpad('hi', -5, 'xy');\nSELECT lpad('hello', 2);\nSELECT lpad('hi', 5, '');\n\nSELECT rpad('hi', 5, 'xy');\nSELECT rpad('hi', 5);\nSELECT rpad('hi', -5, 'xy');\nSELECT rpad('hello', 2);\nSELECT rpad('hi', 5, '');\n\nSELECT ltrim('zzzytrim', 'xyz');\n\nSELECT translate('', '14', 'ax');\nSELECT translate('12345', '14', 'ax');\nSELECT translate('12345', '134', 'a');\n\nSELECT ascii('x');\nSELECT ascii('');\n\nSELECT chr(65);\nSELECT chr(0);\n\nSELECT repeat('Pg', 4);\nSELECT repeat('Pg', -4);\n\nSELECT SUBSTRING('1234567890'::bytea FROM 3) \""
+  ERROR
+    INT_NUMBER "34567890"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('1234567890'::bytea FROM 4 FOR 3) AS \""
+  ERROR
+    INT_NUMBER "456"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('string'::bytea FROM 2 FOR 2147483646) AS \""
+  ERROR
+    IDENT "tring"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('string'::bytea FROM -10 FOR 2147483646) AS \""
+  ERROR
+    STRING_KW "string"
+  ERROR
+    IDENT "\";\nSELECT SUBSTRING('string'::bytea FROM -10 FOR -2147483646) AS \""
+  ERROR
+    IDENT "error"
+  ERROR
+    IDENT "\";\n\nSELECT trim(E'\\\\000'::bytea from E'\\\\000Tom\\\\000'::bytea);\nSELECT trim(leading E'\\\\000'::bytea from E'\\\\000Tom\\\\000'::bytea);\nSELECT trim(trailing E'\\\\000'::bytea from E'\\\\000Tom\\\\000'::bytea);\nSELECT btrim(E'\\\\000trim\\\\000'::bytea, E'\\\\000'::bytea);\nSELECT btrim(''::bytea, E'\\\\000'::bytea);\nSELECT btrim(E'\\\\000trim\\\\000'::bytea, ''::bytea);\nSELECT encode(overlay(E'Th\\\\000omas'::bytea placing E'Th\\\\001omas'::bytea from 2),'escape');\nSELECT encode(overlay(E'Th\\\\000omas'::bytea placing E'\\\\002\\\\003'::bytea from 8),'escape');\nSELECT encode(overlay(E'Th\\\\000omas'::bytea placing E'\\\\002\\\\003'::bytea from 5 for 3),'escape');\n\nSELECT bit_count('\\x1234567890'::bytea);\n\nSELECT unistr('\\0064at\\+0000610');\nSELECT unistr('d\\u0061t\\U000000610');\nSELECT unistr('a\\\\b');\n-- errors:\nSELECT unistr('wrong: \\db99');\nSELECT unistr('wrong: \\db99\\0061');\nSELECT unistr('wrong: \\+00db99\\+000061');\nSELECT unistr('wrong: \\+2FFFFF');\nSELECT unistr('wrong: \\udb99\\u0061');\nSELECT unistr('wrong: \\U0000db99\\U00000061');\nSELECT unistr('wrong: \\U002FFFFF');\nSELECT unistr('wrong: \\xyz');\n"
+---
+ERROR@145: missing comma
+ERROR@160: missing comma
+ERROR@262: missing comma
+ERROR@277: missing comma
+ERROR@430: expected config value, got ON_KW
+ERROR@430: expected SEMICOLON
+ERROR@431: expected command, found ON_KW
+ERROR@466: expected column label, got BYTE_STRING
+ERROR@521: missing comma
+ERROR@529: expected column label, got BYTE_STRING
+ERROR@548: missing comma
+ERROR@610: missing comma
+ERROR@647: expected column label, got BYTE_STRING
+ERROR@1059: missing comma
+ERROR@1085: missing comma
+ERROR@1086: expected SEMICOLON
+ERROR@1086: expected command, found ERROR
+ERROR@1087: expected command, found IDENT
+ERROR@1088: expected command, found IDENT
+ERROR@1393: expected command, found IDENT
+ERROR@1394: expected command, found ERROR
+ERROR@1395: expected command, found INT_NUMBER
+ERROR@1399: expected command, found IDENT
+ERROR@1400: expected command, found ERROR
+ERROR@1401: expected command, found PLUS
+ERROR@1402: expected command, found INT_NUMBER
+ERROR@1408: expected command, found IDENT
+ERROR@1456: expected command, found IDENT
+ERROR@1457: expected command, found STAR
+ERROR@1458: expected command, found INT_NUMBER
+ERROR@1462: expected command, found IDENT
+ERROR@1463: expected command, found ERROR
+ERROR@1464: expected command, found PLUS
+ERROR@1465: expected command, found INT_NUMBER
+ERROR@1471: expected command, found IDENT
+ERROR@1517: expected command, found IDENT
+ERROR@1523: expected command, found IDENT
+ERROR@1548: expected command, found ERROR
+ERROR@1549: expected command, found IDENT
+ERROR@2740: expected command, found TEXT_KW
+ERROR@2744: expected command, found L_PAREN
+ERROR@2745: expected command, found CHAR_KW
+ERROR@2749: expected command, found R_PAREN
+ERROR@2750: expected command, found IDENT
+ERROR@2796: expected command, found TEXT_KW
+ERROR@2800: expected command, found L_PAREN
+ERROR@2801: expected command, found VARCHAR_KW
+ERROR@2808: expected command, found R_PAREN
+ERROR@2809: expected command, found IDENT
+ERROR@2872: expected command, found TEXT_KW
+ERROR@2876: expected command, found L_PAREN
+ERROR@2877: expected command, found NAME_KW
+ERROR@2881: expected command, found R_PAREN
+ERROR@2882: expected command, found IDENT
+ERROR@2983: expected command, found CHAR_KW
+ERROR@2987: expected command, found L_PAREN
+ERROR@2988: expected command, found TEXT_KW
+ERROR@2992: expected command, found R_PAREN
+ERROR@2993: expected command, found IDENT
+ERROR@3093: expected command, found CHAR_KW
+ERROR@3097: expected command, found L_PAREN
+ERROR@3098: expected command, found TEXT_KW
+ERROR@3102: expected command, found R_PAREN
+ERROR@3103: expected command, found IDENT
+ERROR@3153: expected command, found CHAR_KW
+ERROR@3157: expected command, found L_PAREN
+ERROR@3158: expected command, found VARCHAR_KW
+ERROR@3165: expected command, found R_PAREN
+ERROR@3166: expected command, found IDENT
+ERROR@3233: expected command, found CHAR_KW
+ERROR@3237: expected command, found L_PAREN
+ERROR@3238: expected command, found NAME_KW
+ERROR@3242: expected command, found R_PAREN
+ERROR@3243: expected command, found IDENT
+ERROR@3278: expected command, found VARCHAR_KW
+ERROR@3285: expected command, found L_PAREN
+ERROR@3286: expected command, found TEXT_KW
+ERROR@3290: expected command, found R_PAREN
+ERROR@3291: expected command, found IDENT
+ERROR@3340: expected command, found VARCHAR_KW
+ERROR@3347: expected command, found L_PAREN
+ERROR@3348: expected command, found CHAR_KW
+ERROR@3352: expected command, found R_PAREN
+ERROR@3353: expected command, found IDENT
+ERROR@3416: expected command, found VARCHAR_KW
+ERROR@3423: expected command, found L_PAREN
+ERROR@3424: expected command, found NAME_KW
+ERROR@3428: expected command, found R_PAREN
+ERROR@3429: expected command, found IDENT
+ERROR@3619: expected command, found IDENT
+ERROR@3625: expected command, found IDENT
+ERROR@3627: expected command, found IDENT
+ERROR@3633: expected command, found IDENT
+ERROR@3709: expected command, found IDENT
+ERROR@3715: expected command, found IDENT
+ERROR@3717: expected command, found IDENT
+ERROR@3725: expected command, found IDENT
+ERROR@3804: expected command, found IDENT
+ERROR@3810: expected command, found IDENT
+ERROR@3812: expected command, found IDENT
+ERROR@3818: expected command, found IDENT
+ERROR@3885: expected command, found SOME_KW
+ERROR@3890: expected command, found IDENT
+ERROR@3892: expected command, found IDENT
+ERROR@3983: expected command, found INT_NUMBER
+ERROR@3991: expected command, found IDENT
+ERROR@4051: expected command, found INT_NUMBER
+ERROR@4054: expected command, found IDENT
+ERROR@4134: expected command, found IDENT
+ERROR@4139: expected command, found IDENT
+ERROR@4197: expected command, found STRING_KW
+ERROR@4203: expected command, found IDENT
+ERROR@4262: expected command, found IDENT
+ERROR@4267: expected command, found IDENT
+ERROR@4382: expected command, found L_PAREN
+ERROR@4383: expected command, found IDENT
+ERROR@4386: expected command, found R_PAREN
+ERROR@4387: expected command, found POUND
+ERROR@4388: expected command, found IDENT
+ERROR@4408: expected command, found IDENT
+ERROR@4411: expected command, found IDENT
+ERROR@4475: expected command, found L_PAREN
+ERROR@4476: expected command, found IDENT
+ERROR@4479: expected command, found R_PAREN
+ERROR@4480: expected command, found POUND
+ERROR@4481: expected command, found IDENT
+ERROR@4498: expected command, found IDENT
+ERROR@4501: expected command, found IDENT
+ERROR@4574: expected command, found L_PAREN
+ERROR@4575: expected command, found IDENT
+ERROR@4578: expected command, found R_PAREN
+ERROR@4579: expected command, found POUND
+ERROR@4580: expected command, found IDENT
+ERROR@4608: expected command, found TRUE_KW
+ERROR@4612: expected command, found IDENT
+ERROR@4714: expected command, found TRUE_KW
+ERROR@4718: expected command, found IDENT
+ERROR@4779: expected command, found TRUE_KW
+ERROR@4783: expected command, found IDENT
+ERROR@4850: expected command, found TRUE_KW
+ERROR@4854: expected command, found IDENT
+ERROR@4947: expected command, found PERCENT
+ERROR@4948: expected command, found POUND
+ERROR@4949: expected command, found IDENT
+ERROR@4969: expected command, found IDENT
+ERROR@4974: expected command, found IDENT
+ERROR@5017: expected command, found PERCENT
+ERROR@5018: expected command, found POUND
+ERROR@5019: expected command, found IDENT
+ERROR@5040: expected command, found IDENT
+ERROR@5047: expected command, found IDENT
+ERROR@5143: expected command, found PERCENT
+ERROR@5144: expected command, found POUND
+ERROR@5145: expected command, found IDENT
+ERROR@5165: expected command, found IDENT
+ERROR@5170: expected command, found IDENT
+ERROR@5212: expected command, found PERCENT
+ERROR@5213: expected command, found POUND
+ERROR@5214: expected command, found IDENT
+ERROR@5236: expected command, found IDENT
+ERROR@5241: expected command, found IDENT
+ERROR@5283: expected command, found PERCENT
+ERROR@5284: expected command, found PIPE
+ERROR@5285: expected command, found IDENT
+ERROR@5287: expected command, found POUND
+ERROR@5288: expected command, found IDENT
+ERROR@5308: expected command, found IDENT
+ERROR@5313: expected command, found IDENT
+ERROR@5401: expected command, found PERCENT
+ERROR@5402: expected command, found POUND
+ERROR@5403: expected command, found IDENT
+ERROR@5408: expected command, found BYTE_STRING
+ERROR@5419: expected command, found POUND
+ERROR@5420: expected command, found STRING
+ERROR@5531: expected command, found IDENT
+ERROR@5538: expected command, found STRING
+ERROR@5549: expected command, found IDENT
+ERROR@5550: expected command, found POUND
+ERROR@5551: expected command, found IDENT
+ERROR@5572: expected command, found IDENT
+ERROR@5578: expected command, found IDENT
+ERROR@5638: expected command, found IDENT
+ERROR@5645: expected command, found IDENT
+ERROR@5831: expected command, found IDENT
+ERROR@5834: expected command, found IDENT
+ERROR@5960: expected command, found IDENT
+ERROR@5963: expected command, found IDENT
+ERROR@6523: expected command, found NO_KW
+ERROR@6526: expected command, found IDENT
+ERROR@6532: expected command, found IDENT
+ERROR@15440: expected command, found INT_NUMBER
+ERROR@15441: expected command, found IDENT
+ERROR@15492: expected command, found INT_NUMBER
+ERROR@15493: expected command, found IDENT
+ERROR@15549: expected command, found INT_NUMBER
+ERROR@15550: expected command, found IDENT
+ERROR@15611: expected command, found INT_NUMBER
+ERROR@15612: expected command, found IDENT
+ERROR@15669: expected command, found INT_NUMBER
+ERROR@15670: expected command, found IDENT
+ERROR@15731: expected command, found INT_NUMBER
+ERROR@15732: expected command, found IDENT
+ERROR@15801: expected command, found INT_NUMBER
+ERROR@15802: expected command, found IDENT
+ERROR@15890: expected command, found IDENT
+ERROR@15896: expected command, found IDENT
+ERROR@15952: expected command, found IDENT
+ERROR@15960: expected command, found IDENT
+ERROR@16022: expected command, found IDENT
+ERROR@16033: expected command, found IDENT
+ERROR@16093: expected command, found IDENT
+ERROR@16098: expected command, found IDENT
+ERROR@16255: expected command, found TRUE_KW
+ERROR@16259: expected command, found IDENT
+ERROR@16297: expected command, found FALSE_KW
+ERROR@16302: expected command, found IDENT
+ERROR@16337: expected command, found FALSE_KW
+ERROR@16342: expected command, found IDENT
+ERROR@16380: expected command, found TRUE_KW
+ERROR@16384: expected command, found IDENT
+ERROR@16423: expected command, found FALSE_KW
+ERROR@16428: expected command, found IDENT
+ERROR@16470: expected command, found TRUE_KW
+ERROR@16474: expected command, found IDENT
+ERROR@16512: expected command, found TRUE_KW
+ERROR@16516: expected command, found IDENT
+ERROR@16557: expected command, found FALSE_KW
+ERROR@16562: expected command, found IDENT
+ERROR@16598: expected command, found TRUE_KW
+ERROR@16602: expected command, found IDENT
+ERROR@16641: expected command, found FALSE_KW
+ERROR@16646: expected command, found IDENT
+ERROR@16682: expected command, found TRUE_KW
+ERROR@16686: expected command, found IDENT
+ERROR@16725: expected command, found FALSE_KW
+ERROR@16730: expected command, found IDENT
+ERROR@16765: expected command, found FALSE_KW
+ERROR@16770: expected command, found IDENT
+ERROR@16808: expected command, found TRUE_KW
+ERROR@16812: expected command, found IDENT
+ERROR@16850: expected command, found TRUE_KW
+ERROR@16854: expected command, found IDENT
+ERROR@16895: expected command, found FALSE_KW
+ERROR@16900: expected command, found IDENT
+ERROR@16946: expected command, found TRUE_KW
+ERROR@16950: expected command, found IDENT
+ERROR@16999: expected command, found FALSE_KW
+ERROR@17004: expected command, found IDENT
+ERROR@17077: expected command, found TRUE_KW
+ERROR@17081: expected command, found IDENT
+ERROR@17130: expected command, found FALSE_KW
+ERROR@17135: expected command, found IDENT
+ERROR@17182: expected command, found TRUE_KW
+ERROR@17186: expected command, found IDENT
+ERROR@17236: expected command, found FALSE_KW
+ERROR@17241: expected command, found IDENT
+ERROR@17348: expected command, found TRUE_KW
+ERROR@17352: expected command, found IDENT
+ERROR@17397: expected command, found FALSE_KW
+ERROR@17402: expected command, found IDENT
+ERROR@17449: expected command, found FALSE_KW
+ERROR@17454: expected command, found IDENT
+ERROR@17504: expected command, found TRUE_KW
+ERROR@17508: expected command, found IDENT
+ERROR@17556: expected command, found TRUE_KW
+ERROR@17560: expected command, found IDENT
+ERROR@17611: expected command, found FALSE_KW
+ERROR@17616: expected command, found IDENT
+ERROR@17669: expected command, found TRUE_KW
+ERROR@17673: expected command, found IDENT
+ERROR@17729: expected command, found FALSE_KW
+ERROR@17734: expected command, found IDENT
+ERROR@17781: expected command, found TRUE_KW
+ERROR@17785: expected command, found IDENT
+ERROR@17835: expected command, found FALSE_KW
+ERROR@17840: expected command, found IDENT
+ERROR@17888: expected command, found TRUE_KW
+ERROR@17892: expected command, found IDENT
+ERROR@17943: expected command, found FALSE_KW
+ERROR@17948: expected command, found IDENT
+ERROR@17997: expected command, found FALSE_KW
+ERROR@18002: expected command, found IDENT
+ERROR@18054: expected command, found TRUE_KW
+ERROR@18058: expected command, found IDENT
+ERROR@18106: expected command, found TRUE_KW
+ERROR@18110: expected command, found IDENT
+ERROR@18161: expected command, found FALSE_KW
+ERROR@18166: expected command, found IDENT
+ERROR@18231: expected command, found TRUE_KW
+ERROR@18235: expected command, found IDENT
+ERROR@18303: expected command, found FALSE_KW
+ERROR@18308: expected command, found IDENT
+ERROR@18400: expected command, found TRUE_KW
+ERROR@18404: expected command, found IDENT
+ERROR@18453: expected command, found FALSE_KW
+ERROR@18458: expected command, found IDENT
+ERROR@18505: expected command, found TRUE_KW
+ERROR@18509: expected command, found IDENT
+ERROR@18559: expected command, found FALSE_KW
+ERROR@18564: expected command, found IDENT
+ERROR@18610: expected command, found TRUE_KW
+ERROR@18614: expected command, found IDENT
+ERROR@18663: expected command, found FALSE_KW
+ERROR@18668: expected command, found IDENT
+ERROR@18715: expected command, found TRUE_KW
+ERROR@18719: expected command, found IDENT
+ERROR@18769: expected command, found FALSE_KW
+ERROR@18774: expected command, found IDENT
+ERROR@18821: expected command, found FALSE_KW
+ERROR@18826: expected command, found IDENT
+ERROR@18876: expected command, found TRUE_KW
+ERROR@18880: expected command, found IDENT
+ERROR@19020: expected command, found TRUE_KW
+ERROR@19024: expected command, found IDENT
+ERROR@19063: expected command, found FALSE_KW
+ERROR@19068: expected command, found IDENT
+ERROR@19104: expected command, found TRUE_KW
+ERROR@19108: expected command, found IDENT
+ERROR@19147: expected command, found FALSE_KW
+ERROR@19152: expected command, found IDENT
+ERROR@19191: expected command, found TRUE_KW
+ERROR@19195: expected command, found IDENT
+ERROR@19237: expected command, found FALSE_KW
+ERROR@19242: expected command, found IDENT
+ERROR@19278: expected command, found TRUE_KW
+ERROR@19282: expected command, found IDENT
+ERROR@19321: expected command, found FALSE_KW
+ERROR@19326: expected command, found IDENT
+ERROR@19365: expected command, found TRUE_KW
+ERROR@19369: expected command, found IDENT
+ERROR@19411: expected command, found FALSE_KW
+ERROR@19416: expected command, found IDENT
+ERROR@20198: expected command, found IDENT
+ERROR@20205: expected command, found UNKNOWN_KW
+ERROR@20213: expected command, found TYPES_KW
+ERROR@20218: expected command, found IDENT
+ERROR@20263: expected command, found IDENT
+ERROR@20270: expected command, found TEXT_KW
+ERROR@20275: expected command, found TO_KW
+ERROR@20278: expected command, found UNKNOWN_KW
+ERROR@20286: expected command, found TYPE_KW
+ERROR@20290: expected command, found IDENT
+ERROR@20342: expected command, found IDENT
+ERROR@20349: expected command, found CHAR_KW
+ERROR@20354: expected command, found TO_KW
+ERROR@20357: expected command, found UNKNOWN_KW
+ERROR@20365: expected command, found TYPE_KW
+ERROR@20369: expected command, found IDENT
+ERROR@20426: expected command, found IDENT
+ERROR@20433: expected command, found TEXT_KW
+ERROR@20438: expected command, found TO_KW
+ERROR@20441: expected command, found CHAR_KW
+ERROR@20445: expected command, found IDENT
+ERROR@20498: expected command, found IDENT
+ERROR@20505: expected command, found TEXT_KW
+ERROR@20510: expected command, found TO_KW
+ERROR@20513: expected command, found VARCHAR_KW
+ERROR@20520: expected command, found IDENT
+ERROR@21146: expected command, found IDENT
+ERROR@21155: expected command, found START_KW
+ERROR@21160: expected command, found IDENT
+ERROR@23103: expected command, found IDENT
+ERROR@23112: expected command, found START_KW
+ERROR@23117: expected command, found IDENT
+ERROR@24079: expected command, found IDENT
+ERROR@24087: expected command, found IDENT
+ERROR@24147: expected command, found IDENT
+ERROR@24152: expected command, found IDENT
+ERROR@24190: expected command, found IDENT
+ERROR@24195: expected command, found IDENT
+ERROR@24231: expected command, found IDENT
+ERROR@24236: expected command, found IDENT
+ERROR@24268: expected command, found IDENT
+ERROR@24273: expected command, found IDENT
+ERROR@24303: expected command, found IDENT
+ERROR@24308: expected command, found IDENT
+ERROR@24375: expected command, found IDENT
+ERROR@24381: expected command, found IDENT
+ERROR@24432: expected command, found IDENT
+ERROR@24445: expected command, found IDENT
+ERROR@24490: expected command, found IDENT
+ERROR@24494: expected command, found IDENT
+ERROR@24555: expected command, found EMPTY_KW
+ERROR@24561: expected command, found STRING_KW
+ERROR@24567: expected command, found IDENT
+ERROR@24604: expected command, found EMPTY_KW
+ERROR@24610: expected command, found STRING_KW
+ERROR@24616: expected command, found IDENT
+ERROR@24669: expected command, found IDENT
+ERROR@24676: expected command, found AT
+ERROR@24677: expected command, found IDENT
+ERROR@24687: expected command, found IDENT
+ERROR@24740: expected command, found EMPTY_KW
+ERROR@24746: expected command, found STRING_KW
+ERROR@24752: expected command, found IDENT
+ERROR@24806: expected command, found IDENT
+ERROR@24813: expected command, found AT
+ERROR@24814: expected command, found IDENT
+ERROR@24824: expected command, found IDENT
+ERROR@24878: expected command, found EMPTY_KW
+ERROR@24884: expected command, found STRING_KW
+ERROR@24890: expected command, found IDENT
+ERROR@24944: expected command, found IDENT
+ERROR@24947: expected command, found IDENT
+ERROR@24952: expected command, found IDENT
+ERROR@25007: expected command, found IDENT
+ERROR@25014: expected command, found AT
+ERROR@25015: expected command, found IDENT
+ERROR@25025: expected command, found IDENT
+ERROR@25080: expected command, found EMPTY_KW
+ERROR@25086: expected command, found STRING_KW
+ERROR@25092: expected command, found IDENT
+ERROR@25146: expected command, found IDENT
+ERROR@25153: expected command, found IDENT
+ERROR@25207: expected command, found IDENT
+ERROR@25217: expected command, found IDENT
+ERROR@25271: expected command, found EMPTY_KW
+ERROR@25277: expected command, found STRING_KW
+ERROR@25283: expected command, found IDENT
+ERROR@25339: expected command, found IDENT
+ERROR@25346: expected command, found IDENT
+ERROR@25401: expected command, found IDENT
+ERROR@25411: expected command, found IDENT
+ERROR@25466: expected command, found IDENT
+ERROR@25473: expected command, found IDENT
+ERROR@25528: expected command, found EMPTY_KW
+ERROR@25534: expected command, found STRING_KW
+ERROR@25540: expected command, found IDENT
+ERROR@25597: expected command, found IDENT
+ERROR@25607: expected command, found IDENT
+ERROR@25677: expected command, found INT_NUMBER
+ERROR@25709: expected command, found IDENT
+ERROR@25777: expected command, found INT_NUMBER
+ERROR@25801: expected command, found IDENT
+ERROR@25875: expected command, found INT_NUMBER
+ERROR@25907: expected command, found IDENT
+ERROR@25936: expected command, found INT_NUMBER
+ERROR@25947: expected command, found IDENT
+ERROR@25983: expected command, found INT_NUMBER
+ERROR@26005: expected command, found IDENT
+ERROR@26043: expected command, found INT_NUMBER
+ERROR@26051: expected command, found IDENT
+ERROR@26125: expected command, found INT_NUMBER
+ERROR@26136: expected command, found IDENT
+ERROR@26165: expected command, found IDENT
+ERROR@26173: expected command, found IDENT
+ERROR@26209: expected command, found IDENT
+ERROR@26225: expected command, found IDENT
+ERROR@26263: expected command, found IDENT
+ERROR@26269: expected command, found IDENT
+ERROR@26343: expected command, found IDENT
+ERROR@26351: expected command, found IDENT
+ERROR@28067: expected command, found ERROR
+ERROR@28068: expected command, found IDENT
+ERROR@28073: expected command, found IDENT
+ERROR@28103: expected command, found ERROR
+ERROR@28104: expected command, found IDENT
+ERROR@28109: expected command, found IDENT
+ERROR@28147: expected command, found ERROR
+ERROR@28148: expected command, found IDENT
+ERROR@28157: expected command, found IDENT
+ERROR@28191: expected command, found ERROR
+ERROR@28192: expected command, found IDENT
+ERROR@28201: expected command, found IDENT
+ERROR@28247: expected command, found ERROR
+ERROR@28248: expected command, found IDENT
+ERROR@28265: expected command, found IDENT
+ERROR@28314: expected command, found ERROR
+ERROR@28315: expected command, found IDENT
+ERROR@28332: expected command, found IDENT
+ERROR@28363: expected command, found INT_NUMBER
+ERROR@28364: expected command, found IDENT
+ERROR@28398: expected command, found INT_NUMBER
+ERROR@28400: expected command, found IDENT
+ERROR@28436: expected command, found INT_NUMBER
+ERROR@28440: expected command, found IDENT
+ERROR@28512: expected command, found INT_NUMBER
+ERROR@28513: expected command, found IDENT
+ERROR@28547: expected command, found INT_NUMBER
+ERROR@28549: expected command, found IDENT
+ERROR@28589: expected command, found INT_NUMBER
+ERROR@28598: expected command, found IDENT
+ERROR@28674: expected command, found INT_NUMBER
+ERROR@28675: expected command, found IDENT
+ERROR@28709: expected command, found INT_NUMBER
+ERROR@28711: expected command, found IDENT
+ERROR@28759: expected command, found INT_NUMBER
+ERROR@28778: expected command, found IDENT
+ERROR@28894: expected command, found MINUS
+ERROR@28895: expected command, found INT_NUMBER
+ERROR@28900: expected command, found IDENT
+ERROR@28929: expected command, found INT_NUMBER
+ERROR@28934: expected command, found IDENT
+ERROR@28974: expected command, found MINUS
+ERROR@28975: expected command, found INT_NUMBER
+ERROR@28985: expected command, found IDENT
+ERROR@29018: expected command, found INT_NUMBER
+ERROR@29028: expected command, found IDENT
+ERROR@29076: expected command, found MINUS
+ERROR@29077: expected command, found INT_NUMBER
+ERROR@29096: expected command, found IDENT
+ERROR@29144: expected command, found INT_NUMBER
+ERROR@29163: expected command, found IDENT
+ERROR@30819: expected command, found INT_NUMBER
+ERROR@30827: expected command, found IDENT
+ERROR@30885: expected command, found INT_NUMBER
+ERROR@30888: expected command, found IDENT
+ERROR@30951: expected command, found IDENT
+ERROR@30956: expected command, found IDENT
+ERROR@31021: expected command, found STRING_KW
+ERROR@31027: expected command, found IDENT
+ERROR@31093: expected command, found IDENT
+ERROR@31098: expected command, found IDENT
+ERROR@1087: unknown literal prefix
+ERROR@3627: unknown literal prefix
+ERROR@3812: unknown literal prefix
+ERROR@3890: unknown literal prefix
+ERROR@4262: unknown literal prefix
+ERROR@4408: unknown literal prefix
+ERROR@4498: unknown literal prefix
+ERROR@4969: unknown literal prefix
+ERROR@5165: unknown literal prefix
+ERROR@5236: unknown literal prefix
+ERROR@5308: unknown literal prefix
+ERROR@5572: unknown literal prefix
+ERROR@6526: unknown literal prefix
+ERROR@16093: unknown literal prefix
+ERROR@24947: unknown literal prefix
+ERROR@28068: unknown literal prefix
+ERROR@28104: unknown literal prefix
+ERROR@28148: unknown literal prefix
+ERROR@28192: unknown literal prefix
+ERROR@28248: unknown literal prefix
+ERROR@28315: unknown literal prefix
+ERROR@31093: unknown literal prefix
+ERROR@31098: Missing trailing " to terminate the quoted identifier

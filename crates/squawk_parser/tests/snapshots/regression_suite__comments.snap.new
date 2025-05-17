@@ -1,0 +1,128 @@
+---
+source: crates/squawk_parser/tests/regression_suite.rs
+assertion_line: 87
+input_file: crates/squawk_parser/tests/data/regression_suite/comments.sql
+---
+SOURCE_FILE
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- COMMENTS"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'trailing'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            FIRST_KW "first"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- trailing single line"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      COMMENT "/* embedded single line */"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'embedded'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            SECOND_KW "second"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      COMMENT "/* both embedded and trailing single line */"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'both'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "third"
+  SEMICOLON ";"
+  WHITESPACE " "
+  COMMENT "-- trailing single line"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'before multi-line'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "fourth"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "/* This is an example of SQL which should not execute:\n * select 'multi-line';\n */"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'after multi-line'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "fifth"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "--"
+  WHITESPACE "\n"
+  COMMENT "-- Nested comments"
+  WHITESPACE "\n"
+  COMMENT "--"
+  WHITESPACE "\n\n"
+  COMMENT "/*\nSELECT 'trailing' as x1; -- inside block comment\n*/"
+  WHITESPACE "\n\n"
+  COMMENT "/* This block comment surrounds a query which itself has a block comment...\nSELECT /* embedded single line */ 'embedded' AS x2;\n*/"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      COMMENT "-- continued after the following block comments..."
+      WHITESPACE "\n"
+      COMMENT "/* Deeply nested comment.\n   This includes a single apostrophe to make sure we aren't decoding this part as a string.\nSELECT 'deep nest' AS n1;\n/* Second level of nesting...\nSELECT 'deeper nest' as n2;\n/* Third level of nesting...\nSELECT 'deepest nest' as n3;\n*/\nHoo boy. Still two deep...\n*/\nNow just one deep...\n*/"
+      WHITESPACE "\n"
+      TARGET_LIST
+        TARGET
+          LITERAL
+            STRING "'deeply nested example'"
+          WHITESPACE " "
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "sixth"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "/* and this is the end of the file */"
+  WHITESPACE "\n"
