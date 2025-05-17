@@ -168,7 +168,7 @@ SOURCE_FILE
           VALUE_KW "value"
       R_PAREN ")"
     WHITESPACE "\n"
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " \n  "
       L_PAREN "("
@@ -1205,7 +1205,7 @@ SOURCE_FILE
           IDENT "col3"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1275,7 +1275,7 @@ SOURCE_FILE
           IDENT "col3"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1310,7 +1310,7 @@ SOURCE_FILE
           IDENT "time_taptest_table_default"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SELECT
+  TABLE_STMT
     TABLE_KW "Table"
     WHITESPACE " "
     PATH
@@ -1319,7 +1319,7 @@ SOURCE_FILE
           IDENT "\"partman_test.time_taptest_table_p20241124\""
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SELECT
+  TABLE_STMT
     TABLE_KW "Table"
     WHITESPACE " "
     PATH
@@ -3549,7 +3549,7 @@ SOURCE_FILE
           IDENT "attrs"
       R_PAREN ")"
     WHITESPACE "\n"
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("

@@ -604,7 +604,7 @@ SOURCE_FILE
             L_PAREN "("
             PAREN_EXPR
               L_PAREN "("
-              SELECT
+              VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
                 L_PAREN "("

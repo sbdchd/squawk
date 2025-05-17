@@ -158,7 +158,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
-    SELECT
+    TABLE_STMT
       TABLE_KW "table"
       WHITESPACE " "
       PATH
@@ -183,7 +183,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("

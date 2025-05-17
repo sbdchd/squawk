@@ -52,7 +52,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "foo"
       WHITESPACE " "
-      SELECT
+      VALUES
         VALUES_KW "VALUES"
         L_PAREN "("
         LITERAL
@@ -376,7 +376,7 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("

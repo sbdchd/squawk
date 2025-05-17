@@ -1074,13 +1074,13 @@ impl AstNode for DisableRule {
     }
 }
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DisableCluster {
+pub struct ClusterOn {
     pub(crate) syntax: SyntaxNode,
 }
-impl AstNode for DisableCluster {
+impl AstNode for ClusterOn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DISABLE_CLUSTER
+        kind == SyntaxKind::CLUSTER_ON
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -2166,7 +2166,7 @@ pub enum AlterTableAction {
     DisableTrigger(DisableTrigger),
     DisableRls(DisableRls),
     DisableRule(DisableRule),
-    DisableCluster(DisableCluster),
+    ClusterOn(ClusterOn),
     OwnerTo(OwnerTo),
     DetachPartition(DetachPartition),
     DropConstraint(DropConstraint),
@@ -2211,7 +2211,7 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::DISABLE_TRIGGER
                 | SyntaxKind::DISABLE_RLS
                 | SyntaxKind::DISABLE_RULE
-                | SyntaxKind::DISABLE_CLUSTER
+                | SyntaxKind::CLUSTER_ON
                 | SyntaxKind::OWNER_TO
                 | SyntaxKind::DETACH_PARTITION
                 | SyntaxKind::DROP_CONSTRAINT
@@ -2270,9 +2270,7 @@ impl AstNode for AlterTableAction {
             }
             SyntaxKind::DISABLE_RLS => AlterTableAction::DisableRls(DisableRls { syntax }),
             SyntaxKind::DISABLE_RULE => AlterTableAction::DisableRule(DisableRule { syntax }),
-            SyntaxKind::DISABLE_CLUSTER => {
-                AlterTableAction::DisableCluster(DisableCluster { syntax })
-            }
+            SyntaxKind::CLUSTER_ON => AlterTableAction::ClusterOn(ClusterOn { syntax }),
             SyntaxKind::OWNER_TO => AlterTableAction::OwnerTo(OwnerTo { syntax }),
             SyntaxKind::DETACH_PARTITION => {
                 AlterTableAction::DetachPartition(DetachPartition { syntax })
@@ -2336,7 +2334,7 @@ impl AstNode for AlterTableAction {
             AlterTableAction::DisableTrigger(it) => &it.syntax,
             AlterTableAction::DisableRls(it) => &it.syntax,
             AlterTableAction::DisableRule(it) => &it.syntax,
-            AlterTableAction::DisableCluster(it) => &it.syntax,
+            AlterTableAction::ClusterOn(it) => &it.syntax,
             AlterTableAction::OwnerTo(it) => &it.syntax,
             AlterTableAction::DetachPartition(it) => &it.syntax,
             AlterTableAction::DropConstraint(it) => &it.syntax,

@@ -991,7 +991,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "wines"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       L_PAREN "("
       LITERAL

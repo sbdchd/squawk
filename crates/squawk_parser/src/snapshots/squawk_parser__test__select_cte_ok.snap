@@ -78,7 +78,7 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         WHITESPACE "\n  "
-        SELECT
+        VALUES
           VALUES_KW "values"
           WHITESPACE " "
           L_PAREN "("
