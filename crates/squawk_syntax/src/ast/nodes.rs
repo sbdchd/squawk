@@ -3175,7 +3175,7 @@ impl AstNode for Truncate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub enum Item {
+pub enum Stmt {
     AlterTable(AlterTable),
     AlterDomain(AlterDomain),
     AlterAggregate(AlterAggregate),
@@ -3198,7 +3198,7 @@ pub enum Item {
 // impl ast::HasAttrs for Item {}
 // impl ast::HasDocComments for Item {}
 
-impl AstNode for Item {
+impl AstNode for Stmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
@@ -3226,24 +3226,24 @@ impl AstNode for Item {
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
-            SyntaxKind::SELECT => Item::Select(Select { syntax }),
-            SyntaxKind::CREATE_FUNCTION_STMT => Item::CreateFunc(CreateFunc { syntax }),
-            SyntaxKind::ALTER_TABLE => Item::AlterTable(AlterTable { syntax }),
-            SyntaxKind::DROP_DATABASE_STMT => Item::DropDatabase(DropDatabase { syntax }),
-            SyntaxKind::CREATE_TABLE => Item::CreateTable(CreateTable { syntax }),
-            SyntaxKind::BEGIN_STMT => Item::Begin(Begin { syntax }),
-            SyntaxKind::COMMIT_STMT => Item::Commit(Commit { syntax }),
-            SyntaxKind::CREATE_INDEX_STMT => Item::CreateIndex(CreateIndex { syntax }),
-            SyntaxKind::DROP_TABLE => Item::DropTable(DropTable { syntax }),
-            SyntaxKind::DROP_INDEX_STMT => Item::DropIndex(DropIndex { syntax }),
-            SyntaxKind::DROP_TYPE_STMT => Item::DropType(DropType { syntax }),
-            SyntaxKind::CREATE_DOMAIN_STMT => Item::CreateDomain(CreateDomain { syntax }),
-            SyntaxKind::ALTER_DOMAIN_STMT => Item::AlterDomain(AlterDomain { syntax }),
-            SyntaxKind::ALTER_AGGREGATE_STMT => Item::AlterAggregate(AlterAggregate { syntax }),
-            SyntaxKind::CREATE_AGGREGATE_STMT => Item::CreateAggregate(CreateAggregate { syntax }),
-            SyntaxKind::DROP_AGGREGATE_STMT => Item::DropAggregate(DropAggregate { syntax }),
-            SyntaxKind::ROLLBACK_STMT => Item::Rollback(Rollback { syntax }),
-            SyntaxKind::TRUNCATE_STMT => Item::Truncate(Truncate { syntax }),
+            SyntaxKind::SELECT => Stmt::Select(Select { syntax }),
+            SyntaxKind::CREATE_FUNCTION_STMT => Stmt::CreateFunc(CreateFunc { syntax }),
+            SyntaxKind::ALTER_TABLE => Stmt::AlterTable(AlterTable { syntax }),
+            SyntaxKind::DROP_DATABASE_STMT => Stmt::DropDatabase(DropDatabase { syntax }),
+            SyntaxKind::CREATE_TABLE => Stmt::CreateTable(CreateTable { syntax }),
+            SyntaxKind::BEGIN_STMT => Stmt::Begin(Begin { syntax }),
+            SyntaxKind::COMMIT_STMT => Stmt::Commit(Commit { syntax }),
+            SyntaxKind::CREATE_INDEX_STMT => Stmt::CreateIndex(CreateIndex { syntax }),
+            SyntaxKind::DROP_TABLE => Stmt::DropTable(DropTable { syntax }),
+            SyntaxKind::DROP_INDEX_STMT => Stmt::DropIndex(DropIndex { syntax }),
+            SyntaxKind::DROP_TYPE_STMT => Stmt::DropType(DropType { syntax }),
+            SyntaxKind::CREATE_DOMAIN_STMT => Stmt::CreateDomain(CreateDomain { syntax }),
+            SyntaxKind::ALTER_DOMAIN_STMT => Stmt::AlterDomain(AlterDomain { syntax }),
+            SyntaxKind::ALTER_AGGREGATE_STMT => Stmt::AlterAggregate(AlterAggregate { syntax }),
+            SyntaxKind::CREATE_AGGREGATE_STMT => Stmt::CreateAggregate(CreateAggregate { syntax }),
+            SyntaxKind::DROP_AGGREGATE_STMT => Stmt::DropAggregate(DropAggregate { syntax }),
+            SyntaxKind::ROLLBACK_STMT => Stmt::Rollback(Rollback { syntax }),
+            SyntaxKind::TRUNCATE_STMT => Stmt::Truncate(Truncate { syntax }),
             _ => return None,
         };
         Some(res)
@@ -3251,24 +3251,24 @@ impl AstNode for Item {
     #[inline]
     fn syntax(&self) -> &SyntaxNode {
         match self {
-            Item::Select(it) => &it.syntax,
-            Item::CreateFunc(it) => &it.syntax,
-            Item::AlterTable(it) => &it.syntax,
-            Item::DropDatabase(it) => &it.syntax,
-            Item::CreateTable(it) => &it.syntax,
-            Item::Begin(it) => &it.syntax,
-            Item::Commit(it) => &it.syntax,
-            Item::CreateIndex(it) => &it.syntax,
-            Item::DropTable(it) => &it.syntax,
-            Item::DropIndex(it) => &it.syntax,
-            Item::DropType(it) => &it.syntax,
-            Item::CreateDomain(it) => &it.syntax,
-            Item::AlterDomain(it) => &it.syntax,
-            Item::AlterAggregate(it) => &it.syntax,
-            Item::CreateAggregate(it) => &it.syntax,
-            Item::DropAggregate(it) => &it.syntax,
-            Item::Rollback(it) => &it.syntax,
-            Item::Truncate(it) => &it.syntax,
+            Stmt::Select(it) => &it.syntax,
+            Stmt::CreateFunc(it) => &it.syntax,
+            Stmt::AlterTable(it) => &it.syntax,
+            Stmt::DropDatabase(it) => &it.syntax,
+            Stmt::CreateTable(it) => &it.syntax,
+            Stmt::Begin(it) => &it.syntax,
+            Stmt::Commit(it) => &it.syntax,
+            Stmt::CreateIndex(it) => &it.syntax,
+            Stmt::DropTable(it) => &it.syntax,
+            Stmt::DropIndex(it) => &it.syntax,
+            Stmt::DropType(it) => &it.syntax,
+            Stmt::CreateDomain(it) => &it.syntax,
+            Stmt::AlterDomain(it) => &it.syntax,
+            Stmt::AlterAggregate(it) => &it.syntax,
+            Stmt::CreateAggregate(it) => &it.syntax,
+            Stmt::DropAggregate(it) => &it.syntax,
+            Stmt::Rollback(it) => &it.syntax,
+            Stmt::Truncate(it) => &it.syntax,
         }
     }
 }

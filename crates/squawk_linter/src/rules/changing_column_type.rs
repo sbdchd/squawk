@@ -8,7 +8,7 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for item in file.items() {
-        if let ast::Item::AlterTable(alter_table) = item {
+        if let ast::Stmt::AlterTable(alter_table) = item {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AlterColumn(alter_column) = action {
                     if let Some(ast::AlterColumnOption::SetType(set_type)) = alter_column.option() {

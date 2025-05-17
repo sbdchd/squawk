@@ -8,7 +8,7 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn adding_required_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for item in file.items() {
-        if let ast::Item::AlterTable(alter_table) = item {
+        if let ast::Stmt::AlterTable(alter_table) = item {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddColumn(add_column) = action {
                     if has_generated_constrait(add_column.constraints()) {

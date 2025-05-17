@@ -11,7 +11,7 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
     let file = parse.tree();
     let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
     for item in file.items() {
-        if let ast::Item::CreateIndex(create_index) = item {
+        if let ast::Stmt::CreateIndex(create_index) = item {
             if let Some(table_name) = create_index
                 .path()
                 .and_then(|x| x.segment())

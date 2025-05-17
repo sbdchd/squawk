@@ -10,7 +10,7 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
     let help = "Add the `PRIMARY KEY` constraint `USING` an index.";
     let file = parse.tree();
     for item in file.items() {
-        if let ast::Item::AlterTable(alter_table) = item {
+        if let ast::Stmt::AlterTable(alter_table) = item {
             for action in alter_table.actions() {
                 match action {
                     ast::AlterTableAction::AddConstraint(add_constraint) => {

@@ -22,7 +22,7 @@ pub(crate) fn {rule_name_snake}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
     for item in file.items() {{
         match item {{
             // TODO: update to the item you want to check
-            ast::Item::CreateTable(create_table) => {{
+            ast::Stmt::CreateTable(create_table) => {{
                 ctx.report(Violation::new(
                     Rule::{rule_name_pascal},
                     "todo".to_string(),

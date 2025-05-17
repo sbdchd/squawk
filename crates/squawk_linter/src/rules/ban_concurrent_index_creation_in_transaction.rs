@@ -16,13 +16,13 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
     for item in file.items() {
         stmt_count += 1;
         match item {
-            ast::Item::Begin(_) => {
+            ast::Stmt::Begin(_) => {
                 in_transaction = true;
             }
-            ast::Item::Commit(_) => {
+            ast::Stmt::Commit(_) => {
                 in_transaction = false;
             }
-            ast::Item::CreateIndex(create_index) => {
+            ast::Stmt::CreateIndex(create_index) => {
                 if in_transaction {
                     if let Some(concurrently) = create_index.concurrently_token() {
                         errors.push(Violation::new(

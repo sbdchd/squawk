@@ -207,7 +207,7 @@ fn api_walkthrough() {
     let mut func = None;
     for item in file.items() {
         match item {
-            ast::Item::CreateFunc(f) => func = Some(f),
+            ast::Stmt::CreateFunc(f) => func = Some(f),
             _ => unreachable!(),
         }
     }

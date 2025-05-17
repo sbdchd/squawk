@@ -12,7 +12,7 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
     for item in file.items() {
         match item {
-            ast::Item::Begin(_) => {
+            ast::Stmt::Begin(_) => {
                 if ctx.settings.assume_in_transaction {
                     ctx.report(Violation::new(
                         Rule::TransactionNesting,
@@ -30,7 +30,7 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 }
                 in_explicit_transaction = true;
             }
-            ast::Item::Commit(_) | ast::Item::Rollback(_) => {
+            ast::Stmt::Commit(_) | ast::Stmt::Rollback(_) => {
                 if ctx.settings.assume_in_transaction {
                     ctx.report(Violation::new(
                         Rule::TransactionNesting,
