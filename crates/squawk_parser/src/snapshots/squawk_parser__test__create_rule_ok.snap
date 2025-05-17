@@ -128,7 +128,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
       WHITESPACE " "
-      SELECT
+      VALUES
         VALUES_KW "values"
         WHITESPACE " "
         L_PAREN "("
@@ -152,7 +152,7 @@ SOURCE_FILE
             IDENT "t"
     SEMICOLON ";"
     WHITESPACE "\n    "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("

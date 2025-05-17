@@ -2353,7 +2353,7 @@ fn select_stmt(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
     // table [only] name [*]
     if p.eat(TABLE_KW) {
         relation_name(p);
-        return Some(m.complete(p, SELECT));
+        return Some(m.complete(p, TABLE_STMT));
     }
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
@@ -8252,7 +8252,7 @@ fn create_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         },
     );
     match statement.map(|x| x.kind()) {
-        Some(SELECT) => (),
+        Some(SELECT | TABLE_STMT | VALUES) => (),
         Some(kind) => {
             p.error(format!(
                 "expected SELECT, TABLE, or VALUES statement, got {:?}",
@@ -8584,7 +8584,7 @@ fn select_insert_delete_update_or_notify(p: &mut Parser<'_>) {
     );
     if let Some(statement) = statement {
         match statement.kind() {
-            SELECT | INSERT_STMT | UPDATE_STMT | DELETE_STMT | NOTIFY_STMT => (),
+            SELECT | VALUES | INSERT_STMT | UPDATE_STMT | DELETE_STMT | NOTIFY_STMT => (),
             kind => {
                 p.error(format!(
                     "expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement, got {:?}",
@@ -9656,6 +9656,7 @@ fn explain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if let Some(statement) = statement {
         match statement.kind() {
             SELECT
+            | VALUES
             | INSERT_STMT
             | UPDATE_STMT
             | DELETE_STMT
@@ -10626,7 +10627,7 @@ fn values_clause(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     opt_limit_clause(p);
     opt_offset_clause(p);
     opt_fetch_clause(p);
-    m.complete(p, SELECT)
+    m.complete(p, VALUES)
 }
 
 // REINDEX [ ( option [, ...] ) ] { INDEX | TABLE | SCHEMA } [ CONCURRENTLY ] name
@@ -10796,7 +10797,7 @@ fn prepare_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     );
     if let Some(statement) = statement {
         match statement.kind() {
-            SELECT | INSERT_STMT | UPDATE_STMT | DELETE_STMT | MERGE_STMT => (),
+            SELECT | VALUES | INSERT_STMT | UPDATE_STMT | DELETE_STMT | MERGE_STMT => (),
             kind => {
                 p.error(format!(
                     "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {:?}",
@@ -12985,7 +12986,7 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             p.bump(CLUSTER_KW);
             p.bump(ON_KW);
             name_ref(p);
-            DISABLE_CLUSTER
+            CLUSTER_ON
         }
         // OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
         OWNER_KW => {
