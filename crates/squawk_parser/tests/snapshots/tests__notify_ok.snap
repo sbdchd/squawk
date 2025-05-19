@@ -1,0 +1,26 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/notify.sql
+snapshot_kind: text
+---
+SOURCE_FILE
+  COMMENT "-- notify_stmt"
+  WHITESPACE "\n"
+  NOTIFY_STMT
+    NOTIFY_KW "NOTIFY"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  NOTIFY_STMT
+    NOTIFY_KW "NOTIFY"
+    WHITESPACE " "
+    NAME
+      IDENT "virtual"
+    COMMA ","
+    WHITESPACE " "
+    LITERAL
+      STRING "'This is the payload'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
