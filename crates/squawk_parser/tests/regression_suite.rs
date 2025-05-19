@@ -85,5 +85,8 @@ fn sqltest(fixture: Fixture<&str>) {
       assert_snapshot!(test_name, parsed);
     });
 
+    if has_errors {
+        println!("Errors in {test_name}");
+    }
     assert!(!has_errors, "regression tests can't have parser errors.");
 }
