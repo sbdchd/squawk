@@ -801,7 +801,7 @@ SOURCE_FILE
               NAME_REF
                 ANY_KW "any"
               L_PAREN "("
-              SELECT
+              VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
                 L_PAREN "("
@@ -979,7 +979,7 @@ SOURCE_FILE
               NAME_REF
                 ANY_KW "any"
               L_PAREN "("
-              SELECT
+              VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
                 L_PAREN "("
@@ -4939,7 +4939,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- simple"
   WHITESPACE "\n"
-  SELECT
+  TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
     PATH
@@ -4950,7 +4950,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- only"
   WHITESPACE "\n"
-  SELECT
+  TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
     ONLY_KW "only"
@@ -4963,7 +4963,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- star"
   WHITESPACE "\n"
-  SELECT
+  TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
     PATH
@@ -4984,7 +4984,7 @@ SOURCE_FILE
         TARGET
           PAREN_EXPR
             L_PAREN "("
-            SELECT
+            TABLE_STMT
               TABLE_KW "table"
               WHITESPACE " "
               PATH

@@ -1657,7 +1657,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE " "
-    DISABLE_CLUSTER
+    CLUSTER_ON
       CLUSTER_KW "cluster"
       WHITESPACE " "
       ON_KW "on"

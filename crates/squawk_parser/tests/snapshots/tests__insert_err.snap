@@ -32,7 +32,7 @@ SOURCE_FILE
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -84,7 +84,7 @@ SOURCE_FILE
         COMMA ","
       R_PAREN ")"
     WHITESPACE "\n  "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -138,7 +138,7 @@ SOURCE_FILE
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("

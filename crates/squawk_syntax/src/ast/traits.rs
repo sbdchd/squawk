@@ -16,7 +16,7 @@ pub trait HasArgList: AstNode {
 }
 
 pub trait HasModuleItem: AstNode {
-    fn items(&self) -> AstChildren<ast::Item> {
+    fn items(&self) -> AstChildren<ast::Stmt> {
         support::children(self.syntax())
     }
 }

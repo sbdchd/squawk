@@ -349,7 +349,7 @@ SOURCE_FILE
     AS_KW "AS"
     WHITESPACE "\n    "
     COMPOUND_SELECT
-      SELECT
+      VALUES
         VALUES_KW "VALUES"
         WHITESPACE " "
         L_PAREN "("

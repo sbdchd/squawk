@@ -7,7 +7,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- trailing comma and missing comma between value lists"
   WHITESPACE "\n"
-  SELECT
+  VALUES
     VALUES_KW "values"
     WHITESPACE " "
     L_PAREN "("
@@ -25,7 +25,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- extra comma, aka missing tuple"
   WHITESPACE "\n"
-  SELECT
+  VALUES
     VALUES_KW "values"
     WHITESPACE " "
     L_PAREN "("

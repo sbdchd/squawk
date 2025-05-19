@@ -9,7 +9,7 @@ pub(crate) fn ban_truncate_cascade(ctx: &mut Linter, parse: &Parse<SourceFile>) 
     let file = parse.tree();
     for item in file.items() {
         match item {
-            ast::Item::Truncate(truncate) => {
+            ast::Stmt::Truncate(truncate) => {
                 if let Some(cascade) = truncate.cascade_token() {
                     // TODO: if we had knowledge about the entire schema, we
                     // could be more precise here and actually navigate the

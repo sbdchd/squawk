@@ -6,7 +6,7 @@ snapshot_kind: text
 SOURCE_FILE
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  SELECT
+  VALUES
     VALUES_KW "VALUES"
     WHITESPACE " "
     L_PAREN "("
@@ -116,7 +116,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "films"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE "\n    "
       L_PAREN "("
@@ -198,7 +198,7 @@ SOURCE_FILE
       WHITESPACE " "
       PAREN_EXPR
         L_PAREN "("
-        SELECT
+        VALUES
           VALUES_KW "VALUES"
           L_PAREN "("
           LITERAL
@@ -314,7 +314,7 @@ SOURCE_FILE
       WHITESPACE " "
       PAREN_EXPR
         L_PAREN "("
-        SELECT
+        VALUES
           VALUES_KW "VALUES"
           L_PAREN "("
           LITERAL
@@ -435,7 +435,7 @@ SOURCE_FILE
         WHITESPACE " "
         PAREN_EXPR
           L_PAREN "("
-          SELECT
+          VALUES
             VALUES_KW "VALUES"
             L_PAREN "("
             CAST_EXPR
@@ -466,7 +466,7 @@ SOURCE_FILE
   COMMENT "-- union"
   WHITESPACE "\n"
   COMPOUND_SELECT
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -480,7 +480,7 @@ SOURCE_FILE
     WHITESPACE " "
     UNION_KW "union"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -496,7 +496,7 @@ SOURCE_FILE
   COMMENT "-- union_select_values"
   WHITESPACE "\n"
   COMPOUND_SELECT
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -507,7 +507,7 @@ SOURCE_FILE
     UNION_KW "union"
     WHITESPACE " "
     COMPOUND_SELECT
-      SELECT
+      VALUES
         VALUES_KW "values"
         WHITESPACE " "
         L_PAREN "("
@@ -543,7 +543,7 @@ SOURCE_FILE
             UNION_KW "union"
             WHITESPACE " "
             COMPOUND_SELECT
-              SELECT
+              VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
                 L_PAREN "("

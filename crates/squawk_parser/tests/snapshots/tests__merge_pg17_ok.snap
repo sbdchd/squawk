@@ -545,7 +545,7 @@ SOURCE_FILE
     WHITESPACE " "
     VALUE_KW "value"
     WHITESPACE "\n    "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -981,7 +981,7 @@ SOURCE_FILE
           IDENT "balance"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1115,7 +1115,7 @@ SOURCE_FILE
           IDENT "balance"
       R_PAREN ")"
     WHITESPACE "\n  "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1206,7 +1206,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     INSERT_KW "INSERT"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       L_PAREN "("
       FIELD_EXPR
@@ -1366,7 +1366,7 @@ SOURCE_FILE
     WHITESPACE "\n  "
     INSERT_KW "INSERT"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       L_PAREN "("
       FIELD_EXPR
