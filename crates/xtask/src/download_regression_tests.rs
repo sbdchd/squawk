@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{bail, Result};
 use camino::Utf8PathBuf;
 use std::fs::{create_dir_all, remove_dir_all, File};
 use std::io::{BufRead, Cursor, Write};
