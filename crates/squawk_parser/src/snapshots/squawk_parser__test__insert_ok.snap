@@ -15,7 +15,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "products"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -59,7 +59,7 @@ SOURCE_FILE
           IDENT "price"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -103,7 +103,7 @@ SOURCE_FILE
           IDENT "product_no"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("
@@ -162,7 +162,7 @@ SOURCE_FILE
           IDENT "price"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE "\n    "
       L_PAREN "("
@@ -357,7 +357,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "films"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE "\n    "
       L_PAREN "("
@@ -423,7 +423,7 @@ SOURCE_FILE
           IDENT "kind"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -458,7 +458,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "films"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE "\n    "
       L_PAREN "("
@@ -524,7 +524,7 @@ SOURCE_FILE
           IDENT "kind"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -601,7 +601,7 @@ SOURCE_FILE
           IDENT "kind"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE "\n    "
       L_PAREN "("
@@ -725,7 +725,7 @@ SOURCE_FILE
           R_BRACK "]"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -762,7 +762,7 @@ SOURCE_FILE
           IDENT "board"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -797,7 +797,7 @@ SOURCE_FILE
           IDENT "dname"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -947,7 +947,7 @@ SOURCE_FILE
           IDENT "dname"
       R_PAREN ")"
     WHITESPACE "\n    "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1019,7 +1019,7 @@ SOURCE_FILE
           IDENT "dname"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1075,7 +1075,7 @@ SOURCE_FILE
           IDENT "dname"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1185,7 +1185,7 @@ SOURCE_FILE
           IDENT "dname"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1241,7 +1241,7 @@ SOURCE_FILE
           IDENT "dname"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
       L_PAREN "("
@@ -1297,7 +1297,7 @@ SOURCE_FILE
           IDENT "c"
       R_PAREN ")"
     WHITESPACE " "
-    SELECT
+    VALUES
       VALUES_KW "values"
       WHITESPACE " "
       L_PAREN "("

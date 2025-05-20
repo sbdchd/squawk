@@ -15,13 +15,13 @@ pub fn tables_created_in_transaction(
     let mut inside_transaction = assume_in_transaction;
     for item in file.items() {
         match item {
-            ast::Item::Begin(_) => {
+            ast::Stmt::Begin(_) => {
                 inside_transaction = true;
             }
-            ast::Item::Commit(_) => {
+            ast::Stmt::Commit(_) => {
                 inside_transaction = false;
             }
-            ast::Item::CreateTable(create_table) if inside_transaction => {
+            ast::Stmt::CreateTable(create_table) if inside_transaction => {
                 let Some(table_name) = create_table
                     .path()
                     .and_then(|x| x.segment())
@@ -46,7 +46,7 @@ fn not_valid_validate_in_transaction(
     let mut not_valid_names: HashSet<String> = HashSet::new();
     for item in file.items() {
         match item {
-            ast::Item::AlterTable(alter_table) => {
+            ast::Stmt::AlterTable(alter_table) => {
                 for action in alter_table.actions() {
                     match action {
                         ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
@@ -81,13 +81,13 @@ fn not_valid_validate_in_transaction(
                     }
                 }
             }
-            ast::Item::Begin(_) => {
+            ast::Stmt::Begin(_) => {
                 if !inside_transaction {
                     not_valid_names.clear();
                 }
                 inside_transaction = true;
             }
-            ast::Item::Commit(_) => {
+            ast::Stmt::Commit(_) => {
                 inside_transaction = false;
             }
             _ => (),
@@ -105,7 +105,7 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
     let tables_created = tables_created_in_transaction(assume_in_transaction, &file);
 
     for item in file.items() {
-        if let ast::Item::AlterTable(alter_table) = item {
+        if let ast::Stmt::AlterTable(alter_table) = item {
             let Some(table_name) = alter_table
                 .path()
                 .and_then(|x| x.segment())

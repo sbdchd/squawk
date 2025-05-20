@@ -41,7 +41,7 @@ pub(crate) fn check_not_allowed_types(
 ) {
     for item in file.items() {
         match item {
-            ast::Item::CreateTable(create_table) => {
+            ast::Stmt::CreateTable(create_table) => {
                 if let Some(table_args) = create_table.table_args() {
                     for arg in table_args.args() {
                         if let ast::TableArg::Column(column) = arg {
@@ -50,7 +50,7 @@ pub(crate) fn check_not_allowed_types(
                     }
                 }
             }
-            ast::Item::AlterTable(alter_table) => {
+            ast::Stmt::AlterTable(alter_table) => {
                 for action in alter_table.actions() {
                     match action {
                         ast::AlterTableAction::AddColumn(add_column) => {

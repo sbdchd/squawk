@@ -195,7 +195,7 @@ SOURCE_FILE
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SELECT
+  TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
     PATH
@@ -209,7 +209,7 @@ SOURCE_FILE
           TABLE_KW "table"
   SEMICOLON ";"
   WHITESPACE "\n"
-  SELECT
+  TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
     PATH

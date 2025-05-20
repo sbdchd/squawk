@@ -11,7 +11,7 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
     for item in file.items() {
-        if let ast::Item::AlterTable(alter_table) = item {
+        if let ast::Stmt::AlterTable(alter_table) = item {
             for action in alter_table.actions() {
                 match action {
                     ast::AlterTableAction::AddConstraint(add_constraint) => {

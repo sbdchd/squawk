@@ -2492,7 +2492,7 @@ SOURCE_FILE
               EXISTS_KW "exists"
             ARG_LIST
               L_PAREN "("
-              SELECT
+              VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
                 L_PAREN "("

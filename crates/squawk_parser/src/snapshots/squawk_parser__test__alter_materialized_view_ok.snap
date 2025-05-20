@@ -691,7 +691,7 @@ SOURCE_FILE
         NAME_REF
           IDENT "v"
     WHITESPACE "\n  "
-    DISABLE_CLUSTER
+    CLUSTER_ON
       CLUSTER_KW "cluster"
       WHITESPACE " "
       ON_KW "on"

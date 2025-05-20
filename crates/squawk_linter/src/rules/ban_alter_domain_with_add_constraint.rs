@@ -8,7 +8,7 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for item in file.items() {
-        if let ast::Item::AlterDomain(alter_domain) = item {
+        if let ast::Stmt::AlterDomain(alter_domain) = item {
             let actions = alter_domain.actions();
             for action in actions {
                 if let ast::AlterDomainAction::AddConstraint(add_constraint) = action {
