@@ -8,7 +8,7 @@ pub(crate) fn download_regression_tests() -> Result<()> {
     let target_dir = Utf8PathBuf::from("crates/squawk_parser/tests/data/regression_suite");
 
     if target_dir.exists() {
-        println!("Cleaning target directory: {}", target_dir.display());
+        println!("Cleaning target directory: {:?}", target_dir);
         remove_dir_all(&target_dir)?;
     }
 
