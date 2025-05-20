@@ -1,11 +1,11 @@
 use anyhow::Result;
+use camino::Utf8PathBuf;
 use std::fs::{create_dir_all, remove_dir_all, File};
 use std::io::{BufRead, Cursor, Write};
-use std::path::PathBuf;
 use std::process::Command;
 
 pub(crate) fn download_regression_tests() -> Result<()> {
-    let target_dir = PathBuf::from("crates/squawk_parser/tests/data/regression_suite");
+    let target_dir = Utf8PathBuf::from("crates/squawk_parser/tests/data/regression_suite");
 
     if target_dir.exists() {
         println!("Cleaning target directory: {}", target_dir.display());
@@ -32,7 +32,7 @@ pub(crate) fn download_regression_tests() -> Result<()> {
 
         if !output.status.success() {
             let error_msg = String::from_utf8_lossy(&output.stderr);
-            return Err(anyhow::anyhow!(
+            bail!(anyhow::anyhow!(
                 "Failed to download '{}': {}",
                 url,
                 error_msg
@@ -68,7 +68,7 @@ fn fetch_download_urls() -> Result<Vec<String>> {
         .output()?;
 
     if !output.status.success() {
-        return Err(anyhow::anyhow!(
+        bail!(anyhow::anyhow!(
             "Failed to fetch SQL files: {}",
             String::from_utf8_lossy(&output.stderr)
         ));
@@ -90,7 +90,7 @@ fn fetch_download_urls() -> Result<Vec<String>> {
         .collect();
 
     if urls.is_empty() {
-        return Err(anyhow::anyhow!("No SQL files found"));
+        bail!(anyhow::anyhow!("No SQL files found"));
     }
 
     Ok(urls)
