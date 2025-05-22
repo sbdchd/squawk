@@ -60,9 +60,6 @@ mod event;
 mod input;
 mod output;
 
-#[cfg(test)]
-mod test;
-
 pub use crate::{
     lexed_str::LexedStr,
     // output::{Output, Step},

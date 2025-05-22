@@ -1,0 +1,21 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/close.sql
+snapshot_kind: text
+---
+SOURCE_FILE
+  COMMENT "-- pg_docs"
+  WHITESPACE "\n"
+  CLOSE_STMT
+    CLOSE_KW "close"
+    WHITESPACE " "
+    NAME
+      IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  CLOSE_STMT
+    CLOSE_KW "close"
+    WHITESPACE " "
+    ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
