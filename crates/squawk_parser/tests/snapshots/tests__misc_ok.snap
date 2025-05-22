@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/misc.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   CREATE_TABLE
@@ -100,7 +99,7 @@ SOURCE_FILE
             WHITESPACE "\n    "
             CAST_EXPR
               LITERAL
-                PARAM "$1"
+                POSITIONAL_PARAM "$1"
               COLON2 "::"
               ARRAY_TYPE
                 PATH_TYPE
@@ -114,7 +113,7 @@ SOURCE_FILE
             WHITESPACE " \n    "
             CAST_EXPR
               LITERAL
-                PARAM "$2"
+                POSITIONAL_PARAM "$2"
               COLON2 "::"
               ARRAY_TYPE
                 PATH_TYPE
@@ -128,7 +127,7 @@ SOURCE_FILE
             WHITESPACE " \n    "
             CAST_EXPR
               LITERAL
-                PARAM "$3"
+                POSITIONAL_PARAM "$3"
               COLON2 "::"
               ARRAY_TYPE
                 PATH_TYPE
@@ -174,29 +173,29 @@ SOURCE_FILE
       WHITESPACE " \n  "
       L_PAREN "("
       LITERAL
-        PARAM "$1"
+        POSITIONAL_PARAM "$1"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$2"
+        POSITIONAL_PARAM "$2"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$3"
+        POSITIONAL_PARAM "$3"
       R_PAREN ")"
       COMMA ","
       WHITESPACE " \n  "
       L_PAREN "("
       LITERAL
-        PARAM "$4"
+        POSITIONAL_PARAM "$4"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$5"
+        POSITIONAL_PARAM "$5"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$6"
+        POSITIONAL_PARAM "$6"
       R_PAREN ")"
       COMMA ","
       WHITESPACE " \n  "
@@ -204,15 +203,15 @@ SOURCE_FILE
       WHITESPACE "\n  "
       L_PAREN "("
       LITERAL
-        PARAM "$2998"
+        POSITIONAL_PARAM "$2998"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$2999"
+        POSITIONAL_PARAM "$2999"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$3000"
+        POSITIONAL_PARAM "$3000"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
@@ -294,7 +293,7 @@ SOURCE_FILE
             IDENT "api_key"
           FAT_ARROW "=>"
           LITERAL
-            PARAM "$1"
+            POSITIONAL_PARAM "$1"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE " "
@@ -342,7 +341,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           LITERAL
-            PARAM "$1"
+            POSITIONAL_PARAM "$1"
           R_PAREN ")"
       WHITESPACE " "
       ALIAS
@@ -492,7 +491,7 @@ SOURCE_FILE
                     COMMA ","
                     WHITESPACE " "
                     LITERAL
-                      PARAM "$1"
+                      POSITIONAL_PARAM "$1"
                     WHITESPACE "\n        "
                     COMMA ","
                     WHITESPACE " "
@@ -512,7 +511,7 @@ SOURCE_FILE
                         IDENT "_api_key"
                       FAT_ARROW "=>"
                       LITERAL
-                        PARAM "$2"
+                        POSITIONAL_PARAM "$2"
                     WHITESPACE "\n    "
                     R_PAREN ")"
                 WHITESPACE " "
@@ -648,14 +647,14 @@ SOURCE_FILE
                 COMMENT "-- %s,"
                 WHITESPACE "\n        "
                 LITERAL
-                  PARAM "$1"
+                  POSITIONAL_PARAM "$1"
                 COMMA ","
                 WHITESPACE "\n        "
                 COMMENT "-- %s::jsonb,"
                 WHITESPACE "\n        "
                 CAST_EXPR
                   LITERAL
-                    PARAM "$2"
+                    POSITIONAL_PARAM "$2"
                   COLON2 "::"
                   PATH_TYPE
                     PATH
@@ -681,7 +680,7 @@ SOURCE_FILE
                     IDENT "api_key"
                   FAT_ARROW "=>"
                   LITERAL
-                    PARAM "$3"
+                    POSITIONAL_PARAM "$3"
                 WHITESPACE "\n    "
                 R_PAREN ")"
             CUSTOM_OP
