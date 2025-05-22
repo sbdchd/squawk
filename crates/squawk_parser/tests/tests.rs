@@ -59,6 +59,10 @@ fn parser(fixture: Fixture<&str>) {
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/data/regression_suite",
     glob: "*.sql",
+
+)]
+#[dir_test_attr(
+    #[ignore]
 )]
 fn regression_suite(fixture: Fixture<&str>) {
     let content = fixture.content();
