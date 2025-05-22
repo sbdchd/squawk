@@ -777,9 +777,9 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return Some(m);
     }
     let done = match (p.current(), p.nth(1)) {
-        (PARAM, _) => {
+        (POSITIONAL_PARAM, _) => {
             let m = p.start();
-            p.bump(PARAM);
+            p.bump(POSITIONAL_PARAM);
             m.complete(p, LITERAL)
         }
         (VALUES_KW, _) => values_clause(p, None),
@@ -4116,7 +4116,16 @@ pub(crate) const OPERATOR_FIRST: TokenSet = TokenSet::new(&[
 ]);
 
 const LHS_FIRST: TokenSet = TokenSet::new(&[
-    L_PAREN, L_BRACK, CAST_KW, NOT_KW, IS_KW, PARAM, CASE_KW, ARRAY_KW, ROW_KW, DEFAULT_KW,
+    L_PAREN,
+    L_BRACK,
+    CAST_KW,
+    NOT_KW,
+    IS_KW,
+    POSITIONAL_PARAM,
+    CASE_KW,
+    ARRAY_KW,
+    ROW_KW,
+    DEFAULT_KW,
 ])
 .union(OPERATOR_FIRST)
 .union(LITERAL_FIRST)
