@@ -7,7 +7,7 @@ mod utils;
 
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/data",
-    glob: "**/*.sql",
+    glob: "{ok,err}/**/*.sql",
 )]
 fn parser(fixture: Fixture<&str>) {
     let content = fixture.content();
@@ -53,5 +53,31 @@ fn parser(fixture: Fixture<&str>) {
             has_errors,
             "tests defined in the `err` directory must have parser errors."
         );
+    }
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/tests/data/regression_suite",
+    glob: "*.sql",
+)]
+fn regression_suite(fixture: Fixture<&str>) {
+    let content = fixture.content();
+    let absolute_fixture_path = Utf8Path::new(fixture.path());
+    let input_file = absolute_fixture_path;
+    let test_name = absolute_fixture_path
+        .file_name()
+        .and_then(|x| x.strip_suffix(".sql"))
+        .unwrap();
+
+    let (parsed, has_errors) = utils::parse_text(content);
+
+    if has_errors {
+        with_settings!({
+          omit_expression => true,
+          input_file => input_file,
+          snapshot_path => "snapshots/regression_suite",
+        }, {
+          assert_snapshot!(test_name, parsed);
+        });
     }
 }

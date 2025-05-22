@@ -1,11 +1,14 @@
 use anyhow::{bail, Result};
 use camino::Utf8PathBuf;
+use regex::Regex;
 use std::fs::{create_dir_all, remove_dir_all, File};
 use std::io::{BufRead, Cursor, Write};
 use std::process::Command;
 
+const OUTPUT_DIR: &str = "crates/squawk_parser/tests/data/regression_suite";
+
 pub(crate) fn download_regression_tests() -> Result<()> {
-    let target_dir = Utf8PathBuf::from("crates/squawk_parser/tests/data/regression_suite");
+    let target_dir = Utf8PathBuf::from(OUTPUT_DIR);
 
     if target_dir.exists() {
         println!("Cleaning target directory: {:?}", target_dir);
@@ -99,7 +102,9 @@ fn fetch_download_urls() -> Result<Vec<String>> {
 fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Result<()> {
     let mut skipping_copy_block = false;
 
-    for line in source.lines() {
+    let template_vars_regex = Regex::new(r"^:'([^']+)'|^:([a-zA-Z_][a-zA-Z0-9_]*)").unwrap();
+
+    for (idx, line) in source.lines().enumerate() {
         let mut line = line?;
 
         // Detect the start of the COPY block
@@ -129,9 +134,128 @@ fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Result<()> {
             line = line.replace("\\gset", ";");
         }
 
+        // Replace template variables
+        let mut result = String::new();
+        let mut i = 0;
+        let bytes = line.as_bytes();
+        let mut in_single_quote = false;
+        let mut in_double_quote = false;
+        let mut in_array = false;
+
+        while i < bytes.len() {
+            let c = bytes[i] as char;
+
+            // Handle quote state transitions
+            match c {
+                '\'' => {
+                    result.push(c);
+                    i += 1;
+                    in_single_quote = !in_single_quote;
+                    continue;
+                }
+                '"' => {
+                    result.push(c);
+                    i += 1;
+                    in_double_quote = !in_double_quote;
+                    continue;
+                }
+                '[' => {
+                    result.push(c);
+                    i += 1;
+                    in_array = true;
+                    continue;
+                }
+                ']' => {
+                    result.push(c);
+                    i += 1;
+                    in_array = false;
+                    continue;
+                }
+                ':' if !in_single_quote && !in_double_quote && !in_array => {
+                    // Skip type casts (e.g., ::text)
+                    if i + 1 < bytes.len() && bytes[i + 1] as char == ':' {
+                        result.push_str("::");
+                        i += 2;
+                        continue;
+                    }
+
+                    if i + 2 < bytes.len() && bytes[i + 1] as char == '=' {
+                        result.push_str(":=");
+                        i += 2;
+                        continue;
+                    }
+
+                    let remaining = &line[i..];
+                    if let Some(caps) = template_vars_regex.captures(remaining) {
+                        let full = caps.get(0).unwrap();
+                        let m = caps.get(1).or_else(|| caps.get(2)).unwrap();
+                        let matched_var = &remaining[m.start()..m.end()];
+
+                        println!("#{} Replacing template variable {}", idx, matched_var);
+
+                        result.push('\'');
+                        result.push_str(matched_var);
+                        result.push('\'');
+
+                        i += full.end();
+                        continue;
+                    }
+                }
+                _ => {}
+            }
+
+            result.push(c);
+            i += 1;
+        }
+
         // Write the cleaned line
-        writeln!(dest, "{}", line)?;
+        writeln!(dest, "{}", result)?;
     }
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn test_preprocess_sql(sql: &str) -> Result<String> {
+        let input = sql.as_bytes();
+        let mut output = Vec::new();
+        let cursor = Cursor::new(input);
+        preprocess_sql(cursor, &mut output)?;
+        String::from_utf8(output).map_err(Into::into)
+    }
+
+    #[test]
+    fn test_replacement() {
+        let cases = [
+            (
+                "SELECT * FROM foo WHERE bar = :'foo' AND baz = :baz;",
+                "SELECT * FROM foo WHERE bar = 'foo' AND baz = 'baz';",
+            ),
+            (
+                "select array_dims('{1,2,3}'::dia);",
+                "select array_dims('{1,2,3}'::dia);",
+            ),
+            (
+                "SELECT to_char(now(), 'OF') as \"OF\", to_char(now(), 'TZH:TZM') as \"TZH:TZM\";",
+                "SELECT to_char(now(), 'OF') as \"OF\", to_char(now(), 'TZH:TZM') as \"TZH:TZM\";",
+            ),
+            (
+                "SELECT ('{{{1},{2},{3}},{{4},{5},{6}}}'::int[])[1][1:NULL][1];",
+                "SELECT ('{{{1},{2},{3}},{{4},{5},{6}}}'::int[])[1][1:NULL][1];",
+            ),
+            ("d := $1::di;", "d := $1::di;"),
+            (
+                "SELECT JSON_OBJECT('foo': NULL::int FORMAT JSON);",
+                "SELECT JSON_OBJECT('foo': NULL::int FORMAT JSON);",
+            ),
+        ];
+
+        for (input, expected) in &cases {
+            let result = test_preprocess_sql(input).unwrap();
+            assert_eq!(result, format!("{}\n", *expected));
+        }
+    }
 }
