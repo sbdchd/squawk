@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select_operators.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- logical_operators"
@@ -3767,7 +3766,7 @@ SOURCE_FILE
         TARGET
           INDEX_EXPR
             LITERAL
-              PARAM "$1"
+              POSITIONAL_PARAM "$1"
             L_BRACK "["
             LITERAL
               INT_NUMBER "10"

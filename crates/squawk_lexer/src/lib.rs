@@ -114,7 +114,7 @@ impl Cursor<'_> {
                     while self.first().is_ascii_digit() {
                         self.bump();
                     }
-                    TokenKind::Param
+                    TokenKind::PositionalParam
                 }
             }
             '`' => TokenKind::Backtick,

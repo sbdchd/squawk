@@ -80,7 +80,7 @@ pub enum TokenKind {
     /// Positional Parameter, e.g., `$1`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-expressions.html#SQL-EXPRESSIONS-PARAMETERS-POSITIONAL>
-    Param,
+    PositionalParam,
     /// Quoted Identifier, e.g., `"update"` in `update "my_table" set "a" = 5;`
     ///
     /// These are case-sensitive, unlike [`TokenKind::Ident`]

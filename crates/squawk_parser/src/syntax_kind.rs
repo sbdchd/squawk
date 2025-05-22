@@ -1104,7 +1104,7 @@ pub enum SyntaxKind {
     /// see: <https://www.postgresql.org/docs/17/sql-syntax-lexical.html#SQL-SYNTAX-COMMENTS>
     COMMENT,
     IDENT,
-    PARAM,
+    POSITIONAL_PARAM,
     ERROR,
     WHITESPACE,
 
@@ -1250,6 +1250,7 @@ pub enum SyntaxKind {
     CREATE_TYPE_STMT,
     CREATE_TRIGGER_STMT,
     CREATE_FUNCTION_STMT,
+    PARAM,
     PARAM_IN,
     PARAM_OUT,
     PARAM_INOUT,
