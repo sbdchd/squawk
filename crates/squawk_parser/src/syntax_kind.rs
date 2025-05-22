@@ -340,6 +340,8 @@ pub enum SyntaxKind {
     ENCRYPTED_KW,
     /// `end`
     END_KW,
+    /// `enforced`
+    ENFORCED_KW,
     /// `enum`
     ENUM_KW,
     /// `error`
@@ -648,6 +650,8 @@ pub enum SyntaxKind {
     NUMERIC_KW,
     /// `object`
     OBJECT_KW,
+    /// `objects`
+    OBJECTS_KW,
     /// `of`
     OF_KW,
     /// `off`
@@ -1014,6 +1018,8 @@ pub enum SyntaxKind {
     VIEW_KW,
     /// `views`
     VIEWS_KW,
+    /// `virtual`
+    VIRTUAL_KW,
     /// `volatile`
     VOLATILE_KW,
     /// `when`
@@ -1775,6 +1781,8 @@ impl SyntaxKind {
             SyntaxKind::ENCRYPTED_KW
         } else if ident.eq_ignore_ascii_case("end") {
             SyntaxKind::END_KW
+        } else if ident.eq_ignore_ascii_case("enforced") {
+            SyntaxKind::ENFORCED_KW
         } else if ident.eq_ignore_ascii_case("enum") {
             SyntaxKind::ENUM_KW
         } else if ident.eq_ignore_ascii_case("error") {
@@ -2083,6 +2091,8 @@ impl SyntaxKind {
             SyntaxKind::NUMERIC_KW
         } else if ident.eq_ignore_ascii_case("object") {
             SyntaxKind::OBJECT_KW
+        } else if ident.eq_ignore_ascii_case("objects") {
+            SyntaxKind::OBJECTS_KW
         } else if ident.eq_ignore_ascii_case("of") {
             SyntaxKind::OF_KW
         } else if ident.eq_ignore_ascii_case("off") {
@@ -2449,6 +2459,8 @@ impl SyntaxKind {
             SyntaxKind::VIEW_KW
         } else if ident.eq_ignore_ascii_case("views") {
             SyntaxKind::VIEWS_KW
+        } else if ident.eq_ignore_ascii_case("virtual") {
+            SyntaxKind::VIRTUAL_KW
         } else if ident.eq_ignore_ascii_case("volatile") {
             SyntaxKind::VOLATILE_KW
         } else if ident.eq_ignore_ascii_case("when") {
@@ -2602,6 +2614,7 @@ pub(crate) const COLUMN_OR_TABLE_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::ENABLE_KW,
     SyntaxKind::ENCODING_KW,
     SyntaxKind::ENCRYPTED_KW,
+    SyntaxKind::ENFORCED_KW,
     SyntaxKind::ENUM_KW,
     SyntaxKind::ERROR_KW,
     SyntaxKind::ESCAPE_KW,
@@ -2725,6 +2738,7 @@ pub(crate) const COLUMN_OR_TABLE_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::NULLS_KW,
     SyntaxKind::NUMERIC_KW,
     SyntaxKind::OBJECT_KW,
+    SyntaxKind::OBJECTS_KW,
     SyntaxKind::OF_KW,
     SyntaxKind::OFF_KW,
     SyntaxKind::OIDS_KW,
@@ -2878,6 +2892,7 @@ pub(crate) const COLUMN_OR_TABLE_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::VERSION_KW,
     SyntaxKind::VIEW_KW,
     SyntaxKind::VIEWS_KW,
+    SyntaxKind::VIRTUAL_KW,
     SyntaxKind::VOLATILE_KW,
     SyntaxKind::WHITESPACE_KW,
     SyntaxKind::WITHIN_KW,
@@ -3001,6 +3016,7 @@ pub(crate) const TYPE_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::ENABLE_KW,
     SyntaxKind::ENCODING_KW,
     SyntaxKind::ENCRYPTED_KW,
+    SyntaxKind::ENFORCED_KW,
     SyntaxKind::ENUM_KW,
     SyntaxKind::ERROR_KW,
     SyntaxKind::ESCAPE_KW,
@@ -3135,6 +3151,7 @@ pub(crate) const TYPE_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::NULLS_KW,
     SyntaxKind::NUMERIC_KW,
     SyntaxKind::OBJECT_KW,
+    SyntaxKind::OBJECTS_KW,
     SyntaxKind::OF_KW,
     SyntaxKind::OFF_KW,
     SyntaxKind::OIDS_KW,
@@ -3294,6 +3311,7 @@ pub(crate) const TYPE_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::VERSION_KW,
     SyntaxKind::VIEW_KW,
     SyntaxKind::VIEWS_KW,
+    SyntaxKind::VIRTUAL_KW,
     SyntaxKind::VOLATILE_KW,
     SyntaxKind::WHITESPACE_KW,
     SyntaxKind::WITHIN_KW,
@@ -3447,6 +3465,7 @@ pub(crate) const ALL_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::ENCODING_KW,
     SyntaxKind::ENCRYPTED_KW,
     SyntaxKind::END_KW,
+    SyntaxKind::ENFORCED_KW,
     SyntaxKind::ENUM_KW,
     SyntaxKind::ERROR_KW,
     SyntaxKind::ESCAPE_KW,
@@ -3601,6 +3620,7 @@ pub(crate) const ALL_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::NULLS_KW,
     SyntaxKind::NUMERIC_KW,
     SyntaxKind::OBJECT_KW,
+    SyntaxKind::OBJECTS_KW,
     SyntaxKind::OF_KW,
     SyntaxKind::OFF_KW,
     SyntaxKind::OFFSET_KW,
@@ -3784,6 +3804,7 @@ pub(crate) const ALL_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::VERSION_KW,
     SyntaxKind::VIEW_KW,
     SyntaxKind::VIEWS_KW,
+    SyntaxKind::VIRTUAL_KW,
     SyntaxKind::VOLATILE_KW,
     SyntaxKind::WHEN_KW,
     SyntaxKind::WHERE_KW,
@@ -3935,6 +3956,7 @@ pub(crate) const BARE_LABEL_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::ENCODING_KW,
     SyntaxKind::ENCRYPTED_KW,
     SyntaxKind::END_KW,
+    SyntaxKind::ENFORCED_KW,
     SyntaxKind::ENUM_KW,
     SyntaxKind::ERROR_KW,
     SyntaxKind::ESCAPE_KW,
@@ -4073,6 +4095,7 @@ pub(crate) const BARE_LABEL_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::NULLS_KW,
     SyntaxKind::NUMERIC_KW,
     SyntaxKind::OBJECT_KW,
+    SyntaxKind::OBJECTS_KW,
     SyntaxKind::OF_KW,
     SyntaxKind::OFF_KW,
     SyntaxKind::OIDS_KW,
@@ -4245,6 +4268,7 @@ pub(crate) const BARE_LABEL_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::VERSION_KW,
     SyntaxKind::VIEW_KW,
     SyntaxKind::VIEWS_KW,
+    SyntaxKind::VIRTUAL_KW,
     SyntaxKind::VOLATILE_KW,
     SyntaxKind::WHEN_KW,
     SyntaxKind::WHITESPACE_KW,
@@ -4351,6 +4375,7 @@ pub(crate) const UNRESERVED_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::ENABLE_KW,
     SyntaxKind::ENCODING_KW,
     SyntaxKind::ENCRYPTED_KW,
+    SyntaxKind::ENFORCED_KW,
     SyntaxKind::ENUM_KW,
     SyntaxKind::ERROR_KW,
     SyntaxKind::ESCAPE_KW,
@@ -4446,6 +4471,7 @@ pub(crate) const UNRESERVED_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::NOWAIT_KW,
     SyntaxKind::NULLS_KW,
     SyntaxKind::OBJECT_KW,
+    SyntaxKind::OBJECTS_KW,
     SyntaxKind::OF_KW,
     SyntaxKind::OFF_KW,
     SyntaxKind::OIDS_KW,
@@ -4584,6 +4610,7 @@ pub(crate) const UNRESERVED_KEYWORDS: TokenSet = TokenSet::new(&[
     SyntaxKind::VERSION_KW,
     SyntaxKind::VIEW_KW,
     SyntaxKind::VIEWS_KW,
+    SyntaxKind::VIRTUAL_KW,
     SyntaxKind::VOLATILE_KW,
     SyntaxKind::WHITESPACE_KW,
     SyntaxKind::WITHIN_KW,
