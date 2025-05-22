@@ -2,7 +2,7 @@ use std::fmt::Write;
 
 use squawk_parser::{parse, LexedStr};
 
-pub(crate) fn parse_text(text: &str) -> (String, bool) {
+pub fn parse_text(text: &str) -> (String, bool) {
     let lexed = LexedStr::new(text);
     let input = lexed.to_input();
     let output = parse(&input);
