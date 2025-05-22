@@ -2675,7 +2675,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "a"
                 WHITESPACE " "
-                COLONEQ ":="
+                COLON_EQ ":="
                 WHITESPACE " "
                 LITERAL
                   TRUE_KW "true"
@@ -3573,7 +3573,7 @@ SOURCE_FILE
                   ARRAY_KW "array"
                   L_BRACK "["
                   R_BRACK "]"
-                COLON2 "::"
+                COLON_COLON "::"
                 ARRAY_TYPE
                   PATH_TYPE
                     PATH

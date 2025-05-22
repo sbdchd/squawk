@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -13,8 +13,8 @@ pub fn tables_created_in_transaction(
 ) -> HashSet<String> {
     let mut created_table_names = HashSet::new();
     let mut inside_transaction = assume_in_transaction;
-    for item in file.items() {
-        match item {
+    for stmt in file.stmts() {
+        match stmt {
             ast::Stmt::Begin(_) => {
                 inside_transaction = true;
             }
@@ -44,8 +44,8 @@ fn not_valid_validate_in_transaction(
 ) {
     let mut inside_transaction = assume_in_transaction;
     let mut not_valid_names: HashSet<String> = HashSet::new();
-    for item in file.items() {
-        match item {
+    for stmt in file.stmts() {
+        match stmt {
             ast::Stmt::AlterTable(alter_table) => {
                 for action in alter_table.actions() {
                     match action {
@@ -104,8 +104,8 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
 
     let tables_created = tables_created_in_transaction(assume_in_transaction, &file);
 
-    for item in file.items() {
-        if let ast::Stmt::AlterTable(alter_table) = item {
+    for stmt in file.stmts() {
+        if let ast::Stmt::AlterTable(alter_table) = stmt {
             let Some(table_name) = alter_table
                 .path()
                 .and_then(|x| x.segment())

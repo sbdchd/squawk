@@ -521,7 +521,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 PARAM "$1"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT
@@ -539,7 +539,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 PARAM "$2"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT

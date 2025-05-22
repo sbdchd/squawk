@@ -15,6 +15,10 @@ reqwest = { version = "0.12.9", features = ["blocking", "json"] }
 serde.workspace = true
 convert_case.workspace = true
 camino.workspace = true
+ungrammar.workspace = true
+quote.workspace = true
+xshell.workspace = true
+proc-macro2.workspace = true
 
 [lints]
 workspace = true

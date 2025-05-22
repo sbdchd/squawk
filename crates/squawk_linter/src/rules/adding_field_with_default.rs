@@ -3,7 +3,7 @@ use std::collections::HashSet;
 
 use squawk_syntax::ast;
 use squawk_syntax::ast::{AstNode, HasArgList};
-use squawk_syntax::{ast::HasModuleItem, Parse, SourceFile};
+use squawk_syntax::{Parse, SourceFile};
 
 use crate::{Linter, Rule, Violation};
 
@@ -57,8 +57,8 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
     let help = "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.";
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
-    for item in file.items() {
-        if let ast::Stmt::AlterTable(alter_table) = item {
+    for stmt in file.stmts() {
+        if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddColumn(add_column) = action {
                     for constraint in add_column.constraints() {

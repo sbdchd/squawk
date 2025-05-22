@@ -2,11 +2,11 @@
 // https://github.com/rust-lang/rust-analyzer/tree/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/grammar
 
 use crate::{
-    syntax_kind::{
-        SyntaxKind::{self, *},
+    generated::token_sets::{
         ALL_KEYWORDS, BARE_LABEL_KEYWORDS, COLUMN_OR_TABLE_KEYWORDS, RESERVED_KEYWORDS,
         TYPE_KEYWORDS, UNRESERVED_KEYWORDS,
     },
+    syntax_kind::SyntaxKind::{self, *},
     token_set::TokenSet,
     CompletedMarker, Marker, Parser,
 };
@@ -777,9 +777,9 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return Some(m);
     }
     let done = match (p.current(), p.nth(1)) {
-        (PARAM, _) => {
+        (POSITIONAL_PARAM, _) => {
             let m = p.start();
-            p.bump(PARAM);
+            p.bump(POSITIONAL_PARAM);
             m.complete(p, LITERAL)
         }
         (VALUES_KW, _) => values_clause(p, None),
@@ -1654,10 +1654,10 @@ fn json_key_value(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 }
 
 fn named_arg(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
-    assert!(p.at(FAT_ARROW) || p.at(COLONEQ));
+    assert!(p.at(FAT_ARROW) || p.at(COLON_EQ));
     let m = lhs.precede(p);
-    if p.at(COLONEQ) {
-        p.bump(COLONEQ);
+    if p.at(COLON_EQ) {
+        p.bump(COLON_EQ);
     } else {
         p.bump(FAT_ARROW);
     }
@@ -1668,9 +1668,9 @@ fn named_arg(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 }
 
 fn cast_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
-    assert!(p.at(COLON2));
+    assert!(p.at(COLON_COLON));
     let m = lhs.precede(p);
-    p.bump(COLON2);
+    p.bump(COLON_COLON);
     type_name(p);
     m.complete(p, CAST_EXPR)
 }
@@ -2089,13 +2089,13 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         MINUS if p.next_not_joined_op(0) => (8, MINUS, Left), // symbol
         // Later on we return a NAMED_ARG for this instead of BIN_EXPR
         // :=
-        COLON if p.at(COLONEQ) => (5, COLONEQ, Right), // symbol
+        COLON if p.at(COLON_EQ) => (5, COLON_EQ, Right), // symbol
         // ::
-        COLON if p.at(COLON2) => (15, COLON2, Left), // symbol
+        COLON if p.at(COLON_COLON) => (15, COLON_COLON, Left), // symbol
         // Only used in json_object, like json_object('a' value 1) instead of json_object('a': 1)
         // value
         VALUE_KW if r.json_field_arg_allowed => (7, VALUE_KW, Right),
-        // Later on we return a FIELD_ARG instead of BIN_EXPR
+        // Later on we return a JSON_KEY_VALUE instead of BIN_EXPR
         // a: b
         COLON if r.json_field_arg_allowed => (7, COLON, Right),
         _ if p.at_ts(OPERATOR_FIRST) => (7, CUSTOM_OP, Right),
@@ -2159,11 +2159,11 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
             break;
         }
         match op {
-            COLON2 => {
+            COLON_COLON => {
                 lhs = cast_expr(p, lhs);
                 continue;
             }
-            FAT_ARROW | COLONEQ => {
+            FAT_ARROW | COLON_EQ => {
                 lhs = named_arg(p, lhs);
                 continue;
             }
@@ -2740,7 +2740,7 @@ fn data_source(p: &mut Parser<'_>) {
 
 // USING data_source ON join_condition
 fn merge_using_clause(p: &mut Parser<'_>) {
-    let m1 = p.start();
+    let m = p.start();
     p.expect(USING_KW);
     data_source(p);
     p.expect(ON_KW);
@@ -2748,7 +2748,7 @@ fn merge_using_clause(p: &mut Parser<'_>) {
     if expr(p).is_none() {
         p.error("expected an expression");
     }
-    m1.complete(p, USING_CLAUSE);
+    m.complete(p, USING_CLAUSE);
 }
 
 // where from_item can be one of:
@@ -3119,8 +3119,7 @@ fn opt_with_params(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 // [ INCLUDE ( column_name [, ... ] ) ]
 // [ WITH ( storage_parameter [= value] [, ... ] ) ]
 // [ USING INDEX TABLESPACE tablespace_name ]
-#[must_use]
-fn opt_index_parameters(p: &mut Parser<'_>) -> bool {
+fn opt_index_parameters(p: &mut Parser<'_>) {
     opt_include_columns(p);
     opt_with_params(p);
     if p.at(USING_KW) {
@@ -3131,7 +3130,6 @@ fn opt_index_parameters(p: &mut Parser<'_>) -> bool {
         name_ref(p);
         m.complete(p, CONSTRAINT_INDEX_TABLESPACE);
     }
-    true
 }
 
 // referential_action in a FOREIGN KEY/REFERENCES constraint is:
@@ -3293,18 +3291,14 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 p.eat(NOT_KW);
                 p.expect(DISTINCT_KW);
             }
-            if !opt_index_parameters(p) {
-                p.error("expected index parameters");
-            }
+            opt_index_parameters(p);
             UNIQUE_CONSTRAINT
         }
         // PRIMARY KEY index_parameters
         PRIMARY_KW => {
             p.bump(PRIMARY_KW);
             p.expect(KEY_KW);
-            if !opt_index_parameters(p) {
-                p.error("expected index parameters");
-            }
+            opt_index_parameters(p);
             PRIMARY_KEY_CONSTRAINT
         }
         // REFERENCES reftable [ ( refcolumn ) ] [ MATCH FULL | MATCH PARTIAL | MATCH SIMPLE ]
@@ -3506,9 +3500,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
                     p.eat(DISTINCT_KW);
                 }
                 column_list(p);
-                if !opt_index_parameters(p) {
-                    p.error("expected index parameters");
-                }
+                opt_index_parameters(p);
             }
             UNIQUE_CONSTRAINT
         }
@@ -3523,9 +3515,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             // ( column_name [, ... ] ) index_parameters
             } else {
                 column_list(p);
-                if !opt_index_parameters(p) {
-                    p.error("expected index parameters");
-                }
+                opt_index_parameters(p);
             }
             PRIMARY_KEY_CONSTRAINT
         }
@@ -3553,9 +3543,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             }
             p.expect(R_PAREN);
             m.complete(p, CONSTRAINT_EXCLUSIONS);
-            if !opt_index_parameters(p) {
-                p.error("expected index parameters");
-            }
+            opt_index_parameters(p);
             if p.at(WHERE_KW) {
                 let m = p.start();
                 p.bump(WHERE_KW);
@@ -3637,7 +3625,7 @@ fn opt_initally_constraint_option(p: &mut Parser<'_>) -> Option<CompletedMarker>
         (INITIALLY_KW, DEFERRED_KW) => {
             p.bump(INITIALLY_KW);
             p.bump(DEFERRED_KW);
-            INITALLY_DEFERRED_CONSTRAINT_OPTION
+            INITIALLY_DEFERRED_CONSTRAINT_OPTION
         }
         (INITIALLY_KW, IMMEDIATE_KW) => {
             p.bump(INITIALLY_KW);
@@ -3665,7 +3653,7 @@ fn opt_constraint_options(p: &mut Parser<'_>) {
         }
         (Some(deferrable), Some(initially)) => {
             if deferrable.kind() == NOT_DEFERRABLE_CONSTRAINT_OPTION
-                && initially.kind() == INITALLY_DEFERRED_CONSTRAINT_OPTION
+                && initially.kind() == INITIALLY_DEFERRED_CONSTRAINT_OPTION
             {
                 p.error("constraint declared INITIALLY DEFERRED must be DEFERRABLE");
             }
@@ -4109,14 +4097,22 @@ const STRING_FIRST: TokenSet = TokenSet::new(&[
 ]);
 
 // via https://www.postgresql.org/docs/17/sql-createoperator.html
-// + - * / < > = ~ ! @ # % ^ & | ` ?
 pub(crate) const OPERATOR_FIRST: TokenSet = TokenSet::new(&[
     PLUS, MINUS, STAR, SLASH, L_ANGLE, R_ANGLE, EQ, TILDE, BANG, AT, POUND, PERCENT, CARET, AMP,
     PIPE, BACKTICK, QUESTION,
 ]);
 
 const LHS_FIRST: TokenSet = TokenSet::new(&[
-    L_PAREN, L_BRACK, CAST_KW, NOT_KW, IS_KW, PARAM, CASE_KW, ARRAY_KW, ROW_KW, DEFAULT_KW,
+    L_PAREN,
+    L_BRACK,
+    CAST_KW,
+    NOT_KW,
+    IS_KW,
+    POSITIONAL_PARAM,
+    CASE_KW,
+    ARRAY_KW,
+    ROW_KW,
+    DEFAULT_KW,
 ])
 .union(OPERATOR_FIRST)
 .union(LITERAL_FIRST)
@@ -4167,9 +4163,8 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
         return None;
     } else if p.at(STAR) && !p.nth_at_ts(1, OPERATOR_FIRST) {
         p.bump(STAR);
-        true
     } else if expr(p).is_some() {
-        opt_as_col_label(p) || p.at(COMMA)
+        opt_as_col_label(p);
     } else {
         m.abandon(p);
         p.error(format!(
@@ -4553,7 +4548,7 @@ fn commit_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.expect(CHAIN_KW);
         }
     }
-    m.complete(p, COMMIT_STMT)
+    m.complete(p, COMMIT)
 }
 
 const TRANSACTION_MODE_FIRST: TokenSet =
@@ -4626,7 +4621,7 @@ fn begin_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(TRANSACTION_KW);
         opt_transaction_mode_list(p);
     }
-    m.complete(p, BEGIN_STMT)
+    m.complete(p, BEGIN)
 }
 
 // Sconst
@@ -9170,7 +9165,7 @@ fn drop_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         aggregate(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_AGGREGATE_STMT)
+    m.complete(p, DROP_AGGREGATE)
 }
 
 fn source_type_as_target_type(p: &mut Parser<'_>) {
@@ -11460,16 +11455,8 @@ fn drop_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn opt_schema_auth(p: &mut Parser<'_>) -> bool {
     if p.eat(AUTHORIZATION_KW) {
-        if !(p.eat(CURRENT_ROLE_KW) || p.eat(CURRENT_USER_KW) || p.eat(SESSION_USER_KW)) {
-            if p.at_ts(UNRESERVED_KEYWORDS) || p.at(IDENT) {
-                p.bump_any();
-                return true;
-            } else {
-                p.error("expected user_name");
-            }
-        } else {
-            return true;
-        }
+        role(p);
+        return true;
     }
     false
 }
@@ -12008,7 +11995,7 @@ fn create_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     }
     // [ WHERE predicate ]
     opt_where_clause(p);
-    m.complete(p, CREATE_INDEX_STMT)
+    m.complete(p, CREATE_INDEX)
 }
 
 // (
@@ -12051,7 +12038,7 @@ fn opt_param_mode(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         IN_KW => {
             p.bump(IN_KW);
             if p.eat(OUT_KW) {
-                PARAM_INOUT
+                PARAM_IN_OUT
             } else {
                 PARAM_IN
             }
@@ -12062,7 +12049,7 @@ fn opt_param_mode(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
         INOUT_KW => {
             p.bump(INOUT_KW);
-            PARAM_INOUT
+            PARAM_IN_OUT
         }
         _ => {
             m.abandon(p);
@@ -12072,6 +12059,7 @@ fn opt_param_mode(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     Some(m.complete(p, mode))
 }
 
+// [ { DEFAULT | = } default_expr ]
 fn opt_param_default(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(DEFAULT_KW) || p.at(EQ) {
         let m = p.start();
@@ -12168,7 +12156,7 @@ fn param(p: &mut Parser<'_>) {
         type_name(p);
     }
     opt_param_default(p);
-    m.complete(p, PARAM);
+    m.complete(p, POSITIONAL_PARAM);
 }
 
 // { LANGUAGE lang_name
@@ -12992,9 +12980,7 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         OWNER_KW => {
             p.bump(OWNER_KW);
             p.bump(TO_KW);
-            if !(p.eat(CURRENT_ROLE_KW) || p.eat(CURRENT_USER_KW) || p.eat(SESSION_USER_KW)) {
-                name_ref(p);
-            }
+            role(p);
             OWNER_TO
         }
         DETACH_KW => {

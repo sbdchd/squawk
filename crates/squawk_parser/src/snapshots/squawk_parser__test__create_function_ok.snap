@@ -2247,7 +2247,7 @@ SOURCE_FILE
     PARAM_LIST
       L_PAREN "("
       PARAM
-        PARAM_INOUT
+        PARAM_IN_OUT
           IN_KW "in"
           WHITESPACE " "
           OUT_KW "out"
@@ -2290,7 +2290,7 @@ SOURCE_FILE
     PARAM_LIST
       L_PAREN "("
       PARAM
-        PARAM_INOUT
+        PARAM_IN_OUT
           INOUT_KW "inout"
         WHITESPACE " "
         PATH_TYPE

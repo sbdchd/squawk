@@ -1,12 +1,15 @@
 use anyhow::Result;
 // see: https://github.com/matklad/cargo-xtask
 use clap::{arg, Args, Parser, Subcommand};
+use codegen::codegen;
 use generate_keywords::generate_keywords;
 use new_rule::new_lint;
 use sync_kwlist::sync_kwlist;
 
+mod codegen;
 mod generate_keywords;
 mod new_rule;
+mod path;
 mod path_util;
 mod sync_kwlist;
 
@@ -14,6 +17,8 @@ mod sync_kwlist;
 enum TaskName {
     #[command(long_about = "Generate code for keywords using the Postgres kwlist.h")]
     GenerateKeywords,
+    #[command(long_about = "Generate code for AST, SyntaxKind, and TokenSets.")]
+    Codegen,
     #[command(long_about = "Fetch the latest version of kwlist.h from Postgres")]
     SyncKwlist,
     #[command(long_about = "Create a new linter rule")]
@@ -40,5 +45,6 @@ fn main() -> Result<()> {
         TaskName::GenerateKeywords => generate_keywords(),
         TaskName::SyncKwlist => sync_kwlist(),
         TaskName::NewRule(args) => new_lint(args),
+        TaskName::Codegen => codegen(),
     }
 }

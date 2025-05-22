@@ -3402,8 +3402,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
-        IDENT "new_owner"
+      IDENT "new_owner"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- default"

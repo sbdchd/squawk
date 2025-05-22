@@ -100,7 +100,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 PARAM "$1"
-              COLON2 "::"
+              COLON_COLON "::"
               ARRAY_TYPE
                 PATH_TYPE
                   PATH
@@ -114,7 +114,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 PARAM "$2"
-              COLON2 "::"
+              COLON_COLON "::"
               ARRAY_TYPE
                 PATH_TYPE
                   PATH
@@ -128,7 +128,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 PARAM "$3"
-              COLON2 "::"
+              COLON_COLON "::"
               ARRAY_TYPE
                 PATH_TYPE
                   PATH
@@ -655,7 +655,7 @@ SOURCE_FILE
                 CAST_EXPR
                   LITERAL
                     PARAM "$2"
-                  COLON2 "::"
+                  COLON_COLON "::"
                   PATH_TYPE
                     PATH
                       PATH_SEGMENT
@@ -763,7 +763,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE " "
       PARAM
-        PARAM_INOUT
+        PARAM_IN_OUT
           INOUT_KW "INOUT"
         WHITESPACE " "
         NAME
@@ -980,7 +980,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "interaction_ts"
                     R_PAREN ")"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -1036,7 +1036,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "interaction_ts"
                     R_PAREN ")"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -1212,7 +1212,7 @@ SOURCE_FILE
       CAST_EXPR
         LITERAL
           STRING "'2024-12-25'"
-        COLON2 "::"
+        COLON_COLON "::"
         PATH_TYPE
           PATH
             PATH_SEGMENT
@@ -1282,7 +1282,7 @@ SOURCE_FILE
       CAST_EXPR
         LITERAL
           STRING "'2024-12-25'"
-        COLON2 "::"
+        COLON_COLON "::"
         PATH_TYPE
           PATH
             PATH_SEGMENT
@@ -2023,7 +2023,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "plot"
           R_PAREN ")"
-      COLON2 "::"
+      COLON_COLON "::"
       PATH_TYPE
         PATH
           PATH_SEGMENT
@@ -2081,7 +2081,7 @@ SOURCE_FILE
                         LITERAL
                           STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
                         R_PAREN ")"
-                    COLON2 "::"
+                    COLON_COLON "::"
                     PATH_TYPE
                       PATH
                         PATH_SEGMENT
@@ -2473,7 +2473,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               R_PAREN ")"
-          COLON2 "::"
+          COLON_COLON "::"
           PATH_TYPE
             PATH
               PATH_SEGMENT
@@ -2846,7 +2846,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "source_table_name"
                 WHITESPACE " "
-                COLONEQ ":="
+                COLON_EQ ":="
                 WHITESPACE " "
                 LITERAL
                   STRING "'events'"
@@ -2858,7 +2858,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "batched"
                 WHITESPACE " "
-                COLONEQ ":="
+                COLON_EQ ":="
                 WHITESPACE " "
                 LITERAL
                   FALSE_KW "false"
@@ -2870,7 +2870,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "start_time"
                 WHITESPACE " "
-                COLONEQ ":="
+                COLON_EQ ":="
                 WHITESPACE " "
                 LITERAL
                   STRING "'2024-01-01'"
@@ -3350,7 +3350,7 @@ SOURCE_FILE
                   LITERAL
                     STRING "'eventTypeGroups'"
                 R_PAREN ")"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT
@@ -3384,7 +3384,7 @@ SOURCE_FILE
                     LITERAL
                       STRING "'eventTypes'"
                   R_PAREN ")"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -3513,7 +3513,7 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bookings'"
                 R_PAREN ")"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT
@@ -3557,7 +3557,7 @@ SOURCE_FILE
       CAST_EXPR
         LITERAL
           STRING "'{\n     \"start\": \"2025-01-01T23:30:00.000Z\",\n     \"eventTypeId\": 1398027,\n     \"attendee\": {\n       \"name\": \"Elon Musk\",\n       \"email\": \"elon.musk@x.com\",\n       \"timeZone\": \"America/New_York\"\n     }\n  }'"
-        COLON2 "::"
+        COLON_COLON "::"
         PATH_TYPE
           PATH
             PATH_SEGMENT
@@ -5544,13 +5544,13 @@ SOURCE_FILE
                 CAST_EXPR
                   NAME_REF
                     IDENT "ctid"
-                  COLON2 "::"
+                  COLON_COLON "::"
                   PATH_TYPE
                     PATH
                       PATH_SEGMENT
                         NAME_REF
                           TEXT_KW "text"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -5562,13 +5562,13 @@ SOURCE_FILE
                 CAST_EXPR
                   NAME_REF
                     TIMESTAMP_KW "timestamp"
-                  COLON2 "::"
+                  COLON_COLON "::"
                   PATH_TYPE
                     PATH
                       PATH_SEGMENT
                         NAME_REF
                           TEXT_KW "text"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT

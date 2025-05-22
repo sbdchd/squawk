@@ -28,13 +28,30 @@ use std::borrow::Cow;
 
 use rowan::{GreenNodeData, GreenTokenData, NodeOrToken};
 
+use crate::ast;
+use crate::ast::AstNode;
 use crate::{SyntaxNode, TokenText};
 
-// impl ast::Name {
-//     pub fn text(&self) -> TokenText<'_> {
-//         text_of_first_token(self.syntax())
-//     }
-// }
+impl ast::NameRef {
+    #[inline]
+    pub fn text(&self) -> TokenText<'_> {
+        text_of_first_token(self.syntax())
+    }
+}
+
+impl ast::Name {
+    #[inline]
+    pub fn text(&self) -> TokenText<'_> {
+        text_of_first_token(self.syntax())
+    }
+}
+
+impl ast::CharType {
+    #[inline]
+    pub fn text(&self) -> TokenText<'_> {
+        text_of_first_token(self.syntax())
+    }
+}
 
 pub(crate) fn text_of_first_token(node: &SyntaxNode) -> TokenText<'_> {
     fn first_token(green_ref: &GreenNodeData) -> &GreenTokenData {

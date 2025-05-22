@@ -1,6 +1,6 @@
 use std::collections::HashSet;
 
-use squawk_syntax::ast::{self, HasModuleItem};
+use squawk_syntax::ast;
 
 use crate::{text::trim_quotes, Linter};
 
@@ -39,12 +39,12 @@ pub(crate) fn check_not_allowed_types(
     file: &ast::SourceFile,
     check_ty: impl Fn(&mut Linter, Option<ast::Type>),
 ) {
-    for item in file.items() {
-        match item {
+    for stmt in file.stmts() {
+        match stmt {
             ast::Stmt::CreateTable(create_table) => {
                 if let Some(table_args) = create_table.table_args() {
                     for arg in table_args.args() {
-                        if let ast::TableArg::Column(column) = arg {
+                        if let ast::TableArgs::Column(column) = arg {
                             check_ty(ctx, column.ty());
                         }
                     }

@@ -1376,8 +1376,7 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE_STMT
@@ -1479,7 +1478,6 @@ SOURCE_FILE
       WHITESPACE " "
       TO_KW "to"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"

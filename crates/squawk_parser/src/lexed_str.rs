@@ -217,7 +217,7 @@ impl<'a> Converter<'a> {
                 }
                 squawk_lexer::TokenKind::Eof => SyntaxKind::EOF,
                 squawk_lexer::TokenKind::Backtick => SyntaxKind::BACKTICK,
-                squawk_lexer::TokenKind::Param => SyntaxKind::PARAM,
+                squawk_lexer::TokenKind::PositionalParam => SyntaxKind::POSITIONAL_PARAM,
                 squawk_lexer::TokenKind::QuotedIdent { terminated } => {
                     if !terminated {
                         err = "Missing trailing \" to terminate the quoted identifier"

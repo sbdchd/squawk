@@ -440,7 +440,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'192.168.0.1'"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT

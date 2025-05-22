@@ -45,7 +45,7 @@ SOURCE_FILE
                         CAST_EXPR
                           NAME_REF
                             LANGUAGE_KW "language"
-                          COLON2 "::"
+                          COLON_COLON "::"
                           CHAR_TYPE
                             CHAR_KW "char"
                             L_PAREN "("
@@ -173,7 +173,7 @@ SOURCE_FILE
                         CAST_EXPR
                           NAME_REF
                             LANGUAGE_KW "language"
-                          COLON2 "::"
+                          COLON_COLON "::"
                           CHAR_TYPE
                             CHAR_KW "char"
                             L_PAREN "("
