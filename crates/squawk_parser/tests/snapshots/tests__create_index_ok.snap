@@ -468,11 +468,8 @@ SOURCE_FILE
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              OFF_KW "off"
+      LITERAL
+        OFF_KW "off"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -634,11 +631,8 @@ SOURCE_FILE
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              OFF_KW "off"
+      LITERAL
+        OFF_KW "off"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

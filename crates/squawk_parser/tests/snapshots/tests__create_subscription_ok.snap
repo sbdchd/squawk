@@ -131,11 +131,8 @@ SOURCE_FILE
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              OFF_KW "off"
+      LITERAL
+        OFF_KW "off"
       COMMA ","
       WHITESPACE "\n    "
       PATH

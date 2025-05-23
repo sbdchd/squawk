@@ -2,6 +2,7 @@
 use camino::Utf8Path;
 use dir_test::{dir_test, Fixture};
 use insta::{assert_snapshot, with_settings};
+use std::fs::remove_file;
 
 mod utils;
 
@@ -100,5 +101,13 @@ fn regression_suite(fixture: Fixture<&str>) {
         }, {
           assert_snapshot!(test_name, parsed);
         });
+    } else {
+        let snapshot_path = Utf8Path::new("tests/snapshots/regression_suite")
+            .join(format!("tests__{}.snap", test_name));
+        let new_snapshot_path = Utf8Path::new("tests/snapshots/regression_suite")
+            .join(format!("tests__{}.snap.new", test_name));
+
+        let _ = remove_file(snapshot_path);
+        let _ = remove_file(new_snapshot_path);
     }
 }
