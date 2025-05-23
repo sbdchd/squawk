@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/set_transaction.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- docs"
@@ -62,4 +61,27 @@ SOURCE_FILE
     NOT_KW "NOT"
     WHITESPACE " "
     DEFERRABLE_KW "DEFERRABLE"
-  WHITESPACE "\n\n"
+  SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- no commas is postgres historical according to gram.y"
+  WHITESPACE "\n"
+  SET_TRANSACTION_STMT
+    SET_KW "SET"
+    WHITESPACE " "
+    TRANSACTION_KW "TRANSACTION"
+    WHITESPACE " "
+    ISOLATION_KW "ISOLATION"
+    WHITESPACE " "
+    LEVEL_KW "LEVEL"
+    WHITESPACE " "
+    SERIALIZABLE_KW "SERIALIZABLE"
+    WHITESPACE " "
+    READ_KW "READ"
+    WHITESPACE " "
+    WRITE_KW "WRITE"
+    WHITESPACE " "
+    NOT_KW "NOT"
+    WHITESPACE " "
+    DEFERRABLE_KW "DEFERRABLE"
+  SEMICOLON ";"
+  WHITESPACE "\n"

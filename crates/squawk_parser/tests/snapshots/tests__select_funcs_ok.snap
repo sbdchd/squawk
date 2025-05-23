@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select_funcs.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- normalize"
@@ -2676,7 +2675,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "a"
                 WHITESPACE " "
-                COLONEQ ":="
+                COLON_EQ ":="
                 WHITESPACE " "
                 LITERAL
                   TRUE_KW "true"
@@ -3574,7 +3573,7 @@ SOURCE_FILE
                   ARRAY_KW "array"
                   L_BRACK "["
                   R_BRACK "]"
-                COLON2 "::"
+                COLON_COLON "::"
                 ARRAY_TYPE
                   PATH_TYPE
                     PATH

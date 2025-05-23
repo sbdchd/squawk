@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_default_privileges.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"

@@ -210,8 +210,8 @@ impl<'t> Parser<'t> {
             return false;
         }
         let n_raw_tokens = match kind {
-            SyntaxKind::COLON2
-            | SyntaxKind::COLONEQ
+            SyntaxKind::COLON_COLON
+            | SyntaxKind::COLON_EQ
             | SyntaxKind::NEQ
             | SyntaxKind::NEQB
             | SyntaxKind::LTEQ
@@ -508,14 +508,14 @@ impl<'t> Parser<'t> {
                 TrivaBetween::NotAllowed,
             ),
             // :=
-            SyntaxKind::COLONEQ => self.at_composite2(
+            SyntaxKind::COLON_EQ => self.at_composite2(
                 n,
                 SyntaxKind::COLON,
                 SyntaxKind::EQ,
                 TrivaBetween::NotAllowed,
             ),
             // ::
-            SyntaxKind::COLON2 => self.at_composite2(
+            SyntaxKind::COLON_COLON => self.at_composite2(
                 n,
                 SyntaxKind::COLON,
                 SyntaxKind::COLON,
