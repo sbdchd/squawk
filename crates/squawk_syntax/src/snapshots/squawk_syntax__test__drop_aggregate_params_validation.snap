@@ -1,12 +1,12 @@
 ---
-source: crates/syntax/src/test.rs
-input_file: crates/syntax/test_data/validation/drop_aggregate_params.sql
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/drop_aggregate_params.sql
 ---
 SOURCE_FILE@0..389
   WHITESPACE@0..1 "\n"
   COMMENT@1..8 "-- full"
   WHITESPACE@8..9 "\n"
-  DROP_AGGREGATE_STMT@9..167
+  DROP_AGGREGATE@9..167
     DROP_KW@9..13 "drop"
     WHITESPACE@13..14 " "
     AGGREGATE_KW@14..23 "aggregate"
@@ -106,7 +106,7 @@ SOURCE_FILE@0..389
   WHITESPACE@168..170 "\n\n"
   COMMENT@170..182 "-- aggregate"
   WHITESPACE@182..183 "\n"
-  DROP_AGGREGATE_STMT@183..299
+  DROP_AGGREGATE@183..299
     DROP_KW@183..187 "drop"
     WHITESPACE@187..188 " "
     AGGREGATE_KW@188..197 "aggregate"
@@ -178,7 +178,7 @@ SOURCE_FILE@0..389
     RESTRICT_KW@291..299 "restrict"
   SEMICOLON@299..300 ";"
   WHITESPACE@300..302 "\n\n"
-  DROP_AGGREGATE_STMT@302..386
+  DROP_AGGREGATE@302..386
     DROP_KW@302..306 "drop"
     WHITESPACE@306..307 " "
     AGGREGATE_KW@307..316 "aggregate"

@@ -10540,6 +10540,18 @@ fn set_session_auth_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, SET_SESSION_AUTH_STMT)
 }
 
+fn transaction_mode_list(p: &mut Parser<'_>) {
+    // TODO: generalize
+    // transaction_mode [, ...]
+    while !p.at(EOF) && p.at_ts(TRANSACTION_MODE_FIRST) {
+        if !opt_transaction_mode(p) {
+            p.error("expected transaction mode");
+        }
+        // historical pg syntax doesn't require commas
+        p.eat(COMMA);
+    }
+}
+
 // SET TRANSACTION transaction_mode [, ...]
 // SET TRANSACTION SNAPSHOT snapshot_id
 // SET SESSION CHARACTERISTICS AS TRANSACTION transaction_mode [, ...]
@@ -10556,32 +10568,14 @@ fn set_transaction_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(CHARACTERISTICS_KW);
         p.expect(AS_KW);
         p.expect(TRANSACTION_KW);
-        // TODO: generalize
-        // transaction_mode [, ...]
-        while !p.at(EOF) {
-            if !opt_transaction_mode(p) {
-                p.error("expected transaction mode");
-            }
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
+        transaction_mode_list(p);
     } else {
         p.expect(TRANSACTION_KW);
         // [ SNAPSHOT snapshot_id ]
         if p.eat(SNAPSHOT_KW) {
             string_literal(p);
         } else {
-            // TODO: generalize
-            // transaction_mode [, ...]
-            while !p.at(EOF) {
-                if !opt_transaction_mode(p) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
+            transaction_mode_list(p);
         }
     }
     m.complete(p, SET_TRANSACTION_STMT)

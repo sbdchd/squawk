@@ -57,8 +57,9 @@ mod lexed_str;
 mod output;
 mod shortcuts;
 mod syntax_kind;
-#[cfg(test)]
-mod test;
+mod event;
+mod input;
+mod output;
 mod token_set;
 
 pub use crate::{

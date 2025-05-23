@@ -3781,6 +3781,7 @@ dependencies = [
  "serde",
  "ungrammar",
  "xshell",
+ "serde_json",
 ]
 
 [[package]]

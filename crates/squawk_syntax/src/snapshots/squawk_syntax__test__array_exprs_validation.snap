@@ -1,6 +1,6 @@
 ---
-source: crates/syntax/src/test.rs
-input_file: crates/syntax/test_data/validation/array_exprs.sql
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/array_exprs.sql
 ---
 SOURCE_FILE@0..42
   SELECT@0..22
