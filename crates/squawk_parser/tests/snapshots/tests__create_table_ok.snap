@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_table.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   CREATE_TABLE
@@ -1444,7 +1443,7 @@ SOURCE_FILE
           NULL_KW "null"
           WHITESPACE " "
           CONSTRAINT_OPTION_LIST
-            INITALLY_DEFERRED_CONSTRAINT_OPTION
+            INITIALLY_DEFERRED_CONSTRAINT_OPTION
               INITIALLY_KW "initially"
               WHITESPACE " "
               DEFERRED_KW "deferred"
@@ -1821,7 +1820,7 @@ SOURCE_FILE
           DEFERRABLE_CONSTRAINT_OPTION
             DEFERRABLE_KW "deferrable"
           WHITESPACE " "
-          INITALLY_DEFERRED_CONSTRAINT_OPTION
+          INITIALLY_DEFERRED_CONSTRAINT_OPTION
             INITIALLY_KW "initially"
             WHITESPACE " "
             DEFERRED_KW "deferred"
@@ -2555,7 +2554,7 @@ SOURCE_FILE
           DEFERRABLE_CONSTRAINT_OPTION
             DEFERRABLE_KW "deferrable"
           WHITESPACE " "
-          INITALLY_DEFERRED_CONSTRAINT_OPTION
+          INITIALLY_DEFERRED_CONSTRAINT_OPTION
             INITIALLY_KW "initially"
             WHITESPACE " "
             DEFERRED_KW "deferred"

@@ -1,30 +1,29 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/transaction.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- begin_commit_abort_rollback"
   WHITESPACE "\n"
   COMMENT "-- https://www.postgresql.org/docs/17/sql-commit.html"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     COMMIT_KW "commit"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
     WORK_KW "work"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
     AND_KW "and"
@@ -32,7 +31,7 @@ SOURCE_FILE
     CHAIN_KW "chain"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
     AND_KW "and"
@@ -42,7 +41,7 @@ SOURCE_FILE
     CHAIN_KW "chain"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     COMMIT_KW "commit"
     WHITESPACE " "
     PREPARED_KW "prepared"
@@ -53,23 +52,23 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- https://www.postgresql.org/docs/17/sql-begin.html"
   WHITESPACE "\n"
-  BEGIN_STMT
+  BEGIN
     BEGIN_KW "begin"
   SEMICOLON ";"
   WHITESPACE "\n"
-  BEGIN_STMT
+  BEGIN
     BEGIN_KW "begin"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
   SEMICOLON ";"
   WHITESPACE "\n"
-  BEGIN_STMT
+  BEGIN
     BEGIN_KW "begin"
     WHITESPACE " "
     WORK_KW "work"
   SEMICOLON ";"
   WHITESPACE "\n"
-  BEGIN_STMT
+  BEGIN
     BEGIN_KW "begin"
     WHITESPACE " \n  "
     ISOLATION_KW "isolation"
@@ -95,7 +94,7 @@ SOURCE_FILE
     DEFERRABLE_KW "deferrable"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  BEGIN_STMT
+  BEGIN
     BEGIN_KW "begin"
     WHITESPACE "\n  "
     ISOLATION_KW "isolation"
@@ -150,7 +149,7 @@ SOURCE_FILE
     DEFERRABLE_KW "deferrable"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  BEGIN_STMT
+  BEGIN
     START_KW "start"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
@@ -178,7 +177,7 @@ SOURCE_FILE
     DEFERRABLE_KW "deferrable"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  BEGIN_STMT
+  BEGIN
     START_KW "start"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
@@ -335,23 +334,23 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMIT_STMT
+  COMMIT
     END_KW "end"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     END_KW "end"
     WHITESPACE " "
     WORK_KW "work"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     END_KW "end"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     END_KW "end"
     WHITESPACE " "
     AND_KW "and"
@@ -359,7 +358,7 @@ SOURCE_FILE
     CHAIN_KW "chain"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     END_KW "end"
     WHITESPACE " "
     AND_KW "and"

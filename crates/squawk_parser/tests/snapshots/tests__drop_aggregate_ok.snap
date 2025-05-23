@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_aggregate.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_AGGREGATE_STMT
+  DROP_AGGREGATE
     DROP_KW "drop"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
@@ -24,7 +23,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_AGGREGATE_STMT
+  DROP_AGGREGATE
     DROP_KW "drop"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
@@ -121,7 +120,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- aggregate"
   WHITESPACE "\n"
-  DROP_AGGREGATE_STMT
+  DROP_AGGREGATE
     DROP_KW "drop"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
@@ -190,7 +189,7 @@ SOURCE_FILE
     RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_AGGREGATE_STMT
+  DROP_AGGREGATE
     DROP_KW "drop"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"

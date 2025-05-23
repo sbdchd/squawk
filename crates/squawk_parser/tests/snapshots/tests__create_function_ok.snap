@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_function.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- create_func_with_in_out"
@@ -1854,7 +1853,7 @@ SOURCE_FILE
         END_KW "end"
   SEMICOLON ";"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     END_KW "end"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2248,7 +2247,7 @@ SOURCE_FILE
     PARAM_LIST
       L_PAREN "("
       PARAM
-        PARAM_INOUT
+        PARAM_IN_OUT
           IN_KW "in"
           WHITESPACE " "
           OUT_KW "out"
@@ -2291,7 +2290,7 @@ SOURCE_FILE
     PARAM_LIST
       L_PAREN "("
       PARAM
-        PARAM_INOUT
+        PARAM_IN_OUT
           INOUT_KW "inout"
         WHITESPACE " "
         PATH_TYPE

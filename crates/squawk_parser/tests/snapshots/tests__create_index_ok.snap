@@ -1,14 +1,13 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_index.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- create_index"
   WHITESPACE "\n"
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -29,7 +28,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- more options"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     UNIQUE_KW "unique"
@@ -71,7 +70,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- column options"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -102,7 +101,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -129,7 +128,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- opclass"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -186,7 +185,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- column expr"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -226,7 +225,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- trailing options"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -307,7 +306,7 @@ SOURCE_FILE
           INT_NUMBER "10"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -347,7 +346,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -373,7 +372,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_examples"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     UNIQUE_KW "UNIQUE"
@@ -397,7 +396,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     UNIQUE_KW "UNIQUE"
@@ -436,7 +435,7 @@ SOURCE_FILE
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -476,7 +475,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -504,7 +503,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -532,7 +531,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -558,7 +557,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     UNIQUE_KW "UNIQUE"
@@ -597,7 +596,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -642,7 +641,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -669,7 +668,7 @@ SOURCE_FILE
       IDENT "indexspace"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -705,7 +704,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
