@@ -57,19 +57,19 @@ SOURCE_FILE
         VALUES_KW "VALUES"
         L_PAREN "("
         LITERAL
-          PARAM "$1"
+          POSITIONAL_PARAM "$1"
         COMMA ","
         WHITESPACE " "
         LITERAL
-          PARAM "$2"
+          POSITIONAL_PARAM "$2"
         COMMA ","
         WHITESPACE " "
         LITERAL
-          PARAM "$3"
+          POSITIONAL_PARAM "$3"
         COMMA ","
         WHITESPACE " "
         LITERAL
-          PARAM "$4"
+          POSITIONAL_PARAM "$4"
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n\n"
@@ -131,7 +131,7 @@ SOURCE_FILE
                   IDENT "usrid"
               EQ "="
               LITERAL
-                PARAM "$1"
+                POSITIONAL_PARAM "$1"
             WHITESPACE " "
             AND_KW "AND"
             WHITESPACE " "
@@ -163,7 +163,7 @@ SOURCE_FILE
             EQ "="
             WHITESPACE " "
             LITERAL
-              PARAM "$2"
+              POSITIONAL_PARAM "$2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   PREPARE_STMT

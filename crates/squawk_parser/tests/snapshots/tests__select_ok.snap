@@ -562,7 +562,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           LITERAL
-            PARAM "$1"
+            POSITIONAL_PARAM "$1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -589,7 +589,7 @@ SOURCE_FILE
         EQ "="
         WHITESPACE " "
         LITERAL
-          PARAM "$1"
+          POSITIONAL_PARAM "$1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- any_and_all"
@@ -1037,7 +1037,7 @@ SOURCE_FILE
         TARGET
           FIELD_EXPR
             LITERAL
-              PARAM "$1"
+              POSITIONAL_PARAM "$1"
             DOT "."
             NAME_REF
               IDENT "somecolumn"
@@ -1140,7 +1140,7 @@ SOURCE_FILE
               WHEN_KW "when"
               WHITESPACE " "
               LITERAL
-                PARAM "$1"
+                POSITIONAL_PARAM "$1"
               WHITESPACE " "
               THEN_KW "then"
               WHITESPACE " "
@@ -1151,7 +1151,7 @@ SOURCE_FILE
               WHEN_KW "when"
               WHITESPACE " "
               LITERAL
-                PARAM "$2"
+                POSITIONAL_PARAM "$2"
               WHITESPACE " "
               THEN_KW "then"
               WHITESPACE " "

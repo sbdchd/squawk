@@ -969,7 +969,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  BEGIN_STMT
+  BEGIN
     BEGIN_KW "BEGIN"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -1056,7 +1056,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- continue with other operations, and eventually"
   WHITESPACE "\n"
-  COMMIT_STMT
+  COMMIT
     COMMIT_KW "COMMIT"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -1,6 +1,6 @@
 ---
-source: crates/syntax/src/test.rs
-input_file: crates/syntax/test_data/validation/create_aggregate_params.sql
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/create_aggregate_params.sql
 ---
 SOURCE_FILE@0..91
   COMMENT@0..38 "-- can't have out par ..."

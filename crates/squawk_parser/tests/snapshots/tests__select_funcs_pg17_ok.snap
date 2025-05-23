@@ -395,7 +395,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'{\"favorites\":\n    {\"movies\":\n      [{\"name\": \"One\", \"director\": \"John Doe\"},\n       {\"name\": \"Two\", \"director\": \"Don Joe\"}],\n     \"books\":\n      [{\"name\": \"Mystery\", \"authors\": [{\"name\": \"Brown Dan\"}]},\n       {\"name\": \"Wonder\", \"authors\": [{\"name\": \"Jun Murakami\"}, {\"name\":\"Craig Doe\"}]}]\n}}'"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT

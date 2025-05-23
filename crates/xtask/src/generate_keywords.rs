@@ -81,9 +81,9 @@ pub(crate) fn generate_keywords() -> Result<()> {
 }
 
 fn update_syntax_kind(keywords: &HashMap<String, KeywordMeta>) -> Result<()> {
-    let path = "crates/parser/src/syntax_kind.rs";
+    let path = "crates/squawk_parser/src/syntax_kind.rs";
 
-    let data = std::fs::read_to_string(path)?;
+    let data = std::fs::read_to_string(path).context("opening syntax_kind.rs")?;
 
     let mut keys: Vec<_> = keywords.keys().collect();
     keys.sort();

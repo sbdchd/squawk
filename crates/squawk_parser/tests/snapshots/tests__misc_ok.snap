@@ -100,8 +100,8 @@ SOURCE_FILE
             WHITESPACE "\n    "
             CAST_EXPR
               LITERAL
-                PARAM "$1"
-              COLON2 "::"
+                POSITIONAL_PARAM "$1"
+              COLON_COLON "::"
               ARRAY_TYPE
                 PATH_TYPE
                   PATH
@@ -114,8 +114,8 @@ SOURCE_FILE
             WHITESPACE " \n    "
             CAST_EXPR
               LITERAL
-                PARAM "$2"
-              COLON2 "::"
+                POSITIONAL_PARAM "$2"
+              COLON_COLON "::"
               ARRAY_TYPE
                 PATH_TYPE
                   PATH
@@ -128,8 +128,8 @@ SOURCE_FILE
             WHITESPACE " \n    "
             CAST_EXPR
               LITERAL
-                PARAM "$3"
-              COLON2 "::"
+                POSITIONAL_PARAM "$3"
+              COLON_COLON "::"
               ARRAY_TYPE
                 PATH_TYPE
                   PATH
@@ -174,29 +174,29 @@ SOURCE_FILE
       WHITESPACE " \n  "
       L_PAREN "("
       LITERAL
-        PARAM "$1"
+        POSITIONAL_PARAM "$1"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$2"
+        POSITIONAL_PARAM "$2"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$3"
+        POSITIONAL_PARAM "$3"
       R_PAREN ")"
       COMMA ","
       WHITESPACE " \n  "
       L_PAREN "("
       LITERAL
-        PARAM "$4"
+        POSITIONAL_PARAM "$4"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$5"
+        POSITIONAL_PARAM "$5"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$6"
+        POSITIONAL_PARAM "$6"
       R_PAREN ")"
       COMMA ","
       WHITESPACE " \n  "
@@ -204,15 +204,15 @@ SOURCE_FILE
       WHITESPACE "\n  "
       L_PAREN "("
       LITERAL
-        PARAM "$2998"
+        POSITIONAL_PARAM "$2998"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$2999"
+        POSITIONAL_PARAM "$2999"
       COMMA ","
       WHITESPACE " "
       LITERAL
-        PARAM "$3000"
+        POSITIONAL_PARAM "$3000"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
@@ -294,7 +294,7 @@ SOURCE_FILE
             IDENT "api_key"
           FAT_ARROW "=>"
           LITERAL
-            PARAM "$1"
+            POSITIONAL_PARAM "$1"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE " "
@@ -342,7 +342,7 @@ SOURCE_FILE
           COMMA ","
           WHITESPACE " "
           LITERAL
-            PARAM "$1"
+            POSITIONAL_PARAM "$1"
           R_PAREN ")"
       WHITESPACE " "
       ALIAS
@@ -492,7 +492,7 @@ SOURCE_FILE
                     COMMA ","
                     WHITESPACE " "
                     LITERAL
-                      PARAM "$1"
+                      POSITIONAL_PARAM "$1"
                     WHITESPACE "\n        "
                     COMMA ","
                     WHITESPACE " "
@@ -512,7 +512,7 @@ SOURCE_FILE
                         IDENT "_api_key"
                       FAT_ARROW "=>"
                       LITERAL
-                        PARAM "$2"
+                        POSITIONAL_PARAM "$2"
                     WHITESPACE "\n    "
                     R_PAREN ")"
                 WHITESPACE " "
@@ -648,15 +648,15 @@ SOURCE_FILE
                 COMMENT "-- %s,"
                 WHITESPACE "\n        "
                 LITERAL
-                  PARAM "$1"
+                  POSITIONAL_PARAM "$1"
                 COMMA ","
                 WHITESPACE "\n        "
                 COMMENT "-- %s::jsonb,"
                 WHITESPACE "\n        "
                 CAST_EXPR
                   LITERAL
-                    PARAM "$2"
-                  COLON2 "::"
+                    POSITIONAL_PARAM "$2"
+                  COLON_COLON "::"
                   PATH_TYPE
                     PATH
                       PATH_SEGMENT
@@ -681,7 +681,7 @@ SOURCE_FILE
                     IDENT "api_key"
                   FAT_ARROW "=>"
                   LITERAL
-                    PARAM "$3"
+                    POSITIONAL_PARAM "$3"
                 WHITESPACE "\n    "
                 R_PAREN ")"
             CUSTOM_OP
@@ -764,7 +764,7 @@ SOURCE_FILE
       L_PAREN "("
       WHITESPACE " "
       PARAM
-        PARAM_INOUT
+        PARAM_IN_OUT
           INOUT_KW "INOUT"
         WHITESPACE " "
         NAME
@@ -981,7 +981,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "interaction_ts"
                     R_PAREN ")"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -1037,7 +1037,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "interaction_ts"
                     R_PAREN ")"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -1213,7 +1213,7 @@ SOURCE_FILE
       CAST_EXPR
         LITERAL
           STRING "'2024-12-25'"
-        COLON2 "::"
+        COLON_COLON "::"
         PATH_TYPE
           PATH
             PATH_SEGMENT
@@ -1283,7 +1283,7 @@ SOURCE_FILE
       CAST_EXPR
         LITERAL
           STRING "'2024-12-25'"
-        COLON2 "::"
+        COLON_COLON "::"
         PATH_TYPE
           PATH
             PATH_SEGMENT
@@ -1377,7 +1377,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  BEGIN_STMT
+  BEGIN
     BEGIN_KW "BEGIN"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1639,7 +1639,7 @@ SOURCE_FILE
           IDENT "clean_default_temp"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMIT_STMT
+  COMMIT
     COMMIT_KW "COMMIT"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2024,7 +2024,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "plot"
           R_PAREN ")"
-      COLON2 "::"
+      COLON_COLON "::"
       PATH_TYPE
         PATH
           PATH_SEGMENT
@@ -2082,7 +2082,7 @@ SOURCE_FILE
                         LITERAL
                           STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
                         R_PAREN ")"
-                    COLON2 "::"
+                    COLON_COLON "::"
                     PATH_TYPE
                       PATH
                         PATH_SEGMENT
@@ -2289,7 +2289,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "/* enable fast range scans on the sequence column */"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -2474,7 +2474,7 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               R_PAREN ")"
-          COLON2 "::"
+          COLON_COLON "::"
           PATH_TYPE
             PATH
               PATH_SEGMENT
@@ -2554,7 +2554,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -2665,7 +2665,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "/* enable fast range scans on the event_time column */"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "create"
     WHITESPACE " "
     INDEX_KW "index"
@@ -2847,7 +2847,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "source_table_name"
                 WHITESPACE " "
-                COLONEQ ":="
+                COLON_EQ ":="
                 WHITESPACE " "
                 LITERAL
                   STRING "'events'"
@@ -2859,7 +2859,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "batched"
                 WHITESPACE " "
-                COLONEQ ":="
+                COLON_EQ ":="
                 WHITESPACE " "
                 LITERAL
                   FALSE_KW "false"
@@ -2871,7 +2871,7 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "start_time"
                 WHITESPACE " "
-                COLONEQ ":="
+                COLON_EQ ":="
                 WHITESPACE " "
                 LITERAL
                   STRING "'2024-01-01'"
@@ -3351,7 +3351,7 @@ SOURCE_FILE
                   LITERAL
                     STRING "'eventTypeGroups'"
                 R_PAREN ")"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT
@@ -3385,7 +3385,7 @@ SOURCE_FILE
                     LITERAL
                       STRING "'eventTypes'"
                   R_PAREN ")"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -3514,7 +3514,7 @@ SOURCE_FILE
                   LITERAL
                     STRING "'bookings'"
                 R_PAREN ")"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT
@@ -3558,7 +3558,7 @@ SOURCE_FILE
       CAST_EXPR
         LITERAL
           STRING "'{\n     \"start\": \"2025-01-01T23:30:00.000Z\",\n     \"eventTypeId\": 1398027,\n     \"attendee\": {\n       \"name\": \"Elon Musk\",\n       \"email\": \"elon.musk@x.com\",\n       \"timeZone\": \"America/New_York\"\n     }\n  }'"
-        COLON2 "::"
+        COLON_COLON "::"
         PATH_TYPE
           PATH
             PATH_SEGMENT
@@ -3656,7 +3656,7 @@ SOURCE_FILE
           INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     UNIQUE_KW "UNIQUE"
@@ -5455,7 +5455,7 @@ SOURCE_FILE
       DESC_KW "DESC"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -5489,7 +5489,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -5545,13 +5545,13 @@ SOURCE_FILE
                 CAST_EXPR
                   NAME_REF
                     IDENT "ctid"
-                  COLON2 "::"
+                  COLON_COLON "::"
                   PATH_TYPE
                     PATH
                       PATH_SEGMENT
                         NAME_REF
                           TEXT_KW "text"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -5563,13 +5563,13 @@ SOURCE_FILE
                 CAST_EXPR
                   NAME_REF
                     TIMESTAMP_KW "timestamp"
-                  COLON2 "::"
+                  COLON_COLON "::"
                   PATH_TYPE
                     PATH
                       PATH_SEGMENT
                         NAME_REF
                           TEXT_KW "text"
-                COLON2 "::"
+                COLON_COLON "::"
                 PATH_TYPE
                   PATH
                     PATH_SEGMENT
@@ -5740,7 +5740,7 @@ SOURCE_FILE
         DESC_KW "DESC"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -5775,7 +5775,7 @@ SOURCE_FILE
           IDENT "recent_product_sales"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_INDEX_STMT
+  CREATE_INDEX
     CREATE_KW "CREATE"
     WHITESPACE " "
     UNIQUE_KW "UNIQUE"

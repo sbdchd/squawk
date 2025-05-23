@@ -29,7 +29,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'1234'"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -84,7 +84,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               INT_NUMBER "44"
-            COLON2 "::"
+            COLON_COLON "::"
             BIT_TYPE
               BIT_KW "bit"
               L_PAREN "("
@@ -132,7 +132,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'1110'"
-              COLON2 "::"
+              COLON_COLON "::"
               BIT_TYPE
                 BIT_KW "bit"
                 L_PAREN "("
@@ -141,7 +141,7 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "4"
                   R_PAREN ")"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -158,7 +158,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'{1,2,3}'"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -178,7 +178,7 @@ SOURCE_FILE
           CAST_EXPR
             NAME_REF
               IDENT "foo"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -195,7 +195,7 @@ SOURCE_FILE
           CAST_EXPR
             NAME_REF
               IDENT "foo"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -218,7 +218,7 @@ SOURCE_FILE
                 LITERAL
                   STRING "'{}'"
                 WHITESPACE " "
-                COLON2 "::"
+                COLON_COLON "::"
                 WHITESPACE " "
                 ARRAY_TYPE
                   PATH_TYPE
@@ -229,7 +229,7 @@ SOURCE_FILE
                   L_BRACK "["
                   R_BRACK "]"
               WHITESPACE " "
-              COLON2 "::"
+              COLON_COLON "::"
               WHITESPACE " "
               ARRAY_TYPE
                 PATH_TYPE
@@ -240,7 +240,7 @@ SOURCE_FILE
                 L_BRACK "["
                 R_BRACK "]"
             WHITESPACE " "
-            COLON2 "::"
+            COLON_COLON "::"
             WHITESPACE " "
             ARRAY_TYPE
               PATH_TYPE
@@ -265,7 +265,7 @@ SOURCE_FILE
               CAST_EXPR
                 LITERAL
                   STRING "'{}'"
-                COLON2 "::"
+                COLON_COLON "::"
                 ARRAY_TYPE
                   PATH_TYPE
                     PATH
@@ -274,7 +274,7 @@ SOURCE_FILE
                           INT_KW "int"
                   L_BRACK "["
                   R_BRACK "]"
-              COLON2 "::"
+              COLON_COLON "::"
               ARRAY_TYPE
                 PATH_TYPE
                   PATH
@@ -283,7 +283,7 @@ SOURCE_FILE
                         IDENT "int8"
                 L_BRACK "["
                 R_BRACK "]"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -309,7 +309,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'1001'"
-            COLON2 "::"
+            COLON_COLON "::"
             BIT_TYPE
               BIT_KW "bit"
               WHITESPACE " "
@@ -325,7 +325,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'1001'"
-            COLON2 "::"
+            COLON_COLON "::"
             BIT_TYPE
               BIT_KW "bit"
               WHITESPACE " "
@@ -349,7 +349,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               CHARACTER_KW "character"
   SEMICOLON ";"
@@ -363,7 +363,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               CHARACTER_KW "character"
               WHITESPACE " "
@@ -379,7 +379,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               CHAR_KW "char"
   SEMICOLON ";"
@@ -393,7 +393,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               CHAR_KW "char"
               WHITESPACE " "
@@ -409,7 +409,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               VARCHAR_KW "varchar"
   SEMICOLON ";"
@@ -423,7 +423,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
@@ -439,7 +439,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
@@ -457,7 +457,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
@@ -473,7 +473,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               NATIONAL_KW "national"
               WHITESPACE " "
@@ -491,7 +491,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               NCHAR_KW "nchar"
   SEMICOLON ";"
@@ -505,7 +505,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               NCHAR_KW "nchar"
               WHITESPACE " "
@@ -521,7 +521,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               CHAR_TYPE
                 NCHAR_KW "nchar"
@@ -542,7 +542,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIMESTAMP_KW "timestamp"
@@ -561,7 +561,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIMESTAMP_KW "timestamp"
@@ -587,7 +587,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIMESTAMP_KW "timestamp"
@@ -613,7 +613,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIMESTAMP_KW "timestamp"
@@ -628,7 +628,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIMESTAMP_KW "timestamp"
@@ -650,7 +650,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIMESTAMP_KW "timestamp"
@@ -672,7 +672,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIME_KW "time"
@@ -691,7 +691,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIME_KW "time"
@@ -717,7 +717,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIME_KW "time"
@@ -743,7 +743,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIME_KW "time"
@@ -758,7 +758,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIME_KW "time"
@@ -780,7 +780,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'2024-01-01 12:34:56.123456'"
-            COLON2 "::"
+            COLON_COLON "::"
             TIME_TYPE
               NAME_REF
                 TIME_KW "time"
@@ -991,7 +991,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
   SEMICOLON ";"
@@ -1005,7 +1005,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1021,7 +1021,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1037,7 +1037,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1053,7 +1053,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1069,7 +1069,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1085,7 +1085,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1101,7 +1101,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1121,7 +1121,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1141,7 +1141,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1161,7 +1161,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1181,7 +1181,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1201,7 +1201,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1225,7 +1225,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1245,7 +1245,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1265,7 +1265,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1289,7 +1289,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1309,7 +1309,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               WHITESPACE " "
@@ -1333,7 +1333,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'10 days'"
-            COLON2 "::"
+            COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               L_PAREN "("
@@ -1355,7 +1355,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'{}'"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1375,7 +1375,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'\"foo\"'"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT
@@ -1389,7 +1389,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'\"foo\"'"
-              COLON2 "::"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT
@@ -1408,7 +1408,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH
@@ -1430,7 +1430,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH
@@ -1463,7 +1463,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               VARCHAR_KW "varchar"
   SEMICOLON ";"
@@ -1477,7 +1477,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'abc'"
-            COLON2 "::"
+            COLON_COLON "::"
             CHAR_TYPE
               VARCHAR_KW "varchar"
               L_PAREN "("
@@ -1497,7 +1497,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               CHAR_TYPE
                 VARCHAR_KW "varchar"
@@ -1520,7 +1520,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               CHAR_TYPE
                 VARCHAR_KW "varchar"
@@ -1539,7 +1539,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -1565,7 +1565,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH
@@ -1593,7 +1593,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -1625,7 +1625,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -1663,7 +1663,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1680,7 +1680,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1697,7 +1697,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1714,7 +1714,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1731,7 +1731,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1748,7 +1748,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1771,7 +1771,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             DOUBLE_TYPE
               DOUBLE_KW "double"
               WHITESPACE " "
@@ -1787,7 +1787,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1804,7 +1804,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1837,7 +1837,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1854,7 +1854,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1887,7 +1887,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1904,7 +1904,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1932,7 +1932,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -1949,7 +1949,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "''"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -2294,7 +2294,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "''"
-              COLON2 "::"
+              COLON_COLON "::"
               CHAR_TYPE
                 CHAR_KW "char"
                 L_PAREN "("
@@ -2321,7 +2321,7 @@ SOURCE_FILE
               CAST_EXPR
                 LITERAL
                   STRING "'a '"
-                COLON2 "::"
+                COLON_COLON "::"
                 CHAR_TYPE
                   CHAR_KW "CHAR"
                   L_PAREN "("
@@ -2341,7 +2341,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 ESC_STRING "E'a\\n'"
-              COLON2 "::"
+              COLON_COLON "::"
               CHAR_TYPE
                 CHAR_KW "CHAR"
                 L_PAREN "("
@@ -2509,7 +2509,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'{1}'"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -2549,7 +2549,7 @@ SOURCE_FILE
               ARRAY_KW "array"
               L_BRACK "["
               R_BRACK "]"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH
@@ -2571,7 +2571,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               INT_NUMBER "44"
-            COLON2 "::"
+            COLON_COLON "::"
             BIT_TYPE
               BIT_KW "bit"
               L_PAREN "("
@@ -2593,7 +2593,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               INT_NUMBER "44"
-            COLON2 "::"
+            COLON_COLON "::"
             BIT_TYPE
               BIT_KW "bit"
               L_PAREN "("
@@ -2645,7 +2645,7 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'1110'"
-              COLON2 "::"
+              COLON_COLON "::"
               BIT_TYPE
                 BIT_KW "bit"
                 L_PAREN "("
@@ -2654,7 +2654,7 @@ SOURCE_FILE
                     LITERAL
                       INT_NUMBER "4"
                   R_PAREN ")"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH_SEGMENT
@@ -2673,7 +2673,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'1'"
-            COLON2 "::"
+            COLON_COLON "::"
             PATH_TYPE
               PATH
                 PATH
@@ -2695,7 +2695,7 @@ SOURCE_FILE
           CAST_EXPR
             LITERAL
               STRING "'{1}'"
-            COLON2 "::"
+            COLON_COLON "::"
             ARRAY_TYPE
               PATH_TYPE
                 PATH

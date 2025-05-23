@@ -373,7 +373,7 @@ SOURCE_FILE
             R_ANGLE ">"
             WHITESPACE " "
             LITERAL
-              PARAM "$1"
+              POSITIONAL_PARAM "$1"
           WHITESPACE " "
           AND_KW "AND"
           WHITESPACE " "
@@ -384,7 +384,7 @@ SOURCE_FILE
             L_ANGLE "<"
             WHITESPACE " "
             LITERAL
-              PARAM "$2"
+              POSITIONAL_PARAM "$2"
       WHITESPACE "\n    "
       GROUP_BY_CLAUSE
         GROUP_KW "GROUP"
@@ -457,7 +457,7 @@ SOURCE_FILE
             R_ANGLE ">"
             WHITESPACE " "
             LITERAL
-              PARAM "$1"
+              POSITIONAL_PARAM "$1"
           WHITESPACE " "
           AND_KW "AND"
           WHITESPACE " "
@@ -468,7 +468,7 @@ SOURCE_FILE
             L_ANGLE "<"
             WHITESPACE " "
             LITERAL
-              PARAM "$2"
+              POSITIONAL_PARAM "$2"
       WHITESPACE "\n    "
       GROUP_BY_CLAUSE
         GROUP_KW "GROUP"
@@ -521,8 +521,8 @@ SOURCE_FILE
             WHITESPACE " "
             CAST_EXPR
               LITERAL
-                PARAM "$1"
-              COLON2 "::"
+                POSITIONAL_PARAM "$1"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT
@@ -539,8 +539,8 @@ SOURCE_FILE
             WHITESPACE " "
             CAST_EXPR
               LITERAL
-                PARAM "$2"
-              COLON2 "::"
+                POSITIONAL_PARAM "$2"
+              COLON_COLON "::"
               PATH_TYPE
                 PATH
                   PATH_SEGMENT

@@ -10,7 +10,7 @@ SOURCE_FILE
     UNLISTEN_KW "unlisten"
     WHITESPACE " "
     NAME
-      IDENT "virtual"
+      VIRTUAL_KW "virtual"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   UNLISTEN_STMT

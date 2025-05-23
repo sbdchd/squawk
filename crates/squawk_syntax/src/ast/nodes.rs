@@ -2724,7 +2724,7 @@ pub struct Begin {
 impl AstNode for Begin {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::BEGIN_STMT
+        kind == SyntaxKind::BEGIN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -2748,7 +2748,7 @@ pub struct Commit {
 impl AstNode for Commit {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::COMMIT_STMT
+        kind == SyntaxKind::COMMIT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -2839,7 +2839,7 @@ impl CreateIndex {
 impl AstNode for CreateIndex {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_INDEX_STMT
+        kind == SyntaxKind::CREATE_INDEX
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3038,7 +3038,7 @@ impl DropAggregate {
 impl AstNode for DropAggregate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_AGGREGATE_STMT
+        kind == SyntaxKind::DROP_AGGREGATE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -3206,13 +3206,13 @@ impl AstNode for Stmt {
                 | SyntaxKind::ALTER_TABLE
                 | SyntaxKind::DROP_DATABASE_STMT
                 | SyntaxKind::CREATE_TABLE
-                | SyntaxKind::BEGIN_STMT
-                | SyntaxKind::COMMIT_STMT
-                | SyntaxKind::CREATE_INDEX_STMT
+                | SyntaxKind::BEGIN
+                | SyntaxKind::COMMIT
+                | SyntaxKind::CREATE_INDEX
                 | SyntaxKind::DROP_TABLE
                 | SyntaxKind::DROP_INDEX_STMT
                 | SyntaxKind::DROP_TYPE_STMT
-                | SyntaxKind::DROP_AGGREGATE_STMT
+                | SyntaxKind::DROP_AGGREGATE
                 | SyntaxKind::CREATE_DOMAIN_STMT
                 | SyntaxKind::ALTER_DOMAIN_STMT
                 | SyntaxKind::ALTER_AGGREGATE_STMT
@@ -3229,9 +3229,9 @@ impl AstNode for Stmt {
             SyntaxKind::ALTER_TABLE => Stmt::AlterTable(AlterTable { syntax }),
             SyntaxKind::DROP_DATABASE_STMT => Stmt::DropDatabase(DropDatabase { syntax }),
             SyntaxKind::CREATE_TABLE => Stmt::CreateTable(CreateTable { syntax }),
-            SyntaxKind::BEGIN_STMT => Stmt::Begin(Begin { syntax }),
-            SyntaxKind::COMMIT_STMT => Stmt::Commit(Commit { syntax }),
-            SyntaxKind::CREATE_INDEX_STMT => Stmt::CreateIndex(CreateIndex { syntax }),
+            SyntaxKind::BEGIN => Stmt::Begin(Begin { syntax }),
+            SyntaxKind::COMMIT => Stmt::Commit(Commit { syntax }),
+            SyntaxKind::CREATE_INDEX => Stmt::CreateIndex(CreateIndex { syntax }),
             SyntaxKind::DROP_TABLE => Stmt::DropTable(DropTable { syntax }),
             SyntaxKind::DROP_INDEX_STMT => Stmt::DropIndex(DropIndex { syntax }),
             SyntaxKind::DROP_TYPE_STMT => Stmt::DropType(DropType { syntax }),
@@ -3239,7 +3239,7 @@ impl AstNode for Stmt {
             SyntaxKind::ALTER_DOMAIN_STMT => Stmt::AlterDomain(AlterDomain { syntax }),
             SyntaxKind::ALTER_AGGREGATE_STMT => Stmt::AlterAggregate(AlterAggregate { syntax }),
             SyntaxKind::CREATE_AGGREGATE_STMT => Stmt::CreateAggregate(CreateAggregate { syntax }),
-            SyntaxKind::DROP_AGGREGATE_STMT => Stmt::DropAggregate(DropAggregate { syntax }),
+            SyntaxKind::DROP_AGGREGATE => Stmt::DropAggregate(DropAggregate { syntax }),
             SyntaxKind::ROLLBACK_STMT => Stmt::Rollback(Rollback { syntax }),
             SyntaxKind::TRUNCATE_STMT => Stmt::Truncate(Truncate { syntax }),
             _ => return None,
@@ -4453,7 +4453,7 @@ pub struct ParamInOut {
 impl AstNode for ParamInOut {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PARAM_INOUT
+        kind == SyntaxKind::PARAM_IN_OUT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -4508,7 +4508,7 @@ impl AstNode for ParamMode {
             kind,
             SyntaxKind::PARAM_IN
                 | SyntaxKind::PARAM_OUT
-                | SyntaxKind::PARAM_INOUT
+                | SyntaxKind::PARAM_IN_OUT
                 | SyntaxKind::VARIADIC_KW
         )
     }
@@ -4518,7 +4518,7 @@ impl AstNode for ParamMode {
         let res = match syntax.kind() {
             SyntaxKind::PARAM_IN => ParamMode::ParamIn(ParamIn { syntax }),
             SyntaxKind::PARAM_OUT => ParamMode::ParamOut(ParamOut { syntax }),
-            SyntaxKind::PARAM_INOUT => ParamMode::ParamInOut(ParamInOut { syntax }),
+            SyntaxKind::PARAM_IN_OUT => ParamMode::ParamInOut(ParamInOut { syntax }),
             SyntaxKind::PARAM_VARIADIC => ParamMode::ParamVariadic(ParamVariadic { syntax }),
             _ => return None,
         };

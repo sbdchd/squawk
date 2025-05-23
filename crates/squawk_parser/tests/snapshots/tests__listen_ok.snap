@@ -17,6 +17,6 @@ SOURCE_FILE
     LISTEN_KW "LISTEN"
     WHITESPACE " "
     NAME
-      IDENT "virtual"
+      VIRTUAL_KW "virtual"
   SEMICOLON ";"
   WHITESPACE "\n\n"

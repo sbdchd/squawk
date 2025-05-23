@@ -17,7 +17,7 @@ SOURCE_FILE
     NOTIFY_KW "NOTIFY"
     WHITESPACE " "
     NAME
-      IDENT "virtual"
+      VIRTUAL_KW "virtual"
     COMMA ","
     WHITESPACE " "
     LITERAL

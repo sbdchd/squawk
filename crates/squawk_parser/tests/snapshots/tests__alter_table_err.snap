@@ -45,7 +45,7 @@ SOURCE_FILE
           WHITESPACE " "
           DEFERRABLE_KW "deferrable"
         WHITESPACE " "
-        INITALLY_DEFERRED_CONSTRAINT_OPTION
+        INITIALLY_DEFERRED_CONSTRAINT_OPTION
           INITIALLY_KW "initially"
           WHITESPACE " "
           DEFERRED_KW "deferred"
