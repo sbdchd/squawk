@@ -1,7 +1,7 @@
 // synced from: 
-//   commit: e032e4c7ddd0e1f7865b246ec18944365d4f8614
-//   committed at: 2024-11-30T17:42:19Z
-//   file: https://github.com/postgres/postgres/blob/e032e4c7ddd0e1f7865b246ec18944365d4f8614/src/include/parser/kwlist.h
+//   commit: cb1456423d3925f9c70a488b58f03f186561f00f
+//   committed at: 2025-05-22T21:14:54Z
+//   file: https://github.com/postgres/postgres/blob/cb1456423d3925f9c70a488b58f03f186561f00f/src/include/parser/kwlist.h
 //
 // update via:
 //   cargo xtask sync-kwlist
@@ -15,7 +15,7 @@
  * by the PG_KEYWORD macro, which is not defined in this file; it can
  * be defined by the caller for special purposes.
  *
- * Portions Copyright (c) 1996-2024, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2025, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  * IDENTIFICATION
@@ -161,7 +161,7 @@ PG_KEYWORD("enable", ENABLE_P, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("encoding", ENCODING, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("encrypted", ENCRYPTED, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("end", END_P, RESERVED_KEYWORD, BARE_LABEL)
-
+PG_KEYWORD("enforced", ENFORCED, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("enum", ENUM_P, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("error", ERROR_P, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("escape", ESCAPE, UNRESERVED_KEYWORD, BARE_LABEL)
@@ -316,7 +316,7 @@ PG_KEYWORD("nullif", NULLIF, COL_NAME_KEYWORD, BARE_LABEL)
 PG_KEYWORD("nulls", NULLS_P, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("numeric", NUMERIC, COL_NAME_KEYWORD, BARE_LABEL)
 PG_KEYWORD("object", OBJECT_P, UNRESERVED_KEYWORD, BARE_LABEL)
-
+PG_KEYWORD("objects", OBJECTS_P, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("of", OF, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("off", OFF, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("offset", OFFSET, RESERVED_KEYWORD, AS_LABEL)
@@ -500,7 +500,7 @@ PG_KEYWORD("verbose", VERBOSE, TYPE_FUNC_NAME_KEYWORD, BARE_LABEL)
 PG_KEYWORD("version", VERSION_P, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("view", VIEW, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("views", VIEWS, UNRESERVED_KEYWORD, BARE_LABEL)
-
+PG_KEYWORD("virtual", VIRTUAL, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("volatile", VOLATILE, UNRESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("when", WHEN, RESERVED_KEYWORD, BARE_LABEL)
 PG_KEYWORD("where", WHERE, RESERVED_KEYWORD, AS_LABEL)
