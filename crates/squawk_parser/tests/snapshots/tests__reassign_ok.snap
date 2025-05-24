@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/reassign.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  REASSIGN_STMT
+  REASSIGN
     REASSIGN_KW "reassign"
     WHITESPACE " "
     OWNED_KW "owned"
@@ -29,7 +28,7 @@ SOURCE_FILE
     SESSION_USER_KW "session_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REASSIGN_STMT
+  REASSIGN
     REASSIGN_KW "reassign"
     WHITESPACE " "
     OWNED_KW "owned"

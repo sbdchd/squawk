@@ -1,7 +1,4 @@
-use squawk_syntax::{
-    ast::{self, HasModuleItem},
-    Parse, SourceFile,
-};
+use squawk_syntax::{ast, Parse, SourceFile};
 
 use crate::{Linter, Rule, Violation};
 
@@ -13,9 +10,9 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
     let file = parse.tree();
     let mut errors = vec![];
     let mut stmt_count = 0;
-    for item in file.items() {
+    for stmt in file.stmts() {
         stmt_count += 1;
-        match item {
+        match stmt {
             ast::Stmt::Begin(_) => {
                 in_transaction = true;
             }

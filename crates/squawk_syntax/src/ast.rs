@@ -24,11 +24,11 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+mod generated;
+mod node_ext;
 mod nodes;
 mod support;
 mod traits;
-
-mod node_ext;
 
 use std::marker::PhantomData;
 
@@ -36,8 +36,9 @@ use crate::syntax_node::{SyntaxNode, SyntaxNodeChildren, SyntaxToken};
 use squawk_parser::SyntaxKind;
 
 pub use self::{
-    nodes::*,
     // generated::{nodes::*, tokens::*},
+    generated::tokens::*,
+    nodes::*,
     // node_ext::{
     //     AttrKind, FieldKind, Macro, NameLike, NameOrNameRef, PathSegmentKind, SelfParamKind,
     //     SlicePatComponents, StructKind, TraitOrAlias, TypeBoundKind, TypeOrConstParam,
@@ -52,7 +53,6 @@ pub use self::{
         HasIfNotExists, // HasTypeBounds,
         // HasVisibility,
         // HasGenericParams, HasLoopBody,
-        HasModuleItem,
         HasName,
     },
 };

@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_event_trigger.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_EVENT_TRIGGER_STMT
+  CREATE_EVENT_TRIGGER
     CREATE_KW "create"
     WHITESPACE " "
     EVENT_KW "event"
@@ -34,7 +33,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_EVENT_TRIGGER_STMT
+  CREATE_EVENT_TRIGGER
     CREATE_KW "create"
     WHITESPACE " "
     EVENT_KW "event"
@@ -99,7 +98,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"
   WHITESPACE "\n"
-  CREATE_EVENT_TRIGGER_STMT
+  CREATE_EVENT_TRIGGER
     CREATE_KW "CREATE"
     WHITESPACE " "
     EVENT_KW "EVENT"

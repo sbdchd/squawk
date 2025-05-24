@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_subscription.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- connection"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -22,7 +21,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_publication"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -38,7 +37,7 @@ SOURCE_FILE
       IDENT "p"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -80,7 +79,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_publication"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -96,7 +95,7 @@ SOURCE_FILE
       IDENT "p"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -138,7 +137,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_publication"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -154,7 +153,7 @@ SOURCE_FILE
       IDENT "p"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -196,7 +195,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -223,7 +222,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- enable"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -236,7 +235,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- disable"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -249,7 +248,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_parameters"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -281,7 +280,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- skip"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -304,7 +303,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -319,7 +318,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"
@@ -336,7 +335,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_SUBSCRIPTION_STMT
+  ALTER_SUBSCRIPTION
     ALTER_KW "alter"
     WHITESPACE " "
     SUBSCRIPTION_KW "subscription"

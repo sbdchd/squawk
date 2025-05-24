@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/fetch.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "fetch"
     WHITESPACE " "
     NEXT_KW "next"
@@ -17,7 +16,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "fetch"
     WHITESPACE " "
     PRIOR_KW "prior"
@@ -28,7 +27,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "fetch"
     WHITESPACE " "
     PRIOR_KW "prior"
@@ -39,7 +38,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "fetch"
     WHITESPACE " "
     PRIOR_KW "prior"
@@ -48,7 +47,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     NEXT_KW "NEXT"
@@ -59,7 +58,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     PRIOR_KW "PRIOR"
@@ -70,7 +69,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     FIRST_KW "FIRST"
@@ -81,7 +80,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     LAST_KW "LAST"
@@ -92,7 +91,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     ABSOLUTE_KW "ABSOLUTE"
@@ -106,7 +105,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     RELATIVE_KW "RELATIVE"
@@ -120,7 +119,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     LITERAL
@@ -132,7 +131,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     ALL_KW "ALL"
@@ -143,7 +142,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     FORWARD_KW "FORWARD"
@@ -154,7 +153,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     FORWARD_KW "FORWARD"
@@ -168,7 +167,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     FORWARD_KW "FORWARD"
@@ -181,7 +180,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     BACKWARD_KW "BACKWARD"
@@ -192,7 +191,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     BACKWARD_KW "BACKWARD"
@@ -206,7 +205,7 @@ SOURCE_FILE
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
-  FETCH_STMT
+  FETCH
     FETCH_KW "FETCH"
     WHITESPACE " "
     BACKWARD_KW "BACKWARD"

@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/comment.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- access_method"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -28,22 +27,23 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- aggregate_star"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "my_agg"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      STAR "*"
-      R_PAREN ")"
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "my_agg"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -53,22 +53,23 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- aggregate"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      STAR "*"
-      R_PAREN ")"
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -78,38 +79,39 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- aggregate_with_params"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PARAM_IN
-          IN_KW "in"
-        WHITESPACE " "
-        NAME
-          IDENT "a"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                TEXT_KW "text"
-      COMMA ","
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
       WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          TEXT_KW "text"
-      R_PAREN ")"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+        COMMA ","
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            TEXT_KW "text"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -119,41 +121,42 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- aggregate_order_by"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                INT_KW "int"
-      COMMA ","
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          TEXT_KW "text"
-      WHITESPACE " "
-      ORDER_KW "order"
-      WHITESPACE " "
-      BY_KW "by"
-      WHITESPACE " "
-      PARAM
-        TIME_TYPE
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
           NAME_REF
-            TIMESTAMP_KW "timestamp"
-      R_PAREN ")"
+            IDENT "a"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        COMMA ","
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            TEXT_KW "text"
+        WHITESPACE " "
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        PARAM
+          TIME_TYPE
+            NAME_REF
+              TIMESTAMP_KW "timestamp"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -163,7 +166,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- cast"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -194,7 +197,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- collation"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -214,7 +217,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- column"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -239,7 +242,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- constraint_on_table"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -264,7 +267,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- constraint_on_domain"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -291,7 +294,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- conversion"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -311,7 +314,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- database"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -331,7 +334,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- domain"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -351,7 +354,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- extension"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -371,7 +374,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- event_trigger"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -393,7 +396,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- foreign_data_wrapper"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -417,7 +420,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- foreign_table"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -439,7 +442,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- function"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -462,7 +465,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- function_with_args"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -513,7 +516,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- index"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -533,7 +536,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -553,7 +556,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- materialized_view"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -575,7 +578,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- operator"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -606,7 +609,7 @@ SOURCE_FILE
       STRING "''"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -645,7 +648,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- operator_class"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -672,7 +675,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- operator_family"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -699,7 +702,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- policy"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -724,7 +727,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- language"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -744,7 +747,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- procedural_language"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -766,7 +769,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- procedure"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -789,7 +792,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- procedure_with_args"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -843,7 +846,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- publication"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -863,7 +866,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- role"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -883,7 +886,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- routine"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -906,7 +909,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- routine_with_args"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -963,7 +966,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rule"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -988,7 +991,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1008,7 +1011,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1028,7 +1031,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- server"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1048,7 +1051,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- statistics"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1068,7 +1071,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- subscription"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1088,7 +1091,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1108,7 +1111,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table_null"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1127,7 +1130,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1147,7 +1150,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- text_search_configuration"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1171,7 +1174,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- text_search_dictionary"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1195,7 +1198,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- text_search_parser"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1219,7 +1222,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- text_search_template"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1243,7 +1246,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- transform"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1271,7 +1274,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- trigger"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1296,7 +1299,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- type_"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"
@@ -1316,7 +1319,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- view"
   WHITESPACE "\n"
-  COMMENT_STMT
+  COMMENT_ON
     COMMENT_KW "comment"
     WHITESPACE " "
     ON_KW "on"

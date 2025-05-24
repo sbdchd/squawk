@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_view.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- docs"
   WHITESPACE "\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     VIEW_KW "VIEW"
@@ -28,7 +27,7 @@ SOURCE_FILE
               STRING "'Hello World'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     VIEW_KW "VIEW"
@@ -59,7 +58,7 @@ SOURCE_FILE
               IDENT "hello"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     VIEW_KW "VIEW"
@@ -98,7 +97,7 @@ SOURCE_FILE
             STRING "'Comedy'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     VIEW_KW "VIEW"
@@ -145,7 +144,7 @@ SOURCE_FILE
     OPTION_KW "OPTION"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     VIEW_KW "VIEW"
@@ -192,7 +191,7 @@ SOURCE_FILE
     OPTION_KW "OPTION"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     VIEW_KW "VIEW"
@@ -322,7 +321,7 @@ SOURCE_FILE
             STRING "'Comedy'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     RECURSIVE_KW "RECURSIVE"
@@ -395,7 +394,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- complete_syntax"
   WHITESPACE "\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "create"
     WHITESPACE " "
     OR_REPLACE
@@ -477,7 +476,7 @@ SOURCE_FILE
               INT_NUMBER "3"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "create"
     WHITESPACE " "
     TEMPORARY_KW "temporary"
@@ -521,7 +520,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- regression test"
   WHITESPACE "\n"
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "create"
     WHITESPACE " "
     OR_REPLACE

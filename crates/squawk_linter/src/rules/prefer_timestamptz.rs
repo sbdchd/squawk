@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasArgList},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 

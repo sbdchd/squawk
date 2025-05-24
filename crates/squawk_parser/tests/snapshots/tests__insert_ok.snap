@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/insert.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- insert"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -33,7 +32,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -77,7 +76,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -121,7 +120,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -136,7 +135,7 @@ SOURCE_FILE
     VALUES_KW "values"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -208,7 +207,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -275,7 +274,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- schema_from_docs"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -348,7 +347,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs_examples"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -387,7 +386,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -449,7 +448,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -488,7 +487,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -550,7 +549,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -565,7 +564,7 @@ SOURCE_FILE
     VALUES_KW "VALUES"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -649,7 +648,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -688,7 +687,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- Create an empty 3x3 gameboard for noughts-and-crosses"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -741,7 +740,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- The subscripts in the above example aren't really needed"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -776,7 +775,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -816,7 +815,7 @@ SOURCE_FILE
       IDENT "did"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     WITH_CLAUSE
       WITH_KW "WITH"
       WHITESPACE " "
@@ -828,13 +827,14 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         WHITESPACE "\n  "
-        UPDATE_STMT
+        UPDATE
           UPDATE_KW "UPDATE"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "employees"
+          RELATION_NAME
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "employees"
           WHITESPACE " "
           SET_KW "SET"
           WHITESPACE " "
@@ -926,7 +926,7 @@ SOURCE_FILE
           IDENT "upd"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -998,7 +998,7 @@ SOURCE_FILE
         IDENT "dname"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1048,7 +1048,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- Don't update existing distributors based in a certain ZIP code"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1164,7 +1164,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- index to arbitrate taking the DO NOTHING action)"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1220,7 +1220,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- just use a regular unique constraint on \"did\""
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1276,7 +1276,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with schema"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"

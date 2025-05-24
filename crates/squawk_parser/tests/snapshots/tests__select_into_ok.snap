@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select_into.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- docs"
   WHITESPACE "\n"
-  SELECT_INTO_STMT
+  SELECT_INTO
     SELECT_CLAUSE
       SELECT_KW "SELECT"
       WHITESPACE " "
@@ -43,7 +42,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- more_schema"
   WHITESPACE "\n"
-  SELECT_INTO_STMT
+  SELECT_INTO
     SELECT_CLAUSE
       SELECT_KW "select"
       WHITESPACE " "

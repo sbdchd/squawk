@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/call.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CALL_STMT
+  CALL
     CALL_KW "CALL"
     WHITESPACE " "
     PATH
@@ -20,7 +19,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_schema"
   WHITESPACE "\n"
-  CALL_STMT
+  CALL
     CALL_KW "CALL"
     WHITESPACE " "
     PATH
@@ -41,7 +40,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_named_args"
   WHITESPACE "\n"
-  CALL_STMT
+  CALL
     CALL_KW "CALL"
     WHITESPACE " "
     PATH

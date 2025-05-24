@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- parens_and_unions"
@@ -5041,39 +5040,42 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- simple"
   WHITESPACE "\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only"
   WHITESPACE "\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "table"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- star"
   WHITESPACE "\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
-    WHITESPACE " "
-    STAR "*"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      WHITESPACE " "
+      STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested"
@@ -5086,13 +5088,14 @@ SOURCE_FILE
         TARGET
           PAREN_EXPR
             L_PAREN "("
-            TABLE_STMT
+            TABLE
               TABLE_KW "table"
               WHITESPACE " "
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    IDENT "t"
+              RELATION_NAME
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
             R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

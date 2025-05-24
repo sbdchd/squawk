@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_type.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -23,7 +22,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -42,7 +41,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -62,7 +61,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -82,7 +81,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename_attribute"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -107,7 +106,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename_attribute_cascade"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -137,7 +136,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -169,7 +168,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_value"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -189,7 +188,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_value_full"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -224,7 +223,7 @@ SOURCE_FILE
       STRING "'w'"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -261,7 +260,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename_value"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -286,7 +285,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_property"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -309,7 +308,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -343,7 +342,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -369,7 +368,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute_collate"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -403,7 +402,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_attribute_cascade"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -429,7 +428,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -460,7 +459,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_attribute"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -478,7 +477,7 @@ SOURCE_FILE
       IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -503,7 +502,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -530,7 +529,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- alter_attribute"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -558,7 +557,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- alter_attribute_set_data"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -606,7 +605,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"
@@ -636,7 +635,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
   WHITESPACE "\n"
-  ALTER_TYPE_STMT
+  ALTER_TYPE
     ALTER_KW "alter"
     WHITESPACE " "
     TYPE_KW "type"

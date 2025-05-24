@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_access_method.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_ACCESS_METHOD_STMT
+  CREATE_ACCESS_METHOD
     CREATE_KW "create"
     WHITESPACE " "
     ACCESS_KW "access"
@@ -32,7 +31,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_ACCESS_METHOD_STMT
+  CREATE_ACCESS_METHOD
     CREATE_KW "create"
     WHITESPACE " "
     ACCESS_KW "access"

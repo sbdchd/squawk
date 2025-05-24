@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_sequence.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_SEQUENCE_STMT
+  CREATE_SEQUENCE
     CREATE_KW "create"
     WHITESPACE " "
     SEQUENCE_KW "sequence"
@@ -19,7 +18,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_SEQUENCE_STMT
+  CREATE_SEQUENCE
     CREATE_KW "create"
     WHITESPACE " "
     TEMPORARY_KW "temporary"
@@ -107,7 +106,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- unlogged"
   WHITESPACE "\n"
-  CREATE_SEQUENCE_STMT
+  CREATE_SEQUENCE
     CREATE_KW "create"
     WHITESPACE " "
     UNLOGGED_KW "unlogged"

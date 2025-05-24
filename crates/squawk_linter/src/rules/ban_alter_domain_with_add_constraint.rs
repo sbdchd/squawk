@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -7,18 +7,17 @@ use crate::{Linter, Rule, Violation};
 
 pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
-    for item in file.items() {
-        if let ast::Stmt::AlterDomain(alter_domain) = item {
-            let actions = alter_domain.actions();
-            for action in actions {
-                if let ast::AlterDomainAction::AddConstraint(add_constraint) = action {
-                    ctx.report(Violation::new(
+    for stmt in file.stmts() {
+        if let ast::Stmt::AlterDomain(alter_domain) = stmt {
+            if let Some(ast::AlterDomainAction::AddConstraint(add_constraint)) =
+                alter_domain.action()
+            {
+                ctx.report(Violation::new(
                     Rule::BanAlterDomainWithAddConstraint,
                         "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
                         add_constraint.syntax().text_range(),
                         None,
                     ))
-                }
             }
         }
     }

@@ -1,22 +1,21 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/analyze.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  ANALYZE_STMT
+  ANALYZE
     ANALYZE_KW "analyze"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ANALYZE_STMT
+  ANALYZE
     ANALYSE_KW "analyse"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  ANALYZE_STMT
+  ANALYZE
     ANALYZE_KW "analyze"
     WHITESPACE " "
     VERBOSE_KW "verbose"
@@ -67,7 +66,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full_parens"
   WHITESPACE "\n"
-  ANALYZE_STMT
+  ANALYZE
     ANALYZE_KW "analyze"
     WHITESPACE " "
     L_PAREN "("

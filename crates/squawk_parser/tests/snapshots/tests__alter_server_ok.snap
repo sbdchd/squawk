@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_server.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  ALTER_SERVER_STMT
+  ALTER_SERVER
     ALTER_KW "alter"
     WHITESPACE " "
     SERVER_KW "server"
@@ -22,7 +21,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  ALTER_SERVER_STMT
+  ALTER_SERVER
     ALTER_KW "alter"
     WHITESPACE " "
     SERVER_KW "server"
@@ -56,7 +55,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_SERVER_STMT
+  ALTER_SERVER
     ALTER_KW "alter"
     WHITESPACE " "
     SERVER_KW "server"
@@ -71,7 +70,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_SERVER_STMT
+  ALTER_SERVER
     ALTER_KW "alter"
     WHITESPACE " "
     SERVER_KW "server"
@@ -88,7 +87,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_SERVER_STMT
+  ALTER_SERVER
     ALTER_KW "alter"
     WHITESPACE " "
     SERVER_KW "server"

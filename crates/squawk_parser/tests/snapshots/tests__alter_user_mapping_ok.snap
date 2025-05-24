@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_user_mapping.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- full"
   WHITESPACE "\n"
-  ALTER_USER_MAPPING_STMT
+  ALTER_USER_MAPPING
     ALTER_KW "alter"
     WHITESPACE " "
     USER_KW "user"

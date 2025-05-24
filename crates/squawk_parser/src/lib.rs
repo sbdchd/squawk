@@ -49,16 +49,15 @@ use event::Event;
 use grammar::OPERATOR_FIRST;
 use std::cell::Cell;
 use token_set::TokenSet;
+mod event;
+mod generated;
 mod grammar;
-mod token_set;
-
+mod input;
 mod lexed_str;
+mod output;
 mod shortcuts;
 mod syntax_kind;
-
-mod event;
-mod input;
-mod output;
+mod token_set;
 
 pub use crate::{
     lexed_str::LexedStr,
@@ -540,13 +539,6 @@ impl<'t> Parser<'t> {
                 n,
                 SyntaxKind::IS_KW,
                 SyntaxKind::NOT_KW,
-                TrivaBetween::Allowed,
-            ),
-            // is null
-            SyntaxKind::IS_NULL => self.at_composite2(
-                n,
-                SyntaxKind::IS_KW,
-                SyntaxKind::NULL_KW,
                 TrivaBetween::Allowed,
             ),
             // not like

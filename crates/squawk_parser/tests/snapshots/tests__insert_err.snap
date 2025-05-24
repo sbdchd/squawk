@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/err/insert.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- missing comma in column list"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -59,7 +58,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- missing column in column list & trailing comma"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -111,7 +110,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- missing comma in values & trailing comma"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"

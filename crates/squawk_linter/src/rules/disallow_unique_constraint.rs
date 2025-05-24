@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -12,10 +12,11 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
     let help = "Create an index `CONCURRENTLY` and create the constraint using the index.";
     let file = parse.tree();
     let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
-    for item in file.items() {
-        if let ast::Stmt::AlterTable(alter_table) = item {
+    for stmt in file.stmts() {
+        if let ast::Stmt::AlterTable(alter_table) = stmt {
             let Some(table_name) = alter_table
-                .path()
+                .relation_name()
+                .and_then(|x| x.path())
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
                 .map(|x| x.text().to_string())

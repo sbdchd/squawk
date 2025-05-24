@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -10,8 +10,8 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
     let help = "Add `NOT VALID` to the constraint in one transaction and then VALIDATE the constraint in a separate transaction.";
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
-    for item in file.items() {
-        if let ast::Stmt::AlterTable(alter_table) = item {
+    for stmt in file.stmts() {
+        if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
                 match action {
                     ast::AlterTableAction::AddConstraint(add_constraint) => {

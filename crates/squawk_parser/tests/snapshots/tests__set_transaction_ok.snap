@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/set_transaction.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- docs"
   WHITESPACE "\n"
-  SET_TRANSACTION_STMT
+  SET_TRANSACTION
     SET_KW "SET"
     WHITESPACE " "
     TRANSACTION_KW "TRANSACTION"
@@ -17,7 +16,7 @@ SOURCE_FILE
       STRING "'00000003-0000001B-1'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_TRANSACTION_STMT
+  SET_TRANSACTION
     SET_KW "SET"
     WHITESPACE " "
     SESSION_KW "SESSION"
@@ -42,7 +41,7 @@ SOURCE_FILE
     WRITE_KW "write"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_TRANSACTION_STMT
+  SET_TRANSACTION
     SET_KW "SET"
     WHITESPACE " "
     TRANSACTION_KW "TRANSACTION"
@@ -66,7 +65,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- no commas is postgres historical according to gram.y"
   WHITESPACE "\n"
-  SET_TRANSACTION_STMT
+  SET_TRANSACTION
     SET_KW "SET"
     WHITESPACE " "
     TRANSACTION_KW "TRANSACTION"

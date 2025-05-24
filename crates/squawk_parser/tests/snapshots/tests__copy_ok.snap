@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/copy.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple_copy_from"
   WHITESPACE "\n"
-  COPY_STMT
+  COPY
     COPY_KW "copy"
     WHITESPACE " "
     PATH
@@ -22,7 +21,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- copy_to"
   WHITESPACE "\n"
-  COPY_STMT
+  COPY
     COPY_KW "COPY"
     WHITESPACE " "
     PATH
@@ -45,7 +44,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- copy_from"
   WHITESPACE "\n"
-  COPY_STMT
+  COPY
     COPY_KW "COPY"
     WHITESPACE " "
     PATH
@@ -61,7 +60,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- copy_to_file"
   WHITESPACE "\n"
-  COPY_STMT
+  COPY
     COPY_KW "COPY"
     WHITESPACE " "
     L_PAREN "("
@@ -100,7 +99,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- copy_to_compress_filed"
   WHITESPACE "\n"
-  COPY_STMT
+  COPY
     COPY_KW "COPY"
     WHITESPACE " "
     PATH
@@ -118,7 +117,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- log_setting"
   WHITESPACE "\n"
-  COPY_STMT
+  COPY
     COPY_KW "copy"
     WHITESPACE " "
     PATH
@@ -161,7 +160,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- on_error"
   WHITESPACE "\n"
-  COPY_STMT
+  COPY
     COPY_KW "copy"
     WHITESPACE " "
     PATH
@@ -186,7 +185,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all_the_options"
   WHITESPACE "\n"
-  COPY_STMT
+  COPY
     COPY_KW "copy"
     WHITESPACE " "
     PATH

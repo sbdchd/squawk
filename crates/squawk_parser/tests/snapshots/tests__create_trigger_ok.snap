@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_trigger.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- create_trigger"
   WHITESPACE "\n"
-  CREATE_TRIGGER_STMT
+  CREATE_TRIGGER
     CREATE_KW "CREATE"
     WHITESPACE " "
     TRIGGER_KW "TRIGGER"
@@ -45,7 +44,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_most_fields"
   WHITESPACE "\n"
-  CREATE_TRIGGER_STMT
+  CREATE_TRIGGER
     CREATE_KW "create"
     WHITESPACE " "
     OR_REPLACE
@@ -169,7 +168,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- constraint"
   WHITESPACE "\n"
-  CREATE_TRIGGER_STMT
+  CREATE_TRIGGER
     CREATE_KW "create"
     WHITESPACE " "
     CONSTRAINT_KW "constraint"
@@ -214,7 +213,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_most_fields_part2"
   WHITESPACE "\n"
-  CREATE_TRIGGER_STMT
+  CREATE_TRIGGER
     CREATE_KW "create"
     WHITESPACE " "
     TRIGGER_KW "trigger"
@@ -282,7 +281,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_TRIGGER_STMT
+  CREATE_TRIGGER
     CREATE_KW "create"
     WHITESPACE " "
     TRIGGER_KW "trigger"

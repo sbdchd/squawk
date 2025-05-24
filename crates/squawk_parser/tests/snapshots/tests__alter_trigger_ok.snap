@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_trigger.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_TRIGGER_STMT
+  ALTER_TRIGGER
     ALTER_KW "alter"
     WHITESPACE " "
     TRIGGER_KW "trigger"
@@ -31,7 +30,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- depends_on"
   WHITESPACE "\n"
-  ALTER_TRIGGER_STMT
+  ALTER_TRIGGER
     ALTER_KW "alter"
     WHITESPACE " "
     TRIGGER_KW "trigger"
@@ -58,7 +57,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  ALTER_TRIGGER_STMT
+  ALTER_TRIGGER
     ALTER_KW "alter"
     WHITESPACE " "
     TRIGGER_KW "trigger"

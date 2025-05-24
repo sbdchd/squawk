@@ -1,10 +1,9 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_view_extra_parens.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
-  CREATE_VIEW_STMT
+  CREATE_VIEW
     CREATE_KW "create"
     WHITESPACE " "
     VIEW_KW "view"
