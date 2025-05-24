@@ -2737,7 +2737,7 @@ fn paren_data_source(p: &mut Parser<'_>) -> CompletedMarker {
 
     // Try to parse as a SELECT statement first
     if p.at_ts(SELECT_FIRST) {
-        if select_stmt(p, None).is_some() {
+        if select(p, None).is_some() {
             p.expect(R_PAREN);
             return m.complete(p, PAREN_EXPR);
         }
