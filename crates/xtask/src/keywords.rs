@@ -1,4 +1,4 @@
-use crate::path_util::cwd_to_workspace_root;
+use crate::path::project_root;
 use anyhow::{Context, Ok, Result};
 use enum_iterator::{all, Sequence};
 use std::collections::{HashMap, HashSet};
@@ -75,9 +75,8 @@ fn keyword_allowed(cat: KeywordCategory, kw_type: KWType) -> bool {
 }
 
 fn parse_header() -> Result<HashMap<String, KeywordMeta>> {
-    cwd_to_workspace_root().context("Failed to cwd to root")?;
-
-    let data = std::fs::read_to_string("postgres/kwlist.h").context("Failed to read kwlist.h")?;
+    let kwlist_file = project_root().join("postgres/kwlist.h");
+    let data = std::fs::read_to_string(kwlist_file).context("Failed to read kwlist.h")?;
 
     let mut keywords = HashMap::new();
 

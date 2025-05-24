@@ -10,7 +10,6 @@ mod download_regression_tests;
 mod keywords;
 mod new_rule;
 mod path;
-mod path_util;
 mod sync_kwlist;
 
 #[derive(Subcommand, Debug)]
