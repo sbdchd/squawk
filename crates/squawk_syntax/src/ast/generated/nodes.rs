@@ -1239,7 +1239,15 @@ pub struct BetweenExpr {
 }
 impl BetweenExpr {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn end(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn start(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn target(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4328,6 +4336,14 @@ pub struct ExcludeConstraint {
 }
 impl ExcludeConstraint {
     #[inline]
+    pub fn constraint_exclusions(&self) -> Option<ConstraintExclusions> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn constraint_index_method(&self) -> Option<ConstraintIndexMethod> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn exclude_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXCLUDE_KW)
     }
@@ -6024,12 +6040,12 @@ pub struct PercentTypeClause {
 }
 impl PercentTypeClause {
     #[inline]
-    pub fn percent_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PERCENT)
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
     }
     #[inline]
-    pub fn type_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TYPE_KW)
+    pub fn percent_type_clause(&self) -> Option<PercentTypeClause> {
+        support::child(&self.syntax)
     }
 }
 
@@ -6676,8 +6692,48 @@ pub struct Select {
 }
 impl Select {
     #[inline]
-    pub fn select_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SELECT_KW)
+    pub fn filter_clause(&self) -> Option<FilterClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn from_clause(&self) -> Option<FromClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn group_by_clause(&self) -> Option<GroupByClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn having_clause(&self) -> Option<HavingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn limit_clause(&self) -> Option<LimitClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn locking_clauses(&self) -> AstChildren<LockingClause> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn offset_clause(&self) -> Option<OffsetClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn order_by_clause(&self) -> Option<OrderByClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn select_clause(&self) -> Option<SelectClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn window_clause(&self) -> Option<WindowClause> {
+        support::child(&self.syntax)
     }
 }
 
@@ -6686,6 +6742,18 @@ pub struct SelectClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl SelectClause {
+    #[inline]
+    pub fn distinct_clause(&self) -> Option<DistinctClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn target_list(&self) -> Option<TargetList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn all_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALL_KW)
+    }
     #[inline]
     pub fn select_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SELECT_KW)
@@ -6698,8 +6766,52 @@ pub struct SelectInto {
 }
 impl SelectInto {
     #[inline]
-    pub fn select_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SELECT_KW)
+    pub fn filter_clause(&self) -> Option<FilterClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn from_clause(&self) -> Option<FromClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn group_by_clause(&self) -> Option<GroupByClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn having_clause(&self) -> Option<HavingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn into_clause(&self) -> Option<IntoClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn limit_clause(&self) -> Option<LimitClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn locking_clauses(&self) -> AstChildren<LockingClause> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn offset_clause(&self) -> Option<OffsetClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn order_by_clause(&self) -> Option<OrderByClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn select_clause(&self) -> Option<SelectClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn window_clause(&self) -> Option<WindowClause> {
+        support::child(&self.syntax)
     }
 }
 
@@ -7849,6 +7961,7 @@ pub enum AlterTableAction {
     RenameConstraint(RenameConstraint),
     RenameTable(RenameTable),
     ReplicaIdentity(ReplicaIdentity),
+    ResetStorageParams(ResetStorageParams),
     SetAccessMethod(SetAccessMethod),
     SetLogged(SetLogged),
     SetSchema(SetSchema),
@@ -7876,11 +7989,13 @@ pub enum Constraint {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Expr {
     ArrayExpr(ArrayExpr),
+    BetweenExpr(BetweenExpr),
     BinExpr(BinExpr),
     CallExpr(CallExpr),
     CaseExpr(CaseExpr),
     CastExpr(CastExpr),
     FieldExpr(FieldExpr),
+    IndexExpr(IndexExpr),
     Literal(Literal),
     NameRef(NameRef),
 }
@@ -15600,6 +15715,7 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::RENAME_CONSTRAINT
                 | SyntaxKind::RENAME_TABLE
                 | SyntaxKind::REPLICA_IDENTITY
+                | SyntaxKind::RESET_STORAGE_PARAMS
                 | SyntaxKind::SET_ACCESS_METHOD
                 | SyntaxKind::SET_LOGGED
                 | SyntaxKind::SET_SCHEMA
@@ -15666,6 +15782,9 @@ impl AstNode for AlterTableAction {
             SyntaxKind::REPLICA_IDENTITY => {
                 AlterTableAction::ReplicaIdentity(ReplicaIdentity { syntax })
             }
+            SyntaxKind::RESET_STORAGE_PARAMS => {
+                AlterTableAction::ResetStorageParams(ResetStorageParams { syntax })
+            }
             SyntaxKind::SET_ACCESS_METHOD => {
                 AlterTableAction::SetAccessMethod(SetAccessMethod { syntax })
             }
@@ -15724,6 +15843,7 @@ impl AstNode for AlterTableAction {
             AlterTableAction::RenameConstraint(it) => &it.syntax,
             AlterTableAction::RenameTable(it) => &it.syntax,
             AlterTableAction::ReplicaIdentity(it) => &it.syntax,
+            AlterTableAction::ResetStorageParams(it) => &it.syntax,
             AlterTableAction::SetAccessMethod(it) => &it.syntax,
             AlterTableAction::SetLogged(it) => &it.syntax,
             AlterTableAction::SetSchema(it) => &it.syntax,
@@ -15916,6 +16036,12 @@ impl From<ReplicaIdentity> for AlterTableAction {
         AlterTableAction::ReplicaIdentity(node)
     }
 }
+impl From<ResetStorageParams> for AlterTableAction {
+    #[inline]
+    fn from(node: ResetStorageParams) -> AlterTableAction {
+        AlterTableAction::ResetStorageParams(node)
+    }
+}
 impl From<SetAccessMethod> for AlterTableAction {
     #[inline]
     fn from(node: SetAccessMethod) -> AlterTableAction {
@@ -16093,11 +16219,13 @@ impl AstNode for Expr {
         matches!(
             kind,
             SyntaxKind::ARRAY_EXPR
+                | SyntaxKind::BETWEEN_EXPR
                 | SyntaxKind::BIN_EXPR
                 | SyntaxKind::CALL_EXPR
                 | SyntaxKind::CASE_EXPR
                 | SyntaxKind::CAST_EXPR
                 | SyntaxKind::FIELD_EXPR
+                | SyntaxKind::INDEX_EXPR
                 | SyntaxKind::LITERAL
                 | SyntaxKind::NAME_REF
         )
@@ -16106,11 +16234,13 @@ impl AstNode for Expr {
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             SyntaxKind::ARRAY_EXPR => Expr::ArrayExpr(ArrayExpr { syntax }),
+            SyntaxKind::BETWEEN_EXPR => Expr::BetweenExpr(BetweenExpr { syntax }),
             SyntaxKind::BIN_EXPR => Expr::BinExpr(BinExpr { syntax }),
             SyntaxKind::CALL_EXPR => Expr::CallExpr(CallExpr { syntax }),
             SyntaxKind::CASE_EXPR => Expr::CaseExpr(CaseExpr { syntax }),
             SyntaxKind::CAST_EXPR => Expr::CastExpr(CastExpr { syntax }),
             SyntaxKind::FIELD_EXPR => Expr::FieldExpr(FieldExpr { syntax }),
+            SyntaxKind::INDEX_EXPR => Expr::IndexExpr(IndexExpr { syntax }),
             SyntaxKind::LITERAL => Expr::Literal(Literal { syntax }),
             SyntaxKind::NAME_REF => Expr::NameRef(NameRef { syntax }),
             _ => {
@@ -16123,11 +16253,13 @@ impl AstNode for Expr {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             Expr::ArrayExpr(it) => &it.syntax,
+            Expr::BetweenExpr(it) => &it.syntax,
             Expr::BinExpr(it) => &it.syntax,
             Expr::CallExpr(it) => &it.syntax,
             Expr::CaseExpr(it) => &it.syntax,
             Expr::CastExpr(it) => &it.syntax,
             Expr::FieldExpr(it) => &it.syntax,
+            Expr::IndexExpr(it) => &it.syntax,
             Expr::Literal(it) => &it.syntax,
             Expr::NameRef(it) => &it.syntax,
         }
@@ -16137,6 +16269,12 @@ impl From<ArrayExpr> for Expr {
     #[inline]
     fn from(node: ArrayExpr) -> Expr {
         Expr::ArrayExpr(node)
+    }
+}
+impl From<BetweenExpr> for Expr {
+    #[inline]
+    fn from(node: BetweenExpr) -> Expr {
+        Expr::BetweenExpr(node)
     }
 }
 impl From<BinExpr> for Expr {
@@ -16167,6 +16305,12 @@ impl From<FieldExpr> for Expr {
     #[inline]
     fn from(node: FieldExpr) -> Expr {
         Expr::FieldExpr(node)
+    }
+}
+impl From<IndexExpr> for Expr {
+    #[inline]
+    fn from(node: IndexExpr) -> Expr {
+        Expr::IndexExpr(node)
     }
 }
 impl From<Literal> for Expr {

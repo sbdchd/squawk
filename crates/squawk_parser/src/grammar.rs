@@ -43,7 +43,7 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
         R_BRACK
     };
     while !p.at(EOF) && !p.at(closing) {
-        if p.at_ts(SELECT_FIRST) && (select_stmt(p, None).is_none() || p.at(EOF) || p.at(closing)) {
+        if p.at_ts(SELECT_FIRST) && (select(p, None).is_none() || p.at(EOF) || p.at(closing)) {
             break;
         }
         if expr(p).is_none() {
@@ -71,7 +71,7 @@ fn paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         // saw_expr = true;
         // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
-        if p.at_ts(SELECT_FIRST) && (select_stmt(p, None).is_none() || p.at(EOF) || p.at(R_PAREN)) {
+        if p.at_ts(SELECT_FIRST) && (select(p, None).is_none() || p.at(EOF) || p.at(R_PAREN)) {
             break;
         }
         if paren_select(p).is_none() {
@@ -102,7 +102,7 @@ fn tuple_expr(p: &mut Parser<'_>) -> CompletedMarker {
         saw_expr = true;
         // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
-        if p.at_ts(SELECT_FIRST) && (select_stmt(p, None).is_none() || p.at(EOF) || p.at(R_PAREN)) {
+        if p.at_ts(SELECT_FIRST) && (select(p, None).is_none() || p.at(EOF) || p.at(R_PAREN)) {
             break;
         }
         if expr(p).is_none() {
@@ -720,7 +720,7 @@ fn json_array_fn_arg_list(p: &mut Parser<'_>) {
     // 1, 2, 3, 4
     while !p.at(EOF) && !p.at(R_PAREN) && !p.at(RETURNING_KW) {
         if p.at_ts(SELECT_FIRST) {
-            if select_stmt(p, None).is_none() || p.at(EOF) || p.at(R_PAREN) {
+            if select(p, None).is_none() || p.at(EOF) || p.at(R_PAREN) {
                 break;
             }
             opt_json_format_clause(p);
@@ -761,7 +761,7 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
     // args
     p.expect(L_PAREN);
     if p.at_ts(SELECT_FIRST) {
-        select_stmt(p, None);
+        select(p, None);
     } else {
         if expr(p).is_none() {
             p.error("expected expression or select");
@@ -782,7 +782,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             p.bump(POSITIONAL_PARAM);
             m.complete(p, LITERAL)
         }
-        (VALUES_KW, _) => values_clause(p, None),
+        (VALUES_KW, _) => values(p, None),
         (EXTRACT_KW, L_PAREN) => extract_fn(p),
         (JSON_EXISTS_KW, L_PAREN) => json_exists_fn(p),
         (JSON_ARRAY_KW, L_PAREN) => json_array_fn(p),
@@ -827,7 +827,7 @@ fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(EXISTS_KW));
     custom_fn(p, EXISTS_KW, |p| {
         if p.at_ts(SELECT_FIRST) {
-            select_stmt(p, None);
+            select(p, None);
         } else {
             p.error("expected select")
         }
@@ -2218,22 +2218,22 @@ fn with_query(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     p.expect(L_PAREN);
     match p.current() {
         DELETE_KW => {
-            delete_stmt(p, None);
+            delete(p, None);
         }
         SELECT_KW | TABLE_KW | VALUES_KW => {
-            select_stmt(p, None);
+            select(p, None);
         }
         INSERT_KW => {
-            insert_stmt(p, None);
+            insert(p, None);
         }
         UPDATE_KW => {
-            update_stmt(p, None);
+            update(p, None);
         }
         MERGE_KW => {
-            merge_stmt(p, None);
+            merge(p, None);
         }
         WITH_KW => {
-            with_stmt(p, None);
+            with(p, None);
         }
         _ => {
             p.error(format!(
@@ -2286,7 +2286,7 @@ fn with_query(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     Some(m.complete(p, WITH_TABLE))
 }
 
-const WITH_STMT_FOLLOW: TokenSet = TokenSet::new(&[
+const WITH_FOLLOW: TokenSet = TokenSet::new(&[
     DELETE_KW, SELECT_KW, TABLE_KW, INSERT_KW, UPDATE_KW, MERGE_KW,
 ]);
 
@@ -2299,7 +2299,7 @@ fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         if with_query(p).is_none() {
             p.error("expected with_query");
         }
-        if p.at(COMMA) && p.nth_at_ts(1, WITH_STMT_FOLLOW) {
+        if p.at(COMMA) && p.nth_at_ts(1, WITH_FOLLOW) {
             p.err_and_bump("unexpected comma");
             break;
         }
@@ -2336,7 +2336,7 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
         tuple_expr(p);
     } else {
         if p.at_ts(SELECT_FIRST) {
-            select_stmt(p, None);
+            select(p, None);
         } else {
             p.error("expected start of a select statement")
         }
@@ -2347,7 +2347,7 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
 // error recovery:
 // - <https://youtu.be/0HlrqwLjCxA?feature=shared&t=2172>
 /// <https://www.postgresql.org/docs/17/sql-select.html>
-fn select_stmt(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
+fn select(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
     assert!(p.at_ts(SELECT_FIRST));
     let m = m.unwrap_or_else(|| p.start());
     // table [only] name [*]
@@ -2358,10 +2358,10 @@ fn select_stmt(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
     if p.at(WITH_KW) {
-        return with_stmt(p, Some(m));
+        return with(p, Some(m));
     }
     if p.at(VALUES_KW) {
-        let cm = values_clause(p, Some(m));
+        let cm = values(p, Some(m));
         if p.at_ts(COMPOUND_SELECT_FIRST) {
             return Some(compound_select(p, cm));
         } else {
@@ -4243,7 +4243,7 @@ fn opt_if_exists(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 // DROP TABLE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
 /// <https://www.postgresql.org/docs/17/sql-droptable.html>
-fn drop_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, TABLE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -4422,7 +4422,7 @@ fn opt_inherits_tables(p: &mut Parser<'_>) {
 // [ WITH ( storage_parameter [= value] [, ... ] ) | WITHOUT OIDS ]
 // [ ON COMMIT { PRESERVE ROWS | DELETE ROWS | DROP } ]
 // [ TABLESPACE tablespace_name ]
-fn create_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.expect(CREATE_KW);
@@ -4507,9 +4507,9 @@ fn create_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(AS_KW) {
         // query
         if p.at_ts(SELECT_FIRST) {
-            select_stmt(p, None);
+            select(p, None);
         } else if p.at(EXECUTE_KW) {
-            execute_stmt(p);
+            execute(p);
         } else {
             p.error("expected SELECT, TABLE, VALUES, or EXECUTE");
         }
@@ -4526,7 +4526,7 @@ fn create_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // COMMIT PREPARED transaction_id
 //
 // https://www.postgresql.org/docs/17/sql-commit.html
-fn commit_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn commit(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(COMMIT_KW) || p.at(END_KW));
     let m = p.start();
     p.bump_any();
@@ -4600,7 +4600,7 @@ fn opt_transaction_mode_list(p: &mut Parser<'_>) {
 //
 // https://www.postgresql.org/docs/17/sql-begin.html
 // https://www.postgresql.org/docs/17/sql-start-transaction.html
-fn begin_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn begin(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(BEGIN_KW) || p.at(START_KW));
     let m = p.start();
     // BEGIN [ WORK | TRANSACTION ] [ transaction_mode [, ...] ]
@@ -4650,7 +4650,7 @@ fn opt_bool_literal(p: &mut Parser<'_>) -> bool {
 // PREPARE TRANSACTION transaction_id
 //
 // https://www.postgresql.org/docs/17/sql-prepare-transaction.html
-fn prepare_transaction_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn prepare_transaction(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(PREPARE_KW));
     let m = p.start();
     p.bump(PREPARE_KW);
@@ -4662,7 +4662,7 @@ fn prepare_transaction_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // SAVEPOINT savepoint_name
 //
 // https://www.postgresql.org/docs/17/sql-savepoint.html
-fn savepoint_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn savepoint(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SAVEPOINT_KW));
     let m = p.start();
     p.bump(SAVEPOINT_KW);
@@ -4675,7 +4675,7 @@ fn savepoint_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // RELEASE [ SAVEPOINT ] savepoint_name
 //
 // https://www.postgresql.org/docs/17/sql-release-savepoint.html
-fn release_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn release(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(RELEASE_KW));
     let m = p.start();
     p.bump(RELEASE_KW);
@@ -4695,7 +4695,7 @@ fn release_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // https://www.postgresql.org/docs/17/sql-abort.html
 // https://www.postgresql.org/docs/17/sql-rollback-to.html
 // https://www.postgresql.org/docs/17/sql-rollback-prepared.html
-fn rollback_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ROLLBACK_KW) || p.at(ABORT_KW));
     let m = p.start();
     let is_rollback = p.at(ROLLBACK_KW);
@@ -4723,90 +4723,86 @@ struct StmtRestrictions {
 
 fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
     match (p.current(), p.nth(1)) {
-        (ABORT_KW, _) => Some(rollback_stmt(p)),
-        (ALTER_KW, AGGREGATE_KW) => Some(alter_aggregate_stmt(p)),
-        (ALTER_KW, COLLATION_KW) => Some(alter_collation_stmt(p)),
-        (ALTER_KW, CONVERSION_KW) => Some(alter_conversion_stmt(p)),
-        (ALTER_KW, DATABASE_KW) => Some(alter_database_stmt(p)),
-        (ALTER_KW, DEFAULT_KW) if p.nth_at(2, PRIVILEGES_KW) => {
-            Some(alter_default_privileges_stmt(p))
-        }
-        (ALTER_KW, DOMAIN_KW) => Some(alter_domain_stmt(p)),
-        (ALTER_KW, EVENT_KW) if p.nth_at(2, TRIGGER_KW) => Some(alter_event_trigger_stmt(p)),
-        (ALTER_KW, EXTENSION_KW) => Some(alter_extension_stmt(p)),
-        (ALTER_KW, FOREIGN_KW) if p.nth_at(2, DATA_KW) => Some(alter_foreign_data_wrapper_stmt(p)),
-        (ALTER_KW, FOREIGN_KW) if p.nth_at(2, TABLE_KW) => Some(alter_foreign_table_stmt(p)),
-        (ALTER_KW, FUNCTION_KW) => Some(alter_function_stmt(p)),
-        (ALTER_KW, GROUP_KW) => Some(alter_group_stmt(p)),
-        (ALTER_KW, INDEX_KW) => Some(alter_index_stmt(p)),
-        (ALTER_KW, LARGE_KW) if p.nth_at(2, OBJECT_KW) => Some(alter_large_object_stmt(p)),
-        (ALTER_KW, MATERIALIZED_KW) if p.nth_at(2, VIEW_KW) => {
-            Some(alter_materialized_view_stmt(p))
-        }
-        (ALTER_KW, OPERATOR_KW) if p.nth_at(2, CLASS_KW) => Some(alter_operator_class_stmt(p)),
-        (ALTER_KW, OPERATOR_KW) if p.nth_at(2, FAMILY_KW) => Some(alter_operator_family_stmt(p)),
-        (ALTER_KW, OPERATOR_KW) => Some(alter_operator_stmt(p)),
-        (ALTER_KW, POLICY_KW) => Some(alter_policy_stmt(p)),
-        (ALTER_KW, PROCEDURAL_KW | LANGUAGE_KW) => Some(alter_language_stmt(p)),
-        (ALTER_KW, PROCEDURE_KW) => Some(alter_procedure_stmt(p)),
-        (ALTER_KW, PUBLICATION_KW) => Some(alter_publication_stmt(p)),
-        (ALTER_KW, ROLE_KW) => Some(alter_role_stmt(p)),
-        (ALTER_KW, ROUTINE_KW) => Some(alter_routine_stmt(p)),
-        (ALTER_KW, RULE_KW) => Some(alter_rule_stmt(p)),
-        (ALTER_KW, SCHEMA_KW) => Some(alter_schema_stmt(p)),
-        (ALTER_KW, SEQUENCE_KW) => Some(alter_sequence_stmt(p)),
-        (ALTER_KW, SERVER_KW) => Some(alter_server_stmt(p)),
-        (ALTER_KW, STATISTICS_KW) => Some(alter_statistics_stmt(p)),
-        (ALTER_KW, SUBSCRIPTION_KW) => Some(alter_subscription_stmt(p)),
-        (ALTER_KW, SYSTEM_KW) => Some(alter_system_stmt(p)),
-        (ALTER_KW, TABLE_KW) => Some(alter_table_stmt(p)),
-        (ALTER_KW, TABLESPACE_KW) => Some(alter_tablespace_stmt(p)),
+        (ABORT_KW, _) => Some(rollback(p)),
+        (ALTER_KW, AGGREGATE_KW) => Some(alter_aggregate(p)),
+        (ALTER_KW, COLLATION_KW) => Some(alter_collation(p)),
+        (ALTER_KW, CONVERSION_KW) => Some(alter_conversion(p)),
+        (ALTER_KW, DATABASE_KW) => Some(alter_database(p)),
+        (ALTER_KW, DEFAULT_KW) if p.nth_at(2, PRIVILEGES_KW) => Some(alter_default_privileges(p)),
+        (ALTER_KW, DOMAIN_KW) => Some(alter_domain(p)),
+        (ALTER_KW, EVENT_KW) if p.nth_at(2, TRIGGER_KW) => Some(alter_event_trigger(p)),
+        (ALTER_KW, EXTENSION_KW) => Some(alter_extension(p)),
+        (ALTER_KW, FOREIGN_KW) if p.nth_at(2, DATA_KW) => Some(alter_foreign_data_wrapper(p)),
+        (ALTER_KW, FOREIGN_KW) if p.nth_at(2, TABLE_KW) => Some(alter_foreign_table(p)),
+        (ALTER_KW, FUNCTION_KW) => Some(alter_function(p)),
+        (ALTER_KW, GROUP_KW) => Some(alter_group(p)),
+        (ALTER_KW, INDEX_KW) => Some(alter_index(p)),
+        (ALTER_KW, LARGE_KW) if p.nth_at(2, OBJECT_KW) => Some(alter_large_object(p)),
+        (ALTER_KW, MATERIALIZED_KW) if p.nth_at(2, VIEW_KW) => Some(alter_materialized_view(p)),
+        (ALTER_KW, OPERATOR_KW) if p.nth_at(2, CLASS_KW) => Some(alter_operator_class(p)),
+        (ALTER_KW, OPERATOR_KW) if p.nth_at(2, FAMILY_KW) => Some(alter_operator_family(p)),
+        (ALTER_KW, OPERATOR_KW) => Some(alter_operator(p)),
+        (ALTER_KW, POLICY_KW) => Some(alter_policy(p)),
+        (ALTER_KW, PROCEDURAL_KW | LANGUAGE_KW) => Some(alter_language(p)),
+        (ALTER_KW, PROCEDURE_KW) => Some(alter_procedure(p)),
+        (ALTER_KW, PUBLICATION_KW) => Some(alter_publication(p)),
+        (ALTER_KW, ROLE_KW) => Some(alter_role(p)),
+        (ALTER_KW, ROUTINE_KW) => Some(alter_routine(p)),
+        (ALTER_KW, RULE_KW) => Some(alter_rule(p)),
+        (ALTER_KW, SCHEMA_KW) => Some(alter_schema(p)),
+        (ALTER_KW, SEQUENCE_KW) => Some(alter_sequence(p)),
+        (ALTER_KW, SERVER_KW) => Some(alter_server(p)),
+        (ALTER_KW, STATISTICS_KW) => Some(alter_statistics(p)),
+        (ALTER_KW, SUBSCRIPTION_KW) => Some(alter_subscription(p)),
+        (ALTER_KW, SYSTEM_KW) => Some(alter_system(p)),
+        (ALTER_KW, TABLE_KW) => Some(alter_table(p)),
+        (ALTER_KW, TABLESPACE_KW) => Some(alter_tablespace(p)),
         (ALTER_KW, TEXT_KW) if p.nth_at(2, SEARCH_KW) => match p.nth(3) {
             CONFIGURATION_KW => Some(alter_text_search_configuration(p)),
-            DICTIONARY_KW => Some(alter_text_search_dict_stmt(p)),
-            PARSER_KW => Some(alter_text_search_parser_stmt(p)),
-            TEMPLATE_KW => Some(alter_text_search_template_stmt(p)),
+            DICTIONARY_KW => Some(alter_text_search_dict(p)),
+            PARSER_KW => Some(alter_text_search_parser(p)),
+            TEMPLATE_KW => Some(alter_text_search_template(p)),
             _ => {
                 p.error("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
-        (ALTER_KW, TRIGGER_KW) => Some(alter_trigger_stmt(p)),
-        (ALTER_KW, TYPE_KW) => Some(alter_type_stmt(p)),
-        (ALTER_KW, USER_KW) if p.nth_at(2, MAPPING_KW) => Some(alter_user_mapping_stmt(p)),
-        (ALTER_KW, USER_KW) => Some(alter_user_stmt(p)),
-        (ALTER_KW, VIEW_KW) => Some(alter_view_stmt(p)),
-        (ANALYZE_KW | ANALYSE_KW, _) => Some(analyze_stmt(p)),
-        (BEGIN_KW, _) if r.begin_end_allowed => Some(begin_stmt(p)),
-        (CALL_KW, _) => Some(call_stmt(p)),
-        (CHECKPOINT_KW, _) => Some(checkpoint_stmt(p)),
-        (CLOSE_KW, _) => Some(close_stmt(p)),
-        (CLUSTER_KW, _) => Some(cluster_stmt(p)),
-        (COMMENT_KW, _) => Some(comment_stmt(p)),
-        (COMMIT_KW, _) => Some(commit_stmt(p)),
-        (COPY_KW, _) => Some(copy_stmt(p)),
-        (CREATE_KW, ACCESS_KW) => Some(create_access_method_stmt(p)),
-        (CREATE_KW, AGGREGATE_KW) => Some(create_aggregate_stmt(p)),
-        (CREATE_KW, CAST_KW) => Some(create_cast_stmt(p)),
-        (CREATE_KW, COLLATION_KW) => Some(create_collation_stmt(p)),
-        (CREATE_KW, CONVERSION_KW | DEFAULT_KW) => Some(create_conversion_stmt(p)),
-        (CREATE_KW, DATABASE_KW) => Some(create_database_stmt(p)),
-        (CREATE_KW, DOMAIN_KW) => Some(create_domain_stmt(p)),
-        (CREATE_KW, EVENT_KW) => Some(create_event_trigger_stmt(p)),
-        (CREATE_KW, EXTENSION_KW) => Some(create_extension_stmt(p)),
+        (ALTER_KW, TRIGGER_KW) => Some(alter_trigger(p)),
+        (ALTER_KW, TYPE_KW) => Some(alter_type(p)),
+        (ALTER_KW, USER_KW) if p.nth_at(2, MAPPING_KW) => Some(alter_user_mapping(p)),
+        (ALTER_KW, USER_KW) => Some(alter_user(p)),
+        (ALTER_KW, VIEW_KW) => Some(alter_view(p)),
+        (ANALYZE_KW | ANALYSE_KW, _) => Some(analyze(p)),
+        (BEGIN_KW, _) if r.begin_end_allowed => Some(begin(p)),
+        (CALL_KW, _) => Some(call(p)),
+        (CHECKPOINT_KW, _) => Some(checkpoint(p)),
+        (CLOSE_KW, _) => Some(close(p)),
+        (CLUSTER_KW, _) => Some(cluster(p)),
+        (COMMENT_KW, _) => Some(comment(p)),
+        (COMMIT_KW, _) => Some(commit(p)),
+        (COPY_KW, _) => Some(copy(p)),
+        (CREATE_KW, ACCESS_KW) => Some(create_access_method(p)),
+        (CREATE_KW, AGGREGATE_KW) => Some(create_aggregate(p)),
+        (CREATE_KW, CAST_KW) => Some(create_cast(p)),
+        (CREATE_KW, COLLATION_KW) => Some(create_collation(p)),
+        (CREATE_KW, CONVERSION_KW | DEFAULT_KW) => Some(create_conversion(p)),
+        (CREATE_KW, DATABASE_KW) => Some(create_database(p)),
+        (CREATE_KW, DOMAIN_KW) => Some(create_domain(p)),
+        (CREATE_KW, EVENT_KW) => Some(create_event_trigger(p)),
+        (CREATE_KW, EXTENSION_KW) => Some(create_extension(p)),
         (CREATE_KW, FOREIGN_KW) => match p.nth(2) {
-            DATA_KW => Some(create_foreign_data_wrapper_stmt(p)),
-            _ => Some(create_foreign_table_stmt(p)),
+            DATA_KW => Some(create_foreign_data_wrapper(p)),
+            _ => Some(create_foreign_table(p)),
         },
-        (CREATE_KW, FUNCTION_KW) => Some(create_function_stmt(p)),
-        (CREATE_KW, GROUP_KW) => Some(create_group_stmt(p)),
-        (CREATE_KW, INDEX_KW | UNIQUE_KW) => Some(create_index_stmt(p)),
-        (CREATE_KW, LANGUAGE_KW) => Some(create_language_stmt(p)),
-        (CREATE_KW, MATERIALIZED_KW) => Some(create_materialized_view_stmt(p)),
+        (CREATE_KW, FUNCTION_KW) => Some(create_function(p)),
+        (CREATE_KW, GROUP_KW) => Some(create_group(p)),
+        (CREATE_KW, INDEX_KW | UNIQUE_KW) => Some(create_index(p)),
+        (CREATE_KW, LANGUAGE_KW) => Some(create_language(p)),
+        (CREATE_KW, MATERIALIZED_KW) => Some(create_materialized_view(p)),
         (CREATE_KW, OPERATOR_KW) => match p.nth(2) {
-            CLASS_KW => Some(create_operator_class_stmt(p)),
-            FAMILY_KW => Some(create_operator_family_stmt(p)),
-            _ => Some(create_operator_stmt(p)),
+            CLASS_KW => Some(create_operator_class(p)),
+            FAMILY_KW => Some(create_operator_family(p)),
+            _ => Some(create_operator(p)),
         },
         (CREATE_KW, OR_KW) => {
             // CREATE OR REPLACE [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW
@@ -4816,132 +4812,132 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             // CREATE OR REPLACE AGGREGATE
             // ^0     ^1 ^2      ^3
             match p.nth(3) {
-                AGGREGATE_KW => Some(create_aggregate_stmt(p)),
-                CONSTRAINT_KW | TRIGGER_KW => Some(create_trigger_stmt(p)),
-                PROCEDURAL_KW | TRUSTED_KW | LANGUAGE_KW => Some(create_language_stmt(p)),
-                PROCEDURE_KW => Some(create_procedure_stmt(p)),
-                RECURSIVE_KW | TEMP_KW | TEMPORARY_KW => Some(create_view_stmt(p)),
-                RULE_KW => Some(create_rule_stmt(p)),
-                TRANSFORM_KW => Some(create_transform_stmt(p)),
-                VIEW_KW => Some(create_view_stmt(p)),
-                _ => Some(create_function_stmt(p)),
+                AGGREGATE_KW => Some(create_aggregate(p)),
+                CONSTRAINT_KW | TRIGGER_KW => Some(create_trigger(p)),
+                PROCEDURAL_KW | TRUSTED_KW | LANGUAGE_KW => Some(create_language(p)),
+                PROCEDURE_KW => Some(create_procedure(p)),
+                RECURSIVE_KW | TEMP_KW | TEMPORARY_KW => Some(create_view(p)),
+                RULE_KW => Some(create_rule(p)),
+                TRANSFORM_KW => Some(create_transform(p)),
+                VIEW_KW => Some(create_view(p)),
+                _ => Some(create_function(p)),
             }
         }
-        (CREATE_KW, POLICY_KW) => Some(create_policy_stmt(p)),
-        (CREATE_KW, PROCEDURE_KW) => Some(create_procedure_stmt(p)),
-        (CREATE_KW, PUBLICATION_KW) => Some(create_publication_stmt(p)),
-        (CREATE_KW, RECURSIVE_KW | VIEW_KW) => Some(create_view_stmt(p)),
-        (CREATE_KW, ROLE_KW) => Some(create_role_stmt(p)),
-        (CREATE_KW, RULE_KW) => Some(create_rule_stmt(p)),
-        (CREATE_KW, SCHEMA_KW) => Some(create_schema_stmt(p)),
-        (CREATE_KW, SEQUENCE_KW) => Some(create_sequence_stmt(p)),
-        (CREATE_KW, SERVER_KW) => Some(create_server_stmt(p)),
-        (CREATE_KW, STATISTICS_KW) => Some(create_statistics_stmt(p)),
-        (CREATE_KW, SUBSCRIPTION_KW) => Some(create_subscription_stmt(p)),
+        (CREATE_KW, POLICY_KW) => Some(create_policy(p)),
+        (CREATE_KW, PROCEDURE_KW) => Some(create_procedure(p)),
+        (CREATE_KW, PUBLICATION_KW) => Some(create_publication(p)),
+        (CREATE_KW, RECURSIVE_KW | VIEW_KW) => Some(create_view(p)),
+        (CREATE_KW, ROLE_KW) => Some(create_role(p)),
+        (CREATE_KW, RULE_KW) => Some(create_rule(p)),
+        (CREATE_KW, SCHEMA_KW) => Some(create_schema(p)),
+        (CREATE_KW, SEQUENCE_KW) => Some(create_sequence(p)),
+        (CREATE_KW, SERVER_KW) => Some(create_server(p)),
+        (CREATE_KW, STATISTICS_KW) => Some(create_statistics(p)),
+        (CREATE_KW, SUBSCRIPTION_KW) => Some(create_subscription(p)),
         (CREATE_KW, TABLE_KW | GLOBAL_KW | LOCAL_KW | UNLOGGED_KW) if !p.nth_at(2, SEQUENCE_KW) => {
-            Some(create_table_stmt(p))
+            Some(create_table(p))
         }
-        (CREATE_KW, TABLESPACE_KW) => Some(create_tablespace_stmt(p)),
+        (CREATE_KW, TABLESPACE_KW) => Some(create_tablespace(p)),
         (CREATE_KW, TEMP_KW | TEMPORARY_KW) => {
             // CREATE TEMP [ RECURSIVE ] VIEW
             // CREATE TEMP TABLE
             // ^0     ^1   ^2
             match p.nth(2) {
-                RECURSIVE_KW | VIEW_KW => Some(create_view_stmt(p)),
-                SEQUENCE_KW => Some(create_sequence_stmt(p)),
-                _ => Some(create_table_stmt(p)),
+                RECURSIVE_KW | VIEW_KW => Some(create_view(p)),
+                SEQUENCE_KW => Some(create_sequence(p)),
+                _ => Some(create_table(p)),
             }
         }
         (CREATE_KW, TEXT_KW) if p.nth_at(2, SEARCH_KW) => match p.nth(3) {
-            CONFIGURATION_KW => Some(create_text_search_config_stmt(p)),
-            DICTIONARY_KW => Some(create_text_search_dict_stmt(p)),
-            PARSER_KW => Some(create_text_search_parser_stmt(p)),
-            TEMPLATE_KW => Some(create_text_search_template_stmt(p)),
+            CONFIGURATION_KW => Some(create_text_search_config(p)),
+            DICTIONARY_KW => Some(create_text_search_dict(p)),
+            PARSER_KW => Some(create_text_search_parser(p)),
+            TEMPLATE_KW => Some(create_text_search_template(p)),
             _ => {
                 p.error("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
-        (CREATE_KW, TRANSFORM_KW) => Some(create_transform_stmt(p)),
-        (CREATE_KW, TYPE_KW) => Some(create_type_stmt(p)),
-        (CREATE_KW, UNLOGGED_KW) if p.nth_at(2, SEQUENCE_KW) => Some(create_sequence_stmt(p)),
-        (CREATE_KW, USER_KW) if p.nth_at(2, MAPPING_KW) => Some(create_user_mapping_stmt(p)),
-        (CREATE_KW, USER_KW) => Some(create_user_stmt(p)),
-        (CREATE_KW, CONSTRAINT_KW | TRIGGER_KW) => Some(create_trigger_stmt(p)),
-        (DEALLOCATE_KW, _) => Some(deallocate_stmt(p)),
-        (DECLARE_KW, _) => Some(declare_stmt(p)),
-        (DELETE_KW, _) => Some(delete_stmt(p, None)),
-        (DISCARD_KW, _) => Some(discard_stmt(p)),
-        (DO_KW, _) => Some(do_stmt(p)),
-        (DROP_KW, ACCESS_KW) => Some(drop_access_method_stmt(p)),
-        (DROP_KW, AGGREGATE_KW) => Some(drop_aggregate_stmt(p)),
-        (DROP_KW, CAST_KW) => Some(drop_cast_stmt(p)),
-        (DROP_KW, COLLATION_KW) => Some(drop_collation_stmt(p)),
-        (DROP_KW, CONVERSION_KW) => Some(drop_conversion_stmt(p)),
-        (DROP_KW, DATABASE_KW) => Some(drop_database_stmt(p)),
-        (DROP_KW, DOMAIN_KW) => Some(drop_domain_stmt(p)),
-        (DROP_KW, EVENT_KW) => Some(drop_event_trigger_stmt(p)),
-        (DROP_KW, EXTENSION_KW) => Some(drop_extension_stmt(p)),
+        (CREATE_KW, TRANSFORM_KW) => Some(create_transform(p)),
+        (CREATE_KW, TYPE_KW) => Some(create_type(p)),
+        (CREATE_KW, UNLOGGED_KW) if p.nth_at(2, SEQUENCE_KW) => Some(create_sequence(p)),
+        (CREATE_KW, USER_KW) if p.nth_at(2, MAPPING_KW) => Some(create_user_mapping(p)),
+        (CREATE_KW, USER_KW) => Some(create_user(p)),
+        (CREATE_KW, CONSTRAINT_KW | TRIGGER_KW) => Some(create_trigger(p)),
+        (DEALLOCATE_KW, _) => Some(deallocate(p)),
+        (DECLARE_KW, _) => Some(declare(p)),
+        (DELETE_KW, _) => Some(delete(p, None)),
+        (DISCARD_KW, _) => Some(discard(p)),
+        (DO_KW, _) => Some(do_(p)),
+        (DROP_KW, ACCESS_KW) => Some(drop_access_method(p)),
+        (DROP_KW, AGGREGATE_KW) => Some(drop_aggregate(p)),
+        (DROP_KW, CAST_KW) => Some(drop_cast(p)),
+        (DROP_KW, COLLATION_KW) => Some(drop_collation(p)),
+        (DROP_KW, CONVERSION_KW) => Some(drop_conversion(p)),
+        (DROP_KW, DATABASE_KW) => Some(drop_database(p)),
+        (DROP_KW, DOMAIN_KW) => Some(drop_domain(p)),
+        (DROP_KW, EVENT_KW) => Some(drop_event_trigger(p)),
+        (DROP_KW, EXTENSION_KW) => Some(drop_extension(p)),
         (DROP_KW, FOREIGN_KW) => match p.nth(2) {
-            DATA_KW => Some(drop_foreign_data_stmt(p)),
-            TABLE_KW => Some(drop_foreign_table_stmt(p)),
+            DATA_KW => Some(drop_foreign_data(p)),
+            TABLE_KW => Some(drop_foreign_table(p)),
             _ => {
                 p.error("expected DATA or TABLE");
                 None
             }
         },
-        (DROP_KW, FUNCTION_KW) => Some(drop_function_stmt(p)),
-        (DROP_KW, GROUP_KW) => Some(drop_group_stmt(p)),
-        (DROP_KW, INDEX_KW) => Some(drop_index_stmt(p)),
-        (DROP_KW, LANGUAGE_KW | PROCEDURAL_KW) => Some(drop_language_stmt(p)),
-        (DROP_KW, MATERIALIZED_KW) => Some(drop_materialized_view_stmt(p)),
+        (DROP_KW, FUNCTION_KW) => Some(drop_function(p)),
+        (DROP_KW, GROUP_KW) => Some(drop_group(p)),
+        (DROP_KW, INDEX_KW) => Some(drop_index(p)),
+        (DROP_KW, LANGUAGE_KW | PROCEDURAL_KW) => Some(drop_language(p)),
+        (DROP_KW, MATERIALIZED_KW) => Some(drop_materialized_view(p)),
         (DROP_KW, OPERATOR_KW) => match p.nth(2) {
-            CLASS_KW => Some(drop_operator_class_stmt(p)),
-            FAMILY_KW => Some(drop_operator_family_stmt(p)),
-            _ => Some(drop_operator_stmt(p)),
+            CLASS_KW => Some(drop_operator_class(p)),
+            FAMILY_KW => Some(drop_operator_family(p)),
+            _ => Some(drop_operator(p)),
         },
-        (DROP_KW, OWNED_KW) => Some(drop_owned_stmt(p)),
-        (DROP_KW, POLICY_KW) => Some(drop_policy_stmt(p)),
-        (DROP_KW, PROCEDURE_KW) => Some(drop_procedure_stmt(p)),
-        (DROP_KW, PUBLICATION_KW) => Some(drop_publication_stmt(p)),
-        (DROP_KW, ROLE_KW) => Some(drop_role_stmt(p)),
-        (DROP_KW, ROUTINE_KW) => Some(drop_routine_stmt(p)),
-        (DROP_KW, RULE_KW) => Some(drop_rule_stmt(p)),
-        (DROP_KW, SCHEMA_KW) => Some(drop_schema_stmt(p)),
-        (DROP_KW, SEQUENCE_KW) => Some(drop_sequence_stmt(p)),
-        (DROP_KW, SERVER_KW) => Some(drop_server_stmt(p)),
-        (DROP_KW, STATISTICS_KW) => Some(drop_statistics_stmt(p)),
-        (DROP_KW, SUBSCRIPTION_KW) => Some(drop_subscription_stmt(p)),
-        (DROP_KW, TABLE_KW) => Some(drop_table_stmt(p)),
-        (DROP_KW, TABLESPACE_KW) => Some(drop_tablespace_stmt(p)),
+        (DROP_KW, OWNED_KW) => Some(drop_owned(p)),
+        (DROP_KW, POLICY_KW) => Some(drop_policy(p)),
+        (DROP_KW, PROCEDURE_KW) => Some(drop_procedure(p)),
+        (DROP_KW, PUBLICATION_KW) => Some(drop_publication(p)),
+        (DROP_KW, ROLE_KW) => Some(drop_role(p)),
+        (DROP_KW, ROUTINE_KW) => Some(drop_routine(p)),
+        (DROP_KW, RULE_KW) => Some(drop_rule(p)),
+        (DROP_KW, SCHEMA_KW) => Some(drop_schema(p)),
+        (DROP_KW, SEQUENCE_KW) => Some(drop_sequence(p)),
+        (DROP_KW, SERVER_KW) => Some(drop_server(p)),
+        (DROP_KW, STATISTICS_KW) => Some(drop_statistics(p)),
+        (DROP_KW, SUBSCRIPTION_KW) => Some(drop_subscription(p)),
+        (DROP_KW, TABLE_KW) => Some(drop_table(p)),
+        (DROP_KW, TABLESPACE_KW) => Some(drop_tablespace(p)),
         (DROP_KW, TEXT_KW) if p.nth_at(2, SEARCH_KW) => match p.nth(3) {
-            CONFIGURATION_KW => Some(drop_text_search_config_stmt(p)),
-            DICTIONARY_KW => Some(drop_text_search_dict_stmt(p)),
-            PARSER_KW => Some(drop_text_search_parser_stmt(p)),
-            TEMPLATE_KW => Some(drop_text_search_template_stmt(p)),
+            CONFIGURATION_KW => Some(drop_text_search_config(p)),
+            DICTIONARY_KW => Some(drop_text_search_dict(p)),
+            PARSER_KW => Some(drop_text_search_parser(p)),
+            TEMPLATE_KW => Some(drop_text_search_template(p)),
             _ => {
                 p.error("expected TEMPLATE, CONFIGURATION, DICTIONARY, PARSER, or TEMPLATE");
                 None
             }
         },
-        (DROP_KW, TRANSFORM_KW) => Some(drop_transform_stmt(p)),
-        (DROP_KW, TRIGGER_KW) => Some(drop_trigger_stmt(p)),
-        (DROP_KW, TYPE_KW) => Some(drop_type_stmt(p)),
+        (DROP_KW, TRANSFORM_KW) => Some(drop_transform(p)),
+        (DROP_KW, TRIGGER_KW) => Some(drop_trigger(p)),
+        (DROP_KW, TYPE_KW) => Some(drop_type(p)),
         (DROP_KW, USER_KW) => {
             if p.nth_at(2, MAPPING_KW) {
-                Some(drop_user_mapping_stmt(p))
+                Some(drop_user_mapping(p))
             } else {
-                Some(drop_user_stmt(p))
+                Some(drop_user(p))
             }
         }
-        (DROP_KW, VIEW_KW) => Some(drop_view_stmt(p)),
-        (END_KW, _) if r.begin_end_allowed => Some(commit_stmt(p)),
-        (EXECUTE_KW, _) => Some(execute_stmt(p)),
-        (EXPLAIN_KW, _) => Some(explain_stmt(p)),
-        (FETCH_KW, _) => Some(fetch_stmt(p)),
-        (GRANT_KW, _) => Some(grant_stmt(p)),
-        (IMPORT_KW, FOREIGN_KW) => Some(import_foreign_schema_stmt(p)),
-        (INSERT_KW, _) => Some(insert_stmt(p, None)),
+        (DROP_KW, VIEW_KW) => Some(drop_view(p)),
+        (END_KW, _) if r.begin_end_allowed => Some(commit(p)),
+        (EXECUTE_KW, _) => Some(execute(p)),
+        (EXPLAIN_KW, _) => Some(explain(p)),
+        (FETCH_KW, _) => Some(fetch(p)),
+        (GRANT_KW, _) => Some(grant(p)),
+        (IMPORT_KW, FOREIGN_KW) => Some(import_foreign_schema(p)),
+        (INSERT_KW, _) => Some(insert(p, None)),
         (L_PAREN, L_PAREN | SELECT_KW) => {
             // can have select nested in parens, i.e., ((select 1));
             let cm = paren_select(p)?;
@@ -4956,48 +4952,48 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             }
             Some(cm)
         }
-        (LISTEN_KW, _) => Some(listen_stmt(p)),
-        (LOAD_KW, _) => Some(load_stmt(p)),
-        (LOCK_KW, _) => Some(lock_stmt(p)),
-        (MERGE_KW, _) => Some(merge_stmt(p, None)),
-        (MOVE_KW, _) => Some(move_stmt(p)),
-        (NOTIFY_KW, _) => Some(notify_stmt(p)),
-        (PREPARE_KW, TRANSACTION_KW) => Some(prepare_transaction_stmt(p)),
-        (PREPARE_KW, _) => Some(prepare_stmt(p)),
-        (REASSIGN_KW, _) => Some(reassign_stmt(p)),
-        (REFRESH_KW, _) => Some(refresh_stmt(p)),
-        (REINDEX_KW, _) => Some(reindex_stmt(p)),
-        (RELEASE_KW, _) => Some(release_stmt(p)),
-        (RESET_KW, ROLE_KW) => Some(set_role_stmt(p)),
-        (RESET_KW, SESSION_KW) => Some(set_session_auth_stmt(p)),
-        (RESET_KW, _) => Some(reset_stmt(p)),
-        (REVOKE_KW, _) => Some(revoke_stmt(p)),
-        (ROLLBACK_KW, _) => Some(rollback_stmt(p)),
-        (SAVEPOINT_KW, _) => Some(savepoint_stmt(p)),
-        (SECURITY_KW, LABEL_KW) => Some(security_label_stmt(p)),
-        (SELECT_KW | TABLE_KW | VALUES_KW, _) => select_stmt(p, None),
-        (SET_KW, CONSTRAINTS_KW) => Some(set_constraints_stmt(p)),
+        (LISTEN_KW, _) => Some(listen(p)),
+        (LOAD_KW, _) => Some(load(p)),
+        (LOCK_KW, _) => Some(lock(p)),
+        (MERGE_KW, _) => Some(merge(p, None)),
+        (MOVE_KW, _) => Some(move_(p)),
+        (NOTIFY_KW, _) => Some(notify(p)),
+        (PREPARE_KW, TRANSACTION_KW) => Some(prepare_transaction(p)),
+        (PREPARE_KW, _) => Some(prepare(p)),
+        (REASSIGN_KW, _) => Some(reassign(p)),
+        (REFRESH_KW, _) => Some(refresh(p)),
+        (REINDEX_KW, _) => Some(reindex(p)),
+        (RELEASE_KW, _) => Some(release(p)),
+        (RESET_KW, ROLE_KW) => Some(set_role(p)),
+        (RESET_KW, SESSION_KW) => Some(set_session_auth(p)),
+        (RESET_KW, _) => Some(reset(p)),
+        (REVOKE_KW, _) => Some(revoke(p)),
+        (ROLLBACK_KW, _) => Some(rollback(p)),
+        (SAVEPOINT_KW, _) => Some(savepoint(p)),
+        (SECURITY_KW, LABEL_KW) => Some(security_label(p)),
+        (SELECT_KW | TABLE_KW | VALUES_KW, _) => select(p, None),
+        (SET_KW, CONSTRAINTS_KW) => Some(set_constraints(p)),
         (SET_KW, LOCAL_KW) => match p.nth(2) {
-            ROLE_KW => Some(set_role_stmt(p)),
-            SESSION_KW => Some(set_session_auth_stmt(p)),
-            _ => Some(set_stmt(p)),
+            ROLE_KW => Some(set_role(p)),
+            SESSION_KW => Some(set_session_auth(p)),
+            _ => Some(set(p)),
         },
-        (SET_KW, ROLE_KW) => Some(set_role_stmt(p)),
+        (SET_KW, ROLE_KW) => Some(set_role(p)),
         (SET_KW, SESSION_KW) => match p.nth(2) {
-            AUTHORIZATION_KW | SESSION_KW => Some(set_session_auth_stmt(p)),
-            CHARACTERISTICS_KW => Some(set_transaction_stmt(p)),
-            ROLE_KW => Some(set_role_stmt(p)),
-            _ => Some(set_stmt(p)),
+            AUTHORIZATION_KW | SESSION_KW => Some(set_session_auth(p)),
+            CHARACTERISTICS_KW => Some(set_transaction(p)),
+            ROLE_KW => Some(set_role(p)),
+            _ => Some(set(p)),
         },
-        (SET_KW, TRANSACTION_KW) => Some(set_transaction_stmt(p)),
-        (SET_KW, TIME_KW | _) => Some(set_stmt(p)),
-        (SHOW_KW, _) => Some(show_stmt(p)),
-        (START_KW, TRANSACTION_KW) => Some(begin_stmt(p)),
-        (TRUNCATE_KW, _) => Some(truncate_stmt(p)),
-        (UNLISTEN_KW, _) => Some(unlisten_stmt(p)),
-        (UPDATE_KW, _) => Some(update_stmt(p, None)),
-        (VACUUM_KW, _) => Some(vacuum_stmt(p)),
-        (WITH_KW, _) => with_stmt(p, None),
+        (SET_KW, TRANSACTION_KW) => Some(set_transaction(p)),
+        (SET_KW, TIME_KW | _) => Some(set(p)),
+        (SHOW_KW, _) => Some(show(p)),
+        (START_KW, TRANSACTION_KW) => Some(begin(p)),
+        (TRUNCATE_KW, _) => Some(truncate(p)),
+        (UNLISTEN_KW, _) => Some(unlisten(p)),
+        (UPDATE_KW, _) => Some(update(p, None)),
+        (VACUUM_KW, _) => Some(vacuum(p)),
+        (WITH_KW, _) => with(p, None),
         (command, _) => {
             // commands are outlined in:
             // https://www.postgresql.org/docs/17/sql-commands.html
@@ -5013,7 +5009,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
 // ALTER STATISTICS name RENAME TO new_name
 // ALTER STATISTICS name SET SCHEMA new_schema
 // ALTER STATISTICS name SET STATISTICS { new_target | DEFAULT }
-fn alter_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_statistics(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, STATISTICS_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5055,7 +5051,7 @@ fn alter_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ OPTIONS ( [ ADD | SET | DROP ] option ['value'] [, ... ] ) ]
 // ALTER SERVER name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER SERVER name RENAME TO new_name
-fn alter_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_server(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, SERVER_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5107,7 +5103,7 @@ fn alter_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER SEQUENCE [ IF EXISTS ] name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER SEQUENCE [ IF EXISTS ] name RENAME TO new_name
 // ALTER SEQUENCE [ IF EXISTS ] name SET SCHEMA new_schema
-fn alter_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_sequence(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, SEQUENCE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5153,7 +5149,7 @@ fn alter_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // ALTER SCHEMA name RENAME TO new_name
 // ALTER SCHEMA name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
-fn alter_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_schema(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, SCHEMA_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5178,7 +5174,7 @@ fn alter_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // ALTER RULE name ON table_name RENAME TO new_name
-fn alter_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_rule(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, RULE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5213,7 +5209,7 @@ fn alter_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     SET configuration_parameter FROM CURRENT
 //     RESET configuration_parameter
 //     RESET ALL
-fn alter_routine_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_routine(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, ROUTINE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5273,7 +5269,7 @@ fn alter_routine_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //   | CURRENT_ROLE
 //   | CURRENT_USER
 //   | SESSION_USER
-fn alter_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_role(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, ROLE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5322,7 +5318,7 @@ fn alter_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // where publication_object is one of:
 //     TABLE [ ONLY ] table_name [ * ] [ ( column_name [, ... ] ) ] [ WHERE ( expression ) ] [, ... ]
 //     TABLES IN SCHEMA { schema_name | CURRENT_SCHEMA } [, ... ]
-fn alter_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_publication(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, PUBLICATION_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5389,7 +5385,7 @@ fn alter_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     SET configuration_parameter FROM CURRENT
 //     RESET configuration_parameter
 //     RESET ALL
-fn alter_procedure_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_procedure(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, PROCEDURE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5432,7 +5428,7 @@ fn alter_procedure_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ TO { role_name | PUBLIC | CURRENT_ROLE | CURRENT_USER | SESSION_USER } [, ...] ]
 //     [ USING ( using_expression ) ]
 //     [ WITH CHECK ( check_expression ) ]
-fn alter_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_policy(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, POLICY_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5489,7 +5485,7 @@ fn alter_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //
 // ALTER OPERATOR FAMILY name USING index_method
 //     SET SCHEMA new_schema
-fn alter_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, OPERATOR_KW) && p.nth_at(2, FAMILY_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5542,7 +5538,7 @@ fn alter_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER OPERATOR CLASS name USING index_method
 //     SET SCHEMA new_schema
-fn alter_operator_class_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, OPERATOR_KW) && p.nth_at(2, CLASS_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5586,7 +5582,7 @@ fn alter_operator_class_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //            | HASHES
 //            | MERGES
 //           } [, ... ] )
-fn alter_operator_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_operator(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, OPERATOR_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5648,7 +5644,7 @@ fn alter_operator_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     SET ( storage_parameter [= value] [, ... ] )
 //     RESET ( storage_parameter [, ... ] )
 //     OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
-fn alter_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, MATERIALIZED_KW) && p.nth_at(2, VIEW_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5722,7 +5718,7 @@ fn alter_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // ALTER LARGE OBJECT large_object_oid OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
-fn alter_large_object_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_large_object(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, LARGE_KW) && p.nth_at(2, OBJECT_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5739,7 +5735,7 @@ fn alter_large_object_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // ALTER [ PROCEDURAL ] LANGUAGE name RENAME TO new_name
 // ALTER [ PROCEDURAL ] LANGUAGE name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
-fn alter_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_language(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && (p.nth_at(1, PROCEDURAL_KW) || p.nth_at(1, LANGUAGE_KW)));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5774,7 +5770,7 @@ fn alter_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER INDEX [ IF EXISTS ] name RESET ( storage_parameter [, ... ] )
 // ALTER INDEX [ IF EXISTS ] name ALTER [ COLUMN ] column_number
 //     SET STATISTICS integer
-fn alter_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, INDEX_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5866,7 +5862,7 @@ fn alter_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //   | CURRENT_USER
 //   | SESSION_USER
 // ALTER GROUP group_name RENAME TO new_name
-fn alter_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_group(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, GROUP_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5916,7 +5912,7 @@ fn alter_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     SET configuration_parameter FROM CURRENT
 //     RESET configuration_parameter
 //     RESET ALL
-fn alter_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_function(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, FUNCTION_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -5987,7 +5983,7 @@ fn alter_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     NO INHERIT parent_table
 //     OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 //     OPTIONS ( [ ADD | SET | DROP ] option ['value'] [, ... ])
-fn alter_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, FOREIGN_KW) && p.nth_at(2, TABLE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6039,7 +6035,7 @@ fn alter_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ OPTIONS ( [ ADD | SET | DROP ] option ['value'] [, ... ]) ]
 // ALTER FOREIGN DATA WRAPPER name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER FOREIGN DATA WRAPPER name RENAME TO new_name
-fn alter_foreign_data_wrapper_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(ALTER_KW)
             && p.nth_at(1, FOREIGN_KW)
@@ -6085,7 +6081,7 @@ fn alter_foreign_data_wrapper_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER EVENT TRIGGER name ENABLE [ REPLICA | ALWAYS ]
 // ALTER EVENT TRIGGER name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER EVENT TRIGGER name RENAME TO new_name
-fn alter_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, EVENT_KW) && p.nth_at(2, TRIGGER_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6156,7 +6152,7 @@ fn alter_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // * |
 // [ argmode ] [ argname ] argtype [ , ... ] |
 // [ [ argmode ] [ argname ] argtype [ , ... ] ] ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
-fn alter_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_extension(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, EXTENSION_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6324,7 +6320,7 @@ fn alter_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // where domain_constraint is:
 // [ CONSTRAINT constraint_name ]
 // { NOT NULL | CHECK (expression) }
-fn alter_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_domain(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, DOMAIN_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6516,7 +6512,7 @@ fn domain_constraint(p: &mut Parser<'_>) {
 //       ON SCHEMAS
 //       FROM { [ GROUP ] role_name | PUBLIC } [, ...]
 //       [ CASCADE | RESTRICT ]
-fn alter_default_privileges_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_default_privileges(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, DEFAULT_KW) && p.nth_at(2, PRIVILEGES_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6604,7 +6600,7 @@ fn privilege_target_type(p: &mut Parser<'_>) {
 // ALTER DATABASE name SET configuration_parameter FROM CURRENT
 // ALTER DATABASE name RESET configuration_parameter
 // ALTER DATABASE name RESET ALL
-fn alter_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_database(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, DATABASE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6655,7 +6651,7 @@ fn alter_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER CONVERSION name RENAME TO new_name
 // ALTER CONVERSION name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER CONVERSION name SET SCHEMA new_schema
-fn alter_conversion_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_conversion(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, CONVERSION_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6688,7 +6684,7 @@ fn alter_conversion_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER COLLATION name RENAME TO new_name
 // ALTER COLLATION name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER COLLATION name SET SCHEMA new_schema
-fn alter_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_collation(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, COLLATION_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6730,7 +6726,7 @@ fn alter_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // * |
 // [ argmode ] [ argname ] argtype [ , ... ] |
 // [ [ argmode ] [ argname ] argtype [ , ... ] ] ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
-fn alter_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, AGGREGATE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6770,7 +6766,7 @@ fn alter_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER SUBSCRIPTION name SKIP ( skip_option = value )
 // ALTER SUBSCRIPTION name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER SUBSCRIPTION name RENAME TO new_name
-fn alter_subscription_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, SUBSCRIPTION_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6870,7 +6866,7 @@ fn opt_with_options_list(p: &mut Parser<'_>) {
 // ALTER SYSTEM SET configuration_parameter { TO | = } { value [, ...] | DEFAULT }
 // ALTER SYSTEM RESET configuration_parameter
 // ALTER SYSTEM RESET ALL
-fn alter_system_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_system(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, SYSTEM_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6891,7 +6887,7 @@ fn alter_system_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER TABLESPACE name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER TABLESPACE name SET ( tablespace_option = value [, ... ] )
 // ALTER TABLESPACE name RESET ( tablespace_option [, ... ] )
-fn alter_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, TABLESPACE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -6922,7 +6918,7 @@ fn alter_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // ALTER TEXT SEARCH PARSER name RENAME TO new_name
 // ALTER TEXT SEARCH PARSER name SET SCHEMA new_schema
-fn alter_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(ALTER_KW) && p.nth_at(1, TEXT_KW) && p.nth_at(2, SEARCH_KW) && p.nth_at(3, PARSER_KW)
     );
@@ -6950,7 +6946,7 @@ fn alter_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER TEXT SEARCH DICTIONARY name RENAME TO new_name
 // ALTER TEXT SEARCH DICTIONARY name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER TEXT SEARCH DICTIONARY name SET SCHEMA new_schema
-fn alter_text_search_dict_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(ALTER_KW)
             && p.nth_at(1, TEXT_KW)
@@ -7097,7 +7093,7 @@ fn path_name_ref_list(p: &mut Parser<'_>) {
 
 // ALTER TEXT SEARCH TEMPLATE name RENAME TO new_name
 // ALTER TEXT SEARCH TEMPLATE name SET SCHEMA new_schema
-fn alter_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(ALTER_KW)
             && p.nth_at(1, TEXT_KW)
@@ -7124,7 +7120,7 @@ fn alter_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // ALTER TRIGGER name ON table_name RENAME TO new_name
 // ALTER TRIGGER name ON table_name [ NO ] DEPENDS ON EXTENSION extension_name
-fn alter_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, TRIGGER_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -7184,7 +7180,7 @@ fn alter_type_action(p: &mut Parser<'_>) {
 //     ADD ATTRIBUTE attribute_name data_type [ COLLATE collation ] [ CASCADE | RESTRICT ]
 //     DROP ATTRIBUTE [ IF EXISTS ] attribute_name [ CASCADE | RESTRICT ]
 //     ALTER ATTRIBUTE attribute_name [ SET DATA ] TYPE data_type [ COLLATE collation ] [ CASCADE | RESTRICT ]
-fn alter_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, TYPE_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -7282,7 +7278,7 @@ fn alter_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //   | CURRENT_ROLE
 //   | CURRENT_USER
 //   | SESSION_USER
-fn alter_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_user(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, USER_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -7326,7 +7322,7 @@ fn alter_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER USER MAPPING FOR { user_name | USER | CURRENT_ROLE | CURRENT_USER | SESSION_USER | PUBLIC }
 //     SERVER server_name
 //     OPTIONS ( [ ADD | SET | DROP ] option ['value'] [, ... ] )
-fn alter_user_mapping_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, USER_KW) && p.nth_at(2, MAPPING_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -7375,7 +7371,7 @@ fn alter_option(p: &mut Parser<'_>) {
 // ALTER VIEW [ IF EXISTS ] name SET SCHEMA new_schema
 // ALTER VIEW [ IF EXISTS ] name SET ( view_option_name [= view_option_value] [, ... ] )
 // ALTER VIEW [ IF EXISTS ] name RESET ( view_option_name [, ... ] )
-fn alter_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, VIEW_KW));
     let m = p.start();
     p.bump(ALTER_KW);
@@ -7456,7 +7452,7 @@ fn alter_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     BUFFER_USAGE_LIMIT size
 // and table_and_columns is:
 //     table_name [ ( column_name [, ...] ) ]
-fn analyze_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn analyze(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ANALYZE_KW) || p.at(ANALYSE_KW));
     let m = p.start();
     p.bump_any();
@@ -7524,7 +7520,7 @@ fn analyze_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //   * |
 //   [ argmode ] [ argname ] argtype [ , ... ] |
 //   [ [ argmode ] [ argname ] argtype [ , ... ] ] ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
-fn comment_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn comment(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(COMMENT_KW));
     let m = p.start();
     p.bump(COMMENT_KW);
@@ -7648,7 +7644,7 @@ fn comment_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // CLUSTER [ ( option [, ...] ) ] [ table_name [ USING index_name ] ]
 // where option can be one of:
 //   VERBOSE [ boolean ]
-fn cluster_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn cluster(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CLUSTER_KW));
     let m = p.start();
     p.bump(CLUSTER_KW);
@@ -7684,7 +7680,7 @@ fn cluster_option(p: &mut Parser<'_>) {
 // CREATE ACCESS METHOD name
 //     TYPE access_method_type
 //     HANDLER handler_function
-fn create_access_method_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_access_method(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -7760,7 +7756,7 @@ fn create_access_method_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ , MINITCOND = minitial_condition ]
 //     [ , SORTOP = sort_operator ]
 // )
-fn create_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -7795,7 +7791,7 @@ fn create_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // CREATE CAST (source_type AS target_type)
 //     WITH INOUT
 //     [ AS ASSIGNMENT | AS IMPLICIT ]
-fn create_cast_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_cast(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, CAST_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -7830,7 +7826,7 @@ fn create_cast_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ VERSION = version ]
 // )
 // CREATE COLLATION [ IF NOT EXISTS ] name FROM existing_collation
-fn create_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_collation(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, COLLATION_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -7856,7 +7852,7 @@ fn create_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // CREATE [ DEFAULT ] CONVERSION name
 //     FOR source_encoding TO dest_encoding FROM function_name
-fn create_conversion_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_conversion(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -7927,7 +7923,7 @@ fn opt_create_database_option(p: &mut Parser<'_>) -> bool {
 //            [ CONNECTION LIMIT [=] connlimit ]
 //            [ IS_TEMPLATE [=] istemplate ]
 //            [ OID [=] oid ]
-fn create_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_database(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, DATABASE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -7948,7 +7944,7 @@ fn create_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // where domain_constraint is:
 // [ CONSTRAINT constraint_name ]
 // { NOT NULL | NULL | CHECK (expression) }
-fn create_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_domain(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, DOMAIN_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -7982,7 +7978,7 @@ fn event_trigger_when(p: &mut Parser<'_>) {
 //     ON event
 //     [ WHEN filter_variable IN (filter_value [, ... ]) [ AND ... ] ]
 //     EXECUTE { FUNCTION | PROCEDURE } function_name()
-fn create_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, EVENT_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8043,7 +8039,7 @@ fn create_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //   FROM ( { partition_bound_expr | MINVALUE | MAXVALUE } [, ...] )
 //     TO ( { partition_bound_expr | MINVALUE | MAXVALUE } [, ...] ) |
 //   WITH ( MODULUS numeric_literal, REMAINDER numeric_literal )
-fn create_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, FOREIGN_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8111,7 +8107,7 @@ fn create_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ HANDLER handler_function | NO HANDLER ]
 //     [ VALIDATOR validator_function | NO VALIDATOR ]
 //     [ OPTIONS ( option 'value' [, ... ] ) ]
-fn create_foreign_data_wrapper_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, FOREIGN_KW) && p.nth_at(2, DATA_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8174,7 +8170,7 @@ fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
 //     | ADMIN role_name [, ...]
 //     | USER role_name [, ...]
 //     | SYSID uid
-fn create_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_group(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, GROUP_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8186,7 +8182,7 @@ fn create_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // CREATE [ OR REPLACE ] [ TRUSTED ] [ PROCEDURAL ] LANGUAGE name
 //   [ HANDLER call_handler [ INLINE inline_handler ] [ VALIDATOR valfunction ] ]
-fn create_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_language(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8214,7 +8210,7 @@ fn create_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ TABLESPACE tablespace_name ]
 //     AS query
 //     [ WITH [ NO ] DATA ]
-fn create_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, MATERIALIZED_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8264,7 +8260,7 @@ fn create_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //   [, RESTRICT = res_proc ] [, JOIN = join_proc ]
 //   [, HASHES ] [, MERGES ]
 // )
-fn create_operator_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_operator(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, OPERATOR_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8289,7 +8285,7 @@ fn create_operator_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //    | FUNCTION support_number [ ( op_type [ , op_type ] ) ] function_name ( argument_type [, ...] )
 //    | STORAGE storage_type
 //   } [, ... ]
-fn create_operator_class_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, OPERATOR_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8386,7 +8382,7 @@ fn operator_drop_class_option(p: &mut Parser<'_>) {
 }
 
 // CREATE OPERATOR FAMILY name USING index_method
-fn create_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, OPERATOR_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8404,7 +8400,7 @@ fn create_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ TO { role_name | PUBLIC | CURRENT_ROLE | CURRENT_USER | SESSION_USER } [, ...] ]
 //     [ USING ( using_expression ) ]
 //     [ WITH CHECK ( check_expression ) ]
-fn create_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_policy(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, POLICY_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8456,7 +8452,7 @@ fn create_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     | AS 'obj_file', 'link_symbol'
 //     | sql_body
 //   } ...
-fn create_procedure_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_procedure(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8514,7 +8510,7 @@ fn publication_object(p: &mut Parser<'_>) {
 // where publication_object is one of:
 //     TABLE [ ONLY ] table_name [ * ] [ ( column_name [, ... ] ) ] [ WHERE ( expression ) ] [, ... ]
 //     TABLES IN SCHEMA { schema_name | CURRENT_SCHEMA } [, ... ]
-fn create_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_publication(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, PUBLICATION_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8550,7 +8546,7 @@ fn create_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     | ROLE role_name [, ...]
 //     | ADMIN role_name [, ...]
 //     | SYSID uid
-fn create_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_role(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, ROLE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8589,7 +8585,7 @@ fn select_insert_delete_update_or_notify(p: &mut Parser<'_>) {
 //     DO [ ALSO | INSTEAD ] { NOTHING | command | ( command ; command ... ) }
 // where event can be one of:
 //     SELECT | INSERT | UPDATE | DELETE
-fn create_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_rule(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && matches!(p.nth(1), OR_KW | RULE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8631,7 +8627,7 @@ fn create_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ MINVALUE minvalue | NO MINVALUE ] [ MAXVALUE maxvalue | NO MAXVALUE ]
 //     [ START [ WITH ] start ] [ CACHE cache ] [ [ NO ] CYCLE ]
 //     [ OWNED BY { table_name.column_name | NONE } ]
-fn create_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_sequence(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(CREATE_KW) && matches!(p.nth(1), TEMPORARY_KW | TEMP_KW | UNLOGGED_KW | SEQUENCE_KW)
     );
@@ -8652,7 +8648,7 @@ fn create_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // CREATE SERVER [ IF NOT EXISTS ] server_name [ TYPE 'server_type' ] [ VERSION 'server_version' ]
 //     FOREIGN DATA WRAPPER fdw_name
 //     [ OPTIONS ( option 'value' [, ... ] ) ]
-fn create_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_server(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, SERVER_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8681,7 +8677,7 @@ fn create_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ ( statistics_kind [, ... ] ) ]
 //     ON { column_name | ( expression ) }, { column_name | ( expression ) } [, ...]
 //     FROM table_name
-fn create_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_statistics(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, STATISTICS_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8716,7 +8712,7 @@ fn create_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     CONNECTION 'conninfo'
 //     PUBLICATION publication_name [, ...]
 //     [ WITH ( subscription_parameter [= value] [, ... ] ) ]
-fn create_subscription_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, SUBSCRIPTION_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8737,7 +8733,7 @@ fn create_subscription_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ OWNER { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER } ]
 //     LOCATION 'directory'
 //     [ WITH ( tablespace_option = value [, ... ] ) ]
-fn create_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, TABLESPACE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8760,7 +8756,7 @@ fn create_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     LEXTYPES = lextypes_function
 //     [, HEADLINE = headline_function ]
 // )
-fn create_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, TEXT_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8785,7 +8781,7 @@ fn create_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     TEMPLATE = template
 //     [, option = value [, ... ]]
 // )
-fn create_text_search_dict_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, TEXT_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8810,7 +8806,7 @@ fn create_text_search_dict_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     PARSER = parser_name |
 //     COPY = source_config
 // )
-fn create_text_search_config_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_text_search_config(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, TEXT_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8835,7 +8831,7 @@ fn create_text_search_config_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ INIT = init_function , ]
 //     LEXIZE = lexize_function
 // )
-fn create_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, TEXT_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8861,7 +8857,7 @@ fn create_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     FROM SQL WITH FUNCTION from_sql_function_name [ (argument_type [, ...]) ],
 //     TO SQL WITH FUNCTION to_sql_function_name [ (argument_type [, ...]) ]
 // );
-fn create_transform_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_transform(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -8892,7 +8888,7 @@ fn create_transform_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // CREATE USER MAPPING [ IF NOT EXISTS ] FOR { user_name | USER | CURRENT_ROLE | CURRENT_USER | PUBLIC }
 //     SERVER server_name
 //     [ OPTIONS ( option 'value' [, ... ] ) ]
-fn create_user_mapping_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, USER_KW) && p.nth_at(2, MAPPING_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -9021,7 +9017,7 @@ fn opt_role_option(p: &mut Parser<'_>) -> bool {
 //   | ADMIN role_name [, ...]
 //   | USER role_name [, ...]
 //   | SYSID uid
-fn create_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_user(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, USER_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -9042,7 +9038,7 @@ fn opt_role_option_list(p: &mut Parser<'_>) {
 }
 
 // DROP [ PROCEDURAL ] LANGUAGE [ IF EXISTS ] name [ CASCADE| RESTRICT ]
-fn drop_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_language(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && matches!(p.nth(1), LANGUAGE_KW | PROCEDURAL_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9055,7 +9051,7 @@ fn drop_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP GROUP [ IF EXISTS ] name [, ...]
-fn drop_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_group(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, GROUP_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9070,7 +9066,7 @@ fn drop_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // DROP FUNCTION [ IF EXISTS ] name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ] [, ...]
 //     [ CASCADE | RESTRICT ]
-fn drop_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_function(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, FUNCTION_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9087,7 +9083,7 @@ fn drop_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP FOREIGN DATA WRAPPER [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_foreign_data_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_foreign_data(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(DROP_KW) && p.nth_at(1, FOREIGN_KW) && p.nth_at(2, DATA_KW) && p.nth_at(3, WRAPPER_KW)
     );
@@ -9106,7 +9102,7 @@ fn drop_foreign_data_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP FOREIGN TABLE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, FOREIGN_KW) && p.nth_at(2, TABLE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9122,7 +9118,7 @@ fn drop_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP ACCESS METHOD [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_access_method_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_access_method(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, ACCESS_KW) && p.nth_at(2, METHOD_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9146,7 +9142,7 @@ fn aggregate(p: &mut Parser<'_>) {
 // * |
 // [ argmode ] [ argname ] argtype [ , ... ] |
 // [ [ argmode ] [ argname ] argtype [ , ... ] ] ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
-fn drop_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, AGGREGATE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9169,7 +9165,7 @@ fn source_type_as_target_type(p: &mut Parser<'_>) {
 }
 
 // DROP CAST [ IF EXISTS ] (source_type AS target_type) [ CASCADE | RESTRICT ]
-fn drop_cast_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_cast(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, CAST_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9181,7 +9177,7 @@ fn drop_cast_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP COLLATION [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_collation(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, COLLATION_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9193,7 +9189,7 @@ fn drop_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP CONVERSION [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_conversion_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_conversion(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, CONVERSION_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9205,7 +9201,7 @@ fn drop_conversion_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP DOMAIN [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_domain(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, DOMAIN_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9220,7 +9216,7 @@ fn drop_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP EVENT TRIGGER [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, EVENT_KW) && p.nth_at(2, TRIGGER_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9233,7 +9229,7 @@ fn drop_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP EXTENSION [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_extension(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, EXTENSION_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9248,7 +9244,7 @@ fn drop_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP MATERIALIZED VIEW [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, MATERIALIZED_KW) && p.nth_at(2, VIEW_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9264,7 +9260,7 @@ fn drop_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP OPERATOR FAMILY [ IF EXISTS ] name USING index_method [ CASCADE | RESTRICT ]
-fn drop_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_operator_family(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, OPERATOR_KW) && p.nth_at(2, FAMILY_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9279,7 +9275,7 @@ fn drop_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP OPERATOR [ IF EXISTS ] name ( { left_type | NONE } , right_type ) [, ...] [ CASCADE | RESTRICT ]
-fn drop_operator_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_operator(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, OPERATOR_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9306,7 +9302,7 @@ fn operator_sig(p: &mut Parser<'_>) {
 }
 
 // DROP OPERATOR CLASS [ IF EXISTS ] name USING index_method [ CASCADE | RESTRICT ]
-fn drop_operator_class_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_operator_class(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, OPERATOR_KW) && p.nth_at(2, CLASS_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9321,7 +9317,7 @@ fn drop_operator_class_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP OWNED BY { name | CURRENT_ROLE | CURRENT_USER | SESSION_USER } [, ...] [ CASCADE | RESTRICT ]
-fn drop_owned_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_owned(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, OWNED_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9336,7 +9332,7 @@ fn drop_owned_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP POLICY [ IF EXISTS ] name ON table_name [ CASCADE | RESTRICT ]
-fn drop_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_policy(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, POLICY_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9351,7 +9347,7 @@ fn drop_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // DROP PROCEDURE [ IF EXISTS ] name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ] [, ...]
 //     [ CASCADE | RESTRICT ]
-fn drop_procedure_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_procedure(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, PROCEDURE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9368,7 +9364,7 @@ fn drop_procedure_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP PUBLICATION [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_publication(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, PUBLICATION_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9383,7 +9379,7 @@ fn drop_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP ROLE [ IF EXISTS ] name [, ...]
-fn drop_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_role(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, ROLE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9398,7 +9394,7 @@ fn drop_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // DROP ROUTINE [ IF EXISTS ] name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ] [, ...]
 // [ CASCADE | RESTRICT ]
-fn drop_routine_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_routine(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, ROUTINE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9415,7 +9411,7 @@ fn drop_routine_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP RULE [ IF EXISTS ] name ON table_name [ CASCADE | RESTRICT ]
-fn drop_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_rule(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, RULE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9429,7 +9425,7 @@ fn drop_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP SEQUENCE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_sequence(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, SEQUENCE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9444,7 +9440,7 @@ fn drop_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP SERVER [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_server(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, SERVER_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9459,7 +9455,7 @@ fn drop_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP STATISTICS [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_statistics(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, STATISTICS_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9474,7 +9470,7 @@ fn drop_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP SUBSCRIPTION [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_subscription_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_subscription(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, SUBSCRIPTION_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9491,7 +9487,7 @@ fn opt_cascade_or_restrict(p: &mut Parser<'_>) -> bool {
 }
 
 // DROP TABLESPACE [ IF EXISTS ] name
-fn drop_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, TABLESPACE_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9502,7 +9498,7 @@ fn drop_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP TEXT SEARCH PARSER [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(DROP_KW) && p.nth_at(1, TEXT_KW) && p.nth_at(2, SEARCH_KW) && p.nth_at(3, PARSER_KW)
     );
@@ -9518,7 +9514,7 @@ fn drop_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP TEXT SEARCH CONFIGURATION [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_text_search_config_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_text_search_config(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(DROP_KW)
             && p.nth_at(1, TEXT_KW)
@@ -9537,7 +9533,7 @@ fn drop_text_search_config_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP TEXT SEARCH DICTIONARY [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_text_search_dict_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(DROP_KW)
             && p.nth_at(1, TEXT_KW)
@@ -9556,7 +9552,7 @@ fn drop_text_search_dict_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP TEXT SEARCH TEMPLATE [ IF EXISTS ] name [ CASCADE | RESTRICT ]
-fn drop_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
         p.at(DROP_KW) && p.nth_at(1, TEXT_KW) && p.nth_at(2, SEARCH_KW) && p.nth_at(3, TEMPLATE_KW)
     );
@@ -9572,7 +9568,7 @@ fn drop_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP TRANSFORM [ IF EXISTS ] FOR type_name LANGUAGE lang_name [ CASCADE | RESTRICT ]
-fn drop_transform_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_transform(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, TRANSFORM_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9587,7 +9583,7 @@ fn drop_transform_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP USER [ IF EXISTS ] name [, ...]
-fn drop_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_user(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, USER_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9601,7 +9597,7 @@ fn drop_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP USER MAPPING [ IF EXISTS ] FOR { user_name | USER | CURRENT_ROLE | CURRENT_USER | PUBLIC } SERVER server_name
-fn drop_user_mapping_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, USER_KW) && p.nth_at(2, MAPPING_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -9621,7 +9617,7 @@ fn drop_user_mapping_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // EXPLAIN [ANALYZE] [VERBOSE] query
 // EXPLAIN [ ( option [, ...] ) ] statement
-fn explain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn explain(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(EXPLAIN_KW));
     let m = p.start();
     p.bump(EXPLAIN_KW);
@@ -9729,7 +9725,7 @@ fn opt_options_list(p: &mut Parser<'_>) {
 //     FROM SERVER server_name
 //     INTO local_schema
 //     [ OPTIONS ( option 'value' [, ... ] ) ]
-fn import_foreign_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn import_foreign_schema(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(IMPORT_KW) && p.nth_at(1, FOREIGN_KW));
     let m = p.start();
     p.bump(IMPORT_KW);
@@ -9767,7 +9763,7 @@ fn import_foreign_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // where lockmode is one of:
 //     ACCESS SHARE | ROW SHARE | ROW EXCLUSIVE | SHARE UPDATE EXCLUSIVE
 //     | SHARE | SHARE ROW EXCLUSIVE | EXCLUSIVE | ACCESS EXCLUSIVE
-fn lock_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn lock(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(LOCK_KW));
     let m = p.start();
     p.bump(LOCK_KW);
@@ -9853,7 +9849,7 @@ fn table_list(p: &mut Parser<'_>) {
 //
 // and merge_delete is:
 // DELETE
-fn merge_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn merge(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     assert!(p.at(MERGE_KW));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(MERGE_KW);
@@ -9943,7 +9939,7 @@ fn merge_when_clause(p: &mut Parser<'_>) {
             }
             // { VALUES ( { expression | DEFAULT } [, ...] ) | DEFAULT VALUES }
             if p.at(VALUES_KW) {
-                values_clause(p, None);
+                values(p, None);
             } else if p.eat(DEFAULT_KW) {
                 p.expect(VALUES_KW);
             } else {
@@ -9961,7 +9957,7 @@ fn merge_when_clause(p: &mut Parser<'_>) {
 
 // REASSIGN OWNED BY { old_role | CURRENT_ROLE | CURRENT_USER | SESSION_USER } [, ...]
 //                TO { new_role | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
-fn reassign_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn reassign(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(REASSIGN_KW));
     let m = p.start();
     p.bump(REASSIGN_KW);
@@ -9981,7 +9977,7 @@ fn reassign_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // REFRESH MATERIALIZED VIEW [ CONCURRENTLY ] name
 //     [ WITH [ NO ] DATA ]
-fn refresh_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn refresh(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(REFRESH_KW));
     let m = p.start();
     p.bump(REFRESH_KW);
@@ -10002,7 +9998,7 @@ fn refresh_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //          | ALL TABLES IN SCHEMA schema_name [, ...] }
 //     TO role_specification [, ...] [ WITH GRANT OPTION ]
 //     [ GRANTED BY role_specification ]
-fn grant_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn grant(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(GRANT_KW));
     let m = p.start();
     p.bump(GRANT_KW);
@@ -10177,7 +10173,7 @@ fn opt_granted_by(p: &mut Parser<'_>) {
 //     FROM role_specification [, ...]
 //     [ GRANTED BY role_specification ]
 //     [ CASCADE | RESTRICT ]
-fn revoke_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn revoke(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(REVOKE_KW));
     let m = p.start();
     p.bump(REVOKE_KW);
@@ -10345,7 +10341,7 @@ fn opt_role(p: &mut Parser<'_>) -> bool {
 // * |
 // [ argmode ] [ argname ] argtype [ , ... ] |
 // [ [ argmode ] [ argname ] argtype [ , ... ] ] ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
-fn security_label_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn security_label(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SECURITY_KW) && p.nth_at(1, LABEL_KW));
     let m = p.start();
     p.bump(SECURITY_KW);
@@ -10465,7 +10461,7 @@ fn aggregate_arg_list(p: &mut Parser<'_>) {
 }
 
 // SET CONSTRAINTS { ALL | name [, ...] } { DEFERRED | IMMEDIATE }
-fn set_constraints_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn set_constraints(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SET_KW) && p.nth_at(1, CONSTRAINTS_KW));
     let m = p.start();
     p.bump(SET_KW);
@@ -10490,7 +10486,7 @@ fn set_constraints_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // SET [ SESSION | LOCAL ] ROLE role_name
 // SET [ SESSION | LOCAL ] ROLE NONE
 // RESET ROLE
-fn set_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn set_role(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SET_KW) || p.at(RESET_KW));
     let m = p.start();
     if p.eat(RESET_KW) {
@@ -10509,7 +10505,7 @@ fn set_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // SET [ SESSION | LOCAL ] SESSION AUTHORIZATION user_name
 // SET [ SESSION | LOCAL ] SESSION AUTHORIZATION DEFAULT
 // RESET SESSION AUTHORIZATION
-fn set_session_auth_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn set_session_auth(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SET_KW) || p.at(RESET_KW));
     let m = p.start();
     if p.at(RESET_KW) {
@@ -10551,7 +10547,7 @@ fn transaction_mode_list(p: &mut Parser<'_>) {
 //     ISOLATION LEVEL { SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED }
 //     READ WRITE | READ ONLY
 //     [ NOT ] DEFERRABLE
-fn set_transaction_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn set_transaction(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SET_KW));
     let m = p.start();
     p.bump(SET_KW);
@@ -10577,7 +10573,7 @@ fn set_transaction_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ LIMIT { count | ALL } ]
 //     [ OFFSET start [ ROW | ROWS ] ]
 //     [ FETCH { FIRST | NEXT } [ count ] { ROW | ROWS } ONLY ]
-fn values_clause(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn values(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     p.bump(VALUES_KW);
     // TODO: generalize this
@@ -10617,7 +10613,7 @@ fn values_clause(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
 //     CONCURRENTLY [ boolean ]
 //     TABLESPACE new_tablespace
 //     VERBOSE [ boolean ]
-fn reindex_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(REINDEX_KW));
     let m = p.start();
     p.bump(REINDEX_KW);
@@ -10677,7 +10673,7 @@ fn reindex_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DROP VIEW [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_view(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, VIEW_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -10702,7 +10698,7 @@ fn drop_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ WITH ( view_option_name [= view_option_value] [, ... ] ) ]
 //     AS query
 //     [ WITH [ CASCADED | LOCAL ] CHECK OPTION ]
-fn create_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -10739,7 +10735,7 @@ fn create_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // EXECUTE name [ ( parameter [, ...] ) ]
-fn execute_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn execute(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(EXECUTE_KW));
     let m = p.start();
     p.bump(EXECUTE_KW);
@@ -10752,7 +10748,7 @@ fn execute_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // PREPARE name [ ( data_type [, ...] ) ] AS statement
-fn prepare_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn prepare(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(PREPARE_KW));
     let m = p.start();
     p.bump(PREPARE_KW);
@@ -10792,7 +10788,7 @@ fn prepare_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // UNLISTEN { channel | * }
-fn unlisten_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn unlisten(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(UNLISTEN_KW));
     let m = p.start();
     p.bump(UNLISTEN_KW);
@@ -10803,7 +10799,7 @@ fn unlisten_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // CHECKPOINT
-fn checkpoint_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn checkpoint(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CHECKPOINT_KW));
     let m = p.start();
     p.bump(CHECKPOINT_KW);
@@ -10811,7 +10807,7 @@ fn checkpoint_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DEALLOCATE [ PREPARE ] { name | ALL }
-fn deallocate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn deallocate(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DEALLOCATE_KW));
     let m = p.start();
     p.bump(DEALLOCATE_KW);
@@ -10823,7 +10819,7 @@ fn deallocate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // LOAD string
-fn load_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn load(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(LOAD_KW));
     let m = p.start();
     p.bump(LOAD_KW);
@@ -10832,7 +10828,7 @@ fn load_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // LISTEN channel
-fn listen_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn listen(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(LISTEN_KW));
     let m = p.start();
     p.bump(LISTEN_KW);
@@ -10841,7 +10837,7 @@ fn listen_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // NOTIFY channel [ , payload ]
-fn notify_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn notify(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(NOTIFY_KW));
     let m = p.start();
     p.bump(NOTIFY_KW);
@@ -10853,7 +10849,7 @@ fn notify_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, NOTIFY)
 }
 
-fn reset_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn reset(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(RESET_KW));
     let m = p.start();
     p.bump(RESET_KW);
@@ -10864,7 +10860,7 @@ fn reset_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // DISCARD { ALL | PLANS | SEQUENCES | TEMPORARY | TEMP }
-fn discard_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn discard(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DISCARD_KW));
     let m = p.start();
     p.bump(DISCARD_KW);
@@ -10877,7 +10873,7 @@ fn opt_temp(p: &mut Parser<'_>) -> bool {
 }
 
 // DO [ LANGUAGE lang_name ] code
-fn do_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn do_(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DO_KW));
     let m = p.start();
     p.bump(DO_KW);
@@ -10894,7 +10890,7 @@ fn do_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // DECLARE name [ BINARY ] [ ASENSITIVE | INSENSITIVE ] [ [ NO ] SCROLL ]
 //     CURSOR [ { WITH | WITHOUT } HOLD ] FOR query
-fn declare_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn declare(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DECLARE_KW));
     let m = p.start();
     p.bump(DECLARE_KW);
@@ -10964,7 +10960,7 @@ fn opt_direction(p: &mut Parser<'_>) -> bool {
 //     BACKWARD
 //     BACKWARD count
 //     BACKWARD ALL
-fn move_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn move_(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(MOVE_KW));
     let m = p.start();
     p.bump(MOVE_KW);
@@ -10991,7 +10987,7 @@ fn move_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     BACKWARD
 //     BACKWARD count
 //     BACKWARD ALL
-fn fetch_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn fetch(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(FETCH_KW));
     let m = p.start();
     p.bump(FETCH_KW);
@@ -11003,7 +10999,7 @@ fn fetch_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 // CLOSE { name | ALL }
-fn close_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn close(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CLOSE_KW));
     let m = p.start();
     p.bump(CLOSE_KW);
@@ -11015,7 +11011,7 @@ fn close_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // TRUNCATE [ TABLE ] [ ONLY ] name [ * ] [, ... ]
 //   [ RESTART IDENTITY | CONTINUE IDENTITY ] [ CASCADE | RESTRICT ]
-fn truncate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn truncate(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(TRUNCATE_KW));
     let m = p.start();
     p.bump(TRUNCATE_KW);
@@ -11055,7 +11051,7 @@ fn truncate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // pre postgres 9 syntax:
 //
 // VACUUM [ FULL ] [ FREEZE ] [ VERBOSE ] [ ANALYZE ] [ table_and_columns [, ...] ]
-fn vacuum_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn vacuum(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(VACUUM_KW));
     let m = p.start();
     p.bump(VACUUM_KW);
@@ -11249,7 +11245,7 @@ fn copy_option_list(p: &mut Parser<'_>) {
 //     TO { 'filename' | STDOUT }
 //     [ [USING] DELIMITERS 'delimiter_character' ]
 //     [ WITH NULL AS 'null_string' ]
-fn copy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn copy(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(COPY_KW));
     let m = p.start();
     p.bump(COPY_KW);
@@ -11289,7 +11285,7 @@ fn copy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 // https://www.postgresql.org/docs/17/sql-call.html
 // CALL name ( [ argument ] [, ...] )
-fn call_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn call(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CALL_KW));
     let m = p.start();
     p.bump(CALL_KW);
@@ -11317,7 +11313,7 @@ fn call_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     UPDATE [ OF column_name [, ... ] ]
 //     DELETE
 //     TRUNCATE
-fn create_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -11417,7 +11413,7 @@ fn opt_referencing_table(p: &mut Parser<'_>) -> bool {
 
 // https://www.postgresql.org/docs/17/sql-dropschema.html
 // DROP SCHEMA [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
-fn drop_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_schema(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW) && p.nth_at(1, SCHEMA_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -11456,18 +11452,18 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
     while !p.at(EOF) {
         match (p.current(), p.nth(1)) {
             (CREATE_KW, TABLE_KW) => {
-                create_table_stmt(p);
+                create_table(p);
             }
             (CREATE_KW, VIEW_KW) => {
-                create_view_stmt(p);
+                create_view(p);
                 return;
             }
             (CREATE_KW, SEQUENCE_KW) => {
-                create_sequence_stmt(p);
+                create_sequence(p);
                 return;
             }
             (CREATE_KW, TRIGGER_KW) => {
-                create_trigger_stmt(p);
+                create_trigger(p);
                 return;
             }
             _ => return,
@@ -11485,7 +11481,7 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
 //   | CURRENT_USER
 //   | SESSION_USER
 // https://www.postgresql.org/docs/17/sql-createschema.html
-fn create_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW) && p.nth_at(1, SCHEMA_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -11521,7 +11517,7 @@ fn create_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn query(p: &mut Parser<'_>) {
     // TODO: this needs to be more general
-    if !p.at_ts(SELECT_FIRST) || select_stmt(p, None).is_none() {
+    if !p.at_ts(SELECT_FIRST) || select(p, None).is_none() {
         p.error("expected select stmt")
     }
 }
@@ -11545,7 +11541,7 @@ fn query(p: &mut Parser<'_>) {
 //                     ( column_name [, ...] ) = ( sub-SELECT )
 //                   } [, ...]
 //               [ WHERE condition ]
-fn insert_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     assert!(p.at(INSERT_KW));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(INSERT_KW);
@@ -11569,7 +11565,7 @@ fn insert_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     if p.eat(DEFAULT_KW) {
         p.expect(VALUES_KW);
     } else if p.at(VALUES_KW) {
-        values_clause(p, None);
+        values(p, None);
     } else {
         query(p);
     }
@@ -11648,7 +11644,7 @@ fn set_clause(p: &mut Parser<'_>) {
             if p.eat(L_PAREN) {
                 // ( sub-SELECT )
                 if p.at(SELECT_KW) && !found_row {
-                    if select_stmt(p, None).is_none() {
+                    if select(p, None).is_none() {
                         p.error("expected sub-SELECT");
                     }
                 } else {
@@ -11709,7 +11705,7 @@ fn opt_as_alias(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 //     [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
 //
 // https://www.postgresql.org/docs/17/sql-update.html
-fn update_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     assert!(p.at(UPDATE_KW));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(UPDATE_KW);
@@ -11736,17 +11732,17 @@ fn update_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     m.complete(p, UPDATE)
 }
 
-fn with_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
+fn with(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
     let m = m.unwrap_or_else(|| p.start());
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
     with_query_clause(p);
     match p.current() {
-        DELETE_KW => Some(delete_stmt(p, Some(m))),
-        SELECT_KW | TABLE_KW => select_stmt(p, Some(m)),
-        INSERT_KW => Some(insert_stmt(p, Some(m))),
-        UPDATE_KW => Some(update_stmt(p, Some(m))),
-        MERGE_KW => Some(merge_stmt(p, Some(m))),
+        DELETE_KW => Some(delete(p, Some(m))),
+        SELECT_KW | TABLE_KW => select(p, Some(m)),
+        INSERT_KW => Some(insert(p, Some(m))),
+        UPDATE_KW => Some(update(p, Some(m))),
+        MERGE_KW => Some(merge(p, Some(m))),
         _ => {
             m.abandon(p);
             p.error(format!(
@@ -11763,7 +11759,7 @@ fn with_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
 //     [ USING from_item [, ...] ]
 //     [ WHERE condition | WHERE CURRENT OF cursor_name ]
 //     [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
-fn delete_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
+fn delete(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     assert!(p.at(DELETE_KW));
     let m = m.unwrap_or_else(|| p.start());
     p.bump(DELETE_KW);
@@ -11830,7 +11826,7 @@ fn opt_returning_clause(p: &mut Parser<'_>) {
 
 // DROP TYPE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
 // https://www.postgresql.org/docs/17/sql-droptype.html
-fn drop_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_type(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -11850,7 +11846,7 @@ fn drop_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // DROP TRIGGER [ IF EXISTS ] name ON table_name [ CASCADE | RESTRICT ]
 //
 // https://www.postgresql.org/docs/17/sql-droptrigger.html
-fn drop_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -11868,7 +11864,7 @@ fn drop_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // DROP INDEX [ CONCURRENTLY ] [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
 //
 // https://www.postgresql.org/docs/17/sql-dropindex.html
-fn drop_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_index(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW));
     let m = p.start();
     // DROP INDEX
@@ -11893,7 +11889,7 @@ fn drop_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //
 //     FORCE
 // https://www.postgresql.org/docs/17/sql-dropdatabase.html
-fn drop_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn drop_database(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DROP_KW));
     let m = p.start();
     p.bump(DROP_KW);
@@ -11928,7 +11924,7 @@ fn drop_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //     [ WITH ( storage_parameter [= value] [, ... ] ) ]
 //     [ TABLESPACE tablespace_name ]
 //     [ WHERE predicate ]
-fn create_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -12441,7 +12437,7 @@ fn param_list(p: &mut Parser<'_>) {
 //     | sql_body
 //   } ...
 // https://www.postgresql.org/docs/17/sql-createfunction.html
-fn create_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_function(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     // CREATE
@@ -12507,7 +12503,7 @@ fn opt_or_replace(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 //
 // CREATE TYPE name
 // https://www.postgresql.org/docs/17/sql-createtype.html
-fn create_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_type(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -12572,7 +12568,7 @@ fn create_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 //              [ VERSION version ]
 //              [ CASCADE ]
 // https://www.postgresql.org/docs/17/sql-createextension.html
-fn create_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn create_extension(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.bump(CREATE_KW);
@@ -12626,7 +12622,7 @@ fn config_value(p: &mut Parser<'_>) -> bool {
 // SET [ SESSION | LOCAL ] TIME ZONE { value | 'value' | LOCAL | DEFAULT }
 //
 // https://www.postgresql.org/docs/17/sql-set.html
-fn set_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn set(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SET_KW));
     let m = p.start();
     p.bump(SET_KW);
@@ -12655,7 +12651,7 @@ fn set_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // SHOW ALL
 //
 // https://www.postgresql.org/docs/17/sql-show.html
-fn show_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn show(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SHOW_KW));
     let m = p.start();
     p.bump(SHOW_KW);
@@ -12759,7 +12755,7 @@ fn relation_name(p: &mut Parser<'_>) {
 //    NOT OF
 //    OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 //    REPLICA IDENTITY { DEFAULT | USING INDEX index_name | FULL | NOTHING }
-fn alter_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
+fn alter_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW));
     let m = p.start();
     // ALTER TABLE
