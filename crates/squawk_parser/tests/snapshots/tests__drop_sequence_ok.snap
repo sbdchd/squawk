@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_sequence.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_SEQUENCE_STMT
+  DROP_SEQUENCE
     DROP_KW "drop"
     WHITESPACE " "
     SEQUENCE_KW "sequence"
@@ -19,7 +18,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_SEQUENCE_STMT
+  DROP_SEQUENCE
     DROP_KW "drop"
     WHITESPACE " "
     SEQUENCE_KW "sequence"
@@ -54,7 +53,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_SEQUENCE_STMT
+  DROP_SEQUENCE
     DROP_KW "drop"
     WHITESPACE " "
     SEQUENCE_KW "sequence"

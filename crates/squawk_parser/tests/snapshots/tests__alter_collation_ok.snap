@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_collation.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- refresh"
   WHITESPACE "\n"
-  ALTER_COLLATION_STMT
+  ALTER_COLLATION
     ALTER_KW "alter"
     WHITESPACE " "
     COLLATION_KW "collation"
@@ -23,7 +22,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_COLLATION_STMT
+  ALTER_COLLATION
     ALTER_KW "alter"
     WHITESPACE " "
     COLLATION_KW "collation"
@@ -43,7 +42,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_COLLATION_STMT
+  ALTER_COLLATION
     ALTER_KW "alter"
     WHITESPACE " "
     COLLATION_KW "collation"
@@ -60,7 +59,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_COLLATION_STMT
+  ALTER_COLLATION
     ALTER_KW "alter"
     WHITESPACE " "
     COLLATION_KW "collation"
@@ -84,7 +83,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
-  ALTER_COLLATION_STMT
+  ALTER_COLLATION
     ALTER_KW "alter"
     WHITESPACE " "
     COLLATION_KW "collation"

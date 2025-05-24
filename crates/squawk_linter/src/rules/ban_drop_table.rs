@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -7,8 +7,8 @@ use crate::{Linter, Rule, Violation};
 
 pub(crate) fn ban_drop_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
-    for item in file.items() {
-        if let ast::Stmt::DropTable(drop_table) = item {
+    for stmt in file.stmts() {
+        if let ast::Stmt::DropTable(drop_table) = stmt {
             ctx.report(Violation::new(
                 Rule::BanDropTable,
                 "Dropping a table may break existing clients.".into(),

@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_procedure.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -24,7 +23,7 @@ SOURCE_FILE
       IDENT "q"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -63,7 +62,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -80,7 +79,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -99,7 +98,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -119,7 +118,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- security"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -159,7 +158,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- actions"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -218,7 +217,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_param"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -242,7 +241,7 @@ SOURCE_FILE
         IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -266,7 +265,7 @@ SOURCE_FILE
         IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -290,7 +289,7 @@ SOURCE_FILE
         DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -316,7 +315,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- reset_param"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -336,7 +335,7 @@ SOURCE_FILE
               IDENT "c"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -355,7 +354,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- depends"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"
@@ -377,7 +376,7 @@ SOURCE_FILE
           IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PROCEDURE_STMT
+  ALTER_PROCEDURE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURE_KW "procedure"

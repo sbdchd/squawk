@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_owned.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_OWNED_STMT
+  DROP_OWNED
     DROP_KW "drop"
     WHITESPACE " "
     OWNED_KW "owned"
@@ -18,7 +17,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_OWNED_STMT
+  DROP_OWNED
     DROP_KW "drop"
     WHITESPACE " "
     OWNED_KW "owned"
@@ -36,7 +35,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_OWNED_STMT
+  DROP_OWNED
     DROP_KW "drop"
     WHITESPACE " "
     OWNED_KW "owned"

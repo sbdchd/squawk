@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_table_as.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- execute"
   WHITESPACE "\n"
-  CREATE_TABLE_AS_STMT
+  CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
     TEMP_KW "temp"
@@ -26,7 +25,7 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
-    EXECUTE_STMT
+    EXECUTE
       EXECUTE_KW "execute"
       WHITESPACE " "
       NAME_REF
@@ -40,7 +39,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- select"
   WHITESPACE "\n"
-  CREATE_TABLE_AS_STMT
+  CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -81,7 +80,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
-  CREATE_TABLE_AS_STMT
+  CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -93,18 +92,19 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
-    TABLE_STMT
+    TABLE
       TABLE_KW "table"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"
   WHITESPACE "\n"
-  CREATE_TABLE_AS_STMT
+  CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
     TEMPORARY_KW "temporary"
@@ -127,7 +127,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_TABLE_AS_STMT
+  CREATE_TABLE_AS
     CREATE_KW "create"
     WHITESPACE " "
     TEMPORARY_KW "temporary"

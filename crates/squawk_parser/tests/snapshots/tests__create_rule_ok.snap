@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_rule.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_RULE_STMT
+  CREATE_RULE
     CREATE_KW "create"
     WHITESPACE " "
     RULE_KW "rule"
@@ -34,7 +33,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_RULE_STMT
+  CREATE_RULE
     CREATE_KW "create"
     WHITESPACE " "
     OR_REPLACE
@@ -119,7 +118,7 @@ SOURCE_FILE
               INT_NUMBER "1"
     SEMICOLON ";"
     WHITESPACE "\n    "
-    INSERT_STMT
+    INSERT
       INSERT_KW "insert"
       WHITESPACE " "
       INTO_KW "into"
@@ -142,15 +141,16 @@ SOURCE_FILE
         R_PAREN ")"
     SEMICOLON ";"
     WHITESPACE "\n    "
-    DELETE_STMT
+    DELETE
       DELETE_KW "delete"
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     SEMICOLON ";"
     WHITESPACE "\n    "
     VALUES
@@ -166,13 +166,14 @@ SOURCE_FILE
       R_PAREN ")"
     SEMICOLON ";"
     WHITESPACE "\n    "
-    UPDATE_STMT
+    UPDATE
       UPDATE_KW "update"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
       WHITESPACE " "
       SET_KW "set"
       WHITESPACE " "
@@ -185,7 +186,7 @@ SOURCE_FILE
         INT_NUMBER "1"
     SEMICOLON ";"
     WHITESPACE "\n    "
-    NOTIFY_STMT
+    NOTIFY
       NOTIFY_KW "notify"
       WHITESPACE " "
       NAME
@@ -197,7 +198,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_1"
   WHITESPACE "\n"
-  CREATE_RULE_STMT
+  CREATE_RULE
     CREATE_KW "CREATE"
     WHITESPACE " "
     RULE_KW "RULE"
@@ -237,7 +238,7 @@ SOURCE_FILE
           IDENT "t2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_RULE_STMT
+  CREATE_RULE
     CREATE_KW "CREATE"
     WHITESPACE " "
     RULE_KW "RULE"
@@ -294,7 +295,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_2"
   WHITESPACE "\n"
-  CREATE_RULE_STMT
+  CREATE_RULE
     CREATE_KW "CREATE"
     WHITESPACE " "
     RULE_KW "RULE"
@@ -319,20 +320,21 @@ SOURCE_FILE
     WHITESPACE " "
     ALSO_KW "ALSO"
     WHITESPACE " "
-    NOTIFY_STMT
+    NOTIFY
       NOTIFY_KW "NOTIFY"
       WHITESPACE " "
       NAME
         IDENT "mytable"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "mytable"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "mytable"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "

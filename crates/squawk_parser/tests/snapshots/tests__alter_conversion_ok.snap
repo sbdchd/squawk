@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_conversion.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_CONVERSION_STMT
+  ALTER_CONVERSION
     ALTER_KW "alter"
     WHITESPACE " "
     CONVERSION_KW "conversion"
@@ -26,7 +25,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_CONVERSION_STMT
+  ALTER_CONVERSION
     ALTER_KW "alter"
     WHITESPACE " "
     CONVERSION_KW "conversion"
@@ -43,7 +42,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_CONVERSION_STMT
+  ALTER_CONVERSION
     ALTER_KW "alter"
     WHITESPACE " "
     CONVERSION_KW "conversion"
@@ -62,7 +61,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
-  ALTER_CONVERSION_STMT
+  ALTER_CONVERSION
     ALTER_KW "alter"
     WHITESPACE " "
     CONVERSION_KW "conversion"
@@ -82,7 +81,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- qualified_name"
   WHITESPACE "\n"
-  ALTER_CONVERSION_STMT
+  ALTER_CONVERSION
     ALTER_KW "alter"
     WHITESPACE " "
     CONVERSION_KW "conversion"

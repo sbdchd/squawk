@@ -1,20 +1,20 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/merge.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -54,15 +54,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- aliases_with_as"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
     WHITESPACE " "
     ALIAS
       AS_KW "as"
@@ -114,15 +115,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- using_rows_from"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -164,15 +166,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- aliases_no_as"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
     WHITESPACE " "
     ALIAS
       NAME
@@ -220,17 +223,18 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table_with_star"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
-    WHITESPACE " "
-    STAR "*"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      WHITESPACE " "
+      STAR "*"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -270,17 +274,18 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table_with_only"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -320,17 +325,18 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- paren_query"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -383,17 +389,18 @@ SOURCE_FILE
     NOTHING_KW "nothing"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -483,17 +490,18 @@ SOURCE_FILE
     NOTHING_KW "nothing"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -552,15 +560,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- when_clauses_dupe"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"

@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/deallocate.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  DEALLOCATE_STMT
+  DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "
     PREPARE_KW "prepare"
@@ -14,13 +13,13 @@ SOURCE_FILE
     ALL_KW "all"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DEALLOCATE_STMT
+  DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "
     ALL_KW "all"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DEALLOCATE_STMT
+  DEALLOCATE
     DEALLOCATE_KW "deallocate"
     WHITESPACE " "
     NAME

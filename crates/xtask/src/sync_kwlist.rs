@@ -1,4 +1,4 @@
-use anyhow::{Context, Result};
+use anyhow::Result;
 use reqwest::header::USER_AGENT;
 use serde::Deserialize;
 
@@ -10,7 +10,7 @@ pub(crate) fn sync_kwlist() -> Result<()> {
 use std::fs;
 use std::io::Write;
 
-use crate::path_util::cwd_to_workspace_root;
+use crate::path::project_root;
 
 #[derive(Deserialize, Debug)]
 struct CommitResponse {
@@ -46,8 +46,6 @@ fn latest_pg_git_sha() -> Result<()> {
 
     let file_content = file_response.text()?;
 
-    cwd_to_workspace_root().context("Failed to cwd to root")?;
-
     let preamble = format!(
         r"// synced from: 
 //   commit: {}
@@ -62,7 +60,8 @@ fn latest_pg_git_sha() -> Result<()> {
     )
     .to_owned();
 
-    let mut file = fs::File::create("postgres/kwlist.h")?;
+    let kwlist_file = project_root().join("postgres/kwlist.h");
+    let mut file = fs::File::create(kwlist_file)?;
     file.write_all((preamble + &file_content).as_bytes())?;
 
     Ok(())

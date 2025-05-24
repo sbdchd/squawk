@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use squawk_syntax::{
-    ast::{self, AstNode, HasIfExists, HasIfNotExists, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -19,7 +19,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
 
     let mut total_stmts = 0;
-    for _ in file.items() {
+    for _ in file.stmts() {
         total_stmts += 1;
         if total_stmts > 1 {
             break;
@@ -36,8 +36,8 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         None,
     }
 
-    for item in file.items() {
-        match item {
+    for stmt in file.stmts() {
+        match stmt {
             ast::Stmt::Begin(_) => {
                 inside_transaction = true;
             }

@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_materialized_view.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_MATERIALIZED_VIEW_STMT
+  CREATE_MATERIALIZED_VIEW
     CREATE_KW "create"
     WHITESPACE " "
     MATERIALIZED_KW "materialized"
@@ -32,7 +31,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_MATERIALIZED_VIEW_STMT
+  CREATE_MATERIALIZED_VIEW
     CREATE_KW "create"
     WHITESPACE " "
     MATERIALIZED_KW "materialized"
@@ -145,7 +144,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
-  CREATE_MATERIALIZED_VIEW_STMT
+  CREATE_MATERIALIZED_VIEW
     CREATE_KW "create"
     WHITESPACE " "
     MATERIALIZED_KW "materialized"
@@ -159,18 +158,19 @@ SOURCE_FILE
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
-    TABLE_STMT
+    TABLE
       TABLE_KW "table"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"
   WHITESPACE "\n"
-  CREATE_MATERIALIZED_VIEW_STMT
+  CREATE_MATERIALIZED_VIEW
     CREATE_KW "create"
     WHITESPACE " "
     MATERIALIZED_KW "materialized"

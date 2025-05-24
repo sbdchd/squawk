@@ -1,20 +1,20 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/update.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- update"
   WHITESPACE "\n"
   COMMENT "-- update where"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "update"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "products"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "products"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
@@ -41,13 +41,14 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- no where"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "products"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "products"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -68,13 +69,14 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set muliple"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "update"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "mytable"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "mytable"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
@@ -119,13 +121,14 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- sub_select"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "update"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
@@ -150,7 +153,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- with_stmt"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -175,10 +178,11 @@ SOURCE_FILE
     WHITESPACE "\n"
     UPDATE_KW "update"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t2"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t2"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " \n  "
@@ -220,15 +224,16 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- all options"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "update"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ALIAS
       AS_KW "as"
@@ -356,13 +361,14 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -387,13 +393,14 @@ SOURCE_FILE
           STRING "'Drama'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "weather"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "weather"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -455,13 +462,14 @@ SOURCE_FILE
             STRING "'2003-07-03'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "weather"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "weather"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -536,13 +544,14 @@ SOURCE_FILE
       IDENT "prcp"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "weather"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "weather"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -606,13 +615,14 @@ SOURCE_FILE
             STRING "'2003-07-03'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "employees"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "employees"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -673,13 +683,14 @@ SOURCE_FILE
               IDENT "sales_person"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "employees"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "employees"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -737,13 +748,14 @@ SOURCE_FILE
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "accounts"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "accounts"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -801,13 +813,14 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "accounts"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "accounts"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -855,13 +868,14 @@ SOURCE_FILE
             IDENT "sales_person"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "summary"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "summary"
     WHITESPACE " "
     ALIAS
       NAME
@@ -975,14 +989,14 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- other operations"
   WHITESPACE "\n"
-  SAVEPOINT_STMT
+  SAVEPOINT
     SAVEPOINT_KW "SAVEPOINT"
     WHITESPACE " "
     NAME_REF
       IDENT "sp1"
   SEMICOLON ";"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1008,7 +1022,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- so now we issue these commands:"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "ROLLBACK"
     WHITESPACE " "
     TO_KW "TO"
@@ -1017,13 +1031,14 @@ SOURCE_FILE
       IDENT "sp1"
   SEMICOLON ";"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "wines"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "wines"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -1060,13 +1075,14 @@ SOURCE_FILE
     COMMIT_KW "COMMIT"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -1087,7 +1103,7 @@ SOURCE_FILE
     IDENT "c_films"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  UPDATE_STMT
+  UPDATE
     WITH_CLAUSE
       WITH_KW "WITH"
       WHITESPACE " "
@@ -1183,10 +1199,11 @@ SOURCE_FILE
     WHITESPACE "\n"
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "work_item"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "work_item"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "

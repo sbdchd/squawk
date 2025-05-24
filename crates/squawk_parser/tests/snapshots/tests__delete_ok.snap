@@ -1,22 +1,22 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/delete.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- delete"
   WHITESPACE "\n"
   COMMENT "-- with where"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "products"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "products"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -33,90 +33,96 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- no where"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "products"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "products"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- *"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
-    WHITESPACE " "
-    STAR "*"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      WHITESPACE " "
+      STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alias"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
     IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using, where, return"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -151,15 +157,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- using"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " \n"
     USING_CLAUSE
       USING_KW "using"
@@ -180,15 +187,16 @@ SOURCE_FILE
           IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n"
     USING_CLAUSE
       USING_KW "using"
@@ -232,15 +240,16 @@ SOURCE_FILE
               IDENT "id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "user_sessions"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "user_sessions"
     WHITESPACE " "
     IDENT "us"
     WHITESPACE "\n"
@@ -304,15 +313,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- where return"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -333,15 +343,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- returning"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "employees"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "employees"
     WHITESPACE " "
     IDENT "e"
     WHITESPACE "\n"
@@ -418,15 +429,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- cursor"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "invoices"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "invoices"
     WHITESPACE " \n"
     WHERE_KW "where"
     WHITESPACE " "
@@ -439,15 +451,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- returning"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " \n"
     RETURNING_KW "returning"
     WHITESPACE " "
@@ -473,7 +486,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- with"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -500,10 +513,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -542,7 +556,7 @@ SOURCE_FILE
             IDENT "id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -571,10 +585,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -615,7 +630,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- nested"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -669,10 +684,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     USING_CLAUSE
       USING_KW "using"
@@ -683,15 +699,16 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     USING_CLAUSE
       USING_KW "USING"
@@ -732,15 +749,16 @@ SOURCE_FILE
             STRING "'foo'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -782,15 +800,16 @@ SOURCE_FILE
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -805,26 +824,28 @@ SOURCE_FILE
           STRING "'Musical'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "tasks"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "tasks"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -843,15 +864,16 @@ SOURCE_FILE
     STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "tasks"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "tasks"
     WHITESPACE " "
     WHERE_KW "WHERE"
     WHITESPACE " "
@@ -862,7 +884,7 @@ SOURCE_FILE
     IDENT "c_tasks"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     WITH_CLAUSE
       WITH_KW "WITH"
       WHITESPACE " "
@@ -944,10 +966,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "user_logs"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "user_logs"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE " "

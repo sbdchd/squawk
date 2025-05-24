@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/transaction.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- begin_commit_abort_rollback"
@@ -235,7 +234,7 @@ SOURCE_FILE
     DEFERRABLE_KW "deferrable"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  PREPARE_TRANSACTION_STMT
+  PREPARE_TRANSACTION
     PREPARE_KW "prepare"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
@@ -244,14 +243,14 @@ SOURCE_FILE
       STRING "'f'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SAVEPOINT_STMT
+  SAVEPOINT
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  RELEASE_SAVEPOINT_STMT
+  RELEASE_SAVEPOINT
     RELEASE_KW "release"
     WHITESPACE " "
     SAVEPOINT_KW "savepoint"
@@ -260,14 +259,14 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  RELEASE_SAVEPOINT_STMT
+  RELEASE_SAVEPOINT
     RELEASE_KW "release"
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     TO_KW "to"
@@ -278,7 +277,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     WORK_KW "work"
@@ -291,7 +290,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
@@ -304,7 +303,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     TO_KW "to"
@@ -313,7 +312,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     WORK_KW "work"
@@ -324,7 +323,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
@@ -369,23 +368,23 @@ SOURCE_FILE
     CHAIN_KW "chain"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ABORT_KW "abort"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
     WORK_KW "work"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
     AND_KW "and"
@@ -393,7 +392,7 @@ SOURCE_FILE
     CHAIN_KW "chain"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ABORT_KW "abort"
     WHITESPACE " "
     AND_KW "and"
@@ -403,23 +402,23 @@ SOURCE_FILE
     CHAIN_KW "chain"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     WORK_KW "work"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     AND_KW "and"
@@ -427,7 +426,7 @@ SOURCE_FILE
     CHAIN_KW "chain"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     AND_KW "and"
@@ -437,7 +436,7 @@ SOURCE_FILE
     CHAIN_KW "chain"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "rollback"
     WHITESPACE " "
     PREPARED_KW "prepared"

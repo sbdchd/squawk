@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_user.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_USER_STMT
+  CREATE_USER
     CREATE_KW "create"
     WHITESPACE " "
     USER_KW "user"
@@ -17,7 +16,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_USER_STMT
+  CREATE_USER
     CREATE_KW "create"
     WHITESPACE " "
     USER_KW "user"

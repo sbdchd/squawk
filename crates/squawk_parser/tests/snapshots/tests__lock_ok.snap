@@ -1,61 +1,65 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/lock.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_names"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
       COMMA ","
       WHITESPACE " "
-      ONLY_KW "only"
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "b"
+      RELATION_NAME
+        ONLY_KW "only"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "b"
       COMMA ","
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "c"
-      WHITESPACE " "
-      STAR "*"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "c"
+        WHITESPACE " "
+        STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- lock_mode"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -66,14 +70,15 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -84,14 +89,15 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -102,14 +108,15 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -122,14 +129,15 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -138,14 +146,15 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -158,14 +167,15 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -174,14 +184,15 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
@@ -194,32 +205,35 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
       COMMA ","
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "a"
-      WHITESPACE " "
-      STAR "*"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "a"
+        WHITESPACE " "
+        STAR "*"
       COMMA ","
       WHITESPACE " "
-      ONLY_KW "only"
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "c"
+      RELATION_NAME
+        ONLY_KW "only"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "c"
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "

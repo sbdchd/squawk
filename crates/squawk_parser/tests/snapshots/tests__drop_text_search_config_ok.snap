@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_text_search_config.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_TEXT_SEARCH_CONFIG_STMT
+  DROP_TEXT_SEARCH_CONFIG
     DROP_KW "drop"
     WHITESPACE " "
     TEXT_KW "text"
@@ -21,7 +20,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_TEXT_SEARCH_CONFIG_STMT
+  DROP_TEXT_SEARCH_CONFIG
     DROP_KW "drop"
     WHITESPACE " "
     TEXT_KW "text"
@@ -43,7 +42,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- restrict"
   WHITESPACE "\n"
-  DROP_TEXT_SEARCH_CONFIG_STMT
+  DROP_TEXT_SEARCH_CONFIG
     DROP_KW "drop"
     WHITESPACE " "
     TEXT_KW "text"

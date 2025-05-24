@@ -11,7 +11,7 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    CALL_EXPR
+    AGGREGATE
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -34,7 +34,7 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " \n    "
-    CALL_EXPR
+    AGGREGATE
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -45,7 +45,7 @@ SOURCE_FILE
         R_PAREN ")"
     COMMA ","
     WHITESPACE " \n    "
-    CALL_EXPR
+    AGGREGATE
       PATH
         PATH
           PATH_SEGMENT
@@ -61,7 +61,7 @@ SOURCE_FILE
         R_PAREN ")"
     COMMA ","
     WHITESPACE " \n    "
-    CALL_EXPR
+    AGGREGATE
       PATH
         PATH
           PATH_SEGMENT
@@ -106,7 +106,7 @@ SOURCE_FILE
         R_PAREN ")"
     COMMA ","
     WHITESPACE " \n    "
-    CALL_EXPR
+    AGGREGATE
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -126,7 +126,7 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    CALL_EXPR
+    AGGREGATE
       PATH
         PATH_SEGMENT
           NAME_REF
@@ -195,7 +195,7 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    CALL_EXPR
+    AGGREGATE
       PATH
         PATH
           PATH_SEGMENT

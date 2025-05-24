@@ -1,9 +1,8 @@
 use anyhow::Result;
-use camino::Utf8PathBuf;
 use convert_case::{Case, Casing};
 
-use crate::NewRuleArgs;
-use std::{env, fs};
+use crate::{path::project_root, NewRuleArgs};
+use std::fs;
 
 fn make_lint(name: &str) -> String {
     let rule_name_snake = name.to_case(Case::Snake);
@@ -11,7 +10,7 @@ fn make_lint(name: &str) -> String {
     format!(
         r###"
 use squawk_syntax::{{
-    ast::{{self, AstNode, HasModuleItem}},
+    ast::{{self, AstNode}},
     Parse, SourceFile,
 }};
 
@@ -19,9 +18,9 @@ use crate::{{Linter, Violation, Rule}};
 
 pub(crate) fn {rule_name_snake}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
     let file = parse.tree();
-    for item in file.items() {{
-        match item {{
-            // TODO: update to the item you want to check
+    for stmt in file.stmts() {{
+        match stmt {{
+            // TODO: update to the stmt you want to check
             ast::Stmt::CreateTable(create_table) => {{
                 ctx.report(Violation::new(
                     Rule::{rule_name_pascal},
@@ -70,14 +69,9 @@ mod test {{
     )
 }
 
-fn root_path() -> Utf8PathBuf {
-    let binding = Utf8PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    Utf8PathBuf::from(binding.parent().unwrap().parent().unwrap())
-}
-
 fn create_rule_file(name: &str) -> Result<()> {
     let name = name.to_case(Case::Snake);
-    let root = root_path();
+    let root = project_root();
     let lint_path = root.join(format!("crates/squawk_linter/src/rules/{}.rs", name));
 
     if fs::exists(&lint_path)? {
@@ -92,7 +86,7 @@ fn create_rule_file(name: &str) -> Result<()> {
 }
 
 fn update_lib(name: &str) -> Result<()> {
-    let root = root_path();
+    let root = project_root();
     let lib = root.join("crates/squawk_linter/src/lib.rs");
     let mut file_content = fs::read_to_string(&lib)?;
 
@@ -151,7 +145,7 @@ fn update_lib(name: &str) -> Result<()> {
 }
 
 fn update_rules_mod(name: &str) -> Result<()> {
-    let root = root_path();
+    let root = project_root();
     let lib = root.join("crates/squawk_linter/src/rules/mod.rs");
     let mut file_content = fs::read_to_string(&lib)?;
 
@@ -216,7 +210,7 @@ title: {rule_name_kebab}
 }
 
 fn docs_create_rule(name: &str) -> Result<()> {
-    let root = root_path();
+    let root = project_root();
     let docs = root.join("docs");
     let name_kebab = name.to_case(Case::Kebab);
     let rule_doc_path = docs.join(format!("docs/{name_kebab}.md"));
@@ -232,7 +226,7 @@ fn docs_create_rule(name: &str) -> Result<()> {
 
 fn docs_update_page_index(name: &str) -> Result<()> {
     let name_kebab = name.to_case(Case::Kebab);
-    let root = root_path();
+    let root = project_root();
     let rule_sidebars = root.join("docs/src/pages/index.js");
     let mut file_content = fs::read_to_string(&rule_sidebars)?;
 
@@ -258,7 +252,7 @@ fn docs_update_page_index(name: &str) -> Result<()> {
 
 fn docs_update_sidebar(name: &str) -> Result<()> {
     let name_kebab = name.to_case(Case::Kebab);
-    let root = root_path();
+    let root = project_root();
     let rule_sidebars = root.join("docs/sidebars.js");
     let mut file_content = fs::read_to_string(&rule_sidebars)?;
 

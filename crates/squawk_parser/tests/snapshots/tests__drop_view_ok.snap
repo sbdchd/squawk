@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_view.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  DROP_VIEW_STMT
+  DROP_VIEW
     DROP_KW "DROP"
     WHITESPACE " "
     VIEW_KW "VIEW"
@@ -19,7 +18,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_VIEW_STMT
+  DROP_VIEW
     DROP_KW "drop"
     WHITESPACE " "
     VIEW_KW "view"
@@ -49,7 +48,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_VIEW_STMT
+  DROP_VIEW
     DROP_KW "drop"
     WHITESPACE " "
     VIEW_KW "view"

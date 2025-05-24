@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_text_search_parser.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_TEXT_SEARCH_PARSER_STMT
+  ALTER_TEXT_SEARCH_PARSER
     ALTER_KW "alter"
     WHITESPACE " "
     TEXT_KW "text"
@@ -30,7 +29,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
-  ALTER_TEXT_SEARCH_PARSER_STMT
+  ALTER_TEXT_SEARCH_PARSER
     ALTER_KW "alter"
     WHITESPACE " "
     TEXT_KW "text"
@@ -52,7 +51,7 @@ SOURCE_FILE
       IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_TEXT_SEARCH_PARSER_STMT
+  ALTER_TEXT_SEARCH_PARSER
     ALTER_KW "alter"
     WHITESPACE " "
     TEXT_KW "text"

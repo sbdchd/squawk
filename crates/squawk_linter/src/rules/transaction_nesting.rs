@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -10,21 +10,21 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let mut in_explicit_transaction = false;
     let assume_in_transaction_help = "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.";
 
-    for item in file.items() {
-        match item {
+    for stmt in file.stmts() {
+        match stmt {
             ast::Stmt::Begin(_) => {
                 if ctx.settings.assume_in_transaction {
                     ctx.report(Violation::new(
                         Rule::TransactionNesting,
                         "There is an existing transaction already in progress, managed by your migration tool.".to_string(),
-                        item.syntax().text_range(),
+                        stmt.syntax().text_range(),
                         assume_in_transaction_help.to_string()
                     ));
                 } else if in_explicit_transaction {
                     ctx.report(Violation::new(
                         Rule::TransactionNesting,
                         "There is an existing transaction already in progress.".to_string(),
-                        item.syntax().text_range(),
+                        stmt.syntax().text_range(),
                         assume_in_transaction_help.to_string(),
                     ));
                 }
@@ -36,14 +36,14 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         Rule::TransactionNesting,
                         "Attempting to end the transaction that is managed by your migration tool"
                             .to_string(),
-                        item.syntax().text_range(),
+                        stmt.syntax().text_range(),
                         assume_in_transaction_help.to_string(),
                     ));
                 } else if !in_explicit_transaction {
                     ctx.report(Violation::new(
                         Rule::TransactionNesting,
                         "There is no transaction to `COMMIT` or `ROLLBACK`.".to_string(),
-                        item.syntax().text_range(),
+                        stmt.syntax().text_range(),
                         "`BEGIN` a transaction at an earlier point in the migration or remove this statement.".to_string()
                     ));
                 }

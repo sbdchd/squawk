@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_policy.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -24,7 +23,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- as_"
   WHITESPACE "\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -44,7 +43,7 @@ SOURCE_FILE
     IDENT "permissive"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -66,7 +65,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -151,7 +150,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- for_"
   WHITESPACE "\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -171,7 +170,7 @@ SOURCE_FILE
     ALL_KW "all"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -191,7 +190,7 @@ SOURCE_FILE
     SELECT_KW "select"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -211,7 +210,7 @@ SOURCE_FILE
     INSERT_KW "insert"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -231,7 +230,7 @@ SOURCE_FILE
     UPDATE_KW "update"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_POLICY_STMT
+  CREATE_POLICY
     CREATE_KW "create"
     WHITESPACE " "
     POLICY_KW "policy"

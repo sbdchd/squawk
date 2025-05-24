@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/explain.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
     SELECT
@@ -26,7 +25,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- explain_analyze"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
     ANALYZE_KW "analyze"
@@ -49,7 +48,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all_options"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
     L_PAREN "("
@@ -147,7 +146,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -173,7 +172,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     SELECT
@@ -205,7 +204,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_3"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -241,7 +240,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_4"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -280,7 +279,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_5"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     SELECT
@@ -319,7 +318,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_6"
   WHITESPACE "\n"
-  PREPARE_STMT
+  PREPARE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     NAME
@@ -395,12 +394,12 @@ SOURCE_FILE
           IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     ANALYZE_KW "ANALYZE"
     WHITESPACE " "
-    EXECUTE_STMT
+    EXECUTE
       EXECUTE_KW "EXECUTE"
       WHITESPACE " "
       NAME_REF
@@ -418,7 +417,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_7"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -481,7 +480,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_8"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -558,7 +557,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- parens_select"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
     ANALYZE_KW "analyze"
@@ -590,7 +589,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- parens_values"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "explain"
     WHITESPACE " "
     ANALYZE_KW "analyze"
@@ -621,7 +620,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- boolean off"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -660,7 +659,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- boolean on"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -699,7 +698,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- boolean 1"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -738,7 +737,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- boolean 0"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("

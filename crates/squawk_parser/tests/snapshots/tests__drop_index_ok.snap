@@ -6,7 +6,7 @@ snapshot_kind: text
 SOURCE_FILE
   COMMENT "-- drop_index"
   WHITESPACE "\n"
-  DROP_INDEX_STMT
+  DROP_INDEX
     DROP_KW "drop"
     WHITESPACE " "
     INDEX_KW "index"
@@ -17,7 +17,7 @@ SOURCE_FILE
           IDENT "i"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_INDEX_STMT
+  DROP_INDEX
     DROP_KW "drop"
     WHITESPACE " "
     INDEX_KW "index"
@@ -33,7 +33,7 @@ SOURCE_FILE
           IDENT "i"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_INDEX_STMT
+  DROP_INDEX
     DROP_KW "drop"
     WHITESPACE " "
     INDEX_KW "index"
@@ -65,7 +65,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_INDEX_STMT
+  DROP_INDEX
     DROP_KW "drop"
     WHITESPACE " "
     INDEX_KW "index"
@@ -83,7 +83,7 @@ SOURCE_FILE
     RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_INDEX_STMT
+  DROP_INDEX
     DROP_KW "drop"
     WHITESPACE " "
     INDEX_KW "index"
@@ -99,7 +99,7 @@ SOURCE_FILE
           IDENT "\"field_name_idx\""
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_INDEX_STMT
+  DROP_INDEX
     DROP_KW "drop"
     WHITESPACE " "
     INDEX_KW "index"

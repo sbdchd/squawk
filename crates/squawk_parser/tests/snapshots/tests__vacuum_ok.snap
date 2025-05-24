@@ -1,18 +1,17 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/vacuum.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  VACUUM_STMT
+  VACUUM
     VACUUM_KW "vacuum"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  VACUUM_STMT
+  VACUUM
     VACUUM_KW "VACUUM"
     WHITESPACE " "
     L_PAREN "("
@@ -30,7 +29,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  VACUUM_STMT
+  VACUUM
     VACUUM_KW "VACUUM"
     WHITESPACE " "
     L_PAREN "("
@@ -197,7 +196,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- pre_pg_9_syntax"
   WHITESPACE "\n"
-  VACUUM_STMT
+  VACUUM
     VACUUM_KW "vacuum"
     WHITESPACE " "
     FULL_KW "full"
