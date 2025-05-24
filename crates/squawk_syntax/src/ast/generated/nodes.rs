@@ -252,29 +252,6 @@ impl AlterDomain {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterDomainStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AlterDomainStmt {
-    #[inline]
-    pub fn alter_domain_action(&self) -> Option<AlterDomainAction> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn alter_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALTER_KW)
-    }
-    #[inline]
-    pub fn domain_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AlterEventTriggerStmt {
     pub(crate) syntax: SyntaxNode,
 }
@@ -3219,29 +3196,6 @@ pub struct DropDatabase {
     pub(crate) syntax: SyntaxNode,
 }
 impl DropDatabase {
-    #[inline]
-    pub fn if_exists(&self) -> Option<IfExists> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn database_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DATABASE_KW)
-    }
-    #[inline]
-    pub fn drop_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DROP_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropDatabaseStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl DropDatabaseStmt {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -8300,24 +8254,6 @@ impl AstNode for AlterDomain {
         &self.syntax
     }
 }
-impl AstNode for AlterDomainStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_DOMAIN_STMT
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for AlterEventTriggerStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -10842,24 +10778,6 @@ impl AstNode for DropDatabase {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::DROP_DATABASE
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for DropDatabaseStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_DATABASE_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

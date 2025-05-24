@@ -23,17 +23,18 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
-use anyhow::{bail, Context, Result};
+use anyhow::{Context, Result};
 use convert_case::{Case, Casing};
-use enum_iterator::{all, Sequence};
-use proc_macro2::{Punct, Spacing};
 use quote::{format_ident, quote};
 use ungrammar::{Grammar, Rule};
 use xshell::{cmd, Shell};
 
-use crate::path::project_root;
+use crate::{
+    keywords::{keyword_kinds, KeywordKinds},
+    path::project_root,
+};
 
 fn ensure_rustfmt(sh: &Shell) {
     let version = cmd!(sh, "rustup run stable rustfmt --version")
@@ -74,16 +75,18 @@ pub(crate) fn codegen() -> Result<()> {
     let ast_nodes_file = project_root().join("crates/squawk_syntax/src/ast/generated/nodes.rs");
     std::fs::write(ast_nodes_file, ast_nodes).context("problem writing generated nodes")?;
 
-    let token_sets = generate_token_sets()?;
+    let keyword_kinds = keyword_kinds()?;
+
+    let token_sets = generate_token_sets(&keyword_kinds)?;
     let token_sets_file = project_root().join("crates/squawk_parser/src/generated/token_sets.rs");
     std::fs::write(token_sets_file, token_sets).context("problem writing generated token sets")?;
 
-    let pg_keywords = parse_header()?
-        .into_iter()
-        .map(|(key, _)| key)
-        .collect::<Vec<_>>();
-
-    let kinds = generate_kind_src(&ast_src.nodes, &ast_src.enums, &grammar, pg_keywords);
+    let kinds = generate_kind_src(
+        &ast_src.nodes,
+        &ast_src.enums,
+        &grammar,
+        keyword_kinds.all_keywords,
+    );
 
     let syntax_kinds = generate_syntax_kinds(kinds)?;
     let syntax_kinds_file =
@@ -97,7 +100,6 @@ pub(crate) fn codegen() -> Result<()> {
 pub(crate) struct KindsSrc {
     pub(crate) punct: &'static [(&'static str, &'static str)],
     pub(crate) keywords: &'static [&'static str],
-    pub(crate) contextual_keywords: &'static [&'static str],
     pub(crate) literals: &'static [&'static str],
     pub(crate) tokens: &'static [&'static str],
     pub(crate) nodes: &'static [&'static str],
@@ -139,10 +141,6 @@ const PUNCT: &[(&str, &str)] = &[
     ("`", "BACKTICK"),
 ];
 
-// TODO: remove
-const RESERVED: &[&str] = &[];
-const CONTEXTUAL_RESERVED: &[&str] = &[];
-
 fn generate_kind_src(
     nodes: &[AstNodeSrc],
     enums: &[AstEnumSrc],
@@ -150,7 +148,6 @@ fn generate_kind_src(
     pg_keywords: Vec<String>,
 ) -> KindsSrc {
     let mut keywords: Vec<&_> = Vec::new();
-    let mut contextual_keywords: Vec<&_> = Vec::new();
     let mut tokens: Vec<&_> = TOKENS.to_vec();
     let mut literals: Vec<&_> = Vec::new();
     let mut used_puncts = vec![false; PUNCT.len()];
@@ -168,11 +165,8 @@ fn generate_kind_src(
             ("#", token) if !token.is_empty() => {
                 tokens.push(String::leak(token.to_case(Case::UpperSnake)));
             }
-            ("?", kw) if !kw.is_empty() => {
-                contextual_keywords.push(String::leak(kw.to_owned()));
-            }
             _ if name.chars().all(|c| c.is_alphabetic() || c == '_') => {
-                keywords.push(String::leak(name.to_owned()));
+                // pass
             }
             _ => {
                 let idx = PUNCT
@@ -192,13 +186,9 @@ fn generate_kind_src(
                 panic!("Punctuation {punct:?} is not used in grammar");
             }
         });
-    keywords.extend(RESERVED.iter().copied());
     keywords.extend(pg_keywords.into_iter().map(|s| &*s.leak()));
     keywords.sort();
     keywords.dedup();
-    contextual_keywords.extend(CONTEXTUAL_RESERVED.iter().copied());
-    contextual_keywords.sort();
-    contextual_keywords.dedup();
 
     // we leak things here for simplicity, that way we don't have to deal with lifetimes
     // The execution is a one shot job so thats fine
@@ -213,7 +203,6 @@ fn generate_kind_src(
     let nodes = Vec::leak(nodes);
     nodes.sort();
     let keywords = Vec::leak(keywords);
-    let contextual_keywords = Vec::leak(contextual_keywords);
     let literals = Vec::leak(literals);
     literals.sort();
     let tokens = Vec::leak(tokens);
@@ -223,7 +212,6 @@ fn generate_kind_src(
         punct: PUNCT,
         nodes,
         keywords,
-        contextual_keywords,
         literals,
         tokens,
     }
@@ -253,22 +241,6 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
         })
         .collect::<Vec<_>>();
 
-    let (single_byte_tokens_values, single_byte_tokens): (Vec<_>, Vec<_>) = grammar
-        .punct
-        .iter()
-        .filter(|(token, _name)| token.len() == 1)
-        .map(|(token, name)| (token.chars().next().unwrap(), format_ident!("{}", name)))
-        .unzip();
-
-    let punctuation_values = grammar.punct.iter().map(|(token, _name)| {
-        if "{}[]()".contains(token) {
-            let c = token.chars().next().unwrap();
-            quote! { #c }
-        } else {
-            let cs = token.chars().map(|c| Punct::new(c, Spacing::Joint));
-            quote! { #(#cs)* }
-        }
-    });
     let punctuation = grammar
         .punct
         .iter()
@@ -279,19 +251,8 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
         "Self" => format_ident!("SELF_TYPE_KW"),
         name => format_ident!("{}_KW", name.to_case(Case::UpperSnake)),
     };
-    let full_keywords_values = grammar.keywords;
-    let full_keywords = full_keywords_values.iter().map(x);
 
-    let contextual_keywords_values = &grammar.contextual_keywords;
-    let contextual_keywords = contextual_keywords_values.iter().map(x);
-
-    let all_keywords_values = grammar
-        .keywords
-        .iter()
-        .chain(grammar.contextual_keywords.iter())
-        .copied()
-        .collect::<Vec<_>>();
-    let all_keywords_idents = all_keywords_values.iter().map(|kw| format_ident!("{}", kw));
+    let all_keywords_values = grammar.keywords.iter().copied().collect::<Vec<_>>();
     let all_keywords = all_keywords_values.iter().map(x).collect::<Vec<_>>();
 
     let literals = grammar
@@ -350,182 +311,39 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
     ).replace("#[space_hack]", "")))
 }
 
-/// related:
-///   - [postgres/src/backend/utils/adt/misc.c](https://github.com/postgres/postgres/blob/08691ea958c2646b6aadefff878539eb0b860bb0/src/backend/utils/adt/misc.c#L452-L467/)
-///   - [postgres docs: sql keywords appendix](https://www.postgresql.org/docs/17/sql-keywords-appendix.html)
-///
-/// The header file isn't enough though because `json_scalar` can be a function
-/// name, but `between` cannot be
-///
-/// The Postgres parser special cases certain calls like `json_scalar`:
-/// <https://github.com/postgres/postgres/blob/028b4b21df26fee67b3ce75c6f14fcfd3c7cf2ee/src/backend/parser/gram.y#L15684C8-L16145>
-///
-/// | Category     | Column | Table | Function | Type |
-/// |--------------|--------|-------|----------|------|
-/// | Unreserved   | Y      | Y     | Y        | Y    |
-/// | Reserved     | N      | N     | N        | N    |
-/// | ColName      | Y      | Y     | N        | Y    |
-/// | TypeFuncName | N      | N     | Y        | Y    |
-///
-#[derive(Clone, Copy)]
-enum KeywordCategory {
-    Unreserved,
-    Reserved,
-    ColName,
-    TypeFuncName,
-}
-
-enum KeywordLabel {
-    As,
-    Bare,
-}
-
-struct KeywordMeta {
-    category: KeywordCategory,
-    label: KeywordLabel,
-}
-
-fn parse_header() -> Result<HashMap<String, KeywordMeta>> {
-    let kwlist_file = project_root().join("postgres/kwlist.h");
-    let data = std::fs::read_to_string(kwlist_file).context("Failed to read kwlist.h")?;
-
-    let mut keywords = HashMap::new();
-
-    for line in data.lines() {
-        if line.starts_with("PG_KEYWORD") {
-            let line = line
-                .split(&['(', ')'])
-                .nth(1)
-                .context("Invalid kwlist.h structure")?;
-
-            let row_items: Vec<&str> = line.split(',').collect();
-
-            match row_items[..] {
-                [name, _value, category, is_bare_label] => {
-                    let label = match is_bare_label.trim() {
-                        "AS_LABEL" => KeywordLabel::As,
-                        "BARE_LABEL" => KeywordLabel::Bare,
-                        unexpected => anyhow::bail!("Unexpected label: {}", unexpected),
-                    };
-
-                    let category = match category.trim() {
-                        "UNRESERVED_KEYWORD" => KeywordCategory::Unreserved,
-                        "RESERVED_KEYWORD" => KeywordCategory::Reserved,
-                        "COL_NAME_KEYWORD" => KeywordCategory::ColName,
-                        "TYPE_FUNC_NAME_KEYWORD" => KeywordCategory::TypeFuncName,
-                        unexpected => anyhow::bail!("Unexpected category: {}", unexpected),
-                    };
-
-                    let meta = KeywordMeta { category, label };
-                    let name = name.trim().replace('\"', "");
-                    keywords.insert(name, meta);
-                }
-                _ => bail!("Problem reading kwlist.h row"),
-            }
-        }
-    }
-
-    Ok(keywords)
-}
-
-#[derive(Sequence, PartialEq)]
-enum KWType {
-    ColumnTable,
-    Type,
-}
-
-impl std::fmt::Display for KWType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match self {
-            KWType::ColumnTable => "COLUMN_OR_TABLE_KEYWORDS",
-            KWType::Type => "TYPE_KEYWORDS",
-        })
-    }
-}
-
-fn keyword_allowed(cat: KeywordCategory, kw_type: KWType) -> bool {
-    match cat {
-        KeywordCategory::Unreserved => match kw_type {
-            KWType::ColumnTable => true,
-            KWType::Type => true,
-        },
-        KeywordCategory::Reserved => match kw_type {
-            KWType::ColumnTable => false,
-            KWType::Type => false,
-        },
-        KeywordCategory::ColName => match kw_type {
-            KWType::ColumnTable => true,
-            KWType::Type => true,
-        },
-        KeywordCategory::TypeFuncName => match kw_type {
-            KWType::ColumnTable => false,
-            KWType::Type => true,
-        },
-    }
-}
-
-fn generate_token_sets() -> Result<String> {
-    let keywords = parse_header()?;
-    let mut bare_label_keywords = keywords
-        .iter()
-        .filter(|(_key, value)| match value.label {
-            KeywordLabel::As => false,
-            KeywordLabel::Bare => true,
-        })
-        .map(|(key, _value)| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
-        .collect::<Vec<_>>();
-    bare_label_keywords.sort();
-
-    let mut unreserved_keywords = keywords
-        .iter()
-        .filter(|(_key, value)| matches!(value.category, KeywordCategory::Unreserved))
-        .map(|(key, _value)| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
-        .collect::<Vec<_>>();
-    unreserved_keywords.sort();
-
-    let mut reserved_keywords = keywords
-        .iter()
-        .filter(|(_key, value)| matches!(value.category, KeywordCategory::Reserved))
-        .map(|(key, _value)| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
-        .collect::<Vec<_>>();
-    reserved_keywords.sort();
-
-    let mut all_keywords = keywords
-        .iter()
-        .map(|(key, _value)| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
-        .collect::<Vec<_>>();
-    all_keywords.sort();
-
-    let mut col_table_tokens = HashSet::new();
-    let mut type_tokens = HashSet::new();
-    for (key, meta) in &keywords {
-        for variant in all::<KWType>() {
-            match variant {
-                KWType::ColumnTable => {
-                    if keyword_allowed(meta.category, variant) {
-                        col_table_tokens.insert(key);
-                    }
-                }
-                KWType::Type => {
-                    if keyword_allowed(meta.category, variant) {
-                        type_tokens.insert(key);
-                    }
-                }
-            }
-        }
-    }
-
-    let mut column_or_table_keywords = col_table_tokens
+fn generate_token_sets(keyword_kinds: &KeywordKinds) -> Result<String> {
+    let column_or_table_keywords = keyword_kinds
+        .col_table_keywords
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
-    column_or_table_keywords.sort();
 
-    let mut type_keywords = type_tokens
+    let type_keywords = keyword_kinds
+        .type_keywords
         .iter()
         .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
         .collect::<Vec<_>>();
-    type_keywords.sort();
+
+    let all_keywords = &keyword_kinds
+        .all_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
+    let bare_label_keywords = &keyword_kinds
+        .bare_label_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
+    let unreserved_keywords = &keyword_kinds
+        .unreserved_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
+    let reserved_keywords = &keyword_kinds
+        .reserved_keywords
+        .iter()
+        .map(|key| format_ident!("{}_KW", key.to_case(Case::UpperSnake)))
+        .collect::<Vec<_>>();
 
     Ok(reformat(
         quote! {
