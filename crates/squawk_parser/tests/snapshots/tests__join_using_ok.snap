@@ -1,0 +1,96 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/join_using.sql
+snapshot_kind: text
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "f1"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              IDENT "count"
+            ARG_LIST
+              L_PAREN "("
+              STAR "*"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE "\n"
+      NAME_REF
+        IDENT "t1"
+      WHITESPACE " "
+      ALIAS
+        NAME
+          IDENT "x"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME
+              IDENT "x0"
+          COMMA ","
+          COLUMN
+            NAME
+              IDENT "x1"
+          R_PAREN ")"
+      WHITESPACE " "
+      JOIN
+        LEFT_KW "left"
+        WHITESPACE " "
+        JOIN_KW "join"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          NAME_REF
+            IDENT "t1"
+          WHITESPACE " "
+          JOIN
+            LEFT_KW "left"
+            WHITESPACE " "
+            JOIN_KW "join"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "t2"
+            WHITESPACE " "
+            USING_CLAUSE
+              USING_KW "using"
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "f1"
+                R_PAREN ")"
+          R_PAREN ")"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          BIN_EXPR
+            NAME_REF
+              IDENT "x0"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "0"
+          R_PAREN ")"
+    WHITESPACE "\n"
+    GROUP_BY_CLAUSE
+      GROUP_KW "group"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "f1"
+  SEMICOLON ";"
+  WHITESPACE "\n"
