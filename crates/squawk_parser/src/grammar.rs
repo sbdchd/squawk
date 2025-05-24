@@ -2697,8 +2697,7 @@ fn data_source(p: &mut Parser<'_>) {
     p.eat(LATERAL_KW);
     match p.current() {
         L_PAREN => {
-            // TODO: this should be `paren_select` instead of a general `tuple_expr`, since only a select statement is allowed inside
-            tuple_expr(p);
+            paren_data_source(p);
             opt_alias(p);
         }
         JSON_TABLE_KW => {
@@ -2724,6 +2723,33 @@ fn data_source(p: &mut Parser<'_>) {
         _ if p.at_ts(FROM_ITEM_KEYWORDS_FIRST) => from_item_name(p),
         _ => {}
     }
+}
+
+fn paren_data_source(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(L_PAREN));
+    let m = p.start();
+    p.bump(L_PAREN);
+
+    // Try to parse as a SELECT statement first
+    if p.at_ts(SELECT_FIRST) {
+        if select(p, None).is_some() {
+            p.expect(R_PAREN);
+            return m.complete(p, PAREN_EXPR);
+        }
+    }
+
+    // Then try to parse as a FROM_ITEM (which includes table references and joins)
+    if opt_from_item(p) {
+        p.expect(R_PAREN);
+        return m.complete(p, PAREN_EXPR);
+    }
+
+    // Fall back to general expression parsing
+    if expr(p).is_none() {
+        p.error("expected an expression");
+    }
+    p.expect(R_PAREN);
+    m.complete(p, PAREN_EXPR)
 }
 
 // USING data_source ON join_condition
@@ -2829,7 +2855,7 @@ fn join(p: &mut Parser<'_>) {
                 // USING ( join_column [, ...] )
                 p.expect(USING_KW);
                 if p.at(L_PAREN) {
-                    tuple_expr(p);
+                    column_list(p);
                 } else {
                     p.error("expected L_PAREN");
                 }
