@@ -90,11 +90,6 @@ Literal =
   // TODO:
   )
 
-// IndexExpr =
-//   base:Expr 
-//   '[' (lhs:Expr? ':' rhs:Expr?)? ']'
-
-
 NamedArg =
   NameRef FatArrow Expr
 
@@ -178,7 +173,8 @@ Expr =
 | BinExpr
 | CaseExpr
 | FieldExpr
-// | IndexExpr
+| IndexExpr
+| BetweenExpr
 
 ArrayType =
   // int array[]
@@ -291,17 +287,8 @@ PrimaryKeyConstraint =
   'primary' 'key' (UsingIndex | ColumnList IndexParams)
   // ConstraintOptionList?
 
-// ConstraintIndexMethod =
-//   'using' NameRef
-
 // ExcludeElement =
 //   ('(' Expr ')' | Expr) 'with' Operator
-
-// ConstraintExclusions =
-//   ExcludeElement  (',' ExcludeElement)*
-
-// ExcludeConstraint =
-//   'exclude' ConstraintIndexMethod? ConstraintExclusions
 
 // RefAction =
 //   'no' 'action'
@@ -430,6 +417,7 @@ AlterTableAction =
 | SetLogged
 | SetUnlogged
 | SetStorageParams
+| ResetStorageParams
 | RenameTable
 | RenameConstraint
 | RenameColumn
@@ -527,11 +515,17 @@ Join =
 | 'full' 'outer'? 'join'
 
 Select =
- 'select'
-// TODO:
-//  ('all' | 'distinct' ('on' '(' Expr (',' Expr)* ')'))?
-//  TargetList?
-//  // TODO:
+ SelectClause
+ FromClause?
+ WhereClause?
+ GroupByClause?
+ HavingClause?
+ WindowClause?
+ OrderByClause?
+ LockingClause*
+ LimitClause?
+ OffsetClause?
+ FilterClause?
 
 Serializable =
   'serializable'
@@ -578,11 +572,9 @@ Commit =
   'commit' (('work' | 'transaction')? ('and' 'no'? 'chain') | 'prepared' Literal)
 
 Rollback =
-  // TODO:
   'rollback' | 'abort'
 
 CreateAggregate =
-  // TODO:
   'create' OrReplace? 'aggregate' Path ParamList
 
 IfExists =
@@ -600,29 +592,24 @@ DropTable =
   'drop' 'table' IfExists? (Path (',' Path)) ('cascade' | 'restrict')?
 
 DropDatabase =
-  // TODO:
   'drop' 'database' IfExists? NameRef
 
 IfNotExists =
   'if' 'not' 'exists'
 
 CreateTable =
-  // TODO:
   'create' 'table' IfNotExists? Path TableArgs
 
 CreateIndex =
-  // TODO:
   'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName
 
 OrReplace =
   'or' 'replace'
 
 RetType =
-  // TODO:
   'returns' Type
  
 BeginFuncOption =
-  // TODO:
   'begin' 'atomic' 'end'
 
 ReturnFuncOption =
@@ -782,7 +769,7 @@ IndexExpr =
   Expr '[' Expr ']'
 
 BetweenExpr =
-  Expr 'between' Expr 'and' Expr
+  target:Expr 'between' (start:Expr) 'and' (end:Expr)
 
 
 JsonReturningClause =
@@ -810,7 +797,7 @@ JsonPassingClause =
   'passing' (NamedArg (',' NamedArg)*)
 
 PercentTypeClause =
-  '%' 'type'
+  Path PercentTypeClause
 
 WithTimezone =
   'with' 'time' 'zone'
@@ -835,12 +822,25 @@ WithClause =
 
 SelectClause =
   'select'
+  ('all' | DistinctClause)?
+  TargetList?
 
 CompoundSelect =
   Select
 
 SelectInto =
-  'select'
+  SelectClause
+  IntoClause
+  FromClause?
+  WhereClause?
+  GroupByClause?
+  HavingClause?
+  WindowClause?
+  OrderByClause?
+  LockingClause*
+  LimitClause?
+  OffsetClause?
+  FilterClause?
 
 IntoClause =
   'into' 
@@ -864,11 +864,10 @@ ConstraintWhereClause =
   'where' 
 
 ExcludeConstraint =
-  'exclude' 
+  'exclude' ConstraintIndexMethod? ConstraintExclusions
 
 WindowDef =
   '#ident'? ('partition' 'by' Expr)?
-
 
 AlterStatistics =
   'alter' 'statistics' NameRef 
