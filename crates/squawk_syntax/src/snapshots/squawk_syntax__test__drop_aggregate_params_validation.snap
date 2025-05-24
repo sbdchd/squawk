@@ -16,7 +16,7 @@ SOURCE_FILE@0..389
       WHITESPACE@29..30 " "
       EXISTS_KW@30..36 "exists"
     WHITESPACE@36..42 " \n    "
-    CALL_EXPR@42..46
+    AGGREGATE@42..46
       PATH@42..43
         PATH_SEGMENT@42..43
           NAME_REF@42..43
@@ -27,7 +27,7 @@ SOURCE_FILE@0..389
         R_PAREN@45..46 ")"
     COMMA@46..47 ","
     WHITESPACE@47..53 " \n    "
-    CALL_EXPR@53..63
+    AGGREGATE@53..63
       PATH@53..60
         PATH@53..56
           PATH_SEGMENT@53..56
@@ -43,7 +43,7 @@ SOURCE_FILE@0..389
         R_PAREN@62..63 ")"
     COMMA@63..64 ","
     WHITESPACE@64..70 " \n    "
-    CALL_EXPR@70..146
+    AGGREGATE@70..146
       PATH@70..77
         PATH@70..73
           PATH_SEGMENT@70..73
@@ -91,7 +91,7 @@ SOURCE_FILE@0..389
         R_PAREN@145..146 ")"
     COMMA@146..147 ","
     WHITESPACE@147..153 " \n    "
-    CALL_EXPR@153..157
+    AGGREGATE@153..157
       PATH@153..154
         PATH_SEGMENT@153..154
           NAME_REF@153..154
@@ -111,7 +111,7 @@ SOURCE_FILE@0..389
     WHITESPACE@187..188 " "
     AGGREGATE_KW@188..197 "aggregate"
     WHITESPACE@197..198 " "
-    CALL_EXPR@198..290
+    AGGREGATE@198..290
       PATH@198..199
         PATH_SEGMENT@198..199
           NAME_REF@198..199
@@ -183,7 +183,7 @@ SOURCE_FILE@0..389
     WHITESPACE@306..307 " "
     AGGREGATE_KW@307..316 "aggregate"
     WHITESPACE@316..317 " "
-    CALL_EXPR@317..386
+    AGGREGATE@317..386
       PATH@317..324
         PATH@317..320
           PATH_SEGMENT@317..320

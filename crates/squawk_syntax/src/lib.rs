@@ -181,7 +181,7 @@ macro_rules! match_ast {
 /// API.
 #[test]
 fn api_walkthrough() {
-    use ast::{HasModuleItem, SourceFile};
+    use ast::SourceFile;
     use rowan::{Direction, NodeOrToken, SyntaxText, TextRange, WalkEvent};
     use std::fmt::Write;
 
@@ -205,13 +205,13 @@ fn api_walkthrough() {
     // `SourceFile` is the root of the syntax tree. We can iterate file's items.
     // Let's fetch the `foo` function.
     let mut func = None;
-    for item in file.items() {
-        match item {
-            ast::Stmt::CreateFunc(f) => func = Some(f),
+    for stmt in file.stmts() {
+        match stmt {
+            ast::Stmt::CreateFunction(f) => func = Some(f),
             _ => unreachable!(),
         }
     }
-    let func: ast::CreateFunc = func.unwrap();
+    let func: ast::CreateFunction = func.unwrap();
 
     // Each AST node has a bunch of getters for children. All getters return
     // `Option`s though, to account for incomplete code. Some getters are common
@@ -253,8 +253,8 @@ fn api_walkthrough() {
         ast::FuncOption::AsFuncOption(o) => o,
         _ => unreachable!(),
     };
-    let string_text: ast::Literal = option.strings().next().unwrap();
-    assert_eq!(string_text.syntax().to_string(), "'select 1 + 1'");
+    let definition: ast::Literal = option.definition().unwrap();
+    assert_eq!(definition.syntax().to_string(), "'select 1 + 1'");
 
     // Besides the "typed" AST API, there's an untyped CST one as well.
     // To switch from AST to CST, call `.syntax()` method:
@@ -305,7 +305,7 @@ fn api_walkthrough() {
     // As well as some iterator helpers:
     let f = func_option_syntax
         .ancestors()
-        .find_map(ast::CreateFunc::cast);
+        .find_map(ast::CreateFunction::cast);
     assert_eq!(f, Some(func));
     assert!(param
         .syntax()

@@ -1,0 +1,2 @@
+crates/squawk_parser/src/generated/* linguist-generated=true
+crates/squawk_syntax/src/ast/generated/* linguist-generated=true

@@ -11,10 +11,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -59,10 +60,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
     WHITESPACE " "
     ALIAS
       AS_KW "as"
@@ -119,10 +121,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -169,10 +172,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
     WHITESPACE " "
     ALIAS
       NAME
@@ -225,12 +229,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
-    WHITESPACE " "
-    STAR "*"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      WHITESPACE " "
+      STAR "*"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -275,12 +280,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -325,12 +331,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -388,12 +395,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -488,12 +496,13 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -557,10 +566,11 @@ SOURCE_FILE
     WHITESPACE " "
     INTO_KW "into"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"

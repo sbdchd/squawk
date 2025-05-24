@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -7,8 +7,8 @@ use crate::{Linter, Rule, Violation};
 
 pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
-    for item in file.items() {
-        if let ast::Stmt::DropIndex(drop_index) = item {
+    for stmt in file.stmts() {
+        if let ast::Stmt::DropIndex(drop_index) = stmt {
             if drop_index.concurrently_token().is_none() {
                 ctx.report(Violation::new(
                     Rule::RequireConcurrentIndexDeletion,

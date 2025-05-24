@@ -8,5 +8,8 @@
   },
   "[sql]": {
     "editor.tabSize": 2
+  },
+  "[ungrammar]": {
+    "editor.tabSize": 2
   }
 }

@@ -6,20 +6,21 @@ snapshot_kind: text
 SOURCE_FILE
   COMMENT "-- star"
   WHITESPACE "\n"
-  ALTER_AGGREGATE_STMT
+  ALTER_AGGREGATE
     ALTER_KW "alter"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      STAR "*"
-      R_PAREN ")"
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
     WHITESPACE " "
     RENAME_KW "rename"
     WHITESPACE " "
@@ -33,22 +34,23 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- simple_args"
   WHITESPACE "\n"
-  ALTER_AGGREGATE_STMT
+  ALTER_AGGREGATE
     ALTER_KW "alter"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PATH_TYPE
-          IDENT "t"
-      R_PAREN ")"
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            IDENT "t"
+        R_PAREN ")"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
@@ -62,42 +64,43 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- complex_args"
   WHITESPACE "\n"
-  ALTER_AGGREGATE_STMT
+  ALTER_AGGREGATE
     ALTER_KW "alter"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PARAM_IN
-          IN_KW "in"
-        WHITESPACE " "
-        NAME
-          IDENT "x"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                TEXT_KW "text"
-      COMMA ","
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
       WHITESPACE " "
-      PARAM
-        NAME
-          IDENT "y"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "x"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+        COMMA ","
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                NUMERIC_KW "numeric"
-      R_PAREN ")"
+        PARAM
+          NAME
+            IDENT "y"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  NUMERIC_KW "numeric"
+        R_PAREN ")"
     WHITESPACE " \n    "
     OWNER_KW "owner"
     WHITESPACE " "
@@ -108,30 +111,31 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_order_by"
   WHITESPACE "\n"
-  ALTER_AGGREGATE_STMT
+  ALTER_AGGREGATE
     ALTER_KW "alter"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PATH_TYPE
-          IDENT "x"
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
       WHITESPACE " "
-      ORDER_KW "order"
-      WHITESPACE " "
-      BY_KW "by"
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          IDENT "y"
-      R_PAREN ")"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            IDENT "x"
+        WHITESPACE " "
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            IDENT "y"
+        R_PAREN ")"
     WHITESPACE " \n    "
     RENAME_KW "rename"
     WHITESPACE " "
@@ -145,35 +149,36 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- qualified_names"
   WHITESPACE "\n"
-  ALTER_AGGREGATE_STMT
+  ALTER_AGGREGATE
     ALTER_KW "alter"
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
+    AGGREGATE
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PARAM_IN
-          IN_KW "in"
-        WHITESPACE " "
-        PATH_TYPE
-          IDENT "t"
-      COMMA ","
+            IDENT "bar"
       WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          IDENT "u"
-      R_PAREN ")"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          PATH_TYPE
+            IDENT "t"
+        COMMA ","
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            IDENT "u"
+        R_PAREN ")"
     WHITESPACE " \n    "
     SET_KW "set"
     WHITESPACE " "

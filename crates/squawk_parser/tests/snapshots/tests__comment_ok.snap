@@ -35,15 +35,16 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "my_agg"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      STAR "*"
-      R_PAREN ")"
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "my_agg"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -60,15 +61,16 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      STAR "*"
-      R_PAREN ")"
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -85,31 +87,32 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PARAM_IN
-          IN_KW "in"
-        WHITESPACE " "
-        NAME
-          IDENT "a"
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                TEXT_KW "text"
-      COMMA ","
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
       WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          TEXT_KW "text"
-      R_PAREN ")"
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
+        COMMA ","
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            TEXT_KW "text"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "
@@ -126,34 +129,35 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      PARAM
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                INT_KW "int"
-      COMMA ","
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          TEXT_KW "text"
-      WHITESPACE " "
-      ORDER_KW "order"
-      WHITESPACE " "
-      BY_KW "by"
-      WHITESPACE " "
-      PARAM
-        TIME_TYPE
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
           NAME_REF
-            TIMESTAMP_KW "timestamp"
-      R_PAREN ")"
+            IDENT "a"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        PARAM
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  INT_KW "int"
+        COMMA ","
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            TEXT_KW "text"
+        WHITESPACE " "
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        PARAM
+          TIME_TYPE
+            NAME_REF
+              TIMESTAMP_KW "timestamp"
+        R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "

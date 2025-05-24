@@ -6,7 +6,7 @@ snapshot_kind: text
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_DOMAIN_STMT
+  CREATE_DOMAIN
     CREATE_KW "create"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -23,7 +23,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_DOMAIN_STMT
+  CREATE_DOMAIN
     CREATE_KW "create"
     WHITESPACE " "
     DOMAIN_KW "domain"

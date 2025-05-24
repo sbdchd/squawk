@@ -2,11 +2,11 @@
 // https://github.com/rust-lang/rust-analyzer/tree/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/grammar
 
 use crate::{
-    syntax_kind::{
-        SyntaxKind::{self, *},
+    generated::token_sets::{
         ALL_KEYWORDS, BARE_LABEL_KEYWORDS, COLUMN_OR_TABLE_KEYWORDS, RESERVED_KEYWORDS,
         TYPE_KEYWORDS, UNRESERVED_KEYWORDS,
     },
+    syntax_kind::SyntaxKind::{self, *},
     token_set::TokenSet,
     CompletedMarker, Marker, Parser,
 };
@@ -2095,7 +2095,7 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         // Only used in json_object, like json_object('a' value 1) instead of json_object('a': 1)
         // value
         VALUE_KW if r.json_field_arg_allowed => (7, VALUE_KW, Right),
-        // Later on we return a FIELD_ARG instead of BIN_EXPR
+        // Later on we return a JSON_KEY_VALUE instead of BIN_EXPR
         // a: b
         COLON if r.json_field_arg_allowed => (7, COLON, Right),
         _ if p.at_ts(OPERATOR_FIRST) => (7, CUSTOM_OP, Right),
@@ -4097,7 +4097,6 @@ const STRING_FIRST: TokenSet = TokenSet::new(&[
 ]);
 
 // via https://www.postgresql.org/docs/17/sql-createoperator.html
-// + - * / < > = ~ ! @ # % ^ & | ` ?
 pub(crate) const OPERATOR_FIRST: TokenSet = TokenSet::new(&[
     PLUS, MINUS, STAR, SLASH, L_ANGLE, R_ANGLE, EQ, TILDE, BANG, AT, POUND, PERCENT, CARET, AMP,
     PIPE, BACKTICK, QUESTION,
@@ -4710,7 +4709,7 @@ fn rollback_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump_any();
     if p.eat(PREPARED_KW) {
         string_literal(p);
-        return m.complete(p, ROLLBACK_STMT);
+        return m.complete(p, ROLLBACK);
     }
     let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
     if is_rollback && p.eat(TO_KW) {
@@ -4722,7 +4721,7 @@ fn rollback_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.eat(NO_KW);
         p.expect(CHAIN_KW);
     }
-    m.complete(p, ROLLBACK_STMT)
+    m.complete(p, ROLLBACK)
 }
 
 struct StmtRestrictions {
@@ -6205,8 +6204,7 @@ fn alter_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
                 }
                 AGGREGATE_KW => {
                     p.bump(AGGREGATE_KW);
-                    path_name_ref(p);
-                    aggregate_arg_list(p);
+                    aggregate(p);
                 }
                 CAST_KW => {
                     p.bump(CAST_KW);
@@ -6340,7 +6338,7 @@ fn alter_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DOMAIN_KW);
     path_name_ref(p);
     alter_domain_action(p);
-    m.complete(p, ALTER_DOMAIN_STMT)
+    m.complete(p, ALTER_DOMAIN)
 }
 
 fn alter_domain_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -6744,8 +6742,7 @@ fn alter_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(ALTER_KW);
     p.bump(AGGREGATE_KW);
-    path_name_ref(p);
-    aggregate_arg_list(p);
+    aggregate(p);
     match p.current() {
         RENAME_KW => {
             p.bump(RENAME_KW);
@@ -6766,7 +6763,7 @@ fn alter_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME, OWNER, or SET");
         }
     }
-    m.complete(p, ALTER_AGGREGATE_STMT)
+    m.complete(p, ALTER_AGGREGATE)
 }
 
 // ALTER SUBSCRIPTION name CONNECTION 'conninfo'
@@ -7547,8 +7544,7 @@ fn comment_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         AGGREGATE_KW => {
             p.bump_any();
-            path_name_ref(p);
-            aggregate_arg_list(p);
+            aggregate(p);
         }
         CAST_KW => {
             p.bump_any();
@@ -7792,7 +7788,7 @@ fn create_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, CREATE_AGGREGATE_STMT)
+    m.complete(p, CREATE_AGGREGATE)
 }
 
 // CREATE CAST (source_type AS target_type)
@@ -7974,7 +7970,7 @@ fn create_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             break;
         }
     }
-    m.complete(p, CREATE_DOMAIN_STMT)
+    m.complete(p, CREATE_DOMAIN)
 }
 
 // filter_variable IN (filter_value [, ... ])
@@ -9149,7 +9145,7 @@ fn aggregate(p: &mut Parser<'_>) {
     let m = p.start();
     path_name_ref(p);
     aggregate_arg_list(p);
-    m.complete(p, CALL_EXPR);
+    m.complete(p, AGGREGATE);
 }
 
 // DROP AGGREGATE [ IF EXISTS ] name ( aggregate_signature ) [, ...] [ CASCADE | RESTRICT ]
@@ -10411,8 +10407,7 @@ fn security_label_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         AGGREGATE_KW => {
             p.bump(AGGREGATE_KW);
-            path_name(p);
-            aggregate_arg_list(p);
+            aggregate(p);
         }
         _ => p.error("expected database object name"),
     }
@@ -11040,7 +11035,7 @@ fn truncate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(IDENTITY_KW);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, TRUNCATE_STMT)
+    m.complete(p, TRUNCATE)
 }
 
 // VACUUM [ ( option [, ...] ) ] [ table_and_columns [, ...] ]
@@ -11452,16 +11447,8 @@ fn drop_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn opt_schema_auth(p: &mut Parser<'_>) -> bool {
     if p.eat(AUTHORIZATION_KW) {
-        if !(p.eat(CURRENT_ROLE_KW) || p.eat(CURRENT_USER_KW) || p.eat(SESSION_USER_KW)) {
-            if p.at_ts(UNRESERVED_KEYWORDS) || p.at(IDENT) {
-                p.bump_any();
-                return true;
-            } else {
-                p.error("expected user_name");
-            }
-        } else {
-            return true;
-        }
+        role(p);
+        return true;
     }
     false
 }
@@ -11904,7 +11891,7 @@ fn drop_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_INDEX_STMT)
+    m.complete(p, DROP_INDEX)
 }
 
 // DROP DATABASE [ IF EXISTS ] name [ [ WITH ] ( option [, ...] ) ]
@@ -11931,7 +11918,7 @@ fn drop_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         p.expect(R_PAREN);
     }
-    m.complete(p, DROP_DATABASE_STMT)
+    m.complete(p, DROP_DATABASE)
 }
 
 // CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] table_name [ USING method ]
@@ -12064,6 +12051,7 @@ fn opt_param_mode(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     Some(m.complete(p, mode))
 }
 
+// [ { DEFAULT | = } default_expr ]
 fn opt_param_default(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(DEFAULT_KW) || p.at(EQ) {
         let m = p.start();
@@ -12472,7 +12460,7 @@ fn create_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     param_list(p);
     opt_ret_type(p);
     func_option_list(p);
-    m.complete(p, CREATE_FUNCTION_STMT)
+    m.complete(p, CREATE_FUNCTION)
 }
 
 fn opt_or_replace(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -12694,7 +12682,7 @@ const NON_RESERVED_WORD: TokenSet = TokenSet::new(&[IDENT])
     .union(TYPE_FUNC_NAME_KEYWORDS);
 
 fn relation_name(p: &mut Parser<'_>) {
-    // [ ONLY ]
+    let m = p.start();
     if p.eat(ONLY_KW) {
         let trailing_paren = p.eat(L_PAREN);
         // name
@@ -12706,6 +12694,7 @@ fn relation_name(p: &mut Parser<'_>) {
         path_name_ref(p);
         p.eat(STAR);
     }
+    m.complete(p, RELATION_NAME);
 }
 
 // ALTER TABLE [ IF EXISTS ] [ ONLY ] name [ * ]
@@ -12984,9 +12973,7 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         OWNER_KW => {
             p.bump(OWNER_KW);
             p.bump(TO_KW);
-            if !(p.eat(CURRENT_ROLE_KW) || p.eat(CURRENT_USER_KW) || p.eat(SESSION_USER_KW)) {
-                name_ref(p);
-            }
+            role(p);
             OWNER_TO
         }
         DETACH_KW => {

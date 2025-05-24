@@ -13,7 +13,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     for node in root.descendants() {
         match_ast! {
             match node {
-                ast::AlterAggregate(it) => validate_aggregate_params(it.param_list(), errors),
+                ast::AlterAggregate(it) => validate_aggregate_params(it.aggregate().and_then(|x| x.param_list()), errors),
                 ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),

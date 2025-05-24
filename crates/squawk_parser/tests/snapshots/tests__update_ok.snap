@@ -11,10 +11,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "update"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "products"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "products"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
@@ -44,10 +45,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "products"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "products"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -71,10 +73,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "update"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "mytable"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "mytable"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
@@ -122,10 +125,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "update"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
@@ -175,10 +179,11 @@ SOURCE_FILE
     WHITESPACE "\n"
     UPDATE_KW "update"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t2"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t2"
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " \n  "
@@ -223,12 +228,13 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "update"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     ALIAS
       AS_KW "as"
@@ -359,10 +365,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -390,10 +397,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "weather"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "weather"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -458,10 +466,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "weather"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "weather"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -539,10 +548,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "weather"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "weather"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -609,10 +619,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "employees"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "employees"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -676,10 +687,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "employees"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "employees"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -740,10 +752,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "accounts"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "accounts"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -804,10 +817,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "accounts"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "accounts"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -858,10 +872,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "summary"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "summary"
     WHITESPACE " "
     ALIAS
       NAME
@@ -1008,7 +1023,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- so now we issue these commands:"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "ROLLBACK"
     WHITESPACE " "
     TO_KW "TO"
@@ -1020,10 +1035,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "wines"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "wines"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -1063,10 +1079,11 @@ SOURCE_FILE
   UPDATE_STMT
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "
@@ -1183,10 +1200,11 @@ SOURCE_FILE
     WHITESPACE "\n"
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "work_item"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "work_item"
     WHITESPACE " "
     SET_KW "SET"
     WHITESPACE " "

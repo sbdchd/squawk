@@ -6,7 +6,7 @@ snapshot_kind: text
 SOURCE_FILE
   COMMENT "-- set_default"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -27,7 +27,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_default"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -50,7 +50,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_not_null"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -70,7 +70,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_not_null"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -90,7 +90,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_constraint"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -123,7 +123,7 @@ SOURCE_FILE
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -155,7 +155,7 @@ SOURCE_FILE
       VALID_KW "valid"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -190,7 +190,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_constraint"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -211,7 +211,7 @@ SOURCE_FILE
       CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -239,7 +239,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename_constraint"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -265,7 +265,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- validate_constraint"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -286,7 +286,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -304,7 +304,7 @@ SOURCE_FILE
       IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -324,7 +324,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename_to"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"
@@ -345,7 +345,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
-  ALTER_DOMAIN_STMT
+  ALTER_DOMAIN
     ALTER_KW "alter"
     WHITESPACE " "
     DOMAIN_KW "domain"

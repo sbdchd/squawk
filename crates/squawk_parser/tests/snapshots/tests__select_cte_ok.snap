@@ -23,10 +23,11 @@ SOURCE_FILE
           WHITESPACE " "
           INTO_KW "into"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "t"
+          RELATION_NAME
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
           WHITESPACE "\n    "
           USING_CLAUSE
             USING_KW "using"

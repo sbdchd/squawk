@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -9,8 +9,8 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
     let message = "Adding a primary key constraint requires an `ACCESS EXCLUSIVE` lock that will block all reads and writes to the table while the primary key index is built.";
     let help = "Add the `PRIMARY KEY` constraint `USING` an index.";
     let file = parse.tree();
-    for item in file.items() {
-        if let ast::Stmt::AlterTable(alter_table) = item {
+    for stmt in file.stmts() {
+        if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
                 match action {
                     ast::AlterTableAction::AddConstraint(add_constraint) => {

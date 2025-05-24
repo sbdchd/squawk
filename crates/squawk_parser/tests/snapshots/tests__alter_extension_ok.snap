@@ -118,41 +118,42 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
       WHITESPACE " "
-      PARAM
-        PARAM_IN
-          IN_KW "in"
+      PARAM_LIST
+        L_PAREN "("
         WHITESPACE " "
-        NAME
-          IDENT "a"
+        PARAM
+          PARAM_IN
+            IN_KW "in"
+          WHITESPACE " "
+          NAME
+            IDENT "a"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                TEXT_KW "text"
-      WHITESPACE " "
-      ORDER_KW "order"
-      WHITESPACE " "
-      BY_KW "by"
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          IDENT "b"
-      COMMA ","
-      WHITESPACE " "
-      PARAM
-        PATH_TYPE
-          IDENT "c"
-      WHITESPACE " "
-      R_PAREN ")"
+        ORDER_KW "order"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        PARAM
+          PATH_TYPE
+            IDENT "c"
+        WHITESPACE " "
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_EXTENSION_STMT
@@ -167,15 +168,16 @@ SOURCE_FILE
     WHITESPACE " "
     AGGREGATE_KW "aggregate"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "a"
-    WHITESPACE " "
-    PARAM_LIST
-      L_PAREN "("
-      STAR "*"
-      R_PAREN ")"
+    AGGREGATE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      WHITESPACE " "
+      PARAM_LIST
+        L_PAREN "("
+        STAR "*"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_cast"

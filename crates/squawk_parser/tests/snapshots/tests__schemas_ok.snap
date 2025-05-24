@@ -199,34 +199,36 @@ SOURCE_FILE
   TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
+    RELATION_NAME
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              SCHEMA_KW "schema"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            SCHEMA_KW "schema"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          TABLE_KW "table"
+            TABLE_KW "table"
   SEMICOLON ";"
   WHITESPACE "\n"
   TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
+    RELATION_NAME
       PATH
         PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                DATABASE_KW "database"
+          DOT "."
           PATH_SEGMENT
             NAME_REF
-              DATABASE_KW "database"
+              SCHEMA_KW "schema"
         DOT "."
         PATH_SEGMENT
           NAME_REF
-            SCHEMA_KW "schema"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          TABLE_KW "table"
+            TABLE_KW "table"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DROP_SCHEMA_STMT

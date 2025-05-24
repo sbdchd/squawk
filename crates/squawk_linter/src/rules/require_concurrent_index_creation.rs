@@ -1,5 +1,5 @@
 use squawk_syntax::{
-    ast::{self, AstNode, HasModuleItem},
+    ast::{self, AstNode},
     Parse, SourceFile,
 };
 
@@ -10,10 +10,11 @@ use super::constraint_missing_not_valid::tables_created_in_transaction;
 pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     let tables_created = tables_created_in_transaction(ctx.settings.assume_in_transaction, &file);
-    for item in file.items() {
-        if let ast::Stmt::CreateIndex(create_index) = item {
+    for stmt in file.stmts() {
+        if let ast::Stmt::CreateIndex(create_index) = stmt {
             if let Some(table_name) = create_index
-                .path()
+                .relation_name()
+                .and_then(|x| x.path())
                 .and_then(|x| x.segment())
                 .and_then(|x| x.name_ref())
             {
