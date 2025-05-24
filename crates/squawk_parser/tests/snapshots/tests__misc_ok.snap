@@ -3020,10 +3020,11 @@ SOURCE_FILE
         USING_CLAUSE
           USING_KW "using"
           WHITESPACE " "
-          PAREN_EXPR
+          COLUMN_LIST
             L_PAREN "("
-            NAME_REF
-              IDENT "jobid"
+            COLUMN
+              NAME_REF
+                IDENT "jobid"
             R_PAREN ")"
     WHITESPACE "\n"
     WHERE_CLAUSE
@@ -6300,10 +6301,11 @@ SOURCE_FILE
         USING_CLAUSE
           USING_KW "USING"
           WHITESPACE " "
-          PAREN_EXPR
+          COLUMN_LIST
             L_PAREN "("
-            NAME_REF
-              IDENT "turbine_id"
+            COLUMN
+              NAME_REF
+                IDENT "turbine_id"
             R_PAREN ")"
     WHITESPACE "\n"
     WHERE_CLAUSE

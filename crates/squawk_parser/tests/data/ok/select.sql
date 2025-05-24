@@ -356,6 +356,11 @@ select * from t full join t2 using (id);
 -- multi conditions
 select * from t join t2 on t2.team_id = t.team_id and t2.id = t.org_id;
 
+-- nested joins
+select f1, count(*) from
+t1 x(x0,x1) left join (t1 left join t2 using(f1)) on (x0 = 0)
+group by f1;
+
 -- using w/ join alias
 SELECT * from t join t2 using (id) as foo;
 
@@ -487,10 +492,10 @@ select current_schema;
 select * from t order by a using >>>;
 
 -- order_by_regression
-SELECT sensor_id, DATE_TRUNC('day', ts) AS day, MAX(value) AS max_value, MIN(value) AS min_value 
-FROM sensors_uncompressed 
+SELECT sensor_id, DATE_TRUNC('day', ts) AS day, MAX(value) AS max_value, MIN(value) AS min_value
+FROM sensors_uncompressed
 WHERE ts >= DATE '2023-12-21' AND ts < DATE '2023-12-22'
-GROUP BY sensor_id, DATE_TRUNC('day', ts) 
+GROUP BY sensor_id, DATE_TRUNC('day', ts)
 ORDER BY sensor_id, day;
 
 -- select_from_user_table
