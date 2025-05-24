@@ -2709,8 +2709,6 @@ fn data_source(p: &mut Parser<'_>) {
     p.eat(LATERAL_KW);
     match p.current() {
         L_PAREN => {
-            // TODO: this should be `paren_select` instead of a general `tuple_expr`, since only a select statement is allowed inside
-            // THIS CAN ALSO BE ANOTHER JOIN EXPR OR A PAREN_SELECT
             paren_data_source(p);
             opt_alias(p);
         }
