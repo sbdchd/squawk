@@ -221,10 +221,11 @@ SOURCE_FILE
     UPDATE_STMT
       UPDATE_KW "update"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
       WHITESPACE " "
       SET_KW "set"
       WHITESPACE " "
@@ -264,10 +265,11 @@ SOURCE_FILE
       WHITESPACE " "
       FROM_KW "from"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "where"
@@ -297,10 +299,11 @@ SOURCE_FILE
       WHITESPACE " "
       INTO_KW "into"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t1"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
       WHITESPACE "\n  "
       USING_CLAUSE
         USING_KW "using"

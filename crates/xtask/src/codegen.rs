@@ -115,8 +115,6 @@ const PUNCT: &[(&str, &str)] = &[
     (",", "COMMA"),
     ("(", "L_PAREN"),
     (")", "R_PAREN"),
-    // ("{", "L_CURLY"),
-    // ("}", "R_CURLY"),
     ("[", "L_BRACK"),
     ("]", "R_BRACK"),
     ("<", "L_ANGLE"),
@@ -134,41 +132,15 @@ const PUNCT: &[(&str, &str)] = &[
     ("%", "PERCENT"),
     ("_", "UNDERSCORE"),
     (".", "DOT"),
-    // ("..", "DOT2"),
-    // ("...", "DOT3"),
-    // ("..=", "DOT2EQ"),
     (":", "COLON"),
-    // ("::", "COLON_COLON"),
     ("=", "EQ"),
-    // ("==", "EQ2"),
-    // ("=>", "FAT_ARROW"),
     ("!", "BANG"),
-    // ("!=", "NEQ"),
     ("-", "MINUS"),
-    // ("->", "THIN_ARROW"),
-    // ("<=", "LTEQ"),
-    // (">=", "GTEQ"),
-    // ("+=", "PLUSEQ"),
-    // ("-=", "MINUSEQ"),
-    // ("|=", "PIPEEQ"),
-    // ("&=", "AMPEQ"),
-    // ("^=", "CARETEQ"),
-    // ("/=", "SLASHEQ"),
-    // ("*=", "STAREQ"),
-    // ("%=", "PERCENTEQ"),
-    // ("&&", "AMP2"),
-    // ("||", "PIPE2"),
-    // ("<<", "SHL"),
-    // (">>", "SHR"),
-    // ("<<=", "SHLEQ"),
-    // (">>=", "SHREQ"),
     ("`", "BACKTICK"),
 ];
 
-const RESERVED: &[&str] = &[
-    // "abstract", "become", "box", "do", "final", "macro", "override", "priv", "typeof", "unsized",
-    // "virtual", "yield", "try",
-];
+// TODO: remove
+const RESERVED: &[&str] = &[];
 const CONTEXTUAL_RESERVED: &[&str] = &[];
 
 fn generate_kind_src(
@@ -257,123 +229,8 @@ fn generate_kind_src(
     }
 }
 
-const LITERALS: [(&'static str, &'static str); 12] = [
-    // TODO: get these from the grammar
-    ("FLOAT_NUMBER", "`1.0`"),
-    ("INT_NUMBER", "`1`"),
-    ("STRING", "`'foo'`"),
-    (
-        "BYTE_STRING",
-        r#"
-`X'1FF'`, `U&'d\0061t\+000061'`
-
-see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE>
-see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS>
-"#,
-    ),
-    (
-        "BIT_STRING",
-        r#"
-`X'1FF'`, `U&'d\0061t\+000061'`
-
-see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE>
-see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS>
-"#,
-    ),
-    (
-        "DOLLAR_QUOTED_STRING",
-        r#"
-
-`$$Dianne's horse$$`
-
-see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-DOLLAR-QUOTING>
-
-        "#,
-    ),
-    (
-        "ESC_STRING",
-        r#"
-`E'foo'`
-                                                                         
-see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html>
-"#,
-    ),
-    ("PARAM", "`$1`"),
-    // not in grammar?
-    (
-        "COMMENT",
-        r#"
-`-- foo`
-or
-`/* foo */`
-
-see: <https://www.postgresql.org/docs/17/sql-syntax-lexical.html#SQL-SYNTAX-COMMENTS>
-
-"#,
-    ),
-    ("IDENT", "`foo`"),
-    ("ERROR", ""),
-    ("WHITESPACE", ""),
-];
-
-const SYMBOLS: [&'static str; 25] = [
-    ";", ",", "(", ")", "[", "]", "<", ">", "@", "#", "~", "?", "&", "|", "+", "*", "/", "^", "%",
-    ".", ":", "`", "!", "-", "=",
-];
-
 fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
     // TODO: we should have a check to make sure each keyword is used in the grammar once the grammar is ready
-    //     let keywords_ = parse_header()?;
-
-    //     let mut keywords = keywords_
-    //         .iter()
-    //         .map(|(key, _value)| key)
-    //         .collect::<Vec<_>>();
-    //     keywords.sort();
-
-    //     let keywords = keywords_
-    //         .iter()
-    //         .map(|(key, _value)| {
-    //             let ident = format_ident!("{}_KW", key.to_case(Case::UpperSnake));
-    //             let doc_string = format!(r#"`{key}`"#);
-    //             quote! {
-    //                 #[doc = #doc_string]
-    //                 #ident
-    //             }
-    //         })
-    //         .collect::<Vec<_>>();
-
-    //     let symbols = SYMBOLS
-    //         .iter()
-    //         .map(|s| {
-    //             let ident = format_ident!(
-    //                 "{}",
-    //                 token_to_name(s).unwrap_or(s).to_case(Case::UpperSnake)
-    //             );
-    //             let doc_string = if *s == "`" {
-    //                 r#"`` ` ``"#.to_string()
-    //             } else {
-    //                 format!(r#"`{s}`"#)
-    //             };
-    //             quote! {
-    //                 #[doc = #doc_string]
-    //                 #ident
-    //             }
-    //         })
-    //         .collect::<Vec<_>>();
-
-    //     let literals = LITERALS
-    //         .iter()
-    //         .map(|(x, doc)| {
-    //             let ident = format_ident!("{}", x.to_case(Case::UpperSnake));
-    //             let doc_string = format!(r#"{}"#, doc.trim());
-    //             quote! {
-    //                 #[doc = #doc_string]
-    //                 #ident
-    //             }
-    //         })
-    //         .collect::<Vec<_>>();
-
     let conditions = grammar
         .keywords
         .iter()
@@ -395,395 +252,6 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
             }
         })
         .collect::<Vec<_>>();
-
-    //     let nodes = "
-    // LTEQ
-    // GTEQ
-    // CUSTOM_OP
-    // COLON_COLON
-    // COLON_EQ
-    // NEQ
-    // NEQB
-    // FAT_ARROW
-    // ARG_LIST
-    // ARG
-    // PARAM_LIST
-    // COLLATE
-    // TARGET_LIST
-    // TARGET
-    // ARRAY_EXPR
-    // IS_NULL
-    // IS_NOT
-    // IS_NOT_DISTINCT_FROM
-    // OPERATOR_CALL
-    // AT_TIME_ZONE
-    // SIMILAR_TO
-    // IS_DISTINCT_FROM
-    // NOT_LIKE
-    // NOT_IN
-    // BIN_EXPR
-    // POSTFIX_EXPR
-    // CALL_EXPR
-    // BETWEEN_EXPR
-    // CAST_EXPR
-    // CASE_EXPR
-    // ALIAS
-    // FIELD_EXPR
-    // INDEX_EXPR
-    // LITERAL
-    // NAME
-    // NAMED_ARG
-    // JSON_KEY_VALUE
-    // PAREN_EXPR
-    // PATH
-    // PATH_SEGMENT
-    // PATH_TYPE
-    // CHAR_TYPE
-    // BIT_TYPE
-    // PERCENT_TYPE
-    // DOUBLE_TYPE
-    // TIME_TYPE
-    // INTERVAL_TYPE
-    // ARRAY_TYPE
-    // PERCENT_TYPE_CLAUSE
-    // WITH_TIMEZONE
-    // WITHOUT_TIMEZONE
-    // PREFIX_EXPR
-    // COLUMN
-    // SOURCE_FILE
-    // RET_TYPE
-    // STMT
-    // ALTER_AGGREGATE_STMT
-    // ALTER_COLLATION_STMT
-    // ALTER_CONVERSION_STMT
-    // ALTER_DATABASE_STMT
-    // ALTER_DEFAULT_PRIVILEGES_STMT
-    // ALTER_DOMAIN_STMT
-    // ALTER_EVENT_TRIGGER_STMT
-    // ALTER_EXTENSION_STMT
-    // ALTER_FOREIGN_DATA_WRAPPER_STMT
-    // ALTER_FOREIGN_TABLE_STMT
-    // ALTER_FUNCTION_STMT
-    // ALTER_GROUP_STMT
-    // ALTER_INDEX_STMT
-    // ALTER_LANGUAGE_STMT
-    // ALTER_LARGE_OBJECT_STMT
-    // ALTER_MATERIALIZED_VIEW_STMT
-    // ALTER_OPERATOR_STMT
-    // ALTER_OPERATOR_CLASS_STMT
-    // ALTER_OPERATOR_FAMILY_STMT
-    // ALTER_POLICY_STMT
-    // ALTER_PROCEDURE_STMT
-    // ALTER_PUBLICATION_STMT
-    // ALTER_ROLE_STMT
-    // ALTER_ROUTINE_STMT
-    // ALTER_RULE_STMT
-    // ALTER_SCHEMA_STMT
-    // ALTER_SEQUENCE_STMT
-    // ALTER_SERVER_STMT
-    // ALTER_STATISTICS_STMT
-    // ALTER_SUBSCRIPTION_STMT
-    // ALTER_SYSTEM_STMT
-    // ALTER_TABLESPACE_STMT
-    // ALTER_TEXT_SEARCH_CONFIGURATION_STMT
-    // ALTER_TEXT_SEARCH_DICTIONARY_STMT
-    // ALTER_TEXT_SEARCH_PARSER_STMT
-    // ALTER_TEXT_SEARCH_TEMPLATE_STMT
-    // ALTER_TRIGGER_STMT
-    // ALTER_TYPE_STMT
-    // ALTER_USER_STMT
-    // ALTER_USER_MAPPING_STMT
-    // ALTER_VIEW_STMT
-    // ANALYZE_STMT
-    // CLUSTER_STMT
-    // COMMENT_STMT
-    // COMMIT
-    // CREATE_EXTENSION_STMT
-    // CREATE_ACCESS_METHOD_STMT
-    // CREATE_AGGREGATE_STMT
-    // CREATE_CAST_STMT
-    // CREATE_COLLATION_STMT
-    // CREATE_CONVERSION_STMT
-    // CREATE_DATABASE_STMT
-    // CREATE_DOMAIN_STMT
-    // CREATE_EVENT_TRIGGER_STMT
-    // CREATE_FOREIGN_DATA_WRAPPER_STMT
-    // CREATE_FOREIGN_TABLE_STMT
-    // CREATE_GROUP_STMT
-    // CREATE_LANGUAGE_STMT
-    // CREATE_MATERIALIZED_VIEW_STMT
-    // CREATE_OPERATOR_STMT
-    // CREATE_OPERATOR_CLASS_STMT
-    // CREATE_OPERATOR_FAMILY_STMT
-    // CREATE_POLICY_STMT
-    // CREATE_PROCEDURE_STMT
-    // CREATE_PUBLICATION_STMT
-    // CREATE_ROLE_STMT
-    // CREATE_RULE_STMT
-    // CREATE_SEQUENCE_STMT
-    // CREATE_SERVER_STMT
-    // CREATE_STATISTICS_STMT
-    // CREATE_SUBSCRIPTION_STMT
-    // CREATE_TABLE_AS_STMT
-    // CREATE_TABLESPACE_STMT
-    // CREATE_TEXT_SEARCH_CONFIGURATION_STMT
-    // CREATE_TEXT_SEARCH_DICTIONARY_STMT
-    // CREATE_TEXT_SEARCH_PARSER_STMT
-    // CREATE_TEXT_SEARCH_TEMPLATE_STMT
-    // CREATE_TRANSFORM_STMT
-    // CREATE_INDEX_STMT
-    // CREATE_TYPE_STMT
-    // CREATE_TRIGGER_STMT
-    // CREATE_FUNCTION_STMT
-    // PARAM_IN
-    // PARAM_OUT
-    // PARAM_IN_OUT
-    // PARAM_VARIADIC
-    // BEGIN_FUNC_OPTION
-    // RETURN_FUNC_OPTION
-    // AS_FUNC_OPTION
-    // SET_FUNC_OPTION
-    // SUPPORT_FUNC_OPTION
-    // ROWS_FUNC_OPTION
-    // COST_FUNC_OPTION
-    // PARALLEL_FUNC_OPTION
-    // SECURITY_FUNC_OPTION
-    // STRICT_FUNC_OPTION
-    // LEAKPROOF_FUNC_OPTION
-    // RESET_FUNC_OPTION
-    // VOLATILITY_FUNC_OPTION
-    // WINDOW_FUNC_OPTION
-    // TRANSFORM_FUNC_OPTION
-    // LANGUAGE_FUNC_OPTION
-    // PARAM_DEFAULT
-    // FUNC_OPTION_LIST
-    // IF_EXISTS
-    // IF_NOT_EXISTS
-    // OR_REPLACE
-    // DROP_INDEX_STMT
-    // DROP_TRIGGER_STMT
-    // BEGIN
-    // SHOW_STMT
-    // SET_STMT
-    // PREPARE_TRANSACTION_STMT
-    // DROP_DATABASE_STMT
-    // DROP_TYPE_STMT
-    // CALL_STMT
-    // TRUNCATE
-    // MOVE_STMT
-    // FETCH_STMT
-    // DECLARE_STMT
-    // DO_STMT
-    // DISCARD_STMT
-    // RESET_STMT
-    // LISTEN_STMT
-    // LOAD_STMT
-    // DEALLOCATE_STMT
-    // CHECKPOINT_STMT
-    // PREPARE_STMT
-    // UNLISTEN_STMT
-    // NOTIFY_STMT
-    // CLOSE_STMT
-    // VACUUM_STMT
-    // COPY_STMT
-    // DELETE_STMT
-    // MERGE_STMT
-    // LOCK_STMT
-    // EXPLAIN_STMT
-    // DROP_USER_STMT
-    // DROP_TRANSFORM_STMT
-    // DROP_TEXT_SEARCH_TEMPLATE_STMT
-    // DROP_TEXT_SEARCH_PARSER_STMT
-    // DROP_TEXT_SEARCH_DICT_STMT
-    // DROP_TEXT_SEARCH_CONFIG_STMT
-    // DROP_TABLESPACE_STMT
-    // DROP_SUBSCRIPTION_STMT
-    // DROP_STATISTICS_STMT
-    // DROP_SERVER_STMT
-    // DROP_SEQUENCE_STMT
-    // DROP_RULE_STMT
-    // DROP_ROUTINE_STMT
-    // DROP_ROLE_STMT
-    // DROP_PUBLICATION_STMT
-    // DROP_PROCEDURE_STMT
-    // DROP_POLICY_STMT
-    // DROP_OWNED_STMT
-    // DROP_OPERATOR_FAMILY_STMT
-    // DROP_OPERATOR_CLASS_STMT
-    // DROP_MATERIALIZED_VIEW_STMT
-    // DROP_OPERATOR_STMT
-    // DROP_LANGUAGE_STMT
-    // DROP_GROUP_STMT
-    // DROP_FUNCTION_STMT
-    // DROP_FOREIGN_TABLE_STMT
-    // DROP_FOREIGN_DATA_WRAPPER_STMT
-    // DROP_EXTENSION_STMT
-    // DROP_EVENT_TRIGGER_STMT
-    // DROP_DOMAIN_STMT
-    // DROP_CONVERSION_STMT
-    // DROP_COLLATION_STMT
-    // DROP_CAST_STMT
-    // DROP_AGGREGATE_STMT
-    // DROP_ACCESS_METHOD_STMT
-    // DROP_USER_MAPPING_STMT
-    // IMPORT_FOREIGN_SCHEMA
-    // EXECUTE_STMT
-    // CREATE_VIEW_STMT
-    // SAVEPOINT_STMT
-    // RELEASE_SAVEPOINT_STMT
-    // DROP_SCHEMA_STMT
-    // DROP_VIEW_STMT
-    // REINDEX_STMT
-    // UPDATE_STMT
-    // ROLLBACK_STMT
-    // INSERT_STMT
-    // CREATE_SCHEMA_STMT
-    // SELECT
-    // TABLE_STMT
-    // VALUES
-    // SELECT_INTO_STMT
-    // SECURITY_LABEL_STMT
-    // REVOKE_STMT
-    // GRANT_STMT
-    // REFRESH_STMT
-    // REASSIGN_STMT
-    // SET_SESSION_AUTH_STMT
-    // CREATE_USER_MAPPING_STMT
-    // CREATE_USER_STMT
-    // SET_ROLE_STMT
-    // SET_CONSTRAINTS_STMT
-    // SET_TRANSACTION_STMT
-    // INTO_CLAUSE
-    // COMPOUND_SELECT
-    // DROP_TABLE
-    // JOIN
-    // CREATE_TABLE
-    // ALTER_TABLE
-    // WINDOW_DEF
-    // JSON_VALUE_EXPR
-    // JSON_FORMAT_CLAUSE
-    // JSON_RETURNING_CLAUSE
-    // JSON_QUOTES_CLAUSE
-    // JSON_WRAPPER_BEHAVIOR_CLAUSE
-    // JSON_BEHAVIOR_CLAUSE
-    // JSON_PASSING_CLAUSE
-    // JSON_ON_ERROR_CLAUSE
-    // JSON_NULL_CLAUSE
-    // JSON_KEYS_UNIQUE_CLAUSE
-    // SELECT_CLAUSE
-    // LIKE_CLAUSE
-    // REFERENCES_CONSTRAINT
-    // PRIMARY_KEY_CONSTRAINT
-    // FOREIGN_KEY_CONSTRAINT
-    // EXCLUDE_CONSTRAINT
-    // UNIQUE_CONSTRAINT
-    // GENERATED_CONSTRAINT
-    // DEFAULT_CONSTRAINT
-    // CHECK_CONSTRAINT
-    // NULL_CONSTRAINT
-    // NOT_NULL_CONSTRAINT
-    // INDEX_PARAMS
-    // CONSTRAINT_INDEX_TABLESPACE
-    // CONSTRAINT_STORAGE_PARAMS
-    // CONSTRAINT_INCLUDE_CLAUSE
-    // CONSTRAINT_WHERE_CLAUSE
-    // CONSTRAINT_INDEX_METHOD
-    // CONSTRAINT_EXCLUSIONS
-    // DEFERRABLE_CONSTRAINT_OPTION
-    // NOT_DEFERRABLE_CONSTRAINT_OPTION
-    // INITIALLY_DEFERRED_CONSTRAINT_OPTION
-    // INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
-    // CONSTRAINT_OPTION_LIST
-    // SEQUENCE_OPTION_LIST
-    // USING_INDEX
-    // VALIDATE_CONSTRAINT
-    // REPLICA_IDENTITY
-    // OF_TYPE
-    // NOT_OF
-    // FORCE_RLS
-    // NO_FORCE_RLS
-    // INHERIT
-    // NO_INHERIT
-    // ENABLE_TRIGGER
-    // ENABLE_REPLICA_TRIGGER
-    // ENABLE_REPLICA_RULE
-    // ENABLE_ALWAYS_TRIGGER
-    // ENABLE_ALWAYS_RULE
-    // ENABLE_RULE
-    // ENABLE_RLS
-    // DISABLE_TRIGGER
-    // DISABLE_RLS
-    // DISABLE_RULE
-    // CLUSTER_ON
-    // OWNER_TO
-    // DETACH_PARTITION
-    // DROP_CONSTRAINT
-    // DROP_COLUMN
-    // ADD_CONSTRAINT
-    // ADD_COLUMN
-    // ATTACH_PARTITION
-    // TABLE_LIST
-    // SET_SCHEMA
-    // SET_TABLESPACE
-    // SET_WITHOUT_CLUSTER
-    // SET_WITHOUT_OIDS
-    // SET_ACCESS_METHOD
-    // SET_LOGGED
-    // SET_UNLOGGED
-    // SET_STORAGE_PARAMS
-    // RESET_STORAGE_PARAMS
-    // RENAME_TABLE
-    // RENAME_CONSTRAINT
-    // RENAME_COLUMN
-    // RENAME_TO
-    // NOT_VALID
-    // ALTER_CONSTRAINT
-    // ALTER_COLUMN
-    // DROP_DEFAULT
-    // DROP_EXPRESSION
-    // DROP_IDENTITY
-    // DROP_NOT_NULL
-    // RESTART
-    // ADD_GENERATED
-    // RESET_OPTIONS
-    // SET_TYPE
-    // SET_GENERATED_OPTIONS
-    // SET_GENERATED
-    // SET_SEQUENCE_OPTION
-    // SET_DEFAULT
-    // SET_EXPRESSION
-    // SET_STATISTICS
-    // SET_OPTIONS
-    // SET_OPTIONS_LIST
-    // SET_STORAGE
-    // SET_COMPRESSION
-    // SET_NOT_NULL
-    // TABLE_ARGS
-    // COLUMN_LIST
-    // WHEN_CLAUSE
-    // USING_CLAUSE
-    // WITHIN_CLAUSE
-    // FILTER_CLAUSE
-    // OVER_CLAUSE
-    // DISTINCT_CLAUSE
-    // WITH_TABLE
-    // WITH_CLAUSE
-    // FROM_CLAUSE
-    // WHERE_CLAUSE
-    // GROUP_BY_CLAUSE
-    // HAVING_CLAUSE
-    // WINDOW_CLAUSE
-    // LIMIT_CLAUSE
-    // OFFSET_CLAUSE
-    // ORDER_BY_CLAUSE
-    // LOCKING_CLAUSE
-    // TUPLE_EXPR
-    // NAME_REF
-    // "
-    //     .trim()
-    //     .lines();
-
-    //     let nodes = nodes.map(|x| format_ident!("{}", x)).collect::<Vec<_>>();
 
     let (single_byte_tokens_values, single_byte_tokens): (Vec<_>, Vec<_>) = grammar
         .punct
@@ -857,17 +325,6 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
                 #[doc(hidden)]
                 EOF,
 
-                // #[space_hack]
-                // #(#symbols,)*
-
-                // #[space_hack]
-                // #(#keywords,)*
-
-                // #[space_hack]
-                // #(#literals,)*
-
-                // #[space_hack]
-                // #(#nodes,)*
                 #(#punctuation,)*
                 #(#all_keywords,)*
                 #(#literals,)*
@@ -1369,7 +826,7 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
                     | "self_ty"
                     | "iterable"
                     | "condition"
-                    | "args"
+                    // | "args"
                     | "body"
             );
             if manually_implemented {
@@ -1508,25 +965,35 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
         })
         .unzip();
 
+    let enum_nodes = enums.iter().map(|x| &x.name).collect::<HashSet<_>>();
+
     let (enums, enums_boilierplate_impls): (Vec<_>, Vec<_>) = enums
         .iter()
         .map(|e| {
-            let enum_ = e;
-            let variants = enum_
+            let cast_variants = e
                 .variants
                 .iter()
+                .filter(|x| enum_nodes.contains(x))
+                .map(|x| format_ident!("{}", x))
+                .collect::<Vec<_>>();
+            let variants = e
+                .variants
+                .iter()
+                .filter(|x| !enum_nodes.contains(x))
                 .map(|x| format_ident!("{}", x))
                 .collect::<Vec<_>>();
             let kinds = variants
                 .iter()
                 .map(|name| format_ident!("{}", name.to_string().to_case(Case::UpperSnake)))
                 .collect::<Vec<_>>();
-            let name = format_ident!("{}", enum_.name);
+            let name = format_ident!("{}", e.name);
+
             (
                 quote! {
                   #[derive(Debug, Clone, PartialEq, Eq, Hash)]
                   pub enum #name {
                     #(#variants(#variants),)*
+                    #(#cast_variants(#cast_variants),)*
                   }
                 },
                 quote! {
@@ -1541,7 +1008,14 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
                             #(
                             SyntaxKind::#kinds => #name::#variants(#variants { syntax }),
                             )*
-                            _ => return None,
+                            _ => {
+                                #(
+                                    if let Some(result) = #cast_variants::cast(syntax) {
+                                        return Some(#name::#cast_variants(result));
+                                    }
+                                )*
+                                return None;
+                            }
                         };
                         Some(res)
                     }
@@ -1550,6 +1024,9 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
                         match self {
                             #(
                             #name::#variants(it) => &it.syntax,
+                            )*
+                            #(
+                            #name::#cast_variants(it) => &it.syntax(),
                             )*
                         }
                     }

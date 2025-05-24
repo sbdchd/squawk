@@ -32,6 +32,15 @@ use crate::ast;
 use crate::ast::AstNode;
 use crate::{SyntaxNode, TokenText};
 
+use super::support;
+
+impl ast::Constraint {
+    #[inline]
+    pub fn name(&self) -> Option<ast::Name> {
+        support::child(&self.syntax())
+    }
+}
+
 impl ast::NameRef {
     #[inline]
     pub fn text(&self) -> TokenText<'_> {

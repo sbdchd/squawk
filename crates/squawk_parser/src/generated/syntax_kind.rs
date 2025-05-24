@@ -162,6 +162,7 @@ pub enum SyntaxKind {
     ENCODING_KW,
     ENCRYPTED_KW,
     END_KW,
+    ENFORCED_KW,
     ENUM_KW,
     ERROR_KW,
     ESCAPE_KW,
@@ -316,6 +317,7 @@ pub enum SyntaxKind {
     NULLS_KW,
     NUMERIC_KW,
     OBJECT_KW,
+    OBJECTS_KW,
     OF_KW,
     OFF_KW,
     OFFSET_KW,
@@ -387,7 +389,6 @@ pub enum SyntaxKind {
     RESET_KW,
     RESTART_KW,
     RESTRICT_KW,
-    RESTRICTED_KW,
     RETURN_KW,
     RETURNING_KW,
     RETURNS_KW,
@@ -401,7 +402,6 @@ pub enum SyntaxKind {
     ROW_KW,
     ROWS_KW,
     RULE_KW,
-    SAFE_KW,
     SAVEPOINT_KW,
     SCALAR_KW,
     SCHEMA_KW,
@@ -484,7 +484,6 @@ pub enum SyntaxKind {
     UNKNOWN_KW,
     UNLISTEN_KW,
     UNLOGGED_KW,
-    UNSAFE_KW,
     UNTIL_KW,
     UPDATE_KW,
     USER_KW,
@@ -502,6 +501,7 @@ pub enum SyntaxKind {
     VERSION_KW,
     VIEW_KW,
     VIEWS_KW,
+    VIRTUAL_KW,
     VOLATILE_KW,
     WHEN_KW,
     WHERE_KW,
@@ -544,11 +544,12 @@ pub enum SyntaxKind {
     ADD_COLUMN,
     ADD_CONSTRAINT,
     ADD_GENERATED,
+    AGGREGATE,
     ALIAS,
     ALTER_AGGREGATE,
-    ALTER_AGGREGATE_STMT,
     ALTER_COLLATION_STMT,
     ALTER_COLUMN,
+    ALTER_COLUMN_OPTION,
     ALTER_CONSTRAINT,
     ALTER_CONVERSION_STMT,
     ALTER_DATABASE_STMT,
@@ -636,19 +637,16 @@ pub enum SyntaxKind {
     COST_FUNC_OPTION,
     CREATE_ACCESS_METHOD_STMT,
     CREATE_AGGREGATE,
-    CREATE_AGGREGATE_STMT,
     CREATE_CAST_STMT,
     CREATE_COLLATION_STMT,
     CREATE_CONVERSION_STMT,
     CREATE_DATABASE_STMT,
     CREATE_DOMAIN,
-    CREATE_DOMAIN_STMT,
     CREATE_EVENT_TRIGGER_STMT,
     CREATE_EXTENSION_STMT,
     CREATE_FOREIGN_DATA_WRAPPER_STMT,
     CREATE_FOREIGN_TABLE_STMT,
-    CREATE_FUNC,
-    CREATE_FUNCTION_STMT,
+    CREATE_FUNCTION,
     CREATE_GROUP_STMT,
     CREATE_INDEX,
     CREATE_LANGUAGE_STMT,
@@ -934,7 +932,7 @@ pub enum SyntaxKind {
     TRANSACTION_MODE_ISOLATION_LEVEL,
     TRANSACTION_MODE_LIST,
     TRANSFORM_FUNC_OPTION,
-    TRUNCATE_STMT,
+    TRUNCATE,
     TUPLE_EXPR,
     TYPE,
     UNIQUE_CONSTRAINT,
@@ -1219,6 +1217,8 @@ impl SyntaxKind {
             SyntaxKind::ENCRYPTED_KW
         } else if ident.eq_ignore_ascii_case("end") {
             SyntaxKind::END_KW
+        } else if ident.eq_ignore_ascii_case("enforced") {
+            SyntaxKind::ENFORCED_KW
         } else if ident.eq_ignore_ascii_case("enum") {
             SyntaxKind::ENUM_KW
         } else if ident.eq_ignore_ascii_case("error") {
@@ -1527,6 +1527,8 @@ impl SyntaxKind {
             SyntaxKind::NUMERIC_KW
         } else if ident.eq_ignore_ascii_case("object") {
             SyntaxKind::OBJECT_KW
+        } else if ident.eq_ignore_ascii_case("objects") {
+            SyntaxKind::OBJECTS_KW
         } else if ident.eq_ignore_ascii_case("of") {
             SyntaxKind::OF_KW
         } else if ident.eq_ignore_ascii_case("off") {
@@ -1669,8 +1671,6 @@ impl SyntaxKind {
             SyntaxKind::RESTART_KW
         } else if ident.eq_ignore_ascii_case("restrict") {
             SyntaxKind::RESTRICT_KW
-        } else if ident.eq_ignore_ascii_case("restricted") {
-            SyntaxKind::RESTRICTED_KW
         } else if ident.eq_ignore_ascii_case("return") {
             SyntaxKind::RETURN_KW
         } else if ident.eq_ignore_ascii_case("returning") {
@@ -1697,8 +1697,6 @@ impl SyntaxKind {
             SyntaxKind::ROWS_KW
         } else if ident.eq_ignore_ascii_case("rule") {
             SyntaxKind::RULE_KW
-        } else if ident.eq_ignore_ascii_case("safe") {
-            SyntaxKind::SAFE_KW
         } else if ident.eq_ignore_ascii_case("savepoint") {
             SyntaxKind::SAVEPOINT_KW
         } else if ident.eq_ignore_ascii_case("scalar") {
@@ -1863,8 +1861,6 @@ impl SyntaxKind {
             SyntaxKind::UNLISTEN_KW
         } else if ident.eq_ignore_ascii_case("unlogged") {
             SyntaxKind::UNLOGGED_KW
-        } else if ident.eq_ignore_ascii_case("unsafe") {
-            SyntaxKind::UNSAFE_KW
         } else if ident.eq_ignore_ascii_case("until") {
             SyntaxKind::UNTIL_KW
         } else if ident.eq_ignore_ascii_case("update") {
@@ -1899,6 +1895,8 @@ impl SyntaxKind {
             SyntaxKind::VIEW_KW
         } else if ident.eq_ignore_ascii_case("views") {
             SyntaxKind::VIEWS_KW
+        } else if ident.eq_ignore_ascii_case("virtual") {
+            SyntaxKind::VIRTUAL_KW
         } else if ident.eq_ignore_ascii_case("volatile") {
             SyntaxKind::VOLATILE_KW
         } else if ident.eq_ignore_ascii_case("when") {

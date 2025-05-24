@@ -57,9 +57,6 @@ mod lexed_str;
 mod output;
 mod shortcuts;
 mod syntax_kind;
-mod event;
-mod input;
-mod output;
 mod token_set;
 
 pub use crate::{

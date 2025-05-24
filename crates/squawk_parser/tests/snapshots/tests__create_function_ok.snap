@@ -5,7 +5,7 @@ input_file: crates/squawk_parser/tests/data/ok/create_function.sql
 SOURCE_FILE
   COMMENT "-- create_func_with_in_out"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -70,7 +70,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- security_definer"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "CREATE"
     WHITESPACE " "
     FUNCTION_KW "FUNCTION"
@@ -151,7 +151,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- column type return"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -213,7 +213,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- setof return"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -263,7 +263,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- void return"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -306,7 +306,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- omitted return"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -335,7 +335,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -376,7 +376,7 @@ SOURCE_FILE
           STRING "'sql'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -427,7 +427,7 @@ SOURCE_FILE
           STRING "'sql'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -473,7 +473,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- returns table"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -527,7 +527,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- transform"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -588,7 +588,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- transform with type with args"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -644,7 +644,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- window"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -684,7 +684,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- immutable, stable, volatile"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -722,7 +722,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -760,7 +760,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -800,7 +800,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- [ not ] leakproof"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -840,7 +840,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -880,7 +880,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- CALLED ON NULL INPUT | RETURNS NULL ON NULL INPUT | STRICT"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -924,7 +924,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -970,7 +970,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1010,7 +1010,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- [ EXTERNAL ] SECURITY INVOKER | [ EXTERNAL ] SECURITY DEFINER"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1052,7 +1052,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1092,7 +1092,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1134,7 +1134,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1176,7 +1176,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- parallel"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1216,7 +1216,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1256,7 +1256,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1298,7 +1298,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- cost"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1341,7 +1341,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rows"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1384,7 +1384,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- suport"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1432,7 +1432,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1477,7 +1477,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set configuration_parameter"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1529,7 +1529,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1577,7 +1577,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1627,7 +1627,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- as def"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1664,7 +1664,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- as 'object_file', 'link_symbol'"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1705,7 +1705,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- return"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1751,7 +1751,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- begin atomic"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1807,7 +1807,7 @@ SOURCE_FILE
         END_KW "end"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1859,7 +1859,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- lots of ;"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -1922,7 +1922,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all options"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2066,7 +2066,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- regression"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2104,7 +2104,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2153,7 +2153,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- argmode"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2194,7 +2194,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2235,7 +2235,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2278,7 +2278,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2319,7 +2319,7 @@ SOURCE_FILE
         SQL_KW "sql"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2364,7 +2364,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- single arg"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2410,7 +2410,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multi args"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2467,7 +2467,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- named and unnamed"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2520,7 +2520,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- ="
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2583,7 +2583,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- not a parser error but something to warn about"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2640,7 +2640,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- default"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2692,7 +2692,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- expr w/ default"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2750,7 +2750,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- expr w/ ="
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2810,7 +2810,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- mode name type"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2859,7 +2859,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- mode type"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2902,7 +2902,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- name mode type"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2951,7 +2951,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- name type"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -2997,7 +2997,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- type"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"

@@ -830,10 +830,11 @@ SOURCE_FILE
         UPDATE_STMT
           UPDATE_KW "UPDATE"
           WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "employees"
+          RELATION_NAME
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "employees"
           WHITESPACE " "
           SET_KW "SET"
           WHITESPACE " "

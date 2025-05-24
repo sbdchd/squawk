@@ -6202,8 +6202,7 @@ fn alter_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
                 }
                 AGGREGATE_KW => {
                     p.bump(AGGREGATE_KW);
-                    path_name_ref(p);
-                    aggregate_arg_list(p);
+                    aggregate(p);
                 }
                 CAST_KW => {
                     p.bump(CAST_KW);
@@ -6741,8 +6740,7 @@ fn alter_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(ALTER_KW);
     p.bump(AGGREGATE_KW);
-    path_name_ref(p);
-    aggregate_arg_list(p);
+    aggregate(p);
     match p.current() {
         RENAME_KW => {
             p.bump(RENAME_KW);
@@ -6763,7 +6761,7 @@ fn alter_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME, OWNER, or SET");
         }
     }
-    m.complete(p, ALTER_AGGREGATE_STMT)
+    m.complete(p, ALTER_AGGREGATE)
 }
 
 // ALTER SUBSCRIPTION name CONNECTION 'conninfo'
@@ -7544,8 +7542,7 @@ fn comment_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         AGGREGATE_KW => {
             p.bump_any();
-            path_name_ref(p);
-            aggregate_arg_list(p);
+            aggregate(p);
         }
         CAST_KW => {
             p.bump_any();
@@ -7789,7 +7786,7 @@ fn create_aggregate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, CREATE_AGGREGATE_STMT)
+    m.complete(p, CREATE_AGGREGATE)
 }
 
 // CREATE CAST (source_type AS target_type)
@@ -7971,7 +7968,7 @@ fn create_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             break;
         }
     }
-    m.complete(p, CREATE_DOMAIN_STMT)
+    m.complete(p, CREATE_DOMAIN)
 }
 
 // filter_variable IN (filter_value [, ... ])
@@ -9146,7 +9143,7 @@ fn aggregate(p: &mut Parser<'_>) {
     let m = p.start();
     path_name_ref(p);
     aggregate_arg_list(p);
-    m.complete(p, CALL_EXPR);
+    m.complete(p, AGGREGATE);
 }
 
 // DROP AGGREGATE [ IF EXISTS ] name ( aggregate_signature ) [, ...] [ CASCADE | RESTRICT ]
@@ -10408,8 +10405,7 @@ fn security_label_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         AGGREGATE_KW => {
             p.bump(AGGREGATE_KW);
-            path_name(p);
-            aggregate_arg_list(p);
+            aggregate(p);
         }
         _ => p.error("expected database object name"),
     }
@@ -11037,7 +11033,7 @@ fn truncate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(IDENTITY_KW);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, TRUNCATE_STMT)
+    m.complete(p, TRUNCATE)
 }
 
 // VACUUM [ ( option [, ...] ) ] [ table_and_columns [, ...] ]
@@ -12150,7 +12146,7 @@ fn param(p: &mut Parser<'_>) {
         type_name(p);
     }
     opt_param_default(p);
-    m.complete(p, POSITIONAL_PARAM);
+    m.complete(p, PARAM);
 }
 
 // { LANGUAGE lang_name
@@ -12462,7 +12458,7 @@ fn create_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     param_list(p);
     opt_ret_type(p);
     func_option_list(p);
-    m.complete(p, CREATE_FUNCTION_STMT)
+    m.complete(p, CREATE_FUNCTION)
 }
 
 fn opt_or_replace(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -12684,7 +12680,7 @@ const NON_RESERVED_WORD: TokenSet = TokenSet::new(&[IDENT])
     .union(TYPE_FUNC_NAME_KEYWORDS);
 
 fn relation_name(p: &mut Parser<'_>) {
-    // [ ONLY ]
+    let m = p.start();
     if p.eat(ONLY_KW) {
         let trailing_paren = p.eat(L_PAREN);
         // name
@@ -12696,6 +12692,7 @@ fn relation_name(p: &mut Parser<'_>) {
         path_name_ref(p);
         p.eat(STAR);
     }
+    m.complete(p, RELATION_NAME);
 }
 
 // ALTER TABLE [ IF EXISTS ] [ ONLY ] name [ * ]

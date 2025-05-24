@@ -69,10 +69,10 @@ ParamList =
 ArgList =
  '(' '*' ')'
 | '(' ('distinct' | 'all') 'variadic'? Expr ')'
-// | '(' (Expr (',' Expr)*)? ')'
+| '(' args:(Expr (',' Expr)*)? ')'
 
 CallExpr =
-  Expr ParamList
+  Expr ArgList
 
 CastExpr =
   Expr ColonColon Type
@@ -210,8 +210,9 @@ DoubleType =
 
 TimeType = 
   ('time' | 'timestamp')
+  NameRef
   ('(' Literal ')')?
-  ('without' 'time' 'zone')?
+  (WithTimezone | WithoutTimezone)?
 
 IntervalType = 
   'interval'
@@ -320,12 +321,9 @@ CheckConstraint  =
 UsingIndex =
   'using' 'index' NameRef
 
-// Collate =
-//   'collate' Path
-
-// Column =
-//   'period'?
-//   (Name | Name Type Collate? | IndexExpr)
+Column =
+  'period'?
+  (Name | Name Type Collate? | IndexExpr)
 
 // ColumnList =
 //   '(' Column (',' Column)* ('without' 'overlaps')? ')'
@@ -351,15 +349,15 @@ UsingIndex =
 UniqueConstraint =
   ('constraint' NameRef)
   'unique' 
-  // (
-  //   UsingIndex 
-  // | ( 'nulls' 'not'? 'district' )? ColumnList IncludeColumns? WithParams? ConstraintIndexTablespace? 
-  // )
+  (
+    UsingIndex 
+  | ( 'nulls' 'not'? 'distinct' )? ColumnList
+  )
   // ConstraintOptionList?
 
 PrimaryKeyConstraint =
   ('constraint' NameRef)
-  // 'primary' 'key' IncludeColumns? WithParams? ConstraintIndexTablespace?
+  'primary' 'key' (UsingIndex | ColumnList IndexParams)
   // ConstraintOptionList?
 
 // ConstraintIndexMethod =
@@ -479,7 +477,7 @@ ReferencesConstraint =
 //   )
 
 // IfNotExists =
-//   'if' 'not' 'exists' 
+//   IfNotExists 
 
 // AddColumn = 
 //   'add' 'column'? IfNotExists? NameRef Type Collate? (ColumnConstraint (',' ColumnConstraint)*)?
@@ -559,7 +557,7 @@ RelationName =
 TableList = 
   RelationName (',' RelationName)*
 
-TruncateStmt = 
+Truncate = 
   'truncate' 'table'? TableList
   ('restart' 'identity' | 'continue' 'identity')?
   ('cascade' | 'restrict')?
@@ -616,7 +614,7 @@ TableArg =
 | TableConstraint
 
 TableArgs =
-  '(' (TableArg (',' TableArg))? ')'
+  '(' args:((TableArg (',' TableArg)*)?) ')'
 
 WhenClause =
   'when'
@@ -632,9 +630,6 @@ SequenceOptionList =
 
 ColumnList = 
   '(' ')'
-
-Column =
-  'period'?
 
 ConstraintIncludeClause =
   'include'
@@ -709,7 +704,7 @@ Rollback =
 
 CreateAggregate =
   // TODO:
-  'create' Path ParamList
+  'create' OrReplace? 'aggregate' Path ParamList
 
 IfExists =
  'if' 'exists'
@@ -729,9 +724,6 @@ DropDatabase =
   // TODO:
   'drop' 'database' IfExists? NameRef
 
-CreateDomain =
-  'create' 'domain' Name 'as'? Type
-
 IfNotExists =
   'if' 'not' 'exists'
 
@@ -741,7 +733,7 @@ CreateTable =
 
 CreateIndex =
   // TODO:
-  'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on'
+  'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName
 
 OrReplace =
   'or' 'replace'
@@ -781,12 +773,8 @@ FuncOption =
 
 
 
-CreateFunc = 
+CreateFunction = 
   'create' OrReplace? 'function' Path ParamList RetType? option_list:FuncOptionList
-
-AlterAggregate =
-  // TODO:
-  'alter' 'aggregate' Path ParamList
 
 SetDefault =
   'set' 'default' Expr 
@@ -849,7 +837,7 @@ AlterDomainAction =
 | SetSchema
 
 AlterDomain =
-  'alter' 'domain' Path AlterDomainAction
+  'alter' 'domain' Path action:AlterDomainAction
 
 AlterTable =
   'alter' 'table' Path actions:AlterTableAction*
@@ -1041,8 +1029,8 @@ AlterConversionStmt =
   'alter' 'conversion' NameRef
 AlterCollationStmt =
   'alter' 'collation' NameRef 
-AlterAggregateStmt =
-  'alter' 'aggregate' 
+AlterAggregate =
+  'alter' 'aggregate' Aggregate
 AlterSubscriptionStmt =
   'alter' 'subscription' NameRef 
 AlterSystemStmt =
@@ -1079,8 +1067,6 @@ ClusterStmt =
 
 CreateAccessMethodStmt =
   'create' 'access' 'method' NameRef 'type'
-CreateAggregateStmt =
-  'create' 'aggregate'
 CreateCastStmt =
   'create' 'cast' '(' Type 'as' Type ')'
 CreateCollationStmt =
@@ -1089,8 +1075,8 @@ CreateConversionStmt =
   'create' 'conversion' NameRef 'for'
 CreateDatabaseStmt =
   'create' 'database' NameRef
-CreateDomainStmt =
-  'create' 'domain' NameRef 'as'? Type
+CreateDomain =
+  'create' 'domain' NameRef 'as'? Type Collate? Constraint*
 CreateEventTriggerStmt =
   'create' 'event' 'trigger' NameRef 'on'
 CreateForeignDataWrapperStmt =
@@ -1154,8 +1140,12 @@ DropForeignTableStmt =
   'drop' 'foreign' 'table' IfExists?
 DropAccessMethodStmt =
   'drop' 'access' 'method' IfExists? NameRef
+
+Aggregate =
+  Path ParamList
+
 DropAggregate =
-  'drop' 'aggregate' IfExists? aggregates:(CallExpr (',' CallExpr)*)
+  'drop' 'aggregate' IfExists? (Aggregate (',' Aggregate)*)
 DropCastStmt =
   'drop' 'cast' IfExists? '(' Type 'as' Type ')'
 DropCollationStmt =
@@ -1290,8 +1280,6 @@ DropDatabaseStmt =
 IndexParams =
   '(' ')'
 
-CreateFunctionStmt =
-  'create' 
 CreateTypeStmt =
   'create' 'type' Type 
 CreateExtensionStmt =
@@ -1318,7 +1306,7 @@ StrictFuncOption =
 SecurityFuncOption =
   'security' ('invoker' | 'definer')
 ParallelFuncOption =
-  'parallel' ('unsafe' | 'restricted' | 'safe')
+  'parallel' '#ident'
 CostFuncOption =
   'cost' 
 RowsFuncOption =
@@ -1370,8 +1358,10 @@ DetachPartition =
   'detach' 'partition' 
 DropColumn =
   'drop' 'column'? IfExists? 
+
 AddColumn =
-  'add' 'column'? 'if' 'not' 'exists'? 
+  'add' 'column'? IfNotExists? NameRef Type Collate? (Constraint (',' Constraint)*)?
+
 AttachPartition =
   'attach' 'partition' 
 SetTablespace =
@@ -1394,13 +1384,37 @@ RenameTable =
   'rename' 'to' NameRef
 RenameColumn =
   'rename' 'column'? 
+
+
+AlterColumnOption =
+  DropDefault
+| DropExpression
+| DropIdentity
+| DropNotNull
+| Restart
+| AddGenerated
+| ResetOptions
+| SetType
+| SetGeneratedOptions
+| SetGenerated
+| SetSequenceOption
+| SetDefault
+| SetExpression
+| SetStatistics
+| SetOptions
+| SetStorage
+| SetCompression
+| SetNotNull
+
 AlterConstraint =
-  'alter' 'constraint' 
+  'alter' 'constraint' option:AlterColumnOption
+
 AlterColumn =
-  'alter' 'column'? 
+  'alter' 'column'? option:AlterColumnOption
 
 Restart =
   'restart' 'with'? 
+
 SetSequenceOption =
   'set' 
 SetGenerated =
@@ -1414,7 +1428,7 @@ AddGenerated =
 ResetOptions =
   'reset' '(' ')'
 SetType =
-  'set'
+  'set' 'type' Type Collate?
 SetGeneratedOptions =
   'set'
 SetOptionsList =
@@ -1430,7 +1444,7 @@ SetStorage =
 SetCompression =
   'set' 'compression'
 Collate =
-  'collate'
+  'collate' Path
 
 IsNull =
   'is' 'null'
@@ -1444,7 +1458,7 @@ Stmt =
 | Begin
 | Commit
 | Rollback
-| CreateFunc
+| CreateFunction
 | CreateIndex
 | CreateTable
 | CreateDomain
@@ -1454,7 +1468,7 @@ Stmt =
 | DropIndex
 | DropType
 | Select
-| TruncateStmt
+| Truncate
 | RevokeStmt
 | Values
 | TableStmt
@@ -1470,6 +1484,7 @@ Stmt =
 | SavepointStmt
 | ReleaseSavepointStmt
 | RollbackStmt
+| PrepareTransactionStmt
 | ';'
 
 

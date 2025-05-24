@@ -5,7 +5,7 @@ input_file: crates/squawk_syntax/test_data/validation/alter_aggregate_params.sql
 SOURCE_FILE@0..101
   COMMENT@0..38 "-- can't have out par ..."
   WHITESPACE@38..39 "\n"
-  CREATE_AGGREGATE_STMT@39..99
+  CREATE_AGGREGATE@39..99
     CREATE_KW@39..45 "create"
     WHITESPACE@45..46 " "
     AGGREGATE_KW@46..55 "aggregate"

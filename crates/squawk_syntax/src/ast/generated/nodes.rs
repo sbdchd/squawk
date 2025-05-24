@@ -10,24 +10,32 @@ pub struct AddColumn {
 }
 impl AddColumn {
     #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn constraints(&self) -> AstChildren<Constraint> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn if_not_exists(&self) -> Option<IfNotExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn add_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ADD_KW)
     }
     #[inline]
     pub fn column_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COLUMN_KW)
-    }
-    #[inline]
-    pub fn exists_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EXISTS_KW)
-    }
-    #[inline]
-    pub fn if_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IF_KW)
-    }
-    #[inline]
-    pub fn not_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NOT_KW)
     }
 }
 
@@ -62,6 +70,21 @@ impl AddGenerated {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Aggregate {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Aggregate {
+    #[inline]
+    pub fn param_list(&self) -> Option<ParamList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Alias {
     pub(crate) syntax: SyntaxNode,
 }
@@ -78,28 +101,9 @@ pub struct AlterAggregate {
 }
 impl AlterAggregate {
     #[inline]
-    pub fn param_list(&self) -> Option<ParamList> {
+    pub fn aggregate(&self) -> Option<Aggregate> {
         support::child(&self.syntax)
     }
-    #[inline]
-    pub fn path(&self) -> Option<Path> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn aggregate_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
-    }
-    #[inline]
-    pub fn alter_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALTER_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterAggregateStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AlterAggregateStmt {
     #[inline]
     pub fn aggregate_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
@@ -135,6 +139,10 @@ pub struct AlterColumn {
 }
 impl AlterColumn {
     #[inline]
+    pub fn option(&self) -> Option<AlterColumnOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
     }
@@ -149,6 +157,10 @@ pub struct AlterConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl AlterConstraint {
+    #[inline]
+    pub fn option(&self) -> Option<AlterColumnOption> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -222,7 +234,7 @@ pub struct AlterDomain {
 }
 impl AlterDomain {
     #[inline]
-    pub fn alter_domain_action(&self) -> Option<AlterDomainAction> {
+    pub fn action(&self) -> Option<AlterDomainAction> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -1050,6 +1062,10 @@ pub struct ArgList {
 }
 impl ArgList {
     #[inline]
+    pub fn args(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
@@ -1299,11 +1315,11 @@ pub struct CallExpr {
 }
 impl CallExpr {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn arg_list(&self) -> Option<ArgList> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn param_list(&self) -> Option<ParamList> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
 }
@@ -1477,6 +1493,10 @@ pub struct Collate {
 }
 impl Collate {
     #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn collate_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COLLATE_KW)
     }
@@ -1513,6 +1533,22 @@ pub struct Column {
     pub(crate) syntax: SyntaxNode,
 }
 impl Column {
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn index_expr(&self) -> Option<IndexExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn period_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PERIOD_KW)
@@ -1767,6 +1803,10 @@ pub struct CreateAggregate {
 }
 impl CreateAggregate {
     #[inline]
+    pub fn or_replace(&self) -> Option<OrReplace> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn param_list(&self) -> Option<ParamList> {
         support::child(&self.syntax)
     }
@@ -1774,17 +1814,6 @@ impl CreateAggregate {
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
-    #[inline]
-    pub fn create_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CREATE_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateAggregateStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CreateAggregateStmt {
     #[inline]
     pub fn aggregate_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AGGREGATE_KW)
@@ -1893,32 +1922,13 @@ pub struct CreateDomain {
 }
 impl CreateDomain {
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn collate(&self) -> Option<Collate> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn ty(&self) -> Option<Type> {
-        support::child(&self.syntax)
+    pub fn constraints(&self) -> AstChildren<Constraint> {
+        support::children(&self.syntax)
     }
-    #[inline]
-    pub fn as_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::AS_KW)
-    }
-    #[inline]
-    pub fn create_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CREATE_KW)
-    }
-    #[inline]
-    pub fn domain_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DOMAIN_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateDomainStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CreateDomainStmt {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2034,10 +2044,10 @@ impl CreateForeignTableStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateFunc {
+pub struct CreateFunction {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateFunc {
+impl CreateFunction {
     #[inline]
     pub fn option_list(&self) -> Option<FuncOptionList> {
         support::child(&self.syntax)
@@ -2065,17 +2075,6 @@ impl CreateFunc {
     #[inline]
     pub fn function_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FUNCTION_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateFunctionStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CreateFunctionStmt {
-    #[inline]
-    pub fn create_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CREATE_KW)
     }
 }
 
@@ -2109,6 +2108,10 @@ impl CreateIndex {
     }
     #[inline]
     pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn relation_name(&self) -> Option<RelationName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3063,7 +3066,7 @@ pub struct DropAggregate {
 }
 impl DropAggregate {
     #[inline]
-    pub fn aggregates(&self) -> AstChildren<CallExpr> {
+    pub fn aggregates(&self) -> AstChildren<Aggregate> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -5921,20 +5924,12 @@ pub struct ParallelFuncOption {
 }
 impl ParallelFuncOption {
     #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+    #[inline]
     pub fn parallel_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PARALLEL_KW)
-    }
-    #[inline]
-    pub fn restricted_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RESTRICTED_KW)
-    }
-    #[inline]
-    pub fn safe_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SAFE_KW)
-    }
-    #[inline]
-    pub fn unsafe_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::UNSAFE_KW)
     }
 }
 
@@ -6203,12 +6198,32 @@ pub struct PrimaryKeyConstraint {
 }
 impl PrimaryKeyConstraint {
     #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn index_params(&self) -> Option<IndexParams> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_index(&self) -> Option<UsingIndex> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn constraint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
+    }
+    #[inline]
+    pub fn key_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::KEY_KW)
+    }
+    #[inline]
+    pub fn primary_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PRIMARY_KW)
     }
 }
 
@@ -7192,8 +7207,20 @@ pub struct SetType {
 }
 impl SetType {
     #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+    #[inline]
+    pub fn type_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TYPE_KW)
     }
 }
 
@@ -7335,8 +7362,8 @@ pub struct TableArgs {
 }
 impl TableArgs {
     #[inline]
-    pub fn table_arg(&self) -> Option<TableArg> {
-        support::child(&self.syntax)
+    pub fn args(&self) -> AstChildren<TableArg> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
@@ -7345,10 +7372,6 @@ impl TableArgs {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn comma_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COMMA)
     }
 }
 
@@ -7410,6 +7433,18 @@ impl TimeType {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn with_timezone(&self) -> Option<WithTimezone> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn without_timezone(&self) -> Option<WithoutTimezone> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -7424,14 +7459,6 @@ impl TimeType {
     #[inline]
     pub fn timestamp_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TIMESTAMP_KW)
-    }
-    #[inline]
-    pub fn without_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::WITHOUT_KW)
-    }
-    #[inline]
-    pub fn zone_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ZONE_KW)
     }
 }
 
@@ -7489,10 +7516,10 @@ impl TransformFuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TruncateStmt {
+pub struct Truncate {
     pub(crate) syntax: SyntaxNode,
 }
-impl TruncateStmt {
+impl Truncate {
     #[inline]
     pub fn table_list(&self) -> Option<TableList> {
         support::child(&self.syntax)
@@ -7548,12 +7575,32 @@ pub struct UniqueConstraint {
 }
 impl UniqueConstraint {
     #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_index(&self) -> Option<UsingIndex> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn constraint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
+    }
+    #[inline]
+    pub fn distinct_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DISTINCT_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn nulls_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULLS_KW)
     }
     #[inline]
     pub fn unique_token(&self) -> Option<SyntaxToken> {
@@ -7848,6 +7895,28 @@ impl WithoutTimezone {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum AlterColumnOption {
+    AddGenerated(AddGenerated),
+    DropDefault(DropDefault),
+    DropExpression(DropExpression),
+    DropIdentity(DropIdentity),
+    DropNotNull(DropNotNull),
+    ResetOptions(ResetOptions),
+    Restart(Restart),
+    SetCompression(SetCompression),
+    SetDefault(SetDefault),
+    SetExpression(SetExpression),
+    SetGenerated(SetGenerated),
+    SetGeneratedOptions(SetGeneratedOptions),
+    SetNotNull(SetNotNull),
+    SetOptions(SetOptions),
+    SetSequenceOption(SetSequenceOption),
+    SetStatistics(SetStatistics),
+    SetStorage(SetStorage),
+    SetType(SetType),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AlterDomainAction {
     AddConstraint(AddConstraint),
     DropConstraint(DropConstraint),
@@ -7967,7 +8036,7 @@ pub enum Stmt {
     Commit(Commit),
     CreateAggregate(CreateAggregate),
     CreateDomain(CreateDomain),
-    CreateFunc(CreateFunc),
+    CreateFunction(CreateFunction),
     CreateIndex(CreateIndex),
     CreateMaterializedViewStmt(CreateMaterializedViewStmt),
     CreateTable(CreateTable),
@@ -7983,6 +8052,7 @@ pub enum Stmt {
     InsertStmt(InsertStmt),
     MergeStmt(MergeStmt),
     NotifyStmt(NotifyStmt),
+    PrepareTransactionStmt(PrepareTransactionStmt),
     ReleaseSavepointStmt(ReleaseSavepointStmt),
     RevokeStmt(RevokeStmt),
     Rollback(Rollback),
@@ -7990,7 +8060,7 @@ pub enum Stmt {
     SavepointStmt(SavepointStmt),
     Select(Select),
     TableStmt(TableStmt),
-    TruncateStmt(TruncateStmt),
+    Truncate(Truncate),
     UpdateStmt(UpdateStmt),
     Values(Values),
 }
@@ -8085,6 +8155,24 @@ impl AstNode for AddGenerated {
         &self.syntax
     }
 }
+impl AstNode for Aggregate {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::AGGREGATE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Alias {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -8107,24 +8195,6 @@ impl AstNode for AlterAggregate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ALTER_AGGREGATE
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for AlterAggregateStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_AGGREGATE_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9687,24 +9757,6 @@ impl AstNode for CreateAggregate {
         &self.syntax
     }
 }
-impl AstNode for CreateAggregateStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_AGGREGATE_STMT
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for CreateCastStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -9795,24 +9847,6 @@ impl AstNode for CreateDomain {
         &self.syntax
     }
 }
-impl AstNode for CreateDomainStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_DOMAIN_STMT
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for CreateEventTriggerStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -9885,28 +9919,10 @@ impl AstNode for CreateForeignTableStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateFunc {
+impl AstNode for CreateFunction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_FUNC
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for CreateFunctionStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_FUNCTION_STMT
+        kind == SyntaxKind::CREATE_FUNCTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14925,10 +14941,10 @@ impl AstNode for TransformFuncOption {
         &self.syntax
     }
 }
-impl AstNode for TruncateStmt {
+impl AstNode for Truncate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::TRUNCATE_STMT
+        kind == SyntaxKind::TRUNCATE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -15303,6 +15319,202 @@ impl AstNode for WithoutTimezone {
         &self.syntax
     }
 }
+impl AstNode for AlterColumnOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::ADD_GENERATED
+                | SyntaxKind::DROP_DEFAULT
+                | SyntaxKind::DROP_EXPRESSION
+                | SyntaxKind::DROP_IDENTITY
+                | SyntaxKind::DROP_NOT_NULL
+                | SyntaxKind::RESET_OPTIONS
+                | SyntaxKind::RESTART
+                | SyntaxKind::SET_COMPRESSION
+                | SyntaxKind::SET_DEFAULT
+                | SyntaxKind::SET_EXPRESSION
+                | SyntaxKind::SET_GENERATED
+                | SyntaxKind::SET_GENERATED_OPTIONS
+                | SyntaxKind::SET_NOT_NULL
+                | SyntaxKind::SET_OPTIONS
+                | SyntaxKind::SET_SEQUENCE_OPTION
+                | SyntaxKind::SET_STATISTICS
+                | SyntaxKind::SET_STORAGE
+                | SyntaxKind::SET_TYPE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::ADD_GENERATED => AlterColumnOption::AddGenerated(AddGenerated { syntax }),
+            SyntaxKind::DROP_DEFAULT => AlterColumnOption::DropDefault(DropDefault { syntax }),
+            SyntaxKind::DROP_EXPRESSION => {
+                AlterColumnOption::DropExpression(DropExpression { syntax })
+            }
+            SyntaxKind::DROP_IDENTITY => AlterColumnOption::DropIdentity(DropIdentity { syntax }),
+            SyntaxKind::DROP_NOT_NULL => AlterColumnOption::DropNotNull(DropNotNull { syntax }),
+            SyntaxKind::RESET_OPTIONS => AlterColumnOption::ResetOptions(ResetOptions { syntax }),
+            SyntaxKind::RESTART => AlterColumnOption::Restart(Restart { syntax }),
+            SyntaxKind::SET_COMPRESSION => {
+                AlterColumnOption::SetCompression(SetCompression { syntax })
+            }
+            SyntaxKind::SET_DEFAULT => AlterColumnOption::SetDefault(SetDefault { syntax }),
+            SyntaxKind::SET_EXPRESSION => {
+                AlterColumnOption::SetExpression(SetExpression { syntax })
+            }
+            SyntaxKind::SET_GENERATED => AlterColumnOption::SetGenerated(SetGenerated { syntax }),
+            SyntaxKind::SET_GENERATED_OPTIONS => {
+                AlterColumnOption::SetGeneratedOptions(SetGeneratedOptions { syntax })
+            }
+            SyntaxKind::SET_NOT_NULL => AlterColumnOption::SetNotNull(SetNotNull { syntax }),
+            SyntaxKind::SET_OPTIONS => AlterColumnOption::SetOptions(SetOptions { syntax }),
+            SyntaxKind::SET_SEQUENCE_OPTION => {
+                AlterColumnOption::SetSequenceOption(SetSequenceOption { syntax })
+            }
+            SyntaxKind::SET_STATISTICS => {
+                AlterColumnOption::SetStatistics(SetStatistics { syntax })
+            }
+            SyntaxKind::SET_STORAGE => AlterColumnOption::SetStorage(SetStorage { syntax }),
+            SyntaxKind::SET_TYPE => AlterColumnOption::SetType(SetType { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            AlterColumnOption::AddGenerated(it) => &it.syntax,
+            AlterColumnOption::DropDefault(it) => &it.syntax,
+            AlterColumnOption::DropExpression(it) => &it.syntax,
+            AlterColumnOption::DropIdentity(it) => &it.syntax,
+            AlterColumnOption::DropNotNull(it) => &it.syntax,
+            AlterColumnOption::ResetOptions(it) => &it.syntax,
+            AlterColumnOption::Restart(it) => &it.syntax,
+            AlterColumnOption::SetCompression(it) => &it.syntax,
+            AlterColumnOption::SetDefault(it) => &it.syntax,
+            AlterColumnOption::SetExpression(it) => &it.syntax,
+            AlterColumnOption::SetGenerated(it) => &it.syntax,
+            AlterColumnOption::SetGeneratedOptions(it) => &it.syntax,
+            AlterColumnOption::SetNotNull(it) => &it.syntax,
+            AlterColumnOption::SetOptions(it) => &it.syntax,
+            AlterColumnOption::SetSequenceOption(it) => &it.syntax,
+            AlterColumnOption::SetStatistics(it) => &it.syntax,
+            AlterColumnOption::SetStorage(it) => &it.syntax,
+            AlterColumnOption::SetType(it) => &it.syntax,
+        }
+    }
+}
+impl From<AddGenerated> for AlterColumnOption {
+    #[inline]
+    fn from(node: AddGenerated) -> AlterColumnOption {
+        AlterColumnOption::AddGenerated(node)
+    }
+}
+impl From<DropDefault> for AlterColumnOption {
+    #[inline]
+    fn from(node: DropDefault) -> AlterColumnOption {
+        AlterColumnOption::DropDefault(node)
+    }
+}
+impl From<DropExpression> for AlterColumnOption {
+    #[inline]
+    fn from(node: DropExpression) -> AlterColumnOption {
+        AlterColumnOption::DropExpression(node)
+    }
+}
+impl From<DropIdentity> for AlterColumnOption {
+    #[inline]
+    fn from(node: DropIdentity) -> AlterColumnOption {
+        AlterColumnOption::DropIdentity(node)
+    }
+}
+impl From<DropNotNull> for AlterColumnOption {
+    #[inline]
+    fn from(node: DropNotNull) -> AlterColumnOption {
+        AlterColumnOption::DropNotNull(node)
+    }
+}
+impl From<ResetOptions> for AlterColumnOption {
+    #[inline]
+    fn from(node: ResetOptions) -> AlterColumnOption {
+        AlterColumnOption::ResetOptions(node)
+    }
+}
+impl From<Restart> for AlterColumnOption {
+    #[inline]
+    fn from(node: Restart) -> AlterColumnOption {
+        AlterColumnOption::Restart(node)
+    }
+}
+impl From<SetCompression> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetCompression) -> AlterColumnOption {
+        AlterColumnOption::SetCompression(node)
+    }
+}
+impl From<SetDefault> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetDefault) -> AlterColumnOption {
+        AlterColumnOption::SetDefault(node)
+    }
+}
+impl From<SetExpression> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetExpression) -> AlterColumnOption {
+        AlterColumnOption::SetExpression(node)
+    }
+}
+impl From<SetGenerated> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetGenerated) -> AlterColumnOption {
+        AlterColumnOption::SetGenerated(node)
+    }
+}
+impl From<SetGeneratedOptions> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetGeneratedOptions) -> AlterColumnOption {
+        AlterColumnOption::SetGeneratedOptions(node)
+    }
+}
+impl From<SetNotNull> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetNotNull) -> AlterColumnOption {
+        AlterColumnOption::SetNotNull(node)
+    }
+}
+impl From<SetOptions> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetOptions) -> AlterColumnOption {
+        AlterColumnOption::SetOptions(node)
+    }
+}
+impl From<SetSequenceOption> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetSequenceOption) -> AlterColumnOption {
+        AlterColumnOption::SetSequenceOption(node)
+    }
+}
+impl From<SetStatistics> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetStatistics) -> AlterColumnOption {
+        AlterColumnOption::SetStatistics(node)
+    }
+}
+impl From<SetStorage> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetStorage) -> AlterColumnOption {
+        AlterColumnOption::SetStorage(node)
+    }
+}
+impl From<SetType> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetType) -> AlterColumnOption {
+        AlterColumnOption::SetType(node)
+    }
+}
 impl AstNode for AlterDomainAction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -15343,7 +15555,9 @@ impl AstNode for AlterDomainAction {
             SyntaxKind::VALIDATE_CONSTRAINT => {
                 AlterDomainAction::ValidateConstraint(ValidateConstraint { syntax })
             }
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -15550,7 +15764,9 @@ impl AstNode for AlterTableAction {
             SyntaxKind::VALIDATE_CONSTRAINT => {
                 AlterTableAction::ValidateConstraint(ValidateConstraint { syntax })
             }
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -15875,7 +16091,9 @@ impl AstNode for Constraint {
             SyntaxKind::UNIQUE_CONSTRAINT => {
                 Constraint::UniqueConstraint(UniqueConstraint { syntax })
             }
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -15974,7 +16192,9 @@ impl AstNode for Expr {
             SyntaxKind::FIELD_EXPR => Expr::FieldExpr(FieldExpr { syntax }),
             SyntaxKind::LITERAL => Expr::Literal(Literal { syntax }),
             SyntaxKind::NAME_REF => Expr::NameRef(NameRef { syntax }),
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -16106,7 +16326,9 @@ impl AstNode for FuncOption {
             SyntaxKind::WINDOW_FUNC_OPTION => {
                 FuncOption::WindowFuncOption(WindowFuncOption { syntax })
             }
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -16246,7 +16468,9 @@ impl AstNode for ParamMode {
             SyntaxKind::PARAM_IN_OUT => ParamMode::ParamInOut(ParamInOut { syntax }),
             SyntaxKind::PARAM_OUT => ParamMode::ParamOut(ParamOut { syntax }),
             SyntaxKind::PARAM_VARIADIC => ParamMode::ParamVariadic(ParamVariadic { syntax }),
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -16296,7 +16520,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::COMMIT
                 | SyntaxKind::CREATE_AGGREGATE
                 | SyntaxKind::CREATE_DOMAIN
-                | SyntaxKind::CREATE_FUNC
+                | SyntaxKind::CREATE_FUNCTION
                 | SyntaxKind::CREATE_INDEX
                 | SyntaxKind::CREATE_MATERIALIZED_VIEW_STMT
                 | SyntaxKind::CREATE_TABLE
@@ -16312,6 +16536,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::INSERT_STMT
                 | SyntaxKind::MERGE_STMT
                 | SyntaxKind::NOTIFY_STMT
+                | SyntaxKind::PREPARE_TRANSACTION_STMT
                 | SyntaxKind::RELEASE_SAVEPOINT_STMT
                 | SyntaxKind::REVOKE_STMT
                 | SyntaxKind::ROLLBACK
@@ -16319,7 +16544,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::SAVEPOINT_STMT
                 | SyntaxKind::SELECT
                 | SyntaxKind::TABLE_STMT
-                | SyntaxKind::TRUNCATE_STMT
+                | SyntaxKind::TRUNCATE
                 | SyntaxKind::UPDATE_STMT
                 | SyntaxKind::VALUES
         )
@@ -16334,7 +16559,7 @@ impl AstNode for Stmt {
             SyntaxKind::COMMIT => Stmt::Commit(Commit { syntax }),
             SyntaxKind::CREATE_AGGREGATE => Stmt::CreateAggregate(CreateAggregate { syntax }),
             SyntaxKind::CREATE_DOMAIN => Stmt::CreateDomain(CreateDomain { syntax }),
-            SyntaxKind::CREATE_FUNC => Stmt::CreateFunc(CreateFunc { syntax }),
+            SyntaxKind::CREATE_FUNCTION => Stmt::CreateFunction(CreateFunction { syntax }),
             SyntaxKind::CREATE_INDEX => Stmt::CreateIndex(CreateIndex { syntax }),
             SyntaxKind::CREATE_MATERIALIZED_VIEW_STMT => {
                 Stmt::CreateMaterializedViewStmt(CreateMaterializedViewStmt { syntax })
@@ -16354,6 +16579,9 @@ impl AstNode for Stmt {
             SyntaxKind::INSERT_STMT => Stmt::InsertStmt(InsertStmt { syntax }),
             SyntaxKind::MERGE_STMT => Stmt::MergeStmt(MergeStmt { syntax }),
             SyntaxKind::NOTIFY_STMT => Stmt::NotifyStmt(NotifyStmt { syntax }),
+            SyntaxKind::PREPARE_TRANSACTION_STMT => {
+                Stmt::PrepareTransactionStmt(PrepareTransactionStmt { syntax })
+            }
             SyntaxKind::RELEASE_SAVEPOINT_STMT => {
                 Stmt::ReleaseSavepointStmt(ReleaseSavepointStmt { syntax })
             }
@@ -16363,10 +16591,12 @@ impl AstNode for Stmt {
             SyntaxKind::SAVEPOINT_STMT => Stmt::SavepointStmt(SavepointStmt { syntax }),
             SyntaxKind::SELECT => Stmt::Select(Select { syntax }),
             SyntaxKind::TABLE_STMT => Stmt::TableStmt(TableStmt { syntax }),
-            SyntaxKind::TRUNCATE_STMT => Stmt::TruncateStmt(TruncateStmt { syntax }),
+            SyntaxKind::TRUNCATE => Stmt::Truncate(Truncate { syntax }),
             SyntaxKind::UPDATE_STMT => Stmt::UpdateStmt(UpdateStmt { syntax }),
             SyntaxKind::VALUES => Stmt::Values(Values { syntax }),
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -16380,7 +16610,7 @@ impl AstNode for Stmt {
             Stmt::Commit(it) => &it.syntax,
             Stmt::CreateAggregate(it) => &it.syntax,
             Stmt::CreateDomain(it) => &it.syntax,
-            Stmt::CreateFunc(it) => &it.syntax,
+            Stmt::CreateFunction(it) => &it.syntax,
             Stmt::CreateIndex(it) => &it.syntax,
             Stmt::CreateMaterializedViewStmt(it) => &it.syntax,
             Stmt::CreateTable(it) => &it.syntax,
@@ -16396,6 +16626,7 @@ impl AstNode for Stmt {
             Stmt::InsertStmt(it) => &it.syntax,
             Stmt::MergeStmt(it) => &it.syntax,
             Stmt::NotifyStmt(it) => &it.syntax,
+            Stmt::PrepareTransactionStmt(it) => &it.syntax,
             Stmt::ReleaseSavepointStmt(it) => &it.syntax,
             Stmt::RevokeStmt(it) => &it.syntax,
             Stmt::Rollback(it) => &it.syntax,
@@ -16403,7 +16634,7 @@ impl AstNode for Stmt {
             Stmt::SavepointStmt(it) => &it.syntax,
             Stmt::Select(it) => &it.syntax,
             Stmt::TableStmt(it) => &it.syntax,
-            Stmt::TruncateStmt(it) => &it.syntax,
+            Stmt::Truncate(it) => &it.syntax,
             Stmt::UpdateStmt(it) => &it.syntax,
             Stmt::Values(it) => &it.syntax,
         }
@@ -16451,10 +16682,10 @@ impl From<CreateDomain> for Stmt {
         Stmt::CreateDomain(node)
     }
 }
-impl From<CreateFunc> for Stmt {
+impl From<CreateFunction> for Stmt {
     #[inline]
-    fn from(node: CreateFunc) -> Stmt {
-        Stmt::CreateFunc(node)
+    fn from(node: CreateFunction) -> Stmt {
+        Stmt::CreateFunction(node)
     }
 }
 impl From<CreateIndex> for Stmt {
@@ -16547,6 +16778,12 @@ impl From<NotifyStmt> for Stmt {
         Stmt::NotifyStmt(node)
     }
 }
+impl From<PrepareTransactionStmt> for Stmt {
+    #[inline]
+    fn from(node: PrepareTransactionStmt) -> Stmt {
+        Stmt::PrepareTransactionStmt(node)
+    }
+}
 impl From<ReleaseSavepointStmt> for Stmt {
     #[inline]
     fn from(node: ReleaseSavepointStmt) -> Stmt {
@@ -16589,10 +16826,10 @@ impl From<TableStmt> for Stmt {
         Stmt::TableStmt(node)
     }
 }
-impl From<TruncateStmt> for Stmt {
+impl From<Truncate> for Stmt {
     #[inline]
-    fn from(node: TruncateStmt) -> Stmt {
-        Stmt::TruncateStmt(node)
+    fn from(node: Truncate) -> Stmt {
+        Stmt::Truncate(node)
     }
 }
 impl From<UpdateStmt> for Stmt {
@@ -16610,18 +16847,19 @@ impl From<Values> for Stmt {
 impl AstNode for TableArg {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(
-            kind,
-            SyntaxKind::COLUMN | SyntaxKind::LIKE_CLAUSE | SyntaxKind::TABLE_CONSTRAINT
-        )
+        matches!(kind, SyntaxKind::COLUMN | SyntaxKind::LIKE_CLAUSE)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             SyntaxKind::COLUMN => TableArg::Column(Column { syntax }),
             SyntaxKind::LIKE_CLAUSE => TableArg::LikeClause(LikeClause { syntax }),
-            // SyntaxKind::TABLE_CONSTRAINT => TableArg::TableConstraint(TableConstraint { syntax }),
-            _ => return None,
+            _ => {
+                if let Some(result) = TableConstraint::cast(syntax) {
+                    return Some(TableArg::TableConstraint(result));
+                }
+                return None;
+            }
         };
         Some(res)
     }
@@ -16644,12 +16882,6 @@ impl From<LikeClause> for TableArg {
     #[inline]
     fn from(node: LikeClause) -> TableArg {
         TableArg::LikeClause(node)
-    }
-}
-impl From<TableConstraint> for TableArg {
-    #[inline]
-    fn from(node: TableConstraint) -> TableArg {
-        TableArg::TableConstraint(node)
     }
 }
 impl AstNode for TableConstraint {
@@ -16682,7 +16914,9 @@ impl AstNode for TableConstraint {
             SyntaxKind::UNIQUE_CONSTRAINT => {
                 TableConstraint::UniqueConstraint(UniqueConstraint { syntax })
             }
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -16751,7 +16985,9 @@ impl AstNode for TransactionMode {
                     syntax,
                 })
             }
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }
@@ -16822,7 +17058,9 @@ impl AstNode for Type {
             SyntaxKind::PATH_TYPE => Type::PathType(PathType { syntax }),
             SyntaxKind::PERCENT_TYPE => Type::PercentType(PercentType { syntax }),
             SyntaxKind::TIME_TYPE => Type::TimeType(TimeType { syntax }),
-            _ => return None,
+            _ => {
+                return None;
+            }
         };
         Some(res)
     }

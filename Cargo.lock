@@ -3779,9 +3779,9 @@ dependencies = [
  "quote",
  "reqwest 0.12.15",
  "serde",
+ "serde_json",
  "ungrammar",
  "xshell",
- "serde_json",
 ]
 
 [[package]]

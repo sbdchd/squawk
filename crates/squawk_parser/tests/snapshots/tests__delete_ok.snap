@@ -12,10 +12,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "products"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "products"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -37,10 +38,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "products"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "products"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only"
@@ -50,12 +52,13 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- *"
@@ -65,12 +68,13 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
-    WHITESPACE " "
-    STAR "*"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      WHITESPACE " "
+      STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- alias"
@@ -80,10 +84,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -95,10 +100,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     IDENT "a"
   SEMICOLON ";"
@@ -110,12 +116,13 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -155,10 +162,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " \n"
     USING_CLAUSE
       USING_KW "using"
@@ -184,10 +192,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n"
     USING_CLAUSE
       USING_KW "using"
@@ -236,10 +245,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "user_sessions"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "user_sessions"
     WHITESPACE " "
     IDENT "us"
     WHITESPACE "\n"
@@ -308,10 +318,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -337,10 +348,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "employees"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "employees"
     WHITESPACE " "
     IDENT "e"
     WHITESPACE "\n"
@@ -422,10 +434,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "invoices"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "invoices"
     WHITESPACE " \n"
     WHERE_KW "where"
     WHITESPACE " "
@@ -443,10 +456,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " \n"
     RETURNING_KW "returning"
     WHITESPACE " "
@@ -499,10 +513,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -570,10 +585,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
@@ -668,10 +684,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     USING_CLAUSE
       USING_KW "using"
@@ -687,10 +704,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     USING_CLAUSE
       USING_KW "USING"
@@ -736,10 +754,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -786,10 +805,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -809,10 +829,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE_STMT
@@ -820,10 +841,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "tasks"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "tasks"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -847,10 +869,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "tasks"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "tasks"
     WHITESPACE " "
     WHERE_KW "WHERE"
     WHITESPACE " "
@@ -943,10 +966,11 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "user_logs"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "user_logs"
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE " "

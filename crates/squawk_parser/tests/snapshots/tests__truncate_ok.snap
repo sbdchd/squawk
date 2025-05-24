@@ -5,18 +5,19 @@ input_file: crates/squawk_parser/tests/data/ok/truncate.sql
 SOURCE_FILE
   COMMENT "-- pg_grammar"
   WHITESPACE "\n"
-  TRUNCATE_STMT
+  TRUNCATE
     TRUNCATE_KW "truncate"
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
     TABLE_LIST
-      ONLY_KW "only"
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        ONLY_KW "only"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
     WHITESPACE "\n"
     RESTART_KW "restart"
     WHITESPACE " "
@@ -27,66 +28,72 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multiple_tables"
   WHITESPACE "\n"
-  TRUNCATE_STMT
+  TRUNCATE
     TRUNCATE_KW "TRUNCATE"
     WHITESPACE " "
     TABLE_LIST
-      ONLY_KW "only"
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "a"
+      RELATION_NAME
+        ONLY_KW "only"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "a"
       COMMA ","
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "b"
-      WHITESPACE " "
-      STAR "*"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "b"
+        WHITESPACE " "
+        STAR "*"
       COMMA ","
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "c"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "c"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rest"
   WHITESPACE "\n"
-  TRUNCATE_STMT
+  TRUNCATE
     TRUNCATE_KW "truncate"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
-  TRUNCATE_STMT
+  TRUNCATE
     TRUNCATE_KW "truncate"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "a"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "a"
     WHITESPACE " "
     CONTINUE_KW "continue"
     WHITESPACE " "
     IDENTITY_KW "identity"
   SEMICOLON ";"
   WHITESPACE "\n"
-  TRUNCATE_STMT
+  TRUNCATE
     TRUNCATE_KW "truncate"
     WHITESPACE " "
     TABLE_LIST
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "a"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "a"
     WHITESPACE " "
     CONTINUE_KW "continue"
     WHITESPACE " "

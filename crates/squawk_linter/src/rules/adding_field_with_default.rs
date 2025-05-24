@@ -2,7 +2,7 @@ use lazy_static::lazy_static;
 use std::collections::HashSet;
 
 use squawk_syntax::ast;
-use squawk_syntax::ast::{AstNode, HasArgList};
+use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile};
 
 use crate::{Linter, Rule, Violation};

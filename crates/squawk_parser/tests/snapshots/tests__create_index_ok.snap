@@ -14,10 +14,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -49,12 +50,13 @@ SOURCE_FILE
     WHITESPACE " \n  "
     ON_KW "on"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " \n  "
     USING_KW "using"
     WHITESPACE " "
@@ -77,10 +79,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -108,10 +111,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -135,10 +139,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -192,10 +197,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -232,10 +238,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -313,10 +320,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -353,15 +361,16 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "on"
     WHITESPACE " "
-    PATH
+    RELATION_NAME
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "public"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "public"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+            IDENT "t"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -384,10 +393,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -408,10 +418,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -445,10 +456,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -482,10 +494,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -513,10 +526,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -541,10 +555,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -569,10 +584,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -606,10 +622,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "documents_table"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "documents_table"
     WHITESPACE " "
     USING_KW "USING"
     WHITESPACE " "
@@ -651,10 +668,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "films"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "films"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
@@ -678,10 +696,11 @@ SOURCE_FILE
     WHITESPACE "\n    "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "points"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "points"
     WHITESPACE " "
     USING_KW "USING"
     WHITESPACE " "
@@ -716,10 +735,11 @@ SOURCE_FILE
     WHITESPACE " "
     ON_KW "ON"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "sales_table"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "sales_table"
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("

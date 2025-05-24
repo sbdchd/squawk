@@ -95,10 +95,11 @@ SOURCE_FILE
     TABLE_STMT
       TABLE_KW "table"
       WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "u"
+      RELATION_NAME
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"

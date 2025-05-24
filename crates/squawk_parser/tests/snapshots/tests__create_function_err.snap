@@ -5,7 +5,7 @@ input_file: crates/squawk_parser/tests/data/err/create_function.sql
 SOURCE_FILE
   COMMENT "-- regression partial definition"
   WHITESPACE "\n"
-  CREATE_FUNCTION_STMT
+  CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"

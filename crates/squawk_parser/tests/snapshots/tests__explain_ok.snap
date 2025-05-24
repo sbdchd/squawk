@@ -520,7 +520,7 @@ SOURCE_FILE
             WHITESPACE " "
             CAST_EXPR
               LITERAL
-
+                POSITIONAL_PARAM "$1"
               COLON_COLON "::"
               PATH_TYPE
                 PATH
@@ -538,7 +538,7 @@ SOURCE_FILE
             WHITESPACE " "
             CAST_EXPR
               LITERAL
-
+                POSITIONAL_PARAM "$2"
               COLON_COLON "::"
               PATH_TYPE
                 PATH

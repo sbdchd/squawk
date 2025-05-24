@@ -207,11 +207,11 @@ fn api_walkthrough() {
     let mut func = None;
     for stmt in file.stmts() {
         match stmt {
-            ast::Stmt::CreateFunc(f) => func = Some(f),
+            ast::Stmt::CreateFunction(f) => func = Some(f),
             _ => unreachable!(),
         }
     }
-    let func: ast::CreateFunc = func.unwrap();
+    let func: ast::CreateFunction = func.unwrap();
 
     // Each AST node has a bunch of getters for children. All getters return
     // `Option`s though, to account for incomplete code. Some getters are common
@@ -305,7 +305,7 @@ fn api_walkthrough() {
     // As well as some iterator helpers:
     let f = func_option_syntax
         .ancestors()
-        .find_map(ast::CreateFunc::cast);
+        .find_map(ast::CreateFunction::cast);
     assert_eq!(f, Some(func));
     assert!(param
         .syntax()

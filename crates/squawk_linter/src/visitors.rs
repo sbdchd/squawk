@@ -44,7 +44,7 @@ pub(crate) fn check_not_allowed_types(
             ast::Stmt::CreateTable(create_table) => {
                 if let Some(table_args) = create_table.table_args() {
                     for arg in table_args.args() {
-                        if let ast::TableArgs::Column(column) = arg {
+                        if let ast::TableArg::Column(column) = arg {
                             check_ty(ctx, column.ty());
                         }
                     }

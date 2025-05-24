@@ -17,14 +17,14 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     ctx.report(Violation::new(
                         Rule::TransactionNesting,
                         "There is an existing transaction already in progress, managed by your migration tool.".to_string(),
-                        item.syntax().text_range(),
+                        stmt.syntax().text_range(),
                         assume_in_transaction_help.to_string()
                     ));
                 } else if in_explicit_transaction {
                     ctx.report(Violation::new(
                         Rule::TransactionNesting,
                         "There is an existing transaction already in progress.".to_string(),
-                        item.syntax().text_range(),
+                        stmt.syntax().text_range(),
                         assume_in_transaction_help.to_string(),
                     ));
                 }
@@ -36,14 +36,14 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         Rule::TransactionNesting,
                         "Attempting to end the transaction that is managed by your migration tool"
                             .to_string(),
-                        item.syntax().text_range(),
+                        stmt.syntax().text_range(),
                         assume_in_transaction_help.to_string(),
                     ));
                 } else if !in_explicit_transaction {
                     ctx.report(Violation::new(
                         Rule::TransactionNesting,
                         "There is no transaction to `COMMIT` or `ROLLBACK`.".to_string(),
-                        item.syntax().text_range(),
+                        stmt.syntax().text_range(),
                         "`BEGIN` a transaction at an earlier point in the migration or remove this statement.".to_string()
                     ));
                 }

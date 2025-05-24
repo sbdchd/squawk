@@ -4941,10 +4941,11 @@ SOURCE_FILE
   TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- only"
@@ -4952,12 +4953,13 @@ SOURCE_FILE
   TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
-    ONLY_KW "only"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
+    RELATION_NAME
+      ONLY_KW "only"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- star"
@@ -4965,12 +4967,13 @@ SOURCE_FILE
   TABLE_STMT
     TABLE_KW "table"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t"
-    WHITESPACE " "
-    STAR "*"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+      WHITESPACE " "
+      STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested"
@@ -4986,10 +4989,11 @@ SOURCE_FILE
             TABLE_STMT
               TABLE_KW "table"
               WHITESPACE " "
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    IDENT "t"
+              RELATION_NAME
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "t"
             R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
