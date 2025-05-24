@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/revoke.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     SELECT_KW "select"
@@ -46,7 +45,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- on_table"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -96,7 +95,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -139,7 +138,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -164,7 +163,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -207,7 +206,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- on_all_tables"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -246,7 +245,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- columns"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     SELECT_KW "select"
@@ -279,7 +278,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     INSERT_KW "insert"
@@ -312,7 +311,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     UPDATE_KW "update"
@@ -345,7 +344,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     REFERENCES_KW "references"
@@ -378,7 +377,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -403,7 +402,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -428,7 +427,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     SELECT_KW "select"
@@ -447,7 +446,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     IDENT "usage"
@@ -478,7 +477,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     UPDATE_KW "update"
@@ -497,7 +496,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -520,7 +519,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -555,7 +554,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- database"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -586,7 +585,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     CREATE_KW "create"
@@ -612,7 +611,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -631,7 +630,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- domain"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -668,7 +667,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -691,7 +690,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- foreign_data"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -726,7 +725,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -751,7 +750,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- foreign_server"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -784,7 +783,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -807,7 +806,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- function"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     GRANT_KW "grant"
@@ -838,7 +837,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     EXECUTE_KW "execute"
@@ -918,7 +917,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -937,7 +936,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -968,7 +967,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -991,7 +990,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1014,7 +1013,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1080,7 +1079,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- language"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     IDENT "usage"
@@ -1105,7 +1104,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1130,7 +1129,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1159,7 +1158,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     SELECT_KW "select"
@@ -1185,7 +1184,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1212,7 +1211,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- param"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     SET_KW "set"
@@ -1248,7 +1247,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALTER_KW "alter"
@@ -1269,7 +1268,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1290,7 +1289,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- edge_case"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     SET_KW "set"
@@ -1312,7 +1311,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE " \n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     SET_KW "set"
@@ -1330,7 +1329,7 @@ SOURCE_FILE
   WHITESPACE " \n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     CREATE_KW "create"
@@ -1347,7 +1346,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     CREATE_KW "create"
@@ -1375,7 +1374,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1402,7 +1401,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     CREATE_KW "create"
@@ -1427,7 +1426,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1454,7 +1453,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- type_"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     IDENT "usage"
@@ -1488,7 +1487,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1508,7 +1507,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ALL_KW "all"
@@ -1535,7 +1534,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- option"
   WHITESPACE "\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     ADMIN_KW "admin"
@@ -1551,7 +1550,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     INHERIT_KW "inherit"
@@ -1567,7 +1566,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     SET_KW "set"
@@ -1583,7 +1582,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REVOKE_STMT
+  REVOKE
     REVOKE_KW "revoke"
     WHITESPACE " "
     IDENT "public"

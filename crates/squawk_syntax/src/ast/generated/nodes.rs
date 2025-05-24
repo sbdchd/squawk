@@ -115,10 +115,10 @@ impl AlterAggregate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterCollationStmt {
+pub struct AlterCollation {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterCollationStmt {
+impl AlterCollation {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -172,10 +172,10 @@ impl AlterConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterConversionStmt {
+pub struct AlterConversion {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterConversionStmt {
+impl AlterConversion {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -191,10 +191,10 @@ impl AlterConversionStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterDatabaseStmt {
+pub struct AlterDatabase {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterDatabaseStmt {
+impl AlterDatabase {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -210,10 +210,10 @@ impl AlterDatabaseStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterDefaultPrivilegesStmt {
+pub struct AlterDefaultPrivileges {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterDefaultPrivilegesStmt {
+impl AlterDefaultPrivileges {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -252,10 +252,10 @@ impl AlterDomain {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterEventTriggerStmt {
+pub struct AlterEventTrigger {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterEventTriggerStmt {
+impl AlterEventTrigger {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -271,10 +271,10 @@ impl AlterEventTriggerStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterExtensionStmt {
+pub struct AlterExtension {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterExtensionStmt {
+impl AlterExtension {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -290,10 +290,10 @@ impl AlterExtensionStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterForeignDataWrapperStmt {
+pub struct AlterForeignDataWrapper {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterForeignDataWrapperStmt {
+impl AlterForeignDataWrapper {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -313,10 +313,10 @@ impl AlterForeignDataWrapperStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterForeignTableStmt {
+pub struct AlterForeignTable {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterForeignTableStmt {
+impl AlterForeignTable {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -332,10 +332,10 @@ impl AlterForeignTableStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterFunctionStmt {
+pub struct AlterFunction {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterFunctionStmt {
+impl AlterFunction {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -347,10 +347,10 @@ impl AlterFunctionStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterGroupStmt {
+pub struct AlterGroup {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterGroupStmt {
+impl AlterGroup {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -366,10 +366,10 @@ impl AlterGroupStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterIndexStmt {
+pub struct AlterIndex {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterIndexStmt {
+impl AlterIndex {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -385,10 +385,10 @@ impl AlterIndexStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterLanguageStmt {
+pub struct AlterLanguage {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterLanguageStmt {
+impl AlterLanguage {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -404,10 +404,10 @@ impl AlterLanguageStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterLargeObjectStmt {
+pub struct AlterLargeObject {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterLargeObjectStmt {
+impl AlterLargeObject {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -423,10 +423,10 @@ impl AlterLargeObjectStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterMaterializedViewStmt {
+pub struct AlterMaterializedView {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterMaterializedViewStmt {
+impl AlterMaterializedView {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -446,10 +446,25 @@ impl AlterMaterializedViewStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterOperatorClassStmt {
+pub struct AlterOperator {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterOperatorClassStmt {
+impl AlterOperator {
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn operator_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterOperatorClass {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterOperatorClass {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -473,10 +488,10 @@ impl AlterOperatorClassStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterOperatorFamilyStmt {
+pub struct AlterOperatorFamily {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterOperatorFamilyStmt {
+impl AlterOperatorFamily {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -500,25 +515,10 @@ impl AlterOperatorFamilyStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterOperatorStmt {
+pub struct AlterPolicy {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterOperatorStmt {
-    #[inline]
-    pub fn alter_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALTER_KW)
-    }
-    #[inline]
-    pub fn operator_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterPolicyStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AlterPolicyStmt {
+impl AlterPolicy {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -538,10 +538,10 @@ impl AlterPolicyStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterProcedureStmt {
+pub struct AlterProcedure {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterProcedureStmt {
+impl AlterProcedure {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -553,10 +553,10 @@ impl AlterProcedureStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterPublicationStmt {
+pub struct AlterPublication {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterPublicationStmt {
+impl AlterPublication {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -572,10 +572,10 @@ impl AlterPublicationStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterRoleStmt {
+pub struct AlterRole {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterRoleStmt {
+impl AlterRole {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -587,10 +587,10 @@ impl AlterRoleStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterRoutineStmt {
+pub struct AlterRoutine {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterRoutineStmt {
+impl AlterRoutine {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -602,10 +602,10 @@ impl AlterRoutineStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterRuleStmt {
+pub struct AlterRule {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterRuleStmt {
+impl AlterRule {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -625,10 +625,10 @@ impl AlterRuleStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterSchemaStmt {
+pub struct AlterSchema {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterSchemaStmt {
+impl AlterSchema {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -652,10 +652,10 @@ impl AlterSchemaStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterSequenceStmt {
+pub struct AlterSequence {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterSequenceStmt {
+impl AlterSequence {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -671,10 +671,10 @@ impl AlterSequenceStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterServerStmt {
+pub struct AlterServer {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterServerStmt {
+impl AlterServer {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -690,10 +690,10 @@ impl AlterServerStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterStatisticsStmt {
+pub struct AlterStatistics {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterStatisticsStmt {
+impl AlterStatistics {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -709,10 +709,10 @@ impl AlterStatisticsStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterSubscriptionStmt {
+pub struct AlterSubscription {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterSubscriptionStmt {
+impl AlterSubscription {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -728,10 +728,10 @@ impl AlterSubscriptionStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterSystemStmt {
+pub struct AlterSystem {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterSystemStmt {
+impl AlterSystem {
     #[inline]
     pub fn alter_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALTER_KW)
@@ -770,10 +770,10 @@ impl AlterTable {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterTablespaceStmt {
+pub struct AlterTablespace {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterTablespaceStmt {
+impl AlterTablespace {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -789,10 +789,10 @@ impl AlterTablespaceStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterTextSearchConfigurationStmt {
+pub struct AlterTextSearchConfiguration {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterTextSearchConfigurationStmt {
+impl AlterTextSearchConfiguration {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -816,10 +816,10 @@ impl AlterTextSearchConfigurationStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterTextSearchDictionaryStmt {
+pub struct AlterTextSearchDictionary {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterTextSearchDictionaryStmt {
+impl AlterTextSearchDictionary {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -843,10 +843,10 @@ impl AlterTextSearchDictionaryStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterTextSearchParserStmt {
+pub struct AlterTextSearchParser {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterTextSearchParserStmt {
+impl AlterTextSearchParser {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -870,10 +870,10 @@ impl AlterTextSearchParserStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterTextSearchTemplateStmt {
+pub struct AlterTextSearchTemplate {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterTextSearchTemplateStmt {
+impl AlterTextSearchTemplate {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -897,10 +897,10 @@ impl AlterTextSearchTemplateStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterTriggerStmt {
+pub struct AlterTrigger {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterTriggerStmt {
+impl AlterTrigger {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -920,10 +920,10 @@ impl AlterTriggerStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterTypeStmt {
+pub struct AlterType {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterTypeStmt {
+impl AlterType {
     #[inline]
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
@@ -939,10 +939,29 @@ impl AlterTypeStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterUserMappingStmt {
+pub struct AlterUser {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterUserMappingStmt {
+impl AlterUser {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn alter_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALTER_KW)
+    }
+    #[inline]
+    pub fn user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterUserMapping {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterUserMapping {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -970,29 +989,10 @@ impl AlterUserMappingStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterUserStmt {
+pub struct AlterView {
     pub(crate) syntax: SyntaxNode,
 }
-impl AlterUserStmt {
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn alter_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALTER_KW)
-    }
-    #[inline]
-    pub fn user_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USER_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AlterViewStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl AlterViewStmt {
+impl AlterView {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -1008,10 +1008,10 @@ impl AlterViewStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct AnalyzeStmt {
+pub struct Analyze {
     pub(crate) syntax: SyntaxNode,
 }
-impl AnalyzeStmt {
+impl Analyze {
     #[inline]
     pub fn analyze_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ANALYZE_KW)
@@ -1287,6 +1287,17 @@ impl BitType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Call {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Call {
+    #[inline]
+    pub fn call_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CALL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct CallExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -1298,17 +1309,6 @@ impl CallExpr {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CallStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CallStmt {
-    #[inline]
-    pub fn call_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CALL_KW)
     }
 }
 
@@ -1413,10 +1413,10 @@ impl CheckConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CheckpointStmt {
+pub struct Checkpoint {
     pub(crate) syntax: SyntaxNode,
 }
-impl CheckpointStmt {
+impl Checkpoint {
     #[inline]
     pub fn checkpoint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CHECKPOINT_KW)
@@ -1424,13 +1424,28 @@ impl CheckpointStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CloseStmt {
+pub struct Close {
     pub(crate) syntax: SyntaxNode,
 }
-impl CloseStmt {
+impl Close {
     #[inline]
     pub fn close_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CLOSE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Cluster {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Cluster {
+    #[inline]
+    pub fn cluster_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CLUSTER_KW)
+    }
+    #[inline]
+    pub fn verbose_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VERBOSE_KW)
     }
 }
 
@@ -1446,21 +1461,6 @@ impl ClusterOn {
     #[inline]
     pub fn on_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ON_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ClusterStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ClusterStmt {
-    #[inline]
-    pub fn cluster_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CLUSTER_KW)
-    }
-    #[inline]
-    pub fn verbose_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::VERBOSE_KW)
     }
 }
 
@@ -1548,10 +1548,10 @@ impl ColumnList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CommentStmt {
+pub struct CommentOn {
     pub(crate) syntax: SyntaxNode,
 }
-impl CommentStmt {
+impl CommentOn {
     #[inline]
     pub fn comment_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COMMENT_KW)
@@ -1726,10 +1726,10 @@ impl ConstraintWhereClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CopyStmt {
+pub struct Copy {
     pub(crate) syntax: SyntaxNode,
 }
-impl CopyStmt {
+impl Copy {
     #[inline]
     pub fn copy_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COPY_KW)
@@ -1748,10 +1748,10 @@ impl CostFuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateAccessMethodStmt {
+pub struct CreateAccessMethod {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateAccessMethodStmt {
+impl CreateAccessMethod {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -1802,10 +1802,10 @@ impl CreateAggregate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateCastStmt {
+pub struct CreateCast {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateCastStmt {
+impl CreateCast {
     #[inline]
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
@@ -1833,10 +1833,10 @@ impl CreateCastStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateCollationStmt {
+pub struct CreateCollation {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateCollationStmt {
+impl CreateCollation {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -1852,10 +1852,10 @@ impl CreateCollationStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateConversionStmt {
+pub struct CreateConversion {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateConversionStmt {
+impl CreateConversion {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -1875,10 +1875,10 @@ impl CreateConversionStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateDatabaseStmt {
+pub struct CreateDatabase {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateDatabaseStmt {
+impl CreateDatabase {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -1929,10 +1929,10 @@ impl CreateDomain {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateEventTriggerStmt {
+pub struct CreateEventTrigger {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateEventTriggerStmt {
+impl CreateEventTrigger {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -1956,10 +1956,10 @@ impl CreateEventTriggerStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateExtensionStmt {
+pub struct CreateExtension {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateExtensionStmt {
+impl CreateExtension {
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
@@ -1971,10 +1971,10 @@ impl CreateExtensionStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateForeignDataWrapperStmt {
+pub struct CreateForeignDataWrapper {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateForeignDataWrapperStmt {
+impl CreateForeignDataWrapper {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -1998,10 +1998,10 @@ impl CreateForeignDataWrapperStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateForeignTableStmt {
+pub struct CreateForeignTable {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateForeignTableStmt {
+impl CreateForeignTable {
     #[inline]
     pub fn if_not_exists(&self) -> Option<IfNotExists> {
         support::child(&self.syntax)
@@ -2056,10 +2056,10 @@ impl CreateFunction {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateGroupStmt {
+pub struct CreateGroup {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateGroupStmt {
+impl CreateGroup {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2114,10 +2114,10 @@ impl CreateIndex {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateLanguageStmt {
+pub struct CreateLanguage {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateLanguageStmt {
+impl CreateLanguage {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2133,10 +2133,10 @@ impl CreateLanguageStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateMaterializedViewStmt {
+pub struct CreateMaterializedView {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateMaterializedViewStmt {
+impl CreateMaterializedView {
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
@@ -2144,10 +2144,25 @@ impl CreateMaterializedViewStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateOperatorClassStmt {
+pub struct CreateOperator {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateOperatorClassStmt {
+impl CreateOperator {
+    #[inline]
+    pub fn create_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CREATE_KW)
+    }
+    #[inline]
+    pub fn operator_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CreateOperatorClass {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CreateOperatorClass {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2187,10 +2202,10 @@ impl CreateOperatorClassStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateOperatorFamilyStmt {
+pub struct CreateOperatorFamily {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateOperatorFamilyStmt {
+impl CreateOperatorFamily {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2214,25 +2229,10 @@ impl CreateOperatorFamilyStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateOperatorStmt {
+pub struct CreatePolicy {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateOperatorStmt {
-    #[inline]
-    pub fn create_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CREATE_KW)
-    }
-    #[inline]
-    pub fn operator_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreatePolicyStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CreatePolicyStmt {
+impl CreatePolicy {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2252,10 +2252,10 @@ impl CreatePolicyStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateProcedureStmt {
+pub struct CreateProcedure {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateProcedureStmt {
+impl CreateProcedure {
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
@@ -2267,10 +2267,10 @@ impl CreateProcedureStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreatePublicationStmt {
+pub struct CreatePublication {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreatePublicationStmt {
+impl CreatePublication {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2286,10 +2286,10 @@ impl CreatePublicationStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateRoleStmt {
+pub struct CreateRole {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateRoleStmt {
+impl CreateRole {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2305,10 +2305,10 @@ impl CreateRoleStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateRuleStmt {
+pub struct CreateRule {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateRuleStmt {
+impl CreateRule {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2332,10 +2332,10 @@ impl CreateRuleStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateSchemaStmt {
+pub struct CreateSchema {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateSchemaStmt {
+impl CreateSchema {
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
@@ -2347,10 +2347,10 @@ impl CreateSchemaStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateSequenceStmt {
+pub struct CreateSequence {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateSequenceStmt {
+impl CreateSequence {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2366,10 +2366,10 @@ impl CreateSequenceStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateServerStmt {
+pub struct CreateServer {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateServerStmt {
+impl CreateServer {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2385,10 +2385,10 @@ impl CreateServerStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateStatisticsStmt {
+pub struct CreateStatistics {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateStatisticsStmt {
+impl CreateStatistics {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2404,10 +2404,10 @@ impl CreateStatisticsStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateSubscriptionStmt {
+pub struct CreateSubscription {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateSubscriptionStmt {
+impl CreateSubscription {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2450,10 +2450,10 @@ impl CreateTable {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTableAsStmt {
+pub struct CreateTableAs {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTableAsStmt {
+impl CreateTableAs {
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
@@ -2461,10 +2461,10 @@ impl CreateTableAsStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTablespaceStmt {
+pub struct CreateTablespace {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTablespaceStmt {
+impl CreateTablespace {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2480,10 +2480,10 @@ impl CreateTablespaceStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTextSearchConfigurationStmt {
+pub struct CreateTextSearchConfiguration {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTextSearchConfigurationStmt {
+impl CreateTextSearchConfiguration {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2507,10 +2507,10 @@ impl CreateTextSearchConfigurationStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTextSearchDictionaryStmt {
+pub struct CreateTextSearchDictionary {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTextSearchDictionaryStmt {
+impl CreateTextSearchDictionary {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2534,10 +2534,10 @@ impl CreateTextSearchDictionaryStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTextSearchParserStmt {
+pub struct CreateTextSearchParser {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTextSearchParserStmt {
+impl CreateTextSearchParser {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2561,10 +2561,10 @@ impl CreateTextSearchParserStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTextSearchTemplateStmt {
+pub struct CreateTextSearchTemplate {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTextSearchTemplateStmt {
+impl CreateTextSearchTemplate {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2588,10 +2588,10 @@ impl CreateTextSearchTemplateStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTransformStmt {
+pub struct CreateTransform {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTransformStmt {
+impl CreateTransform {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2619,10 +2619,10 @@ impl CreateTransformStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTriggerStmt {
+pub struct CreateTrigger {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTriggerStmt {
+impl CreateTrigger {
     #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
@@ -2630,10 +2630,10 @@ impl CreateTriggerStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateTypeStmt {
+pub struct CreateType {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateTypeStmt {
+impl CreateType {
     #[inline]
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
@@ -2649,10 +2649,29 @@ impl CreateTypeStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateUserMappingStmt {
+pub struct CreateUser {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateUserMappingStmt {
+impl CreateUser {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn create_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CREATE_KW)
+    }
+    #[inline]
+    pub fn user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct CreateUserMapping {
+    pub(crate) syntax: SyntaxNode,
+}
+impl CreateUserMapping {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2680,29 +2699,10 @@ impl CreateUserMappingStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateUserStmt {
+pub struct CreateView {
     pub(crate) syntax: SyntaxNode,
 }
-impl CreateUserStmt {
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn create_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CREATE_KW)
-    }
-    #[inline]
-    pub fn user_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USER_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct CreateViewStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl CreateViewStmt {
+impl CreateView {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2793,10 +2793,10 @@ impl CustomOp {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DeallocateStmt {
+pub struct Deallocate {
     pub(crate) syntax: SyntaxNode,
 }
-impl DeallocateStmt {
+impl Deallocate {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -2816,10 +2816,10 @@ impl DeallocateStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DeclareStmt {
+pub struct Declare {
     pub(crate) syntax: SyntaxNode,
 }
-impl DeclareStmt {
+impl Declare {
     #[inline]
     pub fn declare_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DECLARE_KW)
@@ -2864,10 +2864,10 @@ impl DeferrableConstraintOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DeleteStmt {
+pub struct Delete {
     pub(crate) syntax: SyntaxNode,
 }
-impl DeleteStmt {
+impl Delete {
     #[inline]
     pub fn delete_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DELETE_KW)
@@ -2943,10 +2943,10 @@ impl DisableTrigger {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DiscardStmt {
+pub struct Discard {
     pub(crate) syntax: SyntaxNode,
 }
-impl DiscardStmt {
+impl Discard {
     #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
@@ -2985,10 +2985,10 @@ impl DistinctClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DoStmt {
+pub struct Do {
     pub(crate) syntax: SyntaxNode,
 }
-impl DoStmt {
+impl Do {
     #[inline]
     pub fn do_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DO_KW)
@@ -3011,10 +3011,10 @@ impl DoubleType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropAccessMethodStmt {
+pub struct DropAccessMethod {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropAccessMethodStmt {
+impl DropAccessMethod {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3061,10 +3061,10 @@ impl DropAggregate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropCastStmt {
+pub struct DropCast {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropCastStmt {
+impl DropCast {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3096,10 +3096,10 @@ impl DropCastStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropCollationStmt {
+pub struct DropCollation {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropCollationStmt {
+impl DropCollation {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3169,10 +3169,10 @@ impl DropConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropConversionStmt {
+pub struct DropConversion {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropConversionStmt {
+impl DropConversion {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3230,10 +3230,10 @@ impl DropDefault {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropDomainStmt {
+pub struct DropDomain {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropDomainStmt {
+impl DropDomain {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3253,10 +3253,10 @@ impl DropDomainStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropEventTriggerStmt {
+pub struct DropEventTrigger {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropEventTriggerStmt {
+impl DropEventTrigger {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3299,10 +3299,10 @@ impl DropExpression {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropExtensionStmt {
+pub struct DropExtension {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropExtensionStmt {
+impl DropExtension {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3322,10 +3322,10 @@ impl DropExtensionStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropForeignDataWrapperStmt {
+pub struct DropForeignDataWrapper {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropForeignDataWrapperStmt {
+impl DropForeignDataWrapper {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3353,10 +3353,10 @@ impl DropForeignDataWrapperStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropForeignTableStmt {
+pub struct DropForeignTable {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropForeignTableStmt {
+impl DropForeignTable {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3376,10 +3376,10 @@ impl DropForeignTableStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropFunctionStmt {
+pub struct DropFunction {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropFunctionStmt {
+impl DropFunction {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3395,10 +3395,10 @@ impl DropFunctionStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropGroupStmt {
+pub struct DropGroup {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropGroupStmt {
+impl DropGroup {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3464,10 +3464,10 @@ impl DropIndex {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropLanguageStmt {
+pub struct DropLanguage {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropLanguageStmt {
+impl DropLanguage {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3487,10 +3487,10 @@ impl DropLanguageStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropMaterializedViewStmt {
+pub struct DropMaterializedView {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropMaterializedViewStmt {
+impl DropMaterializedView {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3529,10 +3529,29 @@ impl DropNotNull {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropOperatorClassStmt {
+pub struct DropOperator {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropOperatorClassStmt {
+impl DropOperator {
+    #[inline]
+    pub fn if_exists(&self) -> Option<IfExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn operator_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct DropOperatorClass {
+    pub(crate) syntax: SyntaxNode,
+}
+impl DropOperatorClass {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3560,10 +3579,10 @@ impl DropOperatorClassStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropOperatorFamilyStmt {
+pub struct DropOperatorFamily {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropOperatorFamilyStmt {
+impl DropOperatorFamily {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3583,29 +3602,10 @@ impl DropOperatorFamilyStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropOperatorStmt {
+pub struct DropOwned {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropOperatorStmt {
-    #[inline]
-    pub fn if_exists(&self) -> Option<IfExists> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn drop_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DROP_KW)
-    }
-    #[inline]
-    pub fn operator_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OPERATOR_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropOwnedStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl DropOwnedStmt {
+impl DropOwned {
     #[inline]
     pub fn by_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BY_KW)
@@ -3621,10 +3621,10 @@ impl DropOwnedStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropPolicyStmt {
+pub struct DropPolicy {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropPolicyStmt {
+impl DropPolicy {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3648,10 +3648,10 @@ impl DropPolicyStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropProcedureStmt {
+pub struct DropProcedure {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropProcedureStmt {
+impl DropProcedure {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3667,10 +3667,10 @@ impl DropProcedureStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropPublicationStmt {
+pub struct DropPublication {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropPublicationStmt {
+impl DropPublication {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3690,10 +3690,10 @@ impl DropPublicationStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropRoleStmt {
+pub struct DropRole {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropRoleStmt {
+impl DropRole {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3713,10 +3713,10 @@ impl DropRoleStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropRoutineStmt {
+pub struct DropRoutine {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropRoutineStmt {
+impl DropRoutine {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3732,10 +3732,10 @@ impl DropRoutineStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropRuleStmt {
+pub struct DropRule {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropRuleStmt {
+impl DropRule {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3759,10 +3759,10 @@ impl DropRuleStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropSchemaStmt {
+pub struct DropSchema {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropSchemaStmt {
+impl DropSchema {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3778,10 +3778,10 @@ impl DropSchemaStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropSequenceStmt {
+pub struct DropSequence {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropSequenceStmt {
+impl DropSequence {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3801,10 +3801,10 @@ impl DropSequenceStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropServerStmt {
+pub struct DropServer {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropServerStmt {
+impl DropServer {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3824,10 +3824,10 @@ impl DropServerStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropStatisticsStmt {
+pub struct DropStatistics {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropStatisticsStmt {
+impl DropStatistics {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3847,10 +3847,10 @@ impl DropStatisticsStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropSubscriptionStmt {
+pub struct DropSubscription {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropSubscriptionStmt {
+impl DropSubscription {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3905,10 +3905,10 @@ impl DropTable {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropTablespaceStmt {
+pub struct DropTablespace {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropTablespaceStmt {
+impl DropTablespace {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3928,10 +3928,10 @@ impl DropTablespaceStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropTextSearchConfigStmt {
+pub struct DropTextSearchConfig {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropTextSearchConfigStmt {
+impl DropTextSearchConfig {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3955,10 +3955,10 @@ impl DropTextSearchConfigStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropTextSearchDictStmt {
+pub struct DropTextSearchDict {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropTextSearchDictStmt {
+impl DropTextSearchDict {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -3982,10 +3982,10 @@ impl DropTextSearchDictStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropTextSearchParserStmt {
+pub struct DropTextSearchParser {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropTextSearchParserStmt {
+impl DropTextSearchParser {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -4013,10 +4013,10 @@ impl DropTextSearchParserStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropTextSearchTemplateStmt {
+pub struct DropTextSearchTemplate {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropTextSearchTemplateStmt {
+impl DropTextSearchTemplate {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -4040,10 +4040,10 @@ impl DropTextSearchTemplateStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropTransformStmt {
+pub struct DropTransform {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropTransformStmt {
+impl DropTransform {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -4059,10 +4059,10 @@ impl DropTransformStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropTriggerStmt {
+pub struct DropTrigger {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropTriggerStmt {
+impl DropTrigger {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -4117,29 +4117,33 @@ impl DropType {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropTypeStmt {
+pub struct DropUser {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropTypeStmt {
+impl DropUser {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_refs(&self) -> AstChildren<NameRef> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
     }
     #[inline]
-    pub fn type_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TYPE_KW)
+    pub fn user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USER_KW)
     }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropUserMappingStmt {
+pub struct DropUserMapping {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropUserMappingStmt {
+impl DropUserMapping {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -4171,33 +4175,10 @@ impl DropUserMappingStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropUserStmt {
+pub struct DropView {
     pub(crate) syntax: SyntaxNode,
 }
-impl DropUserStmt {
-    #[inline]
-    pub fn if_exists(&self) -> Option<IfExists> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_refs(&self) -> AstChildren<NameRef> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn drop_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DROP_KW)
-    }
-    #[inline]
-    pub fn user_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::USER_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropViewStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl DropViewStmt {
+impl DropView {
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -4353,10 +4334,10 @@ impl ExcludeConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ExecuteStmt {
+pub struct Execute {
     pub(crate) syntax: SyntaxNode,
 }
-impl ExecuteStmt {
+impl Execute {
     #[inline]
     pub fn execute_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXECUTE_KW)
@@ -4364,10 +4345,10 @@ impl ExecuteStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ExplainStmt {
+pub struct Explain {
     pub(crate) syntax: SyntaxNode,
 }
-impl ExplainStmt {
+impl Explain {
     #[inline]
     pub fn explain_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXPLAIN_KW)
@@ -4390,10 +4371,10 @@ impl FatArrow {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct FetchStmt {
+pub struct Fetch {
     pub(crate) syntax: SyntaxNode,
 }
-impl FetchStmt {
+impl Fetch {
     #[inline]
     pub fn fetch_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FETCH_KW)
@@ -4598,10 +4579,10 @@ impl GeneratedConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct GrantStmt {
+pub struct Grant {
     pub(crate) syntax: SyntaxNode,
 }
-impl GrantStmt {
+impl Grant {
     #[inline]
     pub fn grant_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::GRANT_KW)
@@ -4778,10 +4759,10 @@ impl InitiallyImmediateConstraintOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct InsertStmt {
+pub struct Insert {
     pub(crate) syntax: SyntaxNode,
 }
-impl InsertStmt {
+impl Insert {
     #[inline]
     pub fn insert_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INSERT_KW)
@@ -4904,21 +4885,6 @@ impl IsNotDistinctFrom {
     #[inline]
     pub fn not_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NOT_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct IsNull {
-    pub(crate) syntax: SyntaxNode,
-}
-impl IsNull {
-    #[inline]
-    pub fn is_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IS_KW)
-    }
-    #[inline]
-    pub fn null_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NULL_KW)
     }
 }
 
@@ -5235,10 +5201,10 @@ impl LimitClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ListenStmt {
+pub struct Listen {
     pub(crate) syntax: SyntaxNode,
 }
-impl ListenStmt {
+impl Listen {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -5256,10 +5222,10 @@ pub struct Literal {
 impl Literal {}
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct LoadStmt {
+pub struct Load {
     pub(crate) syntax: SyntaxNode,
 }
-impl LoadStmt {
+impl Load {
     #[inline]
     pub fn load_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LOAD_KW)
@@ -5267,10 +5233,10 @@ impl LoadStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct LockStmt {
+pub struct Lock {
     pub(crate) syntax: SyntaxNode,
 }
-impl LockStmt {
+impl Lock {
     #[inline]
     pub fn lock_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LOCK_KW)
@@ -5308,10 +5274,10 @@ impl Lteq {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct MergeStmt {
+pub struct Merge {
     pub(crate) syntax: SyntaxNode,
 }
-impl MergeStmt {
+impl Merge {
     #[inline]
     pub fn merge_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MERGE_KW)
@@ -5319,10 +5285,10 @@ impl MergeStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct MoveStmt {
+pub struct Move {
     pub(crate) syntax: SyntaxNode,
 }
-impl MoveStmt {
+impl Move {
     #[inline]
     pub fn move_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MOVE_KW)
@@ -5556,10 +5522,10 @@ impl NotValid {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct NotifyStmt {
+pub struct Notify {
     pub(crate) syntax: SyntaxNode,
 }
-impl NotifyStmt {
+impl Notify {
     #[inline]
     pub fn notify_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NOTIFY_KW)
@@ -6090,10 +6056,10 @@ impl PrefixExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PrepareStmt {
+pub struct Prepare {
     pub(crate) syntax: SyntaxNode,
 }
-impl PrepareStmt {
+impl Prepare {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -6105,10 +6071,10 @@ impl PrepareStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct PrepareTransactionStmt {
+pub struct PrepareTransaction {
     pub(crate) syntax: SyntaxNode,
 }
-impl PrepareTransactionStmt {
+impl PrepareTransaction {
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
@@ -6219,10 +6185,10 @@ impl ReadWrite {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ReassignStmt {
+pub struct Reassign {
     pub(crate) syntax: SyntaxNode,
 }
-impl ReassignStmt {
+impl Reassign {
     #[inline]
     pub fn reassign_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::REASSIGN_KW)
@@ -6277,10 +6243,10 @@ impl ReferencesConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RefreshStmt {
+pub struct Refresh {
     pub(crate) syntax: SyntaxNode,
 }
-impl RefreshStmt {
+impl Refresh {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -6312,10 +6278,10 @@ impl RefreshStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ReindexStmt {
+pub struct Reindex {
     pub(crate) syntax: SyntaxNode,
 }
-impl ReindexStmt {
+impl Reindex {
     #[inline]
     pub fn reindex_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::REINDEX_KW)
@@ -6350,10 +6316,10 @@ impl RelationName {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ReleaseSavepointStmt {
+pub struct ReleaseSavepoint {
     pub(crate) syntax: SyntaxNode,
 }
-impl ReleaseSavepointStmt {
+impl ReleaseSavepoint {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -6479,6 +6445,25 @@ impl ReplicaIdentity {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Reset {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Reset {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn all_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALL_KW)
+    }
+    #[inline]
+    pub fn reset_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ResetFuncOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -6505,25 +6490,6 @@ impl ResetOptions {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn reset_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::RESET_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ResetStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ResetStmt {
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn all_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
     #[inline]
     pub fn reset_token(&self) -> Option<SyntaxToken> {
@@ -6596,10 +6562,10 @@ impl ReturnFuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RevokeStmt {
+pub struct Revoke {
     pub(crate) syntax: SyntaxNode,
 }
-impl RevokeStmt {
+impl Revoke {
     #[inline]
     pub fn revoke_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::REVOKE_KW)
@@ -6660,10 +6626,10 @@ impl RowsFuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SavepointStmt {
+pub struct Savepoint {
     pub(crate) syntax: SyntaxNode,
 }
-impl SavepointStmt {
+impl Savepoint {
     #[inline]
     pub fn savepoint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SAVEPOINT_KW)
@@ -6690,10 +6656,10 @@ impl SecurityFuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SecurityLabelStmt {
+pub struct SecurityLabel {
     pub(crate) syntax: SyntaxNode,
 }
-impl SecurityLabelStmt {
+impl SecurityLabel {
     #[inline]
     pub fn label_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LABEL_KW)
@@ -6727,10 +6693,10 @@ impl SelectClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SelectIntoStmt {
+pub struct SelectInto {
     pub(crate) syntax: SyntaxNode,
 }
-impl SelectIntoStmt {
+impl SelectInto {
     #[inline]
     pub fn select_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SELECT_KW)
@@ -6760,6 +6726,21 @@ impl Serializable {
     #[inline]
     pub fn serializable_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SERIALIZABLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Set {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Set {
+    #[inline]
+    pub fn set_options(&self) -> Option<SetOptions> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SET_KW)
     }
 }
 
@@ -6802,10 +6783,10 @@ impl SetCompression {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SetConstraintsStmt {
+pub struct SetConstraints {
     pub(crate) syntax: SyntaxNode,
 }
-impl SetConstraintsStmt {
+impl SetConstraints {
     #[inline]
     pub fn constraints_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINTS_KW)
@@ -6960,10 +6941,10 @@ impl SetOptionsList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SetRoleStmt {
+pub struct SetRole {
     pub(crate) syntax: SyntaxNode,
 }
-impl SetRoleStmt {
+impl SetRole {
     #[inline]
     pub fn role_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ROLE_KW)
@@ -7005,10 +6986,10 @@ impl SetSequenceOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SetSessionAuthStmt {
+pub struct SetSessionAuth {
     pub(crate) syntax: SyntaxNode,
 }
-impl SetSessionAuthStmt {
+impl SetSessionAuth {
     #[inline]
     pub fn authorization_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AUTHORIZATION_KW)
@@ -7035,21 +7016,6 @@ impl SetStatistics {
     #[inline]
     pub fn statistics_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::STATISTICS_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SetStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl SetStmt {
-    #[inline]
-    pub fn set_options(&self) -> Option<SetOptions> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn set_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SET_KW)
     }
 }
 
@@ -7107,10 +7073,10 @@ impl SetTablespace {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SetTransactionStmt {
+pub struct SetTransaction {
     pub(crate) syntax: SyntaxNode,
 }
-impl SetTransactionStmt {
+impl SetTransaction {
     #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
@@ -7198,10 +7164,10 @@ impl SetWithoutOids {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ShowStmt {
+pub struct Show {
     pub(crate) syntax: SyntaxNode,
 }
-impl ShowStmt {
+impl Show {
     #[inline]
     pub fn show_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SHOW_KW)
@@ -7277,6 +7243,17 @@ impl SupportFuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Table {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Table {
+    #[inline]
+    pub fn table_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TABLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct TableArgs {
     pub(crate) syntax: SyntaxNode,
 }
@@ -7303,17 +7280,6 @@ impl TableList {
     #[inline]
     pub fn relation_names(&self) -> AstChildren<RelationName> {
         support::children(&self.syntax)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TableStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl TableStmt {
-    #[inline]
-    pub fn table_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::TABLE_KW)
     }
 }
 
@@ -7529,10 +7495,10 @@ impl UniqueConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UnlistenStmt {
+pub struct Unlisten {
     pub(crate) syntax: SyntaxNode,
 }
-impl UnlistenStmt {
+impl Unlisten {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -7548,10 +7514,10 @@ impl UnlistenStmt {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct UpdateStmt {
+pub struct Update {
     pub(crate) syntax: SyntaxNode,
 }
-impl UpdateStmt {
+impl Update {
     #[inline]
     pub fn update_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::UPDATE_KW)
@@ -7589,10 +7555,10 @@ impl UsingIndex {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct VacuumStmt {
+pub struct Vacuum {
     pub(crate) syntax: SyntaxNode,
 }
-impl VacuumStmt {
+impl Vacuum {
     #[inline]
     pub fn vacuum_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VACUUM_KW)
@@ -7950,37 +7916,181 @@ pub enum ParamMode {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Stmt {
     AlterAggregate(AlterAggregate),
+    AlterCollation(AlterCollation),
+    AlterConversion(AlterConversion),
+    AlterDatabase(AlterDatabase),
+    AlterDefaultPrivileges(AlterDefaultPrivileges),
     AlterDomain(AlterDomain),
+    AlterEventTrigger(AlterEventTrigger),
+    AlterExtension(AlterExtension),
+    AlterForeignDataWrapper(AlterForeignDataWrapper),
+    AlterForeignTable(AlterForeignTable),
+    AlterFunction(AlterFunction),
+    AlterGroup(AlterGroup),
+    AlterIndex(AlterIndex),
+    AlterLanguage(AlterLanguage),
+    AlterLargeObject(AlterLargeObject),
+    AlterMaterializedView(AlterMaterializedView),
+    AlterOperator(AlterOperator),
+    AlterOperatorClass(AlterOperatorClass),
+    AlterOperatorFamily(AlterOperatorFamily),
+    AlterPolicy(AlterPolicy),
+    AlterProcedure(AlterProcedure),
+    AlterPublication(AlterPublication),
+    AlterRole(AlterRole),
+    AlterRoutine(AlterRoutine),
+    AlterRule(AlterRule),
+    AlterSchema(AlterSchema),
+    AlterSequence(AlterSequence),
+    AlterServer(AlterServer),
+    AlterStatistics(AlterStatistics),
+    AlterSubscription(AlterSubscription),
+    AlterSystem(AlterSystem),
     AlterTable(AlterTable),
+    AlterTablespace(AlterTablespace),
+    AlterTextSearchConfiguration(AlterTextSearchConfiguration),
+    AlterTextSearchDictionary(AlterTextSearchDictionary),
+    AlterTextSearchParser(AlterTextSearchParser),
+    AlterTextSearchTemplate(AlterTextSearchTemplate),
+    AlterTrigger(AlterTrigger),
+    AlterType(AlterType),
+    AlterUser(AlterUser),
+    AlterUserMapping(AlterUserMapping),
+    AlterView(AlterView),
+    Analyze(Analyze),
     Begin(Begin),
+    Call(Call),
+    Checkpoint(Checkpoint),
+    Close(Close),
+    Cluster(Cluster),
+    CommentOn(CommentOn),
     Commit(Commit),
+    Copy(Copy),
+    CreateAccessMethod(CreateAccessMethod),
     CreateAggregate(CreateAggregate),
+    CreateCast(CreateCast),
+    CreateCollation(CreateCollation),
+    CreateConversion(CreateConversion),
+    CreateDatabase(CreateDatabase),
     CreateDomain(CreateDomain),
+    CreateEventTrigger(CreateEventTrigger),
+    CreateExtension(CreateExtension),
+    CreateForeignDataWrapper(CreateForeignDataWrapper),
+    CreateForeignTable(CreateForeignTable),
     CreateFunction(CreateFunction),
+    CreateGroup(CreateGroup),
     CreateIndex(CreateIndex),
-    CreateMaterializedViewStmt(CreateMaterializedViewStmt),
+    CreateLanguage(CreateLanguage),
+    CreateMaterializedView(CreateMaterializedView),
+    CreateOperator(CreateOperator),
+    CreateOperatorClass(CreateOperatorClass),
+    CreateOperatorFamily(CreateOperatorFamily),
+    CreatePolicy(CreatePolicy),
+    CreateProcedure(CreateProcedure),
+    CreatePublication(CreatePublication),
+    CreateRole(CreateRole),
+    CreateRule(CreateRule),
+    CreateSchema(CreateSchema),
+    CreateSequence(CreateSequence),
+    CreateServer(CreateServer),
+    CreateStatistics(CreateStatistics),
+    CreateSubscription(CreateSubscription),
     CreateTable(CreateTable),
-    CreateTableAsStmt(CreateTableAsStmt),
-    DeclareStmt(DeclareStmt),
-    DeleteStmt(DeleteStmt),
+    CreateTableAs(CreateTableAs),
+    CreateTablespace(CreateTablespace),
+    CreateTextSearchConfiguration(CreateTextSearchConfiguration),
+    CreateTextSearchDictionary(CreateTextSearchDictionary),
+    CreateTextSearchParser(CreateTextSearchParser),
+    CreateTextSearchTemplate(CreateTextSearchTemplate),
+    CreateTransform(CreateTransform),
+    CreateTrigger(CreateTrigger),
+    CreateType(CreateType),
+    CreateUser(CreateUser),
+    CreateUserMapping(CreateUserMapping),
+    CreateView(CreateView),
+    Deallocate(Deallocate),
+    Declare(Declare),
+    Delete(Delete),
+    Discard(Discard),
+    Do(Do),
+    DropAccessMethod(DropAccessMethod),
     DropAggregate(DropAggregate),
+    DropCast(DropCast),
+    DropCollation(DropCollation),
+    DropConversion(DropConversion),
     DropDatabase(DropDatabase),
+    DropDomain(DropDomain),
+    DropEventTrigger(DropEventTrigger),
+    DropExtension(DropExtension),
+    DropForeignDataWrapper(DropForeignDataWrapper),
+    DropForeignTable(DropForeignTable),
+    DropFunction(DropFunction),
+    DropGroup(DropGroup),
     DropIndex(DropIndex),
+    DropLanguage(DropLanguage),
+    DropMaterializedView(DropMaterializedView),
+    DropOperator(DropOperator),
+    DropOperatorClass(DropOperatorClass),
+    DropOperatorFamily(DropOperatorFamily),
+    DropOwned(DropOwned),
+    DropPolicy(DropPolicy),
+    DropProcedure(DropProcedure),
+    DropPublication(DropPublication),
+    DropRole(DropRole),
+    DropRoutine(DropRoutine),
+    DropRule(DropRule),
+    DropSchema(DropSchema),
+    DropSequence(DropSequence),
+    DropServer(DropServer),
+    DropStatistics(DropStatistics),
+    DropSubscription(DropSubscription),
     DropTable(DropTable),
+    DropTablespace(DropTablespace),
+    DropTextSearchConfig(DropTextSearchConfig),
+    DropTextSearchDict(DropTextSearchDict),
+    DropTextSearchParser(DropTextSearchParser),
+    DropTextSearchTemplate(DropTextSearchTemplate),
+    DropTransform(DropTransform),
+    DropTrigger(DropTrigger),
     DropType(DropType),
-    ExecuteStmt(ExecuteStmt),
-    InsertStmt(InsertStmt),
-    MergeStmt(MergeStmt),
-    NotifyStmt(NotifyStmt),
-    PrepareTransactionStmt(PrepareTransactionStmt),
-    ReleaseSavepointStmt(ReleaseSavepointStmt),
-    RevokeStmt(RevokeStmt),
+    DropUser(DropUser),
+    DropUserMapping(DropUserMapping),
+    DropView(DropView),
+    Execute(Execute),
+    Explain(Explain),
+    Fetch(Fetch),
+    Grant(Grant),
+    ImportForeignSchema(ImportForeignSchema),
+    Insert(Insert),
+    Listen(Listen),
+    Load(Load),
+    Lock(Lock),
+    Merge(Merge),
+    Move(Move),
+    Notify(Notify),
+    Prepare(Prepare),
+    PrepareTransaction(PrepareTransaction),
+    Reassign(Reassign),
+    Refresh(Refresh),
+    Reindex(Reindex),
+    ReleaseSavepoint(ReleaseSavepoint),
+    Reset(Reset),
+    Revoke(Revoke),
     Rollback(Rollback),
-    SavepointStmt(SavepointStmt),
+    Savepoint(Savepoint),
+    SecurityLabel(SecurityLabel),
     Select(Select),
-    TableStmt(TableStmt),
+    SelectInto(SelectInto),
+    Set(Set),
+    SetConstraints(SetConstraints),
+    SetRole(SetRole),
+    SetSessionAuth(SetSessionAuth),
+    SetTransaction(SetTransaction),
+    Show(Show),
     Truncate(Truncate),
-    UpdateStmt(UpdateStmt),
+    Unlisten(Unlisten),
+    Update(Update),
+    Vacuum(Vacuum),
     Values(Values),
 }
 
@@ -8128,10 +8238,10 @@ impl AstNode for AlterAggregate {
         &self.syntax
     }
 }
-impl AstNode for AlterCollationStmt {
+impl AstNode for AlterCollation {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_COLLATION_STMT
+        kind == SyntaxKind::ALTER_COLLATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8182,10 +8292,10 @@ impl AstNode for AlterConstraint {
         &self.syntax
     }
 }
-impl AstNode for AlterConversionStmt {
+impl AstNode for AlterConversion {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_CONVERSION_STMT
+        kind == SyntaxKind::ALTER_CONVERSION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8200,10 +8310,10 @@ impl AstNode for AlterConversionStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterDatabaseStmt {
+impl AstNode for AlterDatabase {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_DATABASE_STMT
+        kind == SyntaxKind::ALTER_DATABASE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8218,10 +8328,10 @@ impl AstNode for AlterDatabaseStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterDefaultPrivilegesStmt {
+impl AstNode for AlterDefaultPrivileges {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_DEFAULT_PRIVILEGES_STMT
+        kind == SyntaxKind::ALTER_DEFAULT_PRIVILEGES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8254,10 +8364,10 @@ impl AstNode for AlterDomain {
         &self.syntax
     }
 }
-impl AstNode for AlterEventTriggerStmt {
+impl AstNode for AlterEventTrigger {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_EVENT_TRIGGER_STMT
+        kind == SyntaxKind::ALTER_EVENT_TRIGGER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8272,10 +8382,10 @@ impl AstNode for AlterEventTriggerStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterExtensionStmt {
+impl AstNode for AlterExtension {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_EXTENSION_STMT
+        kind == SyntaxKind::ALTER_EXTENSION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8290,10 +8400,10 @@ impl AstNode for AlterExtensionStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterForeignDataWrapperStmt {
+impl AstNode for AlterForeignDataWrapper {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_FOREIGN_DATA_WRAPPER_STMT
+        kind == SyntaxKind::ALTER_FOREIGN_DATA_WRAPPER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8308,10 +8418,10 @@ impl AstNode for AlterForeignDataWrapperStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterForeignTableStmt {
+impl AstNode for AlterForeignTable {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_FOREIGN_TABLE_STMT
+        kind == SyntaxKind::ALTER_FOREIGN_TABLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8326,10 +8436,10 @@ impl AstNode for AlterForeignTableStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterFunctionStmt {
+impl AstNode for AlterFunction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_FUNCTION_STMT
+        kind == SyntaxKind::ALTER_FUNCTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8344,10 +8454,10 @@ impl AstNode for AlterFunctionStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterGroupStmt {
+impl AstNode for AlterGroup {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_GROUP_STMT
+        kind == SyntaxKind::ALTER_GROUP
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8362,10 +8472,10 @@ impl AstNode for AlterGroupStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterIndexStmt {
+impl AstNode for AlterIndex {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_INDEX_STMT
+        kind == SyntaxKind::ALTER_INDEX
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8380,10 +8490,10 @@ impl AstNode for AlterIndexStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterLanguageStmt {
+impl AstNode for AlterLanguage {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_LANGUAGE_STMT
+        kind == SyntaxKind::ALTER_LANGUAGE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8398,10 +8508,10 @@ impl AstNode for AlterLanguageStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterLargeObjectStmt {
+impl AstNode for AlterLargeObject {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_LARGE_OBJECT_STMT
+        kind == SyntaxKind::ALTER_LARGE_OBJECT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8416,10 +8526,10 @@ impl AstNode for AlterLargeObjectStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterMaterializedViewStmt {
+impl AstNode for AlterMaterializedView {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_MATERIALIZED_VIEW_STMT
+        kind == SyntaxKind::ALTER_MATERIALIZED_VIEW
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8434,10 +8544,10 @@ impl AstNode for AlterMaterializedViewStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterOperatorClassStmt {
+impl AstNode for AlterOperator {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_OPERATOR_CLASS_STMT
+        kind == SyntaxKind::ALTER_OPERATOR
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8452,10 +8562,10 @@ impl AstNode for AlterOperatorClassStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterOperatorFamilyStmt {
+impl AstNode for AlterOperatorClass {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_OPERATOR_FAMILY_STMT
+        kind == SyntaxKind::ALTER_OPERATOR_CLASS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8470,10 +8580,10 @@ impl AstNode for AlterOperatorFamilyStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterOperatorStmt {
+impl AstNode for AlterOperatorFamily {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_OPERATOR_STMT
+        kind == SyntaxKind::ALTER_OPERATOR_FAMILY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8488,10 +8598,10 @@ impl AstNode for AlterOperatorStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterPolicyStmt {
+impl AstNode for AlterPolicy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_POLICY_STMT
+        kind == SyntaxKind::ALTER_POLICY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8506,10 +8616,10 @@ impl AstNode for AlterPolicyStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterProcedureStmt {
+impl AstNode for AlterProcedure {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_PROCEDURE_STMT
+        kind == SyntaxKind::ALTER_PROCEDURE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8524,10 +8634,10 @@ impl AstNode for AlterProcedureStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterPublicationStmt {
+impl AstNode for AlterPublication {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_PUBLICATION_STMT
+        kind == SyntaxKind::ALTER_PUBLICATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8542,10 +8652,10 @@ impl AstNode for AlterPublicationStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterRoleStmt {
+impl AstNode for AlterRole {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_ROLE_STMT
+        kind == SyntaxKind::ALTER_ROLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8560,10 +8670,10 @@ impl AstNode for AlterRoleStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterRoutineStmt {
+impl AstNode for AlterRoutine {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_ROUTINE_STMT
+        kind == SyntaxKind::ALTER_ROUTINE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8578,10 +8688,10 @@ impl AstNode for AlterRoutineStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterRuleStmt {
+impl AstNode for AlterRule {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_RULE_STMT
+        kind == SyntaxKind::ALTER_RULE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8596,10 +8706,10 @@ impl AstNode for AlterRuleStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterSchemaStmt {
+impl AstNode for AlterSchema {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_SCHEMA_STMT
+        kind == SyntaxKind::ALTER_SCHEMA
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8614,10 +8724,10 @@ impl AstNode for AlterSchemaStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterSequenceStmt {
+impl AstNode for AlterSequence {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_SEQUENCE_STMT
+        kind == SyntaxKind::ALTER_SEQUENCE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8632,10 +8742,10 @@ impl AstNode for AlterSequenceStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterServerStmt {
+impl AstNode for AlterServer {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_SERVER_STMT
+        kind == SyntaxKind::ALTER_SERVER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8650,10 +8760,10 @@ impl AstNode for AlterServerStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterStatisticsStmt {
+impl AstNode for AlterStatistics {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_STATISTICS_STMT
+        kind == SyntaxKind::ALTER_STATISTICS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8668,10 +8778,10 @@ impl AstNode for AlterStatisticsStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterSubscriptionStmt {
+impl AstNode for AlterSubscription {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_SUBSCRIPTION_STMT
+        kind == SyntaxKind::ALTER_SUBSCRIPTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8686,10 +8796,10 @@ impl AstNode for AlterSubscriptionStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterSystemStmt {
+impl AstNode for AlterSystem {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_SYSTEM_STMT
+        kind == SyntaxKind::ALTER_SYSTEM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8722,10 +8832,10 @@ impl AstNode for AlterTable {
         &self.syntax
     }
 }
-impl AstNode for AlterTablespaceStmt {
+impl AstNode for AlterTablespace {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_TABLESPACE_STMT
+        kind == SyntaxKind::ALTER_TABLESPACE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8740,10 +8850,10 @@ impl AstNode for AlterTablespaceStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterTextSearchConfigurationStmt {
+impl AstNode for AlterTextSearchConfiguration {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_TEXT_SEARCH_CONFIGURATION_STMT
+        kind == SyntaxKind::ALTER_TEXT_SEARCH_CONFIGURATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8758,10 +8868,10 @@ impl AstNode for AlterTextSearchConfigurationStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterTextSearchDictionaryStmt {
+impl AstNode for AlterTextSearchDictionary {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_TEXT_SEARCH_DICTIONARY_STMT
+        kind == SyntaxKind::ALTER_TEXT_SEARCH_DICTIONARY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8776,10 +8886,10 @@ impl AstNode for AlterTextSearchDictionaryStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterTextSearchParserStmt {
+impl AstNode for AlterTextSearchParser {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_TEXT_SEARCH_PARSER_STMT
+        kind == SyntaxKind::ALTER_TEXT_SEARCH_PARSER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8794,10 +8904,10 @@ impl AstNode for AlterTextSearchParserStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterTextSearchTemplateStmt {
+impl AstNode for AlterTextSearchTemplate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_TEXT_SEARCH_TEMPLATE_STMT
+        kind == SyntaxKind::ALTER_TEXT_SEARCH_TEMPLATE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8812,10 +8922,10 @@ impl AstNode for AlterTextSearchTemplateStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterTriggerStmt {
+impl AstNode for AlterTrigger {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_TRIGGER_STMT
+        kind == SyntaxKind::ALTER_TRIGGER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8830,10 +8940,10 @@ impl AstNode for AlterTriggerStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterTypeStmt {
+impl AstNode for AlterType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_TYPE_STMT
+        kind == SyntaxKind::ALTER_TYPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8848,10 +8958,10 @@ impl AstNode for AlterTypeStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterUserMappingStmt {
+impl AstNode for AlterUser {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_USER_MAPPING_STMT
+        kind == SyntaxKind::ALTER_USER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8866,10 +8976,10 @@ impl AstNode for AlterUserMappingStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterUserStmt {
+impl AstNode for AlterUserMapping {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_USER_STMT
+        kind == SyntaxKind::ALTER_USER_MAPPING
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8884,10 +8994,10 @@ impl AstNode for AlterUserStmt {
         &self.syntax
     }
 }
-impl AstNode for AlterViewStmt {
+impl AstNode for AlterView {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ALTER_VIEW_STMT
+        kind == SyntaxKind::ALTER_VIEW
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -8902,10 +9012,10 @@ impl AstNode for AlterViewStmt {
         &self.syntax
     }
 }
-impl AstNode for AnalyzeStmt {
+impl AstNode for Analyze {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ANALYZE_STMT
+        kind == SyntaxKind::ANALYZE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9136,10 +9246,10 @@ impl AstNode for BitType {
         &self.syntax
     }
 }
-impl AstNode for CallExpr {
+impl AstNode for Call {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CALL_EXPR
+        kind == SyntaxKind::CALL
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9154,10 +9264,10 @@ impl AstNode for CallExpr {
         &self.syntax
     }
 }
-impl AstNode for CallStmt {
+impl AstNode for CallExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CALL_STMT
+        kind == SyntaxKind::CALL_EXPR
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9244,10 +9354,10 @@ impl AstNode for CheckConstraint {
         &self.syntax
     }
 }
-impl AstNode for CheckpointStmt {
+impl AstNode for Checkpoint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CHECKPOINT_STMT
+        kind == SyntaxKind::CHECKPOINT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9262,10 +9372,28 @@ impl AstNode for CheckpointStmt {
         &self.syntax
     }
 }
-impl AstNode for CloseStmt {
+impl AstNode for Close {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CLOSE_STMT
+        kind == SyntaxKind::CLOSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for Cluster {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CLUSTER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9284,24 +9412,6 @@ impl AstNode for ClusterOn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::CLUSTER_ON
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for ClusterStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CLUSTER_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9406,10 +9516,10 @@ impl AstNode for ColumnList {
         &self.syntax
     }
 }
-impl AstNode for CommentStmt {
+impl AstNode for CommentOn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::COMMENT_STMT
+        kind == SyntaxKind::COMMENT_ON
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9586,10 +9696,10 @@ impl AstNode for ConstraintWhereClause {
         &self.syntax
     }
 }
-impl AstNode for CopyStmt {
+impl AstNode for Copy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::COPY_STMT
+        kind == SyntaxKind::COPY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9622,10 +9732,10 @@ impl AstNode for CostFuncOption {
         &self.syntax
     }
 }
-impl AstNode for CreateAccessMethodStmt {
+impl AstNode for CreateAccessMethod {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_ACCESS_METHOD_STMT
+        kind == SyntaxKind::CREATE_ACCESS_METHOD
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9658,10 +9768,10 @@ impl AstNode for CreateAggregate {
         &self.syntax
     }
 }
-impl AstNode for CreateCastStmt {
+impl AstNode for CreateCast {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_CAST_STMT
+        kind == SyntaxKind::CREATE_CAST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9676,10 +9786,10 @@ impl AstNode for CreateCastStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateCollationStmt {
+impl AstNode for CreateCollation {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_COLLATION_STMT
+        kind == SyntaxKind::CREATE_COLLATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9694,10 +9804,10 @@ impl AstNode for CreateCollationStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateConversionStmt {
+impl AstNode for CreateConversion {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_CONVERSION_STMT
+        kind == SyntaxKind::CREATE_CONVERSION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9712,10 +9822,10 @@ impl AstNode for CreateConversionStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateDatabaseStmt {
+impl AstNode for CreateDatabase {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_DATABASE_STMT
+        kind == SyntaxKind::CREATE_DATABASE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9748,10 +9858,10 @@ impl AstNode for CreateDomain {
         &self.syntax
     }
 }
-impl AstNode for CreateEventTriggerStmt {
+impl AstNode for CreateEventTrigger {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_EVENT_TRIGGER_STMT
+        kind == SyntaxKind::CREATE_EVENT_TRIGGER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9766,10 +9876,10 @@ impl AstNode for CreateEventTriggerStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateExtensionStmt {
+impl AstNode for CreateExtension {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_EXTENSION_STMT
+        kind == SyntaxKind::CREATE_EXTENSION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9784,10 +9894,10 @@ impl AstNode for CreateExtensionStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateForeignDataWrapperStmt {
+impl AstNode for CreateForeignDataWrapper {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_FOREIGN_DATA_WRAPPER_STMT
+        kind == SyntaxKind::CREATE_FOREIGN_DATA_WRAPPER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9802,10 +9912,10 @@ impl AstNode for CreateForeignDataWrapperStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateForeignTableStmt {
+impl AstNode for CreateForeignTable {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_FOREIGN_TABLE_STMT
+        kind == SyntaxKind::CREATE_FOREIGN_TABLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9838,10 +9948,10 @@ impl AstNode for CreateFunction {
         &self.syntax
     }
 }
-impl AstNode for CreateGroupStmt {
+impl AstNode for CreateGroup {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_GROUP_STMT
+        kind == SyntaxKind::CREATE_GROUP
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9874,10 +9984,10 @@ impl AstNode for CreateIndex {
         &self.syntax
     }
 }
-impl AstNode for CreateLanguageStmt {
+impl AstNode for CreateLanguage {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_LANGUAGE_STMT
+        kind == SyntaxKind::CREATE_LANGUAGE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9892,10 +10002,10 @@ impl AstNode for CreateLanguageStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateMaterializedViewStmt {
+impl AstNode for CreateMaterializedView {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_MATERIALIZED_VIEW_STMT
+        kind == SyntaxKind::CREATE_MATERIALIZED_VIEW
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9910,10 +10020,10 @@ impl AstNode for CreateMaterializedViewStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateOperatorClassStmt {
+impl AstNode for CreateOperator {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_OPERATOR_CLASS_STMT
+        kind == SyntaxKind::CREATE_OPERATOR
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9928,10 +10038,10 @@ impl AstNode for CreateOperatorClassStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateOperatorFamilyStmt {
+impl AstNode for CreateOperatorClass {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_OPERATOR_FAMILY_STMT
+        kind == SyntaxKind::CREATE_OPERATOR_CLASS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9946,10 +10056,10 @@ impl AstNode for CreateOperatorFamilyStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateOperatorStmt {
+impl AstNode for CreateOperatorFamily {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_OPERATOR_STMT
+        kind == SyntaxKind::CREATE_OPERATOR_FAMILY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9964,10 +10074,10 @@ impl AstNode for CreateOperatorStmt {
         &self.syntax
     }
 }
-impl AstNode for CreatePolicyStmt {
+impl AstNode for CreatePolicy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_POLICY_STMT
+        kind == SyntaxKind::CREATE_POLICY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -9982,10 +10092,10 @@ impl AstNode for CreatePolicyStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateProcedureStmt {
+impl AstNode for CreateProcedure {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_PROCEDURE_STMT
+        kind == SyntaxKind::CREATE_PROCEDURE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10000,10 +10110,10 @@ impl AstNode for CreateProcedureStmt {
         &self.syntax
     }
 }
-impl AstNode for CreatePublicationStmt {
+impl AstNode for CreatePublication {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_PUBLICATION_STMT
+        kind == SyntaxKind::CREATE_PUBLICATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10018,10 +10128,10 @@ impl AstNode for CreatePublicationStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateRoleStmt {
+impl AstNode for CreateRole {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_ROLE_STMT
+        kind == SyntaxKind::CREATE_ROLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10036,10 +10146,10 @@ impl AstNode for CreateRoleStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateRuleStmt {
+impl AstNode for CreateRule {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_RULE_STMT
+        kind == SyntaxKind::CREATE_RULE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10054,10 +10164,10 @@ impl AstNode for CreateRuleStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateSchemaStmt {
+impl AstNode for CreateSchema {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_SCHEMA_STMT
+        kind == SyntaxKind::CREATE_SCHEMA
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10072,10 +10182,10 @@ impl AstNode for CreateSchemaStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateSequenceStmt {
+impl AstNode for CreateSequence {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_SEQUENCE_STMT
+        kind == SyntaxKind::CREATE_SEQUENCE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10090,10 +10200,10 @@ impl AstNode for CreateSequenceStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateServerStmt {
+impl AstNode for CreateServer {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_SERVER_STMT
+        kind == SyntaxKind::CREATE_SERVER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10108,10 +10218,10 @@ impl AstNode for CreateServerStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateStatisticsStmt {
+impl AstNode for CreateStatistics {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_STATISTICS_STMT
+        kind == SyntaxKind::CREATE_STATISTICS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10126,10 +10236,10 @@ impl AstNode for CreateStatisticsStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateSubscriptionStmt {
+impl AstNode for CreateSubscription {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_SUBSCRIPTION_STMT
+        kind == SyntaxKind::CREATE_SUBSCRIPTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10162,10 +10272,10 @@ impl AstNode for CreateTable {
         &self.syntax
     }
 }
-impl AstNode for CreateTableAsStmt {
+impl AstNode for CreateTableAs {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TABLE_AS_STMT
+        kind == SyntaxKind::CREATE_TABLE_AS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10180,10 +10290,10 @@ impl AstNode for CreateTableAsStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateTablespaceStmt {
+impl AstNode for CreateTablespace {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TABLESPACE_STMT
+        kind == SyntaxKind::CREATE_TABLESPACE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10198,10 +10308,10 @@ impl AstNode for CreateTablespaceStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateTextSearchConfigurationStmt {
+impl AstNode for CreateTextSearchConfiguration {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TEXT_SEARCH_CONFIGURATION_STMT
+        kind == SyntaxKind::CREATE_TEXT_SEARCH_CONFIGURATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10216,10 +10326,10 @@ impl AstNode for CreateTextSearchConfigurationStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateTextSearchDictionaryStmt {
+impl AstNode for CreateTextSearchDictionary {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TEXT_SEARCH_DICTIONARY_STMT
+        kind == SyntaxKind::CREATE_TEXT_SEARCH_DICTIONARY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10234,10 +10344,10 @@ impl AstNode for CreateTextSearchDictionaryStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateTextSearchParserStmt {
+impl AstNode for CreateTextSearchParser {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TEXT_SEARCH_PARSER_STMT
+        kind == SyntaxKind::CREATE_TEXT_SEARCH_PARSER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10252,10 +10362,10 @@ impl AstNode for CreateTextSearchParserStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateTextSearchTemplateStmt {
+impl AstNode for CreateTextSearchTemplate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TEXT_SEARCH_TEMPLATE_STMT
+        kind == SyntaxKind::CREATE_TEXT_SEARCH_TEMPLATE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10270,10 +10380,10 @@ impl AstNode for CreateTextSearchTemplateStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateTransformStmt {
+impl AstNode for CreateTransform {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TRANSFORM_STMT
+        kind == SyntaxKind::CREATE_TRANSFORM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10288,10 +10398,10 @@ impl AstNode for CreateTransformStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateTriggerStmt {
+impl AstNode for CreateTrigger {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TRIGGER_STMT
+        kind == SyntaxKind::CREATE_TRIGGER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10306,10 +10416,10 @@ impl AstNode for CreateTriggerStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateTypeStmt {
+impl AstNode for CreateType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_TYPE_STMT
+        kind == SyntaxKind::CREATE_TYPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10324,10 +10434,10 @@ impl AstNode for CreateTypeStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateUserMappingStmt {
+impl AstNode for CreateUser {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_USER_MAPPING_STMT
+        kind == SyntaxKind::CREATE_USER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10342,10 +10452,10 @@ impl AstNode for CreateUserMappingStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateUserStmt {
+impl AstNode for CreateUserMapping {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_USER_STMT
+        kind == SyntaxKind::CREATE_USER_MAPPING
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10360,10 +10470,10 @@ impl AstNode for CreateUserStmt {
         &self.syntax
     }
 }
-impl AstNode for CreateViewStmt {
+impl AstNode for CreateView {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CREATE_VIEW_STMT
+        kind == SyntaxKind::CREATE_VIEW
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10396,10 +10506,10 @@ impl AstNode for CustomOp {
         &self.syntax
     }
 }
-impl AstNode for DeallocateStmt {
+impl AstNode for Deallocate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DEALLOCATE_STMT
+        kind == SyntaxKind::DEALLOCATE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10414,10 +10524,10 @@ impl AstNode for DeallocateStmt {
         &self.syntax
     }
 }
-impl AstNode for DeclareStmt {
+impl AstNode for Declare {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DECLARE_STMT
+        kind == SyntaxKind::DECLARE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10486,10 +10596,10 @@ impl AstNode for DeferrableConstraintOption {
         &self.syntax
     }
 }
-impl AstNode for DeleteStmt {
+impl AstNode for Delete {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DELETE_STMT
+        kind == SyntaxKind::DELETE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10576,10 +10686,10 @@ impl AstNode for DisableTrigger {
         &self.syntax
     }
 }
-impl AstNode for DiscardStmt {
+impl AstNode for Discard {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DISCARD_STMT
+        kind == SyntaxKind::DISCARD
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10612,10 +10722,10 @@ impl AstNode for DistinctClause {
         &self.syntax
     }
 }
-impl AstNode for DoStmt {
+impl AstNode for Do {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DO_STMT
+        kind == SyntaxKind::DO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10648,10 +10758,10 @@ impl AstNode for DoubleType {
         &self.syntax
     }
 }
-impl AstNode for DropAccessMethodStmt {
+impl AstNode for DropAccessMethod {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_ACCESS_METHOD_STMT
+        kind == SyntaxKind::DROP_ACCESS_METHOD
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10684,10 +10794,10 @@ impl AstNode for DropAggregate {
         &self.syntax
     }
 }
-impl AstNode for DropCastStmt {
+impl AstNode for DropCast {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_CAST_STMT
+        kind == SyntaxKind::DROP_CAST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10702,10 +10812,10 @@ impl AstNode for DropCastStmt {
         &self.syntax
     }
 }
-impl AstNode for DropCollationStmt {
+impl AstNode for DropCollation {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_COLLATION_STMT
+        kind == SyntaxKind::DROP_COLLATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10756,10 +10866,10 @@ impl AstNode for DropConstraint {
         &self.syntax
     }
 }
-impl AstNode for DropConversionStmt {
+impl AstNode for DropConversion {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_CONVERSION_STMT
+        kind == SyntaxKind::DROP_CONVERSION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10810,10 +10920,10 @@ impl AstNode for DropDefault {
         &self.syntax
     }
 }
-impl AstNode for DropDomainStmt {
+impl AstNode for DropDomain {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_DOMAIN_STMT
+        kind == SyntaxKind::DROP_DOMAIN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10828,10 +10938,10 @@ impl AstNode for DropDomainStmt {
         &self.syntax
     }
 }
-impl AstNode for DropEventTriggerStmt {
+impl AstNode for DropEventTrigger {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_EVENT_TRIGGER_STMT
+        kind == SyntaxKind::DROP_EVENT_TRIGGER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10864,10 +10974,10 @@ impl AstNode for DropExpression {
         &self.syntax
     }
 }
-impl AstNode for DropExtensionStmt {
+impl AstNode for DropExtension {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_EXTENSION_STMT
+        kind == SyntaxKind::DROP_EXTENSION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10882,10 +10992,10 @@ impl AstNode for DropExtensionStmt {
         &self.syntax
     }
 }
-impl AstNode for DropForeignDataWrapperStmt {
+impl AstNode for DropForeignDataWrapper {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_FOREIGN_DATA_WRAPPER_STMT
+        kind == SyntaxKind::DROP_FOREIGN_DATA_WRAPPER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10900,10 +11010,10 @@ impl AstNode for DropForeignDataWrapperStmt {
         &self.syntax
     }
 }
-impl AstNode for DropForeignTableStmt {
+impl AstNode for DropForeignTable {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_FOREIGN_TABLE_STMT
+        kind == SyntaxKind::DROP_FOREIGN_TABLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10918,10 +11028,10 @@ impl AstNode for DropForeignTableStmt {
         &self.syntax
     }
 }
-impl AstNode for DropFunctionStmt {
+impl AstNode for DropFunction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_FUNCTION_STMT
+        kind == SyntaxKind::DROP_FUNCTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10936,10 +11046,10 @@ impl AstNode for DropFunctionStmt {
         &self.syntax
     }
 }
-impl AstNode for DropGroupStmt {
+impl AstNode for DropGroup {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_GROUP_STMT
+        kind == SyntaxKind::DROP_GROUP
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -10990,10 +11100,10 @@ impl AstNode for DropIndex {
         &self.syntax
     }
 }
-impl AstNode for DropLanguageStmt {
+impl AstNode for DropLanguage {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_LANGUAGE_STMT
+        kind == SyntaxKind::DROP_LANGUAGE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11008,10 +11118,10 @@ impl AstNode for DropLanguageStmt {
         &self.syntax
     }
 }
-impl AstNode for DropMaterializedViewStmt {
+impl AstNode for DropMaterializedView {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_MATERIALIZED_VIEW_STMT
+        kind == SyntaxKind::DROP_MATERIALIZED_VIEW
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11044,10 +11154,10 @@ impl AstNode for DropNotNull {
         &self.syntax
     }
 }
-impl AstNode for DropOperatorClassStmt {
+impl AstNode for DropOperator {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_OPERATOR_CLASS_STMT
+        kind == SyntaxKind::DROP_OPERATOR
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11062,10 +11172,10 @@ impl AstNode for DropOperatorClassStmt {
         &self.syntax
     }
 }
-impl AstNode for DropOperatorFamilyStmt {
+impl AstNode for DropOperatorClass {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_OPERATOR_FAMILY_STMT
+        kind == SyntaxKind::DROP_OPERATOR_CLASS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11080,10 +11190,10 @@ impl AstNode for DropOperatorFamilyStmt {
         &self.syntax
     }
 }
-impl AstNode for DropOperatorStmt {
+impl AstNode for DropOperatorFamily {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_OPERATOR_STMT
+        kind == SyntaxKind::DROP_OPERATOR_FAMILY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11098,10 +11208,10 @@ impl AstNode for DropOperatorStmt {
         &self.syntax
     }
 }
-impl AstNode for DropOwnedStmt {
+impl AstNode for DropOwned {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_OWNED_STMT
+        kind == SyntaxKind::DROP_OWNED
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11116,10 +11226,10 @@ impl AstNode for DropOwnedStmt {
         &self.syntax
     }
 }
-impl AstNode for DropPolicyStmt {
+impl AstNode for DropPolicy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_POLICY_STMT
+        kind == SyntaxKind::DROP_POLICY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11134,10 +11244,10 @@ impl AstNode for DropPolicyStmt {
         &self.syntax
     }
 }
-impl AstNode for DropProcedureStmt {
+impl AstNode for DropProcedure {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_PROCEDURE_STMT
+        kind == SyntaxKind::DROP_PROCEDURE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11152,10 +11262,10 @@ impl AstNode for DropProcedureStmt {
         &self.syntax
     }
 }
-impl AstNode for DropPublicationStmt {
+impl AstNode for DropPublication {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_PUBLICATION_STMT
+        kind == SyntaxKind::DROP_PUBLICATION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11170,10 +11280,10 @@ impl AstNode for DropPublicationStmt {
         &self.syntax
     }
 }
-impl AstNode for DropRoleStmt {
+impl AstNode for DropRole {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_ROLE_STMT
+        kind == SyntaxKind::DROP_ROLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11188,10 +11298,10 @@ impl AstNode for DropRoleStmt {
         &self.syntax
     }
 }
-impl AstNode for DropRoutineStmt {
+impl AstNode for DropRoutine {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_ROUTINE_STMT
+        kind == SyntaxKind::DROP_ROUTINE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11206,10 +11316,10 @@ impl AstNode for DropRoutineStmt {
         &self.syntax
     }
 }
-impl AstNode for DropRuleStmt {
+impl AstNode for DropRule {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_RULE_STMT
+        kind == SyntaxKind::DROP_RULE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11224,10 +11334,10 @@ impl AstNode for DropRuleStmt {
         &self.syntax
     }
 }
-impl AstNode for DropSchemaStmt {
+impl AstNode for DropSchema {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_SCHEMA_STMT
+        kind == SyntaxKind::DROP_SCHEMA
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11242,10 +11352,10 @@ impl AstNode for DropSchemaStmt {
         &self.syntax
     }
 }
-impl AstNode for DropSequenceStmt {
+impl AstNode for DropSequence {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_SEQUENCE_STMT
+        kind == SyntaxKind::DROP_SEQUENCE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11260,10 +11370,10 @@ impl AstNode for DropSequenceStmt {
         &self.syntax
     }
 }
-impl AstNode for DropServerStmt {
+impl AstNode for DropServer {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_SERVER_STMT
+        kind == SyntaxKind::DROP_SERVER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11278,10 +11388,10 @@ impl AstNode for DropServerStmt {
         &self.syntax
     }
 }
-impl AstNode for DropStatisticsStmt {
+impl AstNode for DropStatistics {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_STATISTICS_STMT
+        kind == SyntaxKind::DROP_STATISTICS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11296,10 +11406,10 @@ impl AstNode for DropStatisticsStmt {
         &self.syntax
     }
 }
-impl AstNode for DropSubscriptionStmt {
+impl AstNode for DropSubscription {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_SUBSCRIPTION_STMT
+        kind == SyntaxKind::DROP_SUBSCRIPTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11332,10 +11442,10 @@ impl AstNode for DropTable {
         &self.syntax
     }
 }
-impl AstNode for DropTablespaceStmt {
+impl AstNode for DropTablespace {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_TABLESPACE_STMT
+        kind == SyntaxKind::DROP_TABLESPACE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11350,10 +11460,10 @@ impl AstNode for DropTablespaceStmt {
         &self.syntax
     }
 }
-impl AstNode for DropTextSearchConfigStmt {
+impl AstNode for DropTextSearchConfig {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_TEXT_SEARCH_CONFIG_STMT
+        kind == SyntaxKind::DROP_TEXT_SEARCH_CONFIG
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11368,10 +11478,10 @@ impl AstNode for DropTextSearchConfigStmt {
         &self.syntax
     }
 }
-impl AstNode for DropTextSearchDictStmt {
+impl AstNode for DropTextSearchDict {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_TEXT_SEARCH_DICT_STMT
+        kind == SyntaxKind::DROP_TEXT_SEARCH_DICT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11386,10 +11496,10 @@ impl AstNode for DropTextSearchDictStmt {
         &self.syntax
     }
 }
-impl AstNode for DropTextSearchParserStmt {
+impl AstNode for DropTextSearchParser {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_TEXT_SEARCH_PARSER_STMT
+        kind == SyntaxKind::DROP_TEXT_SEARCH_PARSER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11404,10 +11514,10 @@ impl AstNode for DropTextSearchParserStmt {
         &self.syntax
     }
 }
-impl AstNode for DropTextSearchTemplateStmt {
+impl AstNode for DropTextSearchTemplate {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_TEXT_SEARCH_TEMPLATE_STMT
+        kind == SyntaxKind::DROP_TEXT_SEARCH_TEMPLATE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11422,10 +11532,10 @@ impl AstNode for DropTextSearchTemplateStmt {
         &self.syntax
     }
 }
-impl AstNode for DropTransformStmt {
+impl AstNode for DropTransform {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_TRANSFORM_STMT
+        kind == SyntaxKind::DROP_TRANSFORM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11440,10 +11550,10 @@ impl AstNode for DropTransformStmt {
         &self.syntax
     }
 }
-impl AstNode for DropTriggerStmt {
+impl AstNode for DropTrigger {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_TRIGGER_STMT
+        kind == SyntaxKind::DROP_TRIGGER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11476,10 +11586,10 @@ impl AstNode for DropType {
         &self.syntax
     }
 }
-impl AstNode for DropTypeStmt {
+impl AstNode for DropUser {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_TYPE_STMT
+        kind == SyntaxKind::DROP_USER
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11494,10 +11604,10 @@ impl AstNode for DropTypeStmt {
         &self.syntax
     }
 }
-impl AstNode for DropUserMappingStmt {
+impl AstNode for DropUserMapping {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_USER_MAPPING_STMT
+        kind == SyntaxKind::DROP_USER_MAPPING
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11512,28 +11622,10 @@ impl AstNode for DropUserMappingStmt {
         &self.syntax
     }
 }
-impl AstNode for DropUserStmt {
+impl AstNode for DropView {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_USER_STMT
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for DropViewStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_VIEW_STMT
+        kind == SyntaxKind::DROP_VIEW
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11692,10 +11784,10 @@ impl AstNode for ExcludeConstraint {
         &self.syntax
     }
 }
-impl AstNode for ExecuteStmt {
+impl AstNode for Execute {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::EXECUTE_STMT
+        kind == SyntaxKind::EXECUTE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11710,10 +11802,10 @@ impl AstNode for ExecuteStmt {
         &self.syntax
     }
 }
-impl AstNode for ExplainStmt {
+impl AstNode for Explain {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::EXPLAIN_STMT
+        kind == SyntaxKind::EXPLAIN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11746,10 +11838,10 @@ impl AstNode for FatArrow {
         &self.syntax
     }
 }
-impl AstNode for FetchStmt {
+impl AstNode for Fetch {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::FETCH_STMT
+        kind == SyntaxKind::FETCH
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -11890,10 +11982,10 @@ impl AstNode for GeneratedConstraint {
         &self.syntax
     }
 }
-impl AstNode for GrantStmt {
+impl AstNode for Grant {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::GRANT_STMT
+        kind == SyntaxKind::GRANT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12106,10 +12198,10 @@ impl AstNode for InitiallyImmediateConstraintOption {
         &self.syntax
     }
 }
-impl AstNode for InsertStmt {
+impl AstNode for Insert {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::INSERT_STMT
+        kind == SyntaxKind::INSERT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12200,24 +12292,6 @@ impl AstNode for IsNotDistinctFrom {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::IS_NOT_DISTINCT_FROM
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for IsNull {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::IS_NULL
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12520,10 +12594,10 @@ impl AstNode for LimitClause {
         &self.syntax
     }
 }
-impl AstNode for ListenStmt {
+impl AstNode for Listen {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LISTEN_STMT
+        kind == SyntaxKind::LISTEN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12556,10 +12630,10 @@ impl AstNode for Literal {
         &self.syntax
     }
 }
-impl AstNode for LoadStmt {
+impl AstNode for Load {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LOAD_STMT
+        kind == SyntaxKind::LOAD
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12574,10 +12648,10 @@ impl AstNode for LoadStmt {
         &self.syntax
     }
 }
-impl AstNode for LockStmt {
+impl AstNode for Lock {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::LOCK_STMT
+        kind == SyntaxKind::LOCK
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12628,10 +12702,10 @@ impl AstNode for Lteq {
         &self.syntax
     }
 }
-impl AstNode for MergeStmt {
+impl AstNode for Merge {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::MERGE_STMT
+        kind == SyntaxKind::MERGE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12646,10 +12720,10 @@ impl AstNode for MergeStmt {
         &self.syntax
     }
 }
-impl AstNode for MoveStmt {
+impl AstNode for Move {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::MOVE_STMT
+        kind == SyntaxKind::MOVE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12916,10 +12990,10 @@ impl AstNode for NotValid {
         &self.syntax
     }
 }
-impl AstNode for NotifyStmt {
+impl AstNode for Notify {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::NOTIFY_STMT
+        kind == SyntaxKind::NOTIFY
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13384,10 +13458,10 @@ impl AstNode for PrefixExpr {
         &self.syntax
     }
 }
-impl AstNode for PrepareStmt {
+impl AstNode for Prepare {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PREPARE_STMT
+        kind == SyntaxKind::PREPARE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13402,10 +13476,10 @@ impl AstNode for PrepareStmt {
         &self.syntax
     }
 }
-impl AstNode for PrepareTransactionStmt {
+impl AstNode for PrepareTransaction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::PREPARE_TRANSACTION_STMT
+        kind == SyntaxKind::PREPARE_TRANSACTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13510,10 +13584,10 @@ impl AstNode for ReadWrite {
         &self.syntax
     }
 }
-impl AstNode for ReassignStmt {
+impl AstNode for Reassign {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::REASSIGN_STMT
+        kind == SyntaxKind::REASSIGN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13546,10 +13620,10 @@ impl AstNode for ReferencesConstraint {
         &self.syntax
     }
 }
-impl AstNode for RefreshStmt {
+impl AstNode for Refresh {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::REFRESH_STMT
+        kind == SyntaxKind::REFRESH
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13564,10 +13638,10 @@ impl AstNode for RefreshStmt {
         &self.syntax
     }
 }
-impl AstNode for ReindexStmt {
+impl AstNode for Reindex {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::REINDEX_STMT
+        kind == SyntaxKind::REINDEX
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13600,10 +13674,10 @@ impl AstNode for RelationName {
         &self.syntax
     }
 }
-impl AstNode for ReleaseSavepointStmt {
+impl AstNode for ReleaseSavepoint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RELEASE_SAVEPOINT_STMT
+        kind == SyntaxKind::RELEASE_SAVEPOINT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13726,6 +13800,24 @@ impl AstNode for ReplicaIdentity {
         &self.syntax
     }
 }
+impl AstNode for Reset {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RESET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ResetFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -13748,24 +13840,6 @@ impl AstNode for ResetOptions {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::RESET_OPTIONS
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for ResetStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::RESET_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13852,10 +13926,10 @@ impl AstNode for ReturnFuncOption {
         &self.syntax
     }
 }
-impl AstNode for RevokeStmt {
+impl AstNode for Revoke {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::REVOKE_STMT
+        kind == SyntaxKind::REVOKE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13924,10 +13998,10 @@ impl AstNode for RowsFuncOption {
         &self.syntax
     }
 }
-impl AstNode for SavepointStmt {
+impl AstNode for Savepoint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SAVEPOINT_STMT
+        kind == SyntaxKind::SAVEPOINT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -13960,10 +14034,10 @@ impl AstNode for SecurityFuncOption {
         &self.syntax
     }
 }
-impl AstNode for SecurityLabelStmt {
+impl AstNode for SecurityLabel {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SECURITY_LABEL_STMT
+        kind == SyntaxKind::SECURITY_LABEL
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14014,10 +14088,10 @@ impl AstNode for SelectClause {
         &self.syntax
     }
 }
-impl AstNode for SelectIntoStmt {
+impl AstNode for SelectInto {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SELECT_INTO_STMT
+        kind == SyntaxKind::SELECT_INTO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14068,6 +14142,24 @@ impl AstNode for Serializable {
         &self.syntax
     }
 }
+impl AstNode for Set {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SetAccessMethod {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -14104,10 +14196,10 @@ impl AstNode for SetCompression {
         &self.syntax
     }
 }
-impl AstNode for SetConstraintsStmt {
+impl AstNode for SetConstraints {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SET_CONSTRAINTS_STMT
+        kind == SyntaxKind::SET_CONSTRAINTS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14284,10 +14376,10 @@ impl AstNode for SetOptionsList {
         &self.syntax
     }
 }
-impl AstNode for SetRoleStmt {
+impl AstNode for SetRole {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SET_ROLE_STMT
+        kind == SyntaxKind::SET_ROLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14338,10 +14430,10 @@ impl AstNode for SetSequenceOption {
         &self.syntax
     }
 }
-impl AstNode for SetSessionAuthStmt {
+impl AstNode for SetSessionAuth {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SET_SESSION_AUTH_STMT
+        kind == SyntaxKind::SET_SESSION_AUTH
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14360,24 +14452,6 @@ impl AstNode for SetStatistics {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SET_STATISTICS
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for SetStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SET_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14446,10 +14520,10 @@ impl AstNode for SetTablespace {
         &self.syntax
     }
 }
-impl AstNode for SetTransactionStmt {
+impl AstNode for SetTransaction {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SET_TRANSACTION_STMT
+        kind == SyntaxKind::SET_TRANSACTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14536,10 +14610,10 @@ impl AstNode for SetWithoutOids {
         &self.syntax
     }
 }
-impl AstNode for ShowStmt {
+impl AstNode for Show {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SHOW_STMT
+        kind == SyntaxKind::SHOW
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14626,6 +14700,24 @@ impl AstNode for SupportFuncOption {
         &self.syntax
     }
 }
+impl AstNode for Table {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::TABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for TableArgs {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -14648,24 +14740,6 @@ impl AstNode for TableList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::TABLE_LIST
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for TableStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::TABLE_STMT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14842,10 +14916,10 @@ impl AstNode for UniqueConstraint {
         &self.syntax
     }
 }
-impl AstNode for UnlistenStmt {
+impl AstNode for Unlisten {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::UNLISTEN_STMT
+        kind == SyntaxKind::UNLISTEN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14860,10 +14934,10 @@ impl AstNode for UnlistenStmt {
         &self.syntax
     }
 }
-impl AstNode for UpdateStmt {
+impl AstNode for Update {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::UPDATE_STMT
+        kind == SyntaxKind::UPDATE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14914,10 +14988,10 @@ impl AstNode for UsingIndex {
         &self.syntax
     }
 }
-impl AstNode for VacuumStmt {
+impl AstNode for Vacuum {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::VACUUM_STMT
+        kind == SyntaxKind::VACUUM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -16361,37 +16435,181 @@ impl AstNode for Stmt {
         matches!(
             kind,
             SyntaxKind::ALTER_AGGREGATE
+                | SyntaxKind::ALTER_COLLATION
+                | SyntaxKind::ALTER_CONVERSION
+                | SyntaxKind::ALTER_DATABASE
+                | SyntaxKind::ALTER_DEFAULT_PRIVILEGES
                 | SyntaxKind::ALTER_DOMAIN
+                | SyntaxKind::ALTER_EVENT_TRIGGER
+                | SyntaxKind::ALTER_EXTENSION
+                | SyntaxKind::ALTER_FOREIGN_DATA_WRAPPER
+                | SyntaxKind::ALTER_FOREIGN_TABLE
+                | SyntaxKind::ALTER_FUNCTION
+                | SyntaxKind::ALTER_GROUP
+                | SyntaxKind::ALTER_INDEX
+                | SyntaxKind::ALTER_LANGUAGE
+                | SyntaxKind::ALTER_LARGE_OBJECT
+                | SyntaxKind::ALTER_MATERIALIZED_VIEW
+                | SyntaxKind::ALTER_OPERATOR
+                | SyntaxKind::ALTER_OPERATOR_CLASS
+                | SyntaxKind::ALTER_OPERATOR_FAMILY
+                | SyntaxKind::ALTER_POLICY
+                | SyntaxKind::ALTER_PROCEDURE
+                | SyntaxKind::ALTER_PUBLICATION
+                | SyntaxKind::ALTER_ROLE
+                | SyntaxKind::ALTER_ROUTINE
+                | SyntaxKind::ALTER_RULE
+                | SyntaxKind::ALTER_SCHEMA
+                | SyntaxKind::ALTER_SEQUENCE
+                | SyntaxKind::ALTER_SERVER
+                | SyntaxKind::ALTER_STATISTICS
+                | SyntaxKind::ALTER_SUBSCRIPTION
+                | SyntaxKind::ALTER_SYSTEM
                 | SyntaxKind::ALTER_TABLE
+                | SyntaxKind::ALTER_TABLESPACE
+                | SyntaxKind::ALTER_TEXT_SEARCH_CONFIGURATION
+                | SyntaxKind::ALTER_TEXT_SEARCH_DICTIONARY
+                | SyntaxKind::ALTER_TEXT_SEARCH_PARSER
+                | SyntaxKind::ALTER_TEXT_SEARCH_TEMPLATE
+                | SyntaxKind::ALTER_TRIGGER
+                | SyntaxKind::ALTER_TYPE
+                | SyntaxKind::ALTER_USER
+                | SyntaxKind::ALTER_USER_MAPPING
+                | SyntaxKind::ALTER_VIEW
+                | SyntaxKind::ANALYZE
                 | SyntaxKind::BEGIN
+                | SyntaxKind::CALL
+                | SyntaxKind::CHECKPOINT
+                | SyntaxKind::CLOSE
+                | SyntaxKind::CLUSTER
+                | SyntaxKind::COMMENT_ON
                 | SyntaxKind::COMMIT
+                | SyntaxKind::COPY
+                | SyntaxKind::CREATE_ACCESS_METHOD
                 | SyntaxKind::CREATE_AGGREGATE
+                | SyntaxKind::CREATE_CAST
+                | SyntaxKind::CREATE_COLLATION
+                | SyntaxKind::CREATE_CONVERSION
+                | SyntaxKind::CREATE_DATABASE
                 | SyntaxKind::CREATE_DOMAIN
+                | SyntaxKind::CREATE_EVENT_TRIGGER
+                | SyntaxKind::CREATE_EXTENSION
+                | SyntaxKind::CREATE_FOREIGN_DATA_WRAPPER
+                | SyntaxKind::CREATE_FOREIGN_TABLE
                 | SyntaxKind::CREATE_FUNCTION
+                | SyntaxKind::CREATE_GROUP
                 | SyntaxKind::CREATE_INDEX
-                | SyntaxKind::CREATE_MATERIALIZED_VIEW_STMT
+                | SyntaxKind::CREATE_LANGUAGE
+                | SyntaxKind::CREATE_MATERIALIZED_VIEW
+                | SyntaxKind::CREATE_OPERATOR
+                | SyntaxKind::CREATE_OPERATOR_CLASS
+                | SyntaxKind::CREATE_OPERATOR_FAMILY
+                | SyntaxKind::CREATE_POLICY
+                | SyntaxKind::CREATE_PROCEDURE
+                | SyntaxKind::CREATE_PUBLICATION
+                | SyntaxKind::CREATE_ROLE
+                | SyntaxKind::CREATE_RULE
+                | SyntaxKind::CREATE_SCHEMA
+                | SyntaxKind::CREATE_SEQUENCE
+                | SyntaxKind::CREATE_SERVER
+                | SyntaxKind::CREATE_STATISTICS
+                | SyntaxKind::CREATE_SUBSCRIPTION
                 | SyntaxKind::CREATE_TABLE
-                | SyntaxKind::CREATE_TABLE_AS_STMT
-                | SyntaxKind::DECLARE_STMT
-                | SyntaxKind::DELETE_STMT
+                | SyntaxKind::CREATE_TABLE_AS
+                | SyntaxKind::CREATE_TABLESPACE
+                | SyntaxKind::CREATE_TEXT_SEARCH_CONFIGURATION
+                | SyntaxKind::CREATE_TEXT_SEARCH_DICTIONARY
+                | SyntaxKind::CREATE_TEXT_SEARCH_PARSER
+                | SyntaxKind::CREATE_TEXT_SEARCH_TEMPLATE
+                | SyntaxKind::CREATE_TRANSFORM
+                | SyntaxKind::CREATE_TRIGGER
+                | SyntaxKind::CREATE_TYPE
+                | SyntaxKind::CREATE_USER
+                | SyntaxKind::CREATE_USER_MAPPING
+                | SyntaxKind::CREATE_VIEW
+                | SyntaxKind::DEALLOCATE
+                | SyntaxKind::DECLARE
+                | SyntaxKind::DELETE
+                | SyntaxKind::DISCARD
+                | SyntaxKind::DO
+                | SyntaxKind::DROP_ACCESS_METHOD
                 | SyntaxKind::DROP_AGGREGATE
+                | SyntaxKind::DROP_CAST
+                | SyntaxKind::DROP_COLLATION
+                | SyntaxKind::DROP_CONVERSION
                 | SyntaxKind::DROP_DATABASE
+                | SyntaxKind::DROP_DOMAIN
+                | SyntaxKind::DROP_EVENT_TRIGGER
+                | SyntaxKind::DROP_EXTENSION
+                | SyntaxKind::DROP_FOREIGN_DATA_WRAPPER
+                | SyntaxKind::DROP_FOREIGN_TABLE
+                | SyntaxKind::DROP_FUNCTION
+                | SyntaxKind::DROP_GROUP
                 | SyntaxKind::DROP_INDEX
+                | SyntaxKind::DROP_LANGUAGE
+                | SyntaxKind::DROP_MATERIALIZED_VIEW
+                | SyntaxKind::DROP_OPERATOR
+                | SyntaxKind::DROP_OPERATOR_CLASS
+                | SyntaxKind::DROP_OPERATOR_FAMILY
+                | SyntaxKind::DROP_OWNED
+                | SyntaxKind::DROP_POLICY
+                | SyntaxKind::DROP_PROCEDURE
+                | SyntaxKind::DROP_PUBLICATION
+                | SyntaxKind::DROP_ROLE
+                | SyntaxKind::DROP_ROUTINE
+                | SyntaxKind::DROP_RULE
+                | SyntaxKind::DROP_SCHEMA
+                | SyntaxKind::DROP_SEQUENCE
+                | SyntaxKind::DROP_SERVER
+                | SyntaxKind::DROP_STATISTICS
+                | SyntaxKind::DROP_SUBSCRIPTION
                 | SyntaxKind::DROP_TABLE
+                | SyntaxKind::DROP_TABLESPACE
+                | SyntaxKind::DROP_TEXT_SEARCH_CONFIG
+                | SyntaxKind::DROP_TEXT_SEARCH_DICT
+                | SyntaxKind::DROP_TEXT_SEARCH_PARSER
+                | SyntaxKind::DROP_TEXT_SEARCH_TEMPLATE
+                | SyntaxKind::DROP_TRANSFORM
+                | SyntaxKind::DROP_TRIGGER
                 | SyntaxKind::DROP_TYPE
-                | SyntaxKind::EXECUTE_STMT
-                | SyntaxKind::INSERT_STMT
-                | SyntaxKind::MERGE_STMT
-                | SyntaxKind::NOTIFY_STMT
-                | SyntaxKind::PREPARE_TRANSACTION_STMT
-                | SyntaxKind::RELEASE_SAVEPOINT_STMT
-                | SyntaxKind::REVOKE_STMT
+                | SyntaxKind::DROP_USER
+                | SyntaxKind::DROP_USER_MAPPING
+                | SyntaxKind::DROP_VIEW
+                | SyntaxKind::EXECUTE
+                | SyntaxKind::EXPLAIN
+                | SyntaxKind::FETCH
+                | SyntaxKind::GRANT
+                | SyntaxKind::IMPORT_FOREIGN_SCHEMA
+                | SyntaxKind::INSERT
+                | SyntaxKind::LISTEN
+                | SyntaxKind::LOAD
+                | SyntaxKind::LOCK
+                | SyntaxKind::MERGE
+                | SyntaxKind::MOVE
+                | SyntaxKind::NOTIFY
+                | SyntaxKind::PREPARE
+                | SyntaxKind::PREPARE_TRANSACTION
+                | SyntaxKind::REASSIGN
+                | SyntaxKind::REFRESH
+                | SyntaxKind::REINDEX
+                | SyntaxKind::RELEASE_SAVEPOINT
+                | SyntaxKind::RESET
+                | SyntaxKind::REVOKE
                 | SyntaxKind::ROLLBACK
-                | SyntaxKind::SAVEPOINT_STMT
+                | SyntaxKind::SAVEPOINT
+                | SyntaxKind::SECURITY_LABEL
                 | SyntaxKind::SELECT
-                | SyntaxKind::TABLE_STMT
+                | SyntaxKind::SELECT_INTO
+                | SyntaxKind::SET
+                | SyntaxKind::SET_CONSTRAINTS
+                | SyntaxKind::SET_ROLE
+                | SyntaxKind::SET_SESSION_AUTH
+                | SyntaxKind::SET_TRANSACTION
+                | SyntaxKind::SHOW
                 | SyntaxKind::TRUNCATE
-                | SyntaxKind::UPDATE_STMT
+                | SyntaxKind::UNLISTEN
+                | SyntaxKind::UPDATE
+                | SyntaxKind::VACUUM
                 | SyntaxKind::VALUES
         )
     }
@@ -16399,45 +16617,249 @@ impl AstNode for Stmt {
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             SyntaxKind::ALTER_AGGREGATE => Stmt::AlterAggregate(AlterAggregate { syntax }),
+            SyntaxKind::ALTER_COLLATION => Stmt::AlterCollation(AlterCollation { syntax }),
+            SyntaxKind::ALTER_CONVERSION => Stmt::AlterConversion(AlterConversion { syntax }),
+            SyntaxKind::ALTER_DATABASE => Stmt::AlterDatabase(AlterDatabase { syntax }),
+            SyntaxKind::ALTER_DEFAULT_PRIVILEGES => {
+                Stmt::AlterDefaultPrivileges(AlterDefaultPrivileges { syntax })
+            }
             SyntaxKind::ALTER_DOMAIN => Stmt::AlterDomain(AlterDomain { syntax }),
+            SyntaxKind::ALTER_EVENT_TRIGGER => {
+                Stmt::AlterEventTrigger(AlterEventTrigger { syntax })
+            }
+            SyntaxKind::ALTER_EXTENSION => Stmt::AlterExtension(AlterExtension { syntax }),
+            SyntaxKind::ALTER_FOREIGN_DATA_WRAPPER => {
+                Stmt::AlterForeignDataWrapper(AlterForeignDataWrapper { syntax })
+            }
+            SyntaxKind::ALTER_FOREIGN_TABLE => {
+                Stmt::AlterForeignTable(AlterForeignTable { syntax })
+            }
+            SyntaxKind::ALTER_FUNCTION => Stmt::AlterFunction(AlterFunction { syntax }),
+            SyntaxKind::ALTER_GROUP => Stmt::AlterGroup(AlterGroup { syntax }),
+            SyntaxKind::ALTER_INDEX => Stmt::AlterIndex(AlterIndex { syntax }),
+            SyntaxKind::ALTER_LANGUAGE => Stmt::AlterLanguage(AlterLanguage { syntax }),
+            SyntaxKind::ALTER_LARGE_OBJECT => Stmt::AlterLargeObject(AlterLargeObject { syntax }),
+            SyntaxKind::ALTER_MATERIALIZED_VIEW => {
+                Stmt::AlterMaterializedView(AlterMaterializedView { syntax })
+            }
+            SyntaxKind::ALTER_OPERATOR => Stmt::AlterOperator(AlterOperator { syntax }),
+            SyntaxKind::ALTER_OPERATOR_CLASS => {
+                Stmt::AlterOperatorClass(AlterOperatorClass { syntax })
+            }
+            SyntaxKind::ALTER_OPERATOR_FAMILY => {
+                Stmt::AlterOperatorFamily(AlterOperatorFamily { syntax })
+            }
+            SyntaxKind::ALTER_POLICY => Stmt::AlterPolicy(AlterPolicy { syntax }),
+            SyntaxKind::ALTER_PROCEDURE => Stmt::AlterProcedure(AlterProcedure { syntax }),
+            SyntaxKind::ALTER_PUBLICATION => Stmt::AlterPublication(AlterPublication { syntax }),
+            SyntaxKind::ALTER_ROLE => Stmt::AlterRole(AlterRole { syntax }),
+            SyntaxKind::ALTER_ROUTINE => Stmt::AlterRoutine(AlterRoutine { syntax }),
+            SyntaxKind::ALTER_RULE => Stmt::AlterRule(AlterRule { syntax }),
+            SyntaxKind::ALTER_SCHEMA => Stmt::AlterSchema(AlterSchema { syntax }),
+            SyntaxKind::ALTER_SEQUENCE => Stmt::AlterSequence(AlterSequence { syntax }),
+            SyntaxKind::ALTER_SERVER => Stmt::AlterServer(AlterServer { syntax }),
+            SyntaxKind::ALTER_STATISTICS => Stmt::AlterStatistics(AlterStatistics { syntax }),
+            SyntaxKind::ALTER_SUBSCRIPTION => Stmt::AlterSubscription(AlterSubscription { syntax }),
+            SyntaxKind::ALTER_SYSTEM => Stmt::AlterSystem(AlterSystem { syntax }),
             SyntaxKind::ALTER_TABLE => Stmt::AlterTable(AlterTable { syntax }),
+            SyntaxKind::ALTER_TABLESPACE => Stmt::AlterTablespace(AlterTablespace { syntax }),
+            SyntaxKind::ALTER_TEXT_SEARCH_CONFIGURATION => {
+                Stmt::AlterTextSearchConfiguration(AlterTextSearchConfiguration { syntax })
+            }
+            SyntaxKind::ALTER_TEXT_SEARCH_DICTIONARY => {
+                Stmt::AlterTextSearchDictionary(AlterTextSearchDictionary { syntax })
+            }
+            SyntaxKind::ALTER_TEXT_SEARCH_PARSER => {
+                Stmt::AlterTextSearchParser(AlterTextSearchParser { syntax })
+            }
+            SyntaxKind::ALTER_TEXT_SEARCH_TEMPLATE => {
+                Stmt::AlterTextSearchTemplate(AlterTextSearchTemplate { syntax })
+            }
+            SyntaxKind::ALTER_TRIGGER => Stmt::AlterTrigger(AlterTrigger { syntax }),
+            SyntaxKind::ALTER_TYPE => Stmt::AlterType(AlterType { syntax }),
+            SyntaxKind::ALTER_USER => Stmt::AlterUser(AlterUser { syntax }),
+            SyntaxKind::ALTER_USER_MAPPING => Stmt::AlterUserMapping(AlterUserMapping { syntax }),
+            SyntaxKind::ALTER_VIEW => Stmt::AlterView(AlterView { syntax }),
+            SyntaxKind::ANALYZE => Stmt::Analyze(Analyze { syntax }),
             SyntaxKind::BEGIN => Stmt::Begin(Begin { syntax }),
+            SyntaxKind::CALL => Stmt::Call(Call { syntax }),
+            SyntaxKind::CHECKPOINT => Stmt::Checkpoint(Checkpoint { syntax }),
+            SyntaxKind::CLOSE => Stmt::Close(Close { syntax }),
+            SyntaxKind::CLUSTER => Stmt::Cluster(Cluster { syntax }),
+            SyntaxKind::COMMENT_ON => Stmt::CommentOn(CommentOn { syntax }),
             SyntaxKind::COMMIT => Stmt::Commit(Commit { syntax }),
+            SyntaxKind::COPY => Stmt::Copy(Copy { syntax }),
+            SyntaxKind::CREATE_ACCESS_METHOD => {
+                Stmt::CreateAccessMethod(CreateAccessMethod { syntax })
+            }
             SyntaxKind::CREATE_AGGREGATE => Stmt::CreateAggregate(CreateAggregate { syntax }),
+            SyntaxKind::CREATE_CAST => Stmt::CreateCast(CreateCast { syntax }),
+            SyntaxKind::CREATE_COLLATION => Stmt::CreateCollation(CreateCollation { syntax }),
+            SyntaxKind::CREATE_CONVERSION => Stmt::CreateConversion(CreateConversion { syntax }),
+            SyntaxKind::CREATE_DATABASE => Stmt::CreateDatabase(CreateDatabase { syntax }),
             SyntaxKind::CREATE_DOMAIN => Stmt::CreateDomain(CreateDomain { syntax }),
+            SyntaxKind::CREATE_EVENT_TRIGGER => {
+                Stmt::CreateEventTrigger(CreateEventTrigger { syntax })
+            }
+            SyntaxKind::CREATE_EXTENSION => Stmt::CreateExtension(CreateExtension { syntax }),
+            SyntaxKind::CREATE_FOREIGN_DATA_WRAPPER => {
+                Stmt::CreateForeignDataWrapper(CreateForeignDataWrapper { syntax })
+            }
+            SyntaxKind::CREATE_FOREIGN_TABLE => {
+                Stmt::CreateForeignTable(CreateForeignTable { syntax })
+            }
             SyntaxKind::CREATE_FUNCTION => Stmt::CreateFunction(CreateFunction { syntax }),
+            SyntaxKind::CREATE_GROUP => Stmt::CreateGroup(CreateGroup { syntax }),
             SyntaxKind::CREATE_INDEX => Stmt::CreateIndex(CreateIndex { syntax }),
-            SyntaxKind::CREATE_MATERIALIZED_VIEW_STMT => {
-                Stmt::CreateMaterializedViewStmt(CreateMaterializedViewStmt { syntax })
+            SyntaxKind::CREATE_LANGUAGE => Stmt::CreateLanguage(CreateLanguage { syntax }),
+            SyntaxKind::CREATE_MATERIALIZED_VIEW => {
+                Stmt::CreateMaterializedView(CreateMaterializedView { syntax })
+            }
+            SyntaxKind::CREATE_OPERATOR => Stmt::CreateOperator(CreateOperator { syntax }),
+            SyntaxKind::CREATE_OPERATOR_CLASS => {
+                Stmt::CreateOperatorClass(CreateOperatorClass { syntax })
+            }
+            SyntaxKind::CREATE_OPERATOR_FAMILY => {
+                Stmt::CreateOperatorFamily(CreateOperatorFamily { syntax })
+            }
+            SyntaxKind::CREATE_POLICY => Stmt::CreatePolicy(CreatePolicy { syntax }),
+            SyntaxKind::CREATE_PROCEDURE => Stmt::CreateProcedure(CreateProcedure { syntax }),
+            SyntaxKind::CREATE_PUBLICATION => Stmt::CreatePublication(CreatePublication { syntax }),
+            SyntaxKind::CREATE_ROLE => Stmt::CreateRole(CreateRole { syntax }),
+            SyntaxKind::CREATE_RULE => Stmt::CreateRule(CreateRule { syntax }),
+            SyntaxKind::CREATE_SCHEMA => Stmt::CreateSchema(CreateSchema { syntax }),
+            SyntaxKind::CREATE_SEQUENCE => Stmt::CreateSequence(CreateSequence { syntax }),
+            SyntaxKind::CREATE_SERVER => Stmt::CreateServer(CreateServer { syntax }),
+            SyntaxKind::CREATE_STATISTICS => Stmt::CreateStatistics(CreateStatistics { syntax }),
+            SyntaxKind::CREATE_SUBSCRIPTION => {
+                Stmt::CreateSubscription(CreateSubscription { syntax })
             }
             SyntaxKind::CREATE_TABLE => Stmt::CreateTable(CreateTable { syntax }),
-            SyntaxKind::CREATE_TABLE_AS_STMT => {
-                Stmt::CreateTableAsStmt(CreateTableAsStmt { syntax })
+            SyntaxKind::CREATE_TABLE_AS => Stmt::CreateTableAs(CreateTableAs { syntax }),
+            SyntaxKind::CREATE_TABLESPACE => Stmt::CreateTablespace(CreateTablespace { syntax }),
+            SyntaxKind::CREATE_TEXT_SEARCH_CONFIGURATION => {
+                Stmt::CreateTextSearchConfiguration(CreateTextSearchConfiguration { syntax })
             }
-            SyntaxKind::DECLARE_STMT => Stmt::DeclareStmt(DeclareStmt { syntax }),
-            SyntaxKind::DELETE_STMT => Stmt::DeleteStmt(DeleteStmt { syntax }),
+            SyntaxKind::CREATE_TEXT_SEARCH_DICTIONARY => {
+                Stmt::CreateTextSearchDictionary(CreateTextSearchDictionary { syntax })
+            }
+            SyntaxKind::CREATE_TEXT_SEARCH_PARSER => {
+                Stmt::CreateTextSearchParser(CreateTextSearchParser { syntax })
+            }
+            SyntaxKind::CREATE_TEXT_SEARCH_TEMPLATE => {
+                Stmt::CreateTextSearchTemplate(CreateTextSearchTemplate { syntax })
+            }
+            SyntaxKind::CREATE_TRANSFORM => Stmt::CreateTransform(CreateTransform { syntax }),
+            SyntaxKind::CREATE_TRIGGER => Stmt::CreateTrigger(CreateTrigger { syntax }),
+            SyntaxKind::CREATE_TYPE => Stmt::CreateType(CreateType { syntax }),
+            SyntaxKind::CREATE_USER => Stmt::CreateUser(CreateUser { syntax }),
+            SyntaxKind::CREATE_USER_MAPPING => {
+                Stmt::CreateUserMapping(CreateUserMapping { syntax })
+            }
+            SyntaxKind::CREATE_VIEW => Stmt::CreateView(CreateView { syntax }),
+            SyntaxKind::DEALLOCATE => Stmt::Deallocate(Deallocate { syntax }),
+            SyntaxKind::DECLARE => Stmt::Declare(Declare { syntax }),
+            SyntaxKind::DELETE => Stmt::Delete(Delete { syntax }),
+            SyntaxKind::DISCARD => Stmt::Discard(Discard { syntax }),
+            SyntaxKind::DO => Stmt::Do(Do { syntax }),
+            SyntaxKind::DROP_ACCESS_METHOD => Stmt::DropAccessMethod(DropAccessMethod { syntax }),
             SyntaxKind::DROP_AGGREGATE => Stmt::DropAggregate(DropAggregate { syntax }),
+            SyntaxKind::DROP_CAST => Stmt::DropCast(DropCast { syntax }),
+            SyntaxKind::DROP_COLLATION => Stmt::DropCollation(DropCollation { syntax }),
+            SyntaxKind::DROP_CONVERSION => Stmt::DropConversion(DropConversion { syntax }),
             SyntaxKind::DROP_DATABASE => Stmt::DropDatabase(DropDatabase { syntax }),
+            SyntaxKind::DROP_DOMAIN => Stmt::DropDomain(DropDomain { syntax }),
+            SyntaxKind::DROP_EVENT_TRIGGER => Stmt::DropEventTrigger(DropEventTrigger { syntax }),
+            SyntaxKind::DROP_EXTENSION => Stmt::DropExtension(DropExtension { syntax }),
+            SyntaxKind::DROP_FOREIGN_DATA_WRAPPER => {
+                Stmt::DropForeignDataWrapper(DropForeignDataWrapper { syntax })
+            }
+            SyntaxKind::DROP_FOREIGN_TABLE => Stmt::DropForeignTable(DropForeignTable { syntax }),
+            SyntaxKind::DROP_FUNCTION => Stmt::DropFunction(DropFunction { syntax }),
+            SyntaxKind::DROP_GROUP => Stmt::DropGroup(DropGroup { syntax }),
             SyntaxKind::DROP_INDEX => Stmt::DropIndex(DropIndex { syntax }),
+            SyntaxKind::DROP_LANGUAGE => Stmt::DropLanguage(DropLanguage { syntax }),
+            SyntaxKind::DROP_MATERIALIZED_VIEW => {
+                Stmt::DropMaterializedView(DropMaterializedView { syntax })
+            }
+            SyntaxKind::DROP_OPERATOR => Stmt::DropOperator(DropOperator { syntax }),
+            SyntaxKind::DROP_OPERATOR_CLASS => {
+                Stmt::DropOperatorClass(DropOperatorClass { syntax })
+            }
+            SyntaxKind::DROP_OPERATOR_FAMILY => {
+                Stmt::DropOperatorFamily(DropOperatorFamily { syntax })
+            }
+            SyntaxKind::DROP_OWNED => Stmt::DropOwned(DropOwned { syntax }),
+            SyntaxKind::DROP_POLICY => Stmt::DropPolicy(DropPolicy { syntax }),
+            SyntaxKind::DROP_PROCEDURE => Stmt::DropProcedure(DropProcedure { syntax }),
+            SyntaxKind::DROP_PUBLICATION => Stmt::DropPublication(DropPublication { syntax }),
+            SyntaxKind::DROP_ROLE => Stmt::DropRole(DropRole { syntax }),
+            SyntaxKind::DROP_ROUTINE => Stmt::DropRoutine(DropRoutine { syntax }),
+            SyntaxKind::DROP_RULE => Stmt::DropRule(DropRule { syntax }),
+            SyntaxKind::DROP_SCHEMA => Stmt::DropSchema(DropSchema { syntax }),
+            SyntaxKind::DROP_SEQUENCE => Stmt::DropSequence(DropSequence { syntax }),
+            SyntaxKind::DROP_SERVER => Stmt::DropServer(DropServer { syntax }),
+            SyntaxKind::DROP_STATISTICS => Stmt::DropStatistics(DropStatistics { syntax }),
+            SyntaxKind::DROP_SUBSCRIPTION => Stmt::DropSubscription(DropSubscription { syntax }),
             SyntaxKind::DROP_TABLE => Stmt::DropTable(DropTable { syntax }),
+            SyntaxKind::DROP_TABLESPACE => Stmt::DropTablespace(DropTablespace { syntax }),
+            SyntaxKind::DROP_TEXT_SEARCH_CONFIG => {
+                Stmt::DropTextSearchConfig(DropTextSearchConfig { syntax })
+            }
+            SyntaxKind::DROP_TEXT_SEARCH_DICT => {
+                Stmt::DropTextSearchDict(DropTextSearchDict { syntax })
+            }
+            SyntaxKind::DROP_TEXT_SEARCH_PARSER => {
+                Stmt::DropTextSearchParser(DropTextSearchParser { syntax })
+            }
+            SyntaxKind::DROP_TEXT_SEARCH_TEMPLATE => {
+                Stmt::DropTextSearchTemplate(DropTextSearchTemplate { syntax })
+            }
+            SyntaxKind::DROP_TRANSFORM => Stmt::DropTransform(DropTransform { syntax }),
+            SyntaxKind::DROP_TRIGGER => Stmt::DropTrigger(DropTrigger { syntax }),
             SyntaxKind::DROP_TYPE => Stmt::DropType(DropType { syntax }),
-            SyntaxKind::EXECUTE_STMT => Stmt::ExecuteStmt(ExecuteStmt { syntax }),
-            SyntaxKind::INSERT_STMT => Stmt::InsertStmt(InsertStmt { syntax }),
-            SyntaxKind::MERGE_STMT => Stmt::MergeStmt(MergeStmt { syntax }),
-            SyntaxKind::NOTIFY_STMT => Stmt::NotifyStmt(NotifyStmt { syntax }),
-            SyntaxKind::PREPARE_TRANSACTION_STMT => {
-                Stmt::PrepareTransactionStmt(PrepareTransactionStmt { syntax })
+            SyntaxKind::DROP_USER => Stmt::DropUser(DropUser { syntax }),
+            SyntaxKind::DROP_USER_MAPPING => Stmt::DropUserMapping(DropUserMapping { syntax }),
+            SyntaxKind::DROP_VIEW => Stmt::DropView(DropView { syntax }),
+            SyntaxKind::EXECUTE => Stmt::Execute(Execute { syntax }),
+            SyntaxKind::EXPLAIN => Stmt::Explain(Explain { syntax }),
+            SyntaxKind::FETCH => Stmt::Fetch(Fetch { syntax }),
+            SyntaxKind::GRANT => Stmt::Grant(Grant { syntax }),
+            SyntaxKind::IMPORT_FOREIGN_SCHEMA => {
+                Stmt::ImportForeignSchema(ImportForeignSchema { syntax })
             }
-            SyntaxKind::RELEASE_SAVEPOINT_STMT => {
-                Stmt::ReleaseSavepointStmt(ReleaseSavepointStmt { syntax })
+            SyntaxKind::INSERT => Stmt::Insert(Insert { syntax }),
+            SyntaxKind::LISTEN => Stmt::Listen(Listen { syntax }),
+            SyntaxKind::LOAD => Stmt::Load(Load { syntax }),
+            SyntaxKind::LOCK => Stmt::Lock(Lock { syntax }),
+            SyntaxKind::MERGE => Stmt::Merge(Merge { syntax }),
+            SyntaxKind::MOVE => Stmt::Move(Move { syntax }),
+            SyntaxKind::NOTIFY => Stmt::Notify(Notify { syntax }),
+            SyntaxKind::PREPARE => Stmt::Prepare(Prepare { syntax }),
+            SyntaxKind::PREPARE_TRANSACTION => {
+                Stmt::PrepareTransaction(PrepareTransaction { syntax })
             }
-            SyntaxKind::REVOKE_STMT => Stmt::RevokeStmt(RevokeStmt { syntax }),
+            SyntaxKind::REASSIGN => Stmt::Reassign(Reassign { syntax }),
+            SyntaxKind::REFRESH => Stmt::Refresh(Refresh { syntax }),
+            SyntaxKind::REINDEX => Stmt::Reindex(Reindex { syntax }),
+            SyntaxKind::RELEASE_SAVEPOINT => Stmt::ReleaseSavepoint(ReleaseSavepoint { syntax }),
+            SyntaxKind::RESET => Stmt::Reset(Reset { syntax }),
+            SyntaxKind::REVOKE => Stmt::Revoke(Revoke { syntax }),
             SyntaxKind::ROLLBACK => Stmt::Rollback(Rollback { syntax }),
-            SyntaxKind::SAVEPOINT_STMT => Stmt::SavepointStmt(SavepointStmt { syntax }),
+            SyntaxKind::SAVEPOINT => Stmt::Savepoint(Savepoint { syntax }),
+            SyntaxKind::SECURITY_LABEL => Stmt::SecurityLabel(SecurityLabel { syntax }),
             SyntaxKind::SELECT => Stmt::Select(Select { syntax }),
-            SyntaxKind::TABLE_STMT => Stmt::TableStmt(TableStmt { syntax }),
+            SyntaxKind::SELECT_INTO => Stmt::SelectInto(SelectInto { syntax }),
+            SyntaxKind::SET => Stmt::Set(Set { syntax }),
+            SyntaxKind::SET_CONSTRAINTS => Stmt::SetConstraints(SetConstraints { syntax }),
+            SyntaxKind::SET_ROLE => Stmt::SetRole(SetRole { syntax }),
+            SyntaxKind::SET_SESSION_AUTH => Stmt::SetSessionAuth(SetSessionAuth { syntax }),
+            SyntaxKind::SET_TRANSACTION => Stmt::SetTransaction(SetTransaction { syntax }),
+            SyntaxKind::SHOW => Stmt::Show(Show { syntax }),
             SyntaxKind::TRUNCATE => Stmt::Truncate(Truncate { syntax }),
-            SyntaxKind::UPDATE_STMT => Stmt::UpdateStmt(UpdateStmt { syntax }),
+            SyntaxKind::UNLISTEN => Stmt::Unlisten(Unlisten { syntax }),
+            SyntaxKind::UPDATE => Stmt::Update(Update { syntax }),
+            SyntaxKind::VACUUM => Stmt::Vacuum(Vacuum { syntax }),
             SyntaxKind::VALUES => Stmt::Values(Values { syntax }),
             _ => {
                 return None;
@@ -16449,37 +16871,181 @@ impl AstNode for Stmt {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             Stmt::AlterAggregate(it) => &it.syntax,
+            Stmt::AlterCollation(it) => &it.syntax,
+            Stmt::AlterConversion(it) => &it.syntax,
+            Stmt::AlterDatabase(it) => &it.syntax,
+            Stmt::AlterDefaultPrivileges(it) => &it.syntax,
             Stmt::AlterDomain(it) => &it.syntax,
+            Stmt::AlterEventTrigger(it) => &it.syntax,
+            Stmt::AlterExtension(it) => &it.syntax,
+            Stmt::AlterForeignDataWrapper(it) => &it.syntax,
+            Stmt::AlterForeignTable(it) => &it.syntax,
+            Stmt::AlterFunction(it) => &it.syntax,
+            Stmt::AlterGroup(it) => &it.syntax,
+            Stmt::AlterIndex(it) => &it.syntax,
+            Stmt::AlterLanguage(it) => &it.syntax,
+            Stmt::AlterLargeObject(it) => &it.syntax,
+            Stmt::AlterMaterializedView(it) => &it.syntax,
+            Stmt::AlterOperator(it) => &it.syntax,
+            Stmt::AlterOperatorClass(it) => &it.syntax,
+            Stmt::AlterOperatorFamily(it) => &it.syntax,
+            Stmt::AlterPolicy(it) => &it.syntax,
+            Stmt::AlterProcedure(it) => &it.syntax,
+            Stmt::AlterPublication(it) => &it.syntax,
+            Stmt::AlterRole(it) => &it.syntax,
+            Stmt::AlterRoutine(it) => &it.syntax,
+            Stmt::AlterRule(it) => &it.syntax,
+            Stmt::AlterSchema(it) => &it.syntax,
+            Stmt::AlterSequence(it) => &it.syntax,
+            Stmt::AlterServer(it) => &it.syntax,
+            Stmt::AlterStatistics(it) => &it.syntax,
+            Stmt::AlterSubscription(it) => &it.syntax,
+            Stmt::AlterSystem(it) => &it.syntax,
             Stmt::AlterTable(it) => &it.syntax,
+            Stmt::AlterTablespace(it) => &it.syntax,
+            Stmt::AlterTextSearchConfiguration(it) => &it.syntax,
+            Stmt::AlterTextSearchDictionary(it) => &it.syntax,
+            Stmt::AlterTextSearchParser(it) => &it.syntax,
+            Stmt::AlterTextSearchTemplate(it) => &it.syntax,
+            Stmt::AlterTrigger(it) => &it.syntax,
+            Stmt::AlterType(it) => &it.syntax,
+            Stmt::AlterUser(it) => &it.syntax,
+            Stmt::AlterUserMapping(it) => &it.syntax,
+            Stmt::AlterView(it) => &it.syntax,
+            Stmt::Analyze(it) => &it.syntax,
             Stmt::Begin(it) => &it.syntax,
+            Stmt::Call(it) => &it.syntax,
+            Stmt::Checkpoint(it) => &it.syntax,
+            Stmt::Close(it) => &it.syntax,
+            Stmt::Cluster(it) => &it.syntax,
+            Stmt::CommentOn(it) => &it.syntax,
             Stmt::Commit(it) => &it.syntax,
+            Stmt::Copy(it) => &it.syntax,
+            Stmt::CreateAccessMethod(it) => &it.syntax,
             Stmt::CreateAggregate(it) => &it.syntax,
+            Stmt::CreateCast(it) => &it.syntax,
+            Stmt::CreateCollation(it) => &it.syntax,
+            Stmt::CreateConversion(it) => &it.syntax,
+            Stmt::CreateDatabase(it) => &it.syntax,
             Stmt::CreateDomain(it) => &it.syntax,
+            Stmt::CreateEventTrigger(it) => &it.syntax,
+            Stmt::CreateExtension(it) => &it.syntax,
+            Stmt::CreateForeignDataWrapper(it) => &it.syntax,
+            Stmt::CreateForeignTable(it) => &it.syntax,
             Stmt::CreateFunction(it) => &it.syntax,
+            Stmt::CreateGroup(it) => &it.syntax,
             Stmt::CreateIndex(it) => &it.syntax,
-            Stmt::CreateMaterializedViewStmt(it) => &it.syntax,
+            Stmt::CreateLanguage(it) => &it.syntax,
+            Stmt::CreateMaterializedView(it) => &it.syntax,
+            Stmt::CreateOperator(it) => &it.syntax,
+            Stmt::CreateOperatorClass(it) => &it.syntax,
+            Stmt::CreateOperatorFamily(it) => &it.syntax,
+            Stmt::CreatePolicy(it) => &it.syntax,
+            Stmt::CreateProcedure(it) => &it.syntax,
+            Stmt::CreatePublication(it) => &it.syntax,
+            Stmt::CreateRole(it) => &it.syntax,
+            Stmt::CreateRule(it) => &it.syntax,
+            Stmt::CreateSchema(it) => &it.syntax,
+            Stmt::CreateSequence(it) => &it.syntax,
+            Stmt::CreateServer(it) => &it.syntax,
+            Stmt::CreateStatistics(it) => &it.syntax,
+            Stmt::CreateSubscription(it) => &it.syntax,
             Stmt::CreateTable(it) => &it.syntax,
-            Stmt::CreateTableAsStmt(it) => &it.syntax,
-            Stmt::DeclareStmt(it) => &it.syntax,
-            Stmt::DeleteStmt(it) => &it.syntax,
+            Stmt::CreateTableAs(it) => &it.syntax,
+            Stmt::CreateTablespace(it) => &it.syntax,
+            Stmt::CreateTextSearchConfiguration(it) => &it.syntax,
+            Stmt::CreateTextSearchDictionary(it) => &it.syntax,
+            Stmt::CreateTextSearchParser(it) => &it.syntax,
+            Stmt::CreateTextSearchTemplate(it) => &it.syntax,
+            Stmt::CreateTransform(it) => &it.syntax,
+            Stmt::CreateTrigger(it) => &it.syntax,
+            Stmt::CreateType(it) => &it.syntax,
+            Stmt::CreateUser(it) => &it.syntax,
+            Stmt::CreateUserMapping(it) => &it.syntax,
+            Stmt::CreateView(it) => &it.syntax,
+            Stmt::Deallocate(it) => &it.syntax,
+            Stmt::Declare(it) => &it.syntax,
+            Stmt::Delete(it) => &it.syntax,
+            Stmt::Discard(it) => &it.syntax,
+            Stmt::Do(it) => &it.syntax,
+            Stmt::DropAccessMethod(it) => &it.syntax,
             Stmt::DropAggregate(it) => &it.syntax,
+            Stmt::DropCast(it) => &it.syntax,
+            Stmt::DropCollation(it) => &it.syntax,
+            Stmt::DropConversion(it) => &it.syntax,
             Stmt::DropDatabase(it) => &it.syntax,
+            Stmt::DropDomain(it) => &it.syntax,
+            Stmt::DropEventTrigger(it) => &it.syntax,
+            Stmt::DropExtension(it) => &it.syntax,
+            Stmt::DropForeignDataWrapper(it) => &it.syntax,
+            Stmt::DropForeignTable(it) => &it.syntax,
+            Stmt::DropFunction(it) => &it.syntax,
+            Stmt::DropGroup(it) => &it.syntax,
             Stmt::DropIndex(it) => &it.syntax,
+            Stmt::DropLanguage(it) => &it.syntax,
+            Stmt::DropMaterializedView(it) => &it.syntax,
+            Stmt::DropOperator(it) => &it.syntax,
+            Stmt::DropOperatorClass(it) => &it.syntax,
+            Stmt::DropOperatorFamily(it) => &it.syntax,
+            Stmt::DropOwned(it) => &it.syntax,
+            Stmt::DropPolicy(it) => &it.syntax,
+            Stmt::DropProcedure(it) => &it.syntax,
+            Stmt::DropPublication(it) => &it.syntax,
+            Stmt::DropRole(it) => &it.syntax,
+            Stmt::DropRoutine(it) => &it.syntax,
+            Stmt::DropRule(it) => &it.syntax,
+            Stmt::DropSchema(it) => &it.syntax,
+            Stmt::DropSequence(it) => &it.syntax,
+            Stmt::DropServer(it) => &it.syntax,
+            Stmt::DropStatistics(it) => &it.syntax,
+            Stmt::DropSubscription(it) => &it.syntax,
             Stmt::DropTable(it) => &it.syntax,
+            Stmt::DropTablespace(it) => &it.syntax,
+            Stmt::DropTextSearchConfig(it) => &it.syntax,
+            Stmt::DropTextSearchDict(it) => &it.syntax,
+            Stmt::DropTextSearchParser(it) => &it.syntax,
+            Stmt::DropTextSearchTemplate(it) => &it.syntax,
+            Stmt::DropTransform(it) => &it.syntax,
+            Stmt::DropTrigger(it) => &it.syntax,
             Stmt::DropType(it) => &it.syntax,
-            Stmt::ExecuteStmt(it) => &it.syntax,
-            Stmt::InsertStmt(it) => &it.syntax,
-            Stmt::MergeStmt(it) => &it.syntax,
-            Stmt::NotifyStmt(it) => &it.syntax,
-            Stmt::PrepareTransactionStmt(it) => &it.syntax,
-            Stmt::ReleaseSavepointStmt(it) => &it.syntax,
-            Stmt::RevokeStmt(it) => &it.syntax,
+            Stmt::DropUser(it) => &it.syntax,
+            Stmt::DropUserMapping(it) => &it.syntax,
+            Stmt::DropView(it) => &it.syntax,
+            Stmt::Execute(it) => &it.syntax,
+            Stmt::Explain(it) => &it.syntax,
+            Stmt::Fetch(it) => &it.syntax,
+            Stmt::Grant(it) => &it.syntax,
+            Stmt::ImportForeignSchema(it) => &it.syntax,
+            Stmt::Insert(it) => &it.syntax,
+            Stmt::Listen(it) => &it.syntax,
+            Stmt::Load(it) => &it.syntax,
+            Stmt::Lock(it) => &it.syntax,
+            Stmt::Merge(it) => &it.syntax,
+            Stmt::Move(it) => &it.syntax,
+            Stmt::Notify(it) => &it.syntax,
+            Stmt::Prepare(it) => &it.syntax,
+            Stmt::PrepareTransaction(it) => &it.syntax,
+            Stmt::Reassign(it) => &it.syntax,
+            Stmt::Refresh(it) => &it.syntax,
+            Stmt::Reindex(it) => &it.syntax,
+            Stmt::ReleaseSavepoint(it) => &it.syntax,
+            Stmt::Reset(it) => &it.syntax,
+            Stmt::Revoke(it) => &it.syntax,
             Stmt::Rollback(it) => &it.syntax,
-            Stmt::SavepointStmt(it) => &it.syntax,
+            Stmt::Savepoint(it) => &it.syntax,
+            Stmt::SecurityLabel(it) => &it.syntax,
             Stmt::Select(it) => &it.syntax,
-            Stmt::TableStmt(it) => &it.syntax,
+            Stmt::SelectInto(it) => &it.syntax,
+            Stmt::Set(it) => &it.syntax,
+            Stmt::SetConstraints(it) => &it.syntax,
+            Stmt::SetRole(it) => &it.syntax,
+            Stmt::SetSessionAuth(it) => &it.syntax,
+            Stmt::SetTransaction(it) => &it.syntax,
+            Stmt::Show(it) => &it.syntax,
             Stmt::Truncate(it) => &it.syntax,
-            Stmt::UpdateStmt(it) => &it.syntax,
+            Stmt::Unlisten(it) => &it.syntax,
+            Stmt::Update(it) => &it.syntax,
+            Stmt::Vacuum(it) => &it.syntax,
             Stmt::Values(it) => &it.syntax,
         }
     }
@@ -16490,10 +17056,184 @@ impl From<AlterAggregate> for Stmt {
         Stmt::AlterAggregate(node)
     }
 }
+impl From<AlterCollation> for Stmt {
+    #[inline]
+    fn from(node: AlterCollation) -> Stmt {
+        Stmt::AlterCollation(node)
+    }
+}
+impl From<AlterConversion> for Stmt {
+    #[inline]
+    fn from(node: AlterConversion) -> Stmt {
+        Stmt::AlterConversion(node)
+    }
+}
+impl From<AlterDatabase> for Stmt {
+    #[inline]
+    fn from(node: AlterDatabase) -> Stmt {
+        Stmt::AlterDatabase(node)
+    }
+}
+impl From<AlterDefaultPrivileges> for Stmt {
+    #[inline]
+    fn from(node: AlterDefaultPrivileges) -> Stmt {
+        Stmt::AlterDefaultPrivileges(node)
+    }
+}
 impl From<AlterDomain> for Stmt {
     #[inline]
     fn from(node: AlterDomain) -> Stmt {
         Stmt::AlterDomain(node)
+    }
+}
+impl From<AlterEventTrigger> for Stmt {
+    #[inline]
+    fn from(node: AlterEventTrigger) -> Stmt {
+        Stmt::AlterEventTrigger(node)
+    }
+}
+impl From<AlterExtension> for Stmt {
+    #[inline]
+    fn from(node: AlterExtension) -> Stmt {
+        Stmt::AlterExtension(node)
+    }
+}
+impl From<AlterForeignDataWrapper> for Stmt {
+    #[inline]
+    fn from(node: AlterForeignDataWrapper) -> Stmt {
+        Stmt::AlterForeignDataWrapper(node)
+    }
+}
+impl From<AlterForeignTable> for Stmt {
+    #[inline]
+    fn from(node: AlterForeignTable) -> Stmt {
+        Stmt::AlterForeignTable(node)
+    }
+}
+impl From<AlterFunction> for Stmt {
+    #[inline]
+    fn from(node: AlterFunction) -> Stmt {
+        Stmt::AlterFunction(node)
+    }
+}
+impl From<AlterGroup> for Stmt {
+    #[inline]
+    fn from(node: AlterGroup) -> Stmt {
+        Stmt::AlterGroup(node)
+    }
+}
+impl From<AlterIndex> for Stmt {
+    #[inline]
+    fn from(node: AlterIndex) -> Stmt {
+        Stmt::AlterIndex(node)
+    }
+}
+impl From<AlterLanguage> for Stmt {
+    #[inline]
+    fn from(node: AlterLanguage) -> Stmt {
+        Stmt::AlterLanguage(node)
+    }
+}
+impl From<AlterLargeObject> for Stmt {
+    #[inline]
+    fn from(node: AlterLargeObject) -> Stmt {
+        Stmt::AlterLargeObject(node)
+    }
+}
+impl From<AlterMaterializedView> for Stmt {
+    #[inline]
+    fn from(node: AlterMaterializedView) -> Stmt {
+        Stmt::AlterMaterializedView(node)
+    }
+}
+impl From<AlterOperator> for Stmt {
+    #[inline]
+    fn from(node: AlterOperator) -> Stmt {
+        Stmt::AlterOperator(node)
+    }
+}
+impl From<AlterOperatorClass> for Stmt {
+    #[inline]
+    fn from(node: AlterOperatorClass) -> Stmt {
+        Stmt::AlterOperatorClass(node)
+    }
+}
+impl From<AlterOperatorFamily> for Stmt {
+    #[inline]
+    fn from(node: AlterOperatorFamily) -> Stmt {
+        Stmt::AlterOperatorFamily(node)
+    }
+}
+impl From<AlterPolicy> for Stmt {
+    #[inline]
+    fn from(node: AlterPolicy) -> Stmt {
+        Stmt::AlterPolicy(node)
+    }
+}
+impl From<AlterProcedure> for Stmt {
+    #[inline]
+    fn from(node: AlterProcedure) -> Stmt {
+        Stmt::AlterProcedure(node)
+    }
+}
+impl From<AlterPublication> for Stmt {
+    #[inline]
+    fn from(node: AlterPublication) -> Stmt {
+        Stmt::AlterPublication(node)
+    }
+}
+impl From<AlterRole> for Stmt {
+    #[inline]
+    fn from(node: AlterRole) -> Stmt {
+        Stmt::AlterRole(node)
+    }
+}
+impl From<AlterRoutine> for Stmt {
+    #[inline]
+    fn from(node: AlterRoutine) -> Stmt {
+        Stmt::AlterRoutine(node)
+    }
+}
+impl From<AlterRule> for Stmt {
+    #[inline]
+    fn from(node: AlterRule) -> Stmt {
+        Stmt::AlterRule(node)
+    }
+}
+impl From<AlterSchema> for Stmt {
+    #[inline]
+    fn from(node: AlterSchema) -> Stmt {
+        Stmt::AlterSchema(node)
+    }
+}
+impl From<AlterSequence> for Stmt {
+    #[inline]
+    fn from(node: AlterSequence) -> Stmt {
+        Stmt::AlterSequence(node)
+    }
+}
+impl From<AlterServer> for Stmt {
+    #[inline]
+    fn from(node: AlterServer) -> Stmt {
+        Stmt::AlterServer(node)
+    }
+}
+impl From<AlterStatistics> for Stmt {
+    #[inline]
+    fn from(node: AlterStatistics) -> Stmt {
+        Stmt::AlterStatistics(node)
+    }
+}
+impl From<AlterSubscription> for Stmt {
+    #[inline]
+    fn from(node: AlterSubscription) -> Stmt {
+        Stmt::AlterSubscription(node)
+    }
+}
+impl From<AlterSystem> for Stmt {
+    #[inline]
+    fn from(node: AlterSystem) -> Stmt {
+        Stmt::AlterSystem(node)
     }
 }
 impl From<AlterTable> for Stmt {
@@ -16502,10 +17242,106 @@ impl From<AlterTable> for Stmt {
         Stmt::AlterTable(node)
     }
 }
+impl From<AlterTablespace> for Stmt {
+    #[inline]
+    fn from(node: AlterTablespace) -> Stmt {
+        Stmt::AlterTablespace(node)
+    }
+}
+impl From<AlterTextSearchConfiguration> for Stmt {
+    #[inline]
+    fn from(node: AlterTextSearchConfiguration) -> Stmt {
+        Stmt::AlterTextSearchConfiguration(node)
+    }
+}
+impl From<AlterTextSearchDictionary> for Stmt {
+    #[inline]
+    fn from(node: AlterTextSearchDictionary) -> Stmt {
+        Stmt::AlterTextSearchDictionary(node)
+    }
+}
+impl From<AlterTextSearchParser> for Stmt {
+    #[inline]
+    fn from(node: AlterTextSearchParser) -> Stmt {
+        Stmt::AlterTextSearchParser(node)
+    }
+}
+impl From<AlterTextSearchTemplate> for Stmt {
+    #[inline]
+    fn from(node: AlterTextSearchTemplate) -> Stmt {
+        Stmt::AlterTextSearchTemplate(node)
+    }
+}
+impl From<AlterTrigger> for Stmt {
+    #[inline]
+    fn from(node: AlterTrigger) -> Stmt {
+        Stmt::AlterTrigger(node)
+    }
+}
+impl From<AlterType> for Stmt {
+    #[inline]
+    fn from(node: AlterType) -> Stmt {
+        Stmt::AlterType(node)
+    }
+}
+impl From<AlterUser> for Stmt {
+    #[inline]
+    fn from(node: AlterUser) -> Stmt {
+        Stmt::AlterUser(node)
+    }
+}
+impl From<AlterUserMapping> for Stmt {
+    #[inline]
+    fn from(node: AlterUserMapping) -> Stmt {
+        Stmt::AlterUserMapping(node)
+    }
+}
+impl From<AlterView> for Stmt {
+    #[inline]
+    fn from(node: AlterView) -> Stmt {
+        Stmt::AlterView(node)
+    }
+}
+impl From<Analyze> for Stmt {
+    #[inline]
+    fn from(node: Analyze) -> Stmt {
+        Stmt::Analyze(node)
+    }
+}
 impl From<Begin> for Stmt {
     #[inline]
     fn from(node: Begin) -> Stmt {
         Stmt::Begin(node)
+    }
+}
+impl From<Call> for Stmt {
+    #[inline]
+    fn from(node: Call) -> Stmt {
+        Stmt::Call(node)
+    }
+}
+impl From<Checkpoint> for Stmt {
+    #[inline]
+    fn from(node: Checkpoint) -> Stmt {
+        Stmt::Checkpoint(node)
+    }
+}
+impl From<Close> for Stmt {
+    #[inline]
+    fn from(node: Close) -> Stmt {
+        Stmt::Close(node)
+    }
+}
+impl From<Cluster> for Stmt {
+    #[inline]
+    fn from(node: Cluster) -> Stmt {
+        Stmt::Cluster(node)
+    }
+}
+impl From<CommentOn> for Stmt {
+    #[inline]
+    fn from(node: CommentOn) -> Stmt {
+        Stmt::CommentOn(node)
     }
 }
 impl From<Commit> for Stmt {
@@ -16514,10 +17350,46 @@ impl From<Commit> for Stmt {
         Stmt::Commit(node)
     }
 }
+impl From<Copy> for Stmt {
+    #[inline]
+    fn from(node: Copy) -> Stmt {
+        Stmt::Copy(node)
+    }
+}
+impl From<CreateAccessMethod> for Stmt {
+    #[inline]
+    fn from(node: CreateAccessMethod) -> Stmt {
+        Stmt::CreateAccessMethod(node)
+    }
+}
 impl From<CreateAggregate> for Stmt {
     #[inline]
     fn from(node: CreateAggregate) -> Stmt {
         Stmt::CreateAggregate(node)
+    }
+}
+impl From<CreateCast> for Stmt {
+    #[inline]
+    fn from(node: CreateCast) -> Stmt {
+        Stmt::CreateCast(node)
+    }
+}
+impl From<CreateCollation> for Stmt {
+    #[inline]
+    fn from(node: CreateCollation) -> Stmt {
+        Stmt::CreateCollation(node)
+    }
+}
+impl From<CreateConversion> for Stmt {
+    #[inline]
+    fn from(node: CreateConversion) -> Stmt {
+        Stmt::CreateConversion(node)
+    }
+}
+impl From<CreateDatabase> for Stmt {
+    #[inline]
+    fn from(node: CreateDatabase) -> Stmt {
+        Stmt::CreateDatabase(node)
     }
 }
 impl From<CreateDomain> for Stmt {
@@ -16526,10 +17398,40 @@ impl From<CreateDomain> for Stmt {
         Stmt::CreateDomain(node)
     }
 }
+impl From<CreateEventTrigger> for Stmt {
+    #[inline]
+    fn from(node: CreateEventTrigger) -> Stmt {
+        Stmt::CreateEventTrigger(node)
+    }
+}
+impl From<CreateExtension> for Stmt {
+    #[inline]
+    fn from(node: CreateExtension) -> Stmt {
+        Stmt::CreateExtension(node)
+    }
+}
+impl From<CreateForeignDataWrapper> for Stmt {
+    #[inline]
+    fn from(node: CreateForeignDataWrapper) -> Stmt {
+        Stmt::CreateForeignDataWrapper(node)
+    }
+}
+impl From<CreateForeignTable> for Stmt {
+    #[inline]
+    fn from(node: CreateForeignTable) -> Stmt {
+        Stmt::CreateForeignTable(node)
+    }
+}
 impl From<CreateFunction> for Stmt {
     #[inline]
     fn from(node: CreateFunction) -> Stmt {
         Stmt::CreateFunction(node)
+    }
+}
+impl From<CreateGroup> for Stmt {
+    #[inline]
+    fn from(node: CreateGroup) -> Stmt {
+        Stmt::CreateGroup(node)
     }
 }
 impl From<CreateIndex> for Stmt {
@@ -16538,10 +17440,94 @@ impl From<CreateIndex> for Stmt {
         Stmt::CreateIndex(node)
     }
 }
-impl From<CreateMaterializedViewStmt> for Stmt {
+impl From<CreateLanguage> for Stmt {
     #[inline]
-    fn from(node: CreateMaterializedViewStmt) -> Stmt {
-        Stmt::CreateMaterializedViewStmt(node)
+    fn from(node: CreateLanguage) -> Stmt {
+        Stmt::CreateLanguage(node)
+    }
+}
+impl From<CreateMaterializedView> for Stmt {
+    #[inline]
+    fn from(node: CreateMaterializedView) -> Stmt {
+        Stmt::CreateMaterializedView(node)
+    }
+}
+impl From<CreateOperator> for Stmt {
+    #[inline]
+    fn from(node: CreateOperator) -> Stmt {
+        Stmt::CreateOperator(node)
+    }
+}
+impl From<CreateOperatorClass> for Stmt {
+    #[inline]
+    fn from(node: CreateOperatorClass) -> Stmt {
+        Stmt::CreateOperatorClass(node)
+    }
+}
+impl From<CreateOperatorFamily> for Stmt {
+    #[inline]
+    fn from(node: CreateOperatorFamily) -> Stmt {
+        Stmt::CreateOperatorFamily(node)
+    }
+}
+impl From<CreatePolicy> for Stmt {
+    #[inline]
+    fn from(node: CreatePolicy) -> Stmt {
+        Stmt::CreatePolicy(node)
+    }
+}
+impl From<CreateProcedure> for Stmt {
+    #[inline]
+    fn from(node: CreateProcedure) -> Stmt {
+        Stmt::CreateProcedure(node)
+    }
+}
+impl From<CreatePublication> for Stmt {
+    #[inline]
+    fn from(node: CreatePublication) -> Stmt {
+        Stmt::CreatePublication(node)
+    }
+}
+impl From<CreateRole> for Stmt {
+    #[inline]
+    fn from(node: CreateRole) -> Stmt {
+        Stmt::CreateRole(node)
+    }
+}
+impl From<CreateRule> for Stmt {
+    #[inline]
+    fn from(node: CreateRule) -> Stmt {
+        Stmt::CreateRule(node)
+    }
+}
+impl From<CreateSchema> for Stmt {
+    #[inline]
+    fn from(node: CreateSchema) -> Stmt {
+        Stmt::CreateSchema(node)
+    }
+}
+impl From<CreateSequence> for Stmt {
+    #[inline]
+    fn from(node: CreateSequence) -> Stmt {
+        Stmt::CreateSequence(node)
+    }
+}
+impl From<CreateServer> for Stmt {
+    #[inline]
+    fn from(node: CreateServer) -> Stmt {
+        Stmt::CreateServer(node)
+    }
+}
+impl From<CreateStatistics> for Stmt {
+    #[inline]
+    fn from(node: CreateStatistics) -> Stmt {
+        Stmt::CreateStatistics(node)
+    }
+}
+impl From<CreateSubscription> for Stmt {
+    #[inline]
+    fn from(node: CreateSubscription) -> Stmt {
+        Stmt::CreateSubscription(node)
     }
 }
 impl From<CreateTable> for Stmt {
@@ -16550,22 +17536,112 @@ impl From<CreateTable> for Stmt {
         Stmt::CreateTable(node)
     }
 }
-impl From<CreateTableAsStmt> for Stmt {
+impl From<CreateTableAs> for Stmt {
     #[inline]
-    fn from(node: CreateTableAsStmt) -> Stmt {
-        Stmt::CreateTableAsStmt(node)
+    fn from(node: CreateTableAs) -> Stmt {
+        Stmt::CreateTableAs(node)
     }
 }
-impl From<DeclareStmt> for Stmt {
+impl From<CreateTablespace> for Stmt {
     #[inline]
-    fn from(node: DeclareStmt) -> Stmt {
-        Stmt::DeclareStmt(node)
+    fn from(node: CreateTablespace) -> Stmt {
+        Stmt::CreateTablespace(node)
     }
 }
-impl From<DeleteStmt> for Stmt {
+impl From<CreateTextSearchConfiguration> for Stmt {
     #[inline]
-    fn from(node: DeleteStmt) -> Stmt {
-        Stmt::DeleteStmt(node)
+    fn from(node: CreateTextSearchConfiguration) -> Stmt {
+        Stmt::CreateTextSearchConfiguration(node)
+    }
+}
+impl From<CreateTextSearchDictionary> for Stmt {
+    #[inline]
+    fn from(node: CreateTextSearchDictionary) -> Stmt {
+        Stmt::CreateTextSearchDictionary(node)
+    }
+}
+impl From<CreateTextSearchParser> for Stmt {
+    #[inline]
+    fn from(node: CreateTextSearchParser) -> Stmt {
+        Stmt::CreateTextSearchParser(node)
+    }
+}
+impl From<CreateTextSearchTemplate> for Stmt {
+    #[inline]
+    fn from(node: CreateTextSearchTemplate) -> Stmt {
+        Stmt::CreateTextSearchTemplate(node)
+    }
+}
+impl From<CreateTransform> for Stmt {
+    #[inline]
+    fn from(node: CreateTransform) -> Stmt {
+        Stmt::CreateTransform(node)
+    }
+}
+impl From<CreateTrigger> for Stmt {
+    #[inline]
+    fn from(node: CreateTrigger) -> Stmt {
+        Stmt::CreateTrigger(node)
+    }
+}
+impl From<CreateType> for Stmt {
+    #[inline]
+    fn from(node: CreateType) -> Stmt {
+        Stmt::CreateType(node)
+    }
+}
+impl From<CreateUser> for Stmt {
+    #[inline]
+    fn from(node: CreateUser) -> Stmt {
+        Stmt::CreateUser(node)
+    }
+}
+impl From<CreateUserMapping> for Stmt {
+    #[inline]
+    fn from(node: CreateUserMapping) -> Stmt {
+        Stmt::CreateUserMapping(node)
+    }
+}
+impl From<CreateView> for Stmt {
+    #[inline]
+    fn from(node: CreateView) -> Stmt {
+        Stmt::CreateView(node)
+    }
+}
+impl From<Deallocate> for Stmt {
+    #[inline]
+    fn from(node: Deallocate) -> Stmt {
+        Stmt::Deallocate(node)
+    }
+}
+impl From<Declare> for Stmt {
+    #[inline]
+    fn from(node: Declare) -> Stmt {
+        Stmt::Declare(node)
+    }
+}
+impl From<Delete> for Stmt {
+    #[inline]
+    fn from(node: Delete) -> Stmt {
+        Stmt::Delete(node)
+    }
+}
+impl From<Discard> for Stmt {
+    #[inline]
+    fn from(node: Discard) -> Stmt {
+        Stmt::Discard(node)
+    }
+}
+impl From<Do> for Stmt {
+    #[inline]
+    fn from(node: Do) -> Stmt {
+        Stmt::Do(node)
+    }
+}
+impl From<DropAccessMethod> for Stmt {
+    #[inline]
+    fn from(node: DropAccessMethod) -> Stmt {
+        Stmt::DropAccessMethod(node)
     }
 }
 impl From<DropAggregate> for Stmt {
@@ -16574,10 +17650,70 @@ impl From<DropAggregate> for Stmt {
         Stmt::DropAggregate(node)
     }
 }
+impl From<DropCast> for Stmt {
+    #[inline]
+    fn from(node: DropCast) -> Stmt {
+        Stmt::DropCast(node)
+    }
+}
+impl From<DropCollation> for Stmt {
+    #[inline]
+    fn from(node: DropCollation) -> Stmt {
+        Stmt::DropCollation(node)
+    }
+}
+impl From<DropConversion> for Stmt {
+    #[inline]
+    fn from(node: DropConversion) -> Stmt {
+        Stmt::DropConversion(node)
+    }
+}
 impl From<DropDatabase> for Stmt {
     #[inline]
     fn from(node: DropDatabase) -> Stmt {
         Stmt::DropDatabase(node)
+    }
+}
+impl From<DropDomain> for Stmt {
+    #[inline]
+    fn from(node: DropDomain) -> Stmt {
+        Stmt::DropDomain(node)
+    }
+}
+impl From<DropEventTrigger> for Stmt {
+    #[inline]
+    fn from(node: DropEventTrigger) -> Stmt {
+        Stmt::DropEventTrigger(node)
+    }
+}
+impl From<DropExtension> for Stmt {
+    #[inline]
+    fn from(node: DropExtension) -> Stmt {
+        Stmt::DropExtension(node)
+    }
+}
+impl From<DropForeignDataWrapper> for Stmt {
+    #[inline]
+    fn from(node: DropForeignDataWrapper) -> Stmt {
+        Stmt::DropForeignDataWrapper(node)
+    }
+}
+impl From<DropForeignTable> for Stmt {
+    #[inline]
+    fn from(node: DropForeignTable) -> Stmt {
+        Stmt::DropForeignTable(node)
+    }
+}
+impl From<DropFunction> for Stmt {
+    #[inline]
+    fn from(node: DropFunction) -> Stmt {
+        Stmt::DropFunction(node)
+    }
+}
+impl From<DropGroup> for Stmt {
+    #[inline]
+    fn from(node: DropGroup) -> Stmt {
+        Stmt::DropGroup(node)
     }
 }
 impl From<DropIndex> for Stmt {
@@ -16586,10 +17722,154 @@ impl From<DropIndex> for Stmt {
         Stmt::DropIndex(node)
     }
 }
+impl From<DropLanguage> for Stmt {
+    #[inline]
+    fn from(node: DropLanguage) -> Stmt {
+        Stmt::DropLanguage(node)
+    }
+}
+impl From<DropMaterializedView> for Stmt {
+    #[inline]
+    fn from(node: DropMaterializedView) -> Stmt {
+        Stmt::DropMaterializedView(node)
+    }
+}
+impl From<DropOperator> for Stmt {
+    #[inline]
+    fn from(node: DropOperator) -> Stmt {
+        Stmt::DropOperator(node)
+    }
+}
+impl From<DropOperatorClass> for Stmt {
+    #[inline]
+    fn from(node: DropOperatorClass) -> Stmt {
+        Stmt::DropOperatorClass(node)
+    }
+}
+impl From<DropOperatorFamily> for Stmt {
+    #[inline]
+    fn from(node: DropOperatorFamily) -> Stmt {
+        Stmt::DropOperatorFamily(node)
+    }
+}
+impl From<DropOwned> for Stmt {
+    #[inline]
+    fn from(node: DropOwned) -> Stmt {
+        Stmt::DropOwned(node)
+    }
+}
+impl From<DropPolicy> for Stmt {
+    #[inline]
+    fn from(node: DropPolicy) -> Stmt {
+        Stmt::DropPolicy(node)
+    }
+}
+impl From<DropProcedure> for Stmt {
+    #[inline]
+    fn from(node: DropProcedure) -> Stmt {
+        Stmt::DropProcedure(node)
+    }
+}
+impl From<DropPublication> for Stmt {
+    #[inline]
+    fn from(node: DropPublication) -> Stmt {
+        Stmt::DropPublication(node)
+    }
+}
+impl From<DropRole> for Stmt {
+    #[inline]
+    fn from(node: DropRole) -> Stmt {
+        Stmt::DropRole(node)
+    }
+}
+impl From<DropRoutine> for Stmt {
+    #[inline]
+    fn from(node: DropRoutine) -> Stmt {
+        Stmt::DropRoutine(node)
+    }
+}
+impl From<DropRule> for Stmt {
+    #[inline]
+    fn from(node: DropRule) -> Stmt {
+        Stmt::DropRule(node)
+    }
+}
+impl From<DropSchema> for Stmt {
+    #[inline]
+    fn from(node: DropSchema) -> Stmt {
+        Stmt::DropSchema(node)
+    }
+}
+impl From<DropSequence> for Stmt {
+    #[inline]
+    fn from(node: DropSequence) -> Stmt {
+        Stmt::DropSequence(node)
+    }
+}
+impl From<DropServer> for Stmt {
+    #[inline]
+    fn from(node: DropServer) -> Stmt {
+        Stmt::DropServer(node)
+    }
+}
+impl From<DropStatistics> for Stmt {
+    #[inline]
+    fn from(node: DropStatistics) -> Stmt {
+        Stmt::DropStatistics(node)
+    }
+}
+impl From<DropSubscription> for Stmt {
+    #[inline]
+    fn from(node: DropSubscription) -> Stmt {
+        Stmt::DropSubscription(node)
+    }
+}
 impl From<DropTable> for Stmt {
     #[inline]
     fn from(node: DropTable) -> Stmt {
         Stmt::DropTable(node)
+    }
+}
+impl From<DropTablespace> for Stmt {
+    #[inline]
+    fn from(node: DropTablespace) -> Stmt {
+        Stmt::DropTablespace(node)
+    }
+}
+impl From<DropTextSearchConfig> for Stmt {
+    #[inline]
+    fn from(node: DropTextSearchConfig) -> Stmt {
+        Stmt::DropTextSearchConfig(node)
+    }
+}
+impl From<DropTextSearchDict> for Stmt {
+    #[inline]
+    fn from(node: DropTextSearchDict) -> Stmt {
+        Stmt::DropTextSearchDict(node)
+    }
+}
+impl From<DropTextSearchParser> for Stmt {
+    #[inline]
+    fn from(node: DropTextSearchParser) -> Stmt {
+        Stmt::DropTextSearchParser(node)
+    }
+}
+impl From<DropTextSearchTemplate> for Stmt {
+    #[inline]
+    fn from(node: DropTextSearchTemplate) -> Stmt {
+        Stmt::DropTextSearchTemplate(node)
+    }
+}
+impl From<DropTransform> for Stmt {
+    #[inline]
+    fn from(node: DropTransform) -> Stmt {
+        Stmt::DropTransform(node)
+    }
+}
+impl From<DropTrigger> for Stmt {
+    #[inline]
+    fn from(node: DropTrigger) -> Stmt {
+        Stmt::DropTrigger(node)
     }
 }
 impl From<DropType> for Stmt {
@@ -16598,46 +17878,142 @@ impl From<DropType> for Stmt {
         Stmt::DropType(node)
     }
 }
-impl From<ExecuteStmt> for Stmt {
+impl From<DropUser> for Stmt {
     #[inline]
-    fn from(node: ExecuteStmt) -> Stmt {
-        Stmt::ExecuteStmt(node)
+    fn from(node: DropUser) -> Stmt {
+        Stmt::DropUser(node)
     }
 }
-impl From<InsertStmt> for Stmt {
+impl From<DropUserMapping> for Stmt {
     #[inline]
-    fn from(node: InsertStmt) -> Stmt {
-        Stmt::InsertStmt(node)
+    fn from(node: DropUserMapping) -> Stmt {
+        Stmt::DropUserMapping(node)
     }
 }
-impl From<MergeStmt> for Stmt {
+impl From<DropView> for Stmt {
     #[inline]
-    fn from(node: MergeStmt) -> Stmt {
-        Stmt::MergeStmt(node)
+    fn from(node: DropView) -> Stmt {
+        Stmt::DropView(node)
     }
 }
-impl From<NotifyStmt> for Stmt {
+impl From<Execute> for Stmt {
     #[inline]
-    fn from(node: NotifyStmt) -> Stmt {
-        Stmt::NotifyStmt(node)
+    fn from(node: Execute) -> Stmt {
+        Stmt::Execute(node)
     }
 }
-impl From<PrepareTransactionStmt> for Stmt {
+impl From<Explain> for Stmt {
     #[inline]
-    fn from(node: PrepareTransactionStmt) -> Stmt {
-        Stmt::PrepareTransactionStmt(node)
+    fn from(node: Explain) -> Stmt {
+        Stmt::Explain(node)
     }
 }
-impl From<ReleaseSavepointStmt> for Stmt {
+impl From<Fetch> for Stmt {
     #[inline]
-    fn from(node: ReleaseSavepointStmt) -> Stmt {
-        Stmt::ReleaseSavepointStmt(node)
+    fn from(node: Fetch) -> Stmt {
+        Stmt::Fetch(node)
     }
 }
-impl From<RevokeStmt> for Stmt {
+impl From<Grant> for Stmt {
     #[inline]
-    fn from(node: RevokeStmt) -> Stmt {
-        Stmt::RevokeStmt(node)
+    fn from(node: Grant) -> Stmt {
+        Stmt::Grant(node)
+    }
+}
+impl From<ImportForeignSchema> for Stmt {
+    #[inline]
+    fn from(node: ImportForeignSchema) -> Stmt {
+        Stmt::ImportForeignSchema(node)
+    }
+}
+impl From<Insert> for Stmt {
+    #[inline]
+    fn from(node: Insert) -> Stmt {
+        Stmt::Insert(node)
+    }
+}
+impl From<Listen> for Stmt {
+    #[inline]
+    fn from(node: Listen) -> Stmt {
+        Stmt::Listen(node)
+    }
+}
+impl From<Load> for Stmt {
+    #[inline]
+    fn from(node: Load) -> Stmt {
+        Stmt::Load(node)
+    }
+}
+impl From<Lock> for Stmt {
+    #[inline]
+    fn from(node: Lock) -> Stmt {
+        Stmt::Lock(node)
+    }
+}
+impl From<Merge> for Stmt {
+    #[inline]
+    fn from(node: Merge) -> Stmt {
+        Stmt::Merge(node)
+    }
+}
+impl From<Move> for Stmt {
+    #[inline]
+    fn from(node: Move) -> Stmt {
+        Stmt::Move(node)
+    }
+}
+impl From<Notify> for Stmt {
+    #[inline]
+    fn from(node: Notify) -> Stmt {
+        Stmt::Notify(node)
+    }
+}
+impl From<Prepare> for Stmt {
+    #[inline]
+    fn from(node: Prepare) -> Stmt {
+        Stmt::Prepare(node)
+    }
+}
+impl From<PrepareTransaction> for Stmt {
+    #[inline]
+    fn from(node: PrepareTransaction) -> Stmt {
+        Stmt::PrepareTransaction(node)
+    }
+}
+impl From<Reassign> for Stmt {
+    #[inline]
+    fn from(node: Reassign) -> Stmt {
+        Stmt::Reassign(node)
+    }
+}
+impl From<Refresh> for Stmt {
+    #[inline]
+    fn from(node: Refresh) -> Stmt {
+        Stmt::Refresh(node)
+    }
+}
+impl From<Reindex> for Stmt {
+    #[inline]
+    fn from(node: Reindex) -> Stmt {
+        Stmt::Reindex(node)
+    }
+}
+impl From<ReleaseSavepoint> for Stmt {
+    #[inline]
+    fn from(node: ReleaseSavepoint) -> Stmt {
+        Stmt::ReleaseSavepoint(node)
+    }
+}
+impl From<Reset> for Stmt {
+    #[inline]
+    fn from(node: Reset) -> Stmt {
+        Stmt::Reset(node)
+    }
+}
+impl From<Revoke> for Stmt {
+    #[inline]
+    fn from(node: Revoke) -> Stmt {
+        Stmt::Revoke(node)
     }
 }
 impl From<Rollback> for Stmt {
@@ -16646,10 +18022,16 @@ impl From<Rollback> for Stmt {
         Stmt::Rollback(node)
     }
 }
-impl From<SavepointStmt> for Stmt {
+impl From<Savepoint> for Stmt {
     #[inline]
-    fn from(node: SavepointStmt) -> Stmt {
-        Stmt::SavepointStmt(node)
+    fn from(node: Savepoint) -> Stmt {
+        Stmt::Savepoint(node)
+    }
+}
+impl From<SecurityLabel> for Stmt {
+    #[inline]
+    fn from(node: SecurityLabel) -> Stmt {
+        Stmt::SecurityLabel(node)
     }
 }
 impl From<Select> for Stmt {
@@ -16658,10 +18040,46 @@ impl From<Select> for Stmt {
         Stmt::Select(node)
     }
 }
-impl From<TableStmt> for Stmt {
+impl From<SelectInto> for Stmt {
     #[inline]
-    fn from(node: TableStmt) -> Stmt {
-        Stmt::TableStmt(node)
+    fn from(node: SelectInto) -> Stmt {
+        Stmt::SelectInto(node)
+    }
+}
+impl From<Set> for Stmt {
+    #[inline]
+    fn from(node: Set) -> Stmt {
+        Stmt::Set(node)
+    }
+}
+impl From<SetConstraints> for Stmt {
+    #[inline]
+    fn from(node: SetConstraints) -> Stmt {
+        Stmt::SetConstraints(node)
+    }
+}
+impl From<SetRole> for Stmt {
+    #[inline]
+    fn from(node: SetRole) -> Stmt {
+        Stmt::SetRole(node)
+    }
+}
+impl From<SetSessionAuth> for Stmt {
+    #[inline]
+    fn from(node: SetSessionAuth) -> Stmt {
+        Stmt::SetSessionAuth(node)
+    }
+}
+impl From<SetTransaction> for Stmt {
+    #[inline]
+    fn from(node: SetTransaction) -> Stmt {
+        Stmt::SetTransaction(node)
+    }
+}
+impl From<Show> for Stmt {
+    #[inline]
+    fn from(node: Show) -> Stmt {
+        Stmt::Show(node)
     }
 }
 impl From<Truncate> for Stmt {
@@ -16670,10 +18088,22 @@ impl From<Truncate> for Stmt {
         Stmt::Truncate(node)
     }
 }
-impl From<UpdateStmt> for Stmt {
+impl From<Unlisten> for Stmt {
     #[inline]
-    fn from(node: UpdateStmt) -> Stmt {
-        Stmt::UpdateStmt(node)
+    fn from(node: Unlisten) -> Stmt {
+        Stmt::Unlisten(node)
+    }
+}
+impl From<Update> for Stmt {
+    #[inline]
+    fn from(node: Update) -> Stmt {
+        Stmt::Update(node)
+    }
+}
+impl From<Vacuum> for Stmt {
+    #[inline]
+    fn from(node: Vacuum) -> Stmt {
+        Stmt::Vacuum(node)
     }
 }
 impl From<Values> for Stmt {

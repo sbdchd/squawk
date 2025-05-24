@@ -1,14 +1,13 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/delete.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- delete"
   WHITESPACE "\n"
   COMMENT "-- with where"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -34,7 +33,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- no where"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -48,7 +47,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- only"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -64,7 +63,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- *"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -80,7 +79,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- alias"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -96,7 +95,7 @@ SOURCE_FILE
     IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -112,7 +111,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- using, where, return"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -158,7 +157,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- using"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -188,7 +187,7 @@ SOURCE_FILE
           IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -241,7 +240,7 @@ SOURCE_FILE
               IDENT "id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -314,7 +313,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- where return"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -344,7 +343,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- returning"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -430,7 +429,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- cursor"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -452,7 +451,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- returning"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "delete"
     WHITESPACE " "
     FROM_KW "from"
@@ -487,7 +486,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- with"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -557,7 +556,7 @@ SOURCE_FILE
             IDENT "id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -631,7 +630,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- nested"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -700,7 +699,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
@@ -750,7 +749,7 @@ SOURCE_FILE
             STRING "'foo'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
@@ -801,7 +800,7 @@ SOURCE_FILE
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
@@ -825,7 +824,7 @@ SOURCE_FILE
           STRING "'Musical'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
@@ -837,7 +836,7 @@ SOURCE_FILE
             IDENT "films"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
@@ -865,7 +864,7 @@ SOURCE_FILE
     STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     DELETE_KW "DELETE"
     WHITESPACE " "
     FROM_KW "FROM"
@@ -885,7 +884,7 @@ SOURCE_FILE
     IDENT "c_tasks"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DELETE_STMT
+  DELETE
     WITH_CLAUSE
       WITH_KW "WITH"
       WHITESPACE " "

@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_policy.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_POLICY_STMT
+  DROP_POLICY
     DROP_KW "drop"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -24,7 +23,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_POLICY_STMT
+  DROP_POLICY
     DROP_KW "drop"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -52,7 +51,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_POLICY_STMT
+  DROP_POLICY
     DROP_KW "drop"
     WHITESPACE " "
     POLICY_KW "policy"

@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_index.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -26,7 +25,7 @@ SOURCE_FILE
           IDENT "j"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -58,7 +57,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_tablespace"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -78,7 +77,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -110,7 +109,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_params"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -130,7 +129,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -174,7 +173,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- reset_params"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -194,7 +193,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -232,7 +231,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- attach"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -252,7 +251,7 @@ SOURCE_FILE
           IDENT "p"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -284,7 +283,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- depends"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -308,7 +307,7 @@ SOURCE_FILE
           IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -337,7 +336,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- alter_column"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -360,7 +359,7 @@ SOURCE_FILE
       INT_NUMBER "100"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -397,7 +396,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all_tablespace"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"
@@ -421,7 +420,7 @@ SOURCE_FILE
       IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_INDEX_STMT
+  ALTER_INDEX
     ALTER_KW "alter"
     WHITESPACE " "
     INDEX_KW "index"

@@ -1,10 +1,9 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_trigger.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
-  DROP_TRIGGER_STMT
+  DROP_TRIGGER
     DROP_KW "drop"
     WHITESPACE " "
     TRIGGER_KW "trigger"
@@ -22,7 +21,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_TRIGGER_STMT
+  DROP_TRIGGER
     DROP_KW "drop"
     WHITESPACE " "
     TRIGGER_KW "trigger"
@@ -45,7 +44,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_TRIGGER_STMT
+  DROP_TRIGGER
     DROP_KW "drop"
     WHITESPACE " "
     TRIGGER_KW "trigger"
@@ -68,7 +67,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_TRIGGER_STMT
+  DROP_TRIGGER
     DROP_KW "drop"
     WHITESPACE " "
     TRIGGER_KW "trigger"
@@ -93,7 +92,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_TRIGGER_STMT
+  DROP_TRIGGER
     DROP_KW "drop"
     WHITESPACE " "
     TRIGGER_KW "trigger"

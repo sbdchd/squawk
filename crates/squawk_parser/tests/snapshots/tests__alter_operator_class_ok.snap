@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_operator_class.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_OPERATOR_CLASS_STMT
+  ALTER_OPERATOR_CLASS
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -31,7 +30,7 @@ SOURCE_FILE
       IDENT "n"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_OPERATOR_CLASS_STMT
+  ALTER_OPERATOR_CLASS
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -63,7 +62,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_OPERATOR_CLASS_STMT
+  ALTER_OPERATOR_CLASS
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -87,7 +86,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_OPERATOR_CLASS_STMT
+  ALTER_OPERATOR_CLASS
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -113,7 +112,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  ALTER_OPERATOR_CLASS_STMT
+  ALTER_OPERATOR_CLASS
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"

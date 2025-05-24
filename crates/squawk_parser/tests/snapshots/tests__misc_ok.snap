@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/misc.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   CREATE_TABLE
@@ -54,7 +53,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -142,7 +141,7 @@ SOURCE_FILE
             R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -218,7 +217,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.timescale.com/blog/combining-semantic-search-and-full-text-search-in-postgresql-with-cohere-pgvector-and-pgai/"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
@@ -1185,7 +1184,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/postgres-partitioning-with-a-default-partition"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1255,7 +1254,7 @@ SOURCE_FILE
     DEFAULT_KW "DEFAULT"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "INSERT"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1312,7 +1311,7 @@ SOURCE_FILE
           IDENT "time_taptest_table_default"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "Table"
     WHITESPACE " "
     RELATION_NAME
@@ -1322,7 +1321,7 @@ SOURCE_FILE
             IDENT "\"partman_test.time_taptest_table_p20241124\""
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "Table"
     WHITESPACE " "
     RELATION_NAME
@@ -1413,7 +1412,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     WITH_CLAUSE
       WITH_KW "WITH"
       WHITESPACE " "
@@ -1425,7 +1424,7 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         WHITESPACE "\n    "
-        DELETE_STMT
+        DELETE
           DELETE_KW "DELETE"
           WHITESPACE " "
           FROM_KW "FROM"
@@ -1547,7 +1546,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  INSERT_STMT
+  INSERT
     WITH_CLAUSE
       WITH_KW "WITH"
       WHITESPACE " "
@@ -1559,7 +1558,7 @@ SOURCE_FILE
         WHITESPACE " "
         L_PAREN "("
         WHITESPACE "\n    "
-        DELETE_STMT
+        DELETE
           DELETE_KW "DELETE"
           WHITESPACE " "
           FROM_KW "FROM"
@@ -1774,7 +1773,7 @@ SOURCE_FILE
           IDENT "time_taptest_table_default"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CALL_STMT
+  CALL
     CALL_KW "CALL"
     WHITESPACE " "
     PATH
@@ -1793,7 +1792,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  VACUUM_STMT
+  VACUUM
     VACUUM_KW "VACUUM"
     WHITESPACE " "
     ANALYZE_KW "ANALYZE"
@@ -1899,7 +1898,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  COPY_STMT
+  COPY
     COPY_KW "COPY"
     WHITESPACE " "
     PATH
@@ -1947,7 +1946,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- Enable pgvector"
   WHITESPACE "\n"
-  CREATE_EXTENSION_STMT
+  CREATE_EXTENSION
     CREATE_KW "CREATE"
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
@@ -1986,7 +1985,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- Populate the column with embeddings from an LLM model"
   WHITESPACE "\n"
-  UPDATE_STMT
+  UPDATE
     UPDATE_KW "UPDATE"
     WHITESPACE " "
     RELATION_NAME
@@ -2323,7 +2322,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "/* for demo: generate some random data */"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -3058,7 +3057,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- https://supabase.com/blog/calendars-in-postgres-using-foreign-data-wrappers"
   WHITESPACE "\n\n"
-  CREATE_FOREIGN_DATA_WRAPPER_STMT
+  CREATE_FOREIGN_DATA_WRAPPER
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -3085,7 +3084,7 @@ SOURCE_FILE
           IDENT "wasm_fdw_validator"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_SERVER_STMT
+  CREATE_SERVER
     CREATE_KW "create"
     WHITESPACE " "
     SERVER_KW "server"
@@ -3143,7 +3142,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -3159,7 +3158,7 @@ SOURCE_FILE
       IDENT "cal"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -3207,7 +3206,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -3539,7 +3538,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- make a 15 minutes meeting with Elon Musk"
   WHITESPACE "\n"
-  INSERT_STMT
+  INSERT
     INSERT_KW "insert"
     WHITESPACE " "
     INTO_KW "into"
@@ -3580,7 +3579,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.tinybird.co/blog-posts/outgrowing-postgres-how-to-run-olap-workloads-on-postgres"
   WHITESPACE "\n\n"
-  CREATE_MATERIALIZED_VIEW_STMT
+  CREATE_MATERIALIZED_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     MATERIALIZED_KW "MATERIALIZED"
@@ -4168,7 +4167,7 @@ SOURCE_FILE
               STRING "'1 day'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_EXTENSION_STMT
+  CREATE_EXTENSION
     CREATE_KW "CREATE"
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
@@ -4177,7 +4176,7 @@ SOURCE_FILE
       IDENT "cstore_fdw"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_SERVER_STMT
+  CREATE_SERVER
     CREATE_KW "CREATE"
     WHITESPACE " "
     SERVER_KW "SERVER"
@@ -4195,7 +4194,7 @@ SOURCE_FILE
       IDENT "cstore_fdw"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "CREATE"
     WHITESPACE " "
     FOREIGN_KW "FOREIGN"
@@ -4254,7 +4253,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_EXTENSION_STMT
+  CREATE_EXTENSION
     CREATE_KW "CREATE"
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
@@ -4263,7 +4262,7 @@ SOURCE_FILE
       IDENT "pg_analytics"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "CREATE"
     WHITESPACE " "
     FOREIGN_KW "FOREIGN"
@@ -4324,7 +4323,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_EXTENSION_STMT
+  CREATE_EXTENSION
     CREATE_KW "CREATE"
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
@@ -4388,7 +4387,7 @@ SOURCE_FILE
           IDENT "duckdb"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_EXTENSION_STMT
+  CREATE_EXTENSION
     CREATE_KW "CREATE"
     WHITESPACE " "
     EXTENSION_KW "EXTENSION"
@@ -5049,7 +5048,7 @@ SOURCE_FILE
         INT_NUMBER "2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     ANALYZE_KW "ANALYZE"
@@ -5128,7 +5127,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- Key settings for parallel queries"
   WHITESPACE "\n"
-  SET_STMT
+  SET
     SET_KW "SET"
     WHITESPACE " "
     NAME_REF
@@ -5142,7 +5141,7 @@ SOURCE_FILE
   WHITESPACE "  "
   COMMENT "-- Workers per query"
   WHITESPACE "\n"
-  SET_STMT
+  SET
     SET_KW "SET"
     WHITESPACE " "
     NAME_REF
@@ -5156,7 +5155,7 @@ SOURCE_FILE
   WHITESPACE "             "
   COMMENT "-- Lower = more parallelism"
   WHITESPACE "\n"
-  SET_STMT
+  SET
     SET_KW "SET"
     WHITESPACE " "
     NAME_REF
@@ -5170,7 +5169,7 @@ SOURCE_FILE
   WHITESPACE "          "
   COMMENT "-- Lower = more parallelism"
   WHITESPACE "\n"
-  SET_STMT
+  SET
     SET_KW "SET"
     WHITESPACE " "
     NAME_REF
@@ -5186,7 +5185,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- Get detailed buffering info"
   WHITESPACE "\n"
-  EXPLAIN_STMT
+  EXPLAIN
     EXPLAIN_KW "EXPLAIN"
     WHITESPACE " "
     L_PAREN "("
@@ -5599,7 +5598,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- https://www.crunchydata.com/blog/indexing-materialized-views-in-postgres"
   WHITESPACE "\n"
-  CREATE_MATERIALIZED_VIEW_STMT
+  CREATE_MATERIALIZED_VIEW
     CREATE_KW "CREATE"
     WHITESPACE " "
     MATERIALIZED_KW "MATERIALIZED"
@@ -5776,7 +5775,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REFRESH_STMT
+  REFRESH
     REFRESH_KW "REFRESH"
     WHITESPACE " "
     MATERIALIZED_KW "MATERIALIZED"
@@ -5824,7 +5823,7 @@ SOURCE_FILE
           IDENT "sku_index"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REFRESH_STMT
+  REFRESH
     REFRESH_KW "REFRESH"
     WHITESPACE " "
     MATERIALIZED_KW "MATERIALIZED"

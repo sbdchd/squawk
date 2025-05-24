@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_operator_family.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -50,7 +49,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multi"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -170,7 +169,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_search"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -218,7 +217,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_op_for_order"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -273,7 +272,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_func"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -311,7 +310,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_func_with_params"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -369,7 +368,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_op"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -411,7 +410,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_op_single_param"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -446,7 +445,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_func"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -488,7 +487,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_func_single_param"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -523,7 +522,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_multiple"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -579,7 +578,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -606,7 +605,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -630,7 +629,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -656,7 +655,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  ALTER_OPERATOR_FAMILY_STMT
+  ALTER_OPERATOR_FAMILY
     ALTER_KW "alter"
     WHITESPACE " "
     OPERATOR_KW "operator"

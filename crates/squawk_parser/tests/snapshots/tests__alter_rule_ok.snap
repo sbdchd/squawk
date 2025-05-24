@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_rule.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  ALTER_RULE_STMT
+  ALTER_RULE
     ALTER_KW "alter"
     WHITESPACE " "
     RULE_KW "rule"
@@ -31,7 +30,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_schema"
   WHITESPACE "\n"
-  ALTER_RULE_STMT
+  ALTER_RULE
     ALTER_KW "alter"
     WHITESPACE " "
     RULE_KW "rule"

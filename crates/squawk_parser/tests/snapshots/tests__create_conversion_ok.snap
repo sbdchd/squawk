@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_conversion.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_CONVERSION_STMT
+  CREATE_CONVERSION
     CREATE_KW "create"
     WHITESPACE " "
     CONVERSION_KW "conversion"
@@ -36,7 +35,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_CONVERSION_STMT
+  CREATE_CONVERSION
     CREATE_KW "create"
     WHITESPACE " "
     DEFAULT_KW "default"

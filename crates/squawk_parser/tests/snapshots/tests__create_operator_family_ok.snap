@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_operator_family.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_OPERATOR_FAMILY_STMT
+  CREATE_OPERATOR_FAMILY
     CREATE_KW "create"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -26,7 +25,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_OPERATOR_FAMILY_STMT
+  CREATE_OPERATOR_FAMILY
     CREATE_KW "create"
     WHITESPACE " "
     OPERATOR_KW "operator"

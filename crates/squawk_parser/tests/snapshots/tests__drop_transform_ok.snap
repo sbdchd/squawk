@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_transform.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_TRANSFORM_STMT
+  DROP_TRANSFORM
     DROP_KW "drop"
     WHITESPACE " "
     TRANSFORM_KW "transform"
@@ -27,7 +26,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_TRANSFORM_STMT
+  DROP_TRANSFORM
     DROP_KW "drop"
     WHITESPACE " "
     TRANSFORM_KW "transform"
@@ -55,7 +54,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- type_args"
   WHITESPACE "\n"
-  DROP_TRANSFORM_STMT
+  DROP_TRANSFORM
     DROP_KW "drop"
     WHITESPACE " "
     TRANSFORM_KW "transform"

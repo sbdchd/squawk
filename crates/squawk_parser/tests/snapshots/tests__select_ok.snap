@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- parens_and_unions"
@@ -4939,7 +4938,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- simple"
   WHITESPACE "\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
@@ -4951,7 +4950,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- only"
   WHITESPACE "\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
@@ -4965,7 +4964,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- star"
   WHITESPACE "\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
@@ -4987,7 +4986,7 @@ SOURCE_FILE
         TARGET
           PAREN_EXPR
             L_PAREN "("
-            TABLE_STMT
+            TABLE
               TABLE_KW "table"
               WHITESPACE " "
               RELATION_NAME

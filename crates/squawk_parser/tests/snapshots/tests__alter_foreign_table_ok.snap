@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_foreign_table.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -29,7 +28,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- only_and_asterisk"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -52,7 +51,7 @@ SOURCE_FILE
       IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -77,7 +76,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -103,7 +102,7 @@ SOURCE_FILE
       IDENT "d"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -129,7 +128,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -157,7 +156,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_add_column"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -185,7 +184,7 @@ SOURCE_FILE
               INT_KW "int"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -240,7 +239,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_drop_column"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -262,7 +261,7 @@ SOURCE_FILE
       CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -291,7 +290,7 @@ SOURCE_FILE
       CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -322,7 +321,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_column_type"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -352,7 +351,7 @@ SOURCE_FILE
                 INT_KW "int"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -396,7 +395,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_set_default"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -431,7 +430,7 @@ SOURCE_FILE
             INT_NUMBER "10"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -466,7 +465,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_drop_default"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -492,7 +491,7 @@ SOURCE_FILE
         DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -518,7 +517,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_not_null"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -546,7 +545,7 @@ SOURCE_FILE
         NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -574,7 +573,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_set_statistics"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -603,7 +602,7 @@ SOURCE_FILE
           INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -632,7 +631,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_set"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -670,7 +669,7 @@ SOURCE_FILE
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -708,7 +707,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_reset"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -741,7 +740,7 @@ SOURCE_FILE
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -770,7 +769,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_set_storage"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -798,7 +797,7 @@ SOURCE_FILE
         IDENT "plain"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -824,7 +823,7 @@ SOURCE_FILE
         EXTERNAL_KW "external"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -850,7 +849,7 @@ SOURCE_FILE
         IDENT "extended"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -876,7 +875,7 @@ SOURCE_FILE
         IDENT "main"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -904,7 +903,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_options"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -959,7 +958,7 @@ SOURCE_FILE
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -992,7 +991,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_add_table_constraint"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1033,7 +1032,7 @@ SOURCE_FILE
         VALID_KW "valid"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1071,7 +1070,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_validate_constraint"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1095,7 +1094,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_drop_constraint"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1124,7 +1123,7 @@ SOURCE_FILE
       RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1150,7 +1149,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_disable_trigger"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1172,7 +1171,7 @@ SOURCE_FILE
         IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1193,7 +1192,7 @@ SOURCE_FILE
       ALL_KW "all"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1216,7 +1215,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_enable_replica_trigger"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1242,7 +1241,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_enable_always_trigger"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1268,7 +1267,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_set_without_oids"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1291,7 +1290,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_inherit"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1313,7 +1312,7 @@ SOURCE_FILE
             IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1347,7 +1346,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_no_inherit"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1371,7 +1370,7 @@ SOURCE_FILE
             IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1407,7 +1406,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_owner_to"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1428,7 +1427,7 @@ SOURCE_FILE
       IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1451,7 +1450,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -1507,7 +1506,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_owner"
   WHITESPACE "\n"
-  ALTER_FOREIGN_TABLE_STMT
+  ALTER_FOREIGN_TABLE
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"

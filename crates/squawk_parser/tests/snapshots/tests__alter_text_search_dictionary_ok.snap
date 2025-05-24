@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_text_search_dictionary.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- options"
   WHITESPACE "\n"
-  ALTER_TEXT_SEARCH_DICTIONARY_STMT
+  ALTER_TEXT_SEARCH_DICTIONARY
     ALTER_KW "alter"
     WHITESPACE " "
     TEXT_KW "text"
@@ -44,7 +43,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_TEXT_SEARCH_DICTIONARY_STMT
+  ALTER_TEXT_SEARCH_DICTIONARY
     ALTER_KW "alter"
     WHITESPACE " "
     TEXT_KW "text"
@@ -68,7 +67,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_TEXT_SEARCH_DICTIONARY_STMT
+  ALTER_TEXT_SEARCH_DICTIONARY
     ALTER_KW "alter"
     WHITESPACE " "
     TEXT_KW "text"
@@ -89,7 +88,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_TEXT_SEARCH_DICTIONARY_STMT
+  ALTER_TEXT_SEARCH_DICTIONARY
     ALTER_KW "alter"
     WHITESPACE " "
     TEXT_KW "text"
@@ -112,7 +111,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  ALTER_TEXT_SEARCH_DICTIONARY_STMT
+  ALTER_TEXT_SEARCH_DICTIONARY
     ALTER_KW "alter"
     WHITESPACE " "
     TEXT_KW "text"

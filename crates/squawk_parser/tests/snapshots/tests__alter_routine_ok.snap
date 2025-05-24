@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_routine.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"
@@ -21,7 +20,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"
@@ -39,7 +38,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"
@@ -56,7 +55,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"
@@ -74,7 +73,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- depends"
   WHITESPACE "\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"
@@ -94,7 +93,7 @@ SOURCE_FILE
           IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"
@@ -118,7 +117,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- no_depends"
   WHITESPACE "\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"
@@ -142,7 +141,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_params"
   WHITESPACE "\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"
@@ -188,7 +187,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all_actions"
   WHITESPACE "\n"
-  ALTER_ROUTINE_STMT
+  ALTER_ROUTINE
     ALTER_KW "alter"
     WHITESPACE " "
     ROUTINE_KW "routine"

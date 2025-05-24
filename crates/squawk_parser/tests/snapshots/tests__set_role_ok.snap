@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/set_role.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- docs"
   WHITESPACE "\n"
-  SET_ROLE_STMT
+  SET_ROLE
     SET_KW "SET"
     WHITESPACE " "
     ROLE_KW "ROLE"
@@ -15,7 +14,7 @@ SOURCE_FILE
       STRING "'paul'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_ROLE_STMT
+  SET_ROLE
     SET_KW "SET"
     WHITESPACE " "
     ROLE_KW "ROLE"
@@ -23,7 +22,7 @@ SOURCE_FILE
     NONE_KW "NONE"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_ROLE_STMT
+  SET_ROLE
     SET_KW "SET"
     WHITESPACE " "
     LOCAL_KW "LOCAL"
@@ -33,7 +32,7 @@ SOURCE_FILE
     NONE_KW "NONE"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_ROLE_STMT
+  SET_ROLE
     SET_KW "SET"
     WHITESPACE " "
     SESSION_KW "SESSION"
@@ -43,7 +42,7 @@ SOURCE_FILE
     IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_ROLE_STMT
+  SET_ROLE
     RESET_KW "RESET"
     WHITESPACE " "
     ROLE_KW "ROLE"

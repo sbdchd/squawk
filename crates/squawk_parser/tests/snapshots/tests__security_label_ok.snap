@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/security_label.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- table"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "SECURITY"
     WHITESPACE " "
     LABEL_KW "LABEL"
@@ -30,7 +29,7 @@ SOURCE_FILE
       STRING "'system_u:object_r:sepgsql_table_t:s0'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "SECURITY"
     WHITESPACE " "
     LABEL_KW "LABEL"
@@ -55,7 +54,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- column"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -81,7 +80,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- on_aggregate_star"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -113,7 +112,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- on_aggregate_args"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -174,7 +173,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- on_aggregate_args_with_order_by"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -255,7 +254,7 @@ SOURCE_FILE
       STRING "''"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -318,7 +317,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- database"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -339,7 +338,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- domain"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -363,7 +362,7 @@ SOURCE_FILE
     NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -384,7 +383,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- event_trigger"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -407,7 +406,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- foreign_table"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -430,7 +429,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- function"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -459,7 +458,7 @@ SOURCE_FILE
     NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -482,7 +481,7 @@ SOURCE_FILE
     NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -543,7 +542,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -564,7 +563,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- materialized_view"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -592,7 +591,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- language"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -613,7 +612,7 @@ SOURCE_FILE
     NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -634,7 +633,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- procedure"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -658,7 +657,7 @@ SOURCE_FILE
     NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -685,7 +684,7 @@ SOURCE_FILE
     NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -731,7 +730,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- publication"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -752,7 +751,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- role"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -773,7 +772,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- routine"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -797,7 +796,7 @@ SOURCE_FILE
     NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -824,7 +823,7 @@ SOURCE_FILE
     NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -875,7 +874,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -896,7 +895,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -922,7 +921,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- subscription"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -943,7 +942,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -964,7 +963,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- type_"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"
@@ -990,7 +989,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- view"
   WHITESPACE "\n"
-  SECURITY_LABEL_STMT
+  SECURITY_LABEL
     SECURITY_KW "security"
     WHITESPACE " "
     LABEL_KW "label"

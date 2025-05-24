@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/schemas.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- create_schema"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -15,7 +14,7 @@ SOURCE_FILE
       IDENT "myschema"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -28,7 +27,7 @@ SOURCE_FILE
     IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -41,7 +40,7 @@ SOURCE_FILE
     CURRENT_ROLE_KW "current_role"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -54,7 +53,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -67,7 +66,7 @@ SOURCE_FILE
     SESSION_USER_KW "session_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -77,7 +76,7 @@ SOURCE_FILE
     IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -93,7 +92,7 @@ SOURCE_FILE
       IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -113,7 +112,7 @@ SOURCE_FILE
     IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -130,7 +129,7 @@ SOURCE_FILE
     IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -196,7 +195,7 @@ SOURCE_FILE
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
@@ -211,7 +210,7 @@ SOURCE_FILE
             TABLE_KW "table"
   SEMICOLON ";"
   WHITESPACE "\n"
-  TABLE_STMT
+  TABLE
     TABLE_KW "table"
     WHITESPACE " "
     RELATION_NAME
@@ -231,7 +230,7 @@ SOURCE_FILE
             TABLE_KW "table"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_SCHEMA_STMT
+  DROP_SCHEMA
     DROP_KW "drop"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -240,7 +239,7 @@ SOURCE_FILE
       IDENT "myschema"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_SCHEMA_STMT
+  DROP_SCHEMA
     DROP_KW "drop"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -251,7 +250,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_SCHEMA_STMT
+  DROP_SCHEMA
     DROP_KW "drop"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -267,7 +266,7 @@ SOURCE_FILE
     RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_SCHEMA_STMT
+  DROP_SCHEMA
     DROP_KW "drop"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -289,7 +288,7 @@ SOURCE_FILE
       IDENT "c"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -304,7 +303,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- create_schema_with_sequence"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -312,7 +311,7 @@ SOURCE_FILE
     NAME
       IDENT "s"
     WHITESPACE "\n  "
-    CREATE_SEQUENCE_STMT
+    CREATE_SEQUENCE
       CREATE_KW "create"
       WHITESPACE " "
       SEQUENCE_KW "sequence"
@@ -325,7 +324,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- create_schema_with_trigger"
   WHITESPACE "\n"
-  CREATE_SCHEMA_STMT
+  CREATE_SCHEMA
     CREATE_KW "create"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -333,7 +332,7 @@ SOURCE_FILE
     NAME
       IDENT "s"
     WHITESPACE "\n  "
-    CREATE_TRIGGER_STMT
+    CREATE_TRIGGER
       CREATE_KW "create"
       WHITESPACE " "
       TRIGGER_KW "trigger"
@@ -366,14 +365,14 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- search_path"
   WHITESPACE "\n"
-  SHOW_STMT
+  SHOW
     SHOW_KW "show"
     WHITESPACE " "
     NAME_REF
       IDENT "search_path"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_STMT
+  SET
     SET_KW "set"
     WHITESPACE " "
     NAME_REF
@@ -386,7 +385,7 @@ SOURCE_FILE
     IDENT "public"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_STMT
+  SET
     SET_KW "set"
     WHITESPACE " "
     NAME_REF
@@ -397,7 +396,7 @@ SOURCE_FILE
     IDENT "myschema"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_STMT
+  SET
     SET_KW "set"
     WHITESPACE " "
     NAME_REF
@@ -408,7 +407,7 @@ SOURCE_FILE
     IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_STMT
+  SET
     SET_KW "set"
     WHITESPACE " "
     TIME_KW "time"
@@ -419,7 +418,7 @@ SOURCE_FILE
       STRING "'America/Los_Angeles'"
   SEMICOLON ";"
   WHITESPACE "\n"
-  SET_STMT
+  SET
     SET_KW "set"
     WHITESPACE " "
     TIME_KW "time"
@@ -429,7 +428,7 @@ SOURCE_FILE
     DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n"
-  SET_STMT
+  SET
     SET_KW "set"
     WHITESPACE " "
     TIME_KW "time"
@@ -439,7 +438,7 @@ SOURCE_FILE
     LOCAL_KW "local"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SET_STMT
+  SET
     SET_KW "set"
     WHITESPACE " "
     NAME_REF
@@ -450,7 +449,7 @@ SOURCE_FILE
     DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n"
-  SET_STMT
+  SET
     SET_KW "set"
     WHITESPACE " "
     NAME_REF

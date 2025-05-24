@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/reindex.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  REINDEX_STMT
+  REINDEX
     REINDEX_KW "REINDEX"
     WHITESPACE " "
     INDEX_KW "INDEX"
@@ -15,7 +14,7 @@ SOURCE_FILE
       IDENT "my_index"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REINDEX_STMT
+  REINDEX
     REINDEX_KW "REINDEX"
     WHITESPACE " "
     TABLE_KW "TABLE"
@@ -24,7 +23,7 @@ SOURCE_FILE
       IDENT "my_table"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REINDEX_STMT
+  REINDEX
     REINDEX_KW "REINDEX"
     WHITESPACE " "
     TABLE_KW "TABLE"
@@ -37,7 +36,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- complete_syntax"
   WHITESPACE "\n"
-  REINDEX_STMT
+  REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
     L_PAREN "("
@@ -67,7 +66,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REINDEX_STMT
+  REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
     SYSTEM_KW "system"
@@ -76,7 +75,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  REINDEX_STMT
+  REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
     INDEX_KW "index"
@@ -85,7 +84,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  REINDEX_STMT
+  REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
     TABLE_KW "table"
@@ -94,7 +93,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  REINDEX_STMT
+  REINDEX
     REINDEX_KW "reindex"
     WHITESPACE " "
     SCHEMA_KW "schema"

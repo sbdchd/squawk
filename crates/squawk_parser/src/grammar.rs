@@ -2353,7 +2353,7 @@ fn select_stmt(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
     // table [only] name [*]
     if p.eat(TABLE_KW) {
         relation_name(p);
-        return Some(m.complete(p, TABLE_STMT));
+        return Some(m.complete(p, TABLE));
     }
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
@@ -2394,14 +2394,7 @@ fn select_stmt(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
             opt_locking_clause(p);
         }
     }
-    Some(m.complete(
-        p,
-        if is_select_into {
-            SELECT_INTO_STMT
-        } else {
-            SELECT
-        },
-    ))
+    Some(m.complete(p, if is_select_into { SELECT_INTO } else { SELECT }))
 }
 
 // INTO [ TEMPORARY | TEMP | UNLOGGED ] [ TABLE ] new_table
@@ -4524,7 +4517,7 @@ fn create_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.eat(NO_KW);
             p.expect(DATA_KW);
         }
-        return m.complete(p, CREATE_TABLE_AS_STMT);
+        return m.complete(p, CREATE_TABLE_AS);
     }
     m.complete(p, CREATE_TABLE)
 }
@@ -4663,7 +4656,7 @@ fn prepare_transaction_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(PREPARE_KW);
     p.expect(TRANSACTION_KW);
     string_literal(p);
-    m.complete(p, PREPARE_TRANSACTION_STMT)
+    m.complete(p, PREPARE_TRANSACTION)
 }
 
 // SAVEPOINT savepoint_name
@@ -4676,7 +4669,7 @@ fn savepoint_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if name_ref_(p).is_none() {
         p.error("expected a name");
     }
-    m.complete(p, SAVEPOINT_STMT)
+    m.complete(p, SAVEPOINT)
 }
 
 // RELEASE [ SAVEPOINT ] savepoint_name
@@ -4690,7 +4683,7 @@ fn release_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if name_ref_(p).is_none() {
         p.error("expected a name");
     }
-    m.complete(p, RELEASE_SAVEPOINT_STMT)
+    m.complete(p, RELEASE_SAVEPOINT)
 }
 
 // ROLLBACK [ WORK | TRANSACTION ] [ AND [ NO ] CHAIN ]
@@ -5055,7 +5048,7 @@ fn alter_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected OWNER, RENAME, or SET");
         }
     }
-    m.complete(p, ALTER_STATISTICS_STMT)
+    m.complete(p, ALTER_STATISTICS)
 }
 
 // ALTER SERVER name [ VERSION 'new_version' ]
@@ -5099,7 +5092,7 @@ fn alter_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
-    m.complete(p, ALTER_SERVER_STMT)
+    m.complete(p, ALTER_SERVER)
 }
 
 // ALTER SEQUENCE [ IF EXISTS ] name
@@ -5155,7 +5148,7 @@ fn alter_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
-    m.complete(p, ALTER_SEQUENCE_STMT)
+    m.complete(p, ALTER_SEQUENCE)
 }
 
 // ALTER SCHEMA name RENAME TO new_name
@@ -5181,7 +5174,7 @@ fn alter_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME or OWNER");
         }
     }
-    m.complete(p, ALTER_SCHEMA_STMT)
+    m.complete(p, ALTER_SCHEMA)
 }
 
 // ALTER RULE name ON table_name RENAME TO new_name
@@ -5196,7 +5189,7 @@ fn alter_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(RENAME_KW);
     p.expect(TO_KW);
     name(p);
-    m.complete(p, ALTER_RULE_STMT)
+    m.complete(p, ALTER_RULE)
 }
 
 // ALTER ROUTINE name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ]
@@ -5255,7 +5248,7 @@ fn alter_routine_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.eat(RESTRICT_KW);
-    m.complete(p, ALTER_ROUTINE_STMT)
+    m.complete(p, ALTER_ROUTINE)
 }
 
 // ALTER ROLE role_specification [ WITH ] option [ ... ]
@@ -5317,7 +5310,7 @@ fn alter_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
-    m.complete(p, ALTER_ROLE_STMT)
+    m.complete(p, ALTER_ROLE)
 }
 
 // ALTER PUBLICATION name ADD publication_object [, ...]
@@ -5376,7 +5369,7 @@ fn alter_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ADD, SET, DROP, OWNER, or RENAME");
         }
     }
-    m.complete(p, ALTER_PUBLICATION_STMT)
+    m.complete(p, ALTER_PUBLICATION)
 }
 
 // ALTER PROCEDURE name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ]
@@ -5431,7 +5424,7 @@ fn alter_procedure_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.eat(RESTRICT_KW);
         }
     }
-    m.complete(p, ALTER_PROCEDURE_STMT)
+    m.complete(p, ALTER_PROCEDURE)
 }
 
 // ALTER POLICY name ON table_name RENAME TO new_name
@@ -5473,7 +5466,7 @@ fn alter_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.expect(R_PAREN);
         }
     }
-    m.complete(p, ALTER_POLICY_STMT)
+    m.complete(p, ALTER_POLICY)
 }
 
 // ALTER OPERATOR FAMILY name USING index_method ADD
@@ -5540,7 +5533,7 @@ fn alter_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ADD, DROP, RENAME, OWNER, or SET");
         }
     }
-    m.complete(p, ALTER_OPERATOR_FAMILY_STMT)
+    m.complete(p, ALTER_OPERATOR_FAMILY)
 }
 
 // ALTER OPERATOR CLASS name USING index_method
@@ -5578,7 +5571,7 @@ fn alter_operator_class_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME, OWNER, or SET");
         }
     }
-    m.complete(p, ALTER_OPERATOR_CLASS_STMT)
+    m.complete(p, ALTER_OPERATOR_CLASS)
 }
 
 // ALTER OPERATOR name ( { left_type | NONE } , right_type )
@@ -5626,7 +5619,7 @@ fn alter_operator_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected OWNER or SET");
         }
     }
-    m.complete(p, ALTER_OPERATOR_STMT)
+    m.complete(p, ALTER_OPERATOR)
 }
 
 // ALTER MATERIALIZED VIEW [ IF EXISTS ] name
@@ -5725,7 +5718,7 @@ fn alter_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
-    m.complete(p, ALTER_MATERIALIZED_VIEW_STMT)
+    m.complete(p, ALTER_MATERIALIZED_VIEW)
 }
 
 // ALTER LARGE OBJECT large_object_oid OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
@@ -5741,7 +5734,7 @@ fn alter_large_object_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(OWNER_KW);
     p.expect(TO_KW);
     role(p);
-    m.complete(p, ALTER_LARGE_OBJECT_STMT)
+    m.complete(p, ALTER_LARGE_OBJECT)
 }
 
 // ALTER [ PROCEDURAL ] LANGUAGE name RENAME TO new_name
@@ -5768,7 +5761,7 @@ fn alter_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME or OWNER");
         }
     }
-    m.complete(p, ALTER_LANGUAGE_STMT)
+    m.complete(p, ALTER_LANGUAGE)
 }
 
 // ALTER INDEX ALL IN TABLESPACE name [ OWNED BY role_name [, ... ] ]
@@ -5862,7 +5855,7 @@ fn alter_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
-    m.complete(p, ALTER_INDEX_STMT)
+    m.complete(p, ALTER_INDEX)
 }
 
 // ALTER GROUP role_specification ADD USER user_name [, ... ]
@@ -5897,7 +5890,7 @@ fn alter_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ADD, DROP, or RENAME");
         }
     }
-    m.complete(p, ALTER_GROUP_STMT)
+    m.complete(p, ALTER_GROUP)
 }
 
 // ALTER FUNCTION name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ]
@@ -5958,7 +5951,7 @@ fn alter_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.eat(RESTRICT_KW);
-    m.complete(p, ALTER_FUNCTION_STMT)
+    m.complete(p, ALTER_FUNCTION)
 }
 
 // ALTER FOREIGN TABLE [ IF EXISTS ] [ ONLY ] name [ * ]
@@ -6037,7 +6030,7 @@ fn alter_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
-    m.complete(p, ALTER_FOREIGN_TABLE_STMT)
+    m.complete(p, ALTER_FOREIGN_TABLE)
 }
 
 // ALTER FOREIGN DATA WRAPPER name
@@ -6085,7 +6078,7 @@ fn alter_foreign_data_wrapper_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !found_option {
         p.error("Missing alter foreign data wrapper option or action.")
     }
-    m.complete(p, ALTER_FOREIGN_DATA_WRAPPER_STMT)
+    m.complete(p, ALTER_FOREIGN_DATA_WRAPPER)
 }
 
 // ALTER EVENT TRIGGER name DISABLE
@@ -6121,7 +6114,7 @@ fn alter_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected DISABLE, ENABLE, OWNER, or RENAME");
         }
     }
-    m.complete(p, ALTER_EVENT_TRIGGER_STMT)
+    m.complete(p, ALTER_EVENT_TRIGGER)
 }
 
 // ALTER EXTENSION name UPDATE [ TO new_version ]
@@ -6306,7 +6299,7 @@ fn alter_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected UPDATE, SET, ADD, or DROP");
         }
     }
-    m.complete(p, ALTER_EXTENSION_STMT)
+    m.complete(p, ALTER_EXTENSION)
 }
 
 // ALTER DOMAIN name
@@ -6583,7 +6576,7 @@ fn alter_default_privileges_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected GRANT or REVOKE");
         }
     }
-    m.complete(p, ALTER_DEFAULT_PRIVILEGES_STMT)
+    m.complete(p, ALTER_DEFAULT_PRIVILEGES)
 }
 
 fn privilege_target_type(p: &mut Parser<'_>) {
@@ -6656,7 +6649,7 @@ fn alter_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
-    m.complete(p, ALTER_DATABASE_STMT)
+    m.complete(p, ALTER_DATABASE)
 }
 
 // ALTER CONVERSION name RENAME TO new_name
@@ -6688,7 +6681,7 @@ fn alter_conversion_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected RENAME, OWNER, or SET");
         }
     }
-    m.complete(p, ALTER_CONVERSION_STMT)
+    m.complete(p, ALTER_CONVERSION)
 }
 
 // ALTER COLLATION name REFRESH VERSION
@@ -6725,7 +6718,7 @@ fn alter_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected REFRESH, RENAME, OWNER, or SET");
         }
     }
-    m.complete(p, ALTER_COLLATION_STMT)
+    m.complete(p, ALTER_COLLATION)
 }
 
 // ALTER AGGREGATE name ( aggregate_signature ) RENAME TO new_name
@@ -6856,7 +6849,7 @@ fn alter_subscription_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         );
         }
     }
-    m.complete(p, ALTER_SUBSCRIPTION_STMT)
+    m.complete(p, ALTER_SUBSCRIPTION)
 }
 
 fn opt_with_options_list(p: &mut Parser<'_>) {
@@ -6891,7 +6884,7 @@ fn alter_system_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected SET or RESET after ALTER SYSTEM");
     }
-    m.complete(p, ALTER_SYSTEM_STMT)
+    m.complete(p, ALTER_SYSTEM)
 }
 
 // ALTER TABLESPACE name RENAME TO new_name
@@ -6924,7 +6917,7 @@ fn alter_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected RENAME, OWNER, SET, or RESET after tablespace name");
     }
-    m.complete(p, ALTER_TABLESPACE_STMT)
+    m.complete(p, ALTER_TABLESPACE)
 }
 
 // ALTER TEXT SEARCH PARSER name RENAME TO new_name
@@ -6948,7 +6941,7 @@ fn alter_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected RENAME TO or SET SCHEMA");
     }
-    m.complete(p, ALTER_TEXT_SEARCH_PARSER_STMT)
+    m.complete(p, ALTER_TEXT_SEARCH_PARSER)
 }
 
 // ALTER TEXT SEARCH DICTIONARY name (
@@ -6992,7 +6985,7 @@ fn alter_text_search_dict_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected '(', RENAME, OWNER, or SET");
     }
-    m.complete(p, ALTER_TEXT_SEARCH_DICTIONARY_STMT)
+    m.complete(p, ALTER_TEXT_SEARCH_DICTIONARY)
 }
 
 // ALTER TEXT SEARCH CONFIGURATION name
@@ -7085,7 +7078,7 @@ fn alter_text_search_configuration(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ADD, ALTER, DROP, RENAME, OWNER, or SET");
         }
     }
-    m.complete(p, ALTER_TEXT_SEARCH_CONFIGURATION_STMT)
+    m.complete(p, ALTER_TEXT_SEARCH_CONFIGURATION)
 }
 
 fn name_ref_list(p: &mut Parser<'_>) {
@@ -7126,7 +7119,7 @@ fn alter_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected RENAME TO or SET SCHEMA");
     }
-    m.complete(p, ALTER_TEXT_SEARCH_TEMPLATE_STMT)
+    m.complete(p, ALTER_TEXT_SEARCH_TEMPLATE)
 }
 
 // ALTER TRIGGER name ON table_name RENAME TO new_name
@@ -7149,7 +7142,7 @@ fn alter_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(EXTENSION_KW);
         name_ref(p);
     }
-    m.complete(p, ALTER_TRIGGER_STMT)
+    m.complete(p, ALTER_TRIGGER)
 }
 
 fn alter_type_action(p: &mut Parser<'_>) {
@@ -7262,7 +7255,7 @@ fn alter_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => p.error("expected ALTER TYPE option"),
     }
-    m.complete(p, ALTER_TYPE_STMT)
+    m.complete(p, ALTER_TYPE)
 }
 
 // ALTER USER role_specification [ WITH ] option [ ... ]
@@ -7303,13 +7296,13 @@ fn alter_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         while !p.at(EOF) && p.at_ts(ROLE_OPTION_FIRST) {
             opt_role_option(p);
         }
-        return m.complete(p, ALTER_USER_STMT);
+        return m.complete(p, ALTER_USER);
     }
     // RENAME TO new_name
     if p.eat(RENAME_KW) {
         p.expect(TO_KW);
         name_ref(p);
-        return m.complete(p, ALTER_USER_STMT);
+        return m.complete(p, ALTER_USER);
     }
     if p.eat(IN_KW) {
         p.expect(DATABASE_KW);
@@ -7327,7 +7320,7 @@ fn alter_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => p.error("expected SET or RESET"),
     }
-    m.complete(p, ALTER_USER_STMT)
+    m.complete(p, ALTER_USER)
 }
 
 // ALTER USER MAPPING FOR { user_name | USER | CURRENT_ROLE | CURRENT_USER | SESSION_USER | PUBLIC }
@@ -7350,7 +7343,7 @@ fn alter_user_mapping_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         alter_option(p);
     }
     p.expect(R_PAREN);
-    m.complete(p, ALTER_USER_MAPPING_STMT)
+    m.complete(p, ALTER_USER_MAPPING)
 }
 
 fn alter_option(p: &mut Parser<'_>) {
@@ -7453,7 +7446,7 @@ fn alter_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         _ => p.error("expected ALTER, OWNER, RENAME, or SET"),
     }
-    m.complete(p, ALTER_VIEW_STMT)
+    m.complete(p, ALTER_VIEW)
 }
 
 // ANALYZE [ ( option [, ...] ) ] [ table_and_columns [, ...] ]
@@ -7477,7 +7470,7 @@ fn analyze_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_relation_list(p);
-    m.complete(p, ANALYZE_STMT)
+    m.complete(p, ANALYZE)
 }
 
 // COMMENT ON
@@ -7649,7 +7642,7 @@ fn comment_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(NULL_KW) && opt_string_literal(p).is_none() {
         p.error("expected string literal or NULL");
     }
-    m.complete(p, COMMENT_STMT)
+    m.complete(p, COMMENT_ON)
 }
 
 // CLUSTER [ ( option [, ...] ) ] [ table_name [ USING index_name ] ]
@@ -7675,7 +7668,7 @@ fn cluster_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(USING_KW) {
         name_ref(p);
     }
-    m.complete(p, CLUSTER_STMT)
+    m.complete(p, CLUSTER)
 }
 
 fn cluster_option(p: &mut Parser<'_>) {
@@ -7704,7 +7697,7 @@ fn create_access_method_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     }
     p.expect(HANDLER_KW);
     path_name(p);
-    m.complete(p, CREATE_ACCESS_METHOD_STMT)
+    m.complete(p, CREATE_ACCESS_METHOD)
 }
 
 // CREATE [ OR REPLACE ] AGGREGATE name ( [ argmode ] [ argname ] arg_data_type [ , ... ] ) (
@@ -7824,7 +7817,7 @@ fn create_cast_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected ASSIGNMENT or IMPLICIT");
         }
     }
-    m.complete(p, CREATE_CAST_STMT)
+    m.complete(p, CREATE_CAST)
 }
 
 // CREATE COLLATION [ IF NOT EXISTS ] name (
@@ -7858,7 +7851,7 @@ fn create_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         p.expect(R_PAREN);
     }
-    m.complete(p, CREATE_COLLATION_STMT)
+    m.complete(p, CREATE_COLLATION)
 }
 
 // CREATE [ DEFAULT ] CONVERSION name
@@ -7876,7 +7869,7 @@ fn create_conversion_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     string_literal(p);
     p.expect(FROM_KW);
     path_name(p);
-    m.complete(p, CREATE_CONVERSION_STMT)
+    m.complete(p, CREATE_CONVERSION)
 }
 
 fn opt_option_value(p: &mut Parser<'_>) -> bool {
@@ -7945,7 +7938,7 @@ fn create_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             break;
         }
     }
-    m.complete(p, CREATE_DATABASE_STMT)
+    m.complete(p, CREATE_DATABASE)
 }
 
 // CREATE DOMAIN name [ AS ] data_type
@@ -8011,7 +8004,7 @@ fn create_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     path_name_ref(p);
     p.expect(L_PAREN);
     p.expect(R_PAREN);
-    m.complete(p, CREATE_EVENT_TRIGGER_STMT)
+    m.complete(p, CREATE_EVENT_TRIGGER)
 }
 
 // CREATE FOREIGN TABLE [ IF NOT EXISTS ] table_name ( [
@@ -8111,7 +8104,7 @@ fn create_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(SERVER_KW);
     name_ref(p);
     opt_options_list(p);
-    m.complete(p, CREATE_FOREIGN_TABLE_STMT)
+    m.complete(p, CREATE_FOREIGN_TABLE)
 }
 
 // CREATE FOREIGN DATA WRAPPER name
@@ -8132,7 +8125,7 @@ fn create_foreign_data_wrapper_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_options_list(p);
-    m.complete(p, CREATE_FOREIGN_DATA_WRAPPER_STMT)
+    m.complete(p, CREATE_FOREIGN_DATA_WRAPPER)
 }
 
 fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
@@ -8188,7 +8181,7 @@ fn create_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(GROUP_KW);
     name(p);
     opt_role_option_list(p);
-    m.complete(p, CREATE_GROUP_STMT)
+    m.complete(p, CREATE_GROUP)
 }
 
 // CREATE [ OR REPLACE ] [ TRUSTED ] [ PROCEDURAL ] LANGUAGE name
@@ -8211,7 +8204,7 @@ fn create_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             path_name_ref(p);
         }
     }
-    m.complete(p, CREATE_LANGUAGE_STMT)
+    m.complete(p, CREATE_LANGUAGE)
 }
 
 // CREATE MATERIALIZED VIEW [ IF NOT EXISTS ] table_name
@@ -8246,7 +8239,7 @@ fn create_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         },
     );
     match statement.map(|x| x.kind()) {
-        Some(SELECT | TABLE_STMT | VALUES) => (),
+        Some(SELECT | TABLE | VALUES) => (),
         Some(kind) => {
             p.error(format!(
                 "expected SELECT, TABLE, or VALUES statement, got {:?}",
@@ -8261,7 +8254,7 @@ fn create_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.eat(NO_KW);
         p.expect(DATA_KW);
     }
-    m.complete(p, CREATE_MATERIALIZED_VIEW_STMT)
+    m.complete(p, CREATE_MATERIALIZED_VIEW)
 }
 
 // CREATE OPERATOR name (
@@ -8287,7 +8280,7 @@ fn create_operator_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, CREATE_OPERATOR_STMT)
+    m.complete(p, CREATE_OPERATOR)
 }
 
 // CREATE OPERATOR CLASS name [ DEFAULT ] FOR TYPE data_type
@@ -8317,7 +8310,7 @@ fn create_operator_class_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     while !p.at(EOF) && p.eat(COMMA) {
         operator_class_option(p);
     }
-    m.complete(p, CREATE_OPERATOR_CLASS_STMT)
+    m.complete(p, CREATE_OPERATOR_CLASS)
 }
 
 // | OPERATOR strategy_number operator_name [ ( op_type, op_type ) ] [ FOR SEARCH | FOR ORDER BY sort_family_name ]
@@ -8402,7 +8395,7 @@ fn create_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     path_name(p);
     p.expect(USING_KW);
     name_ref(p);
-    m.complete(p, CREATE_OPERATOR_FAMILY_STMT)
+    m.complete(p, CREATE_OPERATOR_FAMILY)
 }
 
 // CREATE POLICY name ON table_name
@@ -8450,7 +8443,7 @@ fn create_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         p.expect(R_PAREN);
     }
-    m.complete(p, CREATE_POLICY_STMT)
+    m.complete(p, CREATE_POLICY)
 }
 
 // CREATE [ OR REPLACE ] PROCEDURE
@@ -8472,7 +8465,7 @@ fn create_procedure_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     path_name(p);
     param_list(p);
     func_option_list(p);
-    m.complete(p, CREATE_PROCEDURE_STMT)
+    m.complete(p, CREATE_PROCEDURE)
 }
 
 // [ TABLE ] [ ONLY ] table_name [ * ] [ ( column_name [, ... ] ) ] [ WHERE ( expression ) ] [, ... ]
@@ -8538,7 +8531,7 @@ fn create_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_with_params(p);
-    m.complete(p, CREATE_PUBLICATION_STMT)
+    m.complete(p, CREATE_PUBLICATION)
 }
 
 // CREATE ROLE name [ [ WITH ] option [ ... ] ]
@@ -8564,7 +8557,7 @@ fn create_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(ROLE_KW);
     name(p);
     opt_role_option_list(p);
-    m.complete(p, CREATE_ROLE_STMT)
+    m.complete(p, CREATE_ROLE)
 }
 
 fn select_insert_delete_update_or_notify(p: &mut Parser<'_>) {
@@ -8578,7 +8571,7 @@ fn select_insert_delete_update_or_notify(p: &mut Parser<'_>) {
     );
     if let Some(statement) = statement {
         match statement.kind() {
-            SELECT | VALUES | INSERT_STMT | UPDATE_STMT | DELETE_STMT | NOTIFY_STMT => (),
+            SELECT | VALUES | INSERT | UPDATE | DELETE | NOTIFY => (),
             kind => {
                 p.error(format!(
                     "expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement, got {:?}",
@@ -8629,7 +8622,7 @@ fn create_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         select_insert_delete_update_or_notify(p);
     }
-    m.complete(p, CREATE_RULE_STMT)
+    m.complete(p, CREATE_RULE)
 }
 
 // CREATE [ { TEMPORARY | TEMP } | UNLOGGED ] SEQUENCE [ IF NOT EXISTS ] name
@@ -8653,7 +8646,7 @@ fn create_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             break;
         }
     }
-    m.complete(p, CREATE_SEQUENCE_STMT)
+    m.complete(p, CREATE_SEQUENCE)
 }
 
 // CREATE SERVER [ IF NOT EXISTS ] server_name [ TYPE 'server_type' ] [ VERSION 'server_version' ]
@@ -8677,7 +8670,7 @@ fn create_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(WRAPPER_KW);
     name_ref(p);
     opt_options_list(p);
-    m.complete(p, CREATE_SERVER_STMT)
+    m.complete(p, CREATE_SERVER)
 }
 
 // CREATE STATISTICS [ [ IF NOT EXISTS ] statistics_name ]
@@ -8716,7 +8709,7 @@ fn create_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     }
     p.expect(FROM_KW);
     path_name_ref(p);
-    m.complete(p, CREATE_STATISTICS_STMT)
+    m.complete(p, CREATE_STATISTICS)
 }
 
 // CREATE SUBSCRIPTION subscription_name
@@ -8737,7 +8730,7 @@ fn create_subscription_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         name_ref(p);
     }
     opt_with_params(p);
-    m.complete(p, CREATE_SUBSCRIPTION_STMT)
+    m.complete(p, CREATE_SUBSCRIPTION)
 }
 
 // CREATE TABLESPACE tablespace_name
@@ -8757,7 +8750,7 @@ fn create_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     string_literal(p);
     // TODO: we could have a validator to check these params
     opt_with_params(p);
-    m.complete(p, CREATE_TABLESPACE_STMT)
+    m.complete(p, CREATE_TABLESPACE)
 }
 
 // CREATE TEXT SEARCH PARSER name (
@@ -8785,7 +8778,7 @@ fn create_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, CREATE_TEXT_SEARCH_PARSER_STMT)
+    m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
 // CREATE TEXT SEARCH DICTIONARY name (
@@ -8810,7 +8803,7 @@ fn create_text_search_dict_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, CREATE_TEXT_SEARCH_PARSER_STMT)
+    m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
 // CREATE TEXT SEARCH CONFIGURATION name (
@@ -8835,7 +8828,7 @@ fn create_text_search_config_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, CREATE_TEXT_SEARCH_PARSER_STMT)
+    m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
 // CREATE TEXT SEARCH TEMPLATE name (
@@ -8861,7 +8854,7 @@ fn create_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.expect(R_PAREN);
-    m.complete(p, CREATE_TEXT_SEARCH_PARSER_STMT)
+    m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
 // CREATE [ OR REPLACE ] TRANSFORM FOR type_name LANGUAGE lang_name (
@@ -8893,7 +8886,7 @@ fn create_transform_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     path_name_ref(p);
     opt_param_list(p);
     p.expect(R_PAREN);
-    m.complete(p, CREATE_TRANSFORM_STMT)
+    m.complete(p, CREATE_TRANSFORM)
 }
 
 // CREATE USER MAPPING [ IF NOT EXISTS ] FOR { user_name | USER | CURRENT_ROLE | CURRENT_USER | PUBLIC }
@@ -8915,7 +8908,7 @@ fn create_user_mapping_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     // server_name
     name_ref(p);
     opt_options_list(p);
-    m.complete(p, CREATE_USER_MAPPING_STMT)
+    m.complete(p, CREATE_USER_MAPPING)
 }
 
 const ROLE_OPTION_FIRST: TokenSet = TokenSet::new(&[
@@ -9035,7 +9028,7 @@ fn create_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(USER_KW);
     name(p);
     opt_role_option_list(p);
-    m.complete(p, CREATE_USER_STMT)
+    m.complete(p, CREATE_USER)
 }
 
 fn opt_role_option_list(p: &mut Parser<'_>) {
@@ -9058,7 +9051,7 @@ fn drop_language_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_LANGUAGE_STMT)
+    m.complete(p, DROP_LANGUAGE)
 }
 
 // DROP GROUP [ IF EXISTS ] name [, ...]
@@ -9072,7 +9065,7 @@ fn drop_group_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     while !p.at(EOF) && p.eat(COMMA) {
         name_ref(p);
     }
-    m.complete(p, DROP_GROUP_STMT)
+    m.complete(p, DROP_GROUP)
 }
 
 // DROP FUNCTION [ IF EXISTS ] name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ] [, ...]
@@ -9090,7 +9083,7 @@ fn drop_function_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         opt_param_list(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_FUNCTION_STMT)
+    m.complete(p, DROP_FUNCTION)
 }
 
 // DROP FOREIGN DATA WRAPPER [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9109,7 +9102,7 @@ fn drop_foreign_data_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_FOREIGN_DATA_WRAPPER_STMT)
+    m.complete(p, DROP_FOREIGN_DATA_WRAPPER)
 }
 
 // DROP FOREIGN TABLE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9125,7 +9118,7 @@ fn drop_foreign_table_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         path_name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_FOREIGN_TABLE_STMT)
+    m.complete(p, DROP_FOREIGN_TABLE)
 }
 
 // DROP ACCESS METHOD [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9138,7 +9131,7 @@ fn drop_access_method_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_ACCESS_METHOD_STMT)
+    m.complete(p, DROP_ACCESS_METHOD)
 }
 
 fn aggregate(p: &mut Parser<'_>) {
@@ -9184,7 +9177,7 @@ fn drop_cast_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     source_type_as_target_type(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_CAST_STMT)
+    m.complete(p, DROP_CAST)
 }
 
 // DROP COLLATION [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9196,7 +9189,7 @@ fn drop_collation_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_COLLATION_STMT)
+    m.complete(p, DROP_COLLATION)
 }
 
 // DROP CONVERSION [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9208,7 +9201,7 @@ fn drop_conversion_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_CONVERSION_STMT)
+    m.complete(p, DROP_CONVERSION)
 }
 
 // DROP DOMAIN [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9223,7 +9216,7 @@ fn drop_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         path_name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_DOMAIN_STMT)
+    m.complete(p, DROP_DOMAIN)
 }
 
 // DROP EVENT TRIGGER [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9236,7 +9229,7 @@ fn drop_event_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_EVENT_TRIGGER_STMT)
+    m.complete(p, DROP_EVENT_TRIGGER)
 }
 
 // DROP EXTENSION [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9251,7 +9244,7 @@ fn drop_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_EXTENSION_STMT)
+    m.complete(p, DROP_EXTENSION)
 }
 
 // DROP MATERIALIZED VIEW [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9267,7 +9260,7 @@ fn drop_materialized_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         path_name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_MATERIALIZED_VIEW_STMT)
+    m.complete(p, DROP_MATERIALIZED_VIEW)
 }
 
 // DROP OPERATOR FAMILY [ IF EXISTS ] name USING index_method [ CASCADE | RESTRICT ]
@@ -9282,7 +9275,7 @@ fn drop_operator_family_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(USING_KW);
     name_ref(p); // index_method
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_OPERATOR_FAMILY_STMT)
+    m.complete(p, DROP_OPERATOR_FAMILY)
 }
 
 // DROP OPERATOR [ IF EXISTS ] name ( { left_type | NONE } , right_type ) [, ...] [ CASCADE | RESTRICT ]
@@ -9297,7 +9290,7 @@ fn drop_operator_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         operator_sig(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_OPERATOR_STMT)
+    m.complete(p, DROP_OPERATOR)
 }
 
 // name ( { left_type | NONE } , right_type )
@@ -9324,7 +9317,7 @@ fn drop_operator_class_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(USING_KW);
     name_ref(p); // index_method
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_OPERATOR_CLASS_STMT)
+    m.complete(p, DROP_OPERATOR_CLASS)
 }
 
 // DROP OWNED BY { name | CURRENT_ROLE | CURRENT_USER | SESSION_USER } [, ...] [ CASCADE | RESTRICT ]
@@ -9339,7 +9332,7 @@ fn drop_owned_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         role(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_OWNED_STMT)
+    m.complete(p, DROP_OWNED)
 }
 
 // DROP POLICY [ IF EXISTS ] name ON table_name [ CASCADE | RESTRICT ]
@@ -9353,7 +9346,7 @@ fn drop_policy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(ON_KW);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_POLICY_STMT)
+    m.complete(p, DROP_POLICY)
 }
 
 // DROP PROCEDURE [ IF EXISTS ] name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ] [, ...]
@@ -9371,7 +9364,7 @@ fn drop_procedure_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         opt_param_list(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_PROCEDURE_STMT)
+    m.complete(p, DROP_PROCEDURE)
 }
 
 // DROP PUBLICATION [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9386,7 +9379,7 @@ fn drop_publication_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_PUBLICATION_STMT)
+    m.complete(p, DROP_PUBLICATION)
 }
 
 // DROP ROLE [ IF EXISTS ] name [, ...]
@@ -9400,7 +9393,7 @@ fn drop_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     while !p.at(EOF) && p.eat(COMMA) {
         name_ref(p);
     }
-    m.complete(p, DROP_ROLE_STMT)
+    m.complete(p, DROP_ROLE)
 }
 
 // DROP ROUTINE [ IF EXISTS ] name [ ( [ [ argmode ] [ argname ] argtype [, ...] ] ) ] [, ...]
@@ -9418,7 +9411,7 @@ fn drop_routine_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         opt_param_list(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_ROUTINE_STMT)
+    m.complete(p, DROP_ROUTINE)
 }
 
 // DROP RULE [ IF EXISTS ] name ON table_name [ CASCADE | RESTRICT ]
@@ -9432,7 +9425,7 @@ fn drop_rule_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(ON_KW);
     path_name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_RULE_STMT)
+    m.complete(p, DROP_RULE)
 }
 
 // DROP SEQUENCE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9447,7 +9440,7 @@ fn drop_sequence_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         path_name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_SEQUENCE_STMT)
+    m.complete(p, DROP_SEQUENCE)
 }
 
 // DROP SERVER [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9462,7 +9455,7 @@ fn drop_server_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_SERVER_STMT)
+    m.complete(p, DROP_SERVER)
 }
 
 // DROP STATISTICS [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -9477,7 +9470,7 @@ fn drop_statistics_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         path_name_ref(p);
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_STATISTICS_STMT)
+    m.complete(p, DROP_STATISTICS)
 }
 
 // DROP SUBSCRIPTION [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9489,7 +9482,7 @@ fn drop_subscription_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_SUBSCRIPTION_STMT)
+    m.complete(p, DROP_SUBSCRIPTION)
 }
 
 // [ CASCADE | RESTRICT ]
@@ -9505,7 +9498,7 @@ fn drop_tablespace_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(TABLESPACE_KW);
     opt_if_exists(p);
     name_ref(p);
-    m.complete(p, DROP_TABLESPACE_STMT)
+    m.complete(p, DROP_TABLESPACE)
 }
 
 // DROP TEXT SEARCH PARSER [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9521,7 +9514,7 @@ fn drop_text_search_parser_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_TEXT_SEARCH_PARSER_STMT)
+    m.complete(p, DROP_TEXT_SEARCH_PARSER)
 }
 
 // DROP TEXT SEARCH CONFIGURATION [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9540,7 +9533,7 @@ fn drop_text_search_config_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_TEXT_SEARCH_CONFIG_STMT)
+    m.complete(p, DROP_TEXT_SEARCH_CONFIG)
 }
 
 // DROP TEXT SEARCH DICTIONARY [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9559,7 +9552,7 @@ fn drop_text_search_dict_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_TEXT_SEARCH_DICT_STMT)
+    m.complete(p, DROP_TEXT_SEARCH_DICT)
 }
 
 // DROP TEXT SEARCH TEMPLATE [ IF EXISTS ] name [ CASCADE | RESTRICT ]
@@ -9575,7 +9568,7 @@ fn drop_text_search_template_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_exists(p);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_TEXT_SEARCH_TEMPLATE_STMT)
+    m.complete(p, DROP_TEXT_SEARCH_TEMPLATE)
 }
 
 // DROP TRANSFORM [ IF EXISTS ] FOR type_name LANGUAGE lang_name [ CASCADE | RESTRICT ]
@@ -9590,7 +9583,7 @@ fn drop_transform_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(LANGUAGE_KW);
     name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_TRANSFORM_STMT)
+    m.complete(p, DROP_TRANSFORM)
 }
 
 // DROP USER [ IF EXISTS ] name [, ...]
@@ -9604,7 +9597,7 @@ fn drop_user_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     while !p.at(EOF) && p.eat(COMMA) {
         name_ref(p);
     }
-    m.complete(p, DROP_USER_STMT)
+    m.complete(p, DROP_USER)
 }
 
 // DROP USER MAPPING [ IF EXISTS ] FOR { user_name | USER | CURRENT_ROLE | CURRENT_USER | PUBLIC } SERVER server_name
@@ -9623,7 +9616,7 @@ fn drop_user_mapping_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(SERVER_KW);
     // server_name
     name_ref(p);
-    m.complete(p, DROP_USER_MAPPING_STMT)
+    m.complete(p, DROP_USER_MAPPING)
 }
 
 // EXPLAIN [ANALYZE] [VERBOSE] query
@@ -9651,14 +9644,14 @@ fn explain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         match statement.kind() {
             SELECT
             | VALUES
-            | INSERT_STMT
-            | UPDATE_STMT
-            | DELETE_STMT
-            | MERGE_STMT
-            | EXECUTE_STMT
-            | DECLARE_STMT
-            | CREATE_TABLE_AS_STMT
-            | CREATE_MATERIALIZED_VIEW_STMT
+            | INSERT
+            | UPDATE
+            | DELETE
+            | MERGE
+            | EXECUTE
+            | DECLARE
+            | CREATE_TABLE_AS
+            | CREATE_MATERIALIZED_VIEW
             // TODO: we need a validation to check inside this
             | PAREN_EXPR => (),
             kind => {
@@ -9671,7 +9664,7 @@ fn explain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS");
     }
-    m.complete(p, EXPLAIN_STMT)
+    m.complete(p, EXPLAIN)
 }
 
 // where option can be one of:
@@ -9820,7 +9813,7 @@ fn lock_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     }
     // [ NOWAIT ]
     p.eat(NOWAIT_KW);
-    m.complete(p, LOCK_STMT)
+    m.complete(p, LOCK)
 }
 
 // [ ONLY ] name [ * ] [, ... ]
@@ -9877,7 +9870,7 @@ fn merge_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     }
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
-    m.complete(p, MERGE_STMT)
+    m.complete(p, MERGE)
 }
 
 // where data_source is:
@@ -9983,7 +9976,7 @@ fn reassign_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     while !p.at(EOF) && p.eat(COMMA) {
         role(p);
     }
-    m.complete(p, REASSIGN_STMT)
+    m.complete(p, REASSIGN)
 }
 
 // REFRESH MATERIALIZED VIEW [ CONCURRENTLY ] name
@@ -10000,7 +9993,7 @@ fn refresh_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.eat(NO_KW);
         p.expect(DATA_KW);
     }
-    m.complete(p, REFRESH_STMT)
+    m.complete(p, REFRESH)
 }
 
 // GRANT { { SELECT | INSERT | UPDATE | DELETE | TRUNCATE | REFERENCES | TRIGGER | MAINTAIN }
@@ -10070,7 +10063,7 @@ fn grant_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_granted_by(p);
-    m.complete(p, GRANT_STMT)
+    m.complete(p, GRANT)
 }
 
 fn privilege_target(p: &mut Parser<'_>) {
@@ -10228,7 +10221,7 @@ fn revoke_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     // [ GRANTED BY role_specification ]
     opt_granted_by(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, REVOKE_STMT)
+    m.complete(p, REVOKE)
 }
 
 // { { SELECT | INSERT | UPDATE | REFERENCES } ( column_name [, ...] )
@@ -10415,7 +10408,7 @@ fn security_label_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(NULL_KW) {
         string_literal(p);
     }
-    m.complete(p, SECURITY_LABEL_STMT)
+    m.complete(p, SECURITY_LABEL)
 }
 
 fn agg_args(p: &mut Parser<'_>) {
@@ -10491,7 +10484,7 @@ fn set_constraints_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(DEFERRED_KW) && !p.eat(IMMEDIATE_KW) {
         p.error("expected DEFERRED or IMMEDIATE");
     }
-    m.complete(p, SET_CONSTRAINTS_STMT)
+    m.complete(p, SET_CONSTRAINTS)
 }
 
 // SET [ SESSION | LOCAL ] ROLE role_name
@@ -10510,7 +10503,7 @@ fn set_role_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected NONE or role_name");
         }
     }
-    m.complete(p, SET_ROLE_STMT)
+    m.complete(p, SET_ROLE)
 }
 
 // SET [ SESSION | LOCAL ] SESSION AUTHORIZATION user_name
@@ -10535,7 +10528,7 @@ fn set_session_auth_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected user_name or DEFAULT");
         }
     }
-    m.complete(p, SET_SESSION_AUTH_STMT)
+    m.complete(p, SET_SESSION_AUTH)
 }
 
 fn transaction_mode_list(p: &mut Parser<'_>) {
@@ -10576,7 +10569,7 @@ fn set_transaction_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             transaction_mode_list(p);
         }
     }
-    m.complete(p, SET_TRANSACTION_STMT)
+    m.complete(p, SET_TRANSACTION)
 }
 
 // VALUES ( expression [, ...] ) [, ...]
@@ -10680,7 +10673,7 @@ fn reindex_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if opt_name(p).is_none() && name_required {
         p.error("expected name");
     }
-    m.complete(p, REINDEX_STMT)
+    m.complete(p, REINDEX)
 }
 
 // DROP VIEW [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -10702,7 +10695,7 @@ fn drop_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_VIEW_STMT)
+    m.complete(p, DROP_VIEW)
 }
 
 // CREATE [ OR REPLACE ] [ TEMP | TEMPORARY ] [ RECURSIVE ] VIEW name [ ( column_name [, ...] ) ]
@@ -10742,7 +10735,7 @@ fn create_view_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(CHECK_KW);
         p.expect(OPTION_KW);
     }
-    m.complete(p, CREATE_VIEW_STMT)
+    m.complete(p, CREATE_VIEW)
 }
 
 // EXECUTE name [ ( parameter [, ...] ) ]
@@ -10755,7 +10748,7 @@ fn execute_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at(L_PAREN) {
         arg_list(p);
     }
-    m.complete(p, EXECUTE_STMT)
+    m.complete(p, EXECUTE)
 }
 
 // PREPARE name [ ( data_type [, ...] ) ] AS statement
@@ -10784,7 +10777,7 @@ fn prepare_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     );
     if let Some(statement) = statement {
         match statement.kind() {
-            SELECT | VALUES | INSERT_STMT | UPDATE_STMT | DELETE_STMT | MERGE_STMT => (),
+            SELECT | VALUES | INSERT | UPDATE | DELETE | MERGE => (),
             kind => {
                 p.error(format!(
                     "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {:?}",
@@ -10795,7 +10788,7 @@ fn prepare_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement");
     }
-    m.complete(p, PREPARE_STMT)
+    m.complete(p, PREPARE)
 }
 
 // UNLISTEN { channel | * }
@@ -10806,7 +10799,7 @@ fn unlisten_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(STAR) {
         name(p);
     }
-    m.complete(p, UNLISTEN_STMT)
+    m.complete(p, UNLISTEN)
 }
 
 // CHECKPOINT
@@ -10814,7 +10807,7 @@ fn checkpoint_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CHECKPOINT_KW));
     let m = p.start();
     p.bump(CHECKPOINT_KW);
-    m.complete(p, CHECKPOINT_STMT)
+    m.complete(p, CHECKPOINT)
 }
 
 // DEALLOCATE [ PREPARE ] { name | ALL }
@@ -10826,7 +10819,7 @@ fn deallocate_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(ALL_KW) {
         name(p);
     }
-    m.complete(p, DEALLOCATE_STMT)
+    m.complete(p, DEALLOCATE)
 }
 
 // LOAD string
@@ -10835,7 +10828,7 @@ fn load_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(LOAD_KW);
     string_literal(p);
-    m.complete(p, LOAD_STMT)
+    m.complete(p, LOAD)
 }
 
 // LISTEN channel
@@ -10844,7 +10837,7 @@ fn listen_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(LISTEN_KW);
     name(p);
-    m.complete(p, LISTEN_STMT)
+    m.complete(p, LISTEN)
 }
 
 // NOTIFY channel [ , payload ]
@@ -10857,7 +10850,7 @@ fn notify_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(COMMA) {
         string_literal(p);
     }
-    m.complete(p, NOTIFY_STMT)
+    m.complete(p, NOTIFY)
 }
 
 fn reset_stmt(p: &mut Parser<'_>) -> CompletedMarker {
@@ -10867,7 +10860,7 @@ fn reset_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(ALL_KW) {
         name_ref(p);
     }
-    m.complete(p, RESET_STMT)
+    m.complete(p, RESET)
 }
 
 // DISCARD { ALL | PLANS | SEQUENCES | TEMPORARY | TEMP }
@@ -10876,7 +10869,7 @@ fn discard_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(DISCARD_KW);
     let _ = p.eat(ALL_KW) || p.eat(PLANS_KW) || p.eat(SEQUENCES_KW) || opt_temp(p);
-    m.complete(p, DISCARD_STMT)
+    m.complete(p, DISCARD)
 }
 
 fn opt_temp(p: &mut Parser<'_>) -> bool {
@@ -10896,7 +10889,7 @@ fn do_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     string_literal(p);
-    m.complete(p, DO_STMT)
+    m.complete(p, DO)
 }
 
 // DECLARE name [ BINARY ] [ ASENSITIVE | INSENSITIVE ] [ [ NO ] SCROLL ]
@@ -10924,7 +10917,7 @@ fn declare_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(FOR_KW);
     // select_stmt | values_stmt
     query(p);
-    m.complete(p, DECLARE_STMT)
+    m.complete(p, DECLARE)
 }
 
 fn opt_direction(p: &mut Parser<'_>) -> bool {
@@ -10979,7 +10972,7 @@ fn move_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     let _ = p.eat(FROM_KW) || p.eat(IN_KW);
     // cursor_name
     name(p);
-    m.complete(p, MOVE_STMT)
+    m.complete(p, MOVE)
 }
 
 // FETCH [ direction ] [ FROM | IN ] cursor_name
@@ -11006,7 +10999,7 @@ fn fetch_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     let _ = p.eat(FROM_KW) || p.eat(IN_KW);
     // cursor_name
     name(p);
-    m.complete(p, FETCH_STMT)
+    m.complete(p, FETCH)
 }
 
 // CLOSE { name | ALL }
@@ -11017,7 +11010,7 @@ fn close_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(ALL_KW) {
         name(p);
     }
-    m.complete(p, CLOSE_STMT)
+    m.complete(p, CLOSE)
 }
 
 // TRUNCATE [ TABLE ] [ ONLY ] name [ * ] [, ... ]
@@ -11086,7 +11079,7 @@ fn vacuum_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(R_PAREN);
     }
     opt_relation_list(p);
-    m.complete(p, VACUUM_STMT)
+    m.complete(p, VACUUM)
 }
 
 // [ table_and_columns [, ...] ]
@@ -11291,7 +11284,7 @@ fn copy_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         copy_option_list(p);
     }
     opt_where_clause(p);
-    m.complete(p, COPY_STMT)
+    m.complete(p, COPY)
 }
 
 // https://www.postgresql.org/docs/17/sql-call.html
@@ -11306,7 +11299,7 @@ fn call_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     } else {
         p.error("expected L_PAREN");
     }
-    m.complete(p, CALL_STMT)
+    m.complete(p, CALL)
 }
 
 // https://www.postgresql.org/docs/17/sql-createtrigger.html
@@ -11399,7 +11392,7 @@ fn create_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     }
     // function_name ( arguments )
     call_expr(p);
-    m.complete(p, CREATE_TRIGGER_STMT)
+    m.complete(p, CREATE_TRIGGER)
 }
 
 fn call_expr(p: &mut Parser<'_>) {
@@ -11442,7 +11435,7 @@ fn drop_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.error("expected name");
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_SCHEMA_STMT)
+    m.complete(p, DROP_SCHEMA)
 }
 
 fn opt_schema_auth(p: &mut Parser<'_>) -> bool {
@@ -11501,19 +11494,19 @@ fn create_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     match (if_not_exists, opt_schema_auth(p)) {
         // CREATE SCHEMA IF NOT EXISTS AUTHORIZATION role_specification
         //                                                             ^
-        (true, true) => m.complete(p, CREATE_SCHEMA_STMT),
+        (true, true) => m.complete(p, CREATE_SCHEMA),
         // CREATE SCHEMA IF NOT EXISTS schema_name [ AUTHORIZATION role_specification ]
         //                             ^
         (true, false) => {
             name(p);
             opt_schema_auth(p);
-            m.complete(p, CREATE_SCHEMA_STMT)
+            m.complete(p, CREATE_SCHEMA)
         }
         // CREATE SCHEMA AUTHORIZATION role_specification [ schema_element [ ... ] ]
         //                                                ^
         (false, true) => {
             opt_schema_elements(p);
-            m.complete(p, CREATE_SCHEMA_STMT)
+            m.complete(p, CREATE_SCHEMA)
         }
         // CREATE SCHEMA schema_name [ AUTHORIZATION role_specification ] [ schema_element [ ... ] ]
         //               ^
@@ -11521,7 +11514,7 @@ fn create_schema_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             name(p);
             opt_schema_auth(p);
             opt_schema_elements(p);
-            m.complete(p, CREATE_SCHEMA_STMT)
+            m.complete(p, CREATE_SCHEMA)
         }
     }
 }
@@ -11627,7 +11620,7 @@ fn insert_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     }
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
-    m.complete(p, INSERT_STMT)
+    m.complete(p, INSERT)
 }
 
 // SET { column_name = { expression | DEFAULT } |
@@ -11740,7 +11733,7 @@ fn update_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     }
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
-    m.complete(p, UPDATE_STMT)
+    m.complete(p, UPDATE)
 }
 
 fn with_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
@@ -11803,7 +11796,7 @@ fn delete_stmt(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
         }
     }
     opt_returning_clause(p);
-    m.complete(p, DELETE_STMT)
+    m.complete(p, DELETE)
 }
 
 // WHERE CURRENT OF cursor_name
@@ -11851,7 +11844,7 @@ fn drop_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_TYPE_STMT)
+    m.complete(p, DROP_TYPE)
 }
 
 // DROP TRIGGER [ IF EXISTS ] name ON table_name [ CASCADE | RESTRICT ]
@@ -11869,7 +11862,7 @@ fn drop_trigger_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     // table_name
     path_name_ref(p);
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_TRIGGER_STMT)
+    m.complete(p, DROP_TRIGGER)
 }
 
 // DROP INDEX [ CONCURRENTLY ] [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -12571,7 +12564,7 @@ fn create_type_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         p.expect(R_PAREN);
     }
-    m.complete(p, CREATE_TYPE_STMT)
+    m.complete(p, CREATE_TYPE)
 }
 
 // CREATE EXTENSION [ IF NOT EXISTS ] extension_name
@@ -12597,7 +12590,7 @@ fn create_extension_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     p.eat(CASCADE_KW);
-    m.complete(p, CREATE_EXTENSION_STMT)
+    m.complete(p, CREATE_EXTENSION)
 }
 
 // { value | 'value' | DEFAULT }
@@ -12655,7 +12648,7 @@ fn set_stmt(p: &mut Parser<'_>) -> CompletedMarker {
             p.error(format!("expected config value, got {:?}", p.current()));
         }
     }
-    m.complete(p, SET_STMT)
+    m.complete(p, SET)
 }
 
 // SHOW name
@@ -12669,7 +12662,7 @@ fn show_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.eat(ALL_KW) {
         name_ref(p);
     }
-    m.complete(p, SHOW_STMT)
+    m.complete(p, SHOW)
 }
 
 const COLUMN_FIRST: TokenSet = TokenSet::new(&[IDENT])

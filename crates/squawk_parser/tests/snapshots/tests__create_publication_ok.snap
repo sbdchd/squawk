@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_publication.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_PUBLICATION_STMT
+  CREATE_PUBLICATION
     CREATE_KW "create"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -17,7 +16,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all_tables"
   WHITESPACE "\n"
-  CREATE_PUBLICATION_STMT
+  CREATE_PUBLICATION
     CREATE_KW "create"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -58,7 +57,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table"
   WHITESPACE "\n"
-  CREATE_PUBLICATION_STMT
+  CREATE_PUBLICATION
     CREATE_KW "create"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -198,7 +197,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table_in_schema"
   WHITESPACE "\n"
-  CREATE_PUBLICATION_STMT
+  CREATE_PUBLICATION
     CREATE_KW "create"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -231,7 +230,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multiple tables"
   WHITESPACE "\n"
-  CREATE_PUBLICATION_STMT
+  CREATE_PUBLICATION
     CREATE_KW "create"
     WHITESPACE " "
     PUBLICATION_KW "publication"

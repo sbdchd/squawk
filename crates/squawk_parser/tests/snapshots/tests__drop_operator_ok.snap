@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_operator.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_OPERATOR_STMT
+  DROP_OPERATOR
     DROP_KW "drop"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -31,7 +30,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  DROP_OPERATOR_STMT
+  DROP_OPERATOR
     DROP_KW "drop"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -78,7 +77,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- unary"
   WHITESPACE "\n"
-  DROP_OPERATOR_STMT
+  DROP_OPERATOR
     DROP_KW "drop"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -97,7 +96,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multiple"
   WHITESPACE "\n"
-  DROP_OPERATOR_STMT
+  DROP_OPERATOR
     DROP_KW "drop"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -134,7 +133,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_OPERATOR_STMT
+  DROP_OPERATOR
     DROP_KW "drop"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -196,7 +195,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_OPERATOR_STMT
+  DROP_OPERATOR
     DROP_KW "drop"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -229,7 +228,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- non_default_operator"
   WHITESPACE "\n"
-  DROP_OPERATOR_STMT
+  DROP_OPERATOR
     DROP_KW "drop"
     WHITESPACE " "
     OPERATOR_KW "operator"
@@ -278,7 +277,7 @@ SOURCE_FILE
     RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_OPERATOR_STMT
+  DROP_OPERATOR
     DROP_KW "drop"
     WHITESPACE " "
     OPERATOR_KW "operator"
