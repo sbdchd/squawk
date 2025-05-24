@@ -1696,16 +1696,6 @@ fn arg_list(p: &mut Parser<'_>) {
         m.complete(p, ARG_LIST);
         return;
     }
-    if p.nth_at(1, DISTINCT_KW) || p.nth_at(1, ALL_KW) {
-        p.bump(L_PAREN);
-        p.bump_any();
-        if arg_expr(p).is_none() {
-            p.error("expected expression");
-        }
-        p.expect(R_PAREN);
-        m.complete(p, ARG_LIST);
-        return;
-    }
     delimited(
         p,
         L_PAREN,
@@ -1713,7 +1703,12 @@ fn arg_list(p: &mut Parser<'_>) {
         COMMA,
         || "expected expression".into(),
         EXPR_FIRST.union(ATTRIBUTE_FIRST),
-        |p| arg_expr(p).is_some(),
+        |p| {
+            if p.at(DISTINCT_KW) || p.at(ALL_KW) {
+                p.bump_any(); // consume DISTINCT or ALL
+            }
+            arg_expr(p).is_some()
+        },
     );
     m.complete(p, ARG_LIST);
 }

@@ -500,3 +500,9 @@ ORDER BY sensor_id, day;
 
 -- select_from_user_table
 select * from user;
+
+-- select with aggregates
+explain (costs off)
+select string_agg(distinct f1, ',') filter (where length(f1) > 1)
+from varchar_tbl;
+
