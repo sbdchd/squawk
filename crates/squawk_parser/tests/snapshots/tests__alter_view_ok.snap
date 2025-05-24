@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_view.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- column_set_default"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -29,7 +28,7 @@ SOURCE_FILE
       INT_NUMBER "42"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -61,7 +60,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- column_drop_default"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -85,7 +84,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -104,7 +103,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_current_role"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -133,7 +132,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_current_user"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -152,7 +151,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner_to_session_user"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -171,7 +170,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename_to"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -191,7 +190,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename_column"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -214,7 +213,7 @@ SOURCE_FILE
       IDENT "b"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -237,7 +236,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_schema"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -257,7 +256,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_options"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"
@@ -304,7 +303,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- reset_options"
   WHITESPACE "\n"
-  ALTER_VIEW_STMT
+  ALTER_VIEW
     ALTER_KW "alter"
     WHITESPACE " "
     VIEW_KW "view"

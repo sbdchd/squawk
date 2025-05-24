@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_policy.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_POLICY_STMT
+  ALTER_POLICY
     ALTER_KW "alter"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -29,7 +28,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- to_role"
   WHITESPACE "\n"
-  ALTER_POLICY_STMT
+  ALTER_POLICY
     ALTER_KW "alter"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -49,7 +48,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- to_multiple_roles"
   WHITESPACE "\n"
-  ALTER_POLICY_STMT
+  ALTER_POLICY
     ALTER_KW "alter"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -75,7 +74,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- using_expr"
   WHITESPACE "\n"
-  ALTER_POLICY_STMT
+  ALTER_POLICY
     ALTER_KW "alter"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -104,7 +103,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_check"
   WHITESPACE "\n"
-  ALTER_POLICY_STMT
+  ALTER_POLICY
     ALTER_KW "alter"
     WHITESPACE " "
     POLICY_KW "policy"
@@ -135,7 +134,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  ALTER_POLICY_STMT
+  ALTER_POLICY
     ALTER_KW "alter"
     WHITESPACE " "
     POLICY_KW "policy"

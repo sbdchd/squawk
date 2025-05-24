@@ -541,13 +541,6 @@ impl<'t> Parser<'t> {
                 SyntaxKind::NOT_KW,
                 TrivaBetween::Allowed,
             ),
-            // is null
-            SyntaxKind::IS_NULL => self.at_composite2(
-                n,
-                SyntaxKind::IS_KW,
-                SyntaxKind::NULL_KW,
-                TrivaBetween::Allowed,
-            ),
             // not like
             SyntaxKind::NOT_LIKE => self.at_composite2(
                 n,

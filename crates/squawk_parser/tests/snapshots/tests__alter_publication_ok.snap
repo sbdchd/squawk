@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_publication.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- add_table"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -24,7 +23,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -95,7 +94,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_tables_in_schema"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -115,7 +114,7 @@ SOURCE_FILE
       IDENT "s"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -136,7 +135,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_table"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -154,7 +153,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -225,7 +224,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_parameters"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -259,7 +258,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- drop_table"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -277,7 +276,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -348,7 +347,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner_to"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -363,7 +362,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"
@@ -380,7 +379,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_PUBLICATION_STMT
+  ALTER_PUBLICATION
     ALTER_KW "alter"
     WHITESPACE " "
     PUBLICATION_KW "publication"

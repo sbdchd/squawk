@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_access_method.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_ACCESS_METHOD_STMT
+  DROP_ACCESS_METHOD
     DROP_KW "drop"
     WHITESPACE " "
     ACCESS_KW "access"
@@ -19,7 +18,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_ACCESS_METHOD_STMT
+  DROP_ACCESS_METHOD
     DROP_KW "drop"
     WHITESPACE " "
     ACCESS_KW "access"
@@ -37,7 +36,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_ACCESS_METHOD_STMT
+  DROP_ACCESS_METHOD
     DROP_KW "drop"
     WHITESPACE " "
     ACCESS_KW "access"

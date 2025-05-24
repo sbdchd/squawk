@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/do.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- pg_docs"
   WHITESPACE "\n"
-  DO_STMT
+  DO
     DO_KW "DO"
     WHITESPACE " "
     LITERAL
@@ -15,7 +14,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- do_with_language"
   WHITESPACE "\n"
-  DO_STMT
+  DO
     DO_KW "do"
     WHITESPACE " "
     LANGUAGE_KW "language"

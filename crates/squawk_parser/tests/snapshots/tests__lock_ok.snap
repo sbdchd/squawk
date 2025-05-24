@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/lock.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -19,7 +18,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- table_names"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_KW "table"
@@ -52,7 +51,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- lock_mode"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -71,7 +70,7 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -90,7 +89,7 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -109,7 +108,7 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -130,7 +129,7 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -147,7 +146,7 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -168,7 +167,7 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -185,7 +184,7 @@ SOURCE_FILE
     MODE_KW "mode"
   SEMICOLON ";"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_LIST
@@ -206,7 +205,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all"
   WHITESPACE "\n"
-  LOCK_STMT
+  LOCK
     LOCK_KW "lock"
     WHITESPACE " "
     TABLE_KW "table"

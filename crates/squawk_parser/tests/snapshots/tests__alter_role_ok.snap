@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_role.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- with_options"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -20,7 +19,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- all_options"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -92,7 +91,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -109,7 +108,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_config"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -129,7 +128,7 @@ SOURCE_FILE
       STRING "'value'"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -149,7 +148,7 @@ SOURCE_FILE
       STRING "'value'"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -170,7 +169,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_config_from_current"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -191,7 +190,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- reset_config"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -208,7 +207,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- reset_all"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -222,7 +221,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- in_database"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -251,7 +250,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- using_current_user"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"
@@ -265,7 +264,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- for_all_roles"
   WHITESPACE "\n"
-  ALTER_ROLE_STMT
+  ALTER_ROLE
     ALTER_KW "alter"
     WHITESPACE " "
     ROLE_KW "role"

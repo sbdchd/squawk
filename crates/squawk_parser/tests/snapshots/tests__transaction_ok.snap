@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/transaction.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- begin_commit_abort_rollback"
@@ -235,7 +234,7 @@ SOURCE_FILE
     DEFERRABLE_KW "deferrable"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  PREPARE_TRANSACTION_STMT
+  PREPARE_TRANSACTION
     PREPARE_KW "prepare"
     WHITESPACE " "
     TRANSACTION_KW "transaction"
@@ -244,14 +243,14 @@ SOURCE_FILE
       STRING "'f'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  SAVEPOINT_STMT
+  SAVEPOINT
     SAVEPOINT_KW "savepoint"
     WHITESPACE " "
     NAME_REF
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  RELEASE_SAVEPOINT_STMT
+  RELEASE_SAVEPOINT
     RELEASE_KW "release"
     WHITESPACE " "
     SAVEPOINT_KW "savepoint"
@@ -260,7 +259,7 @@ SOURCE_FILE
       IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
-  RELEASE_SAVEPOINT_STMT
+  RELEASE_SAVEPOINT
     RELEASE_KW "release"
     WHITESPACE " "
     NAME_REF

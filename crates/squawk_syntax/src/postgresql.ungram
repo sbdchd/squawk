@@ -15,12 +15,10 @@
 // | label:'ident' ':' Stmt // Labeled rule
 
 NameRef =
-  // TODO: TokenText
   '#ident'?
 
 
 Name =
-  // TODO: TokenText
   '#ident'?
 
 PathSegment =
@@ -62,9 +60,6 @@ Param =
 
 ParamList =
   (Param (',' Param)*)?
-
-// ReplicaIdentity =
-//   'replica' 'identity' ('default' | 'using' 'index' NameRef | 'full' | 'nothing')
 
 ArgList =
  '(' '*' ')'
@@ -244,74 +239,10 @@ Type =
 | TimeType
 | IntervalType
 
-// OfType = 
-//   'of' Type
-
-// NotOf =
-//   'not' 'of'
-
-// ForceRls =
-//   'force' 'row' 'level' 'security'
-
-// NoForceRls =
-//   'no' 'force' 'row' 'level' 'security'
-
-// Inherit = 
-//   'inherit' Path
-
-// NoInherit = 
-//   'no' 'inherit' Path
-
-// EnableTrigger = 
-//   'enable' 'trigger' (NameRef | 'all' | 'user')
-
-// EnableReplicaTrigger =
-//   'enable' 'replica' 'trigger' NameRef
-
-// EnableReplicaRule =
-//   'enable' 'replica' 'rule' NameRef
-
-// EnableAlwaysTrigger =
-//   'enable' 'always' 'trigger' NameRef
-
-// EnableAlwaysRule =
-//   'enable' 'always' 'rule' NameRef
-
-// EnableRule =
-//   'enable' 'rule' NameRef
-
-// EnableRls =
-//   'enable' 'row' 'level' 'security' NameRef
-
-// DisableTrigger =
-//   'disable' 'trigger' ('all' | 'user' | NameRef)
-
-// DisableRls =
-//   'disable' 'row' 'level' 'security'
-
-// DisableRule = 
-//   'disable' 'rule' NameRef
-
-// ClusterOn =
-//   'cluster' 'on' NameRef
-
-
 Role =
   // TODO: more general than #ident?
   ('group'? '#ident')
 | 'current_role' | 'current_user' | 'session_user'
-
-// OwnerTo =
-//   'owner' 'to' Role
-
-// DetachPartition =
-//   'detach' 'partition' NameRef ('concurrently' | 'finalize')?
-
-// DropConstraint =
-//   'drop' 'constraint' ('if' 'exists')? NameRef ('restrict' | 'cascade')?
-
-// DropColumn =
-//   'drop' 'column'? ('if' 'exists')? NameRef ('restrict' | 'cascade')?
 
 CheckConstraint  =
   ('constraint' NameRef)
@@ -464,51 +395,6 @@ ReferencesConstraint =
   // ('on' 'update' RefAction)?
   // ConstraintOptionList?
 
-// ColumnConstraint =
-//   (
-//     NotNullConstraint
-//   | NullConstraint
-//   | CheckConstraint
-//   | DefaultConstraint
-//   | GeneratedConstraint
-//   | UniqueConstraint
-//   | PrimaryKeyConstraint
-//   | ReferencesConstraint
-//   )
-
-// IfNotExists =
-//   IfNotExists 
-
-// AddColumn = 
-//   'add' 'column'? IfNotExists? NameRef Type Collate? (ColumnConstraint (',' ColumnConstraint)*)?
-
-// AttachPartition =
-//   'attach' 'partition' NameRef // todo: partition spec
-
-// SetSchema =
-//  'set' NameRef
-
-// SetTablespace =
-//   'set' 'tablespace' NameRef 'nowait'?
-
-// SetWithoutCluster =
-//   'set' 'without' 'cluster'
-
-// SetWithoutOids =
-//   'set' 'without' 'oids'
-
-// SetAccessMethod =
-//   'set' 'access' 'method' ('default' | NameRef)
-
-// SetLogged =
-//   'set' 'logged'
-
-// SetUnlogged =
-//   'set' 'unlogged'
-
-// SetStorageParams =
-//   'set' StorageParamList
-
 AlterTableAction =
   ValidateConstraint
 | ReplicaIdentity
@@ -561,13 +447,6 @@ Truncate =
   'truncate' 'table'? TableList
   ('restart' 'identity' | 'continue' 'identity')?
   ('cascade' | 'restrict')?
-
-// Target =
-//   '*'
-// | Expr ('as'? Name)?
-
-// TargetList =
-//   Target (',' Target)*
 
 LikeClause =
   'like'
@@ -842,113 +721,133 @@ AlterDomain =
 AlterTable =
   'alter' 'table' RelationName actions:AlterTableAction*
 
-RevokeStmt =
+Revoke =
   'revoke'
 
 Values = 
   'values'
 
-TableStmt =
+Table =
   'table'
 
-InsertStmt =
+Insert =
   'insert'
 
-UpdateStmt =
+Update =
   'update'
 
-DeleteStmt =
+Delete =
   'delete'
 
-NotifyStmt =
+Notify =
   'notify'
 
-MergeStmt =
+Merge =
   'merge'
 
-DeclareStmt =
+Declare =
   'declare'
 
-ExecuteStmt =
+Execute =
   'execute'
 
-CreateTableAsStmt =
+CreateTableAs =
   'create'
 
-CreateMaterializedViewStmt =
+CreateMaterializedView =
   'create'
 
-SavepointStmt =
+Savepoint =
   'savepoint'
 
-PrepareTransactionStmt =
+PrepareTransaction =
   'prepare' 'transaction' Literal
 
-ReleaseSavepointStmt =
+ReleaseSavepoint =
   'release' 'savepoint' NameRef
 
 ParenExpr =
   '(' Expr ')'
+
 TupleExpr =
   '(' ')'
+
 PrefixExpr =
   Expr
+
 PostfixExpr =
   Expr
+
 IndexExpr =
   Expr '[' Expr ']'
+
 BetweenExpr =
   Expr 'between' Expr 'and' Expr
 
+
 JsonReturningClause =
   'returning' Type
+
 JsonNullClause =
   'null' 'on' 'null' | 'absent' 'on' 'null'
+
 JsonKeysUniqueClause =
   'with' 'unique' 'keys' | 'without' 'unique' 'keys'
+
 JsonQuotesClause =
   'keep' 'quotes' | 'omit' 'quotes'
+
 JsonBehaviorClause =
   'error' 'on' 'error' | 'null' 'on' 'error' | 'empty' 'on' 'error' | 'default' Expr 'on' 'error'
+
 JsonWrapperBehaviorClause =
   'with' 'wrapper' | 'without' 'wrapper' | 'with' 'conditional' 'wrapper'
+
 JsonOnErrorClause =
   'error' 'on' 'error' | 'null' 'on' 'error' | 'empty' 'on' 'error'
+
 JsonPassingClause =
   'passing' (NamedArg (',' NamedArg)*)
-
 
 PercentTypeClause =
   '%' 'type'
 
 WithTimezone =
   'with' 'time' 'zone'
+
 WithoutTimezone =
   'without' 'time' 'zone'
 
 FilterClause =
   'filter' '(' 'where' Expr ')'
+
 OverClause =
   'over' '(' ')'
+
 WithinClause =
   'within' 'group' '(' OrderByClause ')'
 
 WithTable =
   'with'
+
 WithClause =
   'with' 'recursive'? (WithTable (',' WithTable)*)
+
 SelectClause =
   'select'
 
 CompoundSelect =
   Select
 
-SelectIntoStmt =
+SelectInto =
   'select'
+
 IntoClause =
   'into' 
+
 LockingClause =
   'for'
+
 OrderByClause =
   'order' 'by' 
 
@@ -970,170 +869,246 @@ ExcludeConstraint =
 WindowDef =
   '#ident'? ('partition' 'by' Expr)?
 
-AlterStatisticsStmt =
+
+AlterStatistics =
   'alter' 'statistics' NameRef 
-AlterServerStmt =
+
+AlterServer =
   'alter' 'server' NameRef
-AlterSequenceStmt =
+
+AlterSequence =
   'alter' 'sequence' NameRef
-AlterSchemaStmt =
+
+AlterSchema =
   'alter' 'schema' NameRef 'rename' 'to' NameRef
-AlterRuleStmt =
+
+AlterRule =
   'alter' 'rule' NameRef 'on'
-AlterRoutineStmt =
+
+AlterRoutine =
   'alter' 'routine'
-AlterRoleStmt =
+
+AlterRole =
   'alter' 'role'
-AlterPublicationStmt =
+
+AlterPublication =
   'alter' 'publication' NameRef
-AlterProcedureStmt =
+
+AlterProcedure =
   'alter' 'procedure'
-AlterPolicyStmt =
+
+AlterPolicy =
   'alter' 'policy' NameRef 'on'
-AlterOperatorFamilyStmt =
+
+AlterOperatorFamily =
   'alter' 'operator' 'family' NameRef 'using' NameRef
-AlterOperatorClassStmt =
+
+AlterOperatorClass =
   'alter' 'operator' 'class' NameRef 'using' NameRef
-AlterOperatorStmt =
+
+AlterOperator =
   'alter' 'operator'
-AlterMaterializedViewStmt =
+
+AlterMaterializedView =
   'alter' 'materialized' 'view' NameRef
-AlterLargeObjectStmt =
+
+AlterLargeObject =
   'alter' 'large' 'object'
-AlterLanguageStmt =
+
+AlterLanguage =
   'alter' 'language' NameRef
-AlterIndexStmt =
+
+AlterIndex =
   'alter' 'index' NameRef
-AlterGroupStmt =
+
+AlterGroup =
   'alter' 'group' NameRef
-AlterFunctionStmt =
+
+AlterFunction =
   'alter' 'function'
-AlterForeignTableStmt =
+
+AlterForeignTable =
   'alter' 'foreign' 'table'
-AlterForeignDataWrapperStmt =
+
+AlterForeignDataWrapper =
   'alter' 'foreign' 'data' 'wrapper'
-AlterEventTriggerStmt =
+
+AlterEventTrigger =
   'alter' 'event' 'trigger'
-AlterExtensionStmt =
+
+AlterExtension =
   'alter' 'extension' NameRef
-AlterDefaultPrivilegesStmt =
+
+AlterDefaultPrivileges =
   'alter' 'default' 'privileges'
-AlterDatabaseStmt =
+
+AlterDatabase =
   'alter' 'database' NameRef 
-AlterConversionStmt =
+
+AlterConversion =
   'alter' 'conversion' NameRef
-AlterCollationStmt =
+
+AlterCollation =
   'alter' 'collation' NameRef 
+
 AlterAggregate =
   'alter' 'aggregate' Aggregate
-AlterSubscriptionStmt =
+
+AlterSubscription =
   'alter' 'subscription' NameRef 
-AlterSystemStmt =
+
+AlterSystem =
   'alter' 'system' 'set'
-AlterTablespaceStmt =
+
+AlterTablespace =
   'alter' 'tablespace' NameRef
-AlterTextSearchParserStmt =
+
+AlterTextSearchParser =
   'alter' 'text' 'search' 'parser' NameRef
-AlterTextSearchDictionaryStmt =
+
+AlterTextSearchDictionary =
   'alter' 'text' 'search' 'dictionary' NameRef
-AlterTextSearchConfigurationStmt =
+
+AlterTextSearchConfiguration =
   'alter' 'text' 'search' 'configuration' NameRef
-AlterTextSearchTemplateStmt =
+
+AlterTextSearchTemplate =
   'alter' 'text' 'search' 'template' NameRef 
-AlterTriggerStmt =
+
+AlterTrigger =
   'alter' 'trigger' NameRef 'on'
-AlterTypeStmt =
+
+AlterType =
   'alter' 'type' Type 
-AlterUserStmt =
+
+AlterUser =
   'alter' 'user' NameRef
-AlterUserMappingStmt =
+
+AlterUserMapping =
   'alter' 'user' 'mapping' 'for' NameRef 'server' NameRef
-AlterViewStmt =
+
+AlterView =
   'alter' 'view' NameRef
 
-AnalyzeStmt =
+Analyze =
   'analyze' 'verbose'?
 
-CommentStmt =
+// suffix it with `On` to avoid conflicting with comment nodes
+CommentOn =
   'comment' 'on'
 
-ClusterStmt =
+Cluster =
   'cluster' 'verbose'?
 
-CreateAccessMethodStmt =
+CreateAccessMethod =
   'create' 'access' 'method' NameRef 'type'
-CreateCastStmt =
+
+CreateCast =
   'create' 'cast' '(' Type 'as' Type ')'
-CreateCollationStmt =
+
+CreateCollation =
   'create' 'collation' NameRef
-CreateConversionStmt =
+
+CreateConversion =
   'create' 'conversion' NameRef 'for'
-CreateDatabaseStmt =
+
+CreateDatabase =
   'create' 'database' NameRef
+
 CreateDomain =
   'create' 'domain' NameRef 'as'? Type Collate? Constraint*
-CreateEventTriggerStmt =
+
+CreateEventTrigger =
   'create' 'event' 'trigger' NameRef 'on'
-CreateForeignDataWrapperStmt =
+
+CreateForeignDataWrapper =
   'create' 'foreign' 'data' 'wrapper' NameRef
-CreateForeignTableStmt =
+
+CreateForeignTable =
   'create' 'foreign' 'table' IfNotExists?
-CreateGroupStmt =
+
+CreateGroup =
   'create' 'group' NameRef
-CreateLanguageStmt =
+
+CreateLanguage =
   'create' 'language' NameRef
-CreateOperatorStmt =
+
+CreateOperator =
   'create' 'operator' 
-CreateOperatorClassStmt =
+
+CreateOperatorClass =
   'create' 'operator' 'class' NameRef 'default'? 'for' 'type' Type 'using' NameRef
-CreateOperatorFamilyStmt =
+
+CreateOperatorFamily =
   'create' 'operator' 'family' NameRef 'using' NameRef
-CreatePolicyStmt =
+
+CreatePolicy =
   'create' 'policy' NameRef 'on'
-CreateProcedureStmt =
+
+CreateProcedure =
   'create' 'procedure'
-CreatePublicationStmt =
+
+CreatePublication =
   'create' 'publication' NameRef
-CreateRoleStmt =
+
+CreateRole =
   'create' 'role' NameRef
-CreateRuleStmt =
+
+CreateRule =
   'create' 'rule' NameRef 'as' 'on'
-CreateSequenceStmt =
+
+CreateSequence =
   'create' 'sequence' NameRef
-CreateServerStmt =
+
+CreateServer =
   'create' 'server' NameRef
-CreateStatisticsStmt =
+
+CreateStatistics =
   'create' 'statistics' NameRef
-CreateSubscriptionStmt =
+
+CreateSubscription =
   'create' 'subscription' NameRef
-CreateTablespaceStmt =
+
+CreateTablespace =
   'create' 'tablespace' NameRef
-CreateTextSearchParserStmt =
+
+CreateTextSearchParser =
   'create' 'text' 'search' 'parser' NameRef
-CreateTextSearchDictionaryStmt =
+
+CreateTextSearchDictionary =
   'create' 'text' 'search' 'dictionary' NameRef 
-CreateTextSearchConfigurationStmt =
+
+CreateTextSearchConfiguration =
   'create' 'text' 'search' 'configuration' NameRef
-CreateTextSearchTemplateStmt =
+
+CreateTextSearchTemplate =
   'create' 'text' 'search' 'template' NameRef 
-CreateTransformStmt =
+
+CreateTransform =
   'create' 'transform' 'for' Type 'language' NameRef
-CreateUserMappingStmt =
+
+CreateUserMapping =
   'create' 'user' 'mapping' 'for' NameRef 'server' NameRef
-CreateUserStmt =
+
+CreateUser =
   'create' 'user' NameRef
 
-DropLanguageStmt =
+DropLanguage =
   'drop' 'language' IfExists? NameRef
-DropGroupStmt =
+
+DropGroup =
   'drop' 'group' IfExists? NameRef
-DropFunctionStmt =
+
+DropFunction =
   'drop' 'function' IfExists?
-DropForeignDataWrapperStmt =
+
+DropForeignDataWrapper =
   'drop' 'foreign' 'data' 'wrapper' IfExists? NameRef
-DropForeignTableStmt =
+
+DropForeignTable =
   'drop' 'foreign' 'table' IfExists?
-DropAccessMethodStmt =
+
+DropAccessMethod =
   'drop' 'access' 'method' IfExists? NameRef
 
 Aggregate =
@@ -1141,212 +1116,307 @@ Aggregate =
 
 DropAggregate =
   'drop' 'aggregate' IfExists? (Aggregate (',' Aggregate)*)
-DropCastStmt =
+
+DropCast =
   'drop' 'cast' IfExists? '(' Type 'as' Type ')'
-DropCollationStmt =
+
+DropCollation =
   'drop' 'collation' IfExists? NameRef
-DropConversionStmt =
+
+DropConversion =
   'drop' 'conversion' IfExists? NameRef
-DropDomainStmt =
+
+DropDomain =
   'drop' 'domain' IfExists? (Type (',' Type)*)
-DropEventTriggerStmt =
+
+DropEventTrigger =
   'drop' 'event' 'trigger' IfExists? NameRef
-DropExtensionStmt =
+
+DropExtension =
   'drop' 'extension' IfExists? (NameRef (',' NameRef)*)
-DropMaterializedViewStmt =
+
+DropMaterializedView =
   'drop' 'materialized' 'view' IfExists? 
-DropOperatorFamilyStmt =
+
+DropOperatorFamily =
   'drop' 'operator' 'family' IfExists? 
-DropOperatorStmt =
+
+DropOperator =
   'drop' 'operator' IfExists? 
-DropOperatorClassStmt =
+
+DropOperatorClass =
   'drop' 'operator' 'class' IfExists? NameRef 'using' 
-DropOwnedStmt =
+
+DropOwned =
   'drop' 'owned' 'by' 
-DropPolicyStmt =
+
+DropPolicy =
   'drop' 'policy' IfExists? NameRef 'on'
-DropProcedureStmt =
+
+DropProcedure =
   'drop' 'procedure' IfExists? 
-DropPublicationStmt =
+
+DropPublication =
   'drop' 'publication' IfExists? (NameRef (',' NameRef)*)
-DropRoleStmt =
+
+DropRole =
   'drop' 'role' IfExists? (NameRef (',' NameRef)*)
-DropRoutineStmt =
+
+DropRoutine =
   'drop' 'routine' IfExists?
-DropRuleStmt =
+
+DropRule =
   'drop' 'rule' IfExists? NameRef 'on'
-DropSequenceStmt =
+
+DropSequence =
   'drop' 'sequence' IfExists? (NameRef (',' NameRef)*)
-DropServerStmt =
+
+DropServer =
   'drop' 'server' IfExists? NameRef
-DropStatisticsStmt =
+
+DropStatistics =
   'drop' 'statistics' IfExists? NameRef
-DropSubscriptionStmt =
+
+DropSubscription =
   'drop' 'subscription' IfExists? NameRef
-DropTablespaceStmt =
+
+DropTablespace =
   'drop' 'tablespace' IfExists? NameRef
-DropTextSearchParserStmt =
+
+DropTextSearchParser =
   'drop' 'text' 'search' 'parser' IfExists? NameRef
-DropTextSearchConfigStmt =
+
+DropTextSearchConfig =
   'drop' 'text' 'search' 'configuration' IfExists?
-DropTextSearchDictStmt =
+
+DropTextSearchDict =
   'drop' 'text' 'search' 'dictionary' IfExists? 
-DropTextSearchTemplateStmt =
+
+DropTextSearchTemplate =
   'drop' 'text' 'search' 'template' IfExists? 
-DropTransformStmt =
+
+DropTransform =
   'drop' 'transform' IfExists? 
-DropUserStmt =
+
+DropUser =
   'drop' 'user' IfExists? (NameRef (',' NameRef)*)
-DropUserMappingStmt =
+
+DropUserMapping =
   'drop' 'user' 'mapping' IfExists? 'for' NameRef 'server' NameRef
-DropViewStmt =
+
+DropView =
   'drop' 'view' IfExists? 
 
-ExplainStmt =
+Explain =
   'explain' 
+
 ImportForeignSchema =
   'import' 'foreign' 'schema' NameRef 
-LockStmt =
+
+Lock =
   'lock' 'table'? 
-ReassignStmt =
+
+Reassign =
   'reassign' 
-RefreshStmt =
+
+Refresh =
   'refresh' 'materialized' 'view' 'concurrently'? NameRef 'with' 'data'?
-GrantStmt =
+
+Grant =
   'grant' 
-SecurityLabelStmt =
+
+SecurityLabel =
   'security' 'label' 
-SetConstraintsStmt =
+
+SetConstraints =
   'set' 'constraints' 
-SetRoleStmt =
+
+SetRole =
   'set' 'role' 
-SetSessionAuthStmt =
+
+SetSessionAuth =
   'set' 'session' 'authorization'
-SetTransactionStmt =
+
+SetTransaction =
   'set' 'transaction' 
-ReindexStmt =
+
+Reindex =
   'reindex' 
-CreateViewStmt =
+
+CreateView =
   'create' 'view' NameRef 
-PrepareStmt =
+
+Prepare =
   'prepare' NameRef 
-UnlistenStmt =
+
+Unlisten =
   'unlisten' ('*' | NameRef)
-CheckpointStmt =
+
+Checkpoint =
   'checkpoint'
-DeallocateStmt =
+
+Deallocate =
   'deallocate' ('prepare' NameRef | 'all')
-LoadStmt =
+
+Load =
   'load' 
-ListenStmt =
+
+Listen =
   'listen' NameRef
-ResetStmt =
+
+Reset =
   'reset' (NameRef | 'all')
-DiscardStmt =
+
+Discard =
   'discard' ('all' | 'temp' | 'temporary' | 'plans' | 'sequences')
-DoStmt =
+
+Do =
   'do' 
-MoveStmt =
+
+Move =
   'move' 
-FetchStmt =
+
+Fetch =
   'fetch' 
-CloseStmt =
+
+Close =
   'close' 
-VacuumStmt =
+
+Vacuum =
   'vacuum' 
-CopyStmt =
+
+Copy =
   'copy'
-CallStmt =
+
+Call =
   'call' 
-CreateTriggerStmt =
+
+CreateTrigger =
   'create' 
-DropSchemaStmt =
+
+DropSchema =
   'drop' 'schema' IfExists?
-CreateSchemaStmt =
+
+CreateSchema =
   'create' 'schema' 
-DropTypeStmt =
-  'drop' 'type' IfExists?
-DropTriggerStmt =
+
+DropTrigger =
   'drop' 'trigger' IfExists? NameRef 'on' 
+
 IndexParams =
   '(' ')'
 
-CreateTypeStmt =
+CreateType =
   'create' 'type' Type 
-CreateExtensionStmt =
+
+CreateExtension =
   'create' 'extension'
-SetStmt =
+
+Set =
   'set' SetOptions
-ShowStmt =
+
+Show =
   'show' 
 
 LanguageFuncOption =
   'language' NameRef
+
 TransformFuncOption =
   'transform' 
+
 WindowFuncOption =
   'window'
+
 VolatilityFuncOption =
   'immutable' | 'stable' | 'volatile'
+
 LeakproofFuncOption =
   'leakproof' | 'not' 'leakproof'
+
 ResetFuncOption =
   'reset' NameRef
+
 StrictFuncOption =
   'strict' | 'called' 'on' 'null' 'input' | 'returns' 'null' 'on' 'null' 'input'
+
 SecurityFuncOption =
   'security' ('invoker' | 'definer')
+
 ParallelFuncOption =
   'parallel' '#ident'
+
 CostFuncOption =
   'cost' 
+
 RowsFuncOption =
   'rows' 
+
 SupportFuncOption =
   'support' 
+
 SetFuncOption =
   'set' 
+
 AsFuncOption =
   'as' (definition:Literal | obj_file:Literal ',' link_symbol:Literal)
 
 ReplicaIdentity =
   'replica' 'identity' 
+
 OfType =
   'of' Type
+
 NotOf =
   'not' 'of'
+
 ForceRls =
   'force' 'row' 'level' 'security'
+
 NoForceRls =
   'no' 'force' 'row' 'level' 'security'
+
 Inherit =
   'inherit' 
+
 NoInherit =
   'no' 'inherit' 
+
 EnableTrigger =
   'enable' 'trigger'
+
 EnableReplicaTrigger =
   'enable' 'replica' 'trigger' 
+
 EnableReplicaRule =
   'enable' 'replica' 'rule' 
+
 EnableAlwaysTrigger =
   'enable' 'always' 'trigger' 
+
 EnableAlwaysRule =
   'enable' 'always' 'rule' 
+
 EnableRule =
   'enable' 'rule' 
+
 EnableRls =
   'enable' 'row' 'level' 'security'
+
 DisableTrigger =
   'disable' 'trigger' 
+
 DisableRls =
   'disable' 'row' 'level' 'security'
+
 DisableRule =
   'disable' 'rule' 
+
 ClusterOn =
   'cluster' 'on' 
+
 DetachPartition =
   'detach' 'partition' 
+
 DropColumn =
   'drop' 'column'? IfExists? 
 
@@ -1355,27 +1425,36 @@ AddColumn =
 
 AttachPartition =
   'attach' 'partition' 
+
 SetTablespace =
   'set' 'tablespace' NameRef
+
 SetWithoutCluster =
   'set' 'without' 'cluster'
+
 SetWithoutOids =
   'set' 'without' 'oids'
+
 SetAccessMethod =
   'set' 'access' 'method' NameRef
+
 SetLogged =
   'set' 'logged'
+
 SetUnlogged =
   'set' 'unlogged'
+
 SetStorageParams =
   'set' '(' ')'
+
 ResetStorageParams =
   'reset' '(' ')'
+
 RenameTable =
   'rename' 'to' NameRef
+
 RenameColumn =
   'rename' 'column'? 
-
 
 AlterColumnOption =
   DropDefault
@@ -1408,73 +1487,238 @@ Restart =
 
 SetSequenceOption =
   'set' 
+
 SetGenerated =
   'set' 
+
 DropExpression =
   'drop' 'expression' IfExists?
+
 DropIdentity =
   'drop' 'identity' IfExists?
+
 AddGenerated =
   'add' 
+
 ResetOptions =
   'reset' '(' ')'
+
 SetType =
   'set' 'type' Type Collate?
+
 SetGeneratedOptions =
   'set'
+
 SetOptionsList =
   'set' '(' ')'
+
 SetExpression =
   'set' 'expression' Expr
+
 SetStatistics =
   'set' 'statistics'
+
 SetOptions =
   'set' '(' ')'
+
 SetStorage =
   'set' 'storage'
+
 SetCompression =
   'set' 'compression'
+
 Collate =
   'collate' Path
 
-IsNull =
-  'is' 'null'
-
-
 Stmt =
-  AlterTable
+  // We merge this into Rollback
+  // Abort
+  AlterAggregate
+| AlterCollation
+| AlterConversion
+| AlterDatabase
+| AlterDefaultPrivileges
 | AlterDomain
-| AlterAggregate
-| CreateAggregate
+| AlterEventTrigger
+| AlterExtension
+| AlterForeignDataWrapper
+| AlterForeignTable
+| AlterFunction
+| AlterGroup
+| AlterIndex
+| AlterLanguage
+| AlterLargeObject
+| AlterMaterializedView
+| AlterOperator
+| AlterOperatorClass
+| AlterOperatorFamily
+| AlterPolicy
+| AlterProcedure
+| AlterPublication
+| AlterRole
+| AlterRoutine
+| AlterRule
+| AlterSchema
+| AlterSequence
+| AlterServer
+| AlterStatistics
+| AlterSubscription
+| AlterSystem
+| AlterTable
+| AlterTablespace
+| AlterTextSearchConfiguration
+| AlterTextSearchDictionary
+| AlterTextSearchParser
+| AlterTextSearchTemplate
+| AlterTrigger
+| AlterType
+| AlterUser
+| AlterUserMapping
+| AlterView
+| Analyze
 | Begin
+| Call
+| Checkpoint
+| Close
+| Cluster
+| CommentOn
 | Commit
-| Rollback
-| CreateFunction
-| CreateIndex
-| CreateTable
+// Merged into Commit
+// | CommitPrepared
+| Copy
+| CreateAccessMethod
+| CreateAggregate
+| CreateCast
+| CreateCollation
+| CreateConversion
+| CreateDatabase
 | CreateDomain
-| DropDatabase
+| CreateEventTrigger
+| CreateExtension
+| CreateForeignDataWrapper
+| CreateForeignTable
+| CreateFunction
+| CreateGroup
+| CreateIndex
+| CreateLanguage
+| CreateMaterializedView
+| CreateOperator
+| CreateOperatorClass
+| CreateOperatorFamily
+| CreatePolicy
+| CreateProcedure
+| CreatePublication
+| CreateRole
+| CreateRule
+| CreateSchema
+| CreateSequence
+| CreateServer
+| CreateStatistics
+| CreateSubscription
+| CreateTable
+| CreateTableAs
+| CreateTablespace
+| CreateTextSearchConfiguration
+| CreateTextSearchDictionary
+| CreateTextSearchParser
+| CreateTextSearchTemplate
+| CreateTransform
+| CreateTrigger
+| CreateType
+| CreateUser
+| CreateUserMapping
+| CreateView
+| Deallocate
+| Declare
+| Delete
+| Discard
+| Do
+| DropAccessMethod
 | DropAggregate
-| DropTable
+| DropCast
+| DropCollation
+| DropConversion
+| DropDatabase
+| DropDomain
+| DropEventTrigger
+| DropExtension
+| DropForeignDataWrapper
+| DropForeignTable
+| DropFunction
+| DropGroup
 | DropIndex
+| DropLanguage
+| DropMaterializedView
+| DropOperator
+| DropOperatorClass
+| DropOperatorFamily
+| DropOwned
+| DropPolicy
+| DropProcedure
+| DropPublication
+| DropRole
+| DropRoutine
+| DropRule
+| DropSchema
+| DropSequence
+| DropServer
+| DropStatistics
+| DropSubscription
+| DropTable
+| DropTablespace
+| DropTextSearchConfig
+| DropTextSearchDict
+| DropTextSearchParser
+| DropTextSearchTemplate
+| DropTransform
+| DropTrigger
 | DropType
+| DropUser
+| DropUserMapping
+| DropView
+// Merged into Commit
+// | End
+| Execute
+| Explain
+| Fetch
+| Grant
+| ImportForeignSchema
+| Insert
+| Listen
+| Load
+| Lock
+| Merge
+| Move
+| Notify
+| Prepare
+| PrepareTransaction
+| Reassign
+| Refresh
+| Reindex
+| ReleaseSavepoint
+| Reset
+| Revoke
+| Rollback
+// Merged into Rollback
+// | RollbackPrepared
+// | RollbackToSavepoint
+| Savepoint
+| SecurityLabel
 | Select
+| SelectInto
+| Set
+| SetConstraints
+| SetRole
+| SetSessionAuth
+| SetTransaction
+| Show
+// We don't include this and instead merge it into Begin
+// | StartTransaction
 | Truncate
-| RevokeStmt
+| Unlisten
+| Update
+| Vacuum
 | Values
-| TableStmt
-| InsertStmt
-| UpdateStmt
-| DeleteStmt
-| NotifyStmt
-| MergeStmt
-| DeclareStmt
-| ExecuteStmt
-| CreateTableAsStmt
-| CreateMaterializedViewStmt
-| SavepointStmt
-| ReleaseSavepointStmt
-| PrepareTransactionStmt
 | ';'
 
 

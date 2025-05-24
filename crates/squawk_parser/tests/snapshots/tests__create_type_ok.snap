@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_type.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- create_type_as"
   WHITESPACE "\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -22,7 +21,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -56,7 +55,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -112,7 +111,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- create_type_as_enum"
   WHITESPACE "\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -130,7 +129,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -150,7 +149,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -180,7 +179,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- create_type_as_range"
   WHITESPACE "\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -212,7 +211,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -228,7 +227,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -256,7 +255,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- create_type_name"
   WHITESPACE "\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -267,7 +266,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"
@@ -315,7 +314,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  CREATE_TYPE_STMT
+  CREATE_TYPE
     CREATE_KW "create"
     WHITESPACE " "
     TYPE_KW "type"

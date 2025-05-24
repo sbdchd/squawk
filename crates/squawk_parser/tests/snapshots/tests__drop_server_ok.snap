@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_server.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_SERVER_STMT
+  DROP_SERVER
     DROP_KW "drop"
     WHITESPACE " "
     SERVER_KW "server"
@@ -17,7 +16,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_SERVER_STMT
+  DROP_SERVER
     DROP_KW "drop"
     WHITESPACE " "
     SERVER_KW "server"
@@ -41,7 +40,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_SERVER_STMT
+  DROP_SERVER
     DROP_KW "drop"
     WHITESPACE " "
     SERVER_KW "server"

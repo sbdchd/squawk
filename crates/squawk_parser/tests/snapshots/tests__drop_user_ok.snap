@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_user.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  DROP_USER_STMT
+  DROP_USER
     DROP_KW "drop"
     WHITESPACE " "
     USER_KW "user"
@@ -17,7 +16,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  DROP_USER_STMT
+  DROP_USER
     DROP_KW "drop"
     WHITESPACE " "
     USER_KW "user"

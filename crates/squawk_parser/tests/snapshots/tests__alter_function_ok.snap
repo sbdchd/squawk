@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_function.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -23,7 +22,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -41,7 +40,7 @@ SOURCE_FILE
       IDENT "g"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -66,7 +65,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- action_with_params"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -97,7 +96,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -116,7 +115,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -136,7 +135,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -314,7 +313,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- depends"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"
@@ -334,7 +333,7 @@ SOURCE_FILE
       IDENT "e"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_FUNCTION_STMT
+  ALTER_FUNCTION
     ALTER_KW "alter"
     WHITESPACE " "
     FUNCTION_KW "function"

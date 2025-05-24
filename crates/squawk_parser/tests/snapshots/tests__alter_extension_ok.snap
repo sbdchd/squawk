@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_extension.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- update_to"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -17,7 +16,7 @@ SOURCE_FILE
     UPDATE_KW "update"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -32,7 +31,7 @@ SOURCE_FILE
     JSON_KW "json"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -50,7 +49,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -68,7 +67,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_access_method"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -86,7 +85,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -106,7 +105,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_aggregate"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -156,7 +155,7 @@ SOURCE_FILE
         R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -182,7 +181,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_cast"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -211,7 +210,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -245,7 +244,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_collation"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -263,7 +262,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -286,7 +285,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -304,7 +303,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -329,7 +328,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_conversion"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -347,7 +346,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -370,7 +369,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -388,7 +387,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -413,7 +412,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_domain"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -429,7 +428,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -447,7 +446,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_event_trigger"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -465,7 +464,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -485,7 +484,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_foreign_data_wrapper"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -505,7 +504,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -527,7 +526,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_foreign_table"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -547,7 +546,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -572,7 +571,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -592,7 +591,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -619,7 +618,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_function"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -637,7 +636,7 @@ SOURCE_FILE
           IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -683,7 +682,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -701,7 +700,7 @@ SOURCE_FILE
           IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -758,7 +757,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_materialized_view"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -778,7 +777,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -803,7 +802,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -823,7 +822,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -850,7 +849,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_operator"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -885,7 +884,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -922,7 +921,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_operator_class"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -945,7 +944,7 @@ SOURCE_FILE
       IDENT "i"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -970,7 +969,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_operator_family"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -993,7 +992,7 @@ SOURCE_FILE
       IDENT "i"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1018,7 +1017,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_language"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1034,7 +1033,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1052,7 +1051,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1068,7 +1067,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1088,7 +1087,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_procedure"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1106,7 +1105,7 @@ SOURCE_FILE
           IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1152,7 +1151,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1170,7 +1169,7 @@ SOURCE_FILE
           IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1227,7 +1226,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_routine"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1245,7 +1244,7 @@ SOURCE_FILE
           IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1291,7 +1290,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1309,7 +1308,7 @@ SOURCE_FILE
           IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1366,7 +1365,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_sequence"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1384,7 +1383,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1407,7 +1406,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1425,7 +1424,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1450,7 +1449,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_table"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1466,7 +1465,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1484,7 +1483,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_configuration"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1506,7 +1505,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1533,7 +1532,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1555,7 +1554,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1584,7 +1583,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_dictionary"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1606,7 +1605,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1633,7 +1632,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1655,7 +1654,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1684,7 +1683,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_parser"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1706,7 +1705,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1733,7 +1732,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1755,7 +1754,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1784,7 +1783,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_text_search_template"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1806,7 +1805,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1833,7 +1832,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1855,7 +1854,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1884,7 +1883,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_transform"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1907,7 +1906,7 @@ SOURCE_FILE
       IDENT "l"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1932,7 +1931,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_type"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1948,7 +1947,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1966,7 +1965,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_view"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -1984,7 +1983,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2007,7 +2006,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2025,7 +2024,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2050,7 +2049,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_extension"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2066,7 +2065,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2084,7 +2083,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_publication"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2100,7 +2099,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2118,7 +2117,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_schema"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2134,7 +2133,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2152,7 +2151,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_server"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2168,7 +2167,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2186,7 +2185,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_database"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2202,7 +2201,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2220,7 +2219,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_index"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2238,7 +2237,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2261,7 +2260,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2279,7 +2278,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2304,7 +2303,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_statistics"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2322,7 +2321,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2345,7 +2344,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2363,7 +2362,7 @@ SOURCE_FILE
           IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2388,7 +2387,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_role"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2404,7 +2403,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2422,7 +2421,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_subscription"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2438,7 +2437,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2456,7 +2455,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- add_drop_tablespace"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"
@@ -2472,7 +2471,7 @@ SOURCE_FILE
       IDENT "o"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_EXTENSION_STMT
+  ALTER_EXTENSION
     ALTER_KW "alter"
     WHITESPACE " "
     EXTENSION_KW "extension"

@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_type.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- drop_type"
   WHITESPACE "\n"
-  DROP_TYPE_STMT
+  DROP_TYPE
     DROP_KW "drop"
     WHITESPACE " "
     TYPE_KW "type"
@@ -17,7 +16,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_TYPE_STMT
+  DROP_TYPE
     DROP_KW "drop"
     WHITESPACE " "
     TYPE_KW "type"
@@ -33,7 +32,7 @@ SOURCE_FILE
           IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_TYPE_STMT
+  DROP_TYPE
     DROP_KW "drop"
     WHITESPACE " "
     TYPE_KW "type"
@@ -56,7 +55,7 @@ SOURCE_FILE
           IDENT "c"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_TYPE_STMT
+  DROP_TYPE
     DROP_KW "drop"
     WHITESPACE " "
     TYPE_KW "type"
@@ -84,7 +83,7 @@ SOURCE_FILE
           IDENT "c"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_TYPE_STMT
+  DROP_TYPE
     DROP_KW "drop"
     WHITESPACE " "
     TYPE_KW "type"
@@ -102,7 +101,7 @@ SOURCE_FILE
     CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_TYPE_STMT
+  DROP_TYPE
     DROP_KW "drop"
     WHITESPACE " "
     TYPE_KW "type"
@@ -115,7 +114,7 @@ SOURCE_FILE
     RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_TYPE_STMT
+  DROP_TYPE
     DROP_KW "drop"
     WHITESPACE " "
     TYPE_KW "type"

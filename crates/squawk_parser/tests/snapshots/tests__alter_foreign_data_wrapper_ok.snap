@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_foreign_data_wrapper.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- handler"
   WHITESPACE "\n"
-  ALTER_FOREIGN_DATA_WRAPPER_STMT
+  ALTER_FOREIGN_DATA_WRAPPER
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -28,7 +27,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- no_handler"
   WHITESPACE "\n"
-  ALTER_FOREIGN_DATA_WRAPPER_STMT
+  ALTER_FOREIGN_DATA_WRAPPER
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -47,7 +46,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- validator"
   WHITESPACE "\n"
-  ALTER_FOREIGN_DATA_WRAPPER_STMT
+  ALTER_FOREIGN_DATA_WRAPPER
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -69,7 +68,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- no_validator"
   WHITESPACE "\n"
-  ALTER_FOREIGN_DATA_WRAPPER_STMT
+  ALTER_FOREIGN_DATA_WRAPPER
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -88,7 +87,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- options"
   WHITESPACE "\n"
-  ALTER_FOREIGN_DATA_WRAPPER_STMT
+  ALTER_FOREIGN_DATA_WRAPPER
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -130,7 +129,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- multiple"
   WHITESPACE "\n"
-  ALTER_FOREIGN_DATA_WRAPPER_STMT
+  ALTER_FOREIGN_DATA_WRAPPER
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -204,7 +203,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_FOREIGN_DATA_WRAPPER_STMT
+  ALTER_FOREIGN_DATA_WRAPPER
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -225,7 +224,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_FOREIGN_DATA_WRAPPER_STMT
+  ALTER_FOREIGN_DATA_WRAPPER
     ALTER_KW "alter"
     WHITESPACE " "
     FOREIGN_KW "foreign"

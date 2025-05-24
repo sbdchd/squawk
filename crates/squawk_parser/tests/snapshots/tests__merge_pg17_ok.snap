@@ -1,13 +1,12 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/merge_pg17.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- when_clauses_all"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -84,7 +83,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- when_clauses_all_with_conditions"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -180,7 +179,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- returning_all"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -261,7 +260,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- returning_many"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -371,7 +370,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_simple"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -424,7 +423,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_default"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -500,7 +499,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_values"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -591,7 +590,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- merge_update"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -762,7 +761,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- merge_delete"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "merge"
     WHITESPACE " "
     INTO_KW "into"
@@ -823,7 +822,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_select"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     WITH_CLAUSE
       WITH_KW "with"
       WHITESPACE " "
@@ -902,7 +901,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "MERGE"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1015,7 +1014,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "MERGE"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1150,7 +1149,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_3"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "MERGE"
     WHITESPACE " "
     INTO_KW "INTO"
@@ -1322,7 +1321,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_4"
   WHITESPACE "\n"
-  MERGE_STMT
+  MERGE
     MERGE_KW "MERGE"
     WHITESPACE " "
     INTO_KW "INTO"

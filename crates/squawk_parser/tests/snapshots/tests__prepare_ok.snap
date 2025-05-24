@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/prepare.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- insert"
   WHITESPACE "\n"
-  PREPARE_STMT
+  PREPARE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     NAME
@@ -43,7 +42,7 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "AS"
     WHITESPACE "\n    "
-    INSERT_STMT
+    INSERT
       INSERT_KW "INSERT"
       WHITESPACE " "
       INTO_KW "INTO"
@@ -75,7 +74,7 @@ SOURCE_FILE
   WHITESPACE "\n\n\n\n"
   COMMENT "-- select"
   WHITESPACE "\n"
-  PREPARE_STMT
+  PREPARE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     NAME
@@ -166,7 +165,7 @@ SOURCE_FILE
               POSITIONAL_PARAM "$2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  PREPARE_STMT
+  PREPARE
     PREPARE_KW "PREPARE"
     WHITESPACE " "
     NAME
@@ -211,7 +210,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- update"
   WHITESPACE "\n"
-  PREPARE_STMT
+  PREPARE
     PREPARE_KW "prepare"
     WHITESPACE " "
     NAME
@@ -219,7 +218,7 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
-    UPDATE_STMT
+    UPDATE
       UPDATE_KW "update"
       WHITESPACE " "
       RELATION_NAME
@@ -253,7 +252,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- delete"
   WHITESPACE "\n"
-  PREPARE_STMT
+  PREPARE
     PREPARE_KW "prepare"
     WHITESPACE " "
     NAME
@@ -261,7 +260,7 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
-    DELETE_STMT
+    DELETE
       DELETE_KW "delete"
       WHITESPACE " "
       FROM_KW "from"
@@ -287,7 +286,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- merge"
   WHITESPACE "\n"
-  PREPARE_STMT
+  PREPARE
     PREPARE_KW "prepare"
     WHITESPACE " "
     NAME
@@ -295,7 +294,7 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
-    MERGE_STMT
+    MERGE
       MERGE_KW "merge"
       WHITESPACE " "
       INTO_KW "into"
@@ -372,7 +371,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- values"
   WHITESPACE "\n"
-  PREPARE_STMT
+  PREPARE
     PREPARE_KW "prepare"
     WHITESPACE " "
     NAME

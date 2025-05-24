@@ -1,18 +1,17 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/cluster.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CLUSTER_STMT
+  CLUSTER
     CLUSTER_KW "cluster"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CLUSTER_STMT
+  CLUSTER
     CLUSTER_KW "cluster"
     WHITESPACE " "
     L_PAREN "("
@@ -40,7 +39,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- options_only"
   WHITESPACE "\n"
-  CLUSTER_STMT
+  CLUSTER
     CLUSTER_KW "cluster"
     WHITESPACE " "
     L_PAREN "("
@@ -53,7 +52,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- pre_14"
   WHITESPACE "\n"
-  CLUSTER_STMT
+  CLUSTER
     CLUSTER_KW "cluster"
     WHITESPACE " "
     VERBOSE_KW "verbose"
@@ -76,7 +75,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- pre_17"
   WHITESPACE "\n"
-  CLUSTER_STMT
+  CLUSTER
     CLUSTER_KW "cluster"
     WHITESPACE " "
     VERBOSE_KW "verbose"
@@ -84,7 +83,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- pre_8_3"
   WHITESPACE "\n"
-  CLUSTER_STMT
+  CLUSTER
     CLUSTER_KW "cluster"
     WHITESPACE " "
     VERBOSE_KW "verbose"

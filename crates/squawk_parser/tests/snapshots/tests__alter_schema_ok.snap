@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_schema.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_SCHEMA_STMT
+  ALTER_SCHEMA
     ALTER_KW "alter"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -24,7 +23,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_SCHEMA_STMT
+  ALTER_SCHEMA
     ALTER_KW "alter"
     WHITESPACE " "
     SCHEMA_KW "schema"
@@ -39,7 +38,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_SCHEMA_STMT
+  ALTER_SCHEMA
     ALTER_KW "alter"
     WHITESPACE " "
     SCHEMA_KW "schema"

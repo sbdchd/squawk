@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_foreign_table.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -28,7 +27,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- full"
   WHITESPACE "\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -227,7 +226,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_simple"
   WHITESPACE "\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -258,7 +257,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- partitioned"
   WHITESPACE "\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -375,7 +374,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_in"
   WHITESPACE "\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -434,7 +433,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_from"
   WHITESPACE "\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -512,7 +511,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- partitioned_bound_spec_with"
   WHITESPACE "\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"
@@ -571,7 +570,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with schema"
   WHITESPACE "\n"
-  CREATE_FOREIGN_TABLE_STMT
+  CREATE_FOREIGN_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     FOREIGN_KW "foreign"

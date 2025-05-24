@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_database.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -24,7 +23,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -39,7 +38,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -56,7 +55,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -74,7 +73,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -91,7 +90,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- set_param"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -111,7 +110,7 @@ SOURCE_FILE
     IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -131,7 +130,7 @@ SOURCE_FILE
     IDENT "v"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -151,7 +150,7 @@ SOURCE_FILE
     DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -173,7 +172,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- reset"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -189,7 +188,7 @@ SOURCE_FILE
           IDENT "p"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -204,7 +203,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_option"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -222,7 +221,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- option_connection_limit"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -240,7 +239,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- option_is_template"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -256,7 +255,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- with_multiple_options"
   WHITESPACE "\n"
-  ALTER_DATABASE_STMT
+  ALTER_DATABASE
     ALTER_KW "alter"
     WHITESPACE " "
     DATABASE_KW "database"

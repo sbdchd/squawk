@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_language.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- rename"
   WHITESPACE "\n"
-  ALTER_LANGUAGE_STMT
+  ALTER_LANGUAGE
     ALTER_KW "alter"
     WHITESPACE " "
     LANGUAGE_KW "language"
@@ -22,7 +21,7 @@ SOURCE_FILE
       IDENT "y"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_LANGUAGE_STMT
+  ALTER_LANGUAGE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURAL_KW "procedural"
@@ -42,7 +41,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- owner"
   WHITESPACE "\n"
-  ALTER_LANGUAGE_STMT
+  ALTER_LANGUAGE
     ALTER_KW "alter"
     WHITESPACE " "
     LANGUAGE_KW "language"
@@ -57,7 +56,7 @@ SOURCE_FILE
     IDENT "u"
   SEMICOLON ";"
   WHITESPACE "\n"
-  ALTER_LANGUAGE_STMT
+  ALTER_LANGUAGE
     ALTER_KW "alter"
     WHITESPACE " "
     PROCEDURAL_KW "procedural"

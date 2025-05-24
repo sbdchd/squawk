@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/grant.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     SELECT_KW "select"
@@ -46,7 +45,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- on_table"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -94,7 +93,7 @@ SOURCE_FILE
     IDENT "public"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -120,7 +119,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -141,7 +140,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- on_all_tables"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -178,7 +177,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- columns"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     SELECT_KW "select"
@@ -211,7 +210,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     INSERT_KW "insert"
@@ -244,7 +243,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     UPDATE_KW "update"
@@ -277,7 +276,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     REFERENCES_KW "references"
@@ -310,7 +309,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -335,7 +334,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -360,7 +359,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- sequence"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     SELECT_KW "select"
@@ -379,7 +378,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     SELECT_KW "select"
@@ -403,7 +402,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "usage"
@@ -434,7 +433,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     UPDATE_KW "update"
@@ -453,7 +452,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -476,7 +475,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -511,7 +510,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- database"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     CREATE_KW "create"
@@ -542,7 +541,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     CREATE_KW "create"
@@ -568,7 +567,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -587,7 +586,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- domain"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "usage"
@@ -624,7 +623,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -645,7 +644,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -673,7 +672,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- foreign_data"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "usage"
@@ -708,7 +707,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -733,7 +732,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- foreign_server"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "usage"
@@ -766,7 +765,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -789,7 +788,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- function"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     EXECUTE_KW "execute"
@@ -820,7 +819,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     EXECUTE_KW "execute"
@@ -900,7 +899,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -919,7 +918,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -950,7 +949,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -973,7 +972,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -996,7 +995,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1062,7 +1061,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- language"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "usage"
@@ -1087,7 +1086,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1112,7 +1111,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1141,7 +1140,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- large_object"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     SELECT_KW "select"
@@ -1167,7 +1166,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1194,7 +1193,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- param"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     SET_KW "set"
@@ -1230,7 +1229,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALTER_KW "alter"
@@ -1251,7 +1250,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1272,7 +1271,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- edge_case"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     SET_KW "set"
@@ -1294,7 +1293,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE " \n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     SET_KW "set"
@@ -1312,7 +1311,7 @@ SOURCE_FILE
   WHITESPACE " \n\n"
   COMMENT "-- schema"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     CREATE_KW "create"
@@ -1329,7 +1328,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     CREATE_KW "create"
@@ -1371,7 +1370,7 @@ SOURCE_FILE
     SESSION_USER_KW "session_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1398,7 +1397,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- tablespace"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     CREATE_KW "create"
@@ -1423,7 +1422,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1450,7 +1449,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- type_"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "usage"
@@ -1484,7 +1483,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1504,7 +1503,7 @@ SOURCE_FILE
     CURRENT_USER_KW "current_user"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     ALL_KW "all"
@@ -1531,7 +1530,7 @@ SOURCE_FILE
   WHITESPACE "\n\n"
   COMMENT "-- option"
   WHITESPACE "\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "public"
@@ -1547,7 +1546,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "public"
@@ -1563,7 +1562,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "public"
@@ -1579,7 +1578,7 @@ SOURCE_FILE
     TRUE_KW "true"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "public"
@@ -1595,7 +1594,7 @@ SOURCE_FILE
     FALSE_KW "false"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "public"
@@ -1625,7 +1624,7 @@ SOURCE_FILE
     OPTION_KW "option"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  GRANT_STMT
+  GRANT
     GRANT_KW "grant"
     WHITESPACE " "
     IDENT "public"

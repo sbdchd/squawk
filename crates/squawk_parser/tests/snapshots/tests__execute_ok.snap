@@ -1,12 +1,11 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/execute.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- execute"
   WHITESPACE "\n"
-  EXECUTE_STMT
+  EXECUTE
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "
     NAME_REF
@@ -30,7 +29,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  EXECUTE_STMT
+  EXECUTE
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "
     NAME_REF
@@ -46,7 +45,7 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  EXECUTE_STMT
+  EXECUTE
     EXECUTE_KW "EXECUTE"
     WHITESPACE " "
     NAME_REF
