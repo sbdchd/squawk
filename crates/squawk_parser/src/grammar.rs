@@ -4643,7 +4643,9 @@ fn string_literal(p: &mut Parser<'_>) {
 
 fn opt_bool_literal(p: &mut Parser<'_>) -> bool {
     let m = p.start();
-    if p.eat(TRUE_KW) || p.eat(FALSE_KW) {
+    // TOOD: we might want to check if its 1 or 0 specificially, not just `INT_NUMBER`
+    // https://www.postgresql.org/docs/current/sql-explain.html
+    if p.eat(TRUE_KW) || p.eat(FALSE_KW) || p.eat(OFF_KW) || p.eat(ON_KW) || p.eat(INT_NUMBER) {
         m.complete(p, LITERAL);
         true
     } else {

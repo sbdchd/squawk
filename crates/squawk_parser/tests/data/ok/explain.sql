@@ -8,9 +8,9 @@ explain analyze select a from t;
 explain (
   analyze,
   verbose,
-  costs, 
-  costs true, 
-  costs false, 
+  costs,
+  costs true,
+  costs false,
   settings,
   generic_plan,
   buffers,
@@ -69,3 +69,14 @@ explain analyze (((((select 1)))));
 -- parens_values
 explain analyze (((((values (1))))));
 
+-- boolean off
+EXPLAIN (COSTS OFF) SELECT * FROM foo WHERE i = 4;
+
+-- boolean on
+EXPLAIN (COSTS ON) SELECT * FROM foo WHERE i = 4;
+
+-- boolean 1
+EXPLAIN (COSTS 1) SELECT * FROM foo WHERE i = 4;
+
+-- boolean 0
+EXPLAIN (COSTS 0) SELECT * FROM foo WHERE i = 4;

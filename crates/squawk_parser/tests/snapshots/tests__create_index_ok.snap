@@ -1,6 +1,7 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_index.sql
+snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- create_index"
@@ -479,11 +480,8 @@ SOURCE_FILE
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              OFF_KW "off"
+      LITERAL
+        OFF_KW "off"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -650,11 +648,8 @@ SOURCE_FILE
       WHITESPACE " "
       EQ "="
       WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              OFF_KW "off"
+      LITERAL
+        OFF_KW "off"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
