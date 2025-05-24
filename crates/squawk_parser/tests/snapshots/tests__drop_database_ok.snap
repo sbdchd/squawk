@@ -5,7 +5,7 @@ input_file: crates/squawk_parser/tests/data/ok/drop_database.sql
 SOURCE_FILE
   COMMENT "-- drop_database"
   WHITESPACE "\n"
-  DROP_DATABASE_STMT
+  DROP_DATABASE
     DROP_KW "drop"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -14,7 +14,7 @@ SOURCE_FILE
       IDENT "d"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_DATABASE_STMT
+  DROP_DATABASE
     DROP_KW "drop"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -28,7 +28,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
-  DROP_DATABASE_STMT
+  DROP_DATABASE
     DROP_KW "drop"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -48,7 +48,7 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_DATABASE_STMT
+  DROP_DATABASE
     DROP_KW "drop"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -57,7 +57,7 @@ SOURCE_FILE
       IDENT "\"table_name\""
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_DATABASE_STMT
+  DROP_DATABASE
     DROP_KW "drop"
     WHITESPACE " "
     DATABASE_KW "database"
@@ -71,7 +71,7 @@ SOURCE_FILE
       IDENT "\"table_name\""
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  DROP_DATABASE_STMT
+  DROP_DATABASE
     DROP_KW "drop"
     WHITESPACE " "
     DATABASE_KW "database"

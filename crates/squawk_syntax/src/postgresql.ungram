@@ -840,7 +840,7 @@ AlterDomain =
   'alter' 'domain' Path action:AlterDomainAction
 
 AlterTable =
-  'alter' 'table' Path actions:AlterTableAction*
+  'alter' 'table' RelationName actions:AlterTableAction*
 
 RevokeStmt =
   'revoke'
@@ -886,9 +886,6 @@ PrepareTransactionStmt =
 
 ReleaseSavepointStmt =
   'release' 'savepoint' NameRef
-
-RollbackStmt =
-  'rollback'
 
 ParenExpr =
   '(' Expr ')'
@@ -1019,8 +1016,6 @@ AlterEventTriggerStmt =
   'alter' 'event' 'trigger'
 AlterExtensionStmt =
   'alter' 'extension' NameRef
-AlterDomainStmt =
-  'alter' 'domain' NameRef AlterDomainAction
 AlterDefaultPrivilegesStmt =
   'alter' 'default' 'privileges'
 AlterDatabaseStmt =
@@ -1273,10 +1268,6 @@ DropTypeStmt =
   'drop' 'type' IfExists?
 DropTriggerStmt =
   'drop' 'trigger' IfExists? NameRef 'on' 
-DropIndexStmt =
-  'drop' 'index' 'concurrently'? IfExists?
-DropDatabaseStmt =
-  'drop' 'database' IfExists? NameRef 
 IndexParams =
   '(' ')'
 
@@ -1483,7 +1474,6 @@ Stmt =
 | CreateMaterializedViewStmt
 | SavepointStmt
 | ReleaseSavepointStmt
-| RollbackStmt
 | PrepareTransactionStmt
 | ';'
 

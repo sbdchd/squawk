@@ -4707,7 +4707,7 @@ fn rollback_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump_any();
     if p.eat(PREPARED_KW) {
         string_literal(p);
-        return m.complete(p, ROLLBACK_STMT);
+        return m.complete(p, ROLLBACK);
     }
     let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
     if is_rollback && p.eat(TO_KW) {
@@ -4719,7 +4719,7 @@ fn rollback_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         p.eat(NO_KW);
         p.expect(CHAIN_KW);
     }
-    m.complete(p, ROLLBACK_STMT)
+    m.complete(p, ROLLBACK)
 }
 
 struct StmtRestrictions {
@@ -6336,7 +6336,7 @@ fn alter_domain_stmt(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DOMAIN_KW);
     path_name_ref(p);
     alter_domain_action(p);
-    m.complete(p, ALTER_DOMAIN_STMT)
+    m.complete(p, ALTER_DOMAIN)
 }
 
 fn alter_domain_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
@@ -11889,7 +11889,7 @@ fn drop_index_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     opt_cascade_or_restrict(p);
-    m.complete(p, DROP_INDEX_STMT)
+    m.complete(p, DROP_INDEX)
 }
 
 // DROP DATABASE [ IF EXISTS ] name [ [ WITH ] ( option [, ...] ) ]
@@ -11916,7 +11916,7 @@ fn drop_database_stmt(p: &mut Parser<'_>) -> CompletedMarker {
         }
         p.expect(R_PAREN);
     }
-    m.complete(p, DROP_DATABASE_STMT)
+    m.complete(p, DROP_DATABASE)
 }
 
 // CREATE [ UNIQUE ] INDEX [ CONCURRENTLY ] [ [ IF NOT EXISTS ] name ] ON [ ONLY ] table_name [ USING method ]

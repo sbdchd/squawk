@@ -2,4 +2,13 @@
 source: crates/squawk_linter/src/rules/adding_field_with_default.rs
 expression: errors
 ---
-[]
+[
+    Violation {
+        code: AddingFieldWithDefault,
+        message: "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock.",
+        text_range: 62..67,
+        help: Some(
+            "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.",
+        ),
+    },
+]

@@ -779,7 +779,7 @@ impl AlterTable {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn path(&self) -> Option<Path> {
+    pub fn relation_name(&self) -> Option<RelationName> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3494,29 +3494,6 @@ impl DropIndex {
     #[inline]
     pub fn paths(&self) -> AstChildren<Path> {
         support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn concurrently_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONCURRENTLY_KW)
-    }
-    #[inline]
-    pub fn drop_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DROP_KW)
-    }
-    #[inline]
-    pub fn index_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INDEX_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct DropIndexStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl DropIndexStmt {
-    #[inline]
-    pub fn if_exists(&self) -> Option<IfExists> {
-        support::child(&self.syntax)
     }
     #[inline]
     pub fn concurrently_token(&self) -> Option<SyntaxToken> {
@@ -6718,17 +6695,6 @@ impl Rollback {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct RollbackStmt {
-    pub(crate) syntax: SyntaxNode,
-}
-impl RollbackStmt {
-    #[inline]
-    pub fn rollback_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ROLLBACK_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RowsFuncOption {
     pub(crate) syntax: SyntaxNode,
 }
@@ -8056,7 +8022,6 @@ pub enum Stmt {
     ReleaseSavepointStmt(ReleaseSavepointStmt),
     RevokeStmt(RevokeStmt),
     Rollback(Rollback),
-    RollbackStmt(RollbackStmt),
     SavepointStmt(SavepointStmt),
     Select(Select),
     TableStmt(TableStmt),
@@ -11107,24 +11072,6 @@ impl AstNode for DropIndex {
         &self.syntax
     }
 }
-impl AstNode for DropIndexStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::DROP_INDEX_STMT
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for DropLanguageStmt {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -14041,24 +13988,6 @@ impl AstNode for Rollback {
         &self.syntax
     }
 }
-impl AstNode for RollbackStmt {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::ROLLBACK_STMT
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for RowsFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -16540,7 +16469,6 @@ impl AstNode for Stmt {
                 | SyntaxKind::RELEASE_SAVEPOINT_STMT
                 | SyntaxKind::REVOKE_STMT
                 | SyntaxKind::ROLLBACK
-                | SyntaxKind::ROLLBACK_STMT
                 | SyntaxKind::SAVEPOINT_STMT
                 | SyntaxKind::SELECT
                 | SyntaxKind::TABLE_STMT
@@ -16587,7 +16515,6 @@ impl AstNode for Stmt {
             }
             SyntaxKind::REVOKE_STMT => Stmt::RevokeStmt(RevokeStmt { syntax }),
             SyntaxKind::ROLLBACK => Stmt::Rollback(Rollback { syntax }),
-            SyntaxKind::ROLLBACK_STMT => Stmt::RollbackStmt(RollbackStmt { syntax }),
             SyntaxKind::SAVEPOINT_STMT => Stmt::SavepointStmt(SavepointStmt { syntax }),
             SyntaxKind::SELECT => Stmt::Select(Select { syntax }),
             SyntaxKind::TABLE_STMT => Stmt::TableStmt(TableStmt { syntax }),
@@ -16630,7 +16557,6 @@ impl AstNode for Stmt {
             Stmt::ReleaseSavepointStmt(it) => &it.syntax,
             Stmt::RevokeStmt(it) => &it.syntax,
             Stmt::Rollback(it) => &it.syntax,
-            Stmt::RollbackStmt(it) => &it.syntax,
             Stmt::SavepointStmt(it) => &it.syntax,
             Stmt::Select(it) => &it.syntax,
             Stmt::TableStmt(it) => &it.syntax,
@@ -16800,12 +16726,6 @@ impl From<Rollback> for Stmt {
     #[inline]
     fn from(node: Rollback) -> Stmt {
         Stmt::Rollback(node)
-    }
-}
-impl From<RollbackStmt> for Stmt {
-    #[inline]
-    fn from(node: RollbackStmt) -> Stmt {
-        Stmt::RollbackStmt(node)
     }
 }
 impl From<SavepointStmt> for Stmt {

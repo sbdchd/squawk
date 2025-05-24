@@ -1022,7 +1022,7 @@ SOURCE_FILE
   WHITESPACE "\n"
   COMMENT "-- so now we issue these commands:"
   WHITESPACE "\n"
-  ROLLBACK_STMT
+  ROLLBACK
     ROLLBACK_KW "ROLLBACK"
     WHITESPACE " "
     TO_KW "TO"
