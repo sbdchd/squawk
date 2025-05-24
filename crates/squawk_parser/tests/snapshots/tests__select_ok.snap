@@ -5759,4 +5759,66 @@ SOURCE_FILE
       NAME_REF
         USER_KW "user"
   SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- select with aggregates"
   WHITESPACE "\n"
+  EXPLAIN_STMT
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    L_PAREN "("
+    IDENT "costs"
+    WHITESPACE " "
+    LITERAL
+      OFF_KW "off"
+    R_PAREN ")"
+    WHITESPACE "\n"
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            CALL_EXPR
+              NAME_REF
+                IDENT "string_agg"
+              ARG_LIST
+                L_PAREN "("
+                DISTINCT_KW "distinct"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "f1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "','"
+                R_PAREN ")"
+              WHITESPACE " "
+              FILTER_CLAUSE
+                FILTER_KW "filter"
+                WHITESPACE " "
+                L_PAREN "("
+                WHERE_KW "where"
+                WHITESPACE " "
+                BIN_EXPR
+                  CALL_EXPR
+                    NAME_REF
+                      IDENT "length"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "f1"
+                      R_PAREN ")"
+                  WHITESPACE " "
+                  R_ANGLE ">"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
+                R_PAREN ")"
+      WHITESPACE "\n"
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "varchar_tbl"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
