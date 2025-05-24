@@ -37,7 +37,7 @@ use super::support;
 impl ast::Constraint {
     #[inline]
     pub fn name(&self) -> Option<ast::Name> {
-        support::child(&self.syntax())
+        support::child(self.syntax())
     }
 }
 

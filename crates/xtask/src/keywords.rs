@@ -153,8 +153,8 @@ pub(crate) fn keyword_kinds() -> Result<KeywordKinds> {
     reserved_keywords.sort();
 
     let mut all_keywords = keywords
-        .iter()
-        .map(|(key, _value)| key.to_owned())
+        .keys()
+        .map(|key| key.to_owned())
         .collect::<Vec<String>>();
     all_keywords.sort();
 

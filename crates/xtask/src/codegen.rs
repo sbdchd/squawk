@@ -252,7 +252,7 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
         name => format_ident!("{}_KW", name.to_case(Case::UpperSnake)),
     };
 
-    let all_keywords_values = grammar.keywords.iter().copied().collect::<Vec<_>>();
+    let all_keywords_values = grammar.keywords.to_vec();
     let all_keywords = all_keywords_values.iter().map(x).collect::<Vec<_>>();
 
     let literals = grammar
@@ -509,7 +509,7 @@ fn lower(grammar: &Grammar) -> AstSrc {
     for node in grammar_nodes {
         let name = grammar[node].name.clone();
         let rule = &grammar[node].rule;
-        match lower_enum(&grammar, rule) {
+        match lower_enum(grammar, rule) {
             Some(variants) => {
                 let enum_src = AstEnumSrc {
                     // doc: Vec::new(),
@@ -521,7 +521,7 @@ fn lower(grammar: &Grammar) -> AstSrc {
             }
             None => {
                 let mut fields = Vec::new();
-                lower_rule(&mut fields, &grammar, None, rule);
+                lower_rule(&mut fields, grammar, None, rule);
                 res.nodes.push(AstNodeSrc {
                     // doc: Vec::new(),
                     name,
@@ -569,9 +569,8 @@ fn deduplicate_fields(ast: &mut AstSrc) {
 }
 
 fn lower_enum(grammar: &Grammar, rule: &Rule) -> Option<Vec<String>> {
-    let alternatives = match rule {
-        Rule::Alt(it) => it,
-        _ => return None,
+    let Rule::Alt(alternatives) = rule else {
+        return None;
     };
     let mut variants = Vec::new();
     for alternative in alternatives {
@@ -681,9 +680,8 @@ fn lower_separated_list(
     label: Option<&String>,
     rule: &Rule,
 ) -> bool {
-    let rule = match rule {
-        Rule::Seq(it) => it,
-        _ => return false,
+    let Rule::Seq(rule) = rule else {
+        return false;
     };
     let (node, repeat, trailing_sep) = match rule.as_slice() {
         [Rule::Node(node), Rule::Rep(repeat), Rule::Opt(trailing_sep)] => {
@@ -692,9 +690,8 @@ fn lower_separated_list(
         [Rule::Node(node), Rule::Rep(repeat)] => (node, repeat, None),
         _ => return false,
     };
-    let repeat = match &**repeat {
-        Rule::Seq(it) => it,
-        _ => return false,
+    let Rule::Seq(repeat) = &**repeat else {
+        return false;
     };
     if !matches!(
         repeat.as_slice(),
@@ -844,7 +841,7 @@ fn generate_nodes(nodes: &[AstNodeSrc], enums: &[AstEnumSrc]) -> String {
                             #name::#variants(it) => &it.syntax,
                             )*
                             #(
-                            #name::#cast_variants(it) => &it.syntax(),
+                            #name::#cast_variants(it) => it.syntax(),
                             )*
                         }
                     }
@@ -910,8 +907,6 @@ fn generate_tokens(tokens: &[(&'static str, &'static str)]) -> String {
     });
 
     let file = quote! {
-        use std::{fmt, hash};
-
         use crate::{SyntaxKind, SyntaxToken, ast::AstToken};
 
         #(#tokens)*

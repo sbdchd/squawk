@@ -16706,7 +16706,7 @@ impl AstNode for TableArg {
         match self {
             TableArg::Column(it) => &it.syntax,
             TableArg::LikeClause(it) => &it.syntax,
-            TableArg::TableConstraint(it) => &it.syntax(),
+            TableArg::TableConstraint(it) => it.syntax(),
         }
     }
 }

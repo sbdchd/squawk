@@ -1,5 +1,4 @@
 use crate::{ast::AstToken, SyntaxKind, SyntaxToken};
-use std::{fmt, hash};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Null {
