@@ -86,11 +86,16 @@ fn render_lint_error<W: std::io::Write>(
 
     let title = &err.message;
 
-    let mut message = Level::Warning.title(title).id(error_name).snippet(
+    let level = match err.level {
+        ViolationLevel::Warning => Level::Warning,
+        ViolationLevel::Error => Level::Error,
+    };
+
+    let mut message = level.title(title).id(error_name).snippet(
         Snippet::source(sql)
             .origin(filename)
             .fold(true)
-            .annotation(Level::Error.span(err.range.into())),
+            .annotation(level.span(err.range.into())),
     );
     if let Some(help) = &err.help {
         message = message.footer(Level::Help.title(help));
