@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.8.0 - 2025-05-25
+
+### Fixed
+
+- Fix parsing `select select`. (#499)
+
+  Previously, the following would panic:
+
+  ```sql
+  select select
+  ```
+
+- Fix displaying warnings as errors. (#502)
+
+  We were highlighting warnings using the error syntax (red `^` instead of yellow `-`). We also were rendering syntax errors as warnings instead of errors!
+
+- Fix parsing aggregate args with modifiers like `distinct` or `all`. (#498) Thanks @psteinroe!
+
+  Previously the following would error:
+
+  ```sql
+  select string_agg(distinct c, ',')
+    filter (where length(c) > 1)
+    from t;
+  ```
+
+- Fix parsing data sources within params. (#497) Thanks @psteinroe!
+
+  Previously the following would error:
+
+  ```sql
+  select f1, count(*) from
+    t1 x(x0,x1) left join (t1 left join t2 using(f1)) on (x0 = 0)
+  ```
+
+- Fix parsing alternative boolean keywords. (#493) Thanks @psteinroe!
+
+  Previously the following would error:
+
+  ```sql
+  explain (costs off) select;
+  ```
+
+## Changed
+
+- Renamed `ast::Item` to `ast::Stmt`. (#483)
+- Split `select` into `select`, `tables`, and `values` statements. (#484)
+
 ## v2.7.0 - 2025-05-14
 
 ### Fixed
