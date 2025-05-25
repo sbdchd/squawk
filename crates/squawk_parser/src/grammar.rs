@@ -4211,7 +4211,7 @@ fn opt_as_col_label(p: &mut Parser<'_>) -> bool {
 }
 
 fn opt_target_list(p: &mut Parser) -> Option<CompletedMarker> {
-    if !p.at_ts(TARGET_LIST_START) {
+    if !p.at_ts(TARGET_LIST_START) || p.at(SELECT_KW) {
         return None;
     }
     let m = p.start();

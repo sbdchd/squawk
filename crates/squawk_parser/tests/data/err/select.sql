@@ -25,5 +25,9 @@ select 1 in c;
 -- type cast must use a string literal
 select numeric 1234;
 
+-- regression test: this would cause the parser to get stuck & panic, now it
+-- warns about a missing semicolon
+select select;
+
 -- trailing comma at EOF
 select 1,
