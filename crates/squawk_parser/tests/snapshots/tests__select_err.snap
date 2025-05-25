@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/err/select.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "--- via https://duckdb.org/docs/stable/sql/dialect/friendly_sql.html#trailing-commas"
@@ -209,6 +208,19 @@ SOURCE_FILE
             INT_NUMBER "1234"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- regression test: this would cause the parser to get stuck & panic, now it"
+  WHITESPACE "\n"
+  COMMENT "-- warns about a missing semicolon"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  WHITESPACE " "
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
   WHITESPACE "\n"
   SELECT
@@ -233,4 +245,5 @@ ERROR@395: expected expression
 ERROR@396: expected expression
 ERROR@397: expected expression
 ERROR@520: missing comma
-ERROR@561: unexpected trailing comma
+ERROR@646: expected SEMICOLON
+ERROR@689: unexpected trailing comma
