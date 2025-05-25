@@ -86,7 +86,7 @@ fn render_syntax_errors(
     for err in errors {
         let text = err.message();
         let span = err.range().into();
-        let message = Level::Warning.title(text).id("syntax-error").snippet(
+        let message = Level::Error.title(text).id("syntax-error").snippet(
             Snippet::source(sql)
                 .origin(filename)
                 .fold(true)
