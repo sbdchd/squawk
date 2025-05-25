@@ -57,13 +57,13 @@ warning[constraint-missing-not-valid]: By default new constraints require a tabl
  --> example-migration.sql:2:24
   |
 2 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
-  |                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |                        --------------------------------------------------------
   |
 warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
  --> example-migration.sql:2:28
   |
 2 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
-  |                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  |                            ----------------------------------------------------
   |
   = help: Create an index CONCURRENTLY and create the constraint using the index.
 
