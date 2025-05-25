@@ -87,7 +87,6 @@ Literal =
   | '@dollar_quoted_string'
   | '@esc_string'
   | '@positional_param'
-  // TODO:
   )
 
 NamedArg =
@@ -131,7 +130,6 @@ IsNotDistinctFrom =
   'is' 'not' 'distinct' 'from'
 
 OperatorCall =
-  // TODO:
   'operator' '(' (Path '.')? Op ')'
 
 ColonEq =
@@ -156,7 +154,7 @@ Op =
 'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | NotLike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | AtTimeZone
 
 BinExpr =
-  Expr Op Expr
+  lhs:Expr Op rhs:Expr
 
 CaseExpr =
   'case'
@@ -180,8 +178,7 @@ ArrayType =
   // int array[]
   // text[]
   // t[10][10]
-  // TODO:
-  Type NameRef 'array'? // '[' Expr? ']' ('[' Expr? ']')*
+  Type NameRef 'array'? '[' Expr? ']'
 
 PercentType =
   '%' 'type'
@@ -236,14 +233,13 @@ Type =
 | IntervalType
 
 Role =
-  // TODO: more general than #ident?
   ('group'? '#ident')
 | 'current_role' | 'current_user' | 'session_user'
 
 CheckConstraint  =
   ('constraint' NameRef)
   'check' '(' Expr ')' ('no' 'inherit')?
-  // ConstraintOptionList?
+  ConstraintOptionList?
 
 UsingIndex =
   'using' 'index' NameRef
@@ -252,27 +248,6 @@ Column =
   'period'?
   (Name | Name Type Collate? | IndexExpr)
 
-// ColumnList =
-//   '(' Column (',' Column)* ('without' 'overlaps')? ')'
-
-// IncludeColumns =
-//   'include' ColumnList
-
-// Operator =
-//   ('operator' '(' '#op' ')')
-
-// StorageParam =
-//   Path ('=' (Literal | Operator | Type))
-
-// StorageParamList =
-//   '(' StorageParam (',' StorageParam)* ')'
-
-// WithParams =
-//   'with' StorageParamList
-
-// ConstraintIndexTablespace =
-//   'using' 'index' 'tablespace' NameRef
-
 UniqueConstraint =
   ('constraint' NameRef)
   'unique' 
@@ -280,39 +255,62 @@ UniqueConstraint =
     UsingIndex 
   | ( 'nulls' 'not'? 'distinct' )? ColumnList
   )
-  // ConstraintOptionList?
+  ConstraintOptionList?
 
 PrimaryKeyConstraint =
   ('constraint' NameRef)
   'primary' 'key' (UsingIndex | ColumnList IndexParams)
-  // ConstraintOptionList?
+  ConstraintOptionList?
 
-// ExcludeElement =
-//   ('(' Expr ')' | Expr) 'with' Operator
+SetNullColumns =
+  'set' 'null' ColumnList?
 
-// RefAction =
-//   'no' 'action'
-// | 'restrict'
-// | 'cascade'
-// | 'set' 'null' ColumnList?
-// | 'set' 'default' ColumnList?
+SetDefaultColumns =
+  'set' 'default' ColumnList?
+
+Cascade =
+  'cascade'
+
+Restrict =
+  'restrict'
+
+NoAction =
+  'no' 'action'
+
+RefAction =
+  NoAction
+| Restrict
+| Cascade
+| SetNullColumns
+| SetDefaultColumns
+
+OnDeleteAction =
+  'on' 'delete' RefAction
+
+OnUpdateAction =
+  'on' 'update' RefAction
+
+MatchFull =
+  'match' 'full'
+
+MatchPartial =
+  'match' 'partial'
+
+
+MatchSimple =
+  'match' 'simple'
+
+MatchType =
+  MatchFull
+| MatchPartial
+| MatchSimple
+  
 
 ForeignKeyConstraint =
-  'foreign' 'key' ColumnList 'references' Path ColumnList
-  ('match' ('full' | 'partial' | 'simple') )?
-  // ('on' 'delete' RefAction)?
-  // ('on' 'update' RefAction)?
-
-// TableConstraint =
-//   ('constraint' Name)?
-
-//   CheckConstraint 
-//   | UniqueConstraint 
-//   | PrimaryKeyConstraint 
-//   | ExcludeConstraint 
-//   | ForeignKeyConstraint
-
-//   ConstraintOptionList?
+  'foreign' 'key' from_columns:ColumnList 'references' Path to_columns:ColumnList
+  MatchType?
+  OnDeleteAction?
+  OnUpdateAction?
 
 DeferrableConstraintOption =
   'deferrable'
@@ -331,23 +329,21 @@ ConstraintOptionList =
   (DeferrableConstraintOption | NotDeferrableConstraintOption)?
   (InitiallyDeferredConstraintOption | InitiallyImmediateConstraintOption)?
 
-// AddConstraint =
-//   'add' TableConstraint ('not' 'valid')?
 
 NotNullConstraint =
   ('constraint' NameRef)
   'not' 'null'
-  // ConstraintOptionList?
+  ConstraintOptionList?
 
 NullConstraint =
   ('constraint' NameRef)
   'null'
-  // ConstraintOptionList?
+  ConstraintOptionList?
 
 DefaultConstraint =
-  // ('constraint' NameRef)
+  ('constraint' NameRef)
   'default' Expr
-  // ConstraintOptionList?
+  ConstraintOptionList?
 
 // SequenceOption =
 //   'as' Type
@@ -372,15 +368,15 @@ GeneratedConstraint =
   ('constraint' NameRef)
   'generated'
   ('always' 'as' '(' Expr ')' 'stored' | ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList? )
-  // ConstraintOptionList?
+  ConstraintOptionList?
 
 ReferencesConstraint =
   ('constraint' NameRef)
   'references' Path '(' NameRef ')' 
-  ('match' 'full' | 'match' 'partial' | 'match' 'simple')? 
-  // ('on' 'delete' RefAction)?
-  // ('on' 'update' RefAction)?
-  // ConstraintOptionList?
+  MatchType? 
+  OnDeleteAction?
+  OnUpdateAction?
+  ConstraintOptionList?
 
 AlterTableAction =
   ValidateConstraint
@@ -581,8 +577,6 @@ IfExists =
  'if' 'exists'
   
 DropType =
-  // TODO: codegen isn't robust enough to allow us to exclude the extra wrapping
-  // parens around the Path stuff
   'drop' 'type' IfExists? (Path (',' Path)*) ('cascade' | 'restrict')?
 
 DropIndex =
@@ -614,7 +608,6 @@ BeginFuncOption =
 
 ReturnFuncOption =
   'return' Expr
-
 
 FuncOptionList =
   options:(FuncOption*)
@@ -766,7 +759,7 @@ PostfixExpr =
   Expr
 
 IndexExpr =
-  Expr '[' Expr ']'
+  base:Expr '[' index:Expr ']'
 
 BetweenExpr =
   target:Expr 'between' (start:Expr) 'and' (end:Expr)

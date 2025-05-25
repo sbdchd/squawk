@@ -1266,11 +1266,15 @@ pub struct BinExpr {
 }
 impl BinExpr {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn lhs(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn op(&self) -> Option<Op> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rhs(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
 }
@@ -1317,6 +1321,17 @@ impl CallExpr {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Cascade {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Cascade {
+    #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
     }
 }
 
@@ -4480,6 +4495,14 @@ impl ForeignKeyConstraint {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn on_delete_action(&self) -> Option<OnDeleteAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_update_action(&self) -> Option<OnUpdateAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn path(&self) -> Option<Path> {
         support::child(&self.syntax)
     }
@@ -4705,7 +4728,11 @@ pub struct IndexExpr {
 }
 impl IndexExpr {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn base(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn index(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5383,6 +5410,21 @@ impl Neqb {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NoAction {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NoAction {
+    #[inline]
+    pub fn action_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ACTION_KW)
+    }
+    #[inline]
+    pub fn no_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NoForceRls {
     pub(crate) syntax: SyntaxNode,
 }
@@ -5590,6 +5632,44 @@ impl OffsetClause {
     #[inline]
     pub fn offset_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OFFSET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OnDeleteAction {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OnDeleteAction {
+    #[inline]
+    pub fn ref_action(&self) -> Option<RefAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn delete_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DELETE_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OnUpdateAction {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OnUpdateAction {
+    #[inline]
+    pub fn ref_action(&self) -> Option<RefAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+    #[inline]
+    pub fn update_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UPDATE_KW)
     }
 }
 
@@ -6548,6 +6628,17 @@ impl Restart {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Restrict {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Restrict {
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RetType {
     pub(crate) syntax: SyntaxNode,
 }
@@ -6929,6 +7020,25 @@ impl SetDefault {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetDefaultColumns {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetDefaultColumns {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+    #[inline]
+    pub fn set_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SetExpression {
     pub(crate) syntax: SyntaxNode,
 }
@@ -7003,6 +7113,25 @@ impl SetNotNull {
     #[inline]
     pub fn not_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn null_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULL_KW)
+    }
+    #[inline]
+    pub fn set_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetNullColumns {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetNullColumns {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn null_token(&self) -> Option<SyntaxToken> {
@@ -8026,6 +8155,15 @@ pub enum ParamMode {
     ParamInOut(ParamInOut),
     ParamOut(ParamOut),
     ParamVariadic(ParamVariadic),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum RefAction {
+    Cascade(Cascade),
+    NoAction(NoAction),
+    Restrict(Restrict),
+    SetDefaultColumns(SetDefaultColumns),
+    SetNullColumns(SetNullColumns),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -9383,6 +9521,24 @@ impl AstNode for CallExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::CALL_EXPR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for Cascade {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CASCADE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -12943,6 +13099,24 @@ impl AstNode for Neqb {
         &self.syntax
     }
 }
+impl AstNode for NoAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NO_ACTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for NoForceRls {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -13163,6 +13337,42 @@ impl AstNode for OffsetClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::OFFSET_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OnDeleteAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ON_DELETE_ACTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OnUpdateAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ON_UPDATE_ACTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14005,6 +14215,24 @@ impl AstNode for Restart {
         &self.syntax
     }
 }
+impl AstNode for Restrict {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RESTRICT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for RetType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -14347,6 +14575,24 @@ impl AstNode for SetDefault {
         &self.syntax
     }
 }
+impl AstNode for SetDefaultColumns {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_DEFAULT_COLUMNS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SetExpression {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -14441,6 +14687,24 @@ impl AstNode for SetNotNull {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SET_NOT_NULL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SetNullColumns {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_NULL_COLUMNS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -16571,6 +16835,75 @@ impl From<ParamVariadic> for ParamMode {
     #[inline]
     fn from(node: ParamVariadic) -> ParamMode {
         ParamMode::ParamVariadic(node)
+    }
+}
+impl AstNode for RefAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::CASCADE
+                | SyntaxKind::NO_ACTION
+                | SyntaxKind::RESTRICT
+                | SyntaxKind::SET_DEFAULT_COLUMNS
+                | SyntaxKind::SET_NULL_COLUMNS
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::CASCADE => RefAction::Cascade(Cascade { syntax }),
+            SyntaxKind::NO_ACTION => RefAction::NoAction(NoAction { syntax }),
+            SyntaxKind::RESTRICT => RefAction::Restrict(Restrict { syntax }),
+            SyntaxKind::SET_DEFAULT_COLUMNS => {
+                RefAction::SetDefaultColumns(SetDefaultColumns { syntax })
+            }
+            SyntaxKind::SET_NULL_COLUMNS => RefAction::SetNullColumns(SetNullColumns { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            RefAction::Cascade(it) => &it.syntax,
+            RefAction::NoAction(it) => &it.syntax,
+            RefAction::Restrict(it) => &it.syntax,
+            RefAction::SetDefaultColumns(it) => &it.syntax,
+            RefAction::SetNullColumns(it) => &it.syntax,
+        }
+    }
+}
+impl From<Cascade> for RefAction {
+    #[inline]
+    fn from(node: Cascade) -> RefAction {
+        RefAction::Cascade(node)
+    }
+}
+impl From<NoAction> for RefAction {
+    #[inline]
+    fn from(node: NoAction) -> RefAction {
+        RefAction::NoAction(node)
+    }
+}
+impl From<Restrict> for RefAction {
+    #[inline]
+    fn from(node: Restrict) -> RefAction {
+        RefAction::Restrict(node)
+    }
+}
+impl From<SetDefaultColumns> for RefAction {
+    #[inline]
+    fn from(node: SetDefaultColumns) -> RefAction {
+        RefAction::SetDefaultColumns(node)
+    }
+}
+impl From<SetNullColumns> for RefAction {
+    #[inline]
+    fn from(node: SetNullColumns) -> RefAction {
+        RefAction::SetNullColumns(node)
     }
 }
 impl AstNode for Stmt {
