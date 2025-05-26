@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.9.0 - 2025-05-25
+
+### Added
+
+- Added back basic dump ast support via `squawk --debug=ast`. (#505)
+
 ## v2.8.0 - 2025-05-25
 
 ### Fixed
