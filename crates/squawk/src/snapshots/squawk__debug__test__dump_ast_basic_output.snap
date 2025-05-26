@@ -1,0 +1,24 @@
+---
+source: crates/squawk/src/debug.rs
+expression: output
+---
+{
+  "stmts": [
+    {
+      "type": "SELECT"
+    },
+    {
+      "type": "INSERT"
+    },
+    {
+      "type": "UPDATE"
+    },
+    {
+      "type": "DELETE"
+    },
+    {
+      "type": "TRUNCATE"
+    }
+  ],
+  "version": "0.1"
+}
