@@ -2,7 +2,8 @@ use std::{io, path::PathBuf};
 
 use annotate_snippets::{Level, Message, Renderer, Snippet};
 use anyhow::Result;
-use squawk_syntax::syntax_error::SyntaxError;
+use serde_json::json;
+use squawk_syntax::{ast::AstNode, syntax_error::SyntaxError};
 
 use crate::{
     file::{sql_from_path, sql_from_stdin},
@@ -13,11 +14,11 @@ pub(crate) fn debug<W: io::Write>(
     f: &mut W,
     paths: &[PathBuf],
     read_stdin: bool,
-    dump_ast: &DebugOption,
+    debug_option: &DebugOption,
     verbose: bool,
 ) -> Result<()> {
     let process_dump_ast = |sql: &str, filename: &str, f: &mut W| -> Result<()> {
-        match dump_ast {
+        match debug_option {
             DebugOption::Lex => {
                 let tokens = squawk_lexer::tokenize(sql);
                 let mut start = 0;
@@ -61,6 +62,9 @@ pub(crate) fn debug<W: io::Write>(
                     })?;
                 }
             }
+            DebugOption::Ast => {
+                dump_ast(f, sql)?;
+            }
         }
         Ok(())
     };
@@ -74,6 +78,30 @@ pub(crate) fn debug<W: io::Write>(
         let sql = sql_from_path(path)?;
         process_dump_ast(&sql, &path.to_string_lossy(), f)?;
     }
+    Ok(())
+}
+
+fn dump_ast<W: io::Write>(f: &mut W, sql: &str) -> Result<()> {
+    let parse = squawk_syntax::SourceFile::parse(sql);
+    let file = parse.tree();
+
+    let stmts = file
+        .stmts()
+        .map(|stmt| {
+            // No api guarantees for now
+            json!({
+                "type": format!("{:?}", stmt.syntax().kind())
+            })
+        })
+        .collect::<Vec<_>>();
+
+    let output = json!({
+        "version": "0.1",
+        "stmts": stmts,
+    });
+
+    writeln!(f, "{}", serde_json::to_string_pretty(&output)?)?;
+
     Ok(())
 }
 
@@ -95,4 +123,29 @@ fn render_syntax_errors(
         render(message)?;
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod test {
+    use insta::assert_snapshot;
+
+    use super::dump_ast;
+
+    #[test]
+    fn dump_ast_basic_output() {
+        let mut buffer = vec![];
+        dump_ast(
+            &mut buffer,
+            "
+select;
+insert into t values (1, 'a', true);
+update t set c = 10 where b = 5;
+delete from t;
+truncate t;
+",
+        )
+        .unwrap();
+        let output = String::from_utf8(buffer).expect("Invalid UTF-8");
+        assert_snapshot!(output);
+    }
 }

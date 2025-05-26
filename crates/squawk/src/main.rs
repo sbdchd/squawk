@@ -61,7 +61,8 @@ arg_enum! {
     #[derive(Debug, StructOpt)]
     pub enum DebugOption {
         Lex,
-        Parse
+        Parse,
+        Ast
     }
 }
 

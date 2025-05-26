@@ -24,26 +24,6 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// https://www.scattered-thoughts.net/writing/babys-second-wasm-compiler/
-//
-// https://craftinginterpreters.com/parsing-expressions.html
-//
-// see: https://github.com/rust-lang/rust-analyzer/blob/master/crates/parser/src/parser.rs
-// https://rust-analyzer.github.io/blog/2020/09/16/challeging-LR-parsing.html
-// https://github.com/rust-lang/rust-analyzer/blob/master/docs/dev/syntax.md
-// https://ericlippert.com/2012/06/08/red-green-trees/
-// https://github.com/swiftlang/swift/tree/5e2c815edfd758f9b1309ce07bfc01c4bc20ec23/lib/Syntax
-// https://swift-ast-explorer.com
-// https://github.com/rust-lang/rust-analyzer/blob/cf156a7a43f822e71309e50470ac34363da26727/docs/dev/syntax.md
-// https://github.com/kaleidawave/ezno/blob/8ce921e39c3d4e947063f206347b2932cee456ec/parser/src/lib.rs#L177
-// https://kaleidawave.github.io/posts/sets-types-and-type-checking/
-// https://github.com/m-novikov/tree-sitter-sql/tree/main
-// https://github.com/withered-magic/starpls/tree/79f47e12dab8be650804ce7fa931ee5e1e116eae/crates/starpls_parser/src
-// https://github.com/apache/datafusion-sqlparser-rs -- removes comments and whitespace :/
-
-// rust analyzer has a builtin doc test like thing where you generate snapshot
-// style tests from comments on top of grammar functions
-
 use drop_bomb::DropBomb;
 use event::Event;
 use grammar::OPERATOR_FIRST;
