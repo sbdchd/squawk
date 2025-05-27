@@ -1276,4 +1276,154 @@ SOURCE_FILE
       NAME_REF
         IDENT "t"
   SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- regression gh issue #509"
+  WHITESPACE "\n"
+  UPDATE
+    WITH_CLAUSE
+      WITH_KW "WITH"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "ranked_notifications"
+        WHITESPACE " "
+        AS_KW "AS"
+        WHITESPACE " "
+        L_PAREN "("
+        WHITESPACE "\n  "
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "SELECT"
+            WHITESPACE " \n    "
+            TARGET_LIST
+              TARGET
+                NAME_REF
+                  IDENT "notification_id"
+              COMMA ","
+              WHITESPACE "\n    "
+              TARGET
+                CALL_EXPR
+                  NAME_REF
+                    IDENT "ROW_NUMBER"
+                  ARG_LIST
+                    L_PAREN "("
+                    R_PAREN ")"
+                  WHITESPACE " "
+                  OVER_CLAUSE
+                    OVER_KW "OVER"
+                    WHITESPACE " "
+                    L_PAREN "("
+                    WHITESPACE "\n      "
+                    WINDOW_DEF
+                      PARTITION_KW "PARTITION"
+                      WHITESPACE " "
+                      BY_KW "BY"
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "user_id"
+                      COMMA ","
+                      WHITESPACE " "
+                      NAME_REF
+                        IDENT "board_id"
+                      WHITESPACE " "
+                      ORDER_BY_CLAUSE
+                        ORDER_KW "ORDER"
+                        WHITESPACE " "
+                        BY_KW "BY"
+                        WHITESPACE " "
+                        NAME_REF
+                          IDENT "created_at"
+                        WHITESPACE " "
+                        DESC_KW "DESC"
+                    WHITESPACE "\n    "
+                    R_PAREN ")"
+          WHITESPACE "\n  "
+          FROM_CLAUSE
+            FROM_KW "FROM"
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "public"
+              DOT "."
+              NAME_REF
+                IDENT "notification"
+          WHITESPACE "\n  "
+          WHERE_CLAUSE
+            WHERE_KW "WHERE"
+            WHITESPACE " "
+            BIN_EXPR
+              NAME_REF
+                IDENT "android_channel_id"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                STRING "'watchlist'"
+        WHITESPACE "\n"
+        R_PAREN ")"
+    WHITESPACE "\n"
+    UPDATE_KW "UPDATE"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "public"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "notification"
+    WHITESPACE "\n"
+    SET_KW "SET"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "dismissed_at"
+    WHITESPACE " "
+    EQ "="
+    WHITESPACE " "
+    NAME_REF
+      CURRENT_TIMESTAMP_KW "current_timestamp"
+    WHITESPACE "\n"
+    WHERE_CLAUSE
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      BIN_EXPR
+        NAME_REF
+          IDENT "notification_id"
+        WHITESPACE " "
+        IN_KW "IN"
+        WHITESPACE " "
+        PAREN_EXPR
+          L_PAREN "("
+          WHITESPACE "\n  "
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "SELECT"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "notification_id"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "FROM"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "ranked_notifications"
+            WHITESPACE " "
+            WHERE_CLAUSE
+              WHERE_KW "WHERE"
+              WHITESPACE " "
+              BIN_EXPR
+                NAME_REF
+                  IDENT "rn"
+                WHITESPACE " "
+                R_ANGLE ">"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+          WHITESPACE "\n"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"

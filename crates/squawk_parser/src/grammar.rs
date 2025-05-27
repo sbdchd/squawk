@@ -3954,6 +3954,11 @@ fn window_definition(p: &mut Parser<'_>) -> bool {
         if expr(p).is_none() {
             p.error("expected an expression");
         }
+        while p.eat(COMMA) && !p.at(EOF) {
+            if expr(p).is_none() {
+                p.error("expected an expression");
+            }
+        }
     }
     opt_order_by_clause(p);
     if p.at(RANGE_KW) || p.at(ROWS_KW) || p.at(GROUPS_KW) {
