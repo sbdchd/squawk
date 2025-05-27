@@ -103,6 +103,51 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  build-linux-musl-x64:
+    needs: pre_job
+    # if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
+
+    name: Linux Alpine x86_64
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install musl-tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y musl-tools
+
+      - name: Install Toolchain
+        uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
+        with:
+          toolchain: stable
+          target: x86_64-unknown-linux-musl
+          profile: minimal
+          override: true
+
+      - name: Cache
+        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
+
+      - name: Build
+        run: RUSTFLAGS="-C linker=rust-lld" cargo build --target x86_64-unknown-linux-musl --release && mv target/x86_64-unknown-linux-musl/release/squawk target/release/squawk-linux-musl-x64
+
+      - name: Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-squawk-linux-musl-x64
+          path: target/release/squawk-linux-musl-x64
+
+      - name: Release
+        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            target/release/squawk-linux-musl-x64
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   build-windows:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
@@ -193,7 +238,7 @@ jobs:
 
   publish-npm:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-linux-x64, build-mac, build-windows]
+    needs: [build-linux-x64, build-linux-musl-x64, build-mac, build-windows]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -207,7 +252,7 @@ jobs:
 
   publish-docker:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-linux-x64, build-mac, build-windows]
+    needs: [build-linux-x64, build-linux-musl-x64, build-mac, build-windows]
     runs-on: ubuntu-22.04
     permissions:
       contents: read
