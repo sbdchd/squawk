@@ -136,7 +136,9 @@ impl TryFrom<&str> for Rule {
             "prefer-identity" => Ok(Rule::PreferIdentity),
             "prefer-robust-stmts" => Ok(Rule::PreferRobustStmts),
             "prefer-text-field" => Ok(Rule::PreferTextField),
+            // this is typo'd so we just support both
             "prefer-timestamptz" => Ok(Rule::PreferTimestampTz),
+            "prefer-timestamp-tz" => Ok(Rule::PreferTimestampTz),
             "ban-char-field" => Ok(Rule::BanCharField),
             "ban-drop-column" => Ok(Rule::BanDropColumn),
             "ban-drop-table" => Ok(Rule::BanDropTable),
