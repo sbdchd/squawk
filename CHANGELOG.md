@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.10.0 - 2025-05-27
+
+### Fixed
+
+- Fix typo in rule name parsing causing `unused-ignore` to warn for `prefer-timestamp-tz`. (#511)
+
+- Fix parsing window definition. (#510)
+
+  Previously the following would error:
+
+  ```sql
+  WITH ranked_notifications AS (
+    SELECT
+      notification_id,
+      ROW_NUMBER() OVER (
+        PARTITION BY user_id, board_id ORDER BY created_at DESC
+      ) AS rn
+    FROM public.notification
+    WHERE android_channel_id = 'watchlist'
+  )
+  UPDATE public.notification
+  SET dismissed_at = current_timestamp
+  WHERE notification_id IN (
+    SELECT notification_id FROM ranked_notifications WHERE rn > 1
+  );
+  ```
+
 ## v2.9.0 - 2025-05-25
 
 ### Added
