@@ -225,12 +225,9 @@ repos:
 
 Note the `files` parameter as it specifies the location of the files to be linted.
 
-## Prior Art
+## Prior Art / Related
 
 - <https://github.com/erik/squabble>
-
-### Related Tools
-
 - <https://github.com/yandex/zero-downtime-migrations>
 - <https://github.com/tbicr/django-pg-zero-downtime-migrations>
 - <https://github.com/3YOURMIND/django-migration-linter>
@@ -240,6 +237,20 @@ Note the `files` parameter as it specifies the location of the files to be linte
 - <https://github.com/kristiandupont/schemalint>
 - <https://github.com/supabase-community/postgres-language-server>
 - <https://github.com/premium-minds/sonar-postgres-plugin>
+- <https://engineering.fb.com/2022/11/30/data-infrastructure/static-analysis-sql-queries/>
+- <https://github.com/xNaCly/sqleibniz>
+- <https://github.com/sqlfluff/sqlfluff>
+- <https://atlasgo.io/lint/analyzers>
+- <https://github.com/tobymao/sqlglot>
+- <https://github.com/paupino/pg_parse>
+- <https://github.com/sql-formatter-org/sql-formatter>
+- <https://github.com/darold/pgFormatter>
+- <https://github.com/sqls-server/sqls>
+- <https://github.com/joe-re/sql-language-server>
+- <https://github.com/nene/sql-parser-cst>
+  - <https://github.com/nene/prettier-plugin-sql-cst>
+- <https://www.sqlstyle.guide>
+- <https://github.com/ivank/potygen>
 
 ## Related Blog Posts / SE Posts / PG Docs
 
