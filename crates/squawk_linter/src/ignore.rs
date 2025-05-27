@@ -212,4 +212,21 @@ create table users (
         let errors = linter.lint(parse, sql);
         assert_eq!(errors.len(), 1);
     }
+
+    #[test]
+    fn regression_unknown_name() {
+        let mut linter = Linter::with_all_rules();
+        let sql = r#"
+-- squawk-ignore prefer-robust-stmts
+create table test_table (
+  -- squawk-ignore prefer-timestamp-tz
+  created_at timestamp default current_timestamp,
+  other_field text
+);
+        "#;
+
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        let errors = linter.lint(parse, sql);
+        assert_eq!(errors.len(), 0);
+    }
 }
