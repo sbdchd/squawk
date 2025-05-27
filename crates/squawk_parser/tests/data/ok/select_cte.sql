@@ -117,3 +117,19 @@ select timestamp from t;
 with t(time) as (select 1)
 select time from t;
 
+
+-- regression gh issue #509
+WITH ranked_notifications AS (
+  SELECT 
+    notification_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id, board_id ORDER BY created_at DESC
+    )
+  FROM public.notification
+  WHERE android_channel_id = 'watchlist'
+)
+UPDATE public.notification
+SET dismissed_at = current_timestamp
+WHERE notification_id IN (
+  SELECT notification_id FROM ranked_notifications WHERE rn > 1
+);
