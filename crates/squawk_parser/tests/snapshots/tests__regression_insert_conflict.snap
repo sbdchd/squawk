@@ -1,0 +1,264 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/insert_conflict.sql
+---
+ERROR@1270: expected R_PAREN
+ERROR@1270: expected SEMICOLON
+ERROR@1270: expected command, found L_PAREN
+ERROR@1271: expected command, found IDENT
+ERROR@1276: expected command, found R_PAREN
+ERROR@1277: expected command, found COMMA
+ERROR@1279: expected command, found KEY_KW
+ERROR@1282: expected command, found COMMA
+ERROR@1284: expected command, found IDENT
+ERROR@1289: expected command, found L_PAREN
+ERROR@1290: expected command, found IDENT
+ERROR@1295: expected command, found R_PAREN
+ERROR@1296: expected command, found COMMA
+ERROR@1298: expected command, found KEY_KW
+ERROR@1301: expected command, found R_PAREN
+ERROR@1305: expected string literal
+ERROR@1305: expected SEMICOLON
+ERROR@1306: expected command, found NOTHING_KW
+ERROR@1407: expected R_PAREN
+ERROR@1407: expected SEMICOLON
+ERROR@1407: expected command, found L_PAREN
+ERROR@1408: expected command, found IDENT
+ERROR@1413: expected command, found R_PAREN
+ERROR@1414: expected command, found COMMA
+ERROR@1416: expected command, found KEY_KW
+ERROR@1419: expected command, found COMMA
+ERROR@1421: expected command, found IDENT
+ERROR@1426: expected command, found L_PAREN
+ERROR@1427: expected command, found IDENT
+ERROR@1432: expected command, found R_PAREN
+ERROR@1433: expected command, found COMMA
+ERROR@1435: expected command, found KEY_KW
+ERROR@1438: expected command, found R_PAREN
+ERROR@1442: expected string literal
+ERROR@1442: expected SEMICOLON
+ERROR@1443: expected command, found NOTHING_KW
+ERROR@2639: expected R_PAREN
+ERROR@2639: expected SEMICOLON
+ERROR@2639: expected command, found L_PAREN
+ERROR@2640: expected command, found IDENT
+ERROR@2645: expected command, found R_PAREN
+ERROR@2647: expected command, found COLLATE_KW
+ERROR@2655: expected command, found IDENT
+ERROR@2658: expected command, found COMMA
+ERROR@2660: expected command, found KEY_KW
+ERROR@2663: expected command, found COMMA
+ERROR@2665: expected command, found KEY_KW
+ERROR@2668: expected command, found R_PAREN
+ERROR@2672: expected string literal
+ERROR@2672: expected SEMICOLON
+ERROR@2673: expected command, found NOTHING_KW
+ERROR@3701: expected R_PAREN
+ERROR@3701: expected SEMICOLON
+ERROR@3701: expected command, found L_PAREN
+ERROR@3702: expected command, found IDENT
+ERROR@3707: expected command, found R_PAREN
+ERROR@3709: expected command, found COLLATE_KW
+ERROR@3717: expected command, found IDENT
+ERROR@3721: expected command, found IDENT
+ERROR@3737: expected command, found COMMA
+ERROR@3739: expected command, found KEY_KW
+ERROR@3742: expected command, found COMMA
+ERROR@3744: expected command, found KEY_KW
+ERROR@3747: expected command, found R_PAREN
+ERROR@3751: expected string literal
+ERROR@3751: expected SEMICOLON
+ERROR@3752: expected command, found NOTHING_KW
+ERROR@4179: expected R_PAREN
+ERROR@4179: expected SEMICOLON
+ERROR@4179: expected command, found L_PAREN
+ERROR@4180: expected command, found IDENT
+ERROR@4185: expected command, found R_PAREN
+ERROR@4187: expected command, found IDENT
+ERROR@4203: expected command, found COMMA
+ERROR@4205: expected command, found IDENT
+ERROR@4210: expected command, found L_PAREN
+ERROR@4211: expected command, found IDENT
+ERROR@4216: expected command, found R_PAREN
+ERROR@4218: expected command, found COLLATE_KW
+ERROR@4226: expected command, found IDENT
+ERROR@4229: expected command, found R_PAREN
+ERROR@4233: expected string literal
+ERROR@4233: expected SEMICOLON
+ERROR@4234: expected command, found NOTHING_KW
+ERROR@4345: expected R_PAREN
+ERROR@4345: expected SEMICOLON
+ERROR@4345: expected command, found L_PAREN
+ERROR@4346: expected command, found IDENT
+ERROR@4351: expected command, found R_PAREN
+ERROR@4353: expected command, found COLLATE_KW
+ERROR@4361: expected command, found IDENT
+ERROR@4364: expected command, found COMMA
+ERROR@4366: expected command, found IDENT
+ERROR@4371: expected command, found L_PAREN
+ERROR@4372: expected command, found IDENT
+ERROR@4377: expected command, found R_PAREN
+ERROR@4379: expected command, found IDENT
+ERROR@4395: expected command, found R_PAREN
+ERROR@4399: expected string literal
+ERROR@4399: expected SEMICOLON
+ERROR@4400: expected command, found NOTHING_KW
+ERROR@7045: expected R_PAREN
+ERROR@7045: expected SEMICOLON
+ERROR@7045: expected command, found L_PAREN
+ERROR@7046: expected command, found IDENT
+ERROR@7051: expected command, found R_PAREN
+ERROR@7052: expected command, found R_PAREN
+ERROR@7056: expected string literal
+ERROR@7056: expected SEMICOLON
+ERROR@7073: expected SET_KW
+ERROR@7073: expected name
+ERROR@7768: expected EQ
+ERROR@7768: expected an expression, found DOT
+ERROR@7769: expected expression
+ERROR@7769: expected SEMICOLON
+ERROR@7769: expected command, found IDENT
+ERROR@7775: expected command, found EQ
+ERROR@7777: expected command, found STRING
+ERROR@8491: expected R_PAREN
+ERROR@8491: expected SEMICOLON
+ERROR@8491: expected command, found L_PAREN
+ERROR@8492: expected command, found IDENT
+ERROR@8497: expected command, found R_PAREN
+ERROR@8498: expected command, found R_PAREN
+ERROR@8502: expected string literal
+ERROR@8502: expected SEMICOLON
+ERROR@8519: expected SET_KW
+ERROR@8519: expected name
+ERROR@8607: expected R_PAREN
+ERROR@8607: expected SEMICOLON
+ERROR@8607: expected command, found L_PAREN
+ERROR@8608: expected command, found IDENT
+ERROR@8613: expected command, found R_PAREN
+ERROR@8614: expected command, found COMMA
+ERROR@8616: expected command, found KEY_KW
+ERROR@8619: expected command, found R_PAREN
+ERROR@8623: expected string literal
+ERROR@8623: expected SEMICOLON
+ERROR@8640: expected SET_KW
+ERROR@8640: expected name
+ERROR@9501: expected R_PAREN
+ERROR@9501: expected SEMICOLON
+ERROR@9501: expected command, found L_PAREN
+ERROR@9502: expected command, found IDENT
+ERROR@9507: expected command, found R_PAREN
+ERROR@9508: expected command, found R_PAREN
+ERROR@9512: expected string literal
+ERROR@9512: expected SEMICOLON
+ERROR@9529: expected SET_KW
+ERROR@9529: expected name
+ERROR@9622: expected R_PAREN
+ERROR@9622: expected SEMICOLON
+ERROR@9622: expected command, found L_PAREN
+ERROR@9623: expected command, found IDENT
+ERROR@9628: expected command, found R_PAREN
+ERROR@9629: expected command, found COMMA
+ERROR@9631: expected command, found KEY_KW
+ERROR@9634: expected command, found R_PAREN
+ERROR@9638: expected string literal
+ERROR@9638: expected SEMICOLON
+ERROR@9655: expected SET_KW
+ERROR@9655: expected name
+ERROR@9944: expected R_PAREN
+ERROR@9944: expected SEMICOLON
+ERROR@9944: expected command, found L_PAREN
+ERROR@9945: expected command, found IDENT
+ERROR@9950: expected command, found R_PAREN
+ERROR@9951: expected command, found R_PAREN
+ERROR@9955: expected string literal
+ERROR@9955: expected SEMICOLON
+ERROR@9972: expected SET_KW
+ERROR@9972: expected name
+ERROR@10067: expected R_PAREN
+ERROR@10067: expected SEMICOLON
+ERROR@10067: expected command, found L_PAREN
+ERROR@10068: expected command, found IDENT
+ERROR@10073: expected command, found R_PAREN
+ERROR@10074: expected command, found COMMA
+ERROR@10076: expected command, found IDENT
+ERROR@10081: expected command, found L_PAREN
+ERROR@10082: expected command, found IDENT
+ERROR@10087: expected command, found R_PAREN
+ERROR@10088: expected command, found R_PAREN
+ERROR@10092: expected string literal
+ERROR@10092: expected SEMICOLON
+ERROR@10109: expected SET_KW
+ERROR@10109: expected name
+ERROR@10221: expected R_PAREN
+ERROR@10221: expected SEMICOLON
+ERROR@10221: expected command, found L_PAREN
+ERROR@10222: expected command, found IDENT
+ERROR@10227: expected command, found R_PAREN
+ERROR@10228: expected command, found R_PAREN
+ERROR@10232: expected string literal
+ERROR@10232: expected SEMICOLON
+ERROR@10249: expected SET_KW
+ERROR@10249: expected name
+ERROR@10749: expected R_PAREN
+ERROR@10749: expected SEMICOLON
+ERROR@10749: expected command, found L_PAREN
+ERROR@10750: expected command, found IDENT
+ERROR@10755: expected command, found R_PAREN
+ERROR@10756: expected command, found R_PAREN
+ERROR@10760: expected string literal
+ERROR@10760: expected SEMICOLON
+ERROR@10777: expected SET_KW
+ERROR@10777: expected name
+ERROR@10866: expected R_PAREN
+ERROR@10866: expected SEMICOLON
+ERROR@10866: expected command, found L_PAREN
+ERROR@10867: expected command, found IDENT
+ERROR@10872: expected command, found R_PAREN
+ERROR@10873: expected command, found COMMA
+ERROR@10875: expected command, found KEY_KW
+ERROR@10878: expected command, found R_PAREN
+ERROR@10882: expected string literal
+ERROR@10882: expected SEMICOLON
+ERROR@10899: expected SET_KW
+ERROR@10899: expected name
+ERROR@11062: expected R_PAREN
+ERROR@11062: expected SEMICOLON
+ERROR@11062: expected command, found L_PAREN
+ERROR@11063: expected command, found IDENT
+ERROR@11068: expected command, found R_PAREN
+ERROR@11069: expected command, found COMMA
+ERROR@11071: expected command, found KEY_KW
+ERROR@11074: expected command, found COMMA
+ERROR@11076: expected command, found IDENT
+ERROR@11081: expected command, found L_PAREN
+ERROR@11082: expected command, found IDENT
+ERROR@11087: expected command, found R_PAREN
+ERROR@11088: expected command, found COMMA
+ERROR@11090: expected command, found KEY_KW
+ERROR@11093: expected command, found R_PAREN
+ERROR@11097: expected string literal
+ERROR@11097: expected SEMICOLON
+ERROR@11114: expected SET_KW
+ERROR@11114: expected name
+ERROR@11229: expected R_PAREN
+ERROR@11229: expected SEMICOLON
+ERROR@11229: expected command, found L_PAREN
+ERROR@11230: expected command, found IDENT
+ERROR@11235: expected command, found R_PAREN
+ERROR@11236: expected command, found R_PAREN
+ERROR@11240: expected string literal
+ERROR@11240: expected SEMICOLON
+ERROR@11257: expected SET_KW
+ERROR@11257: expected name
+ERROR@15602: expected R_PAREN
+ERROR@15602: expected SEMICOLON
+ERROR@15602: expected command, found L_PAREN
+ERROR@15603: expected command, found IDENT
+ERROR@15604: expected command, found COMMA
+ERROR@15606: expected command, found INT_NUMBER
+ERROR@15607: expected command, found R_PAREN
+ERROR@15608: expected command, found R_PAREN
+ERROR@15612: expected string literal
+ERROR@15612: expected SEMICOLON
+ERROR@15613: expected command, found NOTHING_KW
+ERROR@17667: expected COMMA

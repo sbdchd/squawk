@@ -1,0 +1,85 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/guc.sql
+---
+ERROR@4100: expected SEMICOLON
+ERROR@4100: expected command, found DOT
+ERROR@4101: expected command, found IDENT
+ERROR@4144: expected EQ
+ERROR@4144: expected config value, got DOT
+ERROR@4144: expected SEMICOLON
+ERROR@4144: expected command, found DOT
+ERROR@4145: expected command, found IDENT
+ERROR@4152: expected command, found EQ
+ERROR@4154: expected command, found INT_NUMBER
+ERROR@4169: expected SEMICOLON
+ERROR@4169: expected command, found DOT
+ERROR@4170: expected command, found IDENT
+ERROR@4190: expected SEMICOLON
+ERROR@4190: expected command, found DOT
+ERROR@4191: expected command, found IDENT
+ERROR@4266: expected SEMICOLON
+ERROR@4266: expected command, found DOT
+ERROR@4267: expected command, found IDENT
+ERROR@4285: expected EQ
+ERROR@4285: expected config value, got DOT
+ERROR@4285: expected SEMICOLON
+ERROR@4285: expected command, found DOT
+ERROR@4286: expected command, found IDENT
+ERROR@4288: expected command, found DOT
+ERROR@4289: expected command, found IDENT
+ERROR@4298: expected command, found DOT
+ERROR@4299: expected command, found IDENT
+ERROR@4303: expected command, found EQ
+ERROR@4305: expected command, found STRING
+ERROR@4323: expected SEMICOLON
+ERROR@4323: expected command, found DOT
+ERROR@4324: expected command, found IDENT
+ERROR@4326: expected command, found DOT
+ERROR@4327: expected command, found IDENT
+ERROR@4336: expected command, found DOT
+ERROR@4337: expected command, found IDENT
+ERROR@4352: expected EQ
+ERROR@4352: expected config value, got DOT
+ERROR@4352: expected SEMICOLON
+ERROR@4352: expected command, found DOT
+ERROR@4353: expected command, found IDENT
+ERROR@4363: expected command, found EQ
+ERROR@4365: expected command, found INT_NUMBER
+ERROR@4427: expected SEMICOLON
+ERROR@4427: expected command, found DOT
+ERROR@4428: expected command, found IDENT
+ERROR@4450: expected EQ
+ERROR@4450: expected config value, got DOT
+ERROR@4450: expected SEMICOLON
+ERROR@4450: expected command, found DOT
+ERROR@4451: expected command, found IDENT
+ERROR@4464: expected command, found EQ
+ERROR@4466: expected command, found STRING
+ERROR@4528: expected SEMICOLON
+ERROR@4528: expected command, found DOT
+ERROR@4529: expected command, found IDENT
+ERROR@4653: expected EQ
+ERROR@4653: expected config value, got DOT
+ERROR@4653: expected SEMICOLON
+ERROR@4653: expected command, found DOT
+ERROR@4654: expected command, found IDENT
+ERROR@4673: expected command, found EQ
+ERROR@4675: expected command, found TRUE_KW
+ERROR@4803: expected EQ
+ERROR@4803: expected config value, got DOT
+ERROR@4803: expected SEMICOLON
+ERROR@4803: expected command, found DOT
+ERROR@4804: expected command, found IDENT
+ERROR@4823: expected command, found EQ
+ERROR@4825: expected command, found TRUE_KW
+ERROR@4866: expected SEMICOLON
+ERROR@4866: expected command, found DOT
+ERROR@4867: expected command, found IDENT
+ERROR@7985: expected EQ
+ERROR@7985: expected config value, got DOT
+ERROR@7985: expected SEMICOLON
+ERROR@7985: expected command, found DOT
+ERROR@7986: expected command, found IDENT
+ERROR@7994: expected command, found EQ
+ERROR@7996: expected command, found STRING

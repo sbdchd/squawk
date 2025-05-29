@@ -1,0 +1,17 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/timestamptz.sql
+---
+ERROR@1583: expected SEMICOLON
+ERROR@1593: expected AS_KW
+ERROR@1593: expected L_PAREN
+ERROR@1593: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: ZONE_KW
+ERROR@1593: expected R_PAREN
+ERROR@1593: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: ZONE_KW
+ERROR@1594: expected command, found ZONE_KW
+ERROR@1599: expected command, found STRING
+ERROR@28897: expected COMMA
+ERROR@28900: expected COMMA
+ERROR@29074: expected COMMA
+ERROR@29077: expected COMMA
+ERROR@29280: missing comma

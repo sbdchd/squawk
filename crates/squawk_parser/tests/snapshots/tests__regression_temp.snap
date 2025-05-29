@@ -1,0 +1,20 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/temp.sql
+---
+ERROR@1146: expected type name
+ERROR@1511: expected type name
+ERROR@2093: expected type name
+ERROR@3533: expected type name
+ERROR@3533: expected SEMICOLON
+ERROR@3533: expected command, found DOT
+ERROR@3534: expected command, found IDENT
+ERROR@3543: expected command, found AS_KW
+ERROR@3546: expected command, found TEXT_KW
+ERROR@3551: expected command, found CHECK_KW
+ERROR@3557: expected command, found L_PAREN
+ERROR@3558: expected command, found VALUE_KW
+ERROR@3564: expected command, found L_ANGLE
+ERROR@3565: expected command, found R_ANGLE
+ERROR@3567: expected command, found STRING
+ERROR@3569: expected command, found R_PAREN

@@ -1,0 +1,25 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/select_into.sql
+---
+ERROR@619: expected type name
+ERROR@831: expected type name
+ERROR@944: expected type name
+ERROR@1104: expected type name
+ERROR@1280: expected type name
+ERROR@1428: expected type name
+ERROR@1542: expected type name
+ERROR@1691: expected type name
+ERROR@2192: expected type name
+ERROR@2196: expected type name
+ERROR@2200: expected type name
+ERROR@2270: expected type name
+ERROR@2274: expected type name
+ERROR@2278: expected type name
+ERROR@2361: expected type name
+ERROR@2365: expected type name
+ERROR@2434: expected type name
+ERROR@2438: expected type name
+ERROR@2520: expected type name
+ERROR@2589: expected type name
+ERROR@3762: expected SELECT, got SELECT_INTO

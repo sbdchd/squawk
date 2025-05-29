@@ -1,0 +1,219 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/domain.sql
+---
+ERROR@544: expected SEMICOLON
+ERROR@545: expected command, found NO_KW
+ERROR@548: expected command, found INHERIT_KW
+ERROR@991: expected L_PAREN
+ERROR@993: expected L_PAREN
+ERROR@994: expected L_PAREN
+ERROR@996: expected L_PAREN
+ERROR@999: expected L_PAREN
+ERROR@1006: expected L_PAREN
+ERROR@1008: expected L_PAREN
+ERROR@1015: expected L_PAREN
+ERROR@1022: expected L_PAREN
+ERROR@1029: expected L_PAREN
+ERROR@1032: expected L_PAREN
+ERROR@1037: expected L_PAREN
+ERROR@1048: expected L_PAREN
+ERROR@1051: expected L_PAREN
+ERROR@1065: expected L_PAREN
+ERROR@1067: expected L_PAREN
+ERROR@1068: expected L_PAREN
+ERROR@1070: expected L_PAREN
+ERROR@1080: expected L_PAREN
+ERROR@1239: expected L_PAREN
+ERROR@1246: expected L_PAREN
+ERROR@1253: expected L_PAREN
+ERROR@1267: expected L_PAREN
+ERROR@1277: expected R_PAREN
+ERROR@1277: expected R_PAREN
+ERROR@4141: expected EQ
+ERROR@4180: expected EQ
+ERROR@5076: expected EQ
+ERROR@5076: expected an expression, found DOT
+ERROR@5077: expected expression
+ERROR@5077: expected SEMICOLON
+ERROR@5077: expected command, found IDENT
+ERROR@5079: expected command, found EQ
+ERROR@5081: expected command, found L_PAREN
+ERROR@5082: expected command, found IDENT
+ERROR@5084: expected command, found R_PAREN
+ERROR@5085: expected command, found DOT
+ERROR@5086: expected command, found IDENT
+ERROR@5088: expected command, found PLUS
+ERROR@5090: expected command, found INT_NUMBER
+ERROR@5092: expected command, found WHERE_KW
+ERROR@5098: expected command, found L_PAREN
+ERROR@5099: expected command, found IDENT
+ERROR@5101: expected command, found R_PAREN
+ERROR@5102: expected command, found DOT
+ERROR@5103: expected command, found IDENT
+ERROR@5105: expected command, found R_ANGLE
+ERROR@5107: expected command, found INT_NUMBER
+ERROR@5623: expected EQ
+ERROR@5623: expected an expression, found DOT
+ERROR@5624: expected expression
+ERROR@5624: expected SEMICOLON
+ERROR@5624: expected command, found IDENT
+ERROR@5626: expected command, found EQ
+ERROR@5628: expected command, found L_PAREN
+ERROR@5629: expected command, found IDENT
+ERROR@5631: expected command, found R_PAREN
+ERROR@5632: expected command, found DOT
+ERROR@5633: expected command, found IDENT
+ERROR@5635: expected command, found PLUS
+ERROR@5637: expected command, found INT_NUMBER
+ERROR@5639: expected command, found WHERE_KW
+ERROR@5645: expected command, found L_PAREN
+ERROR@5646: expected command, found IDENT
+ERROR@5648: expected command, found R_PAREN
+ERROR@5649: expected command, found DOT
+ERROR@5650: expected command, found IDENT
+ERROR@5652: expected command, found R_ANGLE
+ERROR@5654: expected command, found INT_NUMBER
+ERROR@5690: expected EQ
+ERROR@5690: expected an expression, found DOT
+ERROR@5691: expected expression
+ERROR@5691: expected SEMICOLON
+ERROR@5691: expected command, found IDENT
+ERROR@5693: expected command, found EQ
+ERROR@5695: expected command, found L_PAREN
+ERROR@5696: expected command, found IDENT
+ERROR@5698: expected command, found R_PAREN
+ERROR@5699: expected command, found DOT
+ERROR@5700: expected command, found IDENT
+ERROR@5702: expected command, found MINUS
+ERROR@5704: expected command, found INT_NUMBER
+ERROR@5705: expected command, found COMMA
+ERROR@5707: expected command, found IDENT
+ERROR@5709: expected command, found DOT
+ERROR@5710: expected command, found IDENT
+ERROR@5712: expected command, found EQ
+ERROR@5714: expected command, found L_PAREN
+ERROR@5715: expected command, found IDENT
+ERROR@5717: expected command, found R_PAREN
+ERROR@5718: expected command, found DOT
+ERROR@5719: expected command, found IDENT
+ERROR@5721: expected command, found PLUS
+ERROR@5723: expected command, found INT_NUMBER
+ERROR@5725: expected command, found WHERE_KW
+ERROR@5731: expected command, found L_PAREN
+ERROR@5732: expected command, found IDENT
+ERROR@5734: expected command, found R_PAREN
+ERROR@5735: expected command, found DOT
+ERROR@5736: expected command, found IDENT
+ERROR@5738: expected command, found R_ANGLE
+ERROR@5740: expected command, found INT_NUMBER
+ERROR@5825: expected EQ
+ERROR@5825: expected an expression, found DOT
+ERROR@5826: expected expression
+ERROR@5826: expected SEMICOLON
+ERROR@5826: expected command, found IDENT
+ERROR@5828: expected command, found EQ
+ERROR@5830: expected command, found L_PAREN
+ERROR@5831: expected command, found IDENT
+ERROR@5833: expected command, found R_PAREN
+ERROR@5834: expected command, found DOT
+ERROR@5835: expected command, found IDENT
+ERROR@5837: expected command, found MINUS
+ERROR@5839: expected command, found INT_NUMBER
+ERROR@5840: expected command, found COMMA
+ERROR@5842: expected command, found IDENT
+ERROR@5844: expected command, found DOT
+ERROR@5845: expected command, found IDENT
+ERROR@5847: expected command, found EQ
+ERROR@5849: expected command, found L_PAREN
+ERROR@5850: expected command, found IDENT
+ERROR@5852: expected command, found R_PAREN
+ERROR@5853: expected command, found DOT
+ERROR@5854: expected command, found IDENT
+ERROR@5856: expected command, found PLUS
+ERROR@5858: expected command, found INT_NUMBER
+ERROR@5860: expected command, found WHERE_KW
+ERROR@5866: expected command, found L_PAREN
+ERROR@5867: expected command, found IDENT
+ERROR@5869: expected command, found R_PAREN
+ERROR@5870: expected command, found DOT
+ERROR@5871: expected command, found IDENT
+ERROR@5873: expected command, found R_ANGLE
+ERROR@5875: expected command, found INT_NUMBER
+ERROR@5960: expected EQ
+ERROR@5960: expected an expression, found DOT
+ERROR@5961: expected expression
+ERROR@5961: expected SEMICOLON
+ERROR@5961: expected command, found IDENT
+ERROR@5963: expected command, found EQ
+ERROR@5965: expected command, found L_PAREN
+ERROR@5966: expected command, found IDENT
+ERROR@5968: expected command, found R_PAREN
+ERROR@5969: expected command, found DOT
+ERROR@5970: expected command, found IDENT
+ERROR@5972: expected command, found MINUS
+ERROR@5974: expected command, found INT_NUMBER
+ERROR@5975: expected command, found COMMA
+ERROR@5977: expected command, found IDENT
+ERROR@5979: expected command, found DOT
+ERROR@5980: expected command, found IDENT
+ERROR@5982: expected command, found EQ
+ERROR@5984: expected command, found L_PAREN
+ERROR@5985: expected command, found IDENT
+ERROR@5987: expected command, found R_PAREN
+ERROR@5988: expected command, found DOT
+ERROR@5989: expected command, found IDENT
+ERROR@5991: expected command, found PLUS
+ERROR@5993: expected command, found INT_NUMBER
+ERROR@5995: expected command, found WHERE_KW
+ERROR@6001: expected command, found L_PAREN
+ERROR@6002: expected command, found IDENT
+ERROR@6004: expected command, found R_PAREN
+ERROR@6005: expected command, found DOT
+ERROR@6006: expected command, found IDENT
+ERROR@6008: expected command, found R_ANGLE
+ERROR@6010: expected command, found INT_NUMBER
+ERROR@7709: expected EQ
+ERROR@7788: expected EQ
+ERROR@8387: expected EQ
+ERROR@8459: expected EQ
+ERROR@8482: expected EQ
+ERROR@8605: expected EQ
+ERROR@8628: expected EQ
+ERROR@8753: expected EQ
+ERROR@8776: expected EQ
+ERROR@9138: expected EQ
+ERROR@9176: expected EQ
+ERROR@10123: expected EQ
+ERROR@10292: expected EQ
+ERROR@10387: expected R_PAREN
+ERROR@10387: expected EQ
+ERROR@10387: expected SEMICOLON
+ERROR@10387: expected command, found L_BRACK
+ERROR@10388: expected command, found INT_NUMBER
+ERROR@10389: expected command, found R_BRACK
+ERROR@10390: expected command, found R_PAREN
+ERROR@10391: expected command, found L_BRACK
+ERROR@10392: expected command, found INT_NUMBER
+ERROR@10393: expected command, found R_BRACK
+ERROR@10395: expected command, found EQ
+ERROR@10397: expected command, found ARRAY_KW
+ERROR@10402: expected command, found L_BRACK
+ERROR@10403: expected command, found INT_NUMBER
+ERROR@10405: expected command, found R_BRACK
+ERROR@10717: expected EQ
+ERROR@10772: expected EQ
+ERROR@10819: expected EQ
+ERROR@10992: expected EQ
+ERROR@23152: expected EQ
+ERROR@23177: expected EQ
+ERROR@25791: expected SEMICOLON
+ERROR@25792: expected command, found ENFORCED_KW
+ERROR@25898: expected NULL_KW
+ERROR@25898: expected SEMICOLON
+ERROR@25899: expected command, found ENFORCED_KW
+ERROR@26072: expected SEMICOLON
+ERROR@26073: expected command, found ENFORCED_KW
+ERROR@26171: expected VALID_KW
+ERROR@26171: expected SEMICOLON
+ERROR@26172: expected command, found ENFORCED_KW

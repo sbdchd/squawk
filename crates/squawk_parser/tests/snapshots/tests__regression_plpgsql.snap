@@ -1,0 +1,594 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/plpgsql.sql
+---
+ERROR@55613: expected command, found INT_NUMBER
+ERROR@55615: expected command, found INT_NUMBER
+ERROR@55618: expected command, found INT_NUMBER
+ERROR@55621: expected command, found INT_NUMBER
+ERROR@55625: expected command, found INT_NUMBER
+ERROR@55629: expected command, found INT_NUMBER
+ERROR@69836: expected EQ
+ERROR@69836: expected config value, got DOT
+ERROR@69836: expected SEMICOLON
+ERROR@69836: expected command, found DOT
+ERROR@69837: expected command, found IDENT
+ERROR@69857: expected command, found TO_KW
+ERROR@69860: expected command, found TRUE_KW
+ERROR@72267: expected SEMICOLON
+ERROR@72267: expected command, found DOT
+ERROR@72268: expected command, found IDENT
+ERROR@72672: expected EQ
+ERROR@72672: expected config value, got DOT
+ERROR@72672: expected SEMICOLON
+ERROR@72672: expected command, found DOT
+ERROR@72673: expected command, found IDENT
+ERROR@72688: expected command, found TO_KW
+ERROR@72691: expected command, found STRING
+ERROR@72709: expected EQ
+ERROR@72709: expected config value, got DOT
+ERROR@72709: expected SEMICOLON
+ERROR@72709: expected command, found DOT
+ERROR@72710: expected command, found IDENT
+ERROR@72725: expected command, found TO_KW
+ERROR@72728: expected command, found STRING
+ERROR@72747: expected EQ
+ERROR@72747: expected config value, got DOT
+ERROR@72747: expected SEMICOLON
+ERROR@72747: expected command, found DOT
+ERROR@72748: expected command, found IDENT
+ERROR@72761: expected command, found TO_KW
+ERROR@72764: expected command, found STRING
+ERROR@72782: expected EQ
+ERROR@72782: expected config value, got DOT
+ERROR@72782: expected SEMICOLON
+ERROR@72782: expected command, found DOT
+ERROR@72783: expected command, found IDENT
+ERROR@72796: expected command, found TO_KW
+ERROR@72799: expected command, found STRING
+ERROR@72863: expected EQ
+ERROR@72863: expected config value, got DOT
+ERROR@72863: expected SEMICOLON
+ERROR@72863: expected command, found DOT
+ERROR@72864: expected command, found IDENT
+ERROR@72879: expected command, found TO_KW
+ERROR@72882: expected command, found STRING
+ERROR@73127: expected EQ
+ERROR@73127: expected config value, got DOT
+ERROR@73127: expected SEMICOLON
+ERROR@73127: expected command, found DOT
+ERROR@73128: expected command, found IDENT
+ERROR@73143: expected command, found TO_KW
+ERROR@73146: expected command, found STRING
+ERROR@74051: expected EQ
+ERROR@74051: expected config value, got DOT
+ERROR@74051: expected SEMICOLON
+ERROR@74051: expected command, found DOT
+ERROR@74052: expected command, found IDENT
+ERROR@74065: expected command, found TO_KW
+ERROR@74068: expected command, found STRING
+ERROR@74254: expected SEMICOLON
+ERROR@74254: expected command, found DOT
+ERROR@74255: expected command, found IDENT
+ERROR@74282: expected SEMICOLON
+ERROR@74282: expected command, found DOT
+ERROR@74283: expected command, found IDENT
+ERROR@74485: expected EQ
+ERROR@74485: expected config value, got DOT
+ERROR@74485: expected SEMICOLON
+ERROR@74485: expected command, found DOT
+ERROR@74486: expected command, found IDENT
+ERROR@74501: expected command, found TO_KW
+ERROR@74504: expected command, found STRING
+ERROR@74620: expected EQ
+ERROR@74620: expected config value, got DOT
+ERROR@74620: expected SEMICOLON
+ERROR@74620: expected command, found DOT
+ERROR@74621: expected command, found IDENT
+ERROR@74634: expected command, found TO_KW
+ERROR@74637: expected command, found STRING
+ERROR@74755: expected SEMICOLON
+ERROR@74755: expected command, found DOT
+ERROR@74756: expected command, found IDENT
+ERROR@74783: expected SEMICOLON
+ERROR@74783: expected command, found DOT
+ERROR@74784: expected command, found IDENT
+ERROR@74812: expected EQ
+ERROR@74812: expected config value, got DOT
+ERROR@74812: expected SEMICOLON
+ERROR@74812: expected command, found DOT
+ERROR@74813: expected command, found IDENT
+ERROR@74828: expected command, found TO_KW
+ERROR@74831: expected command, found STRING
+ERROR@74989: expected EQ
+ERROR@74989: expected config value, got DOT
+ERROR@74989: expected SEMICOLON
+ERROR@74989: expected command, found DOT
+ERROR@74990: expected command, found IDENT
+ERROR@75003: expected command, found TO_KW
+ERROR@75006: expected command, found STRING
+ERROR@75757: expected SEMICOLON
+ERROR@75757: expected command, found DOT
+ERROR@75758: expected command, found IDENT
+ERROR@75785: expected SEMICOLON
+ERROR@75785: expected command, found DOT
+ERROR@75786: expected command, found IDENT
+ERROR@101411: expected SEMICOLON
+ERROR@101411: expected command, found POSITIONAL_PARAM
+ERROR@101428: expected CURSOR_KW
+ERROR@101428: expected FOR_KW
+ERROR@101428: expected select stmt
+ERROR@101428: expected SEMICOLON
+ERROR@101429: expected command, found INT_KW
+ERROR@101433: expected command, found EQ
+ERROR@101435: expected command, found INT_NUMBER
+ERROR@101449: expected SEMICOLON
+ERROR@101458: expected command, found IDENT
+ERROR@101460: expected command, found COLON
+ERROR@101461: expected command, found EQ
+ERROR@101463: expected command, found INT_NUMBER
+ERROR@101465: expected command, found SLASH
+ERROR@101467: expected command, found IDENT
+ERROR@101487: expected command, found DOLLAR_QUOTED_STRING
+ERROR@101765: expected CURSOR_KW
+ERROR@101765: expected FOR_KW
+ERROR@101765: expected select stmt
+ERROR@101765: expected SEMICOLON
+ERROR@101766: expected command, found INT_KW
+ERROR@101770: expected command, found COLON
+ERROR@101771: expected command, found EQ
+ERROR@101773: expected command, found IDENT
+ERROR@101775: expected command, found PLUS
+ERROR@101777: expected command, found INT_NUMBER
+ERROR@101795: expected SEMICOLON
+ERROR@101798: expected command, found IDENT
+ERROR@101804: expected command, found IDENT
+ERROR@101811: expected command, found STRING
+ERROR@101818: expected command, found COMMA
+ERROR@101820: expected command, found IDENT
+ERROR@101828: expected command, found DOLLAR_QUOTED_STRING
+ERROR@101848: expected CURSOR_KW
+ERROR@101848: expected FOR_KW
+ERROR@101848: expected select stmt
+ERROR@101848: expected SEMICOLON
+ERROR@101849: expected command, found INT_KW
+ERROR@101853: expected command, found COLON
+ERROR@101854: expected command, found EQ
+ERROR@101856: expected command, found IDENT
+ERROR@101858: expected command, found PLUS
+ERROR@101860: expected command, found INT_NUMBER
+ERROR@101881: expected command, found IDENT
+ERROR@101883: expected command, found INT_KW
+ERROR@101887: expected command, found COLON
+ERROR@101888: expected command, found EQ
+ERROR@101890: expected command, found INT_NUMBER
+ERROR@101899: expected SEMICOLON
+ERROR@101902: expected command, found IDENT
+ERROR@101908: expected command, found IDENT
+ERROR@101915: expected command, found STRING
+ERROR@101929: expected command, found COMMA
+ERROR@101931: expected command, found IDENT
+ERROR@101932: expected command, found COMMA
+ERROR@101934: expected command, found IDENT
+ERROR@101942: expected command, found DOLLAR_QUOTED_STRING
+ERROR@101962: expected CURSOR_KW
+ERROR@101962: expected FOR_KW
+ERROR@101962: expected select stmt
+ERROR@101962: expected SEMICOLON
+ERROR@101963: expected command, found INT_KW
+ERROR@101967: expected command, found COLON
+ERROR@101968: expected command, found EQ
+ERROR@101970: expected command, found INT_NUMBER
+ERROR@101982: expected command, found IDENT
+ERROR@101984: expected command, found INT_KW
+ERROR@101988: expected command, found COLON
+ERROR@101989: expected command, found EQ
+ERROR@101991: expected command, found IDENT
+ERROR@101993: expected command, found PLUS
+ERROR@101995: expected command, found INT_NUMBER
+ERROR@102003: expected SEMICOLON
+ERROR@102006: expected command, found IDENT
+ERROR@102012: expected command, found IDENT
+ERROR@102019: expected command, found STRING
+ERROR@102033: expected command, found COMMA
+ERROR@102035: expected command, found IDENT
+ERROR@102036: expected command, found COMMA
+ERROR@102038: expected command, found IDENT
+ERROR@102046: expected command, found DOLLAR_QUOTED_STRING
+ERROR@102066: expected CURSOR_KW
+ERROR@102066: expected FOR_KW
+ERROR@102066: expected select stmt
+ERROR@102066: expected SEMICOLON
+ERROR@102067: expected command, found INT_KW
+ERROR@102071: expected command, found COLON
+ERROR@102072: expected command, found EQ
+ERROR@102074: expected command, found INT_NUMBER
+ERROR@102083: expected SEMICOLON
+ERROR@102095: expected CURSOR_KW
+ERROR@102095: expected FOR_KW
+ERROR@102095: expected select stmt
+ERROR@102095: expected SEMICOLON
+ERROR@102096: expected command, found INT_KW
+ERROR@102100: expected command, found COLON
+ERROR@102101: expected command, found EQ
+ERROR@102103: expected command, found IDENT
+ERROR@102105: expected command, found PLUS
+ERROR@102107: expected command, found INT_NUMBER
+ERROR@102120: expected command, found IDENT
+ERROR@102122: expected command, found INT_KW
+ERROR@102126: expected command, found COLON
+ERROR@102127: expected command, found EQ
+ERROR@102129: expected command, found IDENT
+ERROR@102131: expected command, found PLUS
+ERROR@102133: expected command, found INT_NUMBER
+ERROR@102146: expected command, found IDENT
+ERROR@102148: expected command, found INT_KW
+ERROR@102152: expected command, found COLON
+ERROR@102153: expected command, found EQ
+ERROR@102155: expected command, found IDENT
+ERROR@102157: expected command, found STAR
+ERROR@102159: expected command, found INT_NUMBER
+ERROR@102170: expected SEMICOLON
+ERROR@102175: expected command, found IDENT
+ERROR@102181: expected command, found IDENT
+ERROR@102188: expected command, found STRING
+ERROR@102209: expected command, found COMMA
+ERROR@102211: expected command, found IDENT
+ERROR@102212: expected command, found COMMA
+ERROR@102214: expected command, found IDENT
+ERROR@102215: expected command, found COMMA
+ERROR@102217: expected command, found IDENT
+ERROR@102232: expected command, found DOLLAR_QUOTED_STRING
+ERROR@102419: expected CURSOR_KW
+ERROR@102419: expected FOR_KW
+ERROR@102419: expected select stmt
+ERROR@102419: expected SEMICOLON
+ERROR@102420: expected command, found IDENT
+ERROR@102430: expected command, found IDENT
+ERROR@102433: expected command, found BIGINT_KW
+ERROR@102440: expected command, found COLON
+ERROR@102441: expected command, found EQ
+ERROR@102443: expected command, found INT_NUMBER
+ERROR@102452: expected SEMICOLON
+ERROR@102455: expected command, found FOR_KW
+ERROR@102459: expected command, found IDENT
+ERROR@102461: expected command, found IN_KW
+ERROR@102495: expected SEMICOLON
+ERROR@102500: expected command, found RETURN_KW
+ERROR@102507: expected command, found NEXT_KW
+ERROR@102512: expected command, found IDENT
+ERROR@102520: expected SEMICOLON
+ERROR@102521: expected command, found IDENT
+ERROR@102532: expected command, found DOLLAR_QUOTED_STRING
+ERROR@102658: expected command, found POUND
+ERROR@102659: expected command, found IDENT
+ERROR@102677: expected command, found IDENT
+ERROR@102699: expected CURSOR_KW
+ERROR@102699: expected FOR_KW
+ERROR@102699: expected select stmt
+ERROR@102699: expected SEMICOLON
+ERROR@102700: expected command, found IDENT
+ERROR@102710: expected command, found IDENT
+ERROR@102713: expected command, found BIGINT_KW
+ERROR@102720: expected command, found COLON
+ERROR@102721: expected command, found EQ
+ERROR@102723: expected command, found INT_NUMBER
+ERROR@102732: expected SEMICOLON
+ERROR@102735: expected command, found FOR_KW
+ERROR@102739: expected command, found IDENT
+ERROR@102741: expected command, found IN_KW
+ERROR@102775: expected SEMICOLON
+ERROR@102780: expected command, found RETURN_KW
+ERROR@102787: expected command, found NEXT_KW
+ERROR@102792: expected command, found IDENT
+ERROR@102800: expected SEMICOLON
+ERROR@102801: expected command, found IDENT
+ERROR@102812: expected command, found DOLLAR_QUOTED_STRING
+ERROR@102938: expected command, found POUND
+ERROR@102939: expected command, found IDENT
+ERROR@102957: expected command, found IDENT
+ERROR@102977: expected CURSOR_KW
+ERROR@102977: expected FOR_KW
+ERROR@102977: expected select stmt
+ERROR@102977: expected SEMICOLON
+ERROR@102978: expected command, found IDENT
+ERROR@102988: expected command, found IDENT
+ERROR@102991: expected command, found BIGINT_KW
+ERROR@102998: expected command, found COLON
+ERROR@102999: expected command, found EQ
+ERROR@103001: expected command, found INT_NUMBER
+ERROR@103010: expected SEMICOLON
+ERROR@103013: expected command, found FOR_KW
+ERROR@103017: expected command, found IDENT
+ERROR@103019: expected command, found IN_KW
+ERROR@103053: expected SEMICOLON
+ERROR@103058: expected command, found RETURN_KW
+ERROR@103065: expected command, found NEXT_KW
+ERROR@103070: expected command, found IDENT
+ERROR@103078: expected SEMICOLON
+ERROR@103079: expected command, found IDENT
+ERROR@103090: expected command, found DOLLAR_QUOTED_STRING
+ERROR@103313: expected CURSOR_KW
+ERROR@103313: expected FOR_KW
+ERROR@103313: expected select stmt
+ERROR@103313: expected SEMICOLON
+ERROR@103314: expected command, found INT_KW
+ERROR@103318: expected command, found COLON
+ERROR@103319: expected command, found EQ
+ERROR@103321: expected command, found INT_NUMBER
+ERROR@103330: expected SEMICOLON
+ERROR@103333: expected command, found FORWARD_KW
+ERROR@103341: expected command, found COLON
+ERROR@103342: expected command, found EQ
+ERROR@103344: expected command, found FORWARD_KW
+ERROR@103352: expected command, found STAR
+ERROR@103354: expected command, found INT_NUMBER
+ERROR@103359: expected command, found RETURN_KW
+ERROR@103366: expected command, found FORWARD_KW
+ERROR@103378: expected SEMICOLON
+ERROR@103379: expected command, found DOLLAR_QUOTED_STRING
+ERROR@103507: expected CURSOR_KW
+ERROR@103507: expected FOR_KW
+ERROR@103507: expected select stmt
+ERROR@103507: expected SEMICOLON
+ERROR@103508: expected command, found INT_KW
+ERROR@103512: expected command, found COLON
+ERROR@103513: expected command, found EQ
+ERROR@103515: expected command, found INT_NUMBER
+ERROR@103524: expected SEMICOLON
+ERROR@103527: expected command, found RETURN_KW
+ERROR@103534: expected command, found COLON
+ERROR@103535: expected command, found EQ
+ERROR@103537: expected command, found RETURN_KW
+ERROR@103544: expected command, found PLUS
+ERROR@103546: expected command, found INT_NUMBER
+ERROR@103551: expected command, found RETURN_KW
+ERROR@103558: expected command, found RETURN_KW
+ERROR@103569: expected SEMICOLON
+ERROR@103570: expected command, found DOLLAR_QUOTED_STRING
+ERROR@103699: expected CURSOR_KW
+ERROR@103699: expected FOR_KW
+ERROR@103699: expected select stmt
+ERROR@103699: expected SEMICOLON
+ERROR@103700: expected command, found INT_KW
+ERROR@103704: expected command, found COLON
+ERROR@103705: expected command, found EQ
+ERROR@103707: expected command, found INT_NUMBER
+ERROR@103716: expected SEMICOLON
+ERROR@103726: expected ON_KW
+ERROR@103727: unexpected token
+ERROR@103728: expected IS_KW
+ERROR@103728: expected string literal or NULL
+ERROR@103728: expected SEMICOLON
+ERROR@103728: expected command, found EQ
+ERROR@103737: expected ON_KW
+ERROR@103738: unexpected token
+ERROR@103739: expected IS_KW
+ERROR@103739: expected string literal or NULL
+ERROR@103739: expected SEMICOLON
+ERROR@103740: expected command, found INT_NUMBER
+ERROR@103806: expected command, found RETURN_KW
+ERROR@103820: expected ON_KW
+ERROR@103820: unexpected token
+ERROR@103821: expected IS_KW
+ERROR@103821: expected string literal or NULL
+ERROR@103821: expected SEMICOLON
+ERROR@103825: expected SEMICOLON
+ERROR@103826: expected command, found DOLLAR_QUOTED_STRING
+ERROR@104082: expected CURSOR_KW
+ERROR@104082: expected FOR_KW
+ERROR@104082: expected select stmt
+ERROR@104082: expected SEMICOLON
+ERROR@104083: expected command, found INT_KW
+ERROR@104093: expected SEMICOLON
+ERROR@104096: expected command, found IDENT
+ERROR@104104: expected command, found IDENT
+ERROR@104106: expected command, found IN_KW
+ERROR@104109: expected command, found ARRAY_KW
+ERROR@104115: expected command, found POSITIONAL_PARAM
+ERROR@104120: expected command, found IDENT
+ERROR@104129: expected command, found IDENT
+ERROR@104135: expected command, found IDENT
+ERROR@104142: expected command, found STRING
+ERROR@104145: expected command, found COMMA
+ERROR@104147: expected command, found IDENT
+ERROR@104155: expected SEMICOLON
+ERROR@104156: expected command, found IDENT
+ERROR@104169: expected command, found DOLLAR_QUOTED_STRING
+ERROR@104348: expected CURSOR_KW
+ERROR@104348: expected FOR_KW
+ERROR@104348: expected select stmt
+ERROR@104348: expected SEMICOLON
+ERROR@104349: expected command, found INT_KW
+ERROR@104359: expected SEMICOLON
+ERROR@104362: expected command, found IDENT
+ERROR@104370: expected command, found IDENT
+ERROR@104372: expected command, found IDENT
+ERROR@104378: expected command, found INT_NUMBER
+ERROR@104380: expected command, found IN_KW
+ERROR@104383: expected command, found ARRAY_KW
+ERROR@104389: expected command, found POSITIONAL_PARAM
+ERROR@104394: expected command, found IDENT
+ERROR@104403: expected command, found IDENT
+ERROR@104409: expected command, found IDENT
+ERROR@104416: expected command, found STRING
+ERROR@104419: expected command, found COMMA
+ERROR@104421: expected command, found IDENT
+ERROR@104429: expected SEMICOLON
+ERROR@104430: expected command, found IDENT
+ERROR@104443: expected command, found DOLLAR_QUOTED_STRING
+ERROR@104637: expected CURSOR_KW
+ERROR@104637: expected FOR_KW
+ERROR@104637: expected select stmt
+ERROR@104637: expected SEMICOLON
+ERROR@104638: expected command, found INT_KW
+ERROR@104641: expected command, found L_BRACK
+ERROR@104642: expected command, found R_BRACK
+ERROR@104650: expected SEMICOLON
+ERROR@104653: expected command, found IDENT
+ERROR@104661: expected command, found IDENT
+ERROR@104663: expected command, found IDENT
+ERROR@104669: expected command, found INT_NUMBER
+ERROR@104671: expected command, found IN_KW
+ERROR@104674: expected command, found ARRAY_KW
+ERROR@104680: expected command, found POSITIONAL_PARAM
+ERROR@104685: expected command, found IDENT
+ERROR@104694: expected command, found IDENT
+ERROR@104700: expected command, found IDENT
+ERROR@104707: expected command, found STRING
+ERROR@104710: expected command, found COMMA
+ERROR@104712: expected command, found IDENT
+ERROR@104720: expected SEMICOLON
+ERROR@104721: expected command, found IDENT
+ERROR@104734: expected command, found DOLLAR_QUOTED_STRING
+ERROR@104940: expected CURSOR_KW
+ERROR@104940: expected FOR_KW
+ERROR@104940: expected select stmt
+ERROR@104940: expected SEMICOLON
+ERROR@104941: expected command, found INT_KW
+ERROR@104944: expected command, found L_BRACK
+ERROR@104945: expected command, found R_BRACK
+ERROR@104953: expected SEMICOLON
+ERROR@104956: expected command, found IDENT
+ERROR@104964: expected command, found IDENT
+ERROR@104966: expected command, found IDENT
+ERROR@104972: expected command, found INT_NUMBER
+ERROR@104974: expected command, found IN_KW
+ERROR@104977: expected command, found ARRAY_KW
+ERROR@104983: expected command, found POSITIONAL_PARAM
+ERROR@104988: expected command, found IDENT
+ERROR@104997: expected command, found IDENT
+ERROR@105003: expected command, found IDENT
+ERROR@105010: expected command, found STRING
+ERROR@105013: expected command, found COMMA
+ERROR@105015: expected command, found IDENT
+ERROR@105023: expected SEMICOLON
+ERROR@105024: expected command, found IDENT
+ERROR@105037: expected command, found DOLLAR_QUOTED_STRING
+ERROR@105358: expected CURSOR_KW
+ERROR@105358: expected FOR_KW
+ERROR@105358: expected select stmt
+ERROR@105358: expected SEMICOLON
+ERROR@105359: expected command, found IDENT
+ERROR@105372: expected SEMICOLON
+ERROR@105375: expected command, found IDENT
+ERROR@105383: expected command, found IDENT
+ERROR@105385: expected command, found IN_KW
+ERROR@105388: expected command, found ARRAY_KW
+ERROR@105394: expected command, found POSITIONAL_PARAM
+ERROR@105399: expected command, found IDENT
+ERROR@105408: expected command, found IDENT
+ERROR@105414: expected command, found IDENT
+ERROR@105421: expected command, found STRING
+ERROR@105424: expected command, found COMMA
+ERROR@105426: expected command, found IDENT
+ERROR@105434: expected SEMICOLON
+ERROR@105435: expected command, found IDENT
+ERROR@105448: expected command, found DOLLAR_QUOTED_STRING
+ERROR@105691: expected CURSOR_KW
+ERROR@105691: expected FOR_KW
+ERROR@105691: expected select stmt
+ERROR@105691: expected SEMICOLON
+ERROR@105692: expected command, found INT_KW
+ERROR@105697: expected command, found IDENT
+ERROR@105699: expected command, found INT_KW
+ERROR@105709: expected SEMICOLON
+ERROR@105712: expected command, found IDENT
+ERROR@105720: expected command, found IDENT
+ERROR@105721: expected command, found COMMA
+ERROR@105723: expected command, found IDENT
+ERROR@105725: expected command, found IN_KW
+ERROR@105728: expected command, found ARRAY_KW
+ERROR@105734: expected command, found POSITIONAL_PARAM
+ERROR@105739: expected command, found IDENT
+ERROR@105748: expected command, found IDENT
+ERROR@105754: expected command, found IDENT
+ERROR@105761: expected command, found STRING
+ERROR@105775: expected command, found COMMA
+ERROR@105777: expected command, found IDENT
+ERROR@105778: expected command, found COMMA
+ERROR@105780: expected command, found IDENT
+ERROR@105788: expected SEMICOLON
+ERROR@105789: expected command, found IDENT
+ERROR@105802: expected command, found DOLLAR_QUOTED_STRING
+ERROR@106086: expected CURSOR_KW
+ERROR@106086: expected FOR_KW
+ERROR@106086: expected select stmt
+ERROR@106086: expected SEMICOLON
+ERROR@106087: expected command, found IDENT
+ERROR@106095: expected command, found L_BRACK
+ERROR@106096: expected command, found R_BRACK
+ERROR@106104: expected SEMICOLON
+ERROR@106107: expected command, found IDENT
+ERROR@106115: expected command, found IDENT
+ERROR@106117: expected command, found IDENT
+ERROR@106123: expected command, found INT_NUMBER
+ERROR@106125: expected command, found IN_KW
+ERROR@106128: expected command, found ARRAY_KW
+ERROR@106134: expected command, found POSITIONAL_PARAM
+ERROR@106139: expected command, found IDENT
+ERROR@106148: expected command, found IDENT
+ERROR@106154: expected command, found IDENT
+ERROR@106161: expected command, found STRING
+ERROR@106164: expected command, found COMMA
+ERROR@106166: expected command, found IDENT
+ERROR@106174: expected SEMICOLON
+ERROR@106175: expected command, found IDENT
+ERROR@106188: expected command, found DOLLAR_QUOTED_STRING
+ERROR@106593: expected CURSOR_KW
+ERROR@106593: expected FOR_KW
+ERROR@106593: expected select stmt
+ERROR@106593: expected SEMICOLON
+ERROR@106594: expected command, found IDENT
+ERROR@106607: expected SEMICOLON
+ERROR@106610: expected command, found IDENT
+ERROR@106612: expected command, found COLON
+ERROR@106613: expected command, found EQ
+ERROR@106615: expected command, found ROW_KW
+ERROR@106618: expected command, found L_PAREN
+ERROR@106619: expected command, found INT_NUMBER
+ERROR@106621: expected command, found COMMA
+ERROR@106623: expected command, found STRING
+ERROR@106638: expected command, found R_PAREN
+ERROR@106639: expected command, found COLON
+ERROR@106640: expected command, found COLON
+ERROR@106641: expected command, found IDENT
+ERROR@106650: expected command, found IDENT
+ERROR@106651: expected command, found DOT
+ERROR@106652: expected command, found IDENT
+ERROR@106654: expected command, found L_BRACK
+ERROR@106655: expected command, found INT_NUMBER
+ERROR@106656: expected command, found R_BRACK
+ERROR@106658: expected command, found COLON
+ERROR@106659: expected command, found EQ
+ERROR@106661: expected command, found STRING
+ERROR@106674: expected command, found RETURN_KW
+ERROR@106681: expected command, found IDENT
+ERROR@106682: expected command, found DOT
+ERROR@106683: expected command, found IDENT
+ERROR@106687: expected command, found IDENT
+ERROR@111464: expected EQ
+ERROR@111464: expected config value, got DOT
+ERROR@111464: expected SEMICOLON
+ERROR@111464: expected command, found DOT
+ERROR@111465: expected command, found IDENT
+ERROR@111479: expected command, found EQ
+ERROR@111481: expected command, found OFF_KW
+ERROR@111554: expected SEMICOLON
+ERROR@111554: expected command, found DOT
+ERROR@111555: expected command, found IDENT
+ERROR@122193: expected R_PAREN
+ERROR@122193: expected function option
+ERROR@122193: expected SEMICOLON
+ERROR@122193: expected command, found DOT
+ERROR@122194: expected command, found IDENT
+ERROR@122195: expected command, found PERCENT
+ERROR@122196: expected command, found TYPE_KW
+ERROR@122200: expected command, found R_PAREN
+ERROR@122202: expected command, found RETURNS_KW
+ERROR@122210: expected command, found IDENT
+ERROR@122228: expected command, found AS_KW
+ERROR@122231: expected command, found DOLLAR_QUOTED_STRING
+ERROR@122431: expected command, found LANGUAGE_KW
+ERROR@122440: expected command, found IDENT
+ERROR@101339: Unterminated dollar quoted string literal

@@ -1,0 +1,542 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/constraints.sql
+---
+ERROR@1842: expected R_PAREN
+ERROR@1842: expected SEMICOLON
+ERROR@1843: expected command, found NOT_KW
+ERROR@1847: expected command, found ENFORCED_KW
+ERROR@1855: expected command, found R_PAREN
+ERROR@2909: expected R_PAREN
+ERROR@2909: expected SEMICOLON
+ERROR@2910: expected command, found ENFORCED_KW
+ERROR@2918: expected command, found COMMA
+ERROR@2953: expected command, found CONSTRAINT_KW
+ERROR@2964: expected command, found IDENT
+ERROR@2982: expected command, found CHECK_KW
+ERROR@2988: expected command, found L_PAREN
+ERROR@2989: expected command, found IDENT
+ERROR@2991: expected command, found PLUS
+ERROR@2993: expected command, found IDENT
+ERROR@2995: expected command, found EQ
+ERROR@2997: expected command, found INT_NUMBER
+ERROR@2998: expected command, found R_PAREN
+ERROR@3000: expected command, found NOT_KW
+ERROR@3004: expected command, found ENFORCED_KW
+ERROR@3012: expected command, found R_PAREN
+ERROR@15473: expected R_PAREN
+ERROR@15473: expected SEMICOLON
+ERROR@15474: expected command, found ENFORCED_KW
+ERROR@15482: expected command, found R_PAREN
+ERROR@15531: expected NULL_KW
+ERROR@15531: expected R_PAREN
+ERROR@15531: expected SEMICOLON
+ERROR@15532: expected command, found ENFORCED_KW
+ERROR@15540: expected command, found R_PAREN
+ERROR@15599: expected SEMICOLON
+ERROR@15600: expected command, found ENFORCED_KW
+ERROR@15666: expected SEMICOLON
+ERROR@15667: expected command, found NOT_KW
+ERROR@15671: expected command, found ENFORCED_KW
+ERROR@18286: expected FOREIGN_KW
+ERROR@18286: expected KEY_KW
+ERROR@18286: expected column list
+ERROR@18286: expected REFERENCES_KW
+ERROR@18290: expected SEMICOLON
+ERROR@18291: expected command, found NULL_KW
+ERROR@18296: expected command, found IDENT
+ERROR@18951: expected FOREIGN_KW
+ERROR@18951: expected KEY_KW
+ERROR@18951: expected column list
+ERROR@18951: expected REFERENCES_KW
+ERROR@18955: expected SEMICOLON
+ERROR@18956: expected command, found NULL_KW
+ERROR@18961: expected command, found IDENT
+ERROR@19390: expected FOREIGN_KW
+ERROR@19390: expected KEY_KW
+ERROR@19390: expected column list
+ERROR@19390: expected REFERENCES_KW
+ERROR@19394: expected R_PAREN
+ERROR@19394: expected SEMICOLON
+ERROR@19395: expected command, found NULL_KW
+ERROR@19400: expected command, found IDENT
+ERROR@19401: expected command, found R_PAREN
+ERROR@19445: expected FOREIGN_KW
+ERROR@19445: expected KEY_KW
+ERROR@19445: expected column list
+ERROR@19445: expected REFERENCES_KW
+ERROR@19449: expected R_PAREN
+ERROR@19449: expected SEMICOLON
+ERROR@19450: expected command, found NULL_KW
+ERROR@19455: expected command, found IDENT
+ERROR@19456: expected command, found COMMA
+ERROR@19458: expected command, found IDENT
+ERROR@19460: expected command, found INT_KW
+ERROR@19464: expected command, found GENERATED_KW
+ERROR@19474: expected command, found BY_KW
+ERROR@19477: expected command, found DEFAULT_KW
+ERROR@19485: expected command, found AS_KW
+ERROR@19488: expected command, found IDENTITY_KW
+ERROR@19496: expected command, found R_PAREN
+ERROR@19710: expected FOREIGN_KW
+ERROR@19710: expected KEY_KW
+ERROR@19710: expected column list
+ERROR@19710: expected REFERENCES_KW
+ERROR@19714: expected R_PAREN
+ERROR@19714: expected SEMICOLON
+ERROR@19715: expected command, found NULL_KW
+ERROR@19720: expected command, found IDENT
+ERROR@19721: expected command, found R_PAREN
+ERROR@19975: expected R_PAREN
+ERROR@19975: expected SEMICOLON
+ERROR@19976: expected command, found NO_KW
+ERROR@19979: expected command, found INHERIT_KW
+ERROR@19987: expected command, found CONSTRAINT_KW
+ERROR@19998: expected command, found IDENT
+ERROR@20002: expected command, found NOT_KW
+ERROR@20006: expected command, found NULL_KW
+ERROR@20010: expected command, found R_PAREN
+ERROR@20089: expected FOREIGN_KW
+ERROR@20089: expected KEY_KW
+ERROR@20089: expected column list
+ERROR@20089: expected REFERENCES_KW
+ERROR@20093: expected R_PAREN
+ERROR@20093: expected SEMICOLON
+ERROR@20094: expected command, found NULL_KW
+ERROR@20099: expected command, found IDENT
+ERROR@20101: expected command, found NO_KW
+ERROR@20104: expected command, found INHERIT_KW
+ERROR@20111: expected command, found R_PAREN
+ERROR@20193: expected FOREIGN_KW
+ERROR@20193: expected KEY_KW
+ERROR@20193: expected column list
+ERROR@20193: expected REFERENCES_KW
+ERROR@20197: expected R_PAREN
+ERROR@20197: expected SEMICOLON
+ERROR@20198: expected command, found NULL_KW
+ERROR@20203: expected command, found IDENT
+ERROR@20204: expected command, found R_PAREN
+ERROR@20262: expected FOREIGN_KW
+ERROR@20262: expected KEY_KW
+ERROR@20262: expected column list
+ERROR@20262: expected REFERENCES_KW
+ERROR@20266: expected R_PAREN
+ERROR@20266: expected SEMICOLON
+ERROR@20267: expected command, found NULL_KW
+ERROR@20272: expected command, found IDENT
+ERROR@20273: expected command, found COMMA
+ERROR@20275: expected command, found CONSTRAINT_KW
+ERROR@20286: expected command, found IDENT
+ERROR@20290: expected command, found NOT_KW
+ERROR@20294: expected command, found NULL_KW
+ERROR@20299: expected command, found IDENT
+ERROR@20300: expected command, found R_PAREN
+ERROR@20358: expected FOREIGN_KW
+ERROR@20358: expected KEY_KW
+ERROR@20358: expected column list
+ERROR@20358: expected REFERENCES_KW
+ERROR@20362: expected R_PAREN
+ERROR@20362: expected SEMICOLON
+ERROR@20363: expected command, found NULL_KW
+ERROR@20368: expected command, found IDENT
+ERROR@20370: expected command, found NO_KW
+ERROR@20373: expected command, found INHERIT_KW
+ERROR@20380: expected command, found R_PAREN
+ERROR@20431: expected R_PAREN
+ERROR@20431: expected SEMICOLON
+ERROR@20432: expected command, found NO_KW
+ERROR@20435: expected command, found INHERIT_KW
+ERROR@20442: expected command, found R_PAREN
+ERROR@20510: expected FOREIGN_KW
+ERROR@20510: expected KEY_KW
+ERROR@20510: expected column list
+ERROR@20510: expected REFERENCES_KW
+ERROR@20514: expected R_PAREN
+ERROR@20514: expected SEMICOLON
+ERROR@20515: expected command, found NULL_KW
+ERROR@20520: expected command, found IDENT
+ERROR@20521: expected command, found R_PAREN
+ERROR@20596: expected R_PAREN
+ERROR@20596: expected SEMICOLON
+ERROR@20597: expected command, found NO_KW
+ERROR@20600: expected command, found INHERIT_KW
+ERROR@20607: expected command, found R_PAREN
+ERROR@20655: expected R_PAREN
+ERROR@20655: expected SEMICOLON
+ERROR@20656: expected command, found NO_KW
+ERROR@20659: expected command, found INHERIT_KW
+ERROR@20667: expected command, found PRIMARY_KW
+ERROR@20675: expected command, found KEY_KW
+ERROR@20678: expected command, found R_PAREN
+ERROR@20730: expected R_PAREN
+ERROR@20730: expected SEMICOLON
+ERROR@20731: expected command, found NOT_KW
+ERROR@20735: expected command, found NULL_KW
+ERROR@20740: expected command, found IDENT
+ERROR@20742: expected command, found NO_KW
+ERROR@20745: expected command, found INHERIT_KW
+ERROR@20752: expected command, found R_PAREN
+ERROR@20808: expected R_PAREN
+ERROR@20808: expected SEMICOLON
+ERROR@20809: expected command, found NOT_KW
+ERROR@20813: expected command, found NULL_KW
+ERROR@20818: expected command, found IDENT
+ERROR@20820: expected command, found NO_KW
+ERROR@20823: expected command, found INHERIT_KW
+ERROR@20830: expected command, found R_PAREN
+ERROR@20918: expected FOREIGN_KW
+ERROR@20918: expected KEY_KW
+ERROR@20918: expected column list
+ERROR@20918: expected REFERENCES_KW
+ERROR@20922: expected R_PAREN
+ERROR@20922: expected SEMICOLON
+ERROR@20923: expected command, found NULL_KW
+ERROR@20928: expected command, found IDENT
+ERROR@20930: expected command, found NO_KW
+ERROR@20933: expected command, found INHERIT_KW
+ERROR@20940: expected command, found R_PAREN
+ERROR@21021: expected R_PAREN
+ERROR@21021: expected SEMICOLON
+ERROR@21022: expected command, found NO_KW
+ERROR@21025: expected command, found INHERIT_KW
+ERROR@21032: expected command, found R_PAREN
+ERROR@21112: expected R_PAREN
+ERROR@21112: expected SEMICOLON
+ERROR@21113: expected command, found NOT_KW
+ERROR@21117: expected command, found NULL_KW
+ERROR@21122: expected command, found IDENT
+ERROR@21124: expected command, found NO_KW
+ERROR@21127: expected command, found INHERIT_KW
+ERROR@21134: expected command, found R_PAREN
+ERROR@21257: expected name
+ERROR@21257: expected type name
+ERROR@21266: expected SEMICOLON
+ERROR@21267: expected command, found IDENT
+ERROR@21269: expected command, found NO_KW
+ERROR@21272: expected command, found INHERIT_KW
+ERROR@21443: expected name
+ERROR@21443: expected type name
+ERROR@21452: expected SEMICOLON
+ERROR@21453: expected command, found IDENT
+ERROR@21455: expected command, found NO_KW
+ERROR@21458: expected command, found INHERIT_KW
+ERROR@21656: expected R_PAREN
+ERROR@21656: expected SEMICOLON
+ERROR@21657: expected command, found NO_KW
+ERROR@21660: expected command, found INHERIT_KW
+ERROR@21667: expected command, found R_PAREN
+ERROR@21669: expected command, found PARTITION_KW
+ERROR@21679: expected command, found BY_KW
+ERROR@21682: expected command, found IDENT
+ERROR@21687: expected command, found L_PAREN
+ERROR@21688: expected command, found IDENT
+ERROR@21689: expected command, found R_PAREN
+ERROR@21719: expected R_PAREN
+ERROR@21719: expected SEMICOLON
+ERROR@21720: expected command, found NOT_KW
+ERROR@21724: expected command, found NULL_KW
+ERROR@21729: expected command, found IDENT
+ERROR@21731: expected command, found NO_KW
+ERROR@21734: expected command, found INHERIT_KW
+ERROR@21741: expected command, found R_PAREN
+ERROR@21743: expected command, found PARTITION_KW
+ERROR@21753: expected command, found BY_KW
+ERROR@21756: expected command, found IDENT
+ERROR@21761: expected command, found L_PAREN
+ERROR@21762: expected command, found IDENT
+ERROR@21763: expected command, found R_PAREN
+ERROR@21900: expected FOREIGN_KW
+ERROR@21900: expected KEY_KW
+ERROR@21900: expected column list
+ERROR@21900: expected REFERENCES_KW
+ERROR@21904: expected R_PAREN
+ERROR@21904: expected SEMICOLON
+ERROR@21905: expected command, found NULL_KW
+ERROR@21910: expected command, found IDENT
+ERROR@21912: expected command, found NO_KW
+ERROR@21915: expected command, found INHERIT_KW
+ERROR@21922: expected command, found R_PAREN
+ERROR@22093: expected FOREIGN_KW
+ERROR@22093: expected KEY_KW
+ERROR@22093: expected column list
+ERROR@22093: expected REFERENCES_KW
+ERROR@22097: expected SEMICOLON
+ERROR@22098: expected command, found NULL_KW
+ERROR@22103: expected command, found IDENT
+ERROR@22253: expected FOREIGN_KW
+ERROR@22253: expected KEY_KW
+ERROR@22253: expected column list
+ERROR@22253: expected REFERENCES_KW
+ERROR@22257: expected SEMICOLON
+ERROR@22258: expected command, found NULL_KW
+ERROR@22263: expected command, found IDENT
+ERROR@24090: expected R_PAREN
+ERROR@24090: expected SEMICOLON
+ERROR@24091: expected command, found NO_KW
+ERROR@24094: expected command, found INHERIT_KW
+ERROR@24101: expected command, found R_PAREN
+ERROR@24842: expected R_PAREN
+ERROR@24842: expected SEMICOLON
+ERROR@24843: expected command, found NOT_KW
+ERROR@24847: expected command, found NULL_KW
+ERROR@24852: expected command, found IDENT
+ERROR@24853: expected command, found R_PAREN
+ERROR@25154: expected FOREIGN_KW
+ERROR@25154: expected KEY_KW
+ERROR@25154: expected column list
+ERROR@25154: expected REFERENCES_KW
+ERROR@25158: expected R_PAREN
+ERROR@25158: expected SEMICOLON
+ERROR@25159: expected command, found NULL_KW
+ERROR@25164: expected command, found IDENT
+ERROR@25165: expected command, found R_PAREN
+ERROR@25167: expected command, found INHERITS_KW
+ERROR@25176: expected command, found L_PAREN
+ERROR@25177: expected command, found IDENT
+ERROR@25189: expected command, found R_PAREN
+ERROR@26278: expected FOREIGN_KW
+ERROR@26278: expected KEY_KW
+ERROR@26278: expected column list
+ERROR@26278: expected REFERENCES_KW
+ERROR@26282: expected SEMICOLON
+ERROR@26283: expected command, found NULL_KW
+ERROR@26288: expected command, found IDENT
+ERROR@26342: expected FOREIGN_KW
+ERROR@26342: expected KEY_KW
+ERROR@26342: expected column list
+ERROR@26342: expected REFERENCES_KW
+ERROR@26346: expected SEMICOLON
+ERROR@26347: expected command, found NULL_KW
+ERROR@26352: expected command, found IDENT
+ERROR@26354: expected command, found NOT_KW
+ERROR@26358: expected command, found VALID_KW
+ERROR@26563: expected FOREIGN_KW
+ERROR@26563: expected KEY_KW
+ERROR@26563: expected column list
+ERROR@26563: expected REFERENCES_KW
+ERROR@26567: expected SEMICOLON
+ERROR@26568: expected command, found NULL_KW
+ERROR@26573: expected command, found IDENT
+ERROR@26575: expected command, found NOT_KW
+ERROR@26579: expected command, found VALID_KW
+ERROR@26585: expected command, found NO_KW
+ERROR@26588: expected command, found INHERIT_KW
+ERROR@26639: expected FOREIGN_KW
+ERROR@26639: expected KEY_KW
+ERROR@26639: expected column list
+ERROR@26639: expected REFERENCES_KW
+ERROR@26643: expected SEMICOLON
+ERROR@26644: expected command, found NULL_KW
+ERROR@26649: expected command, found IDENT
+ERROR@27519: expected name
+ERROR@27519: expected type name
+ERROR@27528: expected SEMICOLON
+ERROR@27529: expected command, found IDENT
+ERROR@27531: expected command, found NOT_KW
+ERROR@27535: expected command, found VALID_KW
+ERROR@28291: expected name
+ERROR@28291: expected type name
+ERROR@28300: expected SEMICOLON
+ERROR@28301: expected command, found IDENT
+ERROR@28303: expected command, found NOT_KW
+ERROR@28307: expected command, found VALID_KW
+ERROR@28312: expected command, found COMMA
+ERROR@28315: expected command, found ADD_KW
+ERROR@28319: expected command, found NOT_KW
+ERROR@28323: expected command, found NULL_KW
+ERROR@28328: expected command, found IDENT
+ERROR@28330: expected command, found NOT_KW
+ERROR@28334: expected command, found VALID_KW
+ERROR@28676: expected FOREIGN_KW
+ERROR@28676: expected KEY_KW
+ERROR@28676: expected column list
+ERROR@28676: expected REFERENCES_KW
+ERROR@28680: expected SEMICOLON
+ERROR@28681: expected command, found NULL_KW
+ERROR@28686: expected command, found IDENT
+ERROR@28688: expected command, found NOT_KW
+ERROR@28692: expected command, found VALID_KW
+ERROR@28749: expected SEMICOLON
+ERROR@28750: expected command, found NO_KW
+ERROR@28753: expected command, found INHERIT_KW
+ERROR@28874: expected SEMICOLON
+ERROR@28875: expected command, found INHERIT_KW
+ERROR@29160: expected FOREIGN_KW
+ERROR@29160: expected KEY_KW
+ERROR@29160: expected column list
+ERROR@29160: expected REFERENCES_KW
+ERROR@29164: expected SEMICOLON
+ERROR@29165: expected command, found NULL_KW
+ERROR@29170: expected command, found IDENT
+ERROR@29172: expected command, found NOT_KW
+ERROR@29176: expected command, found VALID_KW
+ERROR@29237: expected FOREIGN_KW
+ERROR@29237: expected KEY_KW
+ERROR@29237: expected column list
+ERROR@29237: expected REFERENCES_KW
+ERROR@29241: expected R_PAREN
+ERROR@29241: expected SEMICOLON
+ERROR@29242: expected command, found NULL_KW
+ERROR@29247: expected command, found IDENT
+ERROR@29248: expected command, found R_PAREN
+ERROR@29409: expected FOREIGN_KW
+ERROR@29409: expected KEY_KW
+ERROR@29409: expected column list
+ERROR@29409: expected REFERENCES_KW
+ERROR@29413: expected SEMICOLON
+ERROR@29414: expected command, found NULL_KW
+ERROR@29419: expected command, found IDENT
+ERROR@29421: expected command, found NOT_KW
+ERROR@29425: expected command, found VALID_KW
+ERROR@29987: expected FOREIGN_KW
+ERROR@29987: expected KEY_KW
+ERROR@29987: expected column list
+ERROR@29987: expected REFERENCES_KW
+ERROR@29991: expected SEMICOLON
+ERROR@29992: expected command, found NULL_KW
+ERROR@29997: expected command, found IDENT
+ERROR@29999: expected command, found NOT_KW
+ERROR@30003: expected command, found VALID_KW
+ERROR@30057: expected FOREIGN_KW
+ERROR@30057: expected KEY_KW
+ERROR@30057: expected column list
+ERROR@30057: expected REFERENCES_KW
+ERROR@30061: expected SEMICOLON
+ERROR@30062: expected command, found NULL_KW
+ERROR@30067: expected command, found IDENT
+ERROR@30581: expected FOREIGN_KW
+ERROR@30581: expected KEY_KW
+ERROR@30581: expected column list
+ERROR@30581: expected REFERENCES_KW
+ERROR@30585: expected SEMICOLON
+ERROR@30586: expected command, found NULL_KW
+ERROR@30591: expected command, found IDENT
+ERROR@30593: expected command, found NOT_KW
+ERROR@30597: expected command, found VALID_KW
+ERROR@30733: expected FOREIGN_KW
+ERROR@30733: expected KEY_KW
+ERROR@30733: expected column list
+ERROR@30733: expected REFERENCES_KW
+ERROR@30737: expected R_PAREN
+ERROR@30737: expected SEMICOLON
+ERROR@30738: expected command, found NULL_KW
+ERROR@30743: expected command, found IDENT
+ERROR@30744: expected command, found COMMA
+ERROR@30746: expected command, found IDENT
+ERROR@30748: expected command, found INT_KW
+ERROR@30751: expected command, found R_PAREN
+ERROR@30964: expected FOREIGN_KW
+ERROR@30964: expected KEY_KW
+ERROR@30964: expected column list
+ERROR@30964: expected REFERENCES_KW
+ERROR@30968: expected SEMICOLON
+ERROR@30969: expected command, found NULL_KW
+ERROR@30974: expected command, found IDENT
+ERROR@30976: expected command, found NOT_KW
+ERROR@30980: expected command, found VALID_KW
+ERROR@31648: expected R_PAREN
+ERROR@31648: expected SEMICOLON
+ERROR@31649: expected command, found NOT_KW
+ERROR@31653: expected command, found NULL_KW
+ERROR@31658: expected command, found IDENT
+ERROR@31659: expected command, found R_PAREN
+ERROR@31661: expected command, found PARTITION_KW
+ERROR@31671: expected command, found BY_KW
+ERROR@31674: expected command, found IDENT
+ERROR@31679: expected command, found L_PAREN
+ERROR@31680: expected command, found IDENT
+ERROR@31681: expected command, found R_PAREN
+ERROR@31758: expected FOREIGN_KW
+ERROR@31758: expected KEY_KW
+ERROR@31758: expected column list
+ERROR@31758: expected REFERENCES_KW
+ERROR@31762: expected SEMICOLON
+ERROR@31763: expected command, found NULL_KW
+ERROR@31768: expected command, found IDENT
+ERROR@31770: expected command, found NOT_KW
+ERROR@31774: expected command, found VALID_KW
+ERROR@32238: expected FOREIGN_KW
+ERROR@32238: expected KEY_KW
+ERROR@32238: expected column list
+ERROR@32238: expected REFERENCES_KW
+ERROR@32242: expected SEMICOLON
+ERROR@32243: expected command, found NULL_KW
+ERROR@32248: expected command, found IDENT
+ERROR@32250: expected command, found NOT_KW
+ERROR@32254: expected command, found VALID_KW
+ERROR@32544: expected FOREIGN_KW
+ERROR@32544: expected KEY_KW
+ERROR@32544: expected column list
+ERROR@32544: expected REFERENCES_KW
+ERROR@32548: expected SEMICOLON
+ERROR@32549: expected command, found NULL_KW
+ERROR@32554: expected command, found IDENT
+ERROR@32556: expected command, found NO_KW
+ERROR@32559: expected command, found INHERIT_KW
+ERROR@32857: expected FOREIGN_KW
+ERROR@32857: expected KEY_KW
+ERROR@32857: expected column list
+ERROR@32857: expected REFERENCES_KW
+ERROR@32861: expected SEMICOLON
+ERROR@32862: expected command, found NULL_KW
+ERROR@32867: expected command, found IDENT
+ERROR@32869: expected command, found NOT_KW
+ERROR@32873: expected command, found VALID_KW
+ERROR@33064: expected FOREIGN_KW
+ERROR@33064: expected KEY_KW
+ERROR@33064: expected column list
+ERROR@33064: expected REFERENCES_KW
+ERROR@33068: expected SEMICOLON
+ERROR@33069: expected command, found NULL_KW
+ERROR@33074: expected command, found IDENT
+ERROR@33125: expected FOREIGN_KW
+ERROR@33125: expected KEY_KW
+ERROR@33125: expected column list
+ERROR@33125: expected REFERENCES_KW
+ERROR@33129: expected SEMICOLON
+ERROR@33130: expected command, found NULL_KW
+ERROR@33135: expected command, found IDENT
+ERROR@33137: expected command, found NOT_KW
+ERROR@33141: expected command, found VALID_KW
+ERROR@33499: expected FOREIGN_KW
+ERROR@33499: expected KEY_KW
+ERROR@33499: expected column list
+ERROR@33499: expected REFERENCES_KW
+ERROR@33503: expected SEMICOLON
+ERROR@33504: expected command, found NULL_KW
+ERROR@33509: expected command, found IDENT
+ERROR@33511: expected command, found NOT_KW
+ERROR@33515: expected command, found VALID_KW
+ERROR@33667: expected FOREIGN_KW
+ERROR@33667: expected KEY_KW
+ERROR@33667: expected column list
+ERROR@33667: expected REFERENCES_KW
+ERROR@33671: expected R_PAREN
+ERROR@33671: expected SEMICOLON
+ERROR@33672: expected command, found NULL_KW
+ERROR@33677: expected command, found IDENT
+ERROR@33678: expected command, found COMMA
+ERROR@33680: expected command, found IDENT
+ERROR@33682: expected command, found INT_KW
+ERROR@33685: expected command, found R_PAREN
+ERROR@33923: expected FOREIGN_KW
+ERROR@33923: expected KEY_KW
+ERROR@33923: expected column list
+ERROR@33923: expected REFERENCES_KW
+ERROR@33927: expected SEMICOLON
+ERROR@33928: expected command, found NULL_KW
+ERROR@33933: expected command, found IDENT
+ERROR@33935: expected command, found NOT_KW
+ERROR@33939: expected command, found VALID_KW
+ERROR@34322: expected name
+ERROR@34322: expected type name
+ERROR@34331: expected SEMICOLON
+ERROR@34332: expected command, found IDENT
+ERROR@34334: expected command, found NOT_KW
+ERROR@34338: expected command, found VALID_KW
+ERROR@34605: expected name
+ERROR@34605: expected type name
+ERROR@34614: expected SEMICOLON
+ERROR@34615: expected command, found IDENT
+ERROR@34617: expected command, found NOT_KW
+ERROR@34621: expected command, found VALID_KW

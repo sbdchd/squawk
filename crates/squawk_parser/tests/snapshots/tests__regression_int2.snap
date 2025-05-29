@@ -1,0 +1,6 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/int2.sql
+---
+ERROR@2640: expected TYPE_KW
+ERROR@2640: missing comma

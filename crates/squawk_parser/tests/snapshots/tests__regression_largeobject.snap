@@ -1,0 +1,16 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/largeobject.sql
+---
+ERROR@2820: expected SEMICOLON
+ERROR@2821: expected command, found ON_KW
+ERROR@2824: expected command, found LARGE_KW
+ERROR@2830: expected command, found OBJECT_KW
+ERROR@2837: expected command, found STRING
+ERROR@2847: expected command, found IS_KW
+ERROR@2850: expected command, found STRING
+ERROR@7100: expected SEMICOLON
+ERROR@7575: missing comma
+ERROR@7593: expected SEMICOLON
+ERROR@7594: expected command, found TO_KW
+ERROR@7597: expected command, found IDENT

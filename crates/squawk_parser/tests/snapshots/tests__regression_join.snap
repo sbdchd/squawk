@@ -1,0 +1,25 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/join.sql
+---
+ERROR@77567: expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got COMPOUND_SELECT
+ERROR@93160: expected R_PAREN
+ERROR@93186: expected SEMICOLON
+ERROR@93186: expected command, found R_PAREN
+ERROR@93188: expected command, found AS_KW
+ERROR@93191: expected command, found IDENT
+ERROR@93196: expected command, found CROSS_KW
+ERROR@93202: expected command, found JOIN_KW
+ERROR@93207: expected command, found LATERAL_KW
+ERROR@93255: expected R_PAREN
+ERROR@93282: expected R_PAREN
+ERROR@93282: expected SEMICOLON
+ERROR@93283: expected command, found AS_KW
+ERROR@93286: expected command, found IDENT
+ERROR@93288: expected command, found R_PAREN
+ERROR@93293: expected command, found UNION_KW
+ERROR@93299: expected command, found ALL_KW
+ERROR@93319: expected SEMICOLON
+ERROR@93322: expected command, found R_PAREN
+ERROR@93324: expected command, found AS_KW
+ERROR@93327: expected command, found IDENT

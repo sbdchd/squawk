@@ -127,6 +127,9 @@ select json_array(a absent on null);
 select json_array(a absent on null returning foo format json);
 select json_array(1, true, json '{"a":null}');
 select json_array(1, b, '3' format json, 4);
+-- regression test
+select json_array(select from t);
+select json_array(select into t from u);
 
 -- query_expression
 select json_array(select 1);

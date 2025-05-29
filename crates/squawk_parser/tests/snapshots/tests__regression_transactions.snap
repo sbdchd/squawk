@@ -1,0 +1,118 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/transactions.sql
+---
+ERROR@13916: expected SEMICOLON
+ERROR@13916: expected command, found ERROR
+ERROR@13927: expected SEMICOLON
+ERROR@13927: expected command, found ERROR
+ERROR@13998: expected SEMICOLON
+ERROR@13998: expected command, found ERROR
+ERROR@14121: expected SEMICOLON
+ERROR@14121: expected command, found ERROR
+ERROR@14145: expected SEMICOLON
+ERROR@14145: expected command, found ERROR
+ERROR@14309: expected SEMICOLON
+ERROR@14309: expected command, found ERROR
+ERROR@14341: expected SEMICOLON
+ERROR@14341: expected command, found ERROR
+ERROR@14413: expected SEMICOLON
+ERROR@14413: expected command, found ERROR
+ERROR@14445: expected SEMICOLON
+ERROR@14445: expected command, found ERROR
+ERROR@14626: expected SEMICOLON
+ERROR@14626: expected command, found ERROR
+ERROR@14634: expected SEMICOLON
+ERROR@14634: expected command, found ERROR
+ERROR@14684: expected SEMICOLON
+ERROR@14684: expected command, found ERROR
+ERROR@14692: expected SEMICOLON
+ERROR@14692: expected command, found ERROR
+ERROR@14836: expected SEMICOLON
+ERROR@14836: expected command, found ERROR
+ERROR@14845: expected SEMICOLON
+ERROR@14845: expected command, found ERROR
+ERROR@14877: expected SEMICOLON
+ERROR@14877: expected command, found ERROR
+ERROR@14973: expected SEMICOLON
+ERROR@14973: expected command, found ERROR
+ERROR@14984: expected SEMICOLON
+ERROR@14984: expected command, found ERROR
+ERROR@15163: expected SEMICOLON
+ERROR@15163: expected command, found ERROR
+ERROR@15182: expected SEMICOLON
+ERROR@15182: expected command, found ERROR
+ERROR@15191: expected SEMICOLON
+ERROR@15191: expected command, found ERROR
+ERROR@15283: expected SEMICOLON
+ERROR@15283: expected command, found ERROR
+ERROR@15308: expected SEMICOLON
+ERROR@15308: expected command, found ERROR
+ERROR@15317: expected SEMICOLON
+ERROR@15317: expected command, found ERROR
+ERROR@15358: expected SEMICOLON
+ERROR@15358: expected command, found ERROR
+ERROR@15379: expected SEMICOLON
+ERROR@15379: expected command, found ERROR
+ERROR@15402: expected SEMICOLON
+ERROR@15402: expected command, found ERROR
+ERROR@15491: expected SEMICOLON
+ERROR@15491: expected command, found ERROR
+ERROR@15499: expected SEMICOLON
+ERROR@15499: expected command, found ERROR
+ERROR@15514: expected SEMICOLON
+ERROR@15514: expected command, found ERROR
+ERROR@15541: expected SEMICOLON
+ERROR@15541: expected command, found ERROR
+ERROR@15634: expected SEMICOLON
+ERROR@15634: expected command, found ERROR
+ERROR@15719: expected SEMICOLON
+ERROR@15719: expected command, found ERROR
+ERROR@15893: expected SEMICOLON
+ERROR@15893: expected command, found ERROR
+ERROR@15902: expected SEMICOLON
+ERROR@15902: expected command, found ERROR
+ERROR@15937: expected SEMICOLON
+ERROR@15937: expected command, found ERROR
+ERROR@16012: expected SEMICOLON
+ERROR@16012: expected command, found ERROR
+ERROR@16023: expected SEMICOLON
+ERROR@16023: expected command, found ERROR
+ERROR@16059: expected SEMICOLON
+ERROR@16059: expected command, found ERROR
+ERROR@16188: expected SEMICOLON
+ERROR@16188: expected command, found ERROR
+ERROR@16207: expected SEMICOLON
+ERROR@16207: expected command, found ERROR
+ERROR@16243: expected SEMICOLON
+ERROR@16243: expected command, found ERROR
+ERROR@16316: expected SEMICOLON
+ERROR@16316: expected command, found ERROR
+ERROR@16337: expected SEMICOLON
+ERROR@16337: expected command, found ERROR
+ERROR@16373: expected SEMICOLON
+ERROR@16373: expected command, found ERROR
+ERROR@16514: expected SEMICOLON
+ERROR@16514: expected command, found ERROR
+ERROR@16550: expected SEMICOLON
+ERROR@16550: expected command, found ERROR
+ERROR@16707: expected SEMICOLON
+ERROR@16707: expected command, found ERROR
+ERROR@16743: expected SEMICOLON
+ERROR@16743: expected command, found ERROR
+ERROR@17026: expected SEMICOLON
+ERROR@17026: expected command, found ERROR
+ERROR@17062: expected SEMICOLON
+ERROR@17062: expected command, found ERROR
+ERROR@17071: expected SEMICOLON
+ERROR@17071: expected command, found ERROR
+ERROR@17107: expected SEMICOLON
+ERROR@17107: expected command, found ERROR
+ERROR@17259: expected SEMICOLON
+ERROR@17259: expected command, found ERROR
+ERROR@17295: expected SEMICOLON
+ERROR@17295: expected command, found ERROR
+ERROR@17306: expected SEMICOLON
+ERROR@17306: expected command, found ERROR
+ERROR@17342: expected SEMICOLON
+ERROR@17342: expected command, found ERROR

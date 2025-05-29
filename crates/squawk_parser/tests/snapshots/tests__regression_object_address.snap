@@ -1,0 +1,18 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/object_address.sql
+---
+ERROR@1365: expected type name
+ERROR@1365: expected SEMICOLON
+ERROR@1365: expected command, found DOT
+ERROR@1366: expected command, found IDENT
+ERROR@1376: expected command, found AS_KW
+ERROR@1379: expected command, found IDENT
+ERROR@1384: expected command, found CONSTRAINT_KW
+ERROR@1395: expected command, found IDENT
+ERROR@1405: expected command, found CHECK_KW
+ERROR@1411: expected command, found L_PAREN
+ERROR@1412: expected command, found VALUE_KW
+ERROR@1418: expected command, found R_ANGLE
+ERROR@1420: expected command, found INT_NUMBER
+ERROR@1421: expected command, found R_PAREN

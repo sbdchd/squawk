@@ -1,0 +1,492 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/arrays.sql
+---
+ERROR@564: expected EQ
+ERROR@598: expected EQ
+ERROR@1731: expected EQ
+ERROR@1733: expected COMMA
+ERROR@1733: expected R_BRACK
+ERROR@1733: expected SEMICOLON
+ERROR@1733: expected command, found COLON
+ERROR@1734: expected command, found INT_NUMBER
+ERROR@1735: expected command, found R_BRACK
+ERROR@1737: expected command, found EQ
+ERROR@1739: expected command, found STRING
+ERROR@1751: expected command, found WHERE_KW
+ERROR@1757: expected command, found NOT_KW
+ERROR@1761: expected command, found IDENT
+ERROR@1763: expected command, found EQ
+ERROR@1765: expected command, found STRING
+ERROR@1769: expected command, found COLON
+ERROR@1770: expected command, found COLON
+ERROR@1771: expected command, found IDENT
+ERROR@1801: expected EQ
+ERROR@1803: expected COMMA
+ERROR@1803: expected R_BRACK
+ERROR@1803: expected SEMICOLON
+ERROR@1803: expected command, found COLON
+ERROR@1804: expected command, found INT_NUMBER
+ERROR@1805: expected command, found R_BRACK
+ERROR@1806: expected command, found L_BRACK
+ERROR@1807: expected command, found INT_NUMBER
+ERROR@1808: expected command, found COLON
+ERROR@1809: expected command, found INT_NUMBER
+ERROR@1810: expected command, found R_BRACK
+ERROR@1811: expected command, found L_BRACK
+ERROR@1812: expected command, found INT_NUMBER
+ERROR@1813: expected command, found COLON
+ERROR@1814: expected command, found INT_NUMBER
+ERROR@1815: expected command, found R_BRACK
+ERROR@1817: expected command, found EQ
+ERROR@1819: expected command, found STRING
+ERROR@1831: expected command, found COMMA
+ERROR@1839: expected command, found IDENT
+ERROR@1840: expected command, found L_BRACK
+ERROR@1841: expected command, found INT_NUMBER
+ERROR@1842: expected command, found COLON
+ERROR@1843: expected command, found INT_NUMBER
+ERROR@1844: expected command, found R_BRACK
+ERROR@1845: expected command, found L_BRACK
+ERROR@1846: expected command, found INT_NUMBER
+ERROR@1847: expected command, found COLON
+ERROR@1848: expected command, found INT_NUMBER
+ERROR@1849: expected command, found R_BRACK
+ERROR@1850: expected command, found L_BRACK
+ERROR@1851: expected command, found INT_NUMBER
+ERROR@1852: expected command, found COLON
+ERROR@1853: expected command, found INT_NUMBER
+ERROR@1854: expected command, found R_BRACK
+ERROR@1856: expected command, found EQ
+ERROR@1858: expected command, found STRING
+ERROR@1873: expected command, found WHERE_KW
+ERROR@1879: expected command, found IDENT
+ERROR@1889: expected command, found L_PAREN
+ERROR@1890: expected command, found IDENT
+ERROR@1891: expected command, found R_PAREN
+ERROR@1893: expected command, found EQ
+ERROR@1895: expected command, found STRING
+ERROR@1937: expected EQ
+ERROR@1939: expected COMMA
+ERROR@1939: expected R_BRACK
+ERROR@1939: expected SEMICOLON
+ERROR@1939: expected command, found COLON
+ERROR@1940: expected command, found INT_NUMBER
+ERROR@1941: expected command, found R_BRACK
+ERROR@1943: expected command, found EQ
+ERROR@1945: expected command, found STRING
+ERROR@1962: expected command, found WHERE_KW
+ERROR@1968: expected command, found IDENT
+ERROR@1978: expected command, found L_PAREN
+ERROR@1979: expected command, found IDENT
+ERROR@1980: expected command, found R_PAREN
+ERROR@1982: expected command, found IS_KW
+ERROR@1985: expected command, found NOT_KW
+ERROR@1989: expected command, found NULL_KW
+ERROR@2269: expected EQ
+ERROR@3326: expected EQ
+ERROR@3412: expected EQ
+ERROR@3417: expected COMMA
+ERROR@3417: expected R_BRACK
+ERROR@3417: expected SEMICOLON
+ERROR@3417: expected command, found COLON
+ERROR@3418: expected command, found INT_NUMBER
+ERROR@3419: expected command, found R_BRACK
+ERROR@3421: expected command, found EQ
+ERROR@3423: expected command, found STRING
+ERROR@3445: expected command, found WHERE_KW
+ERROR@3451: expected command, found IDENT
+ERROR@3461: expected command, found L_PAREN
+ERROR@3462: expected command, found IDENT
+ERROR@3463: expected command, found R_PAREN
+ERROR@3465: expected command, found IS_KW
+ERROR@3468: expected command, found NOT_KW
+ERROR@3472: expected command, found NULL_KW
+ERROR@3500: expected EQ
+ERROR@3502: expected COMMA
+ERROR@3502: expected R_BRACK
+ERROR@3502: expected SEMICOLON
+ERROR@3502: expected command, found COLON
+ERROR@3503: expected command, found NULL_KW
+ERROR@3507: expected command, found R_BRACK
+ERROR@3509: expected command, found EQ
+ERROR@3511: expected command, found STRING
+ERROR@3533: expected command, found WHERE_KW
+ERROR@3539: expected command, found IDENT
+ERROR@3549: expected command, found L_PAREN
+ERROR@3550: expected command, found IDENT
+ERROR@3551: expected command, found R_PAREN
+ERROR@3553: expected command, found IS_KW
+ERROR@3556: expected command, found NOT_KW
+ERROR@3560: expected command, found NULL_KW
+ERROR@4077: expected EQ
+ERROR@4078: expected an expression, found COLON
+ERROR@4079: expected R_BRACK
+ERROR@4079: expected SEMICOLON
+ERROR@4079: expected command, found INT_NUMBER
+ERROR@4080: expected command, found R_BRACK
+ERROR@4082: expected command, found EQ
+ERROR@4084: expected command, found STRING
+ERROR@4098: expected command, found COMMA
+ERROR@4100: expected command, found IDENT
+ERROR@4101: expected command, found L_BRACK
+ERROR@4102: expected command, found COLON
+ERROR@4103: expected command, found INT_NUMBER
+ERROR@4104: expected command, found R_BRACK
+ERROR@4105: expected command, found L_BRACK
+ERROR@4106: expected command, found COLON
+ERROR@4107: expected command, found INT_NUMBER
+ERROR@4108: expected command, found R_BRACK
+ERROR@4110: expected command, found EQ
+ERROR@4112: expected command, found STRING
+ERROR@4135: expected command, found WHERE_KW
+ERROR@4141: expected command, found IDENT
+ERROR@4152: expected command, found L_PAREN
+ERROR@4153: expected command, found IDENT
+ERROR@4154: expected command, found COMMA
+ERROR@4155: expected command, found INT_NUMBER
+ERROR@4156: expected command, found R_PAREN
+ERROR@4158: expected command, found EQ
+ERROR@4160: expected command, found INT_NUMBER
+ERROR@4210: expected EQ
+ERROR@4212: expected COMMA
+ERROR@4212: expected R_BRACK
+ERROR@4212: expected SEMICOLON
+ERROR@4212: expected command, found COLON
+ERROR@4213: expected command, found R_BRACK
+ERROR@4215: expected command, found EQ
+ERROR@4217: expected command, found STRING
+ERROR@4231: expected command, found COMMA
+ERROR@4233: expected command, found IDENT
+ERROR@4234: expected command, found L_BRACK
+ERROR@4235: expected command, found INT_NUMBER
+ERROR@4236: expected command, found COLON
+ERROR@4237: expected command, found R_BRACK
+ERROR@4238: expected command, found L_BRACK
+ERROR@4239: expected command, found INT_NUMBER
+ERROR@4240: expected command, found COLON
+ERROR@4241: expected command, found R_BRACK
+ERROR@4243: expected command, found EQ
+ERROR@4245: expected command, found STRING
+ERROR@4314: expected EQ
+ERROR@4315: expected an expression, found COLON
+ERROR@4391: expected EQ
+ERROR@4392: expected an expression, found COLON
+ERROR@4497: expected EQ
+ERROR@4498: expected an expression, found COLON
+ERROR@4996: expected EQ
+ERROR@5142: expected EQ
+ERROR@5272: expected EQ
+ERROR@5285: expected EQ
+ERROR@5402: expected EQ
+ERROR@5670: expected EQ
+ERROR@5681: expected EQ
+ERROR@5746: expected EQ
+ERROR@5756: expected EQ
+ERROR@5815: expected EQ
+ERROR@5825: expected EQ
+ERROR@5885: expected EQ
+ERROR@5895: expected EQ
+ERROR@5954: expected EQ
+ERROR@5966: expected EQ
+ERROR@6033: expected EQ
+ERROR@6035: expected COMMA
+ERROR@6035: expected R_BRACK
+ERROR@6035: expected SEMICOLON
+ERROR@6035: expected command, found COLON
+ERROR@6036: expected command, found INT_NUMBER
+ERROR@6037: expected command, found R_BRACK
+ERROR@6039: expected command, found EQ
+ERROR@6041: expected command, found ARRAY_KW
+ERROR@6046: expected command, found L_BRACK
+ERROR@6047: expected command, found INT_NUMBER
+ERROR@6049: expected command, found COMMA
+ERROR@6050: expected command, found INT_NUMBER
+ERROR@6052: expected command, found COMMA
+ERROR@6053: expected command, found INT_NUMBER
+ERROR@6055: expected command, found R_BRACK
+ERROR@6056: expected command, found COMMA
+ERROR@6058: expected command, found IDENT
+ERROR@6059: expected command, found L_BRACK
+ERROR@6060: expected command, found INT_NUMBER
+ERROR@6061: expected command, found COLON
+ERROR@6062: expected command, found INT_NUMBER
+ERROR@6063: expected command, found R_BRACK
+ERROR@6065: expected command, found EQ
+ERROR@6067: expected command, found ARRAY_KW
+ERROR@6072: expected command, found L_BRACK
+ERROR@6073: expected command, found STRING
+ERROR@6078: expected command, found COMMA
+ERROR@6079: expected command, found STRING
+ERROR@6087: expected command, found COMMA
+ERROR@6088: expected command, found STRING
+ERROR@6096: expected command, found R_BRACK
+ERROR@6144: expected EQ
+ERROR@6146: expected COMMA
+ERROR@6146: expected R_BRACK
+ERROR@6146: expected SEMICOLON
+ERROR@6146: expected command, found COLON
+ERROR@6147: expected command, found INT_NUMBER
+ERROR@6149: expected command, found R_BRACK
+ERROR@6151: expected command, found EQ
+ERROR@6153: expected command, found ARRAY_KW
+ERROR@6158: expected command, found L_BRACK
+ERROR@6159: expected command, found INT_NUMBER
+ERROR@6161: expected command, found COMMA
+ERROR@6162: expected command, found NULL_KW
+ERROR@6166: expected command, found COMMA
+ERROR@6167: expected command, found INT_NUMBER
+ERROR@6169: expected command, found R_BRACK
+ERROR@6170: expected command, found COMMA
+ERROR@6172: expected command, found IDENT
+ERROR@6173: expected command, found L_BRACK
+ERROR@6174: expected command, found INT_NUMBER
+ERROR@6175: expected command, found COLON
+ERROR@6176: expected command, found INT_NUMBER
+ERROR@6178: expected command, found R_BRACK
+ERROR@6180: expected command, found EQ
+ERROR@6182: expected command, found ARRAY_KW
+ERROR@6187: expected command, found L_BRACK
+ERROR@6188: expected command, found STRING
+ERROR@6193: expected command, found COMMA
+ERROR@6194: expected command, found NULL_KW
+ERROR@6198: expected command, found COMMA
+ERROR@6199: expected command, found STRING
+ERROR@6204: expected command, found R_BRACK
+ERROR@6252: expected EQ
+ERROR@6255: expected COMMA
+ERROR@6255: expected R_BRACK
+ERROR@6255: expected SEMICOLON
+ERROR@6255: expected command, found COLON
+ERROR@6256: expected command, found INT_NUMBER
+ERROR@6258: expected command, found R_BRACK
+ERROR@6260: expected command, found EQ
+ERROR@6262: expected command, found ARRAY_KW
+ERROR@6267: expected command, found L_BRACK
+ERROR@6268: expected command, found NULL_KW
+ERROR@6272: expected command, found COMMA
+ERROR@6273: expected command, found INT_NUMBER
+ERROR@6275: expected command, found R_BRACK
+ERROR@6276: expected command, found COMMA
+ERROR@6278: expected command, found IDENT
+ERROR@6279: expected command, found L_BRACK
+ERROR@6280: expected command, found INT_NUMBER
+ERROR@6282: expected command, found COLON
+ERROR@6283: expected command, found INT_NUMBER
+ERROR@6285: expected command, found R_BRACK
+ERROR@6287: expected command, found EQ
+ERROR@6289: expected command, found ARRAY_KW
+ERROR@6294: expected command, found L_BRACK
+ERROR@6295: expected command, found NULL_KW
+ERROR@6299: expected command, found COMMA
+ERROR@6300: expected command, found STRING
+ERROR@6305: expected command, found R_BRACK
+ERROR@6353: expected EQ
+ERROR@6356: expected COMMA
+ERROR@6356: expected R_BRACK
+ERROR@6356: expected SEMICOLON
+ERROR@6356: expected command, found COLON
+ERROR@6357: expected command, found INT_NUMBER
+ERROR@6359: expected command, found R_BRACK
+ERROR@6361: expected command, found EQ
+ERROR@6363: expected command, found ARRAY_KW
+ERROR@6368: expected command, found L_BRACK
+ERROR@6369: expected command, found NULL_KW
+ERROR@6373: expected command, found COMMA
+ERROR@6374: expected command, found INT_NUMBER
+ERROR@6376: expected command, found R_BRACK
+ERROR@6377: expected command, found COMMA
+ERROR@6379: expected command, found IDENT
+ERROR@6380: expected command, found L_BRACK
+ERROR@6381: expected command, found INT_NUMBER
+ERROR@6383: expected command, found COLON
+ERROR@6384: expected command, found INT_NUMBER
+ERROR@6386: expected command, found R_BRACK
+ERROR@6388: expected command, found EQ
+ERROR@6390: expected command, found ARRAY_KW
+ERROR@6395: expected command, found L_BRACK
+ERROR@6396: expected command, found NULL_KW
+ERROR@6400: expected command, found COMMA
+ERROR@6401: expected command, found STRING
+ERROR@6406: expected command, found R_BRACK
+ERROR@6454: expected EQ
+ERROR@6457: expected COMMA
+ERROR@6457: expected R_BRACK
+ERROR@6457: expected SEMICOLON
+ERROR@6457: expected command, found COLON
+ERROR@6458: expected command, found MINUS
+ERROR@6459: expected command, found INT_NUMBER
+ERROR@6460: expected command, found R_BRACK
+ERROR@6462: expected command, found EQ
+ERROR@6464: expected command, found ARRAY_KW
+ERROR@6469: expected command, found L_BRACK
+ERROR@6470: expected command, found MINUS
+ERROR@6471: expected command, found INT_NUMBER
+ERROR@6473: expected command, found COMMA
+ERROR@6474: expected command, found MINUS
+ERROR@6475: expected command, found INT_NUMBER
+ERROR@6477: expected command, found COMMA
+ERROR@6478: expected command, found MINUS
+ERROR@6479: expected command, found INT_NUMBER
+ERROR@6481: expected command, found R_BRACK
+ERROR@6482: expected command, found COMMA
+ERROR@6484: expected command, found IDENT
+ERROR@6485: expected command, found L_BRACK
+ERROR@6486: expected command, found MINUS
+ERROR@6487: expected command, found INT_NUMBER
+ERROR@6488: expected command, found COLON
+ERROR@6489: expected command, found MINUS
+ERROR@6490: expected command, found INT_NUMBER
+ERROR@6491: expected command, found R_BRACK
+ERROR@6493: expected command, found EQ
+ERROR@6495: expected command, found ARRAY_KW
+ERROR@6500: expected command, found L_BRACK
+ERROR@6501: expected command, found STRING
+ERROR@6506: expected command, found COMMA
+ERROR@6507: expected command, found STRING
+ERROR@6512: expected command, found COMMA
+ERROR@6513: expected command, found STRING
+ERROR@6518: expected command, found R_BRACK
+ERROR@6566: expected EQ
+ERROR@6569: expected COMMA
+ERROR@6569: expected R_BRACK
+ERROR@6569: expected SEMICOLON
+ERROR@6569: expected command, found COLON
+ERROR@6570: expected command, found MINUS
+ERROR@6571: expected command, found INT_NUMBER
+ERROR@6572: expected command, found R_BRACK
+ERROR@6574: expected command, found EQ
+ERROR@6576: expected command, found ARRAY_KW
+ERROR@6581: expected command, found L_BRACK
+ERROR@6582: expected command, found MINUS
+ERROR@6583: expected command, found INT_NUMBER
+ERROR@6585: expected command, found COMMA
+ERROR@6586: expected command, found NULL_KW
+ERROR@6590: expected command, found R_BRACK
+ERROR@6591: expected command, found COMMA
+ERROR@6593: expected command, found IDENT
+ERROR@6594: expected command, found L_BRACK
+ERROR@6595: expected command, found MINUS
+ERROR@6596: expected command, found INT_NUMBER
+ERROR@6597: expected command, found COLON
+ERROR@6598: expected command, found MINUS
+ERROR@6599: expected command, found INT_NUMBER
+ERROR@6600: expected command, found R_BRACK
+ERROR@6602: expected command, found EQ
+ERROR@6604: expected command, found ARRAY_KW
+ERROR@6609: expected command, found L_BRACK
+ERROR@6610: expected command, found STRING
+ERROR@6615: expected command, found COMMA
+ERROR@6616: expected command, found NULL_KW
+ERROR@6620: expected command, found R_BRACK
+ERROR@6668: expected EQ
+ERROR@6672: expected COMMA
+ERROR@6672: expected R_BRACK
+ERROR@6672: expected SEMICOLON
+ERROR@6672: expected command, found COLON
+ERROR@6673: expected command, found MINUS
+ERROR@6674: expected command, found INT_NUMBER
+ERROR@6676: expected command, found R_BRACK
+ERROR@6678: expected command, found EQ
+ERROR@6680: expected command, found ARRAY_KW
+ERROR@6685: expected command, found L_BRACK
+ERROR@6686: expected command, found MINUS
+ERROR@6687: expected command, found INT_NUMBER
+ERROR@6689: expected command, found COMMA
+ERROR@6690: expected command, found NULL_KW
+ERROR@6694: expected command, found COMMA
+ERROR@6695: expected command, found MINUS
+ERROR@6696: expected command, found INT_NUMBER
+ERROR@6698: expected command, found R_BRACK
+ERROR@6699: expected command, found COMMA
+ERROR@6701: expected command, found IDENT
+ERROR@6702: expected command, found L_BRACK
+ERROR@6703: expected command, found MINUS
+ERROR@6704: expected command, found INT_NUMBER
+ERROR@6706: expected command, found COLON
+ERROR@6707: expected command, found MINUS
+ERROR@6708: expected command, found INT_NUMBER
+ERROR@6710: expected command, found R_BRACK
+ERROR@6712: expected command, found EQ
+ERROR@6714: expected command, found ARRAY_KW
+ERROR@6719: expected command, found L_BRACK
+ERROR@6720: expected command, found STRING
+ERROR@6725: expected command, found COMMA
+ERROR@6726: expected command, found NULL_KW
+ERROR@6730: expected command, found COMMA
+ERROR@6731: expected command, found STRING
+ERROR@6736: expected command, found R_BRACK
+ERROR@6910: expected EQ
+ERROR@6912: expected COMMA
+ERROR@6912: expected R_BRACK
+ERROR@6912: expected SEMICOLON
+ERROR@6912: expected command, found COLON
+ERROR@6913: expected command, found INT_NUMBER
+ERROR@6914: expected command, found R_BRACK
+ERROR@6916: expected command, found EQ
+ERROR@6918: expected command, found ARRAY_KW
+ERROR@6923: expected command, found L_BRACK
+ERROR@6924: expected command, found INT_NUMBER
+ERROR@6925: expected command, found COMMA
+ERROR@6926: expected command, found INT_NUMBER
+ERROR@6927: expected command, found COMMA
+ERROR@6928: expected command, found INT_NUMBER
+ERROR@6929: expected command, found COMMA
+ERROR@6930: expected command, found NULL_KW
+ERROR@6934: expected command, found COMMA
+ERROR@6935: expected command, found INT_NUMBER
+ERROR@6936: expected command, found COMMA
+ERROR@6937: expected command, found INT_NUMBER
+ERROR@6938: expected command, found R_BRACK
+ERROR@6939: expected command, found COMMA
+ERROR@6941: expected command, found IDENT
+ERROR@6942: expected command, found L_BRACK
+ERROR@6943: expected command, found INT_NUMBER
+ERROR@6944: expected command, found COLON
+ERROR@6945: expected command, found INT_NUMBER
+ERROR@6946: expected command, found R_BRACK
+ERROR@6948: expected command, found EQ
+ERROR@6950: expected command, found ARRAY_KW
+ERROR@6955: expected command, found L_BRACK
+ERROR@6956: expected command, found STRING
+ERROR@6959: expected command, found COMMA
+ERROR@6960: expected command, found STRING
+ERROR@6964: expected command, found COMMA
+ERROR@6965: expected command, found STRING
+ERROR@6969: expected command, found COMMA
+ERROR@6970: expected command, found NULL_KW
+ERROR@6974: expected command, found COMMA
+ERROR@6975: expected command, found STRING
+ERROR@6979: expected command, found COMMA
+ERROR@6980: expected command, found STRING
+ERROR@6984: expected command, found R_BRACK
+ERROR@10382: expected SEMICOLON
+ERROR@10383: expected command, found LANGUAGE_KW
+ERROR@10392: expected command, found IDENT
+ERROR@15187: expected EQ
+ERROR@15211: expected EQ
+ERROR@15345: expected EQ
+ERROR@15373: expected EQ
+ERROR@15401: expected EQ
+ERROR@15882: expected EQ
+ERROR@15939: expected EQ
+ERROR@15950: expected COMMA
+ERROR@15950: expected R_BRACK
+ERROR@15950: expected SEMICOLON
+ERROR@15950: expected command, found COLON
+ERROR@15951: expected command, found INT_NUMBER
+ERROR@15961: expected command, found R_BRACK
+ERROR@15963: expected command, found EQ
+ERROR@15965: expected command, found ARRAY_KW
+ERROR@15970: expected command, found L_BRACK
+ERROR@15971: expected command, found INT_NUMBER
+ERROR@15972: expected command, found COMMA
+ERROR@15973: expected command, found INT_NUMBER
+ERROR@15974: expected command, found R_BRACK
+ERROR@15976: expected command, found WHERE_KW
+ERROR@15982: expected command, found IDENT
+ERROR@15985: expected command, found EQ
+ERROR@15987: expected command, found INT_NUMBER
+ERROR@16637: missing comma
+ERROR@16686: missing comma
+ERROR@27671: expected EQ

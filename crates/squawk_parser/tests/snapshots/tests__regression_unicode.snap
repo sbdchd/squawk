@@ -1,0 +1,44 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/unicode.sql
+---
+ERROR@919: expected SEMICOLON
+ERROR@920: expected command, found AS_KW
+ERROR@923: expected command, found IDENT
+ERROR@976: expected SEMICOLON
+ERROR@977: expected command, found AS_KW
+ERROR@980: expected command, found NFC_KW
+ERROR@983: expected command, found COMMA
+ERROR@989: expected command, found IDENT
+ERROR@993: expected command, found IS_KW
+ERROR@996: expected command, found NFD_KW
+ERROR@1000: expected command, found NORMALIZED_KW
+ERROR@1011: expected command, found AS_KW
+ERROR@1014: expected command, found NFD_KW
+ERROR@1017: expected command, found COMMA
+ERROR@1023: expected command, found IDENT
+ERROR@1027: expected command, found IS_KW
+ERROR@1030: expected command, found NFKC_KW
+ERROR@1035: expected command, found NORMALIZED_KW
+ERROR@1046: expected command, found AS_KW
+ERROR@1049: expected command, found NFKC_KW
+ERROR@1053: expected command, found COMMA
+ERROR@1059: expected command, found IDENT
+ERROR@1063: expected command, found IS_KW
+ERROR@1066: expected command, found NFKD_KW
+ERROR@1071: expected command, found NORMALIZED_KW
+ERROR@1082: expected command, found AS_KW
+ERROR@1085: expected command, found NFKD_KW
+ERROR@1090: expected command, found FROM_KW
+ERROR@1097: expected command, found L_PAREN
+ERROR@1242: expected SEMICOLON
+ERROR@1242: expected command, found R_PAREN
+ERROR@1244: expected command, found IDENT
+ERROR@1249: expected command, found L_PAREN
+ERROR@1250: expected command, found IDENT
+ERROR@1253: expected command, found COMMA
+ERROR@1255: expected command, found IDENT
+ERROR@1258: expected command, found R_PAREN
+ERROR@1260: expected command, found ORDER_KW
+ERROR@1266: expected command, found BY_KW
+ERROR@1269: expected command, found IDENT

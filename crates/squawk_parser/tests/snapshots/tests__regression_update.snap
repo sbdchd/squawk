@@ -1,0 +1,50 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/update.sql
+---
+ERROR@668: expected EQ
+ERROR@668: expected an expression, found DOT
+ERROR@669: expected expression
+ERROR@669: expected SEMICOLON
+ERROR@669: expected command, found IDENT
+ERROR@671: expected command, found EQ
+ERROR@673: expected command, found IDENT
+ERROR@674: expected command, found DOT
+ERROR@675: expected command, found IDENT
+ERROR@677: expected command, found PLUS
+ERROR@679: expected command, found INT_NUMBER
+ERROR@682: expected command, found WHERE_KW
+ERROR@688: expected command, found IDENT
+ERROR@689: expected command, found DOT
+ERROR@690: expected command, found IDENT
+ERROR@692: expected command, found EQ
+ERROR@694: expected command, found INT_NUMBER
+ERROR@8287: expected command, found STRING
+ERROR@8308: expected command, found STRING
+ERROR@9069: expected command, found STRING
+ERROR@9353: expected command, found STRING
+ERROR@9941: expected command, found STRING
+ERROR@10021: expected command, found STRING
+ERROR@10139: expected command, found STRING
+ERROR@10200: expected command, found STRING
+ERROR@10894: expected command, found STRING
+ERROR@10907: expected command, found STRING
+ERROR@11513: expected command, found STRING
+ERROR@12698: expected command, found STRING
+ERROR@12828: expected command, found STRING
+ERROR@12841: expected command, found STRING
+ERROR@12935: expected command, found STRING
+ERROR@13168: expected command, found STRING
+ERROR@13233: expected command, found STRING
+ERROR@13868: expected command, found STRING
+ERROR@14487: expected command, found STRING
+ERROR@14882: expected command, found STRING
+ERROR@15383: expected command, found STRING
+ERROR@15874: expected command, found STRING
+ERROR@16249: expected command, found STRING
+ERROR@16866: expected command, found STRING
+ERROR@18760: expected command, found STRING
+ERROR@19368: expected command, found STRING
+ERROR@19589: expected command, found STRING
+ERROR@19873: expected command, found STRING
+ERROR@20051: expected command, found STRING

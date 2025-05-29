@@ -1,0 +1,31 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/with.sql
+---
+ERROR@23239: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: L_PAREN
+ERROR@23239: expected R_PAREN
+ERROR@23239: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@23242: expected command, found L_PAREN
+ERROR@23288: expected SEMICOLON
+ERROR@23288: expected command, found R_PAREN
+ERROR@23292: expected command, found UNION_KW
+ERROR@23308: expected SEMICOLON
+ERROR@23308: expected command, found R_PAREN
+ERROR@26584: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@26962: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@26962: expected R_PAREN
+ERROR@26979: missing comma
+ERROR@27002: expected SEMICOLON
+ERROR@27003: expected command, found R_PAREN
+ERROR@27005: expected command, found FROM_KW
+ERROR@27010: expected command, found IDENT
+ERROR@41836: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@42490: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@42612: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@42737: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@42859: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@43000: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@43129: expected R_PAREN
+ERROR@43133: expected L_PAREN
+ERROR@43192: expected R_PAREN
+ERROR@43196: expected L_PAREN

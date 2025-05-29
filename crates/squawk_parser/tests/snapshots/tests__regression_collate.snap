@@ -1,0 +1,7 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/collate.sql
+---
+ERROR@6741: expected R_PAREN
+ERROR@6753: expected SEMICOLON
+ERROR@6753: expected command, found R_PAREN

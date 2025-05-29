@@ -1,0 +1,38 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/rowtypes.sql
+---
+ERROR@1874: expected EQ
+ERROR@1874: expected an expression, found DOT
+ERROR@1875: expected expression
+ERROR@1875: expected SEMICOLON
+ERROR@1875: expected command, found IDENT
+ERROR@1882: expected command, found EQ
+ERROR@1884: expected command, found STRING
+ERROR@1998: expected EQ
+ERROR@1998: expected an expression, found DOT
+ERROR@1999: expected expression
+ERROR@1999: expected SEMICOLON
+ERROR@1999: expected command, found IDENT
+ERROR@2001: expected command, found DOT
+ERROR@2002: expected command, found IDENT
+ERROR@2004: expected command, found EQ
+ERROR@2006: expected command, found INT_NUMBER
+ERROR@2009: expected command, found WHERE_KW
+ERROR@2015: expected command, found IDENT
+ERROR@2018: expected command, found EQ
+ERROR@2020: expected command, found INT_NUMBER
+ERROR@2046: expected EQ
+ERROR@2046: expected an expression, found DOT
+ERROR@2047: expected expression
+ERROR@2047: expected SEMICOLON
+ERROR@2047: expected command, found IDENT
+ERROR@2050: expected command, found EQ
+ERROR@2052: expected command, found INT_NUMBER
+ERROR@2628: expected EQ
+ERROR@2628: expected an expression, found DOT
+ERROR@2629: expected expression
+ERROR@2629: expected SEMICOLON
+ERROR@2629: expected command, found FIRST_KW
+ERROR@2635: expected command, found EQ
+ERROR@2637: expected command, found STRING

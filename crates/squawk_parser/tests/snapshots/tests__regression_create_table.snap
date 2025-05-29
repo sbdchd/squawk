@@ -1,0 +1,35 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/create_table.sql
+---
+ERROR@2201: expected SEMICOLON
+ERROR@2408: expected L_PAREN
+ERROR@2413: expected R_PAREN
+ERROR@9986: expected an expression, found R_PAREN
+ERROR@9986: expected expr list
+ERROR@22495: expected R_PAREN
+ERROR@22495: expected DEFAULT_KW
+ERROR@22495: expected SEMICOLON
+ERROR@22496: expected command, found COLLATE_KW
+ERROR@22504: expected command, found IDENT
+ERROR@22511: expected command, found R_PAREN
+ERROR@22513: expected command, found FOR_KW
+ERROR@22524: expected L_PAREN
+ERROR@22534: expected SEMICOLON
+ERROR@22535: expected command, found TO_KW
+ERROR@22538: expected command, found L_PAREN
+ERROR@22539: expected command, found STRING
+ERROR@22542: expected command, found R_PAREN
+ERROR@22649: expected R_PAREN
+ERROR@22649: expected DEFAULT_KW
+ERROR@22649: expected SEMICOLON
+ERROR@22650: expected command, found COLLATE_KW
+ERROR@22658: expected command, found IDENT
+ERROR@22665: expected command, found R_PAREN
+ERROR@22667: expected command, found FOR_KW
+ERROR@22678: expected L_PAREN
+ERROR@22688: expected SEMICOLON
+ERROR@22689: expected command, found TO_KW
+ERROR@22692: expected command, found L_PAREN
+ERROR@22693: expected command, found STRING
+ERROR@22696: expected command, found R_PAREN
