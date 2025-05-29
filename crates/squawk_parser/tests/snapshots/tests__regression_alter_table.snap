@@ -1,0 +1,140 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/alter_table.sql
+---
+ERROR@12719: expected VALID_KW
+ERROR@12719: expected SEMICOLON
+ERROR@12720: expected command, found ENFORCED_KW
+ERROR@15268: expected R_PAREN
+ERROR@15268: expected SEMICOLON
+ERROR@15269: expected command, found NOT_KW
+ERROR@15273: expected command, found VALID_KW
+ERROR@15278: expected command, found R_PAREN
+ERROR@33822: expected FOREIGN_KW
+ERROR@33822: expected KEY_KW
+ERROR@33822: expected column list
+ERROR@33822: expected REFERENCES_KW
+ERROR@33826: expected SEMICOLON
+ERROR@33827: expected command, found NULL_KW
+ERROR@33832: expected command, found IDENT
+ERROR@33835: expected command, found NOT_KW
+ERROR@33839: expected command, found VALID_KW
+ERROR@33940: expected FOREIGN_KW
+ERROR@33940: expected KEY_KW
+ERROR@33940: expected column list
+ERROR@33940: expected REFERENCES_KW
+ERROR@33944: expected SEMICOLON
+ERROR@33945: expected command, found NULL_KW
+ERROR@33950: expected command, found IDENT
+ERROR@38443: expected L_PAREN
+ERROR@38448: expected R_PAREN
+ERROR@38448: expected SEMICOLON
+ERROR@38449: expected command, found OIDS_KW
+ERROR@42440: expected command, found INT_NUMBER
+ERROR@42443: expected command, found INT_NUMBER
+ERROR@42446: expected command, found INT_NUMBER
+ERROR@42495: expected command, found INT_NUMBER
+ERROR@42498: expected command, found INT_NUMBER
+ERROR@42635: expected command, found INT_NUMBER
+ERROR@42638: expected command, found INT_NUMBER
+ERROR@43987: expected NULL_KW
+ERROR@43987: expected SEMICOLON
+ERROR@43988: expected command, found ENFORCED_KW
+ERROR@44078: expected NULL_KW
+ERROR@44078: expected SEMICOLON
+ERROR@44079: expected command, found ENFORCED_KW
+ERROR@44088: expected command, found ENFORCED_KW
+ERROR@67262: expected type name
+ERROR@67262: expected SEMICOLON
+ERROR@67262: expected command, found DOT
+ERROR@67263: expected command, found IDENT
+ERROR@67270: expected command, found INTEGER_KW
+ERROR@67278: expected command, found CHECK_KW
+ERROR@67284: expected command, found L_PAREN
+ERROR@67285: expected command, found VALUE_KW
+ERROR@67291: expected command, found R_ANGLE
+ERROR@67293: expected command, found INT_NUMBER
+ERROR@67294: expected command, found R_PAREN
+ERROR@67380: expected R_PAREN
+ERROR@67380: expected function option
+ERROR@67380: expected SEMICOLON
+ERROR@67380: expected command, found DOT
+ERROR@67381: expected command, found IDENT
+ERROR@67386: expected command, found COMMA
+ERROR@67388: expected command, found IDENT
+ERROR@67394: expected command, found DOT
+ERROR@67395: expected command, found IDENT
+ERROR@67400: expected command, found R_PAREN
+ERROR@67402: expected command, found RETURNS_KW
+ERROR@67410: expected command, found BOOLEAN_KW
+ERROR@67418: expected command, found LANGUAGE_KW
+ERROR@67427: expected command, found SQL_KW
+ERROR@67431: expected command, found AS_KW
+ERROR@67434: expected command, found STRING
+ERROR@68763: expected R_PAREN
+ERROR@68763: expected function option
+ERROR@68763: expected SEMICOLON
+ERROR@68763: expected command, found DOT
+ERROR@68764: expected command, found IDENT
+ERROR@68769: expected command, found COMMA
+ERROR@68771: expected command, found IDENT
+ERROR@68777: expected command, found DOT
+ERROR@68778: expected command, found IDENT
+ERROR@68783: expected command, found R_PAREN
+ERROR@68795: expected EQ
+ERROR@71700: expected type name
+ERROR@74909: expected FOREIGN_KW
+ERROR@74909: expected KEY_KW
+ERROR@74909: expected column list
+ERROR@74909: expected REFERENCES_KW
+ERROR@74913: expected R_PAREN
+ERROR@74913: expected SEMICOLON
+ERROR@74914: expected command, found NULL_KW
+ERROR@74919: expected command, found IDENT
+ERROR@74921: expected command, found COMMA
+ERROR@74925: expected command, found IDENT
+ERROR@74938: expected command, found INT_KW
+ERROR@74942: expected command, found CHECK_KW
+ERROR@74948: expected command, found L_PAREN
+ERROR@74949: expected command, found IDENT
+ERROR@74962: expected command, found R_ANGLE
+ERROR@74964: expected command, found INT_NUMBER
+ERROR@74965: expected command, found R_PAREN
+ERROR@74966: expected command, found COMMA
+ERROR@74970: expected command, found IDENT
+ERROR@74982: expected command, found INT_KW
+ERROR@74985: expected command, found COMMA
+ERROR@74989: expected command, found CONSTRAINT_KW
+ERROR@75000: expected command, found IDENT
+ERROR@75016: expected command, found PRIMARY_KW
+ERROR@75024: expected command, found KEY_KW
+ERROR@75028: expected command, found L_PAREN
+ERROR@75029: expected command, found IDENT
+ERROR@75031: expected command, found R_PAREN
+ERROR@75032: expected command, found R_PAREN
+ERROR@86438: expected name
+ERROR@86438: expected type name
+ERROR@86447: expected SEMICOLON
+ERROR@86448: expected command, found IDENT
+ERROR@91452: expected R_PAREN
+ERROR@91452: expected SEMICOLON
+ERROR@91453: expected command, found NO_KW
+ERROR@91456: expected command, found INHERIT_KW
+ERROR@91463: expected command, found COMMA
+ERROR@91466: expected command, found IDENT
+ERROR@91468: expected command, found CHAR_KW
+ERROR@91472: expected command, found L_PAREN
+ERROR@91473: expected command, found INT_NUMBER
+ERROR@91474: expected command, found R_PAREN
+ERROR@91476: expected command, found COLLATE_KW
+ERROR@91484: expected command, found IDENT
+ERROR@91487: expected command, found COMMA
+ERROR@91490: expected command, found CONSTRAINT_KW
+ERROR@91501: expected command, found IDENT
+ERROR@91509: expected command, found CHECK_KW
+ERROR@91515: expected command, found L_PAREN
+ERROR@91516: expected command, found IDENT
+ERROR@91518: expected command, found R_ANGLE
+ERROR@91520: expected command, found INT_NUMBER
+ERROR@91521: expected command, found R_PAREN
+ERROR@91523: expected command, found R_PAREN

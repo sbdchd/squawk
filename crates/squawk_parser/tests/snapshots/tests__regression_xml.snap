@@ -1,0 +1,627 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/xml.sql
+---
+ERROR@1539: expected R_PAREN
+ERROR@1539: expected R_PAREN
+ERROR@1546: expected SEMICOLON
+ERROR@1546: expected command, found R_PAREN
+ERROR@1547: expected command, found R_PAREN
+ERROR@1549: expected command, found FROM_KW
+ERROR@1554: expected command, found IDENT
+ERROR@4527: expected R_PAREN
+ERROR@4531: expected SEMICOLON
+ERROR@4531: expected command, found R_PAREN
+ERROR@4533: expected command, found FROM_KW
+ERROR@4538: expected command, found IDENT
+ERROR@4589: expected R_PAREN
+ERROR@4593: expected SEMICOLON
+ERROR@4593: expected command, found R_PAREN
+ERROR@7929: expected EQ
+ERROR@7936: expected SEMICOLON
+ERROR@7937: expected command, found DOCUMENT_KW
+ERROR@8035: expected EQ
+ERROR@8042: expected SEMICOLON
+ERROR@8043: expected command, found CONTENT_KW
+ERROR@8743: expected R_PAREN
+ERROR@8743: expected R_PAREN
+ERROR@8750: expected SEMICOLON
+ERROR@8750: expected command, found R_PAREN
+ERROR@8751: expected command, found R_PAREN
+ERROR@8753: expected command, found FROM_KW
+ERROR@8758: expected command, found IDENT
+ERROR@9037: expected R_PAREN
+ERROR@9041: expected SEMICOLON
+ERROR@9041: expected command, found R_PAREN
+ERROR@18387: expected COMMA
+ERROR@18420: expected COMMA
+ERROR@18425: expected COMMA
+ERROR@18458: expected COMMA
+ERROR@18461: expected COMMA
+ERROR@18465: expected COMMA
+ERROR@18515: expected R_PAREN
+ERROR@18519: expected UPDATE_KW
+ERROR@18519: expected SEMICOLON
+ERROR@18520: expected command, found ORDINALITY_KW
+ERROR@18530: expected command, found COMMA
+ERROR@18566: expected command, found IDENT
+ERROR@18579: expected command, found TEXT_KW
+ERROR@18584: expected command, found PATH_KW
+ERROR@18589: expected command, found STRING
+ERROR@18611: expected command, found NOT_KW
+ERROR@18615: expected command, found NULL_KW
+ERROR@18619: expected command, found COMMA
+ERROR@18655: expected command, found IDENT
+ERROR@18666: expected command, found TEXT_KW
+ERROR@18671: expected command, found PATH_KW
+ERROR@18676: expected command, found STRING
+ERROR@18688: expected command, found COMMA
+ERROR@18724: expected command, found IDENT
+ERROR@18734: expected command, found INT_KW
+ERROR@18738: expected command, found PATH_KW
+ERROR@18743: expected command, found STRING
+ERROR@18754: expected command, found COMMA
+ERROR@18790: expected command, found IDENT
+ERROR@18795: expected command, found FLOAT_KW
+ERROR@18801: expected command, found PATH_KW
+ERROR@18806: expected command, found STRING
+ERROR@18812: expected command, found COMMA
+ERROR@18848: expected command, found IDENT
+ERROR@18853: expected command, found TEXT_KW
+ERROR@18858: expected command, found PATH_KW
+ERROR@18863: expected command, found STRING
+ERROR@18875: expected command, found COMMA
+ERROR@18911: expected command, found IDENT
+ERROR@18924: expected command, found TEXT_KW
+ERROR@18929: expected command, found PATH_KW
+ERROR@18934: expected command, found STRING
+ERROR@18949: expected command, found DEFAULT_KW
+ERROR@18957: expected command, found STRING
+ERROR@18972: expected command, found R_PAREN
+ERROR@19098: expected COMMA
+ERROR@19131: expected COMMA
+ERROR@19136: expected COMMA
+ERROR@19169: expected COMMA
+ERROR@19172: expected COMMA
+ERROR@19176: expected COMMA
+ERROR@19226: expected R_PAREN
+ERROR@19230: expected UPDATE_KW
+ERROR@19230: expected SEMICOLON
+ERROR@19231: expected command, found ORDINALITY_KW
+ERROR@19241: expected command, found COMMA
+ERROR@19277: expected command, found IDENT
+ERROR@19290: expected command, found TEXT_KW
+ERROR@19295: expected command, found PATH_KW
+ERROR@19300: expected command, found STRING
+ERROR@19322: expected command, found NOT_KW
+ERROR@19326: expected command, found NULL_KW
+ERROR@19330: expected command, found COMMA
+ERROR@19366: expected command, found IDENT
+ERROR@19377: expected command, found TEXT_KW
+ERROR@19382: expected command, found PATH_KW
+ERROR@19387: expected command, found STRING
+ERROR@19399: expected command, found COMMA
+ERROR@19435: expected command, found IDENT
+ERROR@19445: expected command, found INT_KW
+ERROR@19449: expected command, found PATH_KW
+ERROR@19454: expected command, found STRING
+ERROR@19465: expected command, found COMMA
+ERROR@19501: expected command, found IDENT
+ERROR@19506: expected command, found FLOAT_KW
+ERROR@19512: expected command, found PATH_KW
+ERROR@19517: expected command, found STRING
+ERROR@19523: expected command, found COMMA
+ERROR@19559: expected command, found IDENT
+ERROR@19564: expected command, found TEXT_KW
+ERROR@19569: expected command, found PATH_KW
+ERROR@19574: expected command, found STRING
+ERROR@19586: expected command, found COMMA
+ERROR@19622: expected command, found IDENT
+ERROR@19635: expected command, found TEXT_KW
+ERROR@19640: expected command, found PATH_KW
+ERROR@19645: expected command, found STRING
+ERROR@19660: expected command, found DEFAULT_KW
+ERROR@19668: expected command, found STRING
+ERROR@19683: expected command, found R_PAREN
+ERROR@19866: expected COMMA
+ERROR@19874: expected COMMA
+ERROR@19879: expected COMMA
+ERROR@19887: expected COMMA
+ERROR@19890: expected COMMA
+ERROR@19948: expected COMMA
+ERROR@19956: expected COMMA
+ERROR@19961: expected COMMA
+ERROR@19969: expected COMMA
+ERROR@19972: expected COMMA
+ERROR@19982: expected COMMA
+ERROR@20000: expected COMMA
+ERROR@20088: expected R_PAREN
+ERROR@20088: expected R_PAREN
+ERROR@20094: expected SEMICOLON
+ERROR@20094: expected command, found R_PAREN
+ERROR@20095: expected command, found COMMA
+ERROR@20119: expected command, found STRING
+ERROR@20159: expected command, found PASSING_KW
+ERROR@20167: expected command, found STRING
+ERROR@20244: expected command, found COLUMNS_KW
+ERROR@20252: expected command, found IDENT
+ERROR@20254: expected command, found INT_KW
+ERROR@20258: expected command, found PATH_KW
+ERROR@20263: expected command, found STRING
+ERROR@20269: expected command, found R_PAREN
+ERROR@20351: expected R_PAREN
+ERROR@20351: expected R_PAREN
+ERROR@20359: expected SEMICOLON
+ERROR@20359: expected command, found R_PAREN
+ERROR@20360: expected command, found COMMA
+ERROR@20384: expected command, found STRING
+ERROR@20424: expected command, found PASSING_KW
+ERROR@20432: expected command, found STRING
+ERROR@20509: expected command, found COLUMNS_KW
+ERROR@20517: expected command, found IDENT
+ERROR@20519: expected command, found INT_KW
+ERROR@20523: expected command, found PATH_KW
+ERROR@20528: expected command, found STRING
+ERROR@20534: expected command, found R_PAREN
+ERROR@20613: expected COMMA
+ERROR@20662: expected COMMA
+ERROR@20747: expected COMMA
+ERROR@20777: expected COMMA
+ERROR@20779: expected COMMA
+ERROR@20783: expected COMMA
+ERROR@20822: expected COMMA
+ERROR@20862: expected COMMA
+ERROR@20893: expected COMMA
+ERROR@20895: expected COMMA
+ERROR@20900: expected COMMA
+ERROR@21070: expected COMMA
+ERROR@21103: expected COMMA
+ERROR@21108: expected COMMA
+ERROR@21141: expected COMMA
+ERROR@21144: expected COMMA
+ERROR@21148: expected COMMA
+ERROR@21198: expected R_PAREN
+ERROR@21202: expected UPDATE_KW
+ERROR@21202: expected SEMICOLON
+ERROR@21203: expected command, found ORDINALITY_KW
+ERROR@21213: expected command, found COMMA
+ERROR@21249: expected command, found IDENT
+ERROR@21262: expected command, found TEXT_KW
+ERROR@21267: expected command, found PATH_KW
+ERROR@21272: expected command, found STRING
+ERROR@21287: expected command, found NOT_KW
+ERROR@21291: expected command, found NULL_KW
+ERROR@21295: expected command, found COMMA
+ERROR@21331: expected command, found IDENT
+ERROR@21342: expected command, found TEXT_KW
+ERROR@21347: expected command, found PATH_KW
+ERROR@21352: expected command, found STRING
+ERROR@21364: expected command, found COMMA
+ERROR@21400: expected command, found IDENT
+ERROR@21410: expected command, found INT_KW
+ERROR@21414: expected command, found PATH_KW
+ERROR@21419: expected command, found STRING
+ERROR@21430: expected command, found COMMA
+ERROR@21466: expected command, found IDENT
+ERROR@21471: expected command, found FLOAT_KW
+ERROR@21477: expected command, found PATH_KW
+ERROR@21482: expected command, found STRING
+ERROR@21488: expected command, found COMMA
+ERROR@21524: expected command, found IDENT
+ERROR@21529: expected command, found TEXT_KW
+ERROR@21534: expected command, found PATH_KW
+ERROR@21539: expected command, found STRING
+ERROR@21551: expected command, found COMMA
+ERROR@21587: expected command, found IDENT
+ERROR@21600: expected command, found TEXT_KW
+ERROR@21605: expected command, found PATH_KW
+ERROR@21610: expected command, found STRING
+ERROR@21625: expected command, found DEFAULT_KW
+ERROR@21633: expected command, found STRING
+ERROR@21648: expected command, found R_PAREN
+ERROR@21771: expected COMMA
+ERROR@21779: expected COMMA
+ERROR@21784: expected COMMA
+ERROR@21792: expected COMMA
+ERROR@21807: expected COMMA
+ERROR@21825: expected COMMA
+ERROR@21938: expected COMMA
+ERROR@21946: expected COMMA
+ERROR@21951: expected COMMA
+ERROR@21959: expected COMMA
+ERROR@21962: expected R_PAREN
+ERROR@21966: expected UPDATE_KW
+ERROR@21966: expected SEMICOLON
+ERROR@21967: expected command, found ORDINALITY_KW
+ERROR@21977: expected command, found COMMA
+ERROR@21979: expected command, found IDENT
+ERROR@21994: expected command, found TEXT_KW
+ERROR@21998: expected command, found COMMA
+ERROR@22000: expected command, found IDENT
+ERROR@22012: expected command, found INT_KW
+ERROR@22015: expected command, found R_PAREN
+ERROR@22124: expected COMMA
+ERROR@22132: expected COMMA
+ERROR@22137: expected COMMA
+ERROR@22145: expected COMMA
+ERROR@22148: expected COMMA
+ERROR@22152: expected COMMA
+ERROR@22179: expected COMMA
+ERROR@22197: expected COMMA
+ERROR@22310: expected COMMA
+ERROR@22318: expected COMMA
+ERROR@22323: expected COMMA
+ERROR@22331: expected COMMA
+ERROR@22334: expected COMMA
+ERROR@22338: expected COMMA
+ERROR@22458: expected COMMA
+ERROR@22466: expected COMMA
+ERROR@22471: expected COMMA
+ERROR@22479: expected COMMA
+ERROR@22482: expected R_PAREN
+ERROR@22486: expected UPDATE_KW
+ERROR@22486: expected SEMICOLON
+ERROR@22487: expected command, found ORDINALITY_KW
+ERROR@22497: expected command, found R_PAREN
+ERROR@22606: expected COMMA
+ERROR@22614: expected COMMA
+ERROR@22619: expected COMMA
+ERROR@22627: expected COMMA
+ERROR@22630: expected COMMA
+ERROR@22634: expected COMMA
+ERROR@22661: expected COMMA
+ERROR@22679: expected COMMA
+ERROR@22692: expected COMMA
+ERROR@22696: expected COMMA
+ERROR@22814: expected COMMA
+ERROR@22822: expected COMMA
+ERROR@22827: expected COMMA
+ERROR@22835: expected COMMA
+ERROR@22838: expected COMMA
+ERROR@22842: expected COMMA
+ERROR@22869: expected COMMA
+ERROR@22887: expected COMMA
+ERROR@22900: expected COMMA
+ERROR@22904: expected COMMA
+ERROR@22949: expected COMMA
+ERROR@23049: expected COMMA
+ERROR@23057: expected COMMA
+ERROR@23065: expected COMMA
+ERROR@23103: expected COMMA
+ERROR@23203: expected COMMA
+ERROR@23211: expected COMMA
+ERROR@23219: expected COMMA
+ERROR@23224: expected COMMA
+ERROR@23307: expected COMMA
+ERROR@23389: expected COMMA
+ERROR@23397: expected COMMA
+ERROR@23399: expected COMMA
+ERROR@23461: expected COMMA
+ERROR@23594: expected COMMA
+ERROR@23602: expected COMMA
+ERROR@23606: expected COMMA
+ERROR@23643: expected COMMA
+ERROR@23776: expected COMMA
+ERROR@23784: expected COMMA
+ERROR@23788: expected COMMA
+ERROR@23918: expected COMMA
+ERROR@23951: expected COMMA
+ERROR@23956: expected COMMA
+ERROR@23989: expected COMMA
+ERROR@23992: expected COMMA
+ERROR@23996: expected COMMA
+ERROR@24046: expected R_PAREN
+ERROR@24050: expected UPDATE_KW
+ERROR@24050: expected SEMICOLON
+ERROR@24051: expected command, found ORDINALITY_KW
+ERROR@24061: expected command, found COMMA
+ERROR@24097: expected command, found IDENT
+ERROR@24110: expected command, found TEXT_KW
+ERROR@24115: expected command, found PATH_KW
+ERROR@24120: expected command, found STRING
+ERROR@24135: expected command, found NOT_KW
+ERROR@24139: expected command, found NULL_KW
+ERROR@24143: expected command, found COMMA
+ERROR@24179: expected command, found IDENT
+ERROR@24190: expected command, found TEXT_KW
+ERROR@24195: expected command, found PATH_KW
+ERROR@24200: expected command, found STRING
+ERROR@24212: expected command, found COMMA
+ERROR@24248: expected command, found IDENT
+ERROR@24258: expected command, found INT_KW
+ERROR@24262: expected command, found PATH_KW
+ERROR@24267: expected command, found STRING
+ERROR@24278: expected command, found COMMA
+ERROR@24314: expected command, found IDENT
+ERROR@24319: expected command, found FLOAT_KW
+ERROR@24325: expected command, found PATH_KW
+ERROR@24330: expected command, found STRING
+ERROR@24336: expected command, found COMMA
+ERROR@24372: expected command, found IDENT
+ERROR@24377: expected command, found TEXT_KW
+ERROR@24382: expected command, found PATH_KW
+ERROR@24387: expected command, found STRING
+ERROR@24399: expected command, found COMMA
+ERROR@24435: expected command, found IDENT
+ERROR@24448: expected command, found TEXT_KW
+ERROR@24453: expected command, found PATH_KW
+ERROR@24458: expected command, found STRING
+ERROR@24473: expected command, found DEFAULT_KW
+ERROR@24481: expected command, found STRING
+ERROR@24496: expected command, found R_PAREN
+ERROR@24619: expected COMMA
+ERROR@24627: expected COMMA
+ERROR@24632: expected COMMA
+ERROR@24640: expected COMMA
+ERROR@24655: expected COMMA
+ERROR@24673: expected COMMA
+ERROR@24840: expected COMMA
+ERROR@24848: expected COMMA
+ERROR@24853: expected COMMA
+ERROR@24861: expected COMMA
+ERROR@24876: expected COMMA
+ERROR@24894: expected COMMA
+ERROR@25079: expected COMMA
+ERROR@25087: expected COMMA
+ERROR@25092: expected COMMA
+ERROR@25100: expected COMMA
+ERROR@25115: expected COMMA
+ERROR@25133: expected COMMA
+ERROR@26024: expected COMMA
+ERROR@26057: expected COMMA
+ERROR@26062: expected COMMA
+ERROR@26095: expected COMMA
+ERROR@26098: expected COMMA
+ERROR@26102: expected COMMA
+ERROR@26152: expected R_PAREN
+ERROR@26156: expected UPDATE_KW
+ERROR@26156: expected SEMICOLON
+ERROR@26157: expected command, found ORDINALITY_KW
+ERROR@26167: expected command, found COMMA
+ERROR@26203: expected command, found IDENT
+ERROR@26216: expected command, found TEXT_KW
+ERROR@26221: expected command, found PATH_KW
+ERROR@26226: expected command, found STRING
+ERROR@26241: expected command, found NOT_KW
+ERROR@26245: expected command, found NULL_KW
+ERROR@26249: expected command, found COMMA
+ERROR@26285: expected command, found IDENT
+ERROR@26296: expected command, found TEXT_KW
+ERROR@26301: expected command, found PATH_KW
+ERROR@26306: expected command, found STRING
+ERROR@26318: expected command, found COMMA
+ERROR@26354: expected command, found IDENT
+ERROR@26364: expected command, found INT_KW
+ERROR@26368: expected command, found PATH_KW
+ERROR@26373: expected command, found STRING
+ERROR@26384: expected command, found COMMA
+ERROR@26420: expected command, found IDENT
+ERROR@26425: expected command, found FLOAT_KW
+ERROR@26431: expected command, found PATH_KW
+ERROR@26436: expected command, found STRING
+ERROR@26442: expected command, found COMMA
+ERROR@26478: expected command, found IDENT
+ERROR@26483: expected command, found TEXT_KW
+ERROR@26488: expected command, found PATH_KW
+ERROR@26493: expected command, found STRING
+ERROR@26505: expected command, found COMMA
+ERROR@26541: expected command, found IDENT
+ERROR@26554: expected command, found TEXT_KW
+ERROR@26559: expected command, found PATH_KW
+ERROR@26564: expected command, found STRING
+ERROR@26579: expected command, found DEFAULT_KW
+ERROR@26587: expected command, found STRING
+ERROR@26602: expected command, found R_PAREN
+ERROR@26699: expected COMMA
+ERROR@26732: expected COMMA
+ERROR@26737: expected COMMA
+ERROR@26770: expected COMMA
+ERROR@26773: expected COMMA
+ERROR@26777: expected COMMA
+ERROR@26827: expected R_PAREN
+ERROR@26831: expected UPDATE_KW
+ERROR@26831: expected SEMICOLON
+ERROR@26832: expected command, found ORDINALITY_KW
+ERROR@26842: expected command, found COMMA
+ERROR@26878: expected command, found IDENT
+ERROR@26891: expected command, found TEXT_KW
+ERROR@26896: expected command, found PATH_KW
+ERROR@26901: expected command, found STRING
+ERROR@26916: expected command, found NOT_KW
+ERROR@26920: expected command, found NULL_KW
+ERROR@26924: expected command, found COMMA
+ERROR@26960: expected command, found IDENT
+ERROR@26971: expected command, found TEXT_KW
+ERROR@26976: expected command, found PATH_KW
+ERROR@26981: expected command, found STRING
+ERROR@26993: expected command, found COMMA
+ERROR@27029: expected command, found IDENT
+ERROR@27039: expected command, found INT_KW
+ERROR@27043: expected command, found PATH_KW
+ERROR@27048: expected command, found STRING
+ERROR@27059: expected command, found COMMA
+ERROR@27095: expected command, found IDENT
+ERROR@27100: expected command, found FLOAT_KW
+ERROR@27106: expected command, found PATH_KW
+ERROR@27111: expected command, found STRING
+ERROR@27117: expected command, found COMMA
+ERROR@27153: expected command, found IDENT
+ERROR@27158: expected command, found TEXT_KW
+ERROR@27163: expected command, found PATH_KW
+ERROR@27168: expected command, found STRING
+ERROR@27180: expected command, found COMMA
+ERROR@27216: expected command, found IDENT
+ERROR@27229: expected command, found TEXT_KW
+ERROR@27234: expected command, found PATH_KW
+ERROR@27239: expected command, found STRING
+ERROR@27254: expected command, found DEFAULT_KW
+ERROR@27262: expected command, found STRING
+ERROR@27277: expected command, found R_PAREN
+ERROR@27281: expected command, found WHERE_KW
+ERROR@27287: expected command, found IDENT
+ERROR@27297: expected command, found EQ
+ERROR@27299: expected command, found INT_NUMBER
+ERROR@27425: expected COMMA
+ERROR@27458: expected COMMA
+ERROR@27463: expected COMMA
+ERROR@27496: expected COMMA
+ERROR@27499: expected COMMA
+ERROR@27503: expected COMMA
+ERROR@27553: expected R_PAREN
+ERROR@27557: expected UPDATE_KW
+ERROR@27557: expected SEMICOLON
+ERROR@27558: expected command, found ORDINALITY_KW
+ERROR@27568: expected command, found COMMA
+ERROR@27604: expected command, found IDENT
+ERROR@27617: expected command, found TEXT_KW
+ERROR@27622: expected command, found PATH_KW
+ERROR@27627: expected command, found STRING
+ERROR@27642: expected command, found NOT_KW
+ERROR@27646: expected command, found NULL_KW
+ERROR@27650: expected command, found COMMA
+ERROR@27686: expected command, found IDENT
+ERROR@27697: expected command, found TEXT_KW
+ERROR@27702: expected command, found PATH_KW
+ERROR@27707: expected command, found STRING
+ERROR@27719: expected command, found COMMA
+ERROR@27755: expected command, found IDENT
+ERROR@27765: expected command, found INT_KW
+ERROR@27769: expected command, found PATH_KW
+ERROR@27774: expected command, found STRING
+ERROR@27785: expected command, found COMMA
+ERROR@27821: expected command, found IDENT
+ERROR@27826: expected command, found FLOAT_KW
+ERROR@27832: expected command, found PATH_KW
+ERROR@27837: expected command, found STRING
+ERROR@27843: expected command, found COMMA
+ERROR@27879: expected command, found IDENT
+ERROR@27884: expected command, found TEXT_KW
+ERROR@27889: expected command, found PATH_KW
+ERROR@27894: expected command, found STRING
+ERROR@27906: expected command, found COMMA
+ERROR@27942: expected command, found IDENT
+ERROR@27955: expected command, found TEXT_KW
+ERROR@27960: expected command, found PATH_KW
+ERROR@27965: expected command, found STRING
+ERROR@27980: expected command, found DEFAULT_KW
+ERROR@27988: expected command, found STRING
+ERROR@28003: expected command, found R_PAREN
+ERROR@28007: expected command, found WHERE_KW
+ERROR@28013: expected command, found IDENT
+ERROR@28023: expected command, found EQ
+ERROR@28025: expected command, found INT_NUMBER
+ERROR@28149: expected COMMA
+ERROR@28182: expected COMMA
+ERROR@28187: expected COMMA
+ERROR@28220: expected COMMA
+ERROR@28223: expected COMMA
+ERROR@28227: expected COMMA
+ERROR@28277: expected R_PAREN
+ERROR@28281: expected UPDATE_KW
+ERROR@28281: expected SEMICOLON
+ERROR@28282: expected command, found ORDINALITY_KW
+ERROR@28292: expected command, found COMMA
+ERROR@28328: expected command, found IDENT
+ERROR@28341: expected command, found TEXT_KW
+ERROR@28346: expected command, found PATH_KW
+ERROR@28351: expected command, found STRING
+ERROR@28366: expected command, found NOT_KW
+ERROR@28370: expected command, found NULL_KW
+ERROR@28374: expected command, found COMMA
+ERROR@28410: expected command, found IDENT
+ERROR@28421: expected command, found TEXT_KW
+ERROR@28426: expected command, found PATH_KW
+ERROR@28431: expected command, found STRING
+ERROR@28443: expected command, found COMMA
+ERROR@28479: expected command, found IDENT
+ERROR@28489: expected command, found INT_KW
+ERROR@28493: expected command, found PATH_KW
+ERROR@28498: expected command, found STRING
+ERROR@28509: expected command, found COMMA
+ERROR@28545: expected command, found IDENT
+ERROR@28550: expected command, found FLOAT_KW
+ERROR@28556: expected command, found PATH_KW
+ERROR@28561: expected command, found STRING
+ERROR@28568: expected command, found NOT_KW
+ERROR@28572: expected command, found NULL_KW
+ERROR@28576: expected command, found COMMA
+ERROR@28612: expected command, found IDENT
+ERROR@28617: expected command, found TEXT_KW
+ERROR@28622: expected command, found PATH_KW
+ERROR@28627: expected command, found STRING
+ERROR@28639: expected command, found COMMA
+ERROR@28675: expected command, found IDENT
+ERROR@28688: expected command, found TEXT_KW
+ERROR@28693: expected command, found PATH_KW
+ERROR@28698: expected command, found STRING
+ERROR@28713: expected command, found DEFAULT_KW
+ERROR@28721: expected command, found STRING
+ERROR@28736: expected command, found R_PAREN
+ERROR@29419: expected COMMA
+ERROR@29427: expected COMMA
+ERROR@29432: expected COMMA
+ERROR@29473: expected COMMA
+ERROR@29481: expected COMMA
+ERROR@29537: expected COMMA
+ERROR@29591: expected COMMA
+ERROR@29648: expected COMMA
+ERROR@29706: expected COMMA
+ERROR@29765: expected COMMA
+ERROR@30527: expected COMMA
+ERROR@30535: expected COMMA
+ERROR@30539: expected COMMA
+ERROR@30580: expected COMMA
+ERROR@30588: expected COMMA
+ERROR@30644: expected COMMA
+ERROR@30698: expected COMMA
+ERROR@30755: expected COMMA
+ERROR@30813: expected COMMA
+ERROR@30872: expected COMMA
+ERROR@31275: expected COMMA
+ERROR@31283: expected COMMA
+ERROR@31285: expected COMMA
+ERROR@31293: expected COMMA
+ERROR@31295: expected COMMA
+ERROR@31299: expected COMMA
+ERROR@31415: expected COMMA
+ERROR@31423: expected COMMA
+ERROR@31425: expected COMMA
+ERROR@31433: expected COMMA
+ERROR@31435: expected COMMA
+ERROR@31439: expected COMMA
+ERROR@31533: expected COMMA
+ERROR@31541: expected COMMA
+ERROR@31543: expected COMMA
+ERROR@31551: expected COMMA
+ERROR@31553: expected COMMA
+ERROR@31557: expected COMMA
+ERROR@31566: expected COMMA
+ERROR@31574: expected COMMA
+ERROR@31667: expected COMMA
+ERROR@31686: expected COMMA
+ERROR@31694: expected COMMA
+ERROR@31696: expected COMMA
+ERROR@31700: expected COMMA
+ERROR@31712: expected COMMA
+ERROR@31717: expected COMMA
+ERROR@31729: expected COMMA
+ERROR@31734: expected COMMA
+ERROR@31749: expected COMMA
+ERROR@31757: expected COMMA
+ERROR@31775: expected COMMA
+ERROR@31783: expected COMMA
+ERROR@31836: expected COMMA
+ERROR@31915: expected COMMA
+ERROR@31923: expected COMMA
+ERROR@31925: expected COMMA
+ERROR@31929: expected COMMA
+ERROR@31945: expected COMMA
+ERROR@31949: expected COMMA
+ERROR@31988: expected COMMA
+ERROR@31996: expected COMMA
+ERROR@32015: expected COMMA
+ERROR@32023: expected COMMA
+ERROR@32025: expected COMMA
+ERROR@32037: expected COMMA
+ERROR@32056: expected COMMA
+ERROR@32060: expected COMMA

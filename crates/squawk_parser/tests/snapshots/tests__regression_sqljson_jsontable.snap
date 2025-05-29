@@ -1,0 +1,190 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/sqljson_jsontable.sql
+---
+ERROR@219: expected R_PAREN
+ERROR@219: expected SEMICOLON
+ERROR@220: expected command, found DEFAULT_KW
+ERROR@228: expected command, found INT_NUMBER
+ERROR@230: expected command, found ON_KW
+ERROR@233: expected command, found ERROR_KW
+ERROR@238: expected command, found R_PAREN
+ERROR@311: expected R_PAREN
+ERROR@311: expected SEMICOLON
+ERROR@312: expected command, found NULL_KW
+ERROR@317: expected command, found ON_KW
+ERROR@320: expected command, found ERROR_KW
+ERROR@325: expected command, found R_PAREN
+ERROR@702: expected name
+ERROR@702: expected type name
+ERROR@1514: expected type name
+ERROR@1518: expected SELECT, TABLE, VALUES, or EXECUTE
+ERROR@1518: expected SEMICOLON
+ERROR@1520: expected command, found L_PAREN
+ERROR@1648: expected SEMICOLON
+ERROR@1650: expected command, found R_PAREN
+ERROR@2684: expected ON_KW
+ERROR@2684: expected ERROR_KW
+ERROR@2684: expected R_PAREN
+ERROR@2684: expected R_PAREN
+ERROR@2718: expected SEMICOLON
+ERROR@2719: expected command, found EXISTS_KW
+ERROR@2726: expected command, found PATH_KW
+ERROR@2731: expected command, found STRING
+ERROR@2746: expected command, found FALSE_KW
+ERROR@2752: expected command, found ON_KW
+ERROR@2755: expected command, found ERROR_KW
+ERROR@2763: expected command, found R_PAREN
+ERROR@2766: expected command, found R_PAREN
+ERROR@2768: expected command, found IDENT
+ERROR@2772: expected command, found ON_KW
+ERROR@2775: expected command, found TRUE_KW
+ERROR@5161: expected ON_KW
+ERROR@5161: expected ERROR_KW
+ERROR@5161: expected R_PAREN
+ERROR@5161: expected R_PAREN
+ERROR@5161: expected SEMICOLON
+ERROR@5162: expected command, found TRUE_KW
+ERROR@5167: expected command, found ON_KW
+ERROR@5170: expected command, found ERROR_KW
+ERROR@5175: expected command, found COMMA
+ERROR@5180: expected command, found IDENT
+ERROR@5188: expected command, found TEXT_KW
+ERROR@5193: expected command, found EXISTS_KW
+ERROR@5200: expected command, found PATH_KW
+ERROR@5205: expected command, found STRING
+ERROR@5220: expected command, found UNKNOWN_KW
+ERROR@5228: expected command, found ON_KW
+ERROR@5231: expected command, found ERROR_KW
+ERROR@5236: expected command, found R_PAREN
+ERROR@5237: expected command, found R_PAREN
+ERROR@7739: expected R_PAREN
+ERROR@7739: expected R_PAREN
+ERROR@7739: expected SEMICOLON
+ERROR@7740: expected command, found DEFAULT_KW
+ERROR@7748: expected command, found INT_NUMBER
+ERROR@7750: expected command, found ON_KW
+ERROR@7753: expected command, found ERROR_KW
+ERROR@7758: expected command, found R_PAREN
+ERROR@7759: expected command, found R_PAREN
+ERROR@7761: expected command, found IDENT
+ERROR@7858: expected R_PAREN
+ERROR@7858: expected R_PAREN
+ERROR@7858: expected SEMICOLON
+ERROR@7859: expected command, found DEFAULT_KW
+ERROR@7867: expected command, found INT_NUMBER
+ERROR@7869: expected command, found ON_KW
+ERROR@7872: expected command, found ERROR_KW
+ERROR@7877: expected command, found R_PAREN
+ERROR@7878: expected command, found R_PAREN
+ERROR@7880: expected command, found IDENT
+ERROR@7974: expected R_PAREN
+ERROR@7974: expected R_PAREN
+ERROR@7974: expected SEMICOLON
+ERROR@7975: expected command, found DEFAULT_KW
+ERROR@7983: expected command, found INT_NUMBER
+ERROR@7985: expected command, found ON_KW
+ERROR@7988: expected command, found ERROR_KW
+ERROR@7993: expected command, found R_PAREN
+ERROR@7994: expected command, found R_PAREN
+ERROR@7996: expected command, found IDENT
+ERROR@8109: expected ON_KW
+ERROR@8115: expected R_PAREN
+ERROR@8115: expected R_PAREN
+ERROR@8115: expected SEMICOLON
+ERROR@8116: expected command, found ON_KW
+ERROR@8119: expected command, found ERROR_KW
+ERROR@8124: expected command, found R_PAREN
+ERROR@8125: expected command, found R_PAREN
+ERROR@8225: expected ON_KW
+ERROR@8231: expected R_PAREN
+ERROR@8231: expected R_PAREN
+ERROR@8231: expected SEMICOLON
+ERROR@8232: expected command, found ON_KW
+ERROR@8235: expected command, found ERROR_KW
+ERROR@8240: expected command, found R_PAREN
+ERROR@8241: expected command, found R_PAREN
+ERROR@8715: expected ON_KW
+ERROR@8721: expected R_PAREN
+ERROR@8721: expected R_PAREN
+ERROR@8721: expected SEMICOLON
+ERROR@8722: expected command, found ON_KW
+ERROR@8725: expected command, found ERROR_KW
+ERROR@8730: expected command, found R_PAREN
+ERROR@8731: expected command, found R_PAREN
+ERROR@8812: expected ON_KW
+ERROR@8818: expected R_PAREN
+ERROR@8818: expected R_PAREN
+ERROR@8818: expected SEMICOLON
+ERROR@8819: expected command, found ON_KW
+ERROR@8822: expected command, found ERROR_KW
+ERROR@8827: expected command, found R_PAREN
+ERROR@8828: expected command, found R_PAREN
+ERROR@9376: expected ON_KW
+ERROR@9382: expected R_PAREN
+ERROR@9382: expected R_PAREN
+ERROR@9382: expected SEMICOLON
+ERROR@9383: expected command, found ON_KW
+ERROR@9386: expected command, found ERROR_KW
+ERROR@9391: expected command, found R_PAREN
+ERROR@9392: expected command, found R_PAREN
+ERROR@9486: expected ON_KW
+ERROR@9486: expected ERROR_KW
+ERROR@9486: expected R_PAREN
+ERROR@9486: expected R_PAREN
+ERROR@9486: expected SEMICOLON
+ERROR@9487: expected command, found FALSE_KW
+ERROR@9493: expected command, found ON_KW
+ERROR@9496: expected command, found ERROR_KW
+ERROR@9501: expected command, found R_PAREN
+ERROR@9502: expected command, found R_PAREN
+ERROR@9596: expected ON_KW
+ERROR@9596: expected ERROR_KW
+ERROR@9596: expected R_PAREN
+ERROR@9596: expected R_PAREN
+ERROR@9596: expected SEMICOLON
+ERROR@9597: expected command, found TRUE_KW
+ERROR@9602: expected command, found ON_KW
+ERROR@9605: expected command, found ERROR_KW
+ERROR@9610: expected command, found R_PAREN
+ERROR@9611: expected command, found R_PAREN
+ERROR@17135: expected R_PAREN
+ERROR@17141: expected ON_KW
+ERROR@17141: expected ERROR_KW
+ERROR@17141: expected R_PAREN
+ERROR@17148: expected SEMICOLON
+ERROR@17149: expected command, found ON_KW
+ERROR@17152: expected command, found EMPTY_KW
+ERROR@17157: expected command, found R_PAREN
+ERROR@17158: expected command, found R_PAREN
+ERROR@17304: expected R_PAREN
+ERROR@17304: expected SEMICOLON
+ERROR@17305: expected command, found NULL_KW
+ERROR@17310: expected command, found ON_KW
+ERROR@17313: expected command, found ERROR_KW
+ERROR@17318: expected command, found R_PAREN
+ERROR@17375: expected R_PAREN
+ERROR@17375: expected R_PAREN
+ERROR@17375: expected SEMICOLON
+ERROR@17376: expected command, found TRUE_KW
+ERROR@17381: expected command, found ON_KW
+ERROR@17384: expected command, found EMPTY_KW
+ERROR@17389: expected command, found R_PAREN
+ERROR@17390: expected command, found R_PAREN
+ERROR@17459: expected R_PAREN
+ERROR@17459: expected R_PAREN
+ERROR@17459: expected SEMICOLON
+ERROR@17460: expected command, found TRUE_KW
+ERROR@17465: expected command, found ON_KW
+ERROR@17468: expected command, found ERROR_KW
+ERROR@17473: expected command, found R_PAREN
+ERROR@17474: expected command, found R_PAREN
+ERROR@17538: expected R_PAREN
+ERROR@17544: expected ON_KW
+ERROR@17544: expected ERROR_KW
+ERROR@17544: expected R_PAREN
+ERROR@17551: expected SEMICOLON
+ERROR@17552: expected command, found ON_KW
+ERROR@17555: expected command, found ERROR_KW
+ERROR@17560: expected command, found R_PAREN
+ERROR@17561: expected command, found R_PAREN

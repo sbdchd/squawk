@@ -1,0 +1,1079 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/sqljson.sql
+---
+ERROR@22: expected an expression, found R_PAREN
+ERROR@22: expected expression
+ERROR@1596: expected an expression, found R_PAREN
+ERROR@1596: expected expression
+ERROR@8287: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
+ERROR@8287: expected R_PAREN
+ERROR@8294: missing comma
+ERROR@8301: expected SEMICOLON
+ERROR@8301: expected command, found R_PAREN
+ERROR@8559: expected R_PAREN
+ERROR@8559: expected SEMICOLON
+ERROR@8560: expected command, found RETURNING_KW
+ERROR@8570: expected command, found IDENT
+ERROR@8575: expected command, found R_PAREN
+ERROR@8577: expected command, found IS_KW
+ERROR@8580: expected command, found NULL_KW
+ERROR@8585: expected command, found FROM_KW
+ERROR@8590: expected command, found IDENT
+ERROR@8605: expected command, found L_PAREN
+ERROR@8606: expected command, found INT_NUMBER
+ERROR@8607: expected command, found COMMA
+ERROR@8609: expected command, found INT_NUMBER
+ERROR@8610: expected command, found R_PAREN
+ERROR@8612: expected command, found IDENT
+ERROR@8658: expected R_PAREN
+ERROR@8658: expected SEMICOLON
+ERROR@8659: expected command, found RETURNING_KW
+ERROR@8669: expected command, found IDENT
+ERROR@8674: expected command, found R_PAREN
+ERROR@8676: expected command, found FROM_KW
+ERROR@8681: expected command, found IDENT
+ERROR@8696: expected command, found L_PAREN
+ERROR@8697: expected command, found INT_NUMBER
+ERROR@8698: expected command, found COMMA
+ERROR@8700: expected command, found INT_NUMBER
+ERROR@8701: expected command, found R_PAREN
+ERROR@8703: expected command, found IDENT
+ERROR@8901: expected COMMA
+ERROR@8908: expected COMMA
+ERROR@8994: expected R_PAREN
+ERROR@8994: expected SEMICOLON
+ERROR@8995: expected command, found RETURNING_KW
+ERROR@9005: expected command, found IDENT
+ERROR@9010: expected command, found R_PAREN
+ERROR@9012: expected command, found FROM_KW
+ERROR@9017: expected command, found IDENT
+ERROR@9032: expected command, found L_PAREN
+ERROR@9033: expected command, found INT_NUMBER
+ERROR@9034: expected command, found COMMA
+ERROR@9036: expected command, found INT_NUMBER
+ERROR@9037: expected command, found R_PAREN
+ERROR@9066: expected COMMA
+ERROR@9071: expected R_PAREN
+ERROR@9071: expected SEMICOLON
+ERROR@9072: expected command, found ON_KW
+ERROR@9075: expected command, found NULL_KW
+ERROR@9079: expected command, found R_PAREN
+ERROR@9080: expected command, found COMMA
+ERROR@9084: expected command, found JSON_ARRAYAGG_KW
+ERROR@9097: expected command, found L_PAREN
+ERROR@9098: expected command, found NULL_KW
+ERROR@9103: expected command, found NULL_KW
+ERROR@9108: expected command, found ON_KW
+ERROR@9111: expected command, found NULL_KW
+ERROR@9116: expected command, found RETURNING_KW
+ERROR@9126: expected command, found IDENT
+ERROR@9131: expected command, found R_PAREN
+ERROR@9133: expected command, found FROM_KW
+ERROR@9138: expected command, found IDENT
+ERROR@9153: expected command, found L_PAREN
+ERROR@9154: expected command, found INT_NUMBER
+ERROR@9155: expected command, found COMMA
+ERROR@9157: expected command, found INT_NUMBER
+ERROR@9158: expected command, found R_PAREN
+ERROR@9222: expected R_PAREN
+ERROR@9222: expected SEMICOLON
+ERROR@9223: expected command, found RETURNING_KW
+ERROR@9233: expected command, found IDENT
+ERROR@9238: expected command, found R_PAREN
+ERROR@9240: expected command, found AS_KW
+ERROR@9243: expected command, found IDENT
+ERROR@9258: expected command, found COMMA
+ERROR@9261: expected command, found JSON_ARRAYAGG_KW
+ERROR@9274: expected command, found L_PAREN
+ERROR@9275: expected command, found IDENT
+ERROR@9279: expected command, found ABSENT_KW
+ERROR@9286: expected command, found ON_KW
+ERROR@9289: expected command, found NULL_KW
+ERROR@9293: expected command, found R_PAREN
+ERROR@9295: expected command, found AS_KW
+ERROR@9298: expected command, found IDENT
+ERROR@9312: expected command, found COMMA
+ERROR@9315: expected command, found JSON_ARRAYAGG_KW
+ERROR@9328: expected command, found L_PAREN
+ERROR@9329: expected command, found IDENT
+ERROR@9333: expected command, found ABSENT_KW
+ERROR@9340: expected command, found ON_KW
+ERROR@9343: expected command, found NULL_KW
+ERROR@9348: expected command, found RETURNING_KW
+ERROR@9358: expected command, found IDENT
+ERROR@9363: expected command, found R_PAREN
+ERROR@9365: expected command, found AS_KW
+ERROR@9368: expected command, found IDENT
+ERROR@9396: expected command, found COMMA
+ERROR@9399: expected command, found JSON_ARRAYAGG_KW
+ERROR@9412: expected command, found L_PAREN
+ERROR@9413: expected command, found IDENT
+ERROR@9417: expected command, found NULL_KW
+ERROR@9422: expected command, found ON_KW
+ERROR@9425: expected command, found NULL_KW
+ERROR@9429: expected command, found R_PAREN
+ERROR@9431: expected command, found AS_KW
+ERROR@9434: expected command, found IDENT
+ERROR@9446: expected command, found COMMA
+ERROR@9449: expected command, found JSON_ARRAYAGG_KW
+ERROR@9462: expected command, found L_PAREN
+ERROR@9463: expected command, found IDENT
+ERROR@9467: expected command, found NULL_KW
+ERROR@9472: expected command, found ON_KW
+ERROR@9475: expected command, found NULL_KW
+ERROR@9480: expected command, found RETURNING_KW
+ERROR@9490: expected command, found IDENT
+ERROR@9495: expected command, found R_PAREN
+ERROR@9497: expected command, found AS_KW
+ERROR@9500: expected command, found IDENT
+ERROR@9526: expected command, found COMMA
+ERROR@9529: expected command, found JSON_ARRAYAGG_KW
+ERROR@9542: expected command, found L_PAREN
+ERROR@9543: expected command, found IDENT
+ERROR@9546: expected command, found R_PAREN
+ERROR@9548: expected command, found AS_KW
+ERROR@9551: expected command, found IDENT
+ERROR@9565: expected command, found COMMA
+ERROR@9568: expected command, found JSON_ARRAYAGG_KW
+ERROR@9581: expected command, found L_PAREN
+ERROR@9582: expected command, found IDENT
+ERROR@9586: expected command, found RETURNING_KW
+ERROR@9596: expected command, found IDENT
+ERROR@9601: expected command, found R_PAREN
+ERROR@9603: expected command, found AS_KW
+ERROR@9606: expected command, found IDENT
+ERROR@9625: expected command, found COMMA
+ERROR@9628: expected command, found JSON_ARRAYAGG_KW
+ERROR@9641: expected command, found L_PAREN
+ERROR@9642: expected command, found IDENT
+ERROR@9646: expected command, found ORDER_KW
+ERROR@9652: expected command, found BY_KW
+ERROR@9655: expected command, found IDENT
+ERROR@9658: expected command, found R_PAREN
+ERROR@9660: expected command, found FILTER_KW
+ERROR@9667: expected command, found L_PAREN
+ERROR@9668: expected command, found WHERE_KW
+ERROR@9674: expected command, found IDENT
+ERROR@9678: expected command, found R_ANGLE
+ERROR@9680: expected command, found INT_NUMBER
+ERROR@9681: expected command, found R_PAREN
+ERROR@9683: expected command, found AS_KW
+ERROR@9686: expected command, found IDENT
+ERROR@9702: expected command, found COMMA
+ERROR@9705: expected command, found JSON_ARRAYAGG_KW
+ERROR@9718: expected command, found L_PAREN
+ERROR@9719: expected command, found IDENT
+ERROR@9723: expected command, found ORDER_KW
+ERROR@9729: expected command, found BY_KW
+ERROR@9732: expected command, found IDENT
+ERROR@9736: expected command, found RETURNING_KW
+ERROR@9746: expected command, found IDENT
+ERROR@9751: expected command, found R_PAREN
+ERROR@9753: expected command, found FILTER_KW
+ERROR@9760: expected command, found L_PAREN
+ERROR@9761: expected command, found WHERE_KW
+ERROR@9767: expected command, found IDENT
+ERROR@9771: expected command, found R_ANGLE
+ERROR@9773: expected command, found INT_NUMBER
+ERROR@9774: expected command, found R_PAREN
+ERROR@9776: expected command, found AS_KW
+ERROR@9779: expected command, found IDENT
+ERROR@9812: expected command, found FROM_KW
+ERROR@9818: expected command, found L_PAREN
+ERROR@9881: expected SEMICOLON
+ERROR@9881: expected command, found R_PAREN
+ERROR@9883: expected command, found IDENT
+ERROR@9886: expected command, found L_PAREN
+ERROR@9887: expected command, found IDENT
+ERROR@9890: expected command, found R_PAREN
+ERROR@10120: expected R_PAREN
+ERROR@10120: expected SEMICOLON
+ERROR@10120: expected command, found COLON
+ERROR@10122: expected command, found INT_NUMBER
+ERROR@10123: expected command, found R_PAREN
+ERROR@10125: expected command, found IS_KW
+ERROR@10128: expected command, found NULL_KW
+ERROR@10132: expected command, found COMMA
+ERROR@10136: expected command, found JSON_OBJECTAGG_KW
+ERROR@10150: expected command, found L_PAREN
+ERROR@10151: expected command, found STRING
+ERROR@10156: expected command, found COLON
+ERROR@10158: expected command, found INT_NUMBER
+ERROR@10160: expected command, found RETURNING_KW
+ERROR@10170: expected command, found IDENT
+ERROR@10175: expected command, found R_PAREN
+ERROR@10177: expected command, found IS_KW
+ERROR@10180: expected command, found NULL_KW
+ERROR@10185: expected command, found WHERE_KW
+ERROR@10191: expected command, found FALSE_KW
+ERROR@10225: expected R_PAREN
+ERROR@10225: expected SEMICOLON
+ERROR@10225: expected command, found COLON
+ERROR@10227: expected command, found INT_NUMBER
+ERROR@10228: expected command, found R_PAREN
+ERROR@10258: expected R_PAREN
+ERROR@10258: expected SEMICOLON
+ERROR@10258: expected command, found COLON
+ERROR@10260: expected command, found INT_NUMBER
+ERROR@10262: expected command, found RETURNING_KW
+ERROR@10272: expected command, found IDENT
+ERROR@10277: expected command, found R_PAREN
+ERROR@10305: expected R_PAREN
+ERROR@10305: expected SEMICOLON
+ERROR@10305: expected command, found COLON
+ERROR@10307: expected command, found IDENT
+ERROR@10308: expected command, found R_PAREN
+ERROR@10309: expected command, found COMMA
+ERROR@10376: expected command, found JSON_OBJECTAGG_KW
+ERROR@10390: expected command, found L_PAREN
+ERROR@10391: expected command, found IDENT
+ERROR@10392: expected command, found COLON
+ERROR@10394: expected command, found IDENT
+ERROR@10396: expected command, found RETURNING_KW
+ERROR@10406: expected command, found IDENT
+ERROR@10411: expected command, found R_PAREN
+ERROR@10413: expected command, found FROM_KW
+ERROR@10419: expected command, found IDENT
+ERROR@10434: expected command, found L_PAREN
+ERROR@10435: expected command, found INT_NUMBER
+ERROR@10436: expected command, found COMMA
+ERROR@10438: expected command, found INT_NUMBER
+ERROR@10439: expected command, found R_PAREN
+ERROR@10441: expected command, found IDENT
+ERROR@10469: expected R_PAREN
+ERROR@10469: expected SEMICOLON
+ERROR@10469: expected command, found COLON
+ERROR@10471: expected command, found IDENT
+ERROR@10472: expected command, found R_PAREN
+ERROR@10473: expected command, found COMMA
+ERROR@10476: expected command, found JSON_OBJECTAGG_KW
+ERROR@10490: expected command, found L_PAREN
+ERROR@10491: expected command, found IDENT
+ERROR@10492: expected command, found COLON
+ERROR@10494: expected command, found IDENT
+ERROR@10496: expected command, found NULL_KW
+ERROR@10501: expected command, found ON_KW
+ERROR@10504: expected command, found NULL_KW
+ERROR@10508: expected command, found R_PAREN
+ERROR@10509: expected command, found COMMA
+ERROR@10512: expected command, found JSON_OBJECTAGG_KW
+ERROR@10526: expected command, found L_PAREN
+ERROR@10527: expected command, found IDENT
+ERROR@10528: expected command, found COLON
+ERROR@10530: expected command, found IDENT
+ERROR@10532: expected command, found ABSENT_KW
+ERROR@10539: expected command, found ON_KW
+ERROR@10542: expected command, found NULL_KW
+ERROR@10546: expected command, found R_PAREN
+ERROR@10547: expected command, found COMMA
+ERROR@10550: expected command, found JSON_OBJECTAGG_KW
+ERROR@10564: expected command, found L_PAREN
+ERROR@10565: expected command, found IDENT
+ERROR@10566: expected command, found COLON
+ERROR@10568: expected command, found IDENT
+ERROR@10570: expected command, found RETURNING_KW
+ERROR@10580: expected command, found IDENT
+ERROR@10585: expected command, found R_PAREN
+ERROR@10586: expected command, found COMMA
+ERROR@10589: expected command, found JSON_OBJECTAGG_KW
+ERROR@10603: expected command, found L_PAREN
+ERROR@10604: expected command, found IDENT
+ERROR@10605: expected command, found COLON
+ERROR@10607: expected command, found IDENT
+ERROR@10609: expected command, found NULL_KW
+ERROR@10614: expected command, found ON_KW
+ERROR@10617: expected command, found NULL_KW
+ERROR@10622: expected command, found RETURNING_KW
+ERROR@10632: expected command, found IDENT
+ERROR@10637: expected command, found R_PAREN
+ERROR@10638: expected command, found COMMA
+ERROR@10641: expected command, found JSON_OBJECTAGG_KW
+ERROR@10655: expected command, found L_PAREN
+ERROR@10656: expected command, found IDENT
+ERROR@10657: expected command, found COLON
+ERROR@10659: expected command, found IDENT
+ERROR@10661: expected command, found ABSENT_KW
+ERROR@10668: expected command, found ON_KW
+ERROR@10671: expected command, found NULL_KW
+ERROR@10676: expected command, found RETURNING_KW
+ERROR@10686: expected command, found IDENT
+ERROR@10691: expected command, found R_PAREN
+ERROR@10693: expected command, found FROM_KW
+ERROR@10699: expected command, found L_PAREN
+ERROR@10743: expected SEMICOLON
+ERROR@10743: expected command, found R_PAREN
+ERROR@10745: expected command, found IDENT
+ERROR@10748: expected command, found L_PAREN
+ERROR@10749: expected command, found IDENT
+ERROR@10750: expected command, found COMMA
+ERROR@10752: expected command, found IDENT
+ERROR@10753: expected command, found R_PAREN
+ERROR@10780: expected R_PAREN
+ERROR@10780: expected SEMICOLON
+ERROR@10780: expected command, found COLON
+ERROR@10782: expected command, found IDENT
+ERROR@10789: expected name
+ERROR@10789: expected AS_KW
+ERROR@10789: expected L_PAREN
+ERROR@10789: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@10789: expected R_PAREN
+ERROR@10789: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@10789: expected command, found UNIQUE_KW
+ERROR@10796: expected command, found KEYS_KW
+ERROR@10800: expected command, found R_PAREN
+ERROR@10802: expected command, found FROM_KW
+ERROR@10807: expected command, found L_PAREN
+ERROR@10840: expected SEMICOLON
+ERROR@10840: expected command, found R_PAREN
+ERROR@10842: expected command, found IDENT
+ERROR@10845: expected command, found L_PAREN
+ERROR@10846: expected command, found IDENT
+ERROR@10847: expected command, found COMMA
+ERROR@10849: expected command, found IDENT
+ERROR@10850: expected command, found R_PAREN
+ERROR@10877: expected R_PAREN
+ERROR@10877: expected SEMICOLON
+ERROR@10877: expected command, found COLON
+ERROR@10879: expected command, found IDENT
+ERROR@10881: expected command, found ABSENT_KW
+ERROR@10888: expected command, found ON_KW
+ERROR@10891: expected command, found NULL_KW
+ERROR@10901: expected name
+ERROR@10901: expected AS_KW
+ERROR@10901: expected L_PAREN
+ERROR@10901: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@10901: expected R_PAREN
+ERROR@10901: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@10901: expected command, found UNIQUE_KW
+ERROR@10908: expected command, found KEYS_KW
+ERROR@10912: expected command, found R_PAREN
+ERROR@10914: expected command, found FROM_KW
+ERROR@10919: expected command, found L_PAREN
+ERROR@10952: expected SEMICOLON
+ERROR@10952: expected command, found R_PAREN
+ERROR@10954: expected command, found IDENT
+ERROR@10957: expected command, found L_PAREN
+ERROR@10958: expected command, found IDENT
+ERROR@10959: expected command, found COMMA
+ERROR@10961: expected command, found IDENT
+ERROR@10962: expected command, found R_PAREN
+ERROR@10989: expected R_PAREN
+ERROR@10989: expected SEMICOLON
+ERROR@10989: expected command, found COLON
+ERROR@10991: expected command, found IDENT
+ERROR@10993: expected command, found ABSENT_KW
+ERROR@11000: expected command, found ON_KW
+ERROR@11003: expected command, found NULL_KW
+ERROR@11013: expected name
+ERROR@11013: expected AS_KW
+ERROR@11013: expected L_PAREN
+ERROR@11013: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@11013: expected R_PAREN
+ERROR@11013: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@11013: expected command, found UNIQUE_KW
+ERROR@11020: expected command, found KEYS_KW
+ERROR@11024: expected command, found R_PAREN
+ERROR@11026: expected command, found FROM_KW
+ERROR@11031: expected command, found L_PAREN
+ERROR@11086: expected SEMICOLON
+ERROR@11086: expected command, found R_PAREN
+ERROR@11088: expected command, found IDENT
+ERROR@11091: expected command, found L_PAREN
+ERROR@11092: expected command, found IDENT
+ERROR@11093: expected command, found COMMA
+ERROR@11095: expected command, found IDENT
+ERROR@11096: expected command, found R_PAREN
+ERROR@11123: expected R_PAREN
+ERROR@11123: expected SEMICOLON
+ERROR@11123: expected command, found COLON
+ERROR@11125: expected command, found IDENT
+ERROR@11132: expected name
+ERROR@11132: expected AS_KW
+ERROR@11132: expected L_PAREN
+ERROR@11132: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@11132: expected R_PAREN
+ERROR@11132: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@11132: expected command, found UNIQUE_KW
+ERROR@11139: expected command, found KEYS_KW
+ERROR@11144: expected command, found RETURNING_KW
+ERROR@11154: expected command, found IDENT
+ERROR@11159: expected command, found R_PAREN
+ERROR@11161: expected command, found FROM_KW
+ERROR@11166: expected command, found L_PAREN
+ERROR@11199: expected SEMICOLON
+ERROR@11199: expected command, found R_PAREN
+ERROR@11201: expected command, found IDENT
+ERROR@11204: expected command, found L_PAREN
+ERROR@11205: expected command, found IDENT
+ERROR@11206: expected command, found COMMA
+ERROR@11208: expected command, found IDENT
+ERROR@11209: expected command, found R_PAREN
+ERROR@11236: expected R_PAREN
+ERROR@11236: expected SEMICOLON
+ERROR@11236: expected command, found COLON
+ERROR@11238: expected command, found IDENT
+ERROR@11240: expected command, found ABSENT_KW
+ERROR@11247: expected command, found ON_KW
+ERROR@11250: expected command, found NULL_KW
+ERROR@11260: expected name
+ERROR@11260: expected AS_KW
+ERROR@11260: expected L_PAREN
+ERROR@11260: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@11260: expected R_PAREN
+ERROR@11260: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@11260: expected command, found UNIQUE_KW
+ERROR@11267: expected command, found KEYS_KW
+ERROR@11272: expected command, found RETURNING_KW
+ERROR@11282: expected command, found IDENT
+ERROR@11287: expected command, found R_PAREN
+ERROR@11289: expected command, found FROM_KW
+ERROR@11294: expected command, found L_PAREN
+ERROR@11327: expected SEMICOLON
+ERROR@11327: expected command, found R_PAREN
+ERROR@11329: expected command, found IDENT
+ERROR@11332: expected command, found L_PAREN
+ERROR@11333: expected command, found IDENT
+ERROR@11334: expected command, found COMMA
+ERROR@11336: expected command, found IDENT
+ERROR@11337: expected command, found R_PAREN
+ERROR@11364: expected R_PAREN
+ERROR@11364: expected SEMICOLON
+ERROR@11364: expected command, found COLON
+ERROR@11366: expected command, found IDENT
+ERROR@11368: expected command, found ABSENT_KW
+ERROR@11375: expected command, found ON_KW
+ERROR@11378: expected command, found NULL_KW
+ERROR@11388: expected name
+ERROR@11388: expected AS_KW
+ERROR@11388: expected L_PAREN
+ERROR@11388: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@11388: expected R_PAREN
+ERROR@11388: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@11388: expected command, found UNIQUE_KW
+ERROR@11395: expected command, found KEYS_KW
+ERROR@11400: expected command, found RETURNING_KW
+ERROR@11410: expected command, found IDENT
+ERROR@11415: expected command, found R_PAREN
+ERROR@11417: expected command, found FROM_KW
+ERROR@11422: expected command, found L_PAREN
+ERROR@11485: expected SEMICOLON
+ERROR@11485: expected command, found R_PAREN
+ERROR@11487: expected command, found IDENT
+ERROR@11490: expected command, found L_PAREN
+ERROR@11491: expected command, found IDENT
+ERROR@11492: expected command, found COMMA
+ERROR@11494: expected command, found IDENT
+ERROR@11495: expected command, found R_PAREN
+ERROR@11531: expected R_PAREN
+ERROR@11531: expected SEMICOLON
+ERROR@11531: expected command, found COLON
+ERROR@11533: expected command, found L_PAREN
+ERROR@11534: expected command, found IDENT
+ERROR@11535: expected command, found R_PAREN
+ERROR@11536: expected command, found COLON
+ERROR@11537: expected command, found COLON
+ERROR@11538: expected command, found TEXT_KW
+ERROR@11543: expected command, found FORMAT_KW
+ERROR@11550: expected command, found JSON_KW
+ERROR@11560: expected name
+ERROR@11560: expected AS_KW
+ERROR@11560: expected L_PAREN
+ERROR@11560: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@11560: expected R_PAREN
+ERROR@11560: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@11560: expected command, found UNIQUE_KW
+ERROR@11566: expected command, found R_PAREN
+ERROR@11568: expected command, found FROM_KW
+ERROR@11573: expected command, found IDENT
+ERROR@11588: expected command, found L_PAREN
+ERROR@11589: expected command, found INT_NUMBER
+ERROR@11590: expected command, found COMMA
+ERROR@11592: expected command, found INT_NUMBER
+ERROR@11595: expected command, found R_PAREN
+ERROR@11597: expected command, found IDENT
+ERROR@11914: expected R_PAREN
+ERROR@11914: expected SEMICOLON
+ERROR@11915: expected command, found COLON
+ERROR@11917: expected command, found IDENT
+ERROR@11924: expected name
+ERROR@11924: expected AS_KW
+ERROR@11924: expected L_PAREN
+ERROR@11924: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@11924: expected R_PAREN
+ERROR@11924: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@11924: expected command, found UNIQUE_KW
+ERROR@11931: expected command, found KEYS_KW
+ERROR@11935: expected command, found R_PAREN
+ERROR@11937: expected command, found OVER_KW
+ERROR@11942: expected command, found L_PAREN
+ERROR@11943: expected command, found ORDER_KW
+ERROR@11949: expected command, found BY_KW
+ERROR@11952: expected command, found IDENT
+ERROR@11953: expected command, found R_PAREN
+ERROR@11955: expected command, found FROM_KW
+ERROR@11960: expected command, found L_PAREN
+ERROR@11980: expected SEMICOLON
+ERROR@11980: expected command, found R_PAREN
+ERROR@11982: expected command, found IDENT
+ERROR@11983: expected command, found L_PAREN
+ERROR@11984: expected command, found IDENT
+ERROR@11985: expected command, found COMMA
+ERROR@11986: expected command, found IDENT
+ERROR@11987: expected command, found R_PAREN
+ERROR@12031: expected R_PAREN
+ERROR@12031: expected SEMICOLON
+ERROR@12032: expected command, found COLON
+ERROR@12034: expected command, found IDENT
+ERROR@12041: expected name
+ERROR@12041: expected AS_KW
+ERROR@12041: expected L_PAREN
+ERROR@12041: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@12041: expected R_PAREN
+ERROR@12041: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@12041: expected command, found UNIQUE_KW
+ERROR@12048: expected command, found KEYS_KW
+ERROR@12052: expected command, found R_PAREN
+ERROR@12054: expected command, found OVER_KW
+ERROR@12059: expected command, found L_PAREN
+ERROR@12060: expected command, found ORDER_KW
+ERROR@12066: expected command, found BY_KW
+ERROR@12069: expected command, found IDENT
+ERROR@12070: expected command, found R_PAREN
+ERROR@12072: expected command, found FROM_KW
+ERROR@12077: expected command, found L_PAREN
+ERROR@12104: expected SEMICOLON
+ERROR@12104: expected command, found R_PAREN
+ERROR@12106: expected command, found IDENT
+ERROR@12107: expected command, found L_PAREN
+ERROR@12108: expected command, found IDENT
+ERROR@12109: expected command, found COMMA
+ERROR@12110: expected command, found IDENT
+ERROR@12111: expected command, found R_PAREN
+ERROR@12155: expected R_PAREN
+ERROR@12155: expected SEMICOLON
+ERROR@12156: expected command, found COLON
+ERROR@12158: expected command, found IDENT
+ERROR@12160: expected command, found ABSENT_KW
+ERROR@12167: expected command, found ON_KW
+ERROR@12170: expected command, found NULL_KW
+ERROR@12180: expected name
+ERROR@12180: expected AS_KW
+ERROR@12180: expected L_PAREN
+ERROR@12180: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@12180: expected R_PAREN
+ERROR@12180: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@12180: expected command, found UNIQUE_KW
+ERROR@12187: expected command, found KEYS_KW
+ERROR@12191: expected command, found R_PAREN
+ERROR@12196: expected command, found OVER_KW
+ERROR@12201: expected command, found L_PAREN
+ERROR@12202: expected command, found ORDER_KW
+ERROR@12208: expected command, found BY_KW
+ERROR@12211: expected command, found IDENT
+ERROR@12212: expected command, found R_PAREN
+ERROR@12214: expected command, found FROM_KW
+ERROR@12219: expected command, found L_PAREN
+ERROR@12249: expected SEMICOLON
+ERROR@12249: expected command, found R_PAREN
+ERROR@12251: expected command, found IDENT
+ERROR@12252: expected command, found L_PAREN
+ERROR@12253: expected command, found IDENT
+ERROR@12254: expected command, found COMMA
+ERROR@12255: expected command, found IDENT
+ERROR@12256: expected command, found R_PAREN
+ERROR@12300: expected R_PAREN
+ERROR@12300: expected SEMICOLON
+ERROR@12301: expected command, found COLON
+ERROR@12303: expected command, found IDENT
+ERROR@12305: expected command, found ABSENT_KW
+ERROR@12312: expected command, found ON_KW
+ERROR@12315: expected command, found NULL_KW
+ERROR@12319: expected command, found R_PAREN
+ERROR@12321: expected command, found OVER_KW
+ERROR@12326: expected command, found L_PAREN
+ERROR@12327: expected command, found ORDER_KW
+ERROR@12333: expected command, found BY_KW
+ERROR@12336: expected command, found IDENT
+ERROR@12337: expected command, found R_PAREN
+ERROR@12339: expected command, found FROM_KW
+ERROR@12344: expected command, found L_PAREN
+ERROR@12374: expected SEMICOLON
+ERROR@12374: expected command, found R_PAREN
+ERROR@12376: expected command, found IDENT
+ERROR@12377: expected command, found L_PAREN
+ERROR@12378: expected command, found IDENT
+ERROR@12379: expected command, found COMMA
+ERROR@12380: expected command, found IDENT
+ERROR@12381: expected command, found R_PAREN
+ERROR@12425: expected R_PAREN
+ERROR@12425: expected SEMICOLON
+ERROR@12426: expected command, found COLON
+ERROR@12428: expected command, found IDENT
+ERROR@12430: expected command, found ABSENT_KW
+ERROR@12437: expected command, found ON_KW
+ERROR@12440: expected command, found NULL_KW
+ERROR@12444: expected command, found R_PAREN
+ERROR@12446: expected command, found OVER_KW
+ERROR@12451: expected command, found L_PAREN
+ERROR@12452: expected command, found ORDER_KW
+ERROR@12458: expected command, found BY_KW
+ERROR@12461: expected command, found IDENT
+ERROR@12463: expected command, found RANGE_KW
+ERROR@12469: expected command, found BETWEEN_KW
+ERROR@12477: expected command, found UNBOUNDED_KW
+ERROR@12487: expected command, found PRECEDING_KW
+ERROR@12497: expected command, found AND_KW
+ERROR@12501: expected command, found UNBOUNDED_KW
+ERROR@12511: expected command, found FOLLOWING_KW
+ERROR@12520: expected command, found R_PAREN
+ERROR@12522: expected command, found FROM_KW
+ERROR@12527: expected command, found L_PAREN
+ERROR@12557: expected SEMICOLON
+ERROR@12557: expected command, found R_PAREN
+ERROR@12559: expected command, found IDENT
+ERROR@12560: expected command, found L_PAREN
+ERROR@12561: expected command, found IDENT
+ERROR@12562: expected command, found COMMA
+ERROR@12563: expected command, found IDENT
+ERROR@12564: expected command, found R_PAREN
+ERROR@12881: expected R_PAREN
+ERROR@12881: expected SEMICOLON
+ERROR@12881: expected command, found COLON
+ERROR@12883: expected command, found L_PAREN
+ERROR@12884: expected command, found STRING
+ERROR@12890: expected command, found PIPE
+ERROR@12891: expected command, found PIPE
+ERROR@12893: expected command, found IDENT
+ERROR@12894: expected command, found R_PAREN
+ERROR@12895: expected command, found COLON
+ERROR@12896: expected command, found COLON
+ERROR@12897: expected command, found IDENT
+ERROR@12903: expected command, found FORMAT_KW
+ERROR@12910: expected command, found JSON_KW
+ERROR@12920: expected name
+ERROR@12920: expected AS_KW
+ERROR@12920: expected L_PAREN
+ERROR@12920: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@12920: expected R_PAREN
+ERROR@12920: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@12920: expected command, found UNIQUE_KW
+ERROR@12927: expected command, found RETURNING_KW
+ERROR@12937: expected command, found TEXT_KW
+ERROR@12941: expected command, found R_PAREN
+ERROR@12943: expected command, found FILTER_KW
+ERROR@12950: expected command, found L_PAREN
+ERROR@12951: expected command, found WHERE_KW
+ERROR@12957: expected command, found IDENT
+ERROR@12959: expected command, found R_ANGLE
+ERROR@12961: expected command, found INT_NUMBER
+ERROR@12962: expected command, found R_PAREN
+ERROR@12964: expected command, found FROM_KW
+ERROR@12969: expected command, found IDENT
+ERROR@12984: expected command, found L_PAREN
+ERROR@12985: expected command, found INT_NUMBER
+ERROR@12986: expected command, found COMMA
+ERROR@12987: expected command, found INT_NUMBER
+ERROR@12988: expected command, found R_PAREN
+ERROR@12990: expected command, found IDENT
+ERROR@13046: expected R_PAREN
+ERROR@13046: expected SEMICOLON
+ERROR@13046: expected command, found COLON
+ERROR@13048: expected command, found L_PAREN
+ERROR@13049: expected command, found STRING
+ERROR@13055: expected command, found PIPE
+ERROR@13056: expected command, found PIPE
+ERROR@13058: expected command, found IDENT
+ERROR@13059: expected command, found R_PAREN
+ERROR@13060: expected command, found COLON
+ERROR@13061: expected command, found COLON
+ERROR@13062: expected command, found IDENT
+ERROR@13068: expected command, found FORMAT_KW
+ERROR@13075: expected command, found JSON_KW
+ERROR@13085: expected name
+ERROR@13085: expected AS_KW
+ERROR@13085: expected L_PAREN
+ERROR@13085: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@13085: expected R_PAREN
+ERROR@13085: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@13085: expected command, found UNIQUE_KW
+ERROR@13092: expected command, found RETURNING_KW
+ERROR@13102: expected command, found TEXT_KW
+ERROR@13106: expected command, found R_PAREN
+ERROR@13108: expected command, found OVER_KW
+ERROR@13113: expected command, found L_PAREN
+ERROR@13114: expected command, found PARTITION_KW
+ERROR@13124: expected command, found BY_KW
+ERROR@13127: expected command, found IDENT
+ERROR@13129: expected command, found PERCENT
+ERROR@13131: expected command, found INT_NUMBER
+ERROR@13132: expected command, found R_PAREN
+ERROR@13134: expected command, found FROM_KW
+ERROR@13139: expected command, found IDENT
+ERROR@13154: expected command, found L_PAREN
+ERROR@13155: expected command, found INT_NUMBER
+ERROR@13156: expected command, found COMMA
+ERROR@13157: expected command, found INT_NUMBER
+ERROR@13158: expected command, found R_PAREN
+ERROR@13160: expected command, found IDENT
+ERROR@13222: expected R_PAREN
+ERROR@13222: expected SEMICOLON
+ERROR@13222: expected command, found COLON
+ERROR@13224: expected command, found L_PAREN
+ERROR@13225: expected command, found STRING
+ERROR@13231: expected command, found PIPE
+ERROR@13232: expected command, found PIPE
+ERROR@13234: expected command, found IDENT
+ERROR@13235: expected command, found R_PAREN
+ERROR@13236: expected command, found COLON
+ERROR@13237: expected command, found COLON
+ERROR@13238: expected command, found IDENT
+ERROR@13244: expected command, found FORMAT_KW
+ERROR@13251: expected command, found JSON_KW
+ERROR@13261: expected name
+ERROR@13261: expected AS_KW
+ERROR@13261: expected L_PAREN
+ERROR@13261: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@13261: expected R_PAREN
+ERROR@13261: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@13261: expected command, found UNIQUE_KW
+ERROR@13268: expected command, found RETURNING_KW
+ERROR@13278: expected command, found TEXT_KW
+ERROR@13282: expected command, found R_PAREN
+ERROR@13284: expected command, found FILTER_KW
+ERROR@13291: expected command, found L_PAREN
+ERROR@13292: expected command, found WHERE_KW
+ERROR@13298: expected command, found IDENT
+ERROR@13300: expected command, found R_ANGLE
+ERROR@13302: expected command, found INT_NUMBER
+ERROR@13303: expected command, found R_PAREN
+ERROR@13305: expected command, found FROM_KW
+ERROR@13310: expected command, found IDENT
+ERROR@13325: expected command, found L_PAREN
+ERROR@13326: expected command, found INT_NUMBER
+ERROR@13327: expected command, found COMMA
+ERROR@13328: expected command, found INT_NUMBER
+ERROR@13329: expected command, found R_PAREN
+ERROR@13331: expected command, found IDENT
+ERROR@13469: expected COMMA
+ERROR@13476: expected COMMA
+ERROR@13481: expected COMMA
+ERROR@13486: expected R_PAREN
+ERROR@13486: expected SEMICOLON
+ERROR@13487: expected command, found ON_KW
+ERROR@13490: expected command, found NULL_KW
+ERROR@13495: expected command, found RETURNING_KW
+ERROR@13505: expected command, found TEXT_KW
+ERROR@13509: expected command, found R_PAREN
+ERROR@13511: expected command, found FILTER_KW
+ERROR@13518: expected command, found L_PAREN
+ERROR@13519: expected command, found WHERE_KW
+ERROR@13525: expected command, found IDENT
+ERROR@13527: expected command, found R_ANGLE
+ERROR@13529: expected command, found INT_NUMBER
+ERROR@13530: expected command, found R_PAREN
+ERROR@13532: expected command, found FROM_KW
+ERROR@13537: expected command, found IDENT
+ERROR@13552: expected command, found L_PAREN
+ERROR@13553: expected command, found INT_NUMBER
+ERROR@13554: expected command, found COMMA
+ERROR@13555: expected command, found INT_NUMBER
+ERROR@13556: expected command, found R_PAREN
+ERROR@13558: expected command, found IDENT
+ERROR@13631: expected COMMA
+ERROR@13638: expected COMMA
+ERROR@13643: expected COMMA
+ERROR@13648: expected R_PAREN
+ERROR@13648: expected SEMICOLON
+ERROR@13649: expected command, found ON_KW
+ERROR@13652: expected command, found NULL_KW
+ERROR@13657: expected command, found RETURNING_KW
+ERROR@13667: expected command, found TEXT_KW
+ERROR@13671: expected command, found R_PAREN
+ERROR@13673: expected command, found OVER_KW
+ERROR@13678: expected command, found L_PAREN
+ERROR@13679: expected command, found PARTITION_KW
+ERROR@13689: expected command, found BY_KW
+ERROR@13692: expected command, found IDENT
+ERROR@13694: expected command, found PERCENT
+ERROR@13696: expected command, found INT_NUMBER
+ERROR@13697: expected command, found R_PAREN
+ERROR@13699: expected command, found FROM_KW
+ERROR@13704: expected command, found IDENT
+ERROR@13719: expected command, found L_PAREN
+ERROR@13720: expected command, found INT_NUMBER
+ERROR@13721: expected command, found COMMA
+ERROR@13722: expected command, found INT_NUMBER
+ERROR@13723: expected command, found R_PAREN
+ERROR@13725: expected command, found IDENT
+ERROR@13803: expected COMMA
+ERROR@13810: expected COMMA
+ERROR@13815: expected COMMA
+ERROR@13820: expected R_PAREN
+ERROR@13820: expected SEMICOLON
+ERROR@13821: expected command, found ON_KW
+ERROR@13824: expected command, found NULL_KW
+ERROR@13829: expected command, found RETURNING_KW
+ERROR@13839: expected command, found TEXT_KW
+ERROR@13843: expected command, found R_PAREN
+ERROR@13845: expected command, found FILTER_KW
+ERROR@13852: expected command, found L_PAREN
+ERROR@13853: expected command, found WHERE_KW
+ERROR@13859: expected command, found IDENT
+ERROR@13861: expected command, found R_ANGLE
+ERROR@13863: expected command, found INT_NUMBER
+ERROR@13864: expected command, found R_PAREN
+ERROR@13866: expected command, found FROM_KW
+ERROR@13871: expected command, found IDENT
+ERROR@13886: expected command, found L_PAREN
+ERROR@13887: expected command, found INT_NUMBER
+ERROR@13888: expected command, found COMMA
+ERROR@13889: expected command, found INT_NUMBER
+ERROR@13890: expected command, found R_PAREN
+ERROR@13892: expected command, found IDENT
+ERROR@14949: missing comma
+ERROR@14980: missing comma
+ERROR@15005: missing comma
+ERROR@15006: expected expression in atom_expr
+ERROR@15011: expected an expression in target_el, found IDENT
+ERROR@15042: missing comma
+ERROR@15067: missing comma
+ERROR@15082: missing comma
+ERROR@15117: expected SEMICOLON
+ERROR@15123: expected name
+ERROR@15123: expected AS_KW
+ERROR@15123: expected L_PAREN
+ERROR@15123: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@15123: expected R_PAREN
+ERROR@15123: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@15123: expected command, found UNIQUE_KW
+ERROR@15130: expected command, found KEYS_KW
+ERROR@15135: expected command, found IDENT
+ERROR@15149: expected command, found FROM_KW
+ERROR@15155: expected command, found IDENT
+ERROR@15253: missing comma
+ERROR@15284: missing comma
+ERROR@15309: missing comma
+ERROR@15310: expected expression in atom_expr
+ERROR@15315: expected an expression in target_el, found IDENT
+ERROR@15346: missing comma
+ERROR@15371: missing comma
+ERROR@15386: missing comma
+ERROR@15421: expected SEMICOLON
+ERROR@15427: expected name
+ERROR@15427: expected AS_KW
+ERROR@15427: expected L_PAREN
+ERROR@15427: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@15427: expected R_PAREN
+ERROR@15427: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@15427: expected command, found UNIQUE_KW
+ERROR@15434: expected command, found KEYS_KW
+ERROR@15439: expected command, found IDENT
+ERROR@15453: expected command, found FROM_KW
+ERROR@15511: expected SEMICOLON
+ERROR@15512: expected command, found IDENT
+ERROR@15515: expected command, found L_PAREN
+ERROR@15516: expected command, found IDENT
+ERROR@15518: expected command, found R_PAREN
+ERROR@15606: missing comma
+ERROR@15637: missing comma
+ERROR@15662: missing comma
+ERROR@15663: expected expression in atom_expr
+ERROR@15668: expected an expression in target_el, found IDENT
+ERROR@15699: missing comma
+ERROR@15724: missing comma
+ERROR@15739: missing comma
+ERROR@15774: expected SEMICOLON
+ERROR@15780: expected name
+ERROR@15780: expected AS_KW
+ERROR@15780: expected L_PAREN
+ERROR@15780: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@15780: expected R_PAREN
+ERROR@15780: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@15780: expected command, found UNIQUE_KW
+ERROR@15787: expected command, found KEYS_KW
+ERROR@15792: expected command, found IDENT
+ERROR@15806: expected command, found FROM_KW
+ERROR@15869: expected SEMICOLON
+ERROR@15870: expected command, found IDENT
+ERROR@15873: expected command, found L_PAREN
+ERROR@15874: expected command, found IDENT
+ERROR@15877: expected command, found COMMA
+ERROR@15879: expected command, found IDENT
+ERROR@15881: expected command, found R_PAREN
+ERROR@15968: missing comma
+ERROR@15999: missing comma
+ERROR@16024: missing comma
+ERROR@16025: expected expression in atom_expr
+ERROR@16030: expected an expression in target_el, found IDENT
+ERROR@16061: missing comma
+ERROR@16086: missing comma
+ERROR@16101: missing comma
+ERROR@16136: expected SEMICOLON
+ERROR@16142: expected name
+ERROR@16142: expected AS_KW
+ERROR@16142: expected L_PAREN
+ERROR@16142: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@16142: expected R_PAREN
+ERROR@16142: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@16142: expected command, found UNIQUE_KW
+ERROR@16149: expected command, found KEYS_KW
+ERROR@16154: expected command, found IDENT
+ERROR@16168: expected command, found FROM_KW
+ERROR@16227: expected SEMICOLON
+ERROR@16228: expected command, found IDENT
+ERROR@16231: expected command, found L_PAREN
+ERROR@16232: expected command, found IDENT
+ERROR@16234: expected command, found R_PAREN
+ERROR@16347: expected SEMICOLON
+ERROR@16348: expected command, found AS_KW
+ERROR@16351: expected command, found IDENT
+ERROR@16359: expected command, found COMMA
+ERROR@16361: expected command, found STRING
+ERROR@16366: expected command, found IS_KW
+ERROR@16369: expected command, found NOT_KW
+ERROR@16373: expected command, found JSON_KW
+ERROR@16378: expected command, found ARRAY_KW
+ERROR@16384: expected command, found AS_KW
+ERROR@16387: expected command, found IDENT
+ERROR@16394: expected command, found COMMA
+ERROR@16396: expected command, found STRING
+ERROR@16401: expected command, found IS_KW
+ERROR@16404: expected command, found JSON_KW
+ERROR@16409: expected command, found OBJECT_KW
+ERROR@16421: expected name
+ERROR@16421: expected AS_KW
+ERROR@16421: expected L_PAREN
+ERROR@16421: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@16421: expected R_PAREN
+ERROR@16421: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@16421: expected command, found UNIQUE_KW
+ERROR@16428: expected command, found AS_KW
+ERROR@16431: expected command, found IDENT
+ERROR@16440: expected command, found FROM_KW
+ERROR@16445: expected command, found IDENT
+ERROR@16460: expected command, found L_PAREN
+ERROR@16461: expected command, found INT_NUMBER
+ERROR@16462: expected command, found COMMA
+ERROR@16464: expected command, found INT_NUMBER
+ERROR@16465: expected command, found R_PAREN
+ERROR@16467: expected command, found IDENT
+ERROR@16553: expected SEMICOLON
+ERROR@16554: expected command, found AS_KW
+ERROR@16557: expected command, found IDENT
+ERROR@16565: expected command, found COMMA
+ERROR@16567: expected command, found STRING
+ERROR@16572: expected command, found IS_KW
+ERROR@16575: expected command, found NOT_KW
+ERROR@16579: expected command, found JSON_KW
+ERROR@16584: expected command, found ARRAY_KW
+ERROR@16590: expected command, found AS_KW
+ERROR@16593: expected command, found IDENT
+ERROR@16600: expected command, found COMMA
+ERROR@16602: expected command, found STRING
+ERROR@16607: expected command, found IS_KW
+ERROR@16610: expected command, found JSON_KW
+ERROR@16615: expected command, found OBJECT_KW
+ERROR@16627: expected name
+ERROR@16627: expected AS_KW
+ERROR@16627: expected L_PAREN
+ERROR@16627: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@16627: expected R_PAREN
+ERROR@16627: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@16627: expected command, found UNIQUE_KW
+ERROR@16634: expected command, found AS_KW
+ERROR@16637: expected command, found IDENT
+ERROR@16646: expected command, found FROM_KW
+ERROR@16651: expected command, found IDENT
+ERROR@16666: expected command, found L_PAREN
+ERROR@16667: expected command, found INT_NUMBER
+ERROR@16668: expected command, found COMMA
+ERROR@16670: expected command, found INT_NUMBER
+ERROR@16671: expected command, found R_PAREN
+ERROR@16673: expected command, found IDENT
+ERROR@17011: expected COMMA
+ERROR@17018: expected COMMA
+ERROR@17023: expected COMMA
+ERROR@17028: expected R_PAREN
+ERROR@17028: expected SEMICOLON
+ERROR@17029: expected command, found ON_KW
+ERROR@17032: expected command, found NULL_KW
+ERROR@17037: expected command, found RETURNING_KW
+ERROR@17047: expected command, found VARCHAR_KW
+ERROR@17054: expected command, found L_PAREN
+ERROR@17055: expected command, found INT_NUMBER
+ERROR@17056: expected command, found R_PAREN
+ERROR@17057: expected command, found R_PAREN
+ERROR@17059: expected command, found FROM_KW
+ERROR@17064: expected command, found IDENT
+ERROR@17079: expected command, found L_PAREN
+ERROR@17080: expected command, found INT_NUMBER
+ERROR@17081: expected command, found COMMA
+ERROR@17082: expected command, found INT_NUMBER
+ERROR@17083: expected command, found R_PAREN
+ERROR@17085: expected command, found IDENT
+ERROR@17111: expected R_PAREN
+ERROR@17111: expected SEMICOLON
+ERROR@17111: expected command, found COLON
+ERROR@17113: expected command, found L_PAREN
+ERROR@17114: expected command, found STRING
+ERROR@17120: expected command, found PIPE
+ERROR@17121: expected command, found PIPE
+ERROR@17123: expected command, found IDENT
+ERROR@17124: expected command, found R_PAREN
+ERROR@17125: expected command, found COLON
+ERROR@17126: expected command, found COLON
+ERROR@17127: expected command, found IDENT
+ERROR@17133: expected command, found FORMAT_KW
+ERROR@17140: expected command, found JSON_KW
+ERROR@17150: expected name
+ERROR@17150: expected AS_KW
+ERROR@17150: expected L_PAREN
+ERROR@17150: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: UNIQUE_KW
+ERROR@17150: expected R_PAREN
+ERROR@17150: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: UNIQUE_KW
+ERROR@17150: expected command, found UNIQUE_KW
+ERROR@17157: expected command, found RETURNING_KW
+ERROR@17167: expected command, found VARCHAR_KW
+ERROR@17174: expected command, found L_PAREN
+ERROR@17175: expected command, found INT_NUMBER
+ERROR@17176: expected command, found R_PAREN
+ERROR@17177: expected command, found R_PAREN
+ERROR@17179: expected command, found FROM_KW
+ERROR@17184: expected command, found IDENT
+ERROR@17199: expected command, found L_PAREN
+ERROR@17200: expected command, found INT_NUMBER
+ERROR@17201: expected command, found COMMA
+ERROR@17203: expected command, found INT_NUMBER
+ERROR@17204: expected command, found R_PAREN
+ERROR@17206: expected command, found IDENT
+ERROR@17980: expected R_PAREN
+ERROR@18012: expected SEMICOLON
+ERROR@18013: expected command, found FORMAT_KW
+ERROR@18020: expected command, found JSON_KW
+ERROR@18024: expected command, found R_PAREN
+ERROR@18069: expected R_PAREN
+ERROR@18101: expected SEMICOLON
+ERROR@18102: expected command, found FORMAT_KW
+ERROR@18109: expected command, found JSON_KW
+ERROR@18113: expected command, found R_PAREN
+ERROR@18187: expected R_PAREN
+ERROR@18217: expected SEMICOLON
+ERROR@18218: expected command, found FORMAT_KW
+ERROR@18225: expected command, found JSON_KW
+ERROR@18229: expected command, found R_PAREN
+ERROR@18274: expected R_PAREN
+ERROR@18304: expected SEMICOLON
+ERROR@18305: expected command, found FORMAT_KW
+ERROR@18312: expected command, found JSON_KW
+ERROR@18316: expected command, found R_PAREN
+ERROR@18390: expected R_PAREN
+ERROR@18409: expected SEMICOLON
+ERROR@18410: expected command, found FORMAT_KW
+ERROR@18417: expected command, found JSON_KW
+ERROR@18421: expected command, found R_PAREN
+ERROR@18466: expected R_PAREN
+ERROR@18485: expected SEMICOLON
+ERROR@18486: expected command, found FORMAT_KW
+ERROR@18493: expected command, found JSON_KW
+ERROR@18497: expected command, found R_PAREN

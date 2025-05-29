@@ -1,0 +1,294 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/rangefuncs.sql
+---
+ERROR@1221: expected R_PAREN
+ERROR@1233: expected SEMICOLON
+ERROR@1233: expected command, found R_PAREN
+ERROR@1253: expected L_PAREN
+ERROR@1253: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: IDENT
+ERROR@1253: expected R_PAREN
+ERROR@1253: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: IDENT
+ERROR@1254: expected command, found IDENT
+ERROR@1255: expected command, found L_PAREN
+ERROR@1256: expected command, found IDENT
+ERROR@1257: expected command, found COMMA
+ERROR@1258: expected command, found IDENT
+ERROR@1259: expected command, found COMMA
+ERROR@1260: expected command, found IDENT
+ERROR@1261: expected command, found COMMA
+ERROR@1262: expected command, found IDENT
+ERROR@1263: expected command, found COMMA
+ERROR@1264: expected command, found IDENT
+ERROR@1267: expected command, found R_PAREN
+ERROR@1360: expected R_PAREN
+ERROR@1360: expected USING_KW
+ERROR@1360: expected L_PAREN
+ERROR@1372: expected SEMICOLON
+ERROR@1372: expected command, found R_PAREN
+ERROR@1392: expected L_PAREN
+ERROR@1392: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: IDENT
+ERROR@1392: expected R_PAREN
+ERROR@1392: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: IDENT
+ERROR@1393: expected command, found IDENT
+ERROR@1394: expected command, found L_PAREN
+ERROR@1395: expected command, found IDENT
+ERROR@1396: expected command, found COMMA
+ERROR@1397: expected command, found IDENT
+ERROR@1398: expected command, found COMMA
+ERROR@1399: expected command, found IDENT
+ERROR@1400: expected command, found COMMA
+ERROR@1401: expected command, found IDENT
+ERROR@1402: expected command, found COMMA
+ERROR@1403: expected command, found IDENT
+ERROR@1406: expected command, found R_PAREN
+ERROR@1408: expected command, found ON_KW
+ERROR@1411: expected command, found L_PAREN
+ERROR@1412: expected command, found IDENT
+ERROR@1413: expected command, found EQ
+ERROR@1414: expected command, found IDENT
+ERROR@1417: expected command, found R_PAREN
+ERROR@1880: expected R_PAREN
+ERROR@1906: expected SEMICOLON
+ERROR@1906: expected command, found R_PAREN
+ERROR@1926: expected L_PAREN
+ERROR@1926: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: IDENT
+ERROR@1926: expected R_PAREN
+ERROR@1926: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: IDENT
+ERROR@1927: expected command, found IDENT
+ERROR@1928: expected command, found L_PAREN
+ERROR@1929: expected command, found IDENT
+ERROR@1930: expected command, found COMMA
+ERROR@1931: expected command, found IDENT
+ERROR@1932: expected command, found COMMA
+ERROR@1933: expected command, found IDENT
+ERROR@1934: expected command, found COMMA
+ERROR@1935: expected command, found IDENT
+ERROR@1938: expected command, found R_PAREN
+ERROR@2461: expected R_PAREN
+ERROR@2483: expected SEMICOLON
+ERROR@2483: expected command, found R_PAREN
+ERROR@2485: expected command, found AS_KW
+ERROR@2488: expected command, found IDENT
+ERROR@2489: expected command, found L_PAREN
+ERROR@2490: expected command, found IDENT
+ERROR@2491: expected command, found COMMA
+ERROR@2492: expected command, found IDENT
+ERROR@2493: expected command, found COMMA
+ERROR@2494: expected command, found IDENT
+ERROR@2495: expected command, found R_PAREN
+ERROR@2745: expected R_PAREN
+ERROR@2766: expected SEMICOLON
+ERROR@2766: expected command, found R_PAREN
+ERROR@2786: expected L_PAREN
+ERROR@2786: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: IDENT
+ERROR@2786: expected R_PAREN
+ERROR@2786: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: IDENT
+ERROR@2787: expected command, found IDENT
+ERROR@2788: expected command, found L_PAREN
+ERROR@2789: expected command, found IDENT
+ERROR@2790: expected command, found COMMA
+ERROR@2791: expected command, found IDENT
+ERROR@2792: expected command, found COMMA
+ERROR@2793: expected command, found IDENT
+ERROR@2794: expected command, found R_PAREN
+ERROR@9467: expected R_PAREN
+ERROR@9760: expected SEMICOLON
+ERROR@9760: expected command, found R_PAREN
+ERROR@9794: expected L_PAREN
+ERROR@9794: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: IDENT
+ERROR@9794: expected R_PAREN
+ERROR@9794: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: IDENT
+ERROR@9795: expected command, found IDENT
+ERROR@9797: expected command, found L_PAREN
+ERROR@9798: expected command, found IDENT
+ERROR@9799: expected command, found COMMA
+ERROR@9800: expected command, found IDENT
+ERROR@9801: expected command, found COMMA
+ERROR@9802: expected command, found IDENT
+ERROR@9803: expected command, found COMMA
+ERROR@9804: expected command, found IDENT
+ERROR@9805: expected command, found COMMA
+ERROR@9806: expected command, found IDENT
+ERROR@9807: expected command, found COMMA
+ERROR@9808: expected command, found IDENT
+ERROR@9809: expected command, found COMMA
+ERROR@9810: expected command, found IDENT
+ERROR@9811: expected command, found COMMA
+ERROR@9812: expected command, found IDENT
+ERROR@9813: expected command, found COMMA
+ERROR@9814: expected command, found IDENT
+ERROR@9815: expected command, found COMMA
+ERROR@9816: expected command, found IDENT
+ERROR@9817: expected command, found COMMA
+ERROR@9818: expected command, found IDENT
+ERROR@9819: expected command, found COMMA
+ERROR@9820: expected command, found IDENT
+ERROR@9821: expected command, found COMMA
+ERROR@9822: expected command, found IDENT
+ERROR@9823: expected command, found COMMA
+ERROR@9824: expected command, found IDENT
+ERROR@9825: expected command, found COMMA
+ERROR@9826: expected command, found IDENT
+ERROR@9827: expected command, found COMMA
+ERROR@9828: expected command, found IDENT
+ERROR@9829: expected command, found COMMA
+ERROR@9830: expected command, found IDENT
+ERROR@9831: expected command, found COMMA
+ERROR@9832: expected command, found IDENT
+ERROR@9833: expected command, found COMMA
+ERROR@9834: expected command, found IDENT
+ERROR@9835: expected command, found COMMA
+ERROR@9836: expected command, found IDENT
+ERROR@9837: expected command, found R_PAREN
+ERROR@9878: expected R_PAREN
+ERROR@10171: expected SEMICOLON
+ERROR@10171: expected command, found R_PAREN
+ERROR@10205: expected L_PAREN
+ERROR@10205: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: IDENT
+ERROR@10205: expected R_PAREN
+ERROR@10205: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: IDENT
+ERROR@10206: expected command, found IDENT
+ERROR@10208: expected command, found L_PAREN
+ERROR@10209: expected command, found IDENT
+ERROR@10210: expected command, found COMMA
+ERROR@10211: expected command, found IDENT
+ERROR@10212: expected command, found COMMA
+ERROR@10213: expected command, found IDENT
+ERROR@10214: expected command, found COMMA
+ERROR@10215: expected command, found IDENT
+ERROR@10216: expected command, found COMMA
+ERROR@10217: expected command, found IDENT
+ERROR@10218: expected command, found COMMA
+ERROR@10219: expected command, found IDENT
+ERROR@10220: expected command, found COMMA
+ERROR@10221: expected command, found IDENT
+ERROR@10222: expected command, found COMMA
+ERROR@10223: expected command, found IDENT
+ERROR@10224: expected command, found COMMA
+ERROR@10225: expected command, found IDENT
+ERROR@10226: expected command, found COMMA
+ERROR@10227: expected command, found IDENT
+ERROR@10228: expected command, found COMMA
+ERROR@10229: expected command, found IDENT
+ERROR@10230: expected command, found COMMA
+ERROR@10231: expected command, found IDENT
+ERROR@10232: expected command, found COMMA
+ERROR@10233: expected command, found IDENT
+ERROR@10234: expected command, found COMMA
+ERROR@10235: expected command, found IDENT
+ERROR@10236: expected command, found COMMA
+ERROR@10237: expected command, found IDENT
+ERROR@10238: expected command, found COMMA
+ERROR@10239: expected command, found IDENT
+ERROR@10240: expected command, found COMMA
+ERROR@10241: expected command, found IDENT
+ERROR@10242: expected command, found COMMA
+ERROR@10243: expected command, found IDENT
+ERROR@10244: expected command, found COMMA
+ERROR@10245: expected command, found IDENT
+ERROR@10246: expected command, found COMMA
+ERROR@10247: expected command, found IDENT
+ERROR@10248: expected command, found R_PAREN
+ERROR@10328: expected R_PAREN
+ERROR@10459: expected SEMICOLON
+ERROR@10459: expected command, found R_PAREN
+ERROR@10495: expected L_PAREN
+ERROR@10495: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: IDENT
+ERROR@10495: expected R_PAREN
+ERROR@10495: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: IDENT
+ERROR@10496: expected command, found IDENT
+ERROR@10498: expected command, found L_PAREN
+ERROR@10499: expected command, found IDENT
+ERROR@10500: expected command, found COMMA
+ERROR@10501: expected command, found IDENT
+ERROR@10502: expected command, found COMMA
+ERROR@10503: expected command, found IDENT
+ERROR@10504: expected command, found COMMA
+ERROR@10505: expected command, found IDENT
+ERROR@10506: expected command, found COMMA
+ERROR@10507: expected command, found IDENT
+ERROR@10508: expected command, found COMMA
+ERROR@10509: expected command, found IDENT
+ERROR@10510: expected command, found COMMA
+ERROR@10511: expected command, found IDENT
+ERROR@10512: expected command, found COMMA
+ERROR@10513: expected command, found IDENT
+ERROR@10514: expected command, found R_PAREN
+ERROR@12643: expected R_PAREN
+ERROR@12643: expected USING_KW
+ERROR@12643: expected L_PAREN
+ERROR@12663: expected SEMICOLON
+ERROR@12664: expected command, found R_PAREN
+ERROR@12684: expected L_PAREN
+ERROR@12684: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: IDENT
+ERROR@12684: expected R_PAREN
+ERROR@12684: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: IDENT
+ERROR@12685: expected command, found IDENT
+ERROR@12686: expected command, found L_PAREN
+ERROR@12687: expected command, found IDENT
+ERROR@12689: expected command, found COMMA
+ERROR@12690: expected command, found IDENT
+ERROR@12692: expected command, found COMMA
+ERROR@12693: expected command, found IDENT
+ERROR@12695: expected command, found COMMA
+ERROR@12696: expected command, found IDENT
+ERROR@12698: expected command, found COMMA
+ERROR@12699: expected command, found IDENT
+ERROR@12700: expected command, found R_PAREN
+ERROR@12702: expected command, found ON_KW
+ERROR@12705: expected command, found L_PAREN
+ERROR@12706: expected command, found IDENT
+ERROR@12707: expected command, found PLUS
+ERROR@12708: expected command, found IDENT
+ERROR@12710: expected command, found PLUS
+ERROR@12711: expected command, found IDENT
+ERROR@12713: expected command, found R_PAREN
+ERROR@12714: expected command, found L_ANGLE
+ERROR@12715: expected command, found INT_NUMBER
+ERROR@15403: expected R_PAREN
+ERROR@15425: expected SEMICOLON
+ERROR@15426: expected command, found R_PAREN
+ERROR@15585: expected R_PAREN
+ERROR@15605: expected SEMICOLON
+ERROR@15606: expected command, found R_PAREN
+ERROR@15765: expected R_PAREN
+ERROR@15787: expected SEMICOLON
+ERROR@15788: expected command, found R_PAREN
+ERROR@15973: expected R_PAREN
+ERROR@15996: expected SEMICOLON
+ERROR@15997: expected command, found R_PAREN
+ERROR@28655: expected R_PAREN
+ERROR@28668: expected SEMICOLON
+ERROR@28668: expected command, found R_PAREN
+ERROR@28685: expected AS_KW
+ERROR@28685: expected L_PAREN
+ERROR@28685: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: SEMICOLON
+ERROR@28685: expected R_PAREN
+ERROR@28685: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: SEMICOLON
+ERROR@28722: expected R_PAREN
+ERROR@28746: expected SEMICOLON
+ERROR@28746: expected command, found R_PAREN
+ERROR@28763: expected AS_KW
+ERROR@28763: expected L_PAREN
+ERROR@28763: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: SEMICOLON
+ERROR@28763: expected R_PAREN
+ERROR@28763: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: SEMICOLON
+ERROR@28895: expected R_PAREN
+ERROR@28919: expected SEMICOLON
+ERROR@28919: expected command, found R_PAREN
+ERROR@28936: expected AS_KW
+ERROR@28936: expected L_PAREN
+ERROR@28936: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: SEMICOLON
+ERROR@28936: expected R_PAREN
+ERROR@28936: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: SEMICOLON
+ERROR@29704: expected IDENT
+ERROR@29704: expected SEMICOLON
+ERROR@29705: expected command, found REF_KW
+ERROR@29708: expected command, found COMMA
+ERROR@29720: expected command, found IDENT
+ERROR@30331: expected IDENT
+ERROR@30331: expected SEMICOLON
+ERROR@30332: expected command, found REF_KW
+ERROR@30335: expected command, found COMMA
+ERROR@30347: expected command, found IDENT

@@ -1,0 +1,234 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/returning.sql
+---
+ERROR@5036: expected an expression, found WITH_KW
+ERROR@5040: expected output expression
+ERROR@5040: expected SEMICOLON
+ERROR@5041: expected command, found L_PAREN
+ERROR@5042: expected command, found IDENT
+ERROR@5050: expected command, found AS_KW
+ERROR@5053: expected command, found IDENT
+ERROR@5062: expected command, found R_PAREN
+ERROR@5064: expected command, found STAR
+ERROR@5108: expected an expression, found WITH_KW
+ERROR@5112: expected output expression
+ERROR@5112: expected SEMICOLON
+ERROR@5113: expected command, found L_PAREN
+ERROR@5114: expected command, found NEW_KW
+ERROR@5118: expected command, found AS_KW
+ERROR@5121: expected command, found IDENT
+ERROR@5124: expected command, found R_PAREN
+ERROR@5126: expected command, found STAR
+ERROR@5170: expected an expression, found WITH_KW
+ERROR@5174: expected output expression
+ERROR@5174: expected SEMICOLON
+ERROR@5175: expected command, found L_PAREN
+ERROR@5176: expected command, found OLD_KW
+ERROR@5180: expected command, found AS_KW
+ERROR@5183: expected command, found IDENT
+ERROR@5184: expected command, found COMMA
+ERROR@5186: expected command, found NEW_KW
+ERROR@5190: expected command, found AS_KW
+ERROR@5193: expected command, found IDENT
+ERROR@5194: expected command, found COMMA
+ERROR@5196: expected command, found OLD_KW
+ERROR@5200: expected command, found AS_KW
+ERROR@5203: expected command, found IDENT
+ERROR@5204: expected command, found R_PAREN
+ERROR@5206: expected command, found STAR
+ERROR@5250: expected an expression, found WITH_KW
+ERROR@5254: expected output expression
+ERROR@5254: expected SEMICOLON
+ERROR@5255: expected command, found L_PAREN
+ERROR@5256: expected command, found OLD_KW
+ERROR@5260: expected command, found AS_KW
+ERROR@5263: expected command, found IDENT
+ERROR@5264: expected command, found COMMA
+ERROR@5266: expected command, found NEW_KW
+ERROR@5270: expected command, found AS_KW
+ERROR@5273: expected command, found IDENT
+ERROR@5274: expected command, found COMMA
+ERROR@5276: expected command, found NEW_KW
+ERROR@5280: expected command, found AS_KW
+ERROR@5283: expected command, found IDENT
+ERROR@5284: expected command, found R_PAREN
+ERROR@5286: expected command, found STAR
+ERROR@5330: expected an expression, found WITH_KW
+ERROR@5334: expected output expression
+ERROR@5334: expected SEMICOLON
+ERROR@5335: expected command, found L_PAREN
+ERROR@5336: expected command, found OLD_KW
+ERROR@5340: expected command, found AS_KW
+ERROR@5343: expected command, found IDENT
+ERROR@5344: expected command, found COMMA
+ERROR@5346: expected command, found NEW_KW
+ERROR@5350: expected command, found AS_KW
+ERROR@5353: expected command, found IDENT
+ERROR@5354: expected command, found R_PAREN
+ERROR@5356: expected command, found STAR
+ERROR@5946: expected an expression, found WITH_KW
+ERROR@5950: expected output expression
+ERROR@5950: expected SEMICOLON
+ERROR@5951: expected command, found L_PAREN
+ERROR@5952: expected command, found OLD_KW
+ERROR@5956: expected command, found AS_KW
+ERROR@5959: expected command, found IDENT
+ERROR@5960: expected command, found COMMA
+ERROR@5962: expected command, found NEW_KW
+ERROR@5966: expected command, found AS_KW
+ERROR@5969: expected command, found IDENT
+ERROR@5970: expected command, found R_PAREN
+ERROR@5984: expected command, found IDENT
+ERROR@5985: expected command, found DOT
+ERROR@5986: expected command, found IDENT
+ERROR@5994: expected command, found COLON
+ERROR@5995: expected command, found COLON
+ERROR@5996: expected command, found IDENT
+ERROR@6004: expected command, found COMMA
+ERROR@6006: expected command, found IDENT
+ERROR@6007: expected command, found DOT
+ERROR@6008: expected command, found IDENT
+ERROR@6012: expected command, found COMMA
+ERROR@6014: expected command, found IDENT
+ERROR@6015: expected command, found DOT
+ERROR@6016: expected command, found STAR
+ERROR@6017: expected command, found COMMA
+ERROR@6031: expected command, found IDENT
+ERROR@6032: expected command, found DOT
+ERROR@6033: expected command, found IDENT
+ERROR@6041: expected command, found COLON
+ERROR@6042: expected command, found COLON
+ERROR@6043: expected command, found IDENT
+ERROR@6051: expected command, found COMMA
+ERROR@6053: expected command, found IDENT
+ERROR@6054: expected command, found DOT
+ERROR@6055: expected command, found IDENT
+ERROR@6059: expected command, found COMMA
+ERROR@6061: expected command, found IDENT
+ERROR@6062: expected command, found DOT
+ERROR@6063: expected command, found STAR
+ERROR@6064: expected command, found COMMA
+ERROR@6066: expected command, found STAR
+ERROR@6196: expected an expression, found WITH_KW
+ERROR@6200: expected output expression
+ERROR@6200: expected SEMICOLON
+ERROR@6201: expected command, found L_PAREN
+ERROR@6202: expected command, found OLD_KW
+ERROR@6206: expected command, found AS_KW
+ERROR@6209: expected command, found IDENT
+ERROR@6210: expected command, found COMMA
+ERROR@6212: expected command, found NEW_KW
+ERROR@6216: expected command, found AS_KW
+ERROR@6219: expected command, found IDENT
+ERROR@6220: expected command, found R_PAREN
+ERROR@6234: expected command, found IDENT
+ERROR@6235: expected command, found DOT
+ERROR@6236: expected command, found IDENT
+ERROR@6244: expected command, found COLON
+ERROR@6245: expected command, found COLON
+ERROR@6246: expected command, found IDENT
+ERROR@6254: expected command, found COMMA
+ERROR@6256: expected command, found IDENT
+ERROR@6257: expected command, found DOT
+ERROR@6258: expected command, found IDENT
+ERROR@6262: expected command, found COMMA
+ERROR@6264: expected command, found IDENT
+ERROR@6265: expected command, found DOT
+ERROR@6266: expected command, found STAR
+ERROR@6267: expected command, found COMMA
+ERROR@6281: expected command, found IDENT
+ERROR@6282: expected command, found DOT
+ERROR@6283: expected command, found IDENT
+ERROR@6291: expected command, found COLON
+ERROR@6292: expected command, found COLON
+ERROR@6293: expected command, found IDENT
+ERROR@6301: expected command, found COMMA
+ERROR@6303: expected command, found IDENT
+ERROR@6304: expected command, found DOT
+ERROR@6305: expected command, found IDENT
+ERROR@6309: expected command, found COMMA
+ERROR@6311: expected command, found IDENT
+ERROR@6312: expected command, found DOT
+ERROR@6313: expected command, found STAR
+ERROR@6314: expected command, found COMMA
+ERROR@6316: expected command, found STAR
+ERROR@10619: expected an expression, found RETURNING_KW
+ERROR@10628: expected an expression in target_el, found OLD_KW
+ERROR@10675: expected an expression, found RETURNING_KW
+ERROR@10684: expected an expression in target_el, found OLD_KW
+ERROR@13248: expected an expression, found WITH_KW
+ERROR@13252: expected output expression
+ERROR@13252: expected R_PAREN
+ERROR@13252: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@13253: expected command, found L_PAREN
+ERROR@13254: expected command, found OLD_KW
+ERROR@13258: expected command, found AS_KW
+ERROR@13261: expected command, found IDENT
+ERROR@13270: expected command, found R_PAREN
+ERROR@13272: expected command, found IDENT
+ERROR@13281: expected command, found DOT
+ERROR@13282: expected command, found STAR
+ERROR@13283: expected command, found COMMA
+ERROR@13285: expected command, found NEW_KW
+ERROR@13288: expected command, found DOT
+ERROR@13289: expected command, found STAR
+ERROR@13293: expected command, found R_PAREN
+ERROR@13294: expected command, found COMMA
+ERROR@13296: expected command, found IDENT
+ERROR@13299: expected command, found AS_KW
+ERROR@13302: expected command, found L_PAREN
+ERROR@13345: expected an expression, found WITH_KW
+ERROR@13349: expected output expression
+ERROR@13350: expected command, found L_PAREN
+ERROR@13351: expected command, found NEW_KW
+ERROR@13355: expected command, found AS_KW
+ERROR@13358: expected command, found IDENT
+ERROR@13367: expected command, found R_PAREN
+ERROR@13369: expected command, found OLD_KW
+ERROR@13372: expected command, found DOT
+ERROR@13373: expected command, found STAR
+ERROR@13374: expected command, found COMMA
+ERROR@13376: expected command, found IDENT
+ERROR@13385: expected command, found DOT
+ERROR@13386: expected command, found STAR
+ERROR@13390: expected command, found R_PAREN
+ERROR@13435: expected an expression, found WITH_KW
+ERROR@13439: expected output expression
+ERROR@13440: expected command, found L_PAREN
+ERROR@13441: expected command, found OLD_KW
+ERROR@13445: expected command, found AS_KW
+ERROR@13448: expected command, found IDENT
+ERROR@13449: expected command, found COMMA
+ERROR@13451: expected command, found NEW_KW
+ERROR@13455: expected command, found AS_KW
+ERROR@13458: expected command, found IDENT
+ERROR@13459: expected command, found R_PAREN
+ERROR@13475: expected command, found IDENT
+ERROR@13476: expected command, found DOT
+ERROR@13477: expected command, found STAR
+ERROR@13478: expected command, found COMMA
+ERROR@13480: expected command, found IDENT
+ERROR@13481: expected command, found DOT
+ERROR@13482: expected command, found STAR
+ERROR@13483: expected command, found COMMA
+ERROR@13485: expected command, found IDENT
+ERROR@13486: expected command, found COMMA
+ERROR@13488: expected command, found IDENT
+ERROR@13489: expected command, found COMMA
+ERROR@13491: expected command, found IDENT
+ERROR@13492: expected command, found DOT
+ERROR@13493: expected command, found IDENT
+ERROR@13496: expected command, found EQ
+ERROR@13498: expected command, found IDENT
+ERROR@13499: expected command, found DOT
+ERROR@13500: expected command, found IDENT
+ERROR@13502: expected command, found COMMA
+ERROR@13504: expected command, found IDENT
+ERROR@13506: expected command, found EQ
+ERROR@13508: expected command, found IDENT
+ERROR@13509: expected command, found COMMA
+ERROR@13545: expected command, found COMMA
+ERROR@13607: expected command, found COMMA
+ERROR@13669: expected command, found COMMA
+ERROR@13725: expected command, found COMMA

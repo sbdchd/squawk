@@ -1,0 +1,55 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/triggers.sql
+---
+ERROR@9041: expected ON_KW
+ERROR@9044: expected EXECUTE_KW
+ERROR@9044: expected FUNCTION or PROCEDURE
+ERROR@9046: expected call expression
+ERROR@9046: expected SEMICOLON
+ERROR@9047: expected command, found ON_KW
+ERROR@9050: expected command, found IDENT
+ERROR@9061: expected command, found FOR_KW
+ERROR@9065: expected command, found EACH_KW
+ERROR@9070: expected command, found ROW_KW
+ERROR@9091: expected SEMICOLON
+ERROR@9092: expected command, found IDENT
+ERROR@9104: expected command, found L_PAREN
+ERROR@9105: expected command, found STRING
+ERROR@9118: expected command, found R_PAREN
+ERROR@45732: expected command, found INT_NUMBER
+ERROR@45734: expected command, found INT_NUMBER
+ERROR@45817: expected command, found INT_NUMBER
+ERROR@69825: expected command, found IDENT
+ERROR@69829: expected command, found INT_NUMBER
+ERROR@69832: expected command, found IDENT
+ERROR@69836: expected command, found INT_NUMBER
+ERROR@69839: expected command, found IDENT
+ERROR@69843: expected command, found INT_NUMBER
+ERROR@70530: expected command, found IDENT
+ERROR@70534: expected command, found INT_NUMBER
+ERROR@70537: expected command, found IDENT
+ERROR@70541: expected command, found INT_NUMBER
+ERROR@70544: expected command, found IDENT
+ERROR@70548: expected command, found INT_NUMBER
+ERROR@71189: expected command, found IDENT
+ERROR@71193: expected command, found INT_NUMBER
+ERROR@71196: expected command, found IDENT
+ERROR@71200: expected command, found INT_NUMBER
+ERROR@71203: expected command, found IDENT
+ERROR@71207: expected command, found INT_NUMBER
+ERROR@77540: expected command, found IDENT
+ERROR@77544: expected command, found INT_NUMBER
+ERROR@77547: expected command, found IDENT
+ERROR@77551: expected command, found INT_NUMBER
+ERROR@77554: expected command, found IDENT
+ERROR@77558: expected command, found INT_NUMBER
+ERROR@77770: expected command, found IDENT
+ERROR@77774: expected command, found INT_NUMBER
+ERROR@94936: expected DEPENDS_KW
+ERROR@94936: expected ON_KW
+ERROR@94936: expected EXTENSION_KW
+ERROR@94948: expected SEMICOLON
+ERROR@94949: expected command, found RENAME_KW
+ERROR@94956: expected command, found TO_KW
+ERROR@94959: expected command, found IDENT

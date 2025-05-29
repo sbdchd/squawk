@@ -1,0 +1,103 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/privileges.sql
+---
+ERROR@17722: expected R_PAREN
+ERROR@17782: expected SEMICOLON
+ERROR@17782: expected command, found R_PAREN
+ERROR@17784: expected command, found IDENT
+ERROR@17787: expected command, found WHERE_KW
+ERROR@17793: expected command, found FALSE_KW
+ERROR@17906: expected R_PAREN
+ERROR@17980: expected SEMICOLON
+ERROR@17980: expected command, found R_PAREN
+ERROR@17982: expected command, found IDENT
+ERROR@17985: expected command, found WHERE_KW
+ERROR@17991: expected command, found IDENT
+ERROR@17993: expected command, found L_ANGLE
+ERROR@17995: expected command, found INT_NUMBER
+ERROR@18707: expected TO_KW
+ERROR@18707: expected role, got COMMA
+ERROR@18715: expected SEMICOLON
+ERROR@18716: expected command, found L_PAREN
+ERROR@18717: expected command, found IDENT
+ERROR@18720: expected command, found R_PAREN
+ERROR@18721: expected command, found COMMA
+ERROR@18730: expected path name
+ERROR@18730: expected SET_KW
+ERROR@18737: expected EQ
+ERROR@18737: expected SEMICOLON
+ERROR@18738: expected command, found ON_KW
+ERROR@18741: expected command, found IDENT
+ERROR@18748: expected command, found TO_KW
+ERROR@18751: expected command, found IDENT
+ERROR@37160: expected SELECT, TABLE, VALUES, or EXECUTE
+ERROR@37160: expected SEMICOLON
+ERROR@38499: expected SELECT, TABLE, VALUES, or EXECUTE
+ERROR@38499: expected SEMICOLON
+ERROR@56850: expected SEMICOLON
+ERROR@56851: expected command, found ORDER_KW
+ERROR@56857: expected command, found BY_KW
+ERROR@56860: expected command, found IDENT
+ERROR@56870: expected command, found COLLATE_KW
+ERROR@56878: expected command, found IDENT
+ERROR@56924: expected SEMICOLON
+ERROR@56925: expected command, found ORDER_KW
+ERROR@56931: expected command, found BY_KW
+ERROR@56934: expected command, found IDENT
+ERROR@56944: expected command, found COLLATE_KW
+ERROR@56952: expected command, found IDENT
+ERROR@61439: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
+ERROR@61439: expected TO_KW
+ERROR@61445: expected SEMICOLON
+ERROR@61446: expected command, found OBJECTS_KW
+ERROR@61454: expected command, found TO_KW
+ERROR@61457: expected command, found IDENT
+ERROR@61775: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
+ERROR@61775: expected TO_KW
+ERROR@61781: expected SEMICOLON
+ERROR@61782: expected command, found OBJECTS_KW
+ERROR@61790: expected command, found TO_KW
+ERROR@61793: expected command, found IDENT
+ERROR@62039: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
+ERROR@62039: expected FROM_KW
+ERROR@62045: expected SEMICOLON
+ERROR@62046: expected command, found OBJECTS_KW
+ERROR@62054: expected command, found FROM_KW
+ERROR@62059: expected command, found IDENT
+ERROR@62330: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
+ERROR@62330: expected TO_KW
+ERROR@62336: expected SEMICOLON
+ERROR@62337: expected command, found OBJECTS_KW
+ERROR@62345: expected command, found TO_KW
+ERROR@62348: expected command, found IDENT
+ERROR@62646: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
+ERROR@62646: expected TO_KW
+ERROR@62652: expected SEMICOLON
+ERROR@62653: expected command, found OBJECTS_KW
+ERROR@62661: expected command, found TO_KW
+ERROR@62664: expected command, found IDENT
+ERROR@64849: expected type name
+ERROR@64849: expected SEMICOLON
+ERROR@64849: expected command, found DOT
+ERROR@64850: expected command, found IDENT
+ERROR@64867: expected command, found AS_KW
+ERROR@64870: expected command, found INT_KW
+ERROR@65100: expected type name
+ERROR@65100: expected SEMICOLON
+ERROR@65100: expected command, found DOT
+ERROR@65101: expected command, found IDENT
+ERROR@65118: expected command, found AS_KW
+ERROR@65121: expected command, found INT_KW
+ERROR@74892: expected SEMICOLON
+ERROR@74892: expected command, found COMMA
+ERROR@74894: expected command, found ADMIN_KW
+ERROR@74900: expected command, found TRUE_KW
+ERROR@76186: expected SEMICOLON
+ERROR@76186: expected command, found COMMA
+ERROR@76191: expected name
+ERROR@76191: expected EQ
+ERROR@76286: expected SEMICOLON
+ERROR@76286: expected command, found COMMA
+ERROR@76291: expected name
+ERROR@76291: expected EQ

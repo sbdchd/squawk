@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select_funcs.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- normalize"
@@ -2165,6 +2164,62 @@ SOURCE_FILE
               WHITESPACE " "
               LITERAL
                 INT_NUMBER "4"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- regression test"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_ARRAY_KW "json_array"
+            ARG_LIST
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                WHITESPACE " "
+                FROM_CLAUSE
+                  FROM_KW "from"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "t"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              JSON_ARRAY_KW "json_array"
+            ARG_LIST
+              L_PAREN "("
+              SELECT_INTO
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                WHITESPACE " "
+                INTO_CLAUSE
+                  INTO_KW "into"
+                  WHITESPACE " "
+                  PATH
+                    PATH_SEGMENT
+                      NAME
+                        IDENT "t"
+                WHITESPACE " "
+                FROM_CLAUSE
+                  FROM_KW "from"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "u"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

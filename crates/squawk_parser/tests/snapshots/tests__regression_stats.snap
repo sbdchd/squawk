@@ -1,0 +1,38 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/stats.sql
+---
+ERROR@14434: expected path name
+ERROR@14434: expected IS_KW
+ERROR@14434: expected string literal or NULL
+ERROR@14434: expected SEMICOLON
+ERROR@14435: expected command, found COLON
+ERROR@14436: expected command, found IDENT
+ERROR@14446: expected command, found IS_KW
+ERROR@14449: expected command, found STRING
+ERROR@14904: expected path name
+ERROR@14904: expected IS_KW
+ERROR@14904: expected string literal or NULL
+ERROR@14904: expected SEMICOLON
+ERROR@14905: expected command, found COLON
+ERROR@14906: expected command, found IDENT
+ERROR@14916: expected command, found IS_KW
+ERROR@14919: expected command, found STRING
+ERROR@14962: expected path name
+ERROR@14962: expected IS_KW
+ERROR@14962: expected string literal or NULL
+ERROR@14962: expected SEMICOLON
+ERROR@14963: expected command, found COLON
+ERROR@14964: expected command, found IDENT
+ERROR@14974: expected command, found IS_KW
+ERROR@14977: expected command, found NULL_KW
+ERROR@24357: expected command, found IDENT
+ERROR@24509: expected command, found IDENT
+ERROR@24652: expected command, found IDENT
+ERROR@25572: expected command, found IDENT
+ERROR@25899: expected command, found IDENT
+ERROR@26231: expected command, found IDENT
+ERROR@29127: expected command, found IDENT
+ERROR@30023: expected command, found IDENT
+ERROR@31772: expected command, found IDENT
+ERROR@32434: expected command, found IDENT

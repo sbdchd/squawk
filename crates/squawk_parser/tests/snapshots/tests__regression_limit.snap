@@ -1,0 +1,11 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/limit.sql
+---
+ERROR@973: expected SEMICOLON
+ERROR@974: expected command, found LIMIT_KW
+ERROR@980: expected command, found INT_NUMBER
+ERROR@4758: expected ROWS_KW
+ERROR@5405: expected SEMICOLON
+ERROR@5406: expected command, found OFFSET_KW
+ERROR@5413: expected command, found INT_NUMBER

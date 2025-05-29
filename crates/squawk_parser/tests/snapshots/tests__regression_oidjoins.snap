@@ -1,0 +1,7 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/oidjoins.sql
+---
+ERROR@1549: expected SEMICOLON
+ERROR@1549: expected command, found IDENT
+ERROR@60: Unterminated dollar quoted string literal

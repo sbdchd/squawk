@@ -1,0 +1,13 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/misc_functions.sql
+---
+ERROR@4864: expected SEMICOLON
+ERROR@12867: expected SEMICOLON
+ERROR@13805: expected R_PAREN
+ERROR@13805: expected SEMICOLON
+ERROR@13806: expected command, found EXTERNAL_KW
+ERROR@13814: expected command, found R_PAREN
+ERROR@14006: expected SEMICOLON
+ERROR@14115: expected field name or number, got STRING
+ERROR@14125: expected a name, got CAST_EXPR

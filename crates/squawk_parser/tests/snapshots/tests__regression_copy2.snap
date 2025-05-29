@@ -1,0 +1,62 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/copy2.sql
+---
+ERROR@1026: expected L_PAREN
+ERROR@1043: expected R_PAREN
+ERROR@1246: expected L_PAREN
+ERROR@1250: expected R_PAREN
+ERROR@1273: expected L_PAREN
+ERROR@1283: expected R_PAREN
+ERROR@1283: expected SEMICOLON
+ERROR@1284: expected command, found STRING
+ERROR@1289: expected command, found DELIMITER_KW
+ERROR@1299: expected command, found STRING
+ERROR@1325: expected L_PAREN
+ERROR@1335: expected R_PAREN
+ERROR@1335: expected SEMICOLON
+ERROR@1336: expected command, found QUOTE_KW
+ERROR@1342: expected command, found IDENT
+ERROR@1347: expected command, found ESCAPE_KW
+ERROR@1354: expected command, found ESC_STRING
+ERROR@1360: expected command, found ENCODING_KW
+ERROR@1369: expected command, found STRING
+ERROR@1403: expected L_PAREN
+ERROR@1413: expected R_PAREN
+ERROR@1413: expected SEMICOLON
+ERROR@1414: expected command, found QUOTE_KW
+ERROR@1420: expected command, found STAR
+ERROR@1772: expected command, found IDENT
+ERROR@1778: expected command, found IDENT
+ERROR@1853: expected command, found ERROR
+ERROR@1854: expected command, found DOT
+ERROR@1855: expected command, found IDENT
+ERROR@3206: expected command, found IDENT
+ERROR@3207: expected command, found IDENT
+ERROR@3235: expected command, found IDENT
+ERROR@3236: expected command, found IDENT
+ERROR@3521: expected command, found NOT_KW
+ERROR@3525: expected command, found IDENT
+ERROR@3536: expected command, found BY_KW
+ERROR@3638: expected SEMICOLON
+ERROR@3638: expected command, found IDENT
+ERROR@3639: expected command, found IDENT
+ERROR@3753: expected command, found IDENT
+ERROR@3754: expected command, found IDENT
+ERROR@3846: expected command, found IDENT
+ERROR@3858: expected command, found OR_KW
+ERROR@3861: expected command, found IDENT
+ERROR@3871: expected command, found OPTIONS_KW
+ERROR@3878: expected command, found IDENT
+ERROR@8835: expected command, found STRING
+ERROR@8847: expected command, found IDENT
+ERROR@8851: expected command, found IDENT
+ERROR@9334: expected command, found ERROR
+ERROR@9335: expected command, found IDENT
+ERROR@9336: expected command, found IDENT
+ERROR@9526: expected command, found ERROR
+ERROR@9527: expected command, found IDENT
+ERROR@9528: expected command, found IDENT
+ERROR@3206: unknown literal prefix
+ERROR@3638: unknown literal prefix
+ERROR@9528: Missing trailing " to terminate the quoted identifier

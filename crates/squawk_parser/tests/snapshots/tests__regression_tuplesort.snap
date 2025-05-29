@@ -1,0 +1,192 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/tuplesort.sql
+---
+ERROR@8227: expected R_PAREN
+ERROR@8227: expected COMMA
+ERROR@8228: expected an expression, found ORDER_KW
+ERROR@8233: expected R_PAREN
+ERROR@8236: missing comma
+ERROR@8250: missing comma
+ERROR@8261: expected SEMICOLON
+ERROR@8261: expected command, found R_PAREN
+ERROR@8262: expected command, found R_PAREN
+ERROR@8263: expected command, found L_BRACK
+ERROR@8264: expected command, found INT_NUMBER
+ERROR@8265: expected command, found COLON
+ERROR@8266: expected command, found INT_NUMBER
+ERROR@8267: expected command, found R_BRACK
+ERROR@8268: expected command, found COMMA
+ERROR@8318: expected command, found IDENT
+ERROR@8333: expected command, found L_PAREN
+ERROR@8334: expected command, found FLOAT_NUMBER
+ERROR@8338: expected command, found R_PAREN
+ERROR@8340: expected command, found WITHIN_KW
+ERROR@8347: expected command, found GROUP_KW
+ERROR@8353: expected command, found L_PAREN
+ERROR@8354: expected command, found ORDER_KW
+ERROR@8360: expected command, found BY_KW
+ERROR@8363: expected command, found IDENT
+ERROR@8365: expected command, found R_PAREN
+ERROR@8366: expected command, found COMMA
+ERROR@8402: expected command, found IDENT
+ERROR@8417: expected command, found L_PAREN
+ERROR@8418: expected command, found FLOAT_NUMBER
+ERROR@8422: expected command, found R_PAREN
+ERROR@8424: expected command, found WITHIN_KW
+ERROR@8431: expected command, found GROUP_KW
+ERROR@8437: expected command, found L_PAREN
+ERROR@8438: expected command, found ORDER_KW
+ERROR@8444: expected command, found BY_KW
+ERROR@8447: expected command, found IDENT
+ERROR@8449: expected command, found R_PAREN
+ERROR@8450: expected command, found COMMA
+ERROR@8498: expected command, found IDENT
+ERROR@8513: expected command, found L_PAREN
+ERROR@8514: expected command, found FLOAT_NUMBER
+ERROR@8517: expected command, found R_PAREN
+ERROR@8519: expected command, found WITHIN_KW
+ERROR@8526: expected command, found GROUP_KW
+ERROR@8532: expected command, found L_PAREN
+ERROR@8533: expected command, found ORDER_KW
+ERROR@8539: expected command, found BY_KW
+ERROR@8542: expected command, found IDENT
+ERROR@8558: expected command, found R_PAREN
+ERROR@8559: expected command, found COMMA
+ERROR@8610: expected command, found IDENT
+ERROR@8625: expected command, found L_PAREN
+ERROR@8626: expected command, found FLOAT_NUMBER
+ERROR@8629: expected command, found R_PAREN
+ERROR@8631: expected command, found WITHIN_KW
+ERROR@8638: expected command, found GROUP_KW
+ERROR@8644: expected command, found L_PAREN
+ERROR@8645: expected command, found ORDER_KW
+ERROR@8651: expected command, found BY_KW
+ERROR@8654: expected command, found IDENT
+ERROR@8656: expected command, found COLON
+ERROR@8657: expected command, found COLON
+ERROR@8658: expected command, found TEXT_KW
+ERROR@8662: expected command, found R_PAREN
+ERROR@8663: expected command, found COMMA
+ERROR@8699: expected command, found IDENT
+ERROR@8703: expected command, found L_PAREN
+ERROR@8704: expected command, found STRING
+ERROR@8742: expected command, found COMMA
+ERROR@8744: expected command, found STRING
+ERROR@8747: expected command, found COMMA
+ERROR@8749: expected command, found STRING
+ERROR@8752: expected command, found R_PAREN
+ERROR@8754: expected command, found WITHIN_KW
+ERROR@8761: expected command, found GROUP_KW
+ERROR@8767: expected command, found L_PAREN
+ERROR@8768: expected command, found ORDER_KW
+ERROR@8774: expected command, found BY_KW
+ERROR@8777: expected command, found IDENT
+ERROR@8795: expected command, found COMMA
+ERROR@8797: expected command, found IDENT
+ERROR@8799: expected command, found COMMA
+ERROR@8801: expected command, found IDENT
+ERROR@8803: expected command, found COLON
+ERROR@8804: expected command, found COLON
+ERROR@8805: expected command, found TEXT_KW
+ERROR@8809: expected command, found R_PAREN
+ERROR@8811: expected command, found FROM_KW
+ERROR@8909: expected SEMICOLON
+ERROR@8910: expected command, found IDENT
+ERROR@9150: expected R_PAREN
+ERROR@9150: expected COMMA
+ERROR@9151: expected an expression, found ORDER_KW
+ERROR@9156: expected R_PAREN
+ERROR@9159: missing comma
+ERROR@9173: missing comma
+ERROR@9184: expected SEMICOLON
+ERROR@9184: expected command, found R_PAREN
+ERROR@9185: expected command, found R_PAREN
+ERROR@9186: expected command, found L_BRACK
+ERROR@9187: expected command, found INT_NUMBER
+ERROR@9188: expected command, found COLON
+ERROR@9189: expected command, found INT_NUMBER
+ERROR@9190: expected command, found R_BRACK
+ERROR@9191: expected command, found COMMA
+ERROR@9197: expected command, found IDENT
+ERROR@9212: expected command, found L_PAREN
+ERROR@9213: expected command, found FLOAT_NUMBER
+ERROR@9217: expected command, found R_PAREN
+ERROR@9219: expected command, found WITHIN_KW
+ERROR@9226: expected command, found GROUP_KW
+ERROR@9232: expected command, found L_PAREN
+ERROR@9233: expected command, found ORDER_KW
+ERROR@9239: expected command, found BY_KW
+ERROR@9242: expected command, found IDENT
+ERROR@9244: expected command, found R_PAREN
+ERROR@9245: expected command, found COMMA
+ERROR@9251: expected command, found IDENT
+ERROR@9266: expected command, found L_PAREN
+ERROR@9267: expected command, found FLOAT_NUMBER
+ERROR@9271: expected command, found R_PAREN
+ERROR@9273: expected command, found WITHIN_KW
+ERROR@9280: expected command, found GROUP_KW
+ERROR@9286: expected command, found L_PAREN
+ERROR@9287: expected command, found ORDER_KW
+ERROR@9293: expected command, found BY_KW
+ERROR@9296: expected command, found IDENT
+ERROR@9298: expected command, found R_PAREN
+ERROR@9299: expected command, found COMMA
+ERROR@9305: expected command, found IDENT
+ERROR@9320: expected command, found L_PAREN
+ERROR@9321: expected command, found FLOAT_NUMBER
+ERROR@9324: expected command, found R_PAREN
+ERROR@9326: expected command, found WITHIN_KW
+ERROR@9333: expected command, found GROUP_KW
+ERROR@9339: expected command, found L_PAREN
+ERROR@9340: expected command, found ORDER_KW
+ERROR@9346: expected command, found BY_KW
+ERROR@9349: expected command, found IDENT
+ERROR@9365: expected command, found R_PAREN
+ERROR@9366: expected command, found COMMA
+ERROR@9372: expected command, found IDENT
+ERROR@9387: expected command, found L_PAREN
+ERROR@9388: expected command, found FLOAT_NUMBER
+ERROR@9391: expected command, found R_PAREN
+ERROR@9393: expected command, found WITHIN_KW
+ERROR@9400: expected command, found GROUP_KW
+ERROR@9406: expected command, found L_PAREN
+ERROR@9407: expected command, found ORDER_KW
+ERROR@9413: expected command, found BY_KW
+ERROR@9416: expected command, found IDENT
+ERROR@9418: expected command, found COLON
+ERROR@9419: expected command, found COLON
+ERROR@9420: expected command, found TEXT_KW
+ERROR@9424: expected command, found R_PAREN
+ERROR@9425: expected command, found COMMA
+ERROR@9431: expected command, found IDENT
+ERROR@9435: expected command, found L_PAREN
+ERROR@9436: expected command, found STRING
+ERROR@9474: expected command, found COMMA
+ERROR@9476: expected command, found STRING
+ERROR@9479: expected command, found COMMA
+ERROR@9481: expected command, found STRING
+ERROR@9484: expected command, found R_PAREN
+ERROR@9486: expected command, found WITHIN_KW
+ERROR@9493: expected command, found GROUP_KW
+ERROR@9499: expected command, found L_PAREN
+ERROR@9500: expected command, found ORDER_KW
+ERROR@9506: expected command, found BY_KW
+ERROR@9509: expected command, found IDENT
+ERROR@9527: expected command, found COMMA
+ERROR@9529: expected command, found IDENT
+ERROR@9531: expected command, found COMMA
+ERROR@9533: expected command, found IDENT
+ERROR@9535: expected command, found COLON
+ERROR@9536: expected command, found COLON
+ERROR@9537: expected command, found TEXT_KW
+ERROR@9541: expected command, found R_PAREN
+ERROR@9543: expected command, found FROM_KW
+ERROR@9641: expected SEMICOLON
+ERROR@9642: expected command, found IDENT
+ERROR@10543: expected command, found STRING
+ERROR@10548: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@10550: expected command, found STRING
+ERROR@10648: expected command, found STRING
+ERROR@10653: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
+ERROR@10655: expected command, found STRING

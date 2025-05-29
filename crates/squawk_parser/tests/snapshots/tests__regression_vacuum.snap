@@ -1,0 +1,25 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/vacuum.sql
+---
+ERROR@10085: expected SEMICOLON
+ERROR@10086: expected command, found IDENT
+ERROR@10707: expected SEMICOLON
+ERROR@10708: expected command, found IDENT
+ERROR@10771: expected SEMICOLON
+ERROR@10772: expected command, found IDENT
+ERROR@10781: expected command, found L_PAREN
+ERROR@10782: expected command, found IDENT
+ERROR@10783: expected command, found COMMA
+ERROR@10784: expected command, found IDENT
+ERROR@10785: expected command, found R_PAREN
+ERROR@11096: expected SEMICOLON
+ERROR@11097: expected command, found IDENT
+ERROR@11658: expected SEMICOLON
+ERROR@11659: expected command, found IDENT
+ERROR@12293: expected R_PAREN
+ERROR@12293: expected SEMICOLON
+ERROR@12293: expected command, found MINUS
+ERROR@12294: expected command, found IDENT
+ERROR@12297: expected command, found R_PAREN
+ERROR@12299: expected command, found IDENT

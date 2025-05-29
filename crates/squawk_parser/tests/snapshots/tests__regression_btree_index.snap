@@ -1,0 +1,70 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/btree_index.sql
+---
+ERROR@7067: expected SEMICOLON
+ERROR@7068: expected command, found ILIKE_KW
+ERROR@7074: expected command, found STRING
+ERROR@7083: expected command, found ORDER_KW
+ERROR@7089: expected command, found BY_KW
+ERROR@7092: expected command, found INT_NUMBER
+ERROR@7136: expected SEMICOLON
+ERROR@7137: expected command, found ILIKE_KW
+ERROR@7143: expected command, found STRING
+ERROR@7152: expected command, found ORDER_KW
+ERROR@7158: expected command, found BY_KW
+ERROR@7161: expected command, found INT_NUMBER
+ERROR@7225: expected SEMICOLON
+ERROR@7226: expected command, found ILIKE_KW
+ERROR@7232: expected command, found STRING
+ERROR@7241: expected command, found ORDER_KW
+ERROR@7247: expected command, found BY_KW
+ERROR@7250: expected command, found INT_NUMBER
+ERROR@7549: expected SEMICOLON
+ERROR@7550: expected command, found ILIKE_KW
+ERROR@7556: expected command, found STRING
+ERROR@7565: expected command, found ORDER_KW
+ERROR@7571: expected command, found BY_KW
+ERROR@7574: expected command, found INT_NUMBER
+ERROR@7618: expected SEMICOLON
+ERROR@7619: expected command, found ILIKE_KW
+ERROR@7625: expected command, found STRING
+ERROR@7634: expected command, found ORDER_KW
+ERROR@7640: expected command, found BY_KW
+ERROR@7643: expected command, found INT_NUMBER
+ERROR@7707: expected SEMICOLON
+ERROR@7708: expected command, found ILIKE_KW
+ERROR@7714: expected command, found STRING
+ERROR@7723: expected command, found ORDER_KW
+ERROR@7729: expected command, found BY_KW
+ERROR@7732: expected command, found INT_NUMBER
+ERROR@13001: expected numeric literal
+ERROR@13001: expected SET_KW
+ERROR@13001: expected STATISTICS_KW
+ERROR@13001: expected numeric literal
+ERROR@13001: expected SEMICOLON
+ERROR@13002: expected command, found IDENT
+ERROR@13008: expected name
+ERROR@13008: expected EQ
+ERROR@13008: expected config value, got L_PAREN
+ERROR@13008: expected SEMICOLON
+ERROR@13009: expected command, found L_PAREN
+ERROR@13010: expected command, found IDENT
+ERROR@13020: expected command, found EQ
+ERROR@13021: expected command, found INT_NUMBER
+ERROR@13024: expected command, found R_PAREN
+ERROR@13221: expected numeric literal
+ERROR@13221: expected SET_KW
+ERROR@13221: expected STATISTICS_KW
+ERROR@13221: expected numeric literal
+ERROR@13221: expected SEMICOLON
+ERROR@13222: expected command, found IDENT
+ERROR@13228: expected name
+ERROR@13228: expected EQ
+ERROR@13228: expected config value, got L_PAREN
+ERROR@13228: expected SEMICOLON
+ERROR@13229: expected command, found L_PAREN
+ERROR@13230: expected command, found IDENT
+ERROR@13240: expected command, found EQ
+ERROR@13241: expected command, found INT_NUMBER
+ERROR@13244: expected command, found R_PAREN

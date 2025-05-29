@@ -1,0 +1,49 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/create_aggregate.sql
+---
+ERROR@1544: expected type name
+ERROR@1544: expected R_PAREN
+ERROR@1544: expected function option
+ERROR@1544: expected SEMICOLON
+ERROR@1544: expected command, found L_BRACK
+ERROR@1545: expected command, found R_BRACK
+ERROR@1546: expected command, found COMMA
+ERROR@1547: expected command, found INTEGER_KW
+ERROR@1554: expected command, found COMMA
+ERROR@1555: expected command, found INTEGER_KW
+ERROR@1562: expected command, found COMMA
+ERROR@1563: expected command, found TEXT_KW
+ERROR@1567: expected command, found R_PAREN
+ERROR@1569: expected command, found RETURNS_KW
+ERROR@1577: expected command, found IDENT
+ERROR@1584: expected command, found L_BRACK
+ERROR@1585: expected command, found R_BRACK
+ERROR@1587: expected command, found AS_KW
+ERROR@1590: expected command, found STRING
+ERROR@1639: expected command, found LANGUAGE_KW
+ERROR@1648: expected command, found SQL_KW
+ERROR@1652: expected command, found STRICT_KW
+ERROR@1659: expected command, found IMMUTABLE_KW
+ERROR@1707: expected type name
+ERROR@1707: expected R_PAREN
+ERROR@1707: expected function option
+ERROR@1707: expected SEMICOLON
+ERROR@1707: expected command, found L_BRACK
+ERROR@1708: expected command, found R_BRACK
+ERROR@1709: expected command, found COMMA
+ERROR@1710: expected command, found INTEGER_KW
+ERROR@1717: expected command, found COMMA
+ERROR@1718: expected command, found INTEGER_KW
+ERROR@1725: expected command, found COMMA
+ERROR@1726: expected command, found TEXT_KW
+ERROR@1730: expected command, found R_PAREN
+ERROR@1732: expected command, found RETURNS_KW
+ERROR@1740: expected command, found IDENT
+ERROR@1747: expected command, found L_BRACK
+ERROR@1748: expected command, found R_BRACK
+ERROR@1750: expected command, found AS_KW
+ERROR@1753: expected command, found STRING
+ERROR@1802: expected command, found LANGUAGE_KW
+ERROR@1811: expected command, found SQL_KW
+ERROR@1815: expected command, found IMMUTABLE_KW

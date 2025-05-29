@@ -1,0 +1,18 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/create_am.sql
+---
+ERROR@3427: expected SEMICOLON
+ERROR@3428: expected command, found USING_KW
+ERROR@3434: expected command, found IDENT
+ERROR@3440: expected command, found FROM_KW
+ERROR@3445: expected command, found IDENT
+ERROR@3532: expected AS_KW
+ERROR@3533: expected command, found USING_KW
+ERROR@3538: expected SELECT
+ERROR@3538: expected SEMICOLON
+ERROR@3539: expected command, found IDENT
+ERROR@3545: expected command, found AS_KW
+ERROR@3656: expected SEMICOLON
+ERROR@3657: expected command, found USING_KW
+ERROR@3663: expected command, found IDENT

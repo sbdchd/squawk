@@ -1,0 +1,56 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/sqljson_queryfuncs.sql
+---
+ERROR@4635: expected json behavior
+ERROR@4635: expected ON_KW
+ERROR@4635: expected ERROR_KW
+ERROR@9001: expected json behavior
+ERROR@9001: expected ON_KW
+ERROR@9001: expected ERROR_KW
+ERROR@9103: expected json behavior
+ERROR@9103: expected ON_KW
+ERROR@9103: expected ERROR_KW
+ERROR@10671: expected json behavior
+ERROR@10671: expected ON_KW
+ERROR@10671: expected ERROR_KW
+ERROR@10725: expected json behavior
+ERROR@10725: expected ON_KW
+ERROR@10725: expected ERROR_KW
+ERROR@10785: expected json behavior
+ERROR@10785: expected ON_KW
+ERROR@10785: expected ERROR_KW
+ERROR@10846: expected json behavior
+ERROR@10846: expected ON_KW
+ERROR@10846: expected ERROR_KW
+ERROR@10900: expected json behavior
+ERROR@10900: expected ON_KW
+ERROR@10900: expected ERROR_KW
+ERROR@10966: expected json behavior
+ERROR@10966: expected ON_KW
+ERROR@10966: expected ERROR_KW
+ERROR@13512: expected json behavior
+ERROR@13512: expected ON_KW
+ERROR@13512: expected ERROR_KW
+ERROR@17030: expected json behavior
+ERROR@17030: expected ON_KW
+ERROR@17030: expected ERROR_KW
+ERROR@22420: expected json behavior
+ERROR@22420: expected ON_KW
+ERROR@22420: expected ERROR_KW
+ERROR@22549: expected json behavior
+ERROR@22549: expected ON_KW
+ERROR@22549: expected ERROR_KW
+ERROR@22669: expected json behavior
+ERROR@22669: expected ON_KW
+ERROR@22669: expected ERROR_KW
+ERROR@22800: expected json behavior
+ERROR@22800: expected ON_KW
+ERROR@22800: expected ERROR_KW
+ERROR@23992: expected json behavior
+ERROR@23992: expected ON_KW
+ERROR@23992: expected ERROR_KW
+ERROR@24433: expected type name
+ERROR@26935: expected json behavior
+ERROR@26935: expected ON_KW
+ERROR@26935: expected ERROR_KW

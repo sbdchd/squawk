@@ -1,0 +1,17 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/numeric.sql
+---
+ERROR@32156: expected TYPE_KW
+ERROR@32156: missing comma
+ERROR@32186: expected TYPE_KW
+ERROR@32186: missing comma
+ERROR@32215: expected TYPE_KW
+ERROR@32215: missing comma
+ERROR@32242: expected TYPE_KW
+ERROR@32242: missing comma
+ERROR@47483: expected FROM_KW
+ERROR@47483: expected L_PAREN
+ERROR@47483: expected an expression, found SEMICOLON
+ERROR@47483: expected call expression
+ERROR@47483: expected R_PAREN

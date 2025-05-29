@@ -1,0 +1,69 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/timestamp.sql
+---
+ERROR@742: expected SEMICOLON
+ERROR@743: expected command, found WITHOUT_KW
+ERROR@751: expected command, found TIME_KW
+ERROR@756: expected command, found ZONE_KW
+ERROR@761: expected command, found STRING
+ERROR@834: expected SEMICOLON
+ERROR@835: expected command, found WITHOUT_KW
+ERROR@843: expected command, found TIME_KW
+ERROR@848: expected command, found ZONE_KW
+ERROR@853: expected command, found STRING
+ERROR@927: expected SEMICOLON
+ERROR@928: expected command, found WITHOUT_KW
+ERROR@936: expected command, found TIME_KW
+ERROR@941: expected command, found ZONE_KW
+ERROR@946: expected command, found STRING
+ERROR@1423: expected SEMICOLON
+ERROR@1424: expected command, found WITHOUT_KW
+ERROR@1432: expected command, found TIME_KW
+ERROR@1437: expected command, found ZONE_KW
+ERROR@1442: expected command, found STRING
+ERROR@6994: expected SEMICOLON
+ERROR@6995: expected command, found WITHOUT_KW
+ERROR@7003: expected command, found TIME_KW
+ERROR@7008: expected command, found ZONE_KW
+ERROR@7013: expected command, found STRING
+ERROR@7080: expected SEMICOLON
+ERROR@7081: expected command, found WITHOUT_KW
+ERROR@7089: expected command, found TIME_KW
+ERROR@7094: expected command, found ZONE_KW
+ERROR@7099: expected command, found STRING
+ERROR@7166: expected SEMICOLON
+ERROR@7167: expected command, found WITHOUT_KW
+ERROR@7175: expected command, found TIME_KW
+ERROR@7180: expected command, found ZONE_KW
+ERROR@7185: expected command, found STRING
+ERROR@7253: expected SEMICOLON
+ERROR@7254: expected command, found WITHOUT_KW
+ERROR@7262: expected command, found TIME_KW
+ERROR@7267: expected command, found ZONE_KW
+ERROR@7272: expected command, found STRING
+ERROR@7340: expected SEMICOLON
+ERROR@7341: expected command, found WITHOUT_KW
+ERROR@7349: expected command, found TIME_KW
+ERROR@7354: expected command, found ZONE_KW
+ERROR@7359: expected command, found STRING
+ERROR@7427: expected SEMICOLON
+ERROR@7428: expected command, found WITHOUT_KW
+ERROR@7436: expected command, found TIME_KW
+ERROR@7441: expected command, found ZONE_KW
+ERROR@7446: expected command, found STRING
+ERROR@7482: missing comma
+ERROR@7495: missing comma
+ERROR@11046: missing comma
+ERROR@11059: missing comma
+ERROR@11135: expected AND_KW
+ERROR@11143: expected SEMICOLON
+ERROR@11144: expected command, found TIME_KW
+ERROR@11149: expected command, found ZONE_KW
+ERROR@11154: expected command, found STRING
+ERROR@11170: expected command, found AND_KW
+ERROR@11174: expected command, found TIMESTAMP_KW
+ERROR@11184: expected command, found WITHOUT_KW
+ERROR@11192: expected command, found TIME_KW
+ERROR@11197: expected command, found ZONE_KW
+ERROR@11202: expected command, found STRING

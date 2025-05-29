@@ -1,0 +1,16 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/tablespace.sql
+---
+ERROR@2073: expected SEMICOLON
+ERROR@2073: expected command, found DOT
+ERROR@2074: expected command, found IDENT
+ERROR@2160: expected SEMICOLON
+ERROR@2160: expected command, found DOT
+ERROR@2161: expected command, found IDENT
+ERROR@2234: expected SEMICOLON
+ERROR@2234: expected command, found DOT
+ERROR@2235: expected command, found IDENT
+ERROR@2315: expected SEMICOLON
+ERROR@2315: expected command, found DOT
+ERROR@2316: expected command, found IDENT

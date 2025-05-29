@@ -1,0 +1,158 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/copydml.sql
+---
+ERROR@370: expected select stmt
+ERROR@370: expected R_PAREN
+ERROR@370: expected SEMICOLON
+ERROR@424: expected SEMICOLON
+ERROR@424: expected command, found R_PAREN
+ERROR@426: expected command, found TO_KW
+ERROR@429: expected command, found STDOUT_KW
+ERROR@443: expected select stmt
+ERROR@443: expected R_PAREN
+ERROR@443: expected SEMICOLON
+ERROR@501: expected SEMICOLON
+ERROR@501: expected command, found R_PAREN
+ERROR@503: expected command, found TO_KW
+ERROR@506: expected command, found STDOUT_KW
+ERROR@520: expected select stmt
+ERROR@520: expected R_PAREN
+ERROR@520: expected SEMICOLON
+ERROR@571: expected SEMICOLON
+ERROR@571: expected command, found R_PAREN
+ERROR@573: expected command, found TO_KW
+ERROR@576: expected command, found STDOUT_KW
+ERROR@654: expected select stmt
+ERROR@654: expected R_PAREN
+ERROR@654: expected SEMICOLON
+ERROR@693: expected SEMICOLON
+ERROR@693: expected command, found R_PAREN
+ERROR@695: expected command, found TO_KW
+ERROR@698: expected command, found STDOUT_KW
+ERROR@712: expected select stmt
+ERROR@712: expected R_PAREN
+ERROR@712: expected SEMICOLON
+ERROR@743: expected SEMICOLON
+ERROR@743: expected command, found R_PAREN
+ERROR@745: expected command, found TO_KW
+ERROR@748: expected command, found STDOUT_KW
+ERROR@762: expected select stmt
+ERROR@762: expected R_PAREN
+ERROR@762: expected SEMICOLON
+ERROR@786: expected SEMICOLON
+ERROR@786: expected command, found R_PAREN
+ERROR@788: expected command, found TO_KW
+ERROR@791: expected command, found STDOUT_KW
+ERROR@871: expected select stmt
+ERROR@871: expected R_PAREN
+ERROR@871: expected SEMICOLON
+ERROR@910: expected SEMICOLON
+ERROR@910: expected command, found R_PAREN
+ERROR@912: expected command, found TO_KW
+ERROR@915: expected command, found STDOUT_KW
+ERROR@1039: expected select stmt
+ERROR@1039: expected R_PAREN
+ERROR@1039: expected SEMICOLON
+ERROR@1078: expected SEMICOLON
+ERROR@1078: expected command, found R_PAREN
+ERROR@1080: expected command, found TO_KW
+ERROR@1083: expected command, found STDOUT_KW
+ERROR@1238: expected select stmt
+ERROR@1238: expected R_PAREN
+ERROR@1238: expected SEMICOLON
+ERROR@1277: expected SEMICOLON
+ERROR@1277: expected command, found R_PAREN
+ERROR@1279: expected command, found TO_KW
+ERROR@1282: expected command, found STDOUT_KW
+ERROR@1428: expected select stmt
+ERROR@1428: expected R_PAREN
+ERROR@1428: expected SEMICOLON
+ERROR@1467: expected SEMICOLON
+ERROR@1467: expected command, found R_PAREN
+ERROR@1469: expected command, found TO_KW
+ERROR@1472: expected command, found STDOUT_KW
+ERROR@1583: expected select stmt
+ERROR@1583: expected R_PAREN
+ERROR@1583: expected SEMICOLON
+ERROR@1614: expected SEMICOLON
+ERROR@1614: expected command, found R_PAREN
+ERROR@1616: expected command, found TO_KW
+ERROR@1619: expected command, found STDOUT_KW
+ERROR@1743: expected select stmt
+ERROR@1743: expected R_PAREN
+ERROR@1743: expected SEMICOLON
+ERROR@1774: expected SEMICOLON
+ERROR@1774: expected command, found R_PAREN
+ERROR@1776: expected command, found TO_KW
+ERROR@1779: expected command, found STDOUT_KW
+ERROR@1934: expected select stmt
+ERROR@1934: expected R_PAREN
+ERROR@1934: expected SEMICOLON
+ERROR@1965: expected SEMICOLON
+ERROR@1965: expected command, found R_PAREN
+ERROR@1967: expected command, found TO_KW
+ERROR@1970: expected command, found STDOUT_KW
+ERROR@2116: expected select stmt
+ERROR@2116: expected R_PAREN
+ERROR@2116: expected SEMICOLON
+ERROR@2147: expected SEMICOLON
+ERROR@2147: expected command, found R_PAREN
+ERROR@2149: expected command, found TO_KW
+ERROR@2152: expected command, found STDOUT_KW
+ERROR@2263: expected select stmt
+ERROR@2263: expected R_PAREN
+ERROR@2263: expected SEMICOLON
+ERROR@2287: expected SEMICOLON
+ERROR@2287: expected command, found R_PAREN
+ERROR@2289: expected command, found TO_KW
+ERROR@2292: expected command, found STDOUT_KW
+ERROR@2431: expected select stmt
+ERROR@2431: expected R_PAREN
+ERROR@2431: expected SEMICOLON
+ERROR@2455: expected SEMICOLON
+ERROR@2455: expected command, found R_PAREN
+ERROR@2457: expected command, found TO_KW
+ERROR@2460: expected command, found STDOUT_KW
+ERROR@2645: expected select stmt
+ERROR@2645: expected R_PAREN
+ERROR@2645: expected SEMICOLON
+ERROR@2669: expected SEMICOLON
+ERROR@2669: expected command, found R_PAREN
+ERROR@2671: expected command, found TO_KW
+ERROR@2674: expected command, found STDOUT_KW
+ERROR@2835: expected select stmt
+ERROR@2835: expected R_PAREN
+ERROR@2835: expected SEMICOLON
+ERROR@2859: expected SEMICOLON
+ERROR@2859: expected command, found R_PAREN
+ERROR@2861: expected command, found TO_KW
+ERROR@2864: expected command, found STDOUT_KW
+ERROR@2987: expected select stmt
+ERROR@2987: expected R_PAREN
+ERROR@2987: expected SEMICOLON
+ERROR@3026: expected SEMICOLON
+ERROR@3026: expected command, found R_PAREN
+ERROR@3028: expected command, found TO_KW
+ERROR@3031: expected command, found STDOUT_KW
+ERROR@3589: expected select stmt
+ERROR@3589: expected R_PAREN
+ERROR@3589: expected SEMICOLON
+ERROR@3643: expected SEMICOLON
+ERROR@3643: expected command, found R_PAREN
+ERROR@3645: expected command, found TO_KW
+ERROR@3648: expected command, found STDOUT_KW
+ERROR@3662: expected select stmt
+ERROR@3662: expected R_PAREN
+ERROR@3662: expected SEMICOLON
+ERROR@3720: expected SEMICOLON
+ERROR@3720: expected command, found R_PAREN
+ERROR@3722: expected command, found TO_KW
+ERROR@3725: expected command, found STDOUT_KW
+ERROR@3739: expected select stmt
+ERROR@3739: expected R_PAREN
+ERROR@3739: expected SEMICOLON
+ERROR@3790: expected SEMICOLON
+ERROR@3790: expected command, found R_PAREN
+ERROR@3792: expected command, found TO_KW
+ERROR@3795: expected command, found STDOUT_KW

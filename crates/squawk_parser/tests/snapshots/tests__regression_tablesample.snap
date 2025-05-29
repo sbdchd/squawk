@@ -1,0 +1,10 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/tablesample.sql
+---
+ERROR@3796: expected SEMICOLON
+ERROR@3797: expected command, found TABLESAMPLE_KW
+ERROR@3809: expected command, found IDENT
+ERROR@3819: expected command, found L_PAREN
+ERROR@3820: expected command, found INT_NUMBER
+ERROR@3821: expected command, found R_PAREN

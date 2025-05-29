@@ -1,0 +1,21 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/create_operator.sql
+---
+ERROR@1118: expected an expression, found SEMICOLON
+ERROR@2286: expected R_PAREN
+ERROR@2286: expected SEMICOLON
+ERROR@2287: expected command, found IDENT
+ERROR@2291: expected command, found COMMA
+ERROR@2296: expected command, found PROCEDURE_KW
+ERROR@2306: expected command, found EQ
+ERROR@2308: expected command, found IDENT
+ERROR@2318: expected command, found R_PAREN
+ERROR@2473: expected R_PAREN
+ERROR@2473: expected SEMICOLON
+ERROR@2474: expected command, found IDENT
+ERROR@2478: expected command, found COMMA
+ERROR@2483: expected command, found PROCEDURE_KW
+ERROR@2493: expected command, found EQ
+ERROR@2495: expected command, found IDENT
+ERROR@2505: expected command, found R_PAREN

@@ -1,0 +1,10 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/numerology.sql
+---
+ERROR@1750: missing comma
+ERROR@1203: Missing digits after the exponent symbol
+ERROR@1216: Missing digits after the exponent symbol
+ERROR@1292: Missing digits after the integer base prefix
+ERROR@1328: Missing digits after the integer base prefix
+ERROR@1364: Missing digits after the integer base prefix

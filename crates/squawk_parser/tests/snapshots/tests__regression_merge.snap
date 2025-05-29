@@ -1,0 +1,388 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/merge.sql
+---
+ERROR@1199: expected USING_KW
+ERROR@1209: expected ON_KW
+ERROR@1210: expected an expression, found USING_KW
+ERROR@1215: expected an expression
+ERROR@1215: expected WHEN_KW
+ERROR@1215: expected MATCHED, or NOT MATCHED
+ERROR@1215: expected THEN_KW
+ERROR@1215: expected INSERT, UPDATE, DELETE, or DO NOTHING
+ERROR@1215: expected SEMICOLON
+ERROR@1216: expected command, found SOURCE_KW
+ERROR@1223: expected command, found AS_KW
+ERROR@1226: expected command, found IDENT
+ERROR@1228: expected command, found ON_KW
+ERROR@1231: expected command, found IDENT
+ERROR@1232: expected command, found DOT
+ERROR@1233: expected command, found IDENT
+ERROR@1237: expected command, found EQ
+ERROR@1239: expected command, found IDENT
+ERROR@1240: expected command, found DOT
+ERROR@1241: expected command, found IDENT
+ERROR@1245: expected command, found WHEN_KW
+ERROR@1250: expected command, found MATCHED_KW
+ERROR@1258: expected command, found THEN_KW
+ERROR@1282: expected SET_KW
+ERROR@1282: expected name
+ERROR@1680: expected VALUES or DEFAULT VALUES
+ERROR@1680: expected SEMICOLON
+ERROR@1681: expected command, found INTO_KW
+ERROR@1686: expected command, found TARGET_KW
+ERROR@1693: expected command, found DEFAULT_KW
+ERROR@1707: expected L_PAREN
+ERROR@1735: expected L_PAREN
+ERROR@1741: expected L_PAREN
+ERROR@1746: expected L_PAREN
+ERROR@1753: expected L_PAREN
+ERROR@1755: expected L_PAREN
+ERROR@1761: expected L_PAREN
+ERROR@1768: expected L_PAREN
+ERROR@1771: expected L_PAREN
+ERROR@1773: expected L_PAREN
+ERROR@1776: expected L_PAREN
+ERROR@1777: expected L_PAREN
+ERROR@1778: expected L_PAREN
+ERROR@1782: expected L_PAREN
+ERROR@1784: expected L_PAREN
+ERROR@1785: expected L_PAREN
+ERROR@1786: expected L_PAREN
+ERROR@1790: expected L_PAREN
+ERROR@1795: expected L_PAREN
+ERROR@1799: expected L_PAREN
+ERROR@1807: expected L_PAREN
+ERROR@1813: expected L_PAREN
+ERROR@1820: expected L_PAREN
+ERROR@1952: expected VALUES or DEFAULT VALUES
+ERROR@1952: expected SEMICOLON
+ERROR@2336: expected SET_KW
+ERROR@2343: expected EQ
+ERROR@2347: expected SEMICOLON
+ERROR@2348: expected command, found IDENT
+ERROR@2356: expected command, found EQ
+ERROR@2358: expected command, found INT_NUMBER
+ERROR@2651: expected select stmt
+ERROR@2651: expected R_PAREN
+ERROR@2651: expected SEMICOLON
+ERROR@2721: expected SEMICOLON
+ERROR@2722: expected command, found R_PAREN
+ERROR@2724: expected command, found TO_KW
+ERROR@2727: expected command, found STDOUT_KW
+ERROR@22860: expected IDENT
+ERROR@22860: expected SEMICOLON
+ERROR@22861: expected command, found ACTION_KW
+ERROR@22867: expected command, found COMMA
+ERROR@22879: expected command, found OLD_KW
+ERROR@22882: expected command, found DOT
+ERROR@22883: expected command, found IDENT
+ERROR@22887: expected command, found AS_KW
+ERROR@22890: expected command, found IDENT
+ERROR@22897: expected command, found COMMA
+ERROR@22899: expected command, found OLD_KW
+ERROR@22902: expected command, found DOT
+ERROR@22903: expected command, found IDENT
+ERROR@22911: expected command, found AS_KW
+ERROR@22914: expected command, found IDENT
+ERROR@22925: expected command, found COMMA
+ERROR@22937: expected command, found NEW_KW
+ERROR@22940: expected command, found DOT
+ERROR@22941: expected command, found IDENT
+ERROR@22945: expected command, found AS_KW
+ERROR@22948: expected command, found IDENT
+ERROR@22955: expected command, found COMMA
+ERROR@22957: expected command, found NEW_KW
+ERROR@22960: expected command, found DOT
+ERROR@22961: expected command, found IDENT
+ERROR@22969: expected command, found AS_KW
+ERROR@22972: expected command, found IDENT
+ERROR@22983: expected command, found COMMA
+ERROR@23046: expected SEMICOLON
+ERROR@23046: expected command, found COMMA
+ERROR@23048: expected command, found IDENT
+ERROR@23049: expected command, found DOT
+ERROR@23050: expected command, found STAR
+ERROR@23051: expected command, found COMMA
+ERROR@23063: expected command, found CASE_KW
+ERROR@23068: expected command, found MERGE_ACTION_KW
+ERROR@23080: expected command, found L_PAREN
+ERROR@23081: expected command, found R_PAREN
+ERROR@23097: expected command, found WHEN_KW
+ERROR@23102: expected command, found STRING
+ERROR@23111: expected command, found THEN_KW
+ERROR@23116: expected command, found STRING
+ERROR@23127: expected command, found PIPE
+ERROR@23128: expected command, found PIPE
+ERROR@23129: expected command, found IDENT
+ERROR@23145: expected command, found WHEN_KW
+ERROR@23150: expected command, found STRING
+ERROR@23159: expected command, found THEN_KW
+ERROR@23164: expected command, found STRING
+ERROR@23172: expected command, found PIPE
+ERROR@23173: expected command, found PIPE
+ERROR@23174: expected command, found IDENT
+ERROR@23179: expected command, found PIPE
+ERROR@23180: expected command, found PIPE
+ERROR@23181: expected command, found STRING
+ERROR@23209: expected command, found WHEN_KW
+ERROR@23214: expected command, found STRING
+ERROR@23223: expected command, found THEN_KW
+ERROR@23228: expected command, found STRING
+ERROR@23238: expected command, found PIPE
+ERROR@23239: expected command, found PIPE
+ERROR@23240: expected command, found IDENT
+ERROR@23255: expected SEMICOLON
+ERROR@23256: expected command, found AS_KW
+ERROR@23259: expected command, found IDENT
+ERROR@23931: expected IDENT
+ERROR@23931: expected R_PAREN
+ERROR@23931: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: ACTION_KW
+ERROR@23932: expected command, found ACTION_KW
+ERROR@23938: expected command, found COMMA
+ERROR@23940: expected command, found OLD_KW
+ERROR@23944: expected command, found AS_KW
+ERROR@23947: expected command, found IDENT
+ERROR@23955: expected command, found COMMA
+ERROR@23957: expected command, found NEW_KW
+ERROR@23961: expected command, found AS_KW
+ERROR@23964: expected command, found IDENT
+ERROR@23972: expected command, found COMMA
+ERROR@23974: expected command, found IDENT
+ERROR@23975: expected command, found DOT
+ERROR@23976: expected command, found STAR
+ERROR@23977: expected command, found COMMA
+ERROR@23993: expected command, found CASE_KW
+ERROR@23998: expected command, found MERGE_ACTION_KW
+ERROR@24010: expected command, found L_PAREN
+ERROR@24011: expected command, found R_PAREN
+ERROR@24031: expected command, found WHEN_KW
+ERROR@24036: expected command, found STRING
+ERROR@24045: expected command, found THEN_KW
+ERROR@24050: expected command, found STRING
+ERROR@24061: expected command, found PIPE
+ERROR@24062: expected command, found PIPE
+ERROR@24063: expected command, found IDENT
+ERROR@24083: expected command, found WHEN_KW
+ERROR@24088: expected command, found STRING
+ERROR@24097: expected command, found THEN_KW
+ERROR@24102: expected command, found STRING
+ERROR@24110: expected command, found PIPE
+ERROR@24111: expected command, found PIPE
+ERROR@24112: expected command, found IDENT
+ERROR@24117: expected command, found PIPE
+ERROR@24118: expected command, found PIPE
+ERROR@24119: expected command, found STRING
+ERROR@24151: expected command, found WHEN_KW
+ERROR@24156: expected command, found STRING
+ERROR@24165: expected command, found THEN_KW
+ERROR@24170: expected command, found STRING
+ERROR@24180: expected command, found PIPE
+ERROR@24181: expected command, found PIPE
+ERROR@24182: expected command, found IDENT
+ERROR@24201: expected SEMICOLON
+ERROR@24202: expected command, found AS_KW
+ERROR@24205: expected command, found IDENT
+ERROR@24217: expected command, found R_PAREN
+ERROR@24218: expected command, found COMMA
+ERROR@24220: expected command, found IDENT
+ERROR@24223: expected command, found AS_KW
+ERROR@24226: expected command, found L_PAREN
+ERROR@24518: expected SEMICOLON
+ERROR@24519: expected command, found R_PAREN
+ERROR@24648: expected select stmt
+ERROR@24648: expected R_PAREN
+ERROR@24648: expected SEMICOLON
+ERROR@24974: expected SEMICOLON
+ERROR@24975: expected command, found R_PAREN
+ERROR@24977: expected command, found TO_KW
+ERROR@24980: expected command, found STDOUT_KW
+ERROR@41486: expected ON_KW
+ERROR@41493: expected WHEN_KW
+ERROR@41493: expected MATCHED, or NOT MATCHED
+ERROR@41493: expected THEN_KW
+ERROR@41493: expected INSERT, UPDATE, DELETE, or DO NOTHING
+ERROR@41493: expected SEMICOLON
+ERROR@41494: expected command, found JOIN_KW
+ERROR@41499: expected command, found IDENT
+ERROR@41510: expected command, found IDENT
+ERROR@41513: expected command, found ON_KW
+ERROR@41516: expected command, found IDENT
+ERROR@41521: expected command, found EQ
+ERROR@41523: expected command, found IDENT
+ERROR@41528: expected command, found ON_KW
+ERROR@41531: expected command, found IDENT
+ERROR@41532: expected command, found DOT
+ERROR@41533: expected command, found IDENT
+ERROR@41537: expected command, found EQ
+ERROR@41539: expected command, found IDENT
+ERROR@41544: expected command, found WHEN_KW
+ERROR@41549: expected command, found NOT_KW
+ERROR@41553: expected command, found MATCHED_KW
+ERROR@41561: expected command, found THEN_KW
+ERROR@41573: expected INTO_KW
+ERROR@41600: expected select stmt
+ERROR@41706: expected ON_KW
+ERROR@41713: expected WHEN_KW
+ERROR@41713: expected MATCHED, or NOT MATCHED
+ERROR@41713: expected THEN_KW
+ERROR@41713: expected INSERT, UPDATE, DELETE, or DO NOTHING
+ERROR@41713: expected SEMICOLON
+ERROR@41714: expected command, found JOIN_KW
+ERROR@41719: expected command, found IDENT
+ERROR@41730: expected command, found IDENT
+ERROR@41733: expected command, found ON_KW
+ERROR@41736: expected command, found IDENT
+ERROR@41741: expected command, found EQ
+ERROR@41743: expected command, found IDENT
+ERROR@41748: expected command, found AND_KW
+ERROR@41752: expected command, found IDENT
+ERROR@41757: expected command, found EQ
+ERROR@41759: expected command, found INT_NUMBER
+ERROR@41762: expected command, found ON_KW
+ERROR@41765: expected command, found IDENT
+ERROR@41766: expected command, found DOT
+ERROR@41767: expected command, found IDENT
+ERROR@41771: expected command, found EQ
+ERROR@41773: expected command, found IDENT
+ERROR@41778: expected command, found WHEN_KW
+ERROR@41783: expected command, found NOT_KW
+ERROR@41787: expected command, found MATCHED_KW
+ERROR@41795: expected command, found THEN_KW
+ERROR@41807: expected INTO_KW
+ERROR@41834: expected select stmt
+ERROR@41834: expected SEMICOLON
+ERROR@41835: expected command, found WHEN_KW
+ERROR@41840: expected command, found MATCHED_KW
+ERROR@41848: expected command, found THEN_KW
+ERROR@41860: expected FROM_KW
+ERROR@41860: expected path name
+ERROR@41953: expected ON_KW
+ERROR@41960: expected WHEN_KW
+ERROR@41960: expected MATCHED, or NOT MATCHED
+ERROR@41960: expected THEN_KW
+ERROR@41960: expected INSERT, UPDATE, DELETE, or DO NOTHING
+ERROR@41960: expected SEMICOLON
+ERROR@41961: expected command, found JOIN_KW
+ERROR@41966: expected command, found IDENT
+ERROR@41977: expected command, found IDENT
+ERROR@41980: expected command, found ON_KW
+ERROR@41983: expected command, found IDENT
+ERROR@41988: expected command, found EQ
+ERROR@41990: expected command, found IDENT
+ERROR@41995: expected command, found ON_KW
+ERROR@41998: expected command, found IDENT
+ERROR@41999: expected command, found DOT
+ERROR@42000: expected command, found IDENT
+ERROR@42004: expected command, found EQ
+ERROR@42006: expected command, found IDENT
+ERROR@42011: expected command, found WHEN_KW
+ERROR@42016: expected command, found NOT_KW
+ERROR@42020: expected command, found MATCHED_KW
+ERROR@42028: expected command, found THEN_KW
+ERROR@42040: expected INTO_KW
+ERROR@42060: expected R_PAREN
+ERROR@42060: expected select stmt
+ERROR@42060: expected SEMICOLON
+ERROR@42061: expected command, found PLUS
+ERROR@42063: expected command, found IDENT
+ERROR@42067: expected command, found COMMA
+ERROR@42069: expected command, found IDENT
+ERROR@42073: expected command, found R_PAREN
+ERROR@42075: expected command, found WHEN_KW
+ERROR@42080: expected command, found MATCHED_KW
+ERROR@42088: expected command, found THEN_KW
+ERROR@42108: expected SET_KW
+ERROR@42108: expected name
+ERROR@42182: expected ON_KW
+ERROR@42189: expected WHEN_KW
+ERROR@42189: expected MATCHED, or NOT MATCHED
+ERROR@42189: expected THEN_KW
+ERROR@42189: expected INSERT, UPDATE, DELETE, or DO NOTHING
+ERROR@42189: expected SEMICOLON
+ERROR@42190: expected command, found JOIN_KW
+ERROR@42195: expected command, found IDENT
+ERROR@42206: expected command, found IDENT
+ERROR@42209: expected command, found ON_KW
+ERROR@42212: expected command, found IDENT
+ERROR@42217: expected command, found EQ
+ERROR@42219: expected command, found IDENT
+ERROR@42224: expected command, found AND_KW
+ERROR@42228: expected command, found IDENT
+ERROR@42233: expected command, found EQ
+ERROR@42235: expected command, found INT_NUMBER
+ERROR@42238: expected command, found ON_KW
+ERROR@42241: expected command, found IDENT
+ERROR@42242: expected command, found DOT
+ERROR@42243: expected command, found IDENT
+ERROR@42247: expected command, found EQ
+ERROR@42249: expected command, found IDENT
+ERROR@42254: expected command, found WHEN_KW
+ERROR@42259: expected command, found MATCHED_KW
+ERROR@42267: expected command, found THEN_KW
+ERROR@42287: expected SET_KW
+ERROR@42287: expected name
+ERROR@42477: expected ON_KW
+ERROR@42483: expected WHEN_KW
+ERROR@42483: expected MATCHED, or NOT MATCHED
+ERROR@42483: expected THEN_KW
+ERROR@42483: expected INSERT, UPDATE, DELETE, or DO NOTHING
+ERROR@42483: expected SEMICOLON
+ERROR@42484: expected command, found JOIN_KW
+ERROR@42489: expected command, found IDENT
+ERROR@42500: expected command, found IDENT
+ERROR@42504: expected command, found ON_KW
+ERROR@42507: expected command, found IDENT
+ERROR@42509: expected command, found DOT
+ERROR@42510: expected command, found IDENT
+ERROR@42515: expected command, found EQ
+ERROR@42517: expected command, found IDENT
+ERROR@42520: expected command, found DOT
+ERROR@42521: expected command, found IDENT
+ERROR@42526: expected command, found STAR
+ERROR@42528: expected command, found INT_NUMBER
+ERROR@42531: expected command, found ON_KW
+ERROR@42534: expected command, found IDENT
+ERROR@42535: expected command, found DOT
+ERROR@42536: expected command, found IDENT
+ERROR@42540: expected command, found EQ
+ERROR@42542: expected command, found IDENT
+ERROR@42544: expected command, found DOT
+ERROR@42545: expected command, found IDENT
+ERROR@42550: expected command, found WHEN_KW
+ERROR@42555: expected command, found NOT_KW
+ERROR@42559: expected command, found MATCHED_KW
+ERROR@42567: expected command, found THEN_KW
+ERROR@42579: expected INTO_KW
+ERROR@42579: expected path name
+ERROR@42827: expected ON_KW
+ERROR@42834: expected WHEN_KW
+ERROR@42834: expected MATCHED, or NOT MATCHED
+ERROR@42834: expected THEN_KW
+ERROR@42834: expected INSERT, UPDATE, DELETE, or DO NOTHING
+ERROR@42834: expected SEMICOLON
+ERROR@42835: expected command, found JOIN_KW
+ERROR@42840: expected command, found IDENT
+ERROR@42851: expected command, found IDENT
+ERROR@42854: expected command, found ON_KW
+ERROR@42857: expected command, found IDENT
+ERROR@42859: expected command, found DOT
+ERROR@42860: expected command, found IDENT
+ERROR@42864: expected command, found EQ
+ERROR@42866: expected command, found IDENT
+ERROR@42868: expected command, found DOT
+ERROR@42869: expected command, found IDENT
+ERROR@42873: expected command, found ON_KW
+ERROR@42876: expected command, found IDENT
+ERROR@42877: expected command, found DOT
+ERROR@42878: expected command, found IDENT
+ERROR@42882: expected command, found EQ
+ERROR@42884: expected command, found IDENT
+ERROR@42886: expected command, found DOT
+ERROR@42887: expected command, found IDENT
+ERROR@42891: expected command, found WHEN_KW
+ERROR@42896: expected command, found NOT_KW
+ERROR@42900: expected command, found MATCHED_KW
+ERROR@42908: expected command, found THEN_KW
+ERROR@42920: expected INTO_KW
+ERROR@42949: expected select stmt

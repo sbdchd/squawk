@@ -4163,8 +4163,8 @@ const EXPR_FIRST: TokenSet = LHS_FIRST;
 const ATTRIBUTE_FIRST: TokenSet = TokenSet::new(&[POUND, GROUP_KW]);
 
 const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
-    FROM_KW, WHERE_KW, LIMIT_KW, ORDER_KW, OFFSET_KW, GROUP_KW, HAVING_KW, WINDOW_KW, HAVING_KW,
-    FETCH_KW, FOR_KW, R_PAREN, R_BRACK,
+    SELECT_KW, FROM_KW, WHERE_KW, LIMIT_KW, ORDER_KW, OFFSET_KW, GROUP_KW, INTO_KW, HAVING_KW,
+    WINDOW_KW, HAVING_KW, FETCH_KW, FOR_KW, R_PAREN, R_BRACK,
 ])
 .union(COMPOUND_SELECT_FIRST);
 
@@ -4216,7 +4216,7 @@ fn opt_as_col_label(p: &mut Parser<'_>) -> bool {
 }
 
 fn opt_target_list(p: &mut Parser) -> Option<CompletedMarker> {
-    if !p.at_ts(TARGET_LIST_START) || p.at(SELECT_KW) {
+    if !p.at_ts(TARGET_LIST_START) || p.at_ts(TARGET_FOLLOW) {
         return None;
     }
     let m = p.start();

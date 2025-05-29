@@ -1,0 +1,47 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/jsonb.sql
+---
+ERROR@4490: expected FROM_KW
+ERROR@4490: expected L_PAREN
+ERROR@4492: expected call expression
+ERROR@4492: expected R_PAREN
+ERROR@4591: expected FROM_KW
+ERROR@4591: expected L_PAREN
+ERROR@4593: expected call expression
+ERROR@4593: expected R_PAREN
+ERROR@63353: expected EQ
+ERROR@63488: expected EQ
+ERROR@63609: expected EQ
+ERROR@63726: expected EQ
+ERROR@63851: expected EQ
+ERROR@64241: expected EQ
+ERROR@64296: expected EQ
+ERROR@64473: expected EQ
+ERROR@64640: expected EQ
+ERROR@64839: expected EQ
+ERROR@64928: expected EQ
+ERROR@65018: expected EQ
+ERROR@65229: expected EQ
+ERROR@65428: expected EQ
+ERROR@65620: expected EQ
+ERROR@65873: expected EQ
+ERROR@66121: expected EQ
+ERROR@66331: expected EQ
+ERROR@66388: expected EQ
+ERROR@66599: expected EQ
+ERROR@66661: expected EQ
+ERROR@66846: expected EQ
+ERROR@66904: expected EQ
+ERROR@67084: expected EQ
+ERROR@67147: expected EQ
+ERROR@67363: expected EQ
+ERROR@67559: expected EQ
+ERROR@67831: expected EQ
+ERROR@67890: expected EQ
+ERROR@67954: expected EQ
+ERROR@68011: expected EQ
+ERROR@68073: expected EQ
+ERROR@68291: expected EQ
+ERROR@68343: expected EQ
+ERROR@68817: expected EQ

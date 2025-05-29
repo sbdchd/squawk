@@ -4,7 +4,7 @@ use dir_test::{dir_test, Fixture};
 use insta::{assert_snapshot, with_settings};
 use squawk_parser::{parse, LexedStr};
 use std::fmt::Write;
-use std::fs::remove_file;
+use xshell::{cmd, Shell};
 
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/data/ok",
@@ -19,7 +19,7 @@ fn parser_ok(fixture: Fixture<&str>) {
         .and_then(|x| x.strip_suffix(".sql"))
         .unwrap();
 
-    let (parsed, has_errors) = parse_text(content);
+    let (parsed, errors) = parse_text(content);
 
     with_settings!({
       omit_expression => true,
@@ -31,7 +31,7 @@ fn parser_ok(fixture: Fixture<&str>) {
     // We check that all of our tests in `ok` also pass the Postgres parser,
     // if they don't, they should be moved to the `err` directory.
     assert!(
-        !has_errors,
+        errors.is_empty(),
         "tests defined in the `ok` can't have parser errors."
     );
     // skipping pg17 specific stuff since our parser isn't using the latest parser
@@ -60,7 +60,7 @@ fn parser_err(fixture: Fixture<&str>) {
         .and_then(|x| x.strip_suffix(".sql"))
         .unwrap();
 
-    let (parsed, has_errors) = parse_text(content);
+    let (parsed, errors) = parse_text(content);
 
     with_settings!({
       omit_expression => true,
@@ -70,7 +70,7 @@ fn parser_err(fixture: Fixture<&str>) {
     });
 
     assert!(
-        has_errors,
+        !errors.is_empty(),
         "tests defined in the `err` directory must have parser errors."
     );
 }
@@ -79,9 +79,6 @@ fn parser_err(fixture: Fixture<&str>) {
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/data/regression_suite",
     glob: "*.sql",
-)]
-#[dir_test_attr(
-    #[ignore]
 )]
 fn regression_suite(fixture: Fixture<&str>) {
     let content = fixture.content();
@@ -92,28 +89,41 @@ fn regression_suite(fixture: Fixture<&str>) {
         .and_then(|x| x.strip_suffix(".sql"))
         .unwrap();
 
-    let (parsed, has_errors) = parse_text(content);
+    let (_parsed, errors) = parse_text(content);
 
-    if has_errors {
+    if !errors.is_empty() {
         with_settings!({
           omit_expression => true,
-          input_file => input_file,
-          snapshot_path => "snapshots/regression_suite",
+          input_file => input_file
         }, {
-          assert_snapshot!(test_name, parsed);
+          assert_snapshot!(format!("regression_{}", test_name), errors.join(""));
         });
-    } else {
-        let snapshot_path = Utf8Path::new("tests/snapshots/regression_suite")
-            .join(format!("tests__{}.snap", test_name));
-        let new_snapshot_path = Utf8Path::new("tests/snapshots/regression_suite")
-            .join(format!("tests__{}.snap.new", test_name));
-
-        let _ = remove_file(snapshot_path);
-        let _ = remove_file(new_snapshot_path);
     }
 }
 
-fn parse_text(text: &str) -> (String, bool) {
+// Trying to burn down the errors in the postgres regression suite
+#[test]
+fn regression_suite_errors() {
+    let sh = Shell::new().unwrap();
+    sh.change_dir(env!("CARGO_MANIFEST_DIR"));
+
+    let output = cmd!(sh, "rg -c ERROR tests/snapshots")
+        .ignore_status()
+        .read()
+        .expect("Failed to execute ripgrep command");
+
+    let mut out = vec![];
+    for l in output.lines() {
+        // over other tests that should have errors
+        if l.contains("regression") {
+            out.push(l);
+        }
+    }
+    out.sort();
+    assert_snapshot!(out.join("\n"));
+}
+
+fn parse_text(text: &str) -> (String, Vec<std::string::String>) {
     let lexed = LexedStr::new(text);
     let input = lexed.to_input();
     let output = parse(&input);
@@ -161,12 +171,11 @@ fn parse_text(text: &str) -> (String, bool) {
         errors.push(format!("{err}@{pos}: {msg}\n"));
     }
 
-    let has_errors = !errors.is_empty();
-    if has_errors {
+    if !errors.is_empty() {
         buf.push_str("---\n");
-        for e in errors {
+        for e in &errors {
             buf.push_str(&e);
         }
     }
-    (buf, has_errors)
+    (buf, errors)
 }

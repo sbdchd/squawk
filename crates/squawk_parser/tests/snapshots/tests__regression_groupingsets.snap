@@ -1,0 +1,101 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/groupingsets.sql
+---
+ERROR@218: expected SELECT, got VALUES
+ERROR@389: expected command, found INT_NUMBER
+ERROR@391: expected command, found INT_NUMBER
+ERROR@393: expected command, found INT_NUMBER
+ERROR@395: expected command, found INT_NUMBER
+ERROR@397: expected command, found INT_NUMBER
+ERROR@399: expected command, found INT_NUMBER
+ERROR@401: expected command, found INT_NUMBER
+ERROR@403: expected command, found INT_NUMBER
+ERROR@405: expected command, found INT_NUMBER
+ERROR@407: expected command, found INT_NUMBER
+ERROR@409: expected command, found INT_NUMBER
+ERROR@411: expected command, found INT_NUMBER
+ERROR@413: expected command, found INT_NUMBER
+ERROR@415: expected command, found INT_NUMBER
+ERROR@417: expected command, found INT_NUMBER
+ERROR@419: expected command, found INT_NUMBER
+ERROR@421: expected command, found INT_NUMBER
+ERROR@423: expected command, found INT_NUMBER
+ERROR@425: expected command, found INT_NUMBER
+ERROR@427: expected command, found INT_NUMBER
+ERROR@429: expected command, found INT_NUMBER
+ERROR@431: expected command, found INT_NUMBER
+ERROR@433: expected command, found INT_NUMBER
+ERROR@435: expected command, found INT_NUMBER
+ERROR@437: expected command, found INT_NUMBER
+ERROR@439: expected command, found INT_NUMBER
+ERROR@441: expected command, found INT_NUMBER
+ERROR@443: expected command, found INT_NUMBER
+ERROR@445: expected command, found INT_NUMBER
+ERROR@447: expected command, found INT_NUMBER
+ERROR@449: expected command, found INT_NUMBER
+ERROR@451: expected command, found INT_NUMBER
+ERROR@453: expected command, found INT_NUMBER
+ERROR@455: expected command, found INT_NUMBER
+ERROR@457: expected command, found INT_NUMBER
+ERROR@459: expected command, found INT_NUMBER
+ERROR@461: expected command, found INT_NUMBER
+ERROR@463: expected command, found INT_NUMBER
+ERROR@465: expected command, found INT_NUMBER
+ERROR@467: expected command, found INT_NUMBER
+ERROR@469: expected command, found INT_NUMBER
+ERROR@471: expected command, found INT_NUMBER
+ERROR@473: expected command, found INT_NUMBER
+ERROR@475: expected command, found INT_NUMBER
+ERROR@477: expected command, found INT_NUMBER
+ERROR@479: expected command, found INT_NUMBER
+ERROR@481: expected command, found INT_NUMBER
+ERROR@483: expected command, found INT_NUMBER
+ERROR@485: expected command, found INT_NUMBER
+ERROR@487: expected command, found INT_NUMBER
+ERROR@489: expected command, found INT_NUMBER
+ERROR@491: expected command, found INT_NUMBER
+ERROR@493: expected command, found INT_NUMBER
+ERROR@495: expected command, found INT_NUMBER
+ERROR@497: expected command, found INT_NUMBER
+ERROR@499: expected command, found INT_NUMBER
+ERROR@501: expected command, found INT_NUMBER
+ERROR@503: expected command, found INT_NUMBER
+ERROR@505: expected command, found INT_NUMBER
+ERROR@507: expected command, found INT_NUMBER
+ERROR@509: expected command, found INT_NUMBER
+ERROR@511: expected command, found INT_NUMBER
+ERROR@513: expected command, found INT_NUMBER
+ERROR@515: expected command, found INT_NUMBER
+ERROR@517: expected command, found INT_NUMBER
+ERROR@519: expected command, found INT_NUMBER
+ERROR@521: expected command, found INT_NUMBER
+ERROR@523: expected command, found INT_NUMBER
+ERROR@525: expected command, found INT_NUMBER
+ERROR@527: expected command, found INT_NUMBER
+ERROR@529: expected command, found INT_NUMBER
+ERROR@531: expected command, found INT_NUMBER
+ERROR@631: expected command, found INT_NUMBER
+ERROR@633: expected command, found INT_NUMBER
+ERROR@635: expected command, found INT_NUMBER
+ERROR@637: expected command, found INT_NUMBER
+ERROR@639: expected command, found INT_NUMBER
+ERROR@641: expected command, found INT_NUMBER
+ERROR@643: expected command, found INT_NUMBER
+ERROR@645: expected command, found INT_NUMBER
+ERROR@2762: expected COMMA
+ERROR@2780: expected COMMA
+ERROR@2875: expected COMMA
+ERROR@2893: expected COMMA
+ERROR@2990: expected COMMA
+ERROR@3015: expected COMMA
+ERROR@3114: expected COMMA
+ERROR@3212: expected COMMA
+ERROR@3308: expected COMMA
+ERROR@3402: expected COMMA
+ERROR@3419: expected COMMA
+ERROR@3512: expected COMMA
+ERROR@3529: expected COMMA
+ERROR@3546: expected COMMA
+ERROR@3574: expected COMMA
+ERROR@3684: expected COMMA

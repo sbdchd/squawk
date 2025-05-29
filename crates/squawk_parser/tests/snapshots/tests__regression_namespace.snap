@@ -1,0 +1,11 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/namespace.sql
+---
+ERROR@253: expected SEMICOLON
+ERROR@301: expected SEMICOLON
+ERROR@382: expected SEMICOLON
+ERROR@1810: expected SEMICOLON
+ERROR@2810: expected SEMICOLON
+ERROR@2810: expected command, found DOT
+ERROR@2811: expected command, found IDENT

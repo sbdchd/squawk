@@ -1,0 +1,8 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/subscription.sql
+---
+ERROR@386: expected PUBLICATION_KW
+ERROR@386: expected name
+ERROR@448: expected CONNECTION_KW
+ERROR@448: expected string literal

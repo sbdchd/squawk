@@ -1,0 +1,96 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/foreign_key.sql
+---
+ERROR@273: expected NULL_KW
+ERROR@273: expected R_PAREN
+ERROR@273: expected SEMICOLON
+ERROR@274: expected command, found ENFORCED_KW
+ERROR@282: expected command, found COMMA
+ERROR@292: expected command, found IDENT
+ERROR@299: expected command, found INT_KW
+ERROR@303: expected command, found R_PAREN
+ERROR@752: expected SEMICOLON
+ERROR@753: expected command, found ENFORCED_KW
+ERROR@989: expected SEMICOLON
+ERROR@990: expected command, found ENFORCED_KW
+ERROR@7716: expected SEMICOLON
+ERROR@7717: expected command, found NOT_KW
+ERROR@7721: expected command, found ENFORCED_KW
+ERROR@7956: expected SEMICOLON
+ERROR@7957: expected command, found NOT_KW
+ERROR@7961: expected command, found ENFORCED_KW
+ERROR@8240: expected SEMICOLON
+ERROR@8241: expected command, found ENFORCED_KW
+ERROR@8457: expected SEMICOLON
+ERROR@8458: expected command, found NOT_KW
+ERROR@8462: expected command, found ENFORCED_KW
+ERROR@8471: expected command, found NOT_KW
+ERROR@8475: expected command, found DEFERRABLE_KW
+ERROR@32902: expected SEMICOLON
+ERROR@32903: expected command, found NOT_KW
+ERROR@32907: expected command, found ENFORCED_KW
+ERROR@33284: constraint declared INITIALLY DEFERRED must be DEFERRABLE
+ERROR@33338: expected SEMICOLON
+ERROR@33339: expected command, found NO_KW
+ERROR@33342: expected command, found INHERIT_KW
+ERROR@33403: expected SEMICOLON
+ERROR@33404: expected command, found NOT_KW
+ERROR@33408: expected command, found VALID_KW
+ERROR@33467: expected SEMICOLON
+ERROR@33468: expected command, found ENFORCED_KW
+ERROR@33477: expected command, found NOT_KW
+ERROR@33481: expected command, found ENFORCED_KW
+ERROR@33544: expected R_PAREN
+ERROR@33544: expected SEMICOLON
+ERROR@33545: expected command, found ENFORCED_KW
+ERROR@33554: expected command, found NOT_KW
+ERROR@33558: expected command, found ENFORCED_KW
+ERROR@33566: expected command, found R_PAREN
+ERROR@39895: expected VALID_KW
+ERROR@39895: expected SEMICOLON
+ERROR@39896: expected command, found ENFORCED_KW
+ERROR@40180: expected VALID_KW
+ERROR@40180: expected SEMICOLON
+ERROR@40181: expected command, found ENFORCED_KW
+ERROR@40375: expected SEMICOLON
+ERROR@40376: expected command, found ENFORCED_KW
+ERROR@43083: expected SEMICOLON
+ERROR@43084: expected command, found NOT_KW
+ERROR@43088: expected command, found ENFORCED_KW
+ERROR@43592: expected SEMICOLON
+ERROR@43593: expected command, found ENFORCED_KW
+ERROR@54108: expected R_PAREN
+ERROR@54108: expected SEMICOLON
+ERROR@54109: expected command, found NOT_KW
+ERROR@54113: expected command, found ENFORCED_KW
+ERROR@54121: expected command, found R_PAREN
+ERROR@54469: expected SEMICOLON
+ERROR@54470: expected command, found ENFORCED_KW
+ERROR@54695: expected SEMICOLON
+ERROR@54696: expected command, found NOT_KW
+ERROR@54700: expected command, found ENFORCED_KW
+ERROR@65605: expected SEMICOLON
+ERROR@65605: expected command, found DOT
+ERROR@65606: expected command, found IDENT
+ERROR@66338: expected DEFAULT_KW
+ERROR@66338: expected SEMICOLON
+ERROR@66338: expected command, found DOT
+ERROR@66339: expected command, found IDENT
+ERROR@66351: expected command, found FOR_KW
+ERROR@66362: expected L_PAREN
+ERROR@66561: expected SEMICOLON
+ERROR@66561: expected command, found DOT
+ERROR@66562: expected command, found IDENT
+ERROR@84744: expected DEFAULT_KW
+ERROR@84744: expected SEMICOLON
+ERROR@84744: expected command, found DOT
+ERROR@84745: expected command, found IDENT
+ERROR@84750: expected command, found FOR_KW
+ERROR@84761: expected L_PAREN
+ERROR@84913: expected DEFAULT_KW
+ERROR@84913: expected SEMICOLON
+ERROR@84913: expected command, found DOT
+ERROR@84914: expected command, found IDENT
+ERROR@84919: expected command, found FOR_KW
+ERROR@84930: expected L_PAREN
