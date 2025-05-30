@@ -1,0 +1,14 @@
+---
+source: crates/squawk_linter/src/rules/adding_not_null_field.rs
+expression: errors
+---
+[
+    Violation {
+        code: AddingNotNullableField,
+        message: "Setting a column `NOT NULL` blocks reads while the table is scanned.",
+        text_range: 78..90,
+        help: Some(
+            "Make the field nullable and use a `CHECK` constraint instead.",
+        ),
+    },
+]
