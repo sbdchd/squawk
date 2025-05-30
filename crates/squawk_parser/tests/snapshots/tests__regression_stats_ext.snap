@@ -6,14 +6,6 @@ ERROR@876: expected FROM_KW
 ERROR@876: expected path name
 ERROR@907: expected FROM_KW
 ERROR@907: expected path name
-ERROR@1972: expected STORED_KW
-ERROR@1972: expected R_PAREN
-ERROR@1972: expected SEMICOLON
-ERROR@1973: expected command, found VIRTUAL_KW
-ERROR@1980: expected command, found COMMA
-ERROR@1982: expected command, found IDENT
-ERROR@1984: expected command, found IDENT
-ERROR@1987: expected command, found R_PAREN
 ERROR@4859: expected OWNER, RENAME, or SET
 ERROR@4859: expected SEMICOLON
 ERROR@4860: expected command, found EXISTS_KW

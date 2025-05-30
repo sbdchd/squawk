@@ -703,80 +703,45 @@ ERROR@21261: expected SEMICOLON
 ERROR@21262: expected command, found ERROR
 ERROR@21432: expected SEMICOLON
 ERROR@21433: expected command, found ERROR
-ERROR@22242: expected SEMICOLON
-ERROR@22242: expected command, found COMMA
-ERROR@22245: expected command, found INHERIT_KW
-ERROR@22253: expected command, found TRUE_KW
-ERROR@22257: expected command, found COMMA
-ERROR@22263: expected name
-ERROR@22263: expected EQ
-ERROR@22268: expected SEMICOLON
-ERROR@22270: expected command, found GRANTED_KW
-ERROR@22278: expected command, found BY_KW
-ERROR@22281: expected command, found IDENT
-ERROR@22357: expected SEMICOLON
-ERROR@22357: expected command, found COMMA
-ERROR@22360: expected command, found INHERIT_KW
-ERROR@22368: expected command, found FALSE_KW
-ERROR@22373: expected command, found COMMA
-ERROR@22378: expected name
-ERROR@22378: expected EQ
-ERROR@22384: expected SEMICOLON
-ERROR@22385: expected command, found GRANTED_KW
-ERROR@22393: expected command, found BY_KW
-ERROR@22396: expected command, found IDENT
-ERROR@22472: expected SEMICOLON
-ERROR@22473: expected command, found COMMA
-ERROR@22475: expected command, found INHERIT_KW
-ERROR@22483: expected command, found FALSE_KW
-ERROR@22488: expected command, found COMMA
-ERROR@22493: expected name
-ERROR@22493: expected EQ
-ERROR@22498: expected SEMICOLON
-ERROR@22500: expected command, found GRANTED_KW
-ERROR@22508: expected command, found BY_KW
-ERROR@22511: expected command, found IDENT
-ERROR@22588: expected SEMICOLON
-ERROR@22588: expected command, found COMMA
-ERROR@22590: expected command, found INHERIT_KW
-ERROR@22598: expected command, found TRUE_KW
-ERROR@22602: expected command, found COMMA
-ERROR@22608: expected name
-ERROR@22608: expected EQ
-ERROR@22614: expected SEMICOLON
-ERROR@22615: expected command, found GRANTED_KW
-ERROR@22623: expected command, found BY_KW
-ERROR@22626: expected command, found IDENT
-ERROR@22703: expected SEMICOLON
-ERROR@22703: expected command, found COMMA
-ERROR@22705: expected command, found INHERIT_KW
-ERROR@22713: expected command, found TRUE_KW
-ERROR@22718: expected command, found COMMA
-ERROR@22723: expected name
-ERROR@22723: expected EQ
-ERROR@22728: expected SEMICOLON
-ERROR@22730: expected command, found GRANTED_KW
-ERROR@22738: expected command, found BY_KW
-ERROR@22741: expected command, found IDENT
-ERROR@22818: expected SEMICOLON
-ERROR@22818: expected command, found COMMA
-ERROR@22820: expected command, found INHERIT_KW
-ERROR@22828: expected command, found FALSE_KW
-ERROR@22833: expected command, found COMMA
-ERROR@22838: expected name
-ERROR@22838: expected EQ
-ERROR@22843: expected SEMICOLON
-ERROR@22845: expected command, found GRANTED_KW
-ERROR@22853: expected command, found BY_KW
-ERROR@22856: expected command, found IDENT
-ERROR@22933: expected SEMICOLON
-ERROR@22933: expected command, found COMMA
-ERROR@22935: expected command, found INHERIT_KW
-ERROR@22943: expected command, found FALSE_KW
-ERROR@22948: expected command, found COMMA
-ERROR@22953: expected name
-ERROR@22953: expected EQ
-ERROR@22959: expected SEMICOLON
-ERROR@22960: expected command, found GRANTED_KW
-ERROR@22968: expected command, found BY_KW
-ERROR@22971: expected command, found IDENT
+ERROR@22268: missing comma
+ERROR@22277: expected OPTION, TRUE, or FALSE
+ERROR@22277: missing comma
+ERROR@22280: expected OPTION, TRUE, or FALSE
+ERROR@22280: missing comma
+ERROR@22297: expected OPTION, TRUE, or FALSE
+ERROR@22384: missing comma
+ERROR@22392: expected OPTION, TRUE, or FALSE
+ERROR@22392: missing comma
+ERROR@22395: expected OPTION, TRUE, or FALSE
+ERROR@22395: missing comma
+ERROR@22412: expected OPTION, TRUE, or FALSE
+ERROR@22498: missing comma
+ERROR@22507: expected OPTION, TRUE, or FALSE
+ERROR@22507: missing comma
+ERROR@22510: expected OPTION, TRUE, or FALSE
+ERROR@22510: missing comma
+ERROR@22527: expected OPTION, TRUE, or FALSE
+ERROR@22614: missing comma
+ERROR@22622: expected OPTION, TRUE, or FALSE
+ERROR@22622: missing comma
+ERROR@22625: expected OPTION, TRUE, or FALSE
+ERROR@22625: missing comma
+ERROR@22642: expected OPTION, TRUE, or FALSE
+ERROR@22728: missing comma
+ERROR@22737: expected OPTION, TRUE, or FALSE
+ERROR@22737: missing comma
+ERROR@22740: expected OPTION, TRUE, or FALSE
+ERROR@22740: missing comma
+ERROR@22757: expected OPTION, TRUE, or FALSE
+ERROR@22843: missing comma
+ERROR@22852: expected OPTION, TRUE, or FALSE
+ERROR@22852: missing comma
+ERROR@22855: expected OPTION, TRUE, or FALSE
+ERROR@22855: missing comma
+ERROR@22872: expected OPTION, TRUE, or FALSE
+ERROR@22959: missing comma
+ERROR@22967: expected OPTION, TRUE, or FALSE
+ERROR@22967: missing comma
+ERROR@22970: expected OPTION, TRUE, or FALSE
+ERROR@22970: missing comma
+ERROR@22987: expected OPTION, TRUE, or FALSE

@@ -1,8 +1,0 @@
----
-source: crates/squawk_parser/tests/tests.rs
-input_file: crates/squawk_parser/tests/data/regression_suite/create_role.sql
----
-ERROR@6257: expected SEMICOLON
-ERROR@6257: expected command, found COMMA
-ERROR@6262: expected name
-ERROR@6262: expected EQ

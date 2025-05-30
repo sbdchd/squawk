@@ -2,11 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/create_table_like.sql
 ---
-ERROR@2170: expected STORED_KW
-ERROR@2170: expected R_PAREN
-ERROR@2170: expected SEMICOLON
-ERROR@2171: expected command, found VIRTUAL_KW
-ERROR@2178: expected command, found R_PAREN
 ERROR@5112: expected R_PAREN
 ERROR@5112: expected SEMICOLON
 ERROR@5113: expected command, found ENFORCED_KW

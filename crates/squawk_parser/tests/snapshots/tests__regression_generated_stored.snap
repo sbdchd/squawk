@@ -12,15 +12,6 @@ ERROR@2758: expected command, found INT_NUMBER
 ERROR@2759: expected command, found R_PAREN
 ERROR@2761: expected command, found STORED_KW
 ERROR@2767: expected command, found R_PAREN
-ERROR@6424: expected STORED_KW
-ERROR@6424: expected R_PAREN
-ERROR@6424: expected SEMICOLON
-ERROR@6425: expected command, found VIRTUAL_KW
-ERROR@6432: expected command, found R_PAREN
-ERROR@6434: expected command, found INHERITS_KW
-ERROR@6443: expected command, found L_PAREN
-ERROR@6444: expected command, found IDENT
-ERROR@6450: expected command, found R_PAREN
 ERROR@10576: expected TO_KW
 ERROR@10576: expected role, got COMMA
 ERROR@10584: expected SEMICOLON
@@ -28,21 +19,3 @@ ERROR@10585: expected command, found ON_KW
 ERROR@10588: expected command, found IDENT
 ERROR@10596: expected command, found TO_KW
 ERROR@10599: expected command, found IDENT
-ERROR@17943: expected STORED_KW
-ERROR@17943: expected R_PAREN
-ERROR@17943: expected DEFAULT_KW
-ERROR@17943: expected SEMICOLON
-ERROR@17944: expected command, found VIRTUAL_KW
-ERROR@17962: expected command, found R_PAREN
-ERROR@17964: expected command, found FOR_KW
-ERROR@17975: expected L_PAREN
-ERROR@17994: expected SEMICOLON
-ERROR@17995: expected command, found TO_KW
-ERROR@17998: expected command, found L_PAREN
-ERROR@17999: expected command, found STRING
-ERROR@18011: expected command, found R_PAREN
-ERROR@18770: expected STORED_KW
-ERROR@18770: expected R_PAREN
-ERROR@18770: expected SEMICOLON
-ERROR@18771: expected command, found VIRTUAL_KW
-ERROR@18778: expected command, found R_PAREN

@@ -33,34 +33,8 @@ ERROR@6179: expected command, found INT_NUMBER
 ERROR@6181: expected command, found IDENT
 ERROR@6186: expected command, found IDENT
 ERROR@6190: expected command, found IDENT
-ERROR@34361: expected R_PAREN
-ERROR@34361: expected EQ
-ERROR@34361: expected SEMICOLON
-ERROR@34361: expected command, found L_BRACK
-ERROR@34362: expected command, found INT_NUMBER
-ERROR@34363: expected command, found R_BRACK
-ERROR@34364: expected command, found COMMA
-ERROR@34366: expected command, found IDENT
-ERROR@34368: expected command, found COMMA
-ERROR@34370: expected command, found IDENT
-ERROR@34373: expected command, found R_PAREN
-ERROR@34375: expected command, found EQ
-ERROR@34420: expected SEMICOLON
-ERROR@34423: expected command, found WHERE_KW
-ERROR@34429: expected command, found IDENT
-ERROR@34433: expected command, found DOT
-ERROR@34434: expected command, found IDENT
-ERROR@34437: expected command, found EQ
-ERROR@34439: expected command, found NEW_KW
-ERROR@34442: expected command, found DOT
-ERROR@34443: expected command, found IDENT
-ERROR@34446: expected command, found RETURNING_KW
-ERROR@34456: expected command, found NEW_KW
-ERROR@34459: expected command, found DOT
-ERROR@34460: expected command, found STAR
 ERROR@35833: expected SELECT, got VALUES
 ERROR@35940: expected SELECT, got VALUES
-ERROR@42847: expected EQ
 ERROR@43268: expected an expression, found WITH_KW
 ERROR@43272: expected output expression
 ERROR@43273: expected command, found L_PAREN

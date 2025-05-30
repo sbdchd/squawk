@@ -84,9 +84,6 @@ ERROR@22909: expected command, found ENFORCED_KW
 ERROR@22917: expected command, found R_PAREN
 ERROR@25405: expected type name
 ERROR@25408: expected type name
-ERROR@29267: expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got COMPOUND_SELECT
-ERROR@29422: expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got COMPOUND_SELECT
-ERROR@29565: expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got COMPOUND_SELECT
 ERROR@30331: expected R_PAREN
 ERROR@30426: missing comma
 ERROR@30455: expected SEMICOLON

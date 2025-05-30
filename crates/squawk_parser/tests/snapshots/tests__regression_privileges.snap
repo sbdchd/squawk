@@ -2,6 +2,30 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/privileges.sql
 ---
+ERROR@1281: missing comma
+ERROR@1289: expected OPTION, TRUE, or FALSE
+ERROR@1289: missing comma
+ERROR@1292: expected OPTION, TRUE, or FALSE
+ERROR@1292: missing comma
+ERROR@1311: expected OPTION, TRUE, or FALSE
+ERROR@1377: missing comma
+ERROR@1385: expected OPTION, TRUE, or FALSE
+ERROR@1385: missing comma
+ERROR@1388: expected OPTION, TRUE, or FALSE
+ERROR@1388: missing comma
+ERROR@1407: expected OPTION, TRUE, or FALSE
+ERROR@8877: missing comma
+ERROR@8885: expected OPTION, TRUE, or FALSE
+ERROR@8885: missing comma
+ERROR@8888: expected OPTION, TRUE, or FALSE
+ERROR@8888: missing comma
+ERROR@8906: expected OPTION, TRUE, or FALSE
+ERROR@9007: missing comma
+ERROR@9015: expected OPTION, TRUE, or FALSE
+ERROR@9015: missing comma
+ERROR@9018: expected OPTION, TRUE, or FALSE
+ERROR@9018: missing comma
+ERROR@9031: expected OPTION, TRUE, or FALSE
 ERROR@17722: expected R_PAREN
 ERROR@17782: expected SEMICOLON
 ERROR@17782: expected command, found R_PAREN
@@ -89,15 +113,3 @@ ERROR@65100: expected command, found DOT
 ERROR@65101: expected command, found IDENT
 ERROR@65118: expected command, found AS_KW
 ERROR@65121: expected command, found INT_KW
-ERROR@74892: expected SEMICOLON
-ERROR@74892: expected command, found COMMA
-ERROR@74894: expected command, found ADMIN_KW
-ERROR@74900: expected command, found TRUE_KW
-ERROR@76186: expected SEMICOLON
-ERROR@76186: expected command, found COMMA
-ERROR@76191: expected name
-ERROR@76191: expected EQ
-ERROR@76286: expected SEMICOLON
-ERROR@76286: expected command, found COMMA
-ERROR@76291: expected name
-ERROR@76291: expected EQ
