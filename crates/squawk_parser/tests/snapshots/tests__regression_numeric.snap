@@ -1,9 +1,0 @@
----
-source: crates/squawk_parser/tests/tests.rs
-input_file: crates/squawk_parser/tests/data/regression_suite/numeric.sql
----
-ERROR@47483: expected FROM_KW
-ERROR@47483: expected L_PAREN
-ERROR@47483: expected an expression, found SEMICOLON
-ERROR@47483: expected call expression
-ERROR@47483: expected R_PAREN

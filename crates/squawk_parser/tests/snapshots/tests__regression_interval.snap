@@ -1,6 +1,0 @@
----
-source: crates/squawk_parser/tests/tests.rs
-input_file: crates/squawk_parser/tests/data/regression_suite/interval.sql
----
-ERROR@9258: missing comma
-ERROR@9300: missing comma

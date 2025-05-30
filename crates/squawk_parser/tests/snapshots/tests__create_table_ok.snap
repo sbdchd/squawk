@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_table.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   CREATE_TABLE
@@ -3000,6 +2999,73 @@ SOURCE_FILE
     L_PAREN "("
     LITERAL
       STRING "'buzz'"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_KW "partition"
+    WHITESPACE " "
+    OF_KW "of"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "u"
+    WHITESPACE " "
+    TABLE_ARGS
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        GENERATED_CONSTRAINT
+          GENERATED_KW "generated"
+          WHITESPACE " "
+          ALWAYS_KW "always"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          L_PAREN "("
+          BIN_EXPR
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+          R_PAREN ")"
+          WHITESPACE " "
+          STORED_KW "stored"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    VALUES_KW "values"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'2016-09-01'"
+    R_PAREN ")"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    L_PAREN "("
+    LITERAL
+      STRING "'2016-10-01'"
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

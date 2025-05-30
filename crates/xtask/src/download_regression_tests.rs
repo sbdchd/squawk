@@ -22,6 +22,10 @@ pub(crate) fn download_regression_tests() -> Result<()> {
 
     for (index, url) in urls.iter().enumerate() {
         let filename = url.split('/').last().unwrap();
+        if filename.contains("psql") {
+            // skipping this for now, we don't support psql
+            continue;
+        }
         let filepath = target_dir.join(filename);
 
         println!(

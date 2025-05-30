@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select_casts.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- type_casts"
@@ -1040,6 +1039,24 @@ SOURCE_FILE
             COLON_COLON "::"
             INTERVAL_TYPE
               INTERVAL_KW "interval"
+              L_PAREN "("
+              LITERAL
+                INT_NUMBER "0"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            LITERAL
+              STRING "'10 days'"
+            COLON_COLON "::"
+            INTERVAL_TYPE
+              INTERVAL_KW "interval"
               WHITESPACE " "
               DAY_KW "day"
   SEMICOLON ";"
@@ -1337,11 +1354,9 @@ SOURCE_FILE
             INTERVAL_TYPE
               INTERVAL_KW "interval"
               L_PAREN "("
-              ARG_LIST
-                ARG
-                  LITERAL
-                    INT_NUMBER "10"
-                R_PAREN ")"
+              LITERAL
+                INT_NUMBER "10"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- JsonType"

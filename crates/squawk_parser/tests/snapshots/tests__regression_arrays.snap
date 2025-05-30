@@ -1,9 +1,0 @@
----
-source: crates/squawk_parser/tests/tests.rs
-input_file: crates/squawk_parser/tests/data/regression_suite/arrays.sql
----
-ERROR@10382: expected SEMICOLON
-ERROR@10383: expected command, found LANGUAGE_KW
-ERROR@10392: expected command, found IDENT
-ERROR@16637: missing comma
-ERROR@16686: missing comma

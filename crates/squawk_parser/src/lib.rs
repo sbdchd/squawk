@@ -263,6 +263,13 @@ impl<'t> Parser<'t> {
                 m.complete(self, SyntaxKind::NOT_LIKE);
                 return true;
             }
+            SyntaxKind::NOT_ILIKE => {
+                let m = self.start();
+                self.bump(SyntaxKind::NOT_KW);
+                self.bump(SyntaxKind::ILIKE_KW);
+                m.complete(self, SyntaxKind::NOT_ILIKE);
+                return true;
+            }
             SyntaxKind::NOT_IN => {
                 let m = self.start();
                 self.bump(SyntaxKind::NOT_KW);

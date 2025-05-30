@@ -715,6 +715,16 @@ type: string
 
 https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
 
+### VSCode Syntax Highlighting
+
+Aka a non-semantic version
+
+### Monaco Support
+
+- Monaco Syntax Highlighting
+
+### Codemirror Support
+
 ### Show Syntax Tree Command
 
 replicate what we have in WASM in IDE

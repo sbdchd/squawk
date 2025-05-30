@@ -1776,6 +1776,13 @@ fn opt_interval_trailing(p: &mut Parser<'_>) {
         (SECOND_KW, _) => {
             interval_second(p);
         }
+        (L_PAREN, _) => {
+            p.bump(L_PAREN);
+            if opt_numeric_literal(p).is_none() {
+                p.error("expected number")
+            }
+            p.bump(R_PAREN);
+        }
         _ => (),
     }
 }
@@ -1795,6 +1802,12 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             p.expect(ZONE_KW);
         }
     } else if p.eat(INTERVAL_KW) {
+        if p.eat(L_PAREN) {
+            if opt_numeric_literal(p).is_none() {
+                p.error("expected number");
+            }
+            p.expect(R_PAREN);
+        }
         is_interval_cast = true;
     } else {
         p.bump_any();
@@ -2055,8 +2068,12 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         OVERLAPS_KW => (7, OVERLAPS_KW, Left),
         // like
         LIKE_KW => (6, LIKE_KW, Left),
+        // ilike
+        ILIKE_KW => (6, ILIKE_KW, Left),
         // not like
         NOT_KW if !r.not_disabled && p.at(NOT_LIKE) => (6, NOT_LIKE, Left),
+        // not ilike
+        NOT_KW if !r.not_disabled && p.at(NOT_ILIKE) => (6, NOT_ILIKE, Left),
         // not in
         NOT_KW if !r.not_disabled && p.at(NOT_IN) => (6, NOT_IN, Left),
         // is distinct from
@@ -2713,7 +2730,7 @@ fn data_source(p: &mut Parser<'_>) {
             json_table_fn(p);
             opt_alias(p);
         }
-        ROWS_KW => {
+        ROWS_KW if p.nth_at(1, FROM_KW) => {
             p.bump(ROWS_KW);
             p.expect(FROM_KW);
             p.expect(L_PAREN);
@@ -3301,8 +3318,18 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                     p.expect(ALWAYS_KW);
                 }
                 p.expect(AS_KW);
-                p.expect(IDENTITY_KW);
-                opt_sequence_options(p);
+                if p.eat(L_PAREN) {
+                    if expr(p).is_none() {
+                        p.error("expected an expression");
+                    }
+                    p.expect(R_PAREN);
+                    if !p.eat(STORED_KW) && !p.eat(VIRTUAL_KW) {
+                        p.error("expected STORED or VIRTUAL");
+                    }
+                } else {
+                    p.expect(IDENTITY_KW);
+                    opt_sequence_options(p);
+                }
                 GENERATED_CONSTRAINT
             } else {
                 p.error("expected generated type");
@@ -8264,7 +8291,7 @@ fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         },
     );
     match statement.map(|x| x.kind()) {
-        Some(SELECT | TABLE | VALUES) => (),
+        Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES) => (),
         Some(kind) => {
             p.error(format!(
                 "expected SELECT, TABLE, or VALUES statement, got {:?}",
@@ -8373,7 +8400,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
             }
             if p.eat(L_PAREN) {
                 type_name(p);
-                if p.eat(COMMA) {
+                while !p.at(EOF) && p.eat(COMMA) {
                     type_name(p);
                 }
                 p.expect(R_PAREN);
@@ -8400,7 +8427,7 @@ fn operator_drop_class_option(p: &mut Parser<'_>) {
             }
             if p.eat(L_PAREN) {
                 type_name(p);
-                if p.eat(COMMA) {
+                while !p.at(EOF) && !p.at(R_PAREN) && p.eat(COMMA) {
                     type_name(p);
                 }
                 p.expect(R_PAREN);
@@ -10045,14 +10072,13 @@ fn grant(p: &mut Parser<'_>) -> CompletedMarker {
     // ALL [ PRIVILEGES ]
     if p.eat(ALL_KW) {
         p.eat(PRIVILEGES_KW);
+        opt_column_list(p);
     } else if !p.at(TO_KW) {
         revoke_command(p);
         while !p.at(EOF) && p.eat(COMMA) {
             revoke_command(p);
         }
     }
-    // [ ( column_name [, ...] ) ]
-    opt_column_list(p);
     // ON { [ TABLE ] table_name [, ...]
     //      | ALL TABLES IN SCHEMA schema_name [, ...] }
     // ON { SEQUENCE sequence_name [, ...]
@@ -10295,16 +10321,17 @@ const REVOKE_COMMAND_FIRST: TokenSet = TokenSet::new(&[
 ]);
 
 fn revoke_command(p: &mut Parser<'_>) {
-    if opt_role(p) {
-        return;
+    if !opt_role(p) {
+        if p.eat(ALTER_KW) {
+            p.expect(SYSTEM_KW);
+        } else if p.at_ts(REVOKE_COMMAND_FIRST) {
+            p.bump_any();
+        } else {
+            p.error(format!("expected command name, got {:?}", p.current()))
+        }
     }
-    if p.eat(ALTER_KW) {
-        p.expect(SYSTEM_KW);
-    } else if p.at_ts(REVOKE_COMMAND_FIRST) {
-        p.bump_any();
-    } else {
-        p.error(format!("expected command name, got {:?}", p.current()))
-    }
+    // [ ( column_name [, ...] ) ]
+    opt_column_list(p);
 }
 
 // where role_specification can be:
@@ -10913,11 +10940,7 @@ fn opt_temp(p: &mut Parser<'_>) -> bool {
     p.eat(TEMP_KW) || p.eat(TEMPORARY_KW)
 }
 
-// DO [ LANGUAGE lang_name ] code
-fn do_(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(DO_KW));
-    let m = p.start();
-    p.bump(DO_KW);
+fn opt_language(p: &mut Parser<'_>) {
     if p.eat(LANGUAGE_KW) {
         if p.at_ts(NON_RESERVED_WORD) {
             p.bump_any();
@@ -10925,7 +10948,16 @@ fn do_(p: &mut Parser<'_>) -> CompletedMarker {
             string_literal(p);
         }
     }
+}
+
+// DO [ LANGUAGE lang_name ] code
+fn do_(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(DO_KW));
+    let m = p.start();
+    p.bump(DO_KW);
+    opt_language(p);
     string_literal(p);
+    opt_language(p);
     m.complete(p, DO)
 }
 
@@ -12155,6 +12187,9 @@ fn param(p: &mut Parser<'_>) {
             // foo(8)
             //    ^
             L_PAREN => true,
+            // text[]
+            //     ^
+            L_BRACK => true,
             // float8 order by
             //        ^
             ORDER_KW => true,
@@ -12163,7 +12198,7 @@ fn param(p: &mut Parser<'_>) {
             _ => false,
         };
         if at_type {
-            name_or_type.complete(p, PATH_TYPE);
+            type_mods(p, name_or_type, true, PATH_TYPE);
         } else {
             name_or_type.complete(p, NAME);
             if !param_mode_seen {
@@ -12347,12 +12382,19 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
                 if p.eat(SEMICOLON) {
                     continue;
                 }
-                stmt(
-                    p,
-                    &StmtRestrictions {
-                        begin_end_allowed: false,
-                    },
-                );
+                // sql standard
+                if p.eat(RETURN_KW) {
+                    if expr(p).is_none() {
+                        p.error("expected expr")
+                    }
+                } else {
+                    stmt(
+                        p,
+                        &StmtRestrictions {
+                            begin_end_allowed: false,
+                        },
+                    );
+                }
                 if p.at(END_KW) {
                     p.expect(SEMICOLON);
                 }

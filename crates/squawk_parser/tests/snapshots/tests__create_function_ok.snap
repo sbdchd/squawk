@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_function.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- create_func_with_in_out"
@@ -3035,4 +3034,58 @@ SOURCE_FILE
         WHITESPACE " "
         SQL_KW "sql"
   SEMICOLON ";"
-  WHITESPACE "\n\n\n\n"
+  WHITESPACE "\n\n"
+  COMMENT "-- array type"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    WHITESPACE " "
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PATH_TYPE
+          IDENT "internal"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        ARRAY_TYPE
+          PATH_TYPE
+            TEXT_KW "text"
+          L_BRACK "["
+          R_BRACK "]"
+      COMMA ","
+      WHITESPACE " "
+      PARAM
+        PATH_TYPE
+          IDENT "bool"
+      R_PAREN ")"
+    WHITESPACE " \n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "void"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n"

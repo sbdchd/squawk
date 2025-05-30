@@ -2,22 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/collate.linux.utf8.sql
 ---
-ERROR@3274: expected SEMICOLON
-ERROR@3275: expected command, found ILIKE_KW
-ERROR@3281: expected command, found STRING
-ERROR@3323: expected SEMICOLON
-ERROR@3324: expected command, found ILIKE_KW
-ERROR@3330: expected command, found STRING
-ERROR@3373: expected SEMICOLON
-ERROR@3374: expected command, found ILIKE_KW
-ERROR@3380: expected command, found STRING
-ERROR@3430: missing comma
-ERROR@3490: missing comma
-ERROR@3532: missing comma
-ERROR@3588: missing comma
-ERROR@3739: expected SEMICOLON
-ERROR@3740: expected command, found ILIKE_KW
-ERROR@3746: expected command, found STRING
 ERROR@13571: expected SEMICOLON
 ERROR@13571: expected command, found COMMA
 ERROR@13573: expected command, found IDENT

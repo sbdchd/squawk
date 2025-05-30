@@ -405,5 +405,7 @@ create function f(int8)
 returns void
 as '' language sql;
 
-
-
+-- array type
+create function f (internal, text[], bool) 
+returns void
+as '' language sql;

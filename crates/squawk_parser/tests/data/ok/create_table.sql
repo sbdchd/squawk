@@ -316,6 +316,10 @@ create table t
 partition of foo.bar
 for values from ('bar') to ('buzz');
 
+create table t partition of u (
+  c generated always as (b * 2) stored
+) for values from ('2016-09-01') to ('2016-10-01');
+
 -- missing entries
 create table t ();
 
