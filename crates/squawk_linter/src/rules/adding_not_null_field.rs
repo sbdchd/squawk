@@ -3,12 +3,9 @@ use squawk_syntax::{
     Parse, SourceFile,
 };
 
-use crate::{Linter, Rule, Version, Violation};
+use crate::{Linter, Rule, Violation};
 
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    if ctx.settings.pg_version >= Version::new(11, 0, 0) {
-        return;
-    }
     let file = parse.tree();
     for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
@@ -38,7 +35,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule, Version};
+    use crate::{Linter, Rule};
 
     #[test]
     fn set_not_null() {
@@ -47,7 +44,6 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET NOT NULL;
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::AddingNotNullableField]);
-        linter.settings.pg_version = Version::new(10, 0, 0);
         let errors = linter.lint(file, sql);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
@@ -95,5 +91,21 @@ COMMIT;
         let mut linter = Linter::from([Rule::AddingNotNullableField]);
         let errors = linter.lint(file, sql);
         assert!(errors.is_empty());
+    }
+
+    #[test]
+    fn regression_gh_issue_519() {
+        let sql = r#"
+BEGIN;
+-- Running upgrade a -> b
+ALTER TABLE my_table ALTER COLUMN my_column SET NOT NULL;
+UPDATE alembic_version SET version_num='b' WHERE alembic_version.version_num = 'a';
+COMMIT;
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::AddingNotNullableField]);
+        let errors = linter.lint(file, sql);
+        assert!(!errors.is_empty());
+        assert_debug_snapshot!(errors);
     }
 }
