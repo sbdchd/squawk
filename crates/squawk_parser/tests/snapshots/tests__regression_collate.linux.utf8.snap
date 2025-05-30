@@ -18,9 +18,6 @@ ERROR@3588: missing comma
 ERROR@3739: expected SEMICOLON
 ERROR@3740: expected command, found ILIKE_KW
 ERROR@3746: expected command, found STRING
-ERROR@9210: expected R_PAREN
-ERROR@9222: expected SEMICOLON
-ERROR@9222: expected command, found R_PAREN
 ERROR@13571: expected SEMICOLON
 ERROR@13571: expected command, found COMMA
 ERROR@13573: expected command, found IDENT

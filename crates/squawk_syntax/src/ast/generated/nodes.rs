@@ -1113,12 +1113,24 @@ pub struct ArrayType {
 }
 impl ArrayType {
     #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
     }
     #[inline]
     pub fn array_token(&self) -> Option<SyntaxToken> {
@@ -1401,6 +1413,10 @@ pub struct CheckConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl CheckConstraint {
+    #[inline]
+    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
@@ -2855,8 +2871,20 @@ pub struct DefaultConstraint {
 }
 impl DefaultConstraint {
     #[inline]
+    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn constraint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
     #[inline]
     pub fn default_token(&self) -> Option<SyntaxToken> {
@@ -4413,6 +4441,17 @@ impl Fetch {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FetchClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FetchClause {
+    #[inline]
+    pub fn fetch_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FETCH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FieldExpr {
     pub(crate) syntax: SyntaxNode,
 }
@@ -4491,7 +4530,11 @@ pub struct ForeignKeyConstraint {
 }
 impl ForeignKeyConstraint {
     #[inline]
-    pub fn column_list(&self) -> Option<ColumnList> {
+    pub fn from_columns(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn match_type(&self) -> Option<MatchType> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -4507,32 +4550,20 @@ impl ForeignKeyConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn foreign_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
+    pub fn to_columns(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
     }
     #[inline]
-    pub fn full_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FULL_KW)
+    pub fn foreign_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOREIGN_KW)
     }
     #[inline]
     pub fn key_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::KEY_KW)
     }
     #[inline]
-    pub fn match_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::MATCH_KW)
-    }
-    #[inline]
-    pub fn partial_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PARTIAL_KW)
-    }
-    #[inline]
     pub fn references_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::REFERENCES_KW)
-    }
-    #[inline]
-    pub fn simple_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SIMPLE_KW)
     }
 }
 
@@ -4563,6 +4594,10 @@ pub struct GeneratedConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl GeneratedConstraint {
+    #[inline]
+    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
@@ -5317,6 +5352,51 @@ impl Lteq {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MatchFull {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MatchFull {
+    #[inline]
+    pub fn full_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FULL_KW)
+    }
+    #[inline]
+    pub fn match_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATCH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MatchPartial {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MatchPartial {
+    #[inline]
+    pub fn match_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATCH_KW)
+    }
+    #[inline]
+    pub fn partial_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PARTIAL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MatchSimple {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MatchSimple {
+    #[inline]
+    pub fn match_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATCH_KW)
+    }
+    #[inline]
+    pub fn simple_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SIMPLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Merge {
     pub(crate) syntax: SyntaxNode,
 }
@@ -5532,6 +5612,10 @@ pub struct NotNullConstraint {
 }
 impl NotNullConstraint {
     #[inline]
+    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
@@ -5595,6 +5679,10 @@ pub struct NullConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl NullConstraint {
+    #[inline]
+    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -6195,6 +6283,10 @@ impl PrimaryKeyConstraint {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn index_params(&self) -> Option<IndexParams> {
         support::child(&self.syntax)
     }
@@ -6297,7 +6389,23 @@ pub struct ReferencesConstraint {
 }
 impl ReferencesConstraint {
     #[inline]
+    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn match_type(&self) -> Option<MatchType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_delete_action(&self) -> Option<OnDeleteAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_update_action(&self) -> Option<OnUpdateAction> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -6317,24 +6425,8 @@ impl ReferencesConstraint {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
     #[inline]
-    pub fn full_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::FULL_KW)
-    }
-    #[inline]
-    pub fn match_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::MATCH_KW)
-    }
-    #[inline]
-    pub fn partial_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::PARTIAL_KW)
-    }
-    #[inline]
     pub fn references_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::REFERENCES_KW)
-    }
-    #[inline]
-    pub fn simple_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SIMPLE_KW)
     }
 }
 
@@ -6782,6 +6874,10 @@ pub struct Select {
     pub(crate) syntax: SyntaxNode,
 }
 impl Select {
+    #[inline]
+    pub fn fetch_clause(&self) -> Option<FetchClause> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn filter_clause(&self) -> Option<FilterClause> {
         support::child(&self.syntax)
@@ -7706,6 +7802,10 @@ impl UniqueConstraint {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
@@ -8147,6 +8247,13 @@ pub enum FuncOption {
     TransformFuncOption(TransformFuncOption),
     VolatilityFuncOption(VolatilityFuncOption),
     WindowFuncOption(WindowFuncOption),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MatchType {
+    MatchFull(MatchFull),
+    MatchPartial(MatchPartial),
+    MatchSimple(MatchSimple),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -12127,6 +12234,24 @@ impl AstNode for Fetch {
         &self.syntax
     }
 }
+impl AstNode for FetchClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FETCH_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for FieldExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -12959,6 +13084,60 @@ impl AstNode for Lteq {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::LTEQ
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MatchFull {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MATCH_FULL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MatchPartial {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MATCH_PARTIAL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MatchSimple {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MATCH_SIMPLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -16777,6 +16956,53 @@ impl From<WindowFuncOption> for FuncOption {
     #[inline]
     fn from(node: WindowFuncOption) -> FuncOption {
         FuncOption::WindowFuncOption(node)
+    }
+}
+impl AstNode for MatchType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::MATCH_FULL | SyntaxKind::MATCH_PARTIAL | SyntaxKind::MATCH_SIMPLE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::MATCH_FULL => MatchType::MatchFull(MatchFull { syntax }),
+            SyntaxKind::MATCH_PARTIAL => MatchType::MatchPartial(MatchPartial { syntax }),
+            SyntaxKind::MATCH_SIMPLE => MatchType::MatchSimple(MatchSimple { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            MatchType::MatchFull(it) => &it.syntax,
+            MatchType::MatchPartial(it) => &it.syntax,
+            MatchType::MatchSimple(it) => &it.syntax,
+        }
+    }
+}
+impl From<MatchFull> for MatchType {
+    #[inline]
+    fn from(node: MatchFull) -> MatchType {
+        MatchType::MatchFull(node)
+    }
+}
+impl From<MatchPartial> for MatchType {
+    #[inline]
+    fn from(node: MatchPartial) -> MatchType {
+        MatchType::MatchPartial(node)
+    }
+}
+impl From<MatchSimple> for MatchType {
+    #[inline]
+    fn from(node: MatchSimple) -> MatchType {
+        MatchType::MatchSimple(node)
     }
 }
 impl AstNode for ParamMode {

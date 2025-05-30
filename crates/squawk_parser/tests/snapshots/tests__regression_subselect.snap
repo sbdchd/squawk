@@ -2,8 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/subselect.sql
 ---
-ERROR@4054: expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got COMPOUND_SELECT
-ERROR@4116: expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got COMPOUND_SELECT
 ERROR@31606: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: L_PAREN
 ERROR@31606: expected R_PAREN
 ERROR@31606: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN

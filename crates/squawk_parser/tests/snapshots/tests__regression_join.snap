@@ -2,7 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/join.sql
 ---
-ERROR@77567: expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got COMPOUND_SELECT
 ERROR@93160: expected R_PAREN
 ERROR@93186: expected SEMICOLON
 ERROR@93186: expected command, found R_PAREN

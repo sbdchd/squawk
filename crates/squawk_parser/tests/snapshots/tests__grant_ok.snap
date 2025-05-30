@@ -1288,7 +1288,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
-    SET_KW "set"
+    NAME
+      SET_KW "set"
     WHITESPACE " "
     OPTION_KW "option"
   SEMICOLON ";"
@@ -1541,7 +1542,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
-    ADMIN_KW "admin"
+    NAME
+      ADMIN_KW "admin"
     WHITESPACE " "
     OPTION_KW "option"
   SEMICOLON ";"
@@ -1557,7 +1559,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
-    INHERIT_KW "inherit"
+    NAME
+      INHERIT_KW "inherit"
     WHITESPACE " "
     OPTION_KW "option"
   SEMICOLON ";"
@@ -1573,7 +1576,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
-    INHERIT_KW "inherit"
+    NAME
+      INHERIT_KW "inherit"
     WHITESPACE " "
     TRUE_KW "true"
   SEMICOLON ";"
@@ -1589,7 +1593,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
-    SET_KW "set"
+    NAME
+      SET_KW "set"
     WHITESPACE " "
     FALSE_KW "false"
   SEMICOLON ";"
@@ -1619,7 +1624,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     WITH_KW "with"
     WHITESPACE " "
-    SET_KW "set"
+    NAME
+      SET_KW "set"
     WHITESPACE " "
     OPTION_KW "option"
   SEMICOLON ";"

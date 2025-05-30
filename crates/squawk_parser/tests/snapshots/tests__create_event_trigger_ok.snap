@@ -23,12 +23,12 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "function"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "f"
-    L_PAREN "("
-    R_PAREN ")"
+    CALL_EXPR
+      NAME_REF
+        IDENT "f"
+      ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -83,17 +83,16 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "function"
     WHITESPACE " "
-    PATH
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
+    CALL_EXPR
+      FIELD_EXPR
+        NAME_REF
+          IDENT "foo"
+        DOT "."
         NAME_REF
           IDENT "f"
-    L_PAREN "("
-    R_PAREN ")"
+      ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"
@@ -116,11 +115,11 @@ SOURCE_FILE
     WHITESPACE " "
     FUNCTION_KW "FUNCTION"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "abort_any_command"
-    L_PAREN "("
-    R_PAREN ")"
+    CALL_EXPR
+      NAME_REF
+        IDENT "abort_any_command"
+      ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

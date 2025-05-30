@@ -113,13 +113,6 @@ ERROR@7056: expected string literal
 ERROR@7056: expected SEMICOLON
 ERROR@7073: expected SET_KW
 ERROR@7073: expected name
-ERROR@7768: expected EQ
-ERROR@7768: expected an expression, found DOT
-ERROR@7769: expected expression
-ERROR@7769: expected SEMICOLON
-ERROR@7769: expected command, found IDENT
-ERROR@7775: expected command, found EQ
-ERROR@7777: expected command, found STRING
 ERROR@8491: expected R_PAREN
 ERROR@8491: expected SEMICOLON
 ERROR@8491: expected command, found L_PAREN

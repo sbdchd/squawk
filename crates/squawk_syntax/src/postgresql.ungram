@@ -450,6 +450,9 @@ WindowClause =
 LimitClause =
   'limit'
 
+FetchClause =
+  'fetch'
+
 OffsetClause =
   'offset'
 
@@ -520,6 +523,7 @@ Select =
  OrderByClause?
  LockingClause*
  LimitClause?
+ FetchClause?
  OffsetClause?
  FilterClause?
 

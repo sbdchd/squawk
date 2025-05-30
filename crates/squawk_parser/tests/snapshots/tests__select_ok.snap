@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- parens_and_unions"
@@ -4036,16 +4035,17 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
     WHITESPACE " "
-    FETCH_KW "fetch"
-    WHITESPACE " "
-    FIRST_KW "first"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "3"
-    WHITESPACE " "
-    ROWS_KW "rows"
-    WHITESPACE " "
-    ONLY_KW "only"
+    FETCH_CLAUSE
+      FETCH_KW "fetch"
+      WHITESPACE " "
+      FIRST_KW "first"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "3"
+      WHITESPACE " "
+      ROWS_KW "rows"
+      WHITESPACE " "
+      ONLY_KW "only"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- next"
@@ -4067,18 +4067,19 @@ SOURCE_FILE
       LITERAL
         INT_NUMBER "1"
     WHITESPACE " "
-    FETCH_KW "fetch"
-    WHITESPACE " "
-    NEXT_KW "next"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    WHITESPACE " "
-    ROW_KW "row"
-    WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    TIES_KW "ties"
+    FETCH_CLAUSE
+      FETCH_KW "fetch"
+      WHITESPACE " "
+      NEXT_KW "next"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE " "
+      ROW_KW "row"
+      WHITESPACE " "
+      WITH_KW "with"
+      WHITESPACE " "
+      TIES_KW "ties"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple_expr"
