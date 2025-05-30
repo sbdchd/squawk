@@ -87,6 +87,8 @@ select '10 days'::interval year;
 
 select '10 days'::interval month;
 
+select '10 days'::interval(0);
+
 select '10 days'::interval day;
 
 select '10 days'::interval hour;

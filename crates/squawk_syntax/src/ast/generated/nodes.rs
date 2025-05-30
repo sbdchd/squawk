@@ -5577,6 +5577,21 @@ impl NotDeferrableConstraintOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NotIlike {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NotIlike {
+    #[inline]
+    pub fn ilike_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ILIKE_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NotIn {
     pub(crate) syntax: SyntaxNode,
 }
@@ -5815,6 +5830,10 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn not_ilike(&self) -> Option<NotIlike> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn not_in(&self) -> Option<NotIn> {
         support::child(&self.syntax)
     }
@@ -5873,6 +5892,10 @@ impl Op {
     #[inline]
     pub fn collate_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COLLATE_KW)
+    }
+    #[inline]
+    pub fn ilike_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ILIKE_KW)
     }
     #[inline]
     pub fn in_token(&self) -> Option<SyntaxToken> {
@@ -13354,6 +13377,24 @@ impl AstNode for NotDeferrableConstraintOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NOT_DEFERRABLE_CONSTRAINT_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NotIlike {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NOT_ILIKE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

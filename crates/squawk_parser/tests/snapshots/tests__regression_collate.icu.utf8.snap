@@ -2,34 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/collate.icu.utf8.sql
 ---
-ERROR@3535: expected SEMICOLON
-ERROR@3536: expected command, found ILIKE_KW
-ERROR@3542: expected command, found STRING
-ERROR@3584: expected SEMICOLON
-ERROR@3585: expected command, found ILIKE_KW
-ERROR@3591: expected command, found STRING
-ERROR@3634: expected SEMICOLON
-ERROR@3635: expected command, found ILIKE_KW
-ERROR@3641: expected command, found STRING
-ERROR@3694: missing comma
-ERROR@3757: missing comma
-ERROR@3799: missing comma
-ERROR@3858: missing comma
-ERROR@4012: expected SEMICOLON
-ERROR@4013: expected command, found ILIKE_KW
-ERROR@4019: expected command, found STRING
-ERROR@12097: expected SEMICOLON
-ERROR@12098: expected command, found ILIKE_KW
-ERROR@12104: expected command, found STRING
-ERROR@12146: expected SEMICOLON
-ERROR@12147: expected command, found ILIKE_KW
-ERROR@12153: expected command, found STRING
-ERROR@12215: expected SEMICOLON
-ERROR@12216: expected command, found ILIKE_KW
-ERROR@12222: expected command, found STRING
-ERROR@12264: expected SEMICOLON
-ERROR@12265: expected command, found ILIKE_KW
-ERROR@12271: expected command, found STRING
 ERROR@14369: expected SEMICOLON
 ERROR@14369: expected command, found COMMA
 ERROR@14371: expected command, found IDENT
@@ -45,13 +17,4 @@ ERROR@14752: expected MATERIALIZED_KW
 ERROR@14752: expected VIEW_KW
 ERROR@14762: expected SEMICOLON
 ERROR@14763: expected command, found VERSION_KW
-ERROR@21137: expected SEMICOLON
-ERROR@21138: expected command, found ILIKE_KW
-ERROR@21144: expected command, found STRING
-ERROR@22661: expected SEMICOLON
-ERROR@22662: expected command, found ILIKE_KW
-ERROR@22668: expected command, found STRING
-ERROR@24211: expected SEMICOLON
-ERROR@24212: expected command, found ILIKE_KW
-ERROR@24218: expected command, found STRING
 ERROR@42437: expected STORED or VIRTUAL
