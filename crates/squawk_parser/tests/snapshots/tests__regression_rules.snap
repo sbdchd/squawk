@@ -25,10 +25,10 @@ ERROR@6160: expected command, found BOTH_KW
 ERROR@6165: expected command, found ROWS_KW
 ERROR@6176: expected AS_KW
 ERROR@6176: expected L_PAREN
-ERROR@6176: expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: EQ
-ERROR@6176: expected R_PAREN
-ERROR@6176: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: EQ
 ERROR@6177: expected command, found EQ
+ERROR@6178: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
+ERROR@6178: expected R_PAREN
+ERROR@6178: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: INT_NUMBER
 ERROR@6179: expected command, found INT_NUMBER
 ERROR@6181: expected command, found IDENT
 ERROR@6186: expected command, found IDENT

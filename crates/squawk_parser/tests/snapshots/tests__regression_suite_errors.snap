@@ -2,18 +2,13 @@
 source: crates/squawk_parser/tests/tests.rs
 expression: "out.join(\"\\n\")"
 ---
-tests/snapshots/tests__regression_copy.snap:231
-tests/snapshots/tests__regression_copy2.snap:58
-tests/snapshots/tests__regression_copydml.snap:154
-tests/snapshots/tests__regression_copyselect.snap:27
-tests/snapshots/tests__regression_create_am.snap:14
+tests/snapshots/tests__regression_copyselect.snap:21
 tests/snapshots/tests__regression_create_index.snap:10
 tests/snapshots/tests__regression_create_operator.snap:17
 tests/snapshots/tests__regression_create_table.snap:31
 tests/snapshots/tests__regression_create_table_like.snap:20
 tests/snapshots/tests__regression_create_view.snap:265
 tests/snapshots/tests__regression_domain.snap:35
-tests/snapshots/tests__regression_drop_if_exists.snap:12
 tests/snapshots/tests__regression_errors.snap:286
 tests/snapshots/tests__regression_foreign_data.snap:57
 tests/snapshots/tests__regression_foreign_key.snap:24
@@ -25,7 +20,7 @@ tests/snapshots/tests__regression_insert.snap:19
 tests/snapshots/tests__regression_insert_conflict.snap:253
 tests/snapshots/tests__regression_join.snap:20
 tests/snapshots/tests__regression_largeobject.snap:12
-tests/snapshots/tests__regression_merge.snap:384
+tests/snapshots/tests__regression_merge.snap:370
 tests/snapshots/tests__regression_misc.snap:8
 tests/snapshots/tests__regression_misc_functions.snap:9
 tests/snapshots/tests__regression_namespace.snap:4
@@ -34,18 +29,17 @@ tests/snapshots/tests__regression_partition_prune.snap:330
 tests/snapshots/tests__regression_plpgsql.snap:128
 tests/snapshots/tests__regression_privileges.snap:84
 tests/snapshots/tests__regression_publication.snap:71
-tests/snapshots/tests__regression_rangefuncs.snap:290
+tests/snapshots/tests__regression_rangefuncs.snap:291
 tests/snapshots/tests__regression_returning.snap:230
-tests/snapshots/tests__regression_rowsecurity.snap:75
+tests/snapshots/tests__regression_rowsecurity.snap:27
 tests/snapshots/tests__regression_rules.snap:59
 tests/snapshots/tests__regression_select_parallel.snap:3
-tests/snapshots/tests__regression_sqljson.snap:1075
+tests/snapshots/tests__regression_sqljson.snap:1073
 tests/snapshots/tests__regression_sqljson_jsontable.snap:185
 tests/snapshots/tests__regression_sqljson_queryfuncs.snap:51
-tests/snapshots/tests__regression_stats.snap:7
+tests/snapshots/tests__regression_stats.snap:6
 tests/snapshots/tests__regression_stats_ext.snap:9
-tests/snapshots/tests__regression_strings.snap:533
-tests/snapshots/tests__regression_subscription.snap:4
+tests/snapshots/tests__regression_strings.snap:188
 tests/snapshots/tests__regression_subselect.snap:52
 tests/snapshots/tests__regression_tablesample.snap:6
 tests/snapshots/tests__regression_timestamp.snap:65

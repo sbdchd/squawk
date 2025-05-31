@@ -2239,32 +2239,7 @@ fn with_query(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.eat(MATERIALIZED_KW);
     }
     p.expect(L_PAREN);
-    match p.current() {
-        DELETE_KW => {
-            delete(p, None);
-        }
-        SELECT_KW | TABLE_KW | VALUES_KW => {
-            select(p, None);
-        }
-        INSERT_KW => {
-            insert(p, None);
-        }
-        UPDATE_KW => {
-            update(p, None);
-        }
-        MERGE_KW => {
-            merge(p, None);
-        }
-        WITH_KW => {
-            with(p, None);
-        }
-        _ => {
-            p.error(format!(
-                "expected DELETE, SELECT, TABLE, VALUES, INSERT, WITH, or UPDATE, got: {:?}",
-                p.current()
-            ));
-        }
-    }
+    preparable_stmt(p);
     p.expect(R_PAREN);
     // [ SEARCH { BREADTH | DEPTH } FIRST BY column_name [, ...] SET search_seq_col_name ]
     if p.eat(SEARCH_KW) {
@@ -9590,7 +9565,7 @@ fn drop_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(PARSER_KW);
     opt_if_exists(p);
-    name_ref(p);
+    path_name_ref(p);
     opt_cascade_or_restrict(p);
     m.complete(p, DROP_TEXT_SEARCH_PARSER)
 }
@@ -9609,7 +9584,7 @@ fn drop_text_search_config(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(CONFIGURATION_KW);
     opt_if_exists(p);
-    name_ref(p);
+    path_name_ref(p);
     opt_cascade_or_restrict(p);
     m.complete(p, DROP_TEXT_SEARCH_CONFIG)
 }
@@ -9628,7 +9603,7 @@ fn drop_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(DICTIONARY_KW);
     opt_if_exists(p);
-    name_ref(p);
+    path_name_ref(p);
     opt_cascade_or_restrict(p);
     m.complete(p, DROP_TEXT_SEARCH_DICT)
 }
@@ -9644,7 +9619,7 @@ fn drop_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(TEMPLATE_KW);
     opt_if_exists(p);
-    name_ref(p);
+    path_name_ref(p);
     opt_cascade_or_restrict(p);
     m.complete(p, DROP_TEXT_SEARCH_TEMPLATE)
 }
@@ -10855,27 +10830,7 @@ fn prepare(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(R_PAREN);
     }
     p.expect(AS_KW);
-    // statement
-    // Any SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement.
-    let statement = stmt(
-        p,
-        &StmtRestrictions {
-            begin_end_allowed: false,
-        },
-    );
-    if let Some(statement) = statement {
-        match statement.kind() {
-            SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | INSERT | UPDATE | DELETE | MERGE => {}
-            kind => {
-                p.error(format!(
-                    "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {:?}",
-                    kind
-                ));
-            }
-        }
-    } else {
-        p.error("expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement");
-    }
+    preparable_stmt(p);
     m.complete(p, PREPARE)
 }
 
@@ -11008,8 +10963,25 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(HOLD_KW);
     }
     p.expect(FOR_KW);
-    // select_stmt | values_stmt
-    query(p);
+    // select stmt
+    let statement = stmt(
+        p,
+        &StmtRestrictions {
+            begin_end_allowed: false,
+        },
+    );
+    match statement.map(|x| x.kind()) {
+        Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES) => (),
+        Some(kind) => {
+            p.error(format!(
+                "expected SELECT, TABLE, or VALUES statement, got {:?}",
+                kind
+            ));
+        }
+        None => {
+            p.error("expected SELECT, TABLE, or VALUES statement");
+        }
+    }
     m.complete(p, DECLARE)
 }
 
@@ -11282,6 +11254,51 @@ fn copy_option_list(p: &mut Parser<'_>) {
     p.expect(R_PAREN);
 }
 
+fn opt_copy_option_item(p: &mut Parser<'_>) -> bool {
+    match p.current() {
+        BINARY_KW | FREEZE_KW | CSV_KW | HEADER_KW => {
+            p.bump_any();
+        }
+        DELIMITER_KW | NULL_KW | QUOTE_KW | ESCAPE_KW => {
+            p.bump_any();
+            p.eat(AS_KW);
+            string_literal(p);
+        }
+        ENCODING_KW => {
+            p.bump_any();
+            string_literal(p);
+        }
+        FORCE_KW => {
+            p.bump_any();
+            match p.current() {
+                NOT_KW => {
+                    p.bump_any();
+                    p.expect(NULL_KW);
+                    if !p.eat(STAR) {
+                        name_ref(p);
+                        while !p.at(EOF) && p.eat(COMMA) {
+                            name_ref(p);
+                        }
+                    }
+                }
+                QUOTE_KW | NULL_KW => {
+                    p.bump_any();
+                    if !p.eat(STAR) {
+                        name_ref(p);
+                        while !p.at(EOF) && p.eat(COMMA) {
+                            name_ref(p);
+                        }
+                    }
+                }
+                _ => return false,
+            }
+        }
+
+        _ => return false,
+    }
+    true
+}
+
 // COPY table_name [ ( column_name [, ...] ) ]
 //     FROM { 'filename' | PROGRAM 'command' | STDIN }
 //     [ [ WITH ] ( option [, ...] ) ]
@@ -11347,8 +11364,7 @@ fn copy(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(COPY_KW);
     if p.eat(L_PAREN) {
-        // query
-        query(p);
+        preparable_stmt(p);
         p.expect(R_PAREN);
     } else {
         // table_name
@@ -11372,12 +11388,41 @@ fn copy(p: &mut Parser<'_>) -> CompletedMarker {
             string_literal(p);
         }
     }
-    // [ [ WITH ] ( option [, ...] ) ]
-    if p.eat(WITH_KW) || p.at(L_PAREN) {
+    p.eat(WITH_KW);
+    // [ ( option [, ...] ) ]
+    if p.at(L_PAREN) {
         copy_option_list(p);
+    } else {
+        // old copy option syntax
+        while !p.at(EOF) && opt_copy_option_item(p) {}
     }
     opt_where_clause(p);
     m.complete(p, COPY)
+}
+
+fn preparable_stmt(p: &mut Parser<'_>) {
+    let statement = stmt(
+        p,
+        &StmtRestrictions {
+            begin_end_allowed: false,
+        },
+    );
+    match statement.map(|x| x.kind()) {
+        // select | insert | update | delete | merge
+        Some(
+            SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES | INSERT | UPDATE | DELETE
+            | MERGE,
+        ) => (),
+        Some(kind) => {
+            p.error(format!(
+                    "expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement, got {:?}",
+                    kind
+                ));
+        }
+        None => {
+            p.error("expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement");
+        }
+    }
 }
 
 // https://www.postgresql.org/docs/17/sql-call.html

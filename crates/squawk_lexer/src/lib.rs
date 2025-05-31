@@ -358,12 +358,12 @@ impl Cursor<'_> {
     fn double_quoted_string(&mut self) -> bool {
         while let Some(c) = self.bump() {
             match c {
-                '"' => {
-                    return true;
-                }
-                '\\' if self.first() == '\\' || self.first() == '"' => {
+                '"' if self.first() == '"' => {
                     // Bump again to skip escaped character.
                     self.bump();
+                }
+                '"' => {
+                    return true;
                 }
                 _ => (),
             }
@@ -738,6 +738,13 @@ U&"d!0061t!+000061" UESCAPE '!'
 
 
 "hello-world
+"#))
+    }
+
+    #[test]
+    fn quoted_ident_with_escape_quote() {
+        assert_debug_snapshot!(lex(r#"
+"foo "" bar"
 "#))
     }
 }
