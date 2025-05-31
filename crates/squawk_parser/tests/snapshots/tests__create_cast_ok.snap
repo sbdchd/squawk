@@ -141,7 +141,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          TEXT_KW "text"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
       R_PAREN ")"
     WHITESPACE "\n  "
     AS_KW "as"

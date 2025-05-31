@@ -1354,9 +1354,10 @@ SOURCE_FILE
               INT_NUMBER "10"
           R_PAREN ")"
           WHITESPACE " "
-          NO_KW "no"
-          WHITESPACE " "
-          INHERIT_KW "inherit"
+          NO_INHERIT
+            NO_KW "no"
+            WHITESPACE " "
+            INHERIT_KW "inherit"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -1400,9 +1401,8 @@ SOURCE_FILE
               INT_NUMBER "10"
           R_PAREN ")"
           WHITESPACE " "
-          CONSTRAINT_OPTION_LIST
-            DEFERRABLE_CONSTRAINT_OPTION
-              DEFERRABLE_KW "deferrable"
+          DEFERRABLE_CONSTRAINT_OPTION
+            DEFERRABLE_KW "deferrable"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1420,11 +1420,10 @@ SOURCE_FILE
           WHITESPACE " "
           NULL_KW "null"
           WHITESPACE " "
-          CONSTRAINT_OPTION_LIST
-            NOT_DEFERRABLE_CONSTRAINT_OPTION
-              NOT_KW "not"
-              WHITESPACE " "
-              DEFERRABLE_KW "deferrable"
+          NOT_DEFERRABLE_CONSTRAINT_OPTION
+            NOT_KW "not"
+            WHITESPACE " "
+            DEFERRABLE_KW "deferrable"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1442,11 +1441,10 @@ SOURCE_FILE
           WHITESPACE " "
           NULL_KW "null"
           WHITESPACE " "
-          CONSTRAINT_OPTION_LIST
-            INITIALLY_DEFERRED_CONSTRAINT_OPTION
-              INITIALLY_KW "initially"
-              WHITESPACE " "
-              DEFERRED_KW "deferred"
+          INITIALLY_DEFERRED_CONSTRAINT_OPTION
+            INITIALLY_KW "initially"
+            WHITESPACE " "
+            DEFERRED_KW "deferred"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1464,11 +1462,10 @@ SOURCE_FILE
           WHITESPACE " "
           NULL_KW "null"
           WHITESPACE " "
-          CONSTRAINT_OPTION_LIST
-            INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
-              INITIALLY_KW "initially"
-              WHITESPACE " "
-              IMMEDIATE_KW "immediate"
+          INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
+            INITIALLY_KW "initially"
+            WHITESPACE " "
+            IMMEDIATE_KW "immediate"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -1629,7 +1626,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
         R_PAREN ")"
-        WHITESPACE " "
+      WHITESPACE " "
+      NO_INHERIT
         NO_KW "no"
         WHITESPACE " "
         INHERIT_KW "inherit"
@@ -1815,15 +1813,14 @@ SOURCE_FILE
             NAME_REF
               IDENT "a"
           R_PAREN ")"
+      WHITESPACE " "
+      DEFERRABLE_CONSTRAINT_OPTION
+        DEFERRABLE_KW "deferrable"
+      WHITESPACE " "
+      INITIALLY_DEFERRED_CONSTRAINT_OPTION
+        INITIALLY_KW "initially"
         WHITESPACE " "
-        CONSTRAINT_OPTION_LIST
-          DEFERRABLE_CONSTRAINT_OPTION
-            DEFERRABLE_KW "deferrable"
-          WHITESPACE " "
-          INITIALLY_DEFERRED_CONSTRAINT_OPTION
-            INITIALLY_KW "initially"
-            WHITESPACE " "
-            DEFERRED_KW "deferred"
+        DEFERRED_KW "deferred"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -2219,10 +2216,9 @@ SOURCE_FILE
                 STRING "'%foo'"
           WHITESPACE " "
           R_PAREN ")"
-        WHITESPACE "\n    "
-        CONSTRAINT_OPTION_LIST
-          DEFERRABLE_CONSTRAINT_OPTION
-            DEFERRABLE_KW "deferrable"
+      WHITESPACE "\n    "
+      DEFERRABLE_CONSTRAINT_OPTION
+        DEFERRABLE_KW "deferrable"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -2364,7 +2360,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
         R_PAREN ")"
-        WHITESPACE " "
+      WHITESPACE " "
+      NO_INHERIT
         NO_KW "no"
         WHITESPACE " "
         INHERIT_KW "inherit"
@@ -2549,15 +2546,14 @@ SOURCE_FILE
             NAME_REF
               IDENT "a"
           R_PAREN ")"
+      WHITESPACE " "
+      DEFERRABLE_CONSTRAINT_OPTION
+        DEFERRABLE_KW "deferrable"
+      WHITESPACE " "
+      INITIALLY_DEFERRED_CONSTRAINT_OPTION
+        INITIALLY_KW "initially"
         WHITESPACE " "
-        CONSTRAINT_OPTION_LIST
-          DEFERRABLE_CONSTRAINT_OPTION
-            DEFERRABLE_KW "deferrable"
-          WHITESPACE " "
-          INITIALLY_DEFERRED_CONSTRAINT_OPTION
-            INITIALLY_KW "initially"
-            WHITESPACE " "
-            DEFERRED_KW "deferred"
+        DEFERRED_KW "deferred"
       COMMA ","
       WHITESPACE "\n  "
       CHECK_CONSTRAINT
@@ -2579,17 +2575,16 @@ SOURCE_FILE
           NAME_REF
             IDENT "o"
         R_PAREN ")"
+      WHITESPACE " "
+      NOT_DEFERRABLE_CONSTRAINT_OPTION
+        NOT_KW "not"
         WHITESPACE " "
-        CONSTRAINT_OPTION_LIST
-          NOT_DEFERRABLE_CONSTRAINT_OPTION
-            NOT_KW "not"
-            WHITESPACE " "
-            DEFERRABLE_KW "deferrable"
-          WHITESPACE " "
-          INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
-            INITIALLY_KW "initially"
-            WHITESPACE " "
-            IMMEDIATE_KW "immediate"
+        DEFERRABLE_KW "deferrable"
+      WHITESPACE " "
+      INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
+        INITIALLY_KW "initially"
+        WHITESPACE " "
+        IMMEDIATE_KW "immediate"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

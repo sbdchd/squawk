@@ -874,12 +874,18 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          IDENT "int4"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          IDENT "int4"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int4"
       WHITESPACE " "
       R_PAREN ")"
     WHITESPACE " "

@@ -409,6 +409,5 @@ SOURCE_FILE
   WHITESPACE "\n"
 ---
 ERROR@39: expected path name
-ERROR@99: expected type name
 ERROR@143: unexpected trailing comma
 ERROR@201: unexpected trailing comma

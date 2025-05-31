@@ -86,7 +86,10 @@ SOURCE_FILE@0..389
         WHITESPACE@127..136 "\n        "
         PARAM@136..140
           PATH_TYPE@136..140
-            TEXT_KW@136..140 "text"
+            PATH@136..140
+              PATH_SEGMENT@136..140
+                NAME_REF@136..140
+                  TEXT_KW@136..140 "text"
         WHITESPACE@140..145 "\n    "
         R_PAREN@145..146 ")"
     COMMA@146..147 ","
@@ -129,7 +132,10 @@ SOURCE_FILE@0..389
         WHITESPACE@211..214 "\n  "
         PARAM@214..218
           PATH_TYPE@214..218
-            TEXT_KW@214..218 "text"
+            PATH@214..218
+              PATH_SEGMENT@214..218
+                NAME_REF@214..218
+                  TEXT_KW@214..218 "text"
         COMMA@218..219 ","
         WHITESPACE@219..222 "\n  "
         PARAM@222..229
@@ -171,7 +177,10 @@ SOURCE_FILE@0..389
         WHITESPACE@279..284 "\n    "
         PARAM@284..288
           PATH_TYPE@284..288
-            TEXT_KW@284..288 "text"
+            PATH@284..288
+              PATH_SEGMENT@284..288
+                NAME_REF@284..288
+                  TEXT_KW@284..288 "text"
         WHITESPACE@288..289 "\n"
         R_PAREN@289..290 ")"
     WHITESPACE@290..291 " "
@@ -228,7 +237,10 @@ SOURCE_FILE@0..389
         WHITESPACE@375..380 "\n    "
         PARAM@380..384
           PATH_TYPE@380..384
-            TEXT_KW@380..384 "text"
+            PATH@380..384
+              PATH_SEGMENT@380..384
+                NAME_REF@380..384
+                  TEXT_KW@380..384 "text"
         WHITESPACE@384..385 "\n"
         R_PAREN@385..386 ")"
   SEMICOLON@386..387 ";"

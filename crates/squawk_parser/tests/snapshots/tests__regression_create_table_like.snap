@@ -2,31 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/create_table_like.sql
 ---
-ERROR@5112: expected R_PAREN
-ERROR@5112: expected SEMICOLON
-ERROR@5113: expected command, found ENFORCED_KW
-ERROR@5122: expected command, found PRIMARY_KW
-ERROR@5130: expected command, found KEY_KW
-ERROR@5133: expected command, found COMMA
-ERROR@5136: expected command, found IDENT
-ERROR@5138: expected command, found TEXT_KW
-ERROR@5143: expected command, found CHECK_KW
-ERROR@5149: expected command, found L_PAREN
-ERROR@5150: expected command, found IDENT
-ERROR@5156: expected command, found L_PAREN
-ERROR@5157: expected command, found IDENT
-ERROR@5158: expected command, found R_PAREN
-ERROR@5160: expected command, found R_ANGLE
-ERROR@5162: expected command, found INT_NUMBER
-ERROR@5165: expected command, found R_PAREN
-ERROR@5167: expected command, found NOT_KW
-ERROR@5171: expected command, found ENFORCED_KW
-ERROR@5179: expected command, found R_PAREN
-ERROR@8398: expected R_PAREN
-ERROR@8398: expected SEMICOLON
-ERROR@8399: expected command, found NO_KW
-ERROR@8402: expected command, found INHERIT_KW
-ERROR@8409: expected command, found R_PAREN
 ERROR@9797: expected name
 ERROR@9797: expected R_PAREN
 ERROR@9797: expected SERVER_KW

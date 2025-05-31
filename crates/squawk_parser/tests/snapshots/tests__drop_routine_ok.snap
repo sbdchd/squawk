@@ -42,7 +42,10 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          TEXT_KW "text"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
       R_PAREN ")"
     COMMA ","
     WHITESPACE " "
@@ -83,7 +86,10 @@ SOURCE_FILE
           OUT_KW "out"
         WHITESPACE " "
         PATH_TYPE
-          TEXT_KW "text"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
       R_PAREN ")"
     WHITESPACE " "
     CASCADE_KW "cascade"

@@ -1,0 +1,11 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\nDO $doblock$\nend\n$doblock$;\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "DO" @ Ident,
+    " " @ Whitespace,
+    "$doblock$\nend\n$doblock$" @ Literal { kind: DollarQuotedString { terminated: true } },
+    ";" @ Semi,
+]

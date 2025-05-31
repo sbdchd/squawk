@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_aggregate.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple_old_syntax"
@@ -370,7 +369,10 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          IDENT "t"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
       R_PAREN ")"
     WHITESPACE " "
     L_PAREN "("
@@ -440,7 +442,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          TEXT_KW "text"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
       COMMA ","
       WHITESPACE " "
       PARAM
@@ -715,7 +720,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          IDENT "a"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
       COMMA ","
       WHITESPACE "\n  "
       PARAM
@@ -836,7 +844,10 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          IDENT "anycompatible"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "anycompatible"
       R_PAREN ")"
     WHITESPACE "\n"
     L_PAREN "("
@@ -892,7 +903,10 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          IDENT "anynonarray"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "anynonarray"
       R_PAREN ")"
     WHITESPACE "\n"
     L_PAREN "("
@@ -955,7 +969,10 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          IDENT "float8"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
       WHITESPACE " "
       ORDER_KW "ORDER"
       WHITESPACE " "
@@ -963,7 +980,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          IDENT "anyelement"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "anyelement"
       R_PAREN ")"
     WHITESPACE "\n"
     L_PAREN "("
@@ -1026,7 +1046,10 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          IDENT "complex"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "complex"
       R_PAREN ")"
     WHITESPACE "\n"
     L_PAREN "("
@@ -1127,7 +1150,10 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          IDENT "float8"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "float8"
       R_PAREN ")"
     WHITESPACE "\n"
     L_PAREN "("

@@ -74,9 +74,6 @@ ERROR@58007: expected L_PAREN
 ERROR@58021: expected R_PAREN
 ERROR@58105: expected L_PAREN
 ERROR@58119: expected R_PAREN
-ERROR@62112: expected type name
-ERROR@62639: expected type name
-ERROR@63728: expected type name
 ERROR@79066: expected SEMICOLON
 ERROR@79066: expected command, found DOT
 ERROR@79067: expected command, found IDENT

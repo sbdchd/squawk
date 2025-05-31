@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/drop_aggregate.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
@@ -101,7 +100,10 @@ SOURCE_FILE
         WHITESPACE "\n        "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         WHITESPACE "\n    "
         R_PAREN ")"
     COMMA ","
@@ -144,7 +146,10 @@ SOURCE_FILE
         WHITESPACE "\n  "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         COMMA ","
         WHITESPACE "\n  "
         PARAM
@@ -183,7 +188,10 @@ SOURCE_FILE
         WHITESPACE "\n    "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE " "
@@ -237,7 +245,10 @@ SOURCE_FILE
         WHITESPACE "\n    "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         WHITESPACE "\n"
         R_PAREN ")"
   SEMICOLON ";"

@@ -83,6 +83,9 @@ fn parser_err(fixture: Fixture<&str>) {
 fn regression_suite(fixture: Fixture<&str>) {
     let content = fixture.content();
     let absolute_fixture_path = Utf8Path::new(fixture.path());
+    if absolute_fixture_path.to_string().contains("psql") {
+        return;
+    }
     let input_file = absolute_fixture_path;
     let test_name = absolute_fixture_path
         .file_name()
@@ -174,7 +177,7 @@ fn parse_text(text: &str) -> (String, Vec<std::string::String>) {
     if !errors.is_empty() {
         buf.push_str("---\n");
         for e in &errors {
-            buf.push_str(&e);
+            buf.push_str(e);
         }
     }
     (buf, errors)

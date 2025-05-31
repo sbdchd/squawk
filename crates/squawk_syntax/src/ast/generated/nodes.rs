@@ -49,6 +49,38 @@ impl AddConstraint {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn deferrable_constraint_option(&self) -> Option<DeferrableConstraintOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn enforced(&self) -> Option<Enforced> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn initially_deferred_constraint_option(
+        &self,
+    ) -> Option<InitiallyDeferredConstraintOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn initially_immediate_constraint_option(
+        &self,
+    ) -> Option<InitiallyImmediateConstraintOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn no_inherit(&self) -> Option<NoInherit> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn not_deferrable_constraint_option(&self) -> Option<NotDeferrableConstraintOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn not_enforced(&self) -> Option<NotEnforced> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn not_valid(&self) -> Option<NotValid> {
         support::child(&self.syntax)
     }
@@ -1414,10 +1446,6 @@ pub struct CheckConstraint {
 }
 impl CheckConstraint {
     #[inline]
-    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
@@ -1440,14 +1468,6 @@ impl CheckConstraint {
     #[inline]
     pub fn constraint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
-    }
-    #[inline]
-    pub fn inherit_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::INHERIT_KW)
-    }
-    #[inline]
-    pub fn no_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NO_KW)
     }
 }
 
@@ -1704,33 +1724,6 @@ impl ConstraintIndexTablespace {
     #[inline]
     pub fn using_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::USING_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ConstraintOptionList {
-    pub(crate) syntax: SyntaxNode,
-}
-impl ConstraintOptionList {
-    #[inline]
-    pub fn deferrable_constraint_option(&self) -> Option<DeferrableConstraintOption> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn initially_deferred_constraint_option(
-        &self,
-    ) -> Option<InitiallyDeferredConstraintOption> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn initially_immediate_constraint_option(
-        &self,
-    ) -> Option<InitiallyImmediateConstraintOption> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn not_deferrable_constraint_option(&self) -> Option<NotDeferrableConstraintOption> {
-        support::child(&self.syntax)
     }
 }
 
@@ -2870,10 +2863,6 @@ pub struct DefaultConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl DefaultConstraint {
-    #[inline]
-    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
@@ -4374,6 +4363,17 @@ impl EnableTrigger {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Enforced {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Enforced {
+    #[inline]
+    pub fn enforced_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ENFORCED_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct ExcludeConstraint {
     pub(crate) syntax: SyntaxNode,
 }
@@ -4594,10 +4594,6 @@ pub struct GeneratedConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl GeneratedConstraint {
-    #[inline]
-    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
@@ -5577,6 +5573,21 @@ impl NotDeferrableConstraintOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NotEnforced {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NotEnforced {
+    #[inline]
+    pub fn enforced_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ENFORCED_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NotIlike {
     pub(crate) syntax: SyntaxNode,
 }
@@ -5626,10 +5637,6 @@ pub struct NotNullConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl NotNullConstraint {
-    #[inline]
-    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -5694,10 +5701,6 @@ pub struct NullConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl NullConstraint {
-    #[inline]
-    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -6306,10 +6309,6 @@ impl PrimaryKeyConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn index_params(&self) -> Option<IndexParams> {
         support::child(&self.syntax)
     }
@@ -6411,10 +6410,6 @@ pub struct ReferencesConstraint {
     pub(crate) syntax: SyntaxNode,
 }
 impl ReferencesConstraint {
-    #[inline]
-    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn match_type(&self) -> Option<MatchType> {
         support::child(&self.syntax)
@@ -7822,10 +7817,6 @@ pub struct UniqueConstraint {
 impl UniqueConstraint {
     #[inline]
     pub fn column_list(&self) -> Option<ColumnList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn constraint_option_list(&self) -> Option<ConstraintOptionList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -10043,24 +10034,6 @@ impl AstNode for ConstraintIndexTablespace {
         &self.syntax
     }
 }
-impl AstNode for ConstraintOptionList {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CONSTRAINT_OPTION_LIST
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for ConstraintStorageParams {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -12167,6 +12140,24 @@ impl AstNode for EnableTrigger {
         &self.syntax
     }
 }
+impl AstNode for Enforced {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ENFORCED
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for ExcludeConstraint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -13377,6 +13368,24 @@ impl AstNode for NotDeferrableConstraintOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NOT_DEFERRABLE_CONSTRAINT_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NotEnforced {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NOT_ENFORCED
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

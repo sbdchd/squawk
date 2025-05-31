@@ -110,7 +110,10 @@ SOURCE_FILE
         WHITESPACE " "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
@@ -146,7 +149,10 @@ SOURCE_FILE
         WHITESPACE " "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         WHITESPACE " "
         ORDER_KW "order"
         WHITESPACE " "
@@ -505,7 +511,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          TEXT_KW "text"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
       R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"
