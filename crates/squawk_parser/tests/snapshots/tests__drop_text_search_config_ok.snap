@@ -14,8 +14,10 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    NAME_REF
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -34,8 +36,10 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    NAME_REF
-      IDENT "bar"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
     WHITESPACE " "
     CASCADE_KW "cascade"
   SEMICOLON ";"
@@ -51,8 +55,10 @@ SOURCE_FILE
     WHITESPACE " "
     CONFIGURATION_KW "configuration"
     WHITESPACE " "
-    NAME_REF
-      IDENT "bar"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
     WHITESPACE " "
     RESTRICT_KW "restrict"
   SEMICOLON ";"

@@ -5,12 +5,6 @@ input_file: crates/squawk_parser/tests/data/regression_suite/copyselect.sql
 ERROR@1031: expected SEMICOLON
 ERROR@1032: expected command, found TO_KW
 ERROR@1035: expected command, found STDOUT_KW
-ERROR@1459: expected SEMICOLON
-ERROR@1460: expected command, found CSV_KW
-ERROR@1464: expected command, found HEADER_KW
-ERROR@1471: expected command, found FORCE_KW
-ERROR@1477: expected command, found QUOTE_KW
-ERROR@1483: expected command, found IDENT
 ERROR@1742: expected SEMICOLON
 ERROR@1742: expected command, found ERROR
 ERROR@1786: expected SEMICOLON

@@ -45,14 +45,14 @@ select test from copytest2 order by test collate "C";
 -- in text mode, \. must be alone on its line
 truncate copytest2;
 copy copytest2(test) from stdin;
-line1
-line2
-foo\.
-line3
+-- line1
+-- line2
+-- foo\.
+-- line3
 copy copytest2(test) from stdin;
-line4
-line5
-line6
+-- line4
+-- line5
+-- line6
 select test from copytest2;
 
 
@@ -64,9 +64,9 @@ create temp table copytest3 (
 	"col with "" quote"  int);
 
 copy copytest3 from stdin csv header;
-this is just a line full of junk that would error out if parsed
-1,a,1
-2,b,2
+-- this is just a line full of junk that would error out if parsed
+-- 1,a,1
+-- 2,b,2
 
 copy copytest3 to stdout csv header;
 
@@ -75,9 +75,9 @@ create temp table copytest4 (
 	"colname with tab: 	" text);
 
 copy copytest4 from stdin (header);
-this is just a line full of junk that would error out if parsed
-1	a
-2	b
+-- this is just a line full of junk that would error out if parsed
+-- 1	a
+-- 2	b
 
 copy copytest4 to stdout (header);
 
@@ -139,8 +139,8 @@ create index on parted_copytest (b);
 drop trigger part_ins_trig on parted_copytest_a2;
 
 copy parted_copytest from stdin;
-1	1	str1
-2	2	str2
+-- 1	1	str1
+-- 2	2	str2
 
 -- Ensure index entries were properly added during the copy.
 select * from parted_copytest where b = 1;
@@ -197,9 +197,9 @@ create trigger check_after_tab_progress_reporting
 
 -- Generate COPY FROM report with PIPE.
 copy tab_progress_reporting from stdin;
-sharon	25	(15,12)	1000	sam
-sam	30	(10,5)	2000	bill
-bill	20	(11,10)	1000	sharon
+-- sharon	25	(15,12)	1000	sam
+-- sam	30	(10,5)	2000	bill
+-- bill	20	(11,10)	1000	sharon
 
 -- Generate COPY FROM report with FILE, with some excluded tuples.
 truncate tab_progress_reporting;
@@ -208,9 +208,9 @@ copy tab_progress_reporting from 'filename'
 
 -- Generate COPY FROM report with PIPE, with some skipped tuples.
 copy tab_progress_reporting from stdin(on_error ignore);
-sharon	x	(15,12)	x	sam
-sharon	25	(15,12)	1000	sam
-sharon	y	(15,12)	x	sam
+-- sharon	x	(15,12)	x	sam
+-- sharon	25	(15,12)	1000	sam
+-- sharon	y	(15,12)	x	sam
 
 drop trigger check_after_tab_progress_reporting on tab_progress_reporting;
 drop function notice_after_tab_progress_reporting();
@@ -229,48 +229,48 @@ copy header_copytest to stdout with (header match);
 copy header_copytest from stdin with (header wrong_choice);
 -- works
 copy header_copytest from stdin with (header match);
-a	b	c
-1	2	foo
+-- a	b	c
+-- 1	2	foo
 copy header_copytest (c, a, b) from stdin with (header match);
-c	a	b
-bar	3	4
+-- c	a	b
+-- bar	3	4
 copy header_copytest from stdin with (header match, format csv);
-a,b,c
-5,6,baz
+-- a,b,c
+-- 5,6,baz
 -- errors
 copy header_copytest (c, b, a) from stdin with (header match);
-a	b	c
-1	2	foo
+-- a	b	c
+-- 1	2	foo
 copy header_copytest from stdin with (header match);
-a	b	\N
-1	2	foo
+-- a	b	\N
+-- 1	2	foo
 copy header_copytest from stdin with (header match);
-a	b
-1	2
+-- a	b
+-- 1	2
 copy header_copytest from stdin with (header match);
-a	b	c	d
-1	2	foo	bar
+-- a	b	c	d
+-- 1	2	foo	bar
 copy header_copytest from stdin with (header match);
-a	b	d
-1	2	foo
+-- a	b	d
+-- 1	2	foo
 SELECT * FROM header_copytest ORDER BY a;
 
 -- Drop an extra column, in the middle of the existing set.
 alter table header_copytest drop column b;
 -- works
 copy header_copytest (c, a) from stdin with (header match);
-c	a
-foo	7
+-- c	a
+-- foo	7
 copy header_copytest (a, c) from stdin with (header match);
-a	c
-8	foo
+-- a	c
+-- 8	foo
 -- errors
 copy header_copytest from stdin with (header match);
-a	........pg.dropped.2........	c
-1	2	foo
+-- a	........pg.dropped.2........	c
+-- 1	2	foo
 copy header_copytest (a, c) from stdin with (header match);
-a	c	b
-1	foo	2
+-- a	c	b
+-- 1	foo	2
 
 SELECT * FROM header_copytest ORDER BY a;
 drop table header_copytest;
@@ -329,7 +329,7 @@ create foreign data wrapper copytest_wrapper;
 create server copytest_server foreign data wrapper copytest_wrapper;
 create foreign table copytest_foreign_table (a int) server copytest_server;
 copy copytest_foreign_table from stdin (freeze);
-1
+-- 1
 rollback;
 
 -- Tests for COPY TO with materialized views.

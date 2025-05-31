@@ -384,48 +384,44 @@ function ErrorList({ errors }: { errors: Marker[] }) {
   if (errors.length === 0) {
     return <div>no errors!</div>
   }
-  return (
-    <>
-      {errors.map((x) => {
-        const color =
-          x.severity === monaco.MarkerSeverity.Warning
-            ? "border-l-amber-300"
-            : x.severity === monaco.MarkerSeverity.Error
-              ? "border-l-red-400"
-              : ""
-        const code = typeof x.code === "string" ? x.code : x.code?.value
-        return (
-          <div className={`${color} border-l-2 pl-2 leading-5`} key={x.id}>
-            <div data-range={`${x.range_start}..${x.range_end}`}>
-              {code == null ? (
-                <div className="font-semibold">{code}</div>
-              ) : (
-                <a
-                  href={`https://squawkhq.com/docs/${encodeURIComponent(code)}`}
-                  target="_blank"
-                >
-                  {code}
-                </a>
-              )}
-              :{x.startLineNumber}:{x.startColumn}: {x.message}
-            </div>
-            {x.messages.length > 0 && (
-              <div className="pl-4 pt-1">
-                {x.messages.map((note) => {
-                  return (
-                    <div key={note}>
-                      <span className="text-blue-400 font-semibold">help:</span>{" "}
-                      {note}
-                    </div>
-                  )
-                })}
-              </div>
-            )}
+  return errors.map((x) => {
+    const color =
+      x.severity === monaco.MarkerSeverity.Warning
+        ? "border-l-amber-300"
+        : x.severity === monaco.MarkerSeverity.Error
+          ? "border-l-red-400"
+          : ""
+    const code = typeof x.code === "string" ? x.code : x.code?.value
+    return (
+      <div className={`${color} border-l-2 pl-2 leading-5`} key={x.id}>
+        <div data-range={`${x.range_start}..${x.range_end}`}>
+          {code == null ? (
+            <div className="font-semibold">{code}</div>
+          ) : (
+            <a
+              href={`https://squawkhq.com/docs/${encodeURIComponent(code)}`}
+              target="_blank"
+            >
+              {code}
+            </a>
+          )}
+          :{x.startLineNumber}:{x.startColumn}: {x.message}
+        </div>
+        {x.messages.length > 0 && (
+          <div className="pl-4 pt-1">
+            {x.messages.map((note) => {
+              return (
+                <div key={note}>
+                  <span className="text-blue-400 font-semibold">help:</span>{" "}
+                  {note}
+                </div>
+              )
+            })}
           </div>
-        )
-      })}
-    </>
-  )
+        )}
+      </div>
+    )
+  })
 }
 
 function ErrorPanel({ errors }: { errors: Marker[] }) {

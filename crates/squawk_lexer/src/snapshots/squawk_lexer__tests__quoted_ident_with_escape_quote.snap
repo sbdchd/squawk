@@ -1,0 +1,9 @@
+---
+source: crates/squawk_lexer/src/lib.rs
+expression: "lex(r#\"\n\"foo \"\" bar\"\n\"#)"
+---
+[
+    "\n" @ Whitespace,
+    "\"foo \"\" bar\"" @ QuotedIdent { terminated: true },
+    "\n" @ Whitespace,
+]

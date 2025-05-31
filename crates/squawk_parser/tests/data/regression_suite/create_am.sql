@@ -112,13 +112,13 @@ CREATE TABLE tableam_tblas_heap2 USING heap2 AS SELECT * FROM tableam_tbl_heap2;
 SELECT f1 FROM tableam_tbl_heap2 ORDER BY f1;
 
 -- SELECT INTO doesn't support USING
-SELECT INTO tableam_tblselectinto_heap2 USING heap2 FROM tableam_tbl_heap2;
+-- SELECT INTO tableam_tblselectinto_heap2 USING heap2 FROM tableam_tbl_heap2;
 
 -- CREATE VIEW doesn't support USING
-CREATE VIEW tableam_view_heap2 USING heap2 AS SELECT * FROM tableam_tbl_heap2;
+-- CREATE VIEW tableam_view_heap2 USING heap2 AS SELECT * FROM tableam_tbl_heap2;
 
 -- CREATE SEQUENCE doesn't support USING
-CREATE SEQUENCE tableam_seq_heap2 USING heap2;
+-- CREATE SEQUENCE tableam_seq_heap2 USING heap2;
 
 -- CREATE MATERIALIZED VIEW does support USING
 CREATE MATERIALIZED VIEW tableam_tblmv_heap2 USING heap2 AS SELECT * FROM tableam_tbl_heap2;

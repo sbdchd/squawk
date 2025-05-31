@@ -9,10 +9,10 @@ CREATE ROLE regress_subscription_user_dummy LOGIN NOSUPERUSER;
 SET SESSION AUTHORIZATION 'regress_subscription_user';
 
 -- fail - no publications
-CREATE SUBSCRIPTION regress_testsub CONNECTION 'foo';
+-- CREATE SUBSCRIPTION regress_testsub CONNECTION 'foo';
 
 -- fail - no connection
-CREATE SUBSCRIPTION regress_testsub PUBLICATION foo;
+-- CREATE SUBSCRIPTION regress_testsub PUBLICATION foo;
 
 -- fail - cannot do CREATE SUBSCRIPTION CREATE SLOT inside transaction block
 BEGIN;

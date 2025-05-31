@@ -63,13 +63,6 @@ ERROR@2347: expected SEMICOLON
 ERROR@2348: expected command, found IDENT
 ERROR@2356: expected command, found EQ
 ERROR@2358: expected command, found INT_NUMBER
-ERROR@2651: expected select stmt
-ERROR@2651: expected R_PAREN
-ERROR@2651: expected SEMICOLON
-ERROR@2721: expected SEMICOLON
-ERROR@2722: expected command, found R_PAREN
-ERROR@2724: expected command, found TO_KW
-ERROR@2727: expected command, found STDOUT_KW
 ERROR@22860: expected IDENT
 ERROR@22860: expected SEMICOLON
 ERROR@22861: expected command, found ACTION_KW
@@ -190,13 +183,6 @@ ERROR@24223: expected command, found AS_KW
 ERROR@24226: expected command, found L_PAREN
 ERROR@24518: expected SEMICOLON
 ERROR@24519: expected command, found R_PAREN
-ERROR@24648: expected select stmt
-ERROR@24648: expected R_PAREN
-ERROR@24648: expected SEMICOLON
-ERROR@24974: expected SEMICOLON
-ERROR@24975: expected command, found R_PAREN
-ERROR@24977: expected command, found TO_KW
-ERROR@24980: expected command, found STDOUT_KW
 ERROR@41486: expected ON_KW
 ERROR@41493: expected WHEN_KW
 ERROR@41493: expected MATCHED, or NOT MATCHED

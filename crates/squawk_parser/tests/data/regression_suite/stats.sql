@@ -662,7 +662,7 @@ SELECT current_setting('fsync') = 'off'
   OR 'my_io_sum_shared_after_fsyncs' >= 'my_io_sum_shared_before_fsyncs';
 SELECT sum(writes) AS writes, sum(fsyncs) AS fsyncs
   FROM pg_stat_io
-  WHERE context = 'normal' AND object = 'wal' ; io_sum_wal_normal_after_
+  WHERE context = 'normal' AND object = 'wal' ; -- io_sum_wal_normal_after_
 SELECT current_setting('synchronous_commit') = 'on';
 SELECT 'io_sum_wal_normal_after_writes' > 'io_sum_wal_normal_before_writes';
 SELECT current_setting('fsync') = 'off'

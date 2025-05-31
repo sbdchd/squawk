@@ -80,13 +80,13 @@ COPY y TO stdout (FORMAT CSV, FORCE_QUOTE *);
 
 CREATE TEMP TABLE testnl (a int, b text, c int);
 
-inside",2
+-- inside",2
 
 -- test end of copy marker
 CREATE TEMP TABLE testeoc (a text);
 
-c\.d
-"\."
+-- c\.d
+-- "\."
 
 COPY testeoc TO stdout CSV;
 
@@ -195,9 +195,9 @@ begin
 end $$ language plpgsql immutable;
 alter table check_con_tbl add check (check_con_function(check_con_tbl.*));
 copy check_con_tbl from stdin;
-1
+-- 1
 copy check_con_tbl from stdin;
-0
+-- 0
 select * from check_con_tbl;
 
 -- test with RLS enabled.
@@ -287,14 +287,14 @@ COMMIT;
 
 -- tests for on_error option
 CREATE TABLE check_ign_err (n int, m int[], k int);
-5	{5}	5
+-- 5	{5}	5
 
--- want context for notices
+-- -- want context for notices
 
-5	{5}	5
-6	a
-7	{7}	a
-8	{8}	8
+-- 5	{5}	5
+-- 6	a
+-- 7	{7}	a
+-- 8	{8}	8
 
 -- tests for on_error option with log_verbosity and null constraint via domain
 CREATE DOMAIN dcheck_ign_err2 varchar(15) NOT NULL;
@@ -314,9 +314,9 @@ CREATE TABLE hard_err(foo widget);
 -- test extra data: should fail
 
 -- tests for reject_limit option
-10	{10}	10
+-- 10	{10}	10
 
-10	{10}	10
+-- 10	{10}	10
 
 -- clean up
 DROP TABLE forcetest;
@@ -349,16 +349,16 @@ create temp table copy_default (
 
 -- if DEFAULT is not specified, then the marker will be regular data
 copy copy_default from stdin;
-1	value	'2022-07-04'
-2	\D	'2022-07-05'
+-- 1	value	'2022-07-04'
+-- 2	\D	'2022-07-05'
 
 select id, text_value, ts_value from copy_default;
 
 truncate copy_default;
 
 copy copy_default from stdin with (format csv);
-1,value,2022-07-04
-2,\D,2022-07-05
+-- 1,value,2022-07-04
+-- 2,\D,2022-07-05
 
 select id, text_value, ts_value from copy_default;
 
@@ -382,25 +382,25 @@ copy copy_default from stdin with (default '\N');
 
 -- cannot use DEFAULT marker in column that has no DEFAULT value
 copy copy_default from stdin with (default '\D');
-2	\D	'2022-07-05'
+-- 2	\D	'2022-07-05'
 
 copy copy_default from stdin with (format csv, default '\D');
-2,\D,2022-07-05
+-- 2,\D,2022-07-05
 
 -- The DEFAULT marker must be unquoted and unescaped or it's not recognized
 copy copy_default from stdin with (default '\D');
-1	\D	'2022-07-04'
-2	\\D	'2022-07-04'
-3	"\D"	'2022-07-04'
+-- 1	\D	'2022-07-04'
+-- 2	\\D	'2022-07-04'
+-- 3	"\D"	'2022-07-04'
 
 select id, text_value, ts_value from copy_default;
 
 truncate copy_default;
 
 copy copy_default from stdin with (format csv, default '\D');
-1,\D,2022-07-04
-2,\\D,2022-07-04
-3,"\D",2022-07-04
+-- 1,\D,2022-07-04
+-- 2,\\D,2022-07-04
+-- 3,"\D",2022-07-04
 
 select id, text_value, ts_value from copy_default;
 
@@ -408,18 +408,18 @@ truncate copy_default;
 
 -- successful usage of DEFAULT option in COPY
 copy copy_default from stdin with (default '\D');
-1	value	'2022-07-04'
-2	\D	'2022-07-03'
-3	\D	\D
+-- 1	value	'2022-07-04'
+-- 2	\D	'2022-07-03'
+-- 3	\D	\D
 
 select id, text_value, ts_value from copy_default;
 
 truncate copy_default;
 
 copy copy_default from stdin with (format csv, default '\D');
-1,value,2022-07-04
-2,\D,2022-07-03
-3,\D,\D
+-- 1,value,2022-07-04
+-- 2,\D,2022-07-03
+-- 3,\D,\D
 
 select id, text_value, ts_value from copy_default;
 
