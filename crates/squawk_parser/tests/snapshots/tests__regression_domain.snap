@@ -2,9 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/domain.sql
 ---
-ERROR@544: expected SEMICOLON
-ERROR@545: expected command, found NO_KW
-ERROR@548: expected command, found INHERIT_KW
 ERROR@991: expected L_PAREN
 ERROR@993: expected L_PAREN
 ERROR@994: expected L_PAREN
@@ -40,13 +37,3 @@ ERROR@10397: expected command, found ARRAY_KW
 ERROR@10402: expected command, found L_BRACK
 ERROR@10403: expected command, found INT_NUMBER
 ERROR@10405: expected command, found R_BRACK
-ERROR@25791: expected SEMICOLON
-ERROR@25792: expected command, found ENFORCED_KW
-ERROR@25898: expected NULL_KW
-ERROR@25898: expected SEMICOLON
-ERROR@25899: expected command, found ENFORCED_KW
-ERROR@26072: expected SEMICOLON
-ERROR@26073: expected command, found ENFORCED_KW
-ERROR@26171: expected VALID_KW
-ERROR@26171: expected SEMICOLON
-ERROR@26172: expected command, found ENFORCED_KW

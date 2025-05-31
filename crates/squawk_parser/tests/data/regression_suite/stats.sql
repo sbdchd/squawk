@@ -393,7 +393,7 @@ SELECT shobj_description(d.oid, 'pg_database') as description_before
 -- force some stats in pg_shdescription.
 BEGIN;
 SELECT current_database() as datname ;
-COMMENT ON DATABASE :"datname" IS 'This is a test comment';
+COMMENT ON DATABASE "datname" IS 'This is a test comment';
 SELECT pg_stat_force_next_flush();
 COMMIT;
 
@@ -405,8 +405,8 @@ SELECT (n_tup_ins + n_tup_upd) > 0 AS has_data FROM pg_stat_all_tables
   WHERE relid = 'pg_shdescription'::regclass;
 
 -- set back comment
-  COMMENT ON DATABASE :"datname" IS 'description_before';
-  COMMENT ON DATABASE :"datname" IS NULL;
+  COMMENT ON DATABASE "datname" IS 'description_before';
+  COMMENT ON DATABASE "datname" IS NULL;
 
 -----
 -- Test that various stats views are being properly populated
@@ -625,13 +625,13 @@ SELECT sum(extends) AS my_io_sum_shared_before_extends
   WHERE context = 'normal' AND object = 'relation' ;
 SELECT sum(writes) AS writes, sum(fsyncs) AS fsyncs
   FROM pg_stat_io
-  WHERE object = 'relation' ; io_sum_shared_before_
+  WHERE object = 'relation' ; -- io_sum_shared_before_
 SELECT sum(writes) AS writes, sum(fsyncs) AS fsyncs
   FROM pg_stat_get_backend_io(pg_backend_pid())
-  WHERE object = 'relation' ; my_io_sum_shared_before_
+  WHERE object = 'relation' ; -- my_io_sum_shared_before_
 SELECT sum(writes) AS writes, sum(fsyncs) AS fsyncs
   FROM pg_stat_io
-  WHERE context = 'normal' AND object = 'wal' ; io_sum_wal_normal_before_
+  WHERE context = 'normal' AND object = 'wal' ; -- io_sum_wal_normal_before_
 CREATE TABLE test_io_shared(a int);
 INSERT INTO test_io_shared SELECT i FROM generate_series(1,100)i;
 SELECT pg_stat_force_next_flush();

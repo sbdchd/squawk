@@ -86,15 +86,3 @@ ERROR@62652: expected SEMICOLON
 ERROR@62653: expected command, found OBJECTS_KW
 ERROR@62661: expected command, found TO_KW
 ERROR@62664: expected command, found IDENT
-ERROR@64849: expected type name
-ERROR@64849: expected SEMICOLON
-ERROR@64849: expected command, found DOT
-ERROR@64850: expected command, found IDENT
-ERROR@64867: expected command, found AS_KW
-ERROR@64870: expected command, found INT_KW
-ERROR@65100: expected type name
-ERROR@65100: expected SEMICOLON
-ERROR@65100: expected command, found DOT
-ERROR@65101: expected command, found IDENT
-ERROR@65118: expected command, found AS_KW
-ERROR@65121: expected command, found INT_KW

@@ -123,9 +123,10 @@ SOURCE_FILE
           IDENT "b"
       R_PAREN ")"
       WHITESPACE " "
-      NO_KW "no"
-      WHITESPACE " "
-      INHERIT_KW "inherit"
+      NO_INHERIT
+        NO_KW "no"
+        WHITESPACE " "
+        INHERIT_KW "inherit"
     WHITESPACE "\n    "
     DEFAULT_CONSTRAINT
       DEFAULT_KW "default"

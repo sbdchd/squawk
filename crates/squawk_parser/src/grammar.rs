@@ -1431,8 +1431,12 @@ fn opt_path(p: &mut Parser<'_>, kind: SyntaxKind) -> Option<CompletedMarker> {
     Some(path_for_qualifier(p, qual, kind))
 }
 
+fn opt_path_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    opt_path(p, NAME)
+}
+
 fn path_name(p: &mut Parser<'_>) {
-    if opt_path(p, NAME).is_none() {
+    if opt_path_name(p).is_none() {
         p.error("expected path name");
     }
 }
@@ -3240,7 +3244,7 @@ fn opt_column_constraint(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     match opt_constraint_inner(p) {
         Some(kind) => {
-            opt_constraint_options(p);
+            opt_constraint_option_list(p);
             Some(m.complete(p, kind))
         }
         None => {
@@ -3283,9 +3287,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 p.error("expected expression");
             }
             p.expect(R_PAREN);
-            if p.eat(NO_KW) {
-                p.expect(INHERIT_KW);
-            }
+            opt_no_inherit(p);
             CHECK_CONSTRAINT
         }
         DEFAULT_KW => {
@@ -3306,9 +3308,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                     p.error("expected an expression");
                 }
                 p.expect(R_PAREN);
-                if !p.eat(STORED_KW) && !p.eat(VIRTUAL_KW) {
-                    p.error("expected STORED or VIRTUAL");
-                }
+                opt_virtual_or_stored(p);
                 GENERATED_CONSTRAINT
             // { ALWAYS | BY DEFAULT } AS IDENTITY [ ( sequence_options ) ]
             } else if p.at(ALWAYS_KW) || p.at(BY_KW) {
@@ -3323,9 +3323,7 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                         p.error("expected an expression");
                     }
                     p.expect(R_PAREN);
-                    if !p.eat(STORED_KW) && !p.eat(VIRTUAL_KW) {
-                        p.error("expected STORED or VIRTUAL");
-                    }
+                    opt_virtual_or_stored(p);
                 } else {
                     p.expect(IDENTITY_KW);
                     opt_sequence_options(p);
@@ -3377,6 +3375,21 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         }
     };
     Some(kind)
+}
+
+fn opt_virtual_or_stored(p: &mut Parser<'_>) {
+    let _ = p.eat(STORED_KW) || p.eat(VIRTUAL_KW);
+}
+
+fn opt_no_inherit(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.eat(NO_KW) {
+        if p.eat(INHERIT_KW) {
+            m.complete(p, NO_INHERIT);
+        }
+    } else {
+        m.abandon(p);
+    }
 }
 
 // [ ON DELETE referential_action ]
@@ -3501,6 +3514,7 @@ const TABLE_CONSTRAINT_FIRST: TokenSet = TokenSet::new(&[
     PRIMARY_KW,
     EXCLUDE_KW,
     FOREIGN_KW,
+    NOT_KW,
 ]);
 
 // and table_constraint is:
@@ -3533,9 +3547,6 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
                 p.error("expected expr");
             }
             p.expect(R_PAREN);
-            if p.eat(NO_KW) {
-                p.expect(INHERIT_KW);
-            }
             CHECK_CONSTRAINT
         }
         // UNIQUE [ NULLS [ NOT ] DISTINCT ] ( column_name [, ... ] ) index_parameters
@@ -3608,6 +3619,12 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             }
             EXCLUDE_CONSTRAINT
         }
+        NOT_KW => {
+            p.bump(NOT_KW);
+            p.expect(NULL_KW);
+            name_ref(p);
+            NOT_NULL_CONSTRAINT
+        }
         // FOREIGN KEY ( column_name [, ... ] ) REFERENCES reftable [ ( refcolumn [, ... ] ) ]
         //   [ MATCH FULL | MATCH PARTIAL | MATCH SIMPLE ] [ ON DELETE referential_action ] [ ON UPDATE referential_action ] }
         _ => {
@@ -3641,8 +3658,9 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
             FOREIGN_KEY_CONSTRAINT
         }
     };
-    opt_constraint_options(p);
-    m.complete(p, kind)
+    let cm = m.complete(p, kind);
+    opt_constraint_option_list(p);
+    cm
 }
 
 fn opt_without_overlaps(p: &mut Parser<'_>) {
@@ -3651,68 +3669,61 @@ fn opt_without_overlaps(p: &mut Parser<'_>) {
     }
 }
 
-fn opt_deferrable_constraint_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    let m = p.start();
-    let kind = match (p.current(), p.nth(1)) {
-        (DEFERRABLE_KW, _) => {
-            p.bump(DEFERRABLE_KW);
-            DEFERRABLE_CONSTRAINT_OPTION
-        }
-        (NOT_KW, DEFERRABLE_KW) => {
-            p.bump(NOT_KW);
-            p.bump(DEFERRABLE_KW);
-            NOT_DEFERRABLE_CONSTRAINT_OPTION
-        }
-        _ => {
-            m.abandon(p);
-            return None;
-        }
-    };
-    Some(m.complete(p, kind))
-}
-
-fn opt_initally_constraint_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    let m = p.start();
-    let kind = match (p.current(), p.nth(1)) {
-        (INITIALLY_KW, DEFERRED_KW) => {
-            p.bump(INITIALLY_KW);
-            p.bump(DEFERRED_KW);
-            INITIALLY_DEFERRED_CONSTRAINT_OPTION
-        }
-        (INITIALLY_KW, IMMEDIATE_KW) => {
-            p.bump(INITIALLY_KW);
-            p.bump(IMMEDIATE_KW);
-            INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
-        }
-        _ => {
-            m.abandon(p);
-            return None;
-        }
-    };
-    Some(m.complete(p, kind))
-}
-
 // [ NOT DEFERRABLE | [ DEFERRABLE ] [ INITIALLY IMMEDIATE | INITIALLY DEFERRED ] ]
-fn opt_constraint_options(p: &mut Parser<'_>) {
-    let m = p.start();
-    let deferrable = opt_deferrable_constraint_option(p);
-    let initially = opt_initally_constraint_option(p);
-
-    match (deferrable, initially) {
-        (None, None) => {
-            m.abandon(p);
-            return;
-        }
-        (Some(deferrable), Some(initially)) => {
-            if deferrable.kind() == NOT_DEFERRABLE_CONSTRAINT_OPTION
-                && initially.kind() == INITIALLY_DEFERRED_CONSTRAINT_OPTION
-            {
-                p.error("constraint declared INITIALLY DEFERRED must be DEFERRABLE");
+fn opt_constraint_option_list(p: &mut Parser<'_>) {
+    // TODO: validation for these
+    while !p.at(EOF) {
+        let m = p.start();
+        let kind = match (p.current(), p.nth(1)) {
+            (DEFERRABLE_KW, _) => {
+                p.bump(DEFERRABLE_KW);
+                DEFERRABLE_CONSTRAINT_OPTION
             }
-        }
-        (_, _) => (),
+            (NOT_KW, DEFERRABLE_KW) => {
+                p.bump(NOT_KW);
+                p.bump(DEFERRABLE_KW);
+                NOT_DEFERRABLE_CONSTRAINT_OPTION
+            }
+            (INITIALLY_KW, DEFERRED_KW) => {
+                p.bump(INITIALLY_KW);
+                p.bump(DEFERRED_KW);
+                INITIALLY_DEFERRED_CONSTRAINT_OPTION
+            }
+            (INITIALLY_KW, IMMEDIATE_KW) => {
+                p.bump(INITIALLY_KW);
+                p.bump(IMMEDIATE_KW);
+                INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
+            }
+            (NOT_KW, VALID_KW) => {
+                p.bump(NOT_KW);
+                p.bump(VALID_KW);
+                NOT_VALID
+            }
+            (NO_KW, INHERIT_KW) => {
+                p.bump(NO_KW);
+                p.bump(INHERIT_KW);
+                NO_INHERIT
+            }
+            (INHERIT_KW, _) => {
+                p.bump(INHERIT_KW);
+                INHERIT
+            }
+            (NOT_KW, ENFORCED_KW) => {
+                p.bump(NOT_KW);
+                p.bump(ENFORCED_KW);
+                NOT_ENFORCED
+            }
+            (ENFORCED_KW, _) => {
+                p.bump(ENFORCED_KW);
+                ENFORCED
+            }
+            (_, _) => {
+                m.abandon(p);
+                break;
+            }
+        };
+        m.complete(p, kind);
     }
-    m.complete(p, CONSTRAINT_OPTION_LIST);
 }
 
 const COLUMN_NAME_KEYWORDS: TokenSet = TokenSet::new(&[
@@ -3811,16 +3822,18 @@ fn col_def(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
     name_ref(p);
     match t {
         ColDefType::WithData => {
-            type_name(p);
-            // [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ]
-            if p.eat(STORAGE_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
-                p.bump_any();
+            // TODO: validation to check for missing types
+            if opt_type_name(p) {
+                // [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ]
+                if p.eat(STORAGE_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
+                    p.bump_any();
+                }
+                // [ COMPRESSION compression_method ]
+                if p.eat(COMPRESSION_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
+                    p.bump_any();
+                }
+                opt_collate(p);
             }
-            // [ COMPRESSION compression_method ]
-            if p.eat(COMPRESSION_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
-                p.bump_any();
-            }
-            opt_collate(p);
         }
         ColDefType::ColumnNameOnly => {
             // [ WITH OPTIONS ]
@@ -5894,13 +5907,25 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
             ALTER_KW => {
                 p.bump(ALTER_KW);
                 p.eat(COLUMN_KW);
-                if opt_numeric_literal(p).is_none() {
-                    p.error("expected numeric literal");
+                if opt_numeric_literal(p).is_none() && opt_name_ref(p).is_none() {
+                    p.error("expected numeric literal or name");
                 }
                 p.expect(SET_KW);
-                p.expect(STATISTICS_KW);
-                if opt_numeric_literal(p).is_none() {
-                    p.error("expected numeric literal");
+                if p.eat(L_PAREN) {
+                    while !p.at(EOF) && !p.at(R_PAREN) {
+                        if !attribute_option(p, AttributeValue::Either) {
+                            break;
+                        }
+                        if !p.eat(COMMA) {
+                            break;
+                        }
+                    }
+                    p.expect(R_PAREN);
+                } else {
+                    p.expect(STATISTICS_KW);
+                    if opt_numeric_literal(p).is_none() {
+                        p.error("expected numeric literal");
+                    }
                 }
             }
             _ => {
@@ -6446,9 +6471,7 @@ fn alter_domain_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         ADD_KW => {
             p.bump(ADD_KW);
             domain_constraint(p);
-            if p.eat(NOT_KW) {
-                p.expect(VALID_KW);
-            }
+            opt_constraint_option_list(p);
             ADD_CONSTRAINT
         }
         RENAME_KW => {
@@ -8006,7 +8029,7 @@ fn create_domain(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(CREATE_KW);
     p.bump(DOMAIN_KW);
-    name(p);
+    path_name(p);
     p.eat(AS_KW);
     type_name(p);
     opt_collate(p);
@@ -9240,6 +9263,9 @@ fn drop_collation(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(COLLATION_KW);
     opt_if_exists(p);
     path_name_ref(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        path_name_ref(p);
+    }
     opt_cascade_or_restrict(p);
     m.complete(p, DROP_COLLATION)
 }
@@ -10732,7 +10758,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
         }
     };
     p.eat(CONCURRENTLY_KW);
-    if opt_name(p).is_none() && name_required {
+    if opt_path_name(p).is_none() && name_required {
         p.error("expected name");
     }
     m.complete(p, REINDEX)
@@ -10839,9 +10865,7 @@ fn prepare(p: &mut Parser<'_>) -> CompletedMarker {
     );
     if let Some(statement) = statement {
         match statement.kind() {
-            SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | INSERT | UPDATE | DELETE | MERGE => {
-                ()
-            }
+            SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | INSERT | UPDATE | DELETE | MERGE => {}
             kind => {
                 p.error(format!(
                     "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {:?}",
@@ -11428,7 +11452,7 @@ fn create_trigger(p: &mut Parser<'_>) -> CompletedMarker {
         path_name_ref(p);
     }
     // [ NOT DEFERRABLE | [ DEFERRABLE ] [ INITIALLY IMMEDIATE | INITIALLY DEFERRED ] ]
-    opt_constraint_options(p);
+    opt_constraint_option_list(p);
     // [ REFERENCING { { OLD | NEW } TABLE [ AS ] transition_relation_name } [ ... ] ]
     if p.eat(REFERENCING_KW) {
         while !p.at(EOF) {
@@ -11590,7 +11614,7 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn query(p: &mut Parser<'_>) {
     // TODO: this needs to be more general
-    if !p.at_ts(SELECT_FIRST) || select(p, None).is_none() {
+    if (!p.at_ts(SELECT_FIRST) || select(p, None).is_none()) && paren_select(p).is_none() {
         p.error("expected select stmt")
     }
 }
@@ -12154,15 +12178,6 @@ const TYPE_FUNC_NAME_KEYWORDS: TokenSet = TokenSet::new(&[
     VERBOSE_KW,
 ]);
 
-fn opt_param_name(p: &mut Parser<'_>) -> bool {
-    if p.at(IDENT) || p.at_ts(UNRESERVED_KEYWORDS) || p.at_ts(TYPE_FUNC_NAME_KEYWORDS) {
-        p.bump_any();
-        true
-    } else {
-        false
-    }
-}
-
 // [ argmode ] [ argname ] argtype [ { DEFAULT | = } default_expr ]
 //
 // func_arg:
@@ -12175,12 +12190,12 @@ fn param(p: &mut Parser<'_>) {
     let m = p.start();
     // [ argmode ]
     let param_mode_seen = opt_param_mode(p).is_some();
-    let name_or_type = p.start();
     // [ argname ]
-    let maybe_name = opt_param_name(p);
+    let maybe_name =
+        p.at(IDENT) || p.at_ts(UNRESERVED_KEYWORDS) || p.at_ts(TYPE_FUNC_NAME_KEYWORDS);
     if maybe_name {
         // Could have either parsed a name or a type, we know if it it's a type if:
-        let at_type = match p.current() {
+        let at_type = match p.nth(1) {
             // foo.bar%type
             //    ^
             DOT => true,
@@ -12198,9 +12213,9 @@ fn param(p: &mut Parser<'_>) {
             _ => false,
         };
         if at_type {
-            type_mods(p, name_or_type, true, PATH_TYPE);
+            type_name(p);
         } else {
-            name_or_type.complete(p, NAME);
+            name(p);
             if !param_mode_seen {
                 opt_param_mode(p);
             }
@@ -12208,7 +12223,6 @@ fn param(p: &mut Parser<'_>) {
             type_name(p);
         }
     } else {
-        name_or_type.abandon(p);
         // argtype
         type_name(p);
     }
@@ -13104,7 +13118,6 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             if p.at_ts(TABLE_CONSTRAINT_FIRST) {
                 // at table_constraint or table_constraint_using_index
                 table_constraint(p);
-                opt_not_valid(p);
                 ADD_CONSTRAINT
             } else {
                 // [ COLUMN ] [ IF NOT EXISTS ] column_name data_type [ COLLATE collation ] [ column_constraint [ ... ] ]
@@ -13258,7 +13271,7 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             if p.eat(CONSTRAINT_KW) {
                 // name
                 name_ref(p);
-                opt_constraint_options(p);
+                opt_constraint_option_list(p);
                 ALTER_CONSTRAINT
             } else {
                 p.eat(COLUMN_KW);
@@ -13280,17 +13293,6 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         _ => return None,
     };
     Some(kind)
-}
-
-fn opt_not_valid(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if p.at(NOT_KW) {
-        let m = p.start();
-        p.bump(NOT_KW);
-        p.expect(VALID_KW);
-        Some(m.complete(p, NOT_VALID))
-    } else {
-        None
-    }
 }
 
 // /* Column label --- allowed labels in "AS" clauses.

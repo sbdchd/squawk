@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_aggregate.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- star"
@@ -49,7 +48,10 @@ SOURCE_FILE
         L_PAREN "("
         PARAM
           PATH_TYPE
-            IDENT "t"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
         R_PAREN ")"
     WHITESPACE " "
     SET_KW "set"
@@ -126,7 +128,10 @@ SOURCE_FILE
         L_PAREN "("
         PARAM
           PATH_TYPE
-            IDENT "x"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "x"
         WHITESPACE " "
         ORDER_KW "order"
         WHITESPACE " "
@@ -134,7 +139,10 @@ SOURCE_FILE
         WHITESPACE " "
         PARAM
           PATH_TYPE
-            IDENT "y"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "y"
         R_PAREN ")"
     WHITESPACE " \n    "
     RENAME_KW "rename"
@@ -172,12 +180,18 @@ SOURCE_FILE
             IN_KW "in"
           WHITESPACE " "
           PATH_TYPE
-            IDENT "t"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "t"
         COMMA ","
         WHITESPACE " "
         PARAM
           PATH_TYPE
-            IDENT "u"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "u"
         R_PAREN ")"
     WHITESPACE " \n    "
     SET_KW "set"

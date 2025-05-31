@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/create_domain.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- simple"
@@ -11,8 +10,10 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    NAME
-      IDENT "d"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "d"
     WHITESPACE " "
     PATH_TYPE
       PATH
@@ -28,8 +29,10 @@ SOURCE_FILE
     WHITESPACE " "
     DOMAIN_KW "domain"
     WHITESPACE " "
-    NAME
-      IDENT "d"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "d"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "

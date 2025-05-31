@@ -161,7 +161,10 @@ SOURCE_FILE
         WHITESPACE "\n  "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE " "
@@ -205,7 +208,10 @@ SOURCE_FILE
         WHITESPACE "\n  "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         COMMA ","
         WHITESPACE "\n  "
         PARAM
@@ -244,7 +250,10 @@ SOURCE_FILE
         WHITESPACE "\n    "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE " "
@@ -305,7 +314,10 @@ SOURCE_FILE
         WHITESPACE "\n    "
         PARAM
           PATH_TYPE
-            TEXT_KW "text"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  TEXT_KW "text"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE " "

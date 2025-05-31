@@ -145,12 +145,18 @@ SOURCE_FILE
         WHITESPACE " "
         PARAM
           PATH_TYPE
-            IDENT "b"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "b"
         COMMA ","
         WHITESPACE " "
         PARAM
           PATH_TYPE
-            IDENT "c"
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "c"
         WHITESPACE " "
         R_PAREN ")"
   SEMICOLON ";"

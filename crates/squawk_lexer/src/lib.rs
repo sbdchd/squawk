@@ -389,6 +389,7 @@ impl Cursor<'_> {
             }
         }
 
+        // we have a dollar quoted string deliminated with `$$`
         if start.is_empty() {
             loop {
                 self.eat_while(|c| c != '$');
@@ -428,9 +429,9 @@ impl Cursor<'_> {
                 }
 
                 // closing '$'
-                if self.first() == '$' {
+                let terminated = match_count == start.len();
+                if self.first() == '$' && terminated {
                     self.bump();
-                    let terminated = match_count == start.len();
                     return TokenKind::Literal {
                         kind: LiteralKind::DollarQuotedString { terminated },
                     };
@@ -584,6 +585,14 @@ $SomeTag$Dianne's horse$SomeTag$
 -- with dollar inside and matching tags
 $foo$hello$world$bar$
 "#))
+    }
+
+    #[test]
+    fn dollar_strings_part2() {
+        assert_debug_snapshot!(lex(r#"
+DO $doblock$
+end
+$doblock$;"#))
     }
 
     #[test]

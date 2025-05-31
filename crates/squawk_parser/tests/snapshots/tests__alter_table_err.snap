@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/err/alter_table.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- missing alter_table"
@@ -40,16 +39,15 @@ SOURCE_FILE
       NAME_REF
         IDENT "c"
       WHITESPACE " "
-      CONSTRAINT_OPTION_LIST
-        NOT_DEFERRABLE_CONSTRAINT_OPTION
-          NOT_KW "not"
-          WHITESPACE " "
-          DEFERRABLE_KW "deferrable"
+      NOT_DEFERRABLE_CONSTRAINT_OPTION
+        NOT_KW "not"
         WHITESPACE " "
-        INITIALLY_DEFERRED_CONSTRAINT_OPTION
-          INITIALLY_KW "initially"
-          WHITESPACE " "
-          DEFERRED_KW "deferred"
+        DEFERRABLE_KW "deferrable"
+      WHITESPACE " "
+      INITIALLY_DEFERRED_CONSTRAINT_OPTION
+        INITIALLY_KW "initially"
+        WHITESPACE " "
+        DEFERRED_KW "deferred"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg 18 only, via: https://www.depesz.com/2025/05/01/waiting-for-postgresql-18-allow-not-null-constraints-to-be-added-as-not-valid/"
@@ -73,28 +71,23 @@ SOURCE_FILE
     ADD_CONSTRAINT
       ADD_KW "add"
       WHITESPACE " "
-      FOREIGN_KEY_CONSTRAINT
+      NOT_NULL_CONSTRAINT
         CONSTRAINT_KW "constraint"
         WHITESPACE " "
         NAME
           IDENT "id_not_null"
         WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              NOT_KW "not"
-  WHITESPACE " "
-  ERROR
-    NULL_KW "null"
-  WHITESPACE " "
-  ERROR
-    IDENT "id"
-  WHITESPACE " "
-  ERROR
-    NOT_KW "not"
-  WHITESPACE " "
-  ERROR
-    VALID_KW "valid"
+        NOT_KW "not"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "id"
+      WHITESPACE " "
+      NOT_VALID
+        NOT_KW "not"
+        WHITESPACE " "
+        VALID_KW "valid"
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
@@ -102,13 +95,3 @@ ERROR@23: expected command, found ADD_KW
 ERROR@27: expected command, found COLUMN_KW
 ERROR@34: expected command, found IDENT
 ERROR@38: expected command, found BOOLEAN_KW
-ERROR@134: constraint declared INITIALLY DEFERRED must be DEFERRABLE
-ERROR@322: expected FOREIGN_KW
-ERROR@322: expected KEY_KW
-ERROR@322: expected column list
-ERROR@322: expected REFERENCES_KW
-ERROR@326: expected SEMICOLON
-ERROR@327: expected command, found NULL_KW
-ERROR@332: expected command, found IDENT
-ERROR@335: expected command, found NOT_KW
-ERROR@339: expected command, found VALID_KW

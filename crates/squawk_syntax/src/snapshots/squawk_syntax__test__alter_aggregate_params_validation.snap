@@ -21,7 +21,10 @@ SOURCE_FILE@0..101
           IN_KW@58..60 "in"
         WHITESPACE@60..61 " "
         PATH_TYPE@61..62
-          IDENT@61..62 "x"
+          PATH@61..62
+            PATH_SEGMENT@61..62
+              NAME_REF@61..62
+                IDENT@61..62 "x"
       COMMA@62..63 ","
       WHITESPACE@63..64 " "
       PARAM@64..69
@@ -29,7 +32,10 @@ SOURCE_FILE@0..101
           OUT_KW@64..67 "out"
         WHITESPACE@67..68 " "
         PATH_TYPE@68..69
-          IDENT@68..69 "y"
+          PATH@68..69
+            PATH_SEGMENT@68..69
+              NAME_REF@68..69
+                IDENT@68..69 "y"
       R_PAREN@69..70 ")"
     WHITESPACE@70..71 " "
     L_PAREN@71..72 "("

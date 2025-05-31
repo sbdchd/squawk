@@ -1,9 +1,0 @@
----
-source: crates/squawk_parser/tests/tests.rs
-input_file: crates/squawk_parser/tests/data/regression_suite/matview.sql
----
-ERROR@4758: expected type name
-ERROR@4761: expected type name
-ERROR@5137: expected type name
-ERROR@5140: expected type name
-ERROR@5143: expected type name

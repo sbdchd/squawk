@@ -304,7 +304,10 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          IDENT "t"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -357,12 +360,18 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          IDENT "a"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          IDENT "b"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "b"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

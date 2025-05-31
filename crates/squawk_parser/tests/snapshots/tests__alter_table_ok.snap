@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/alter_table.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- add column"
@@ -114,9 +113,8 @@ SOURCE_FILE
       NAME_REF
         IDENT "c"
       WHITESPACE " "
-      CONSTRAINT_OPTION_LIST
-        DEFERRABLE_CONSTRAINT_OPTION
-          DEFERRABLE_KW "deferrable"
+      DEFERRABLE_CONSTRAINT_OPTION
+        DEFERRABLE_KW "deferrable"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -138,42 +136,40 @@ SOURCE_FILE
       NAME_REF
         IDENT "c"
       WHITESPACE " "
-      CONSTRAINT_OPTION_LIST
-        NOT_DEFERRABLE_CONSTRAINT_OPTION
-          NOT_KW "not"
-          WHITESPACE " "
-          DEFERRABLE_KW "deferrable"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  ALTER_TABLE
-    ALTER_KW "alter"
-    WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    ALTER_CONSTRAINT
-      ALTER_KW "alter"
-      WHITESPACE " "
-      CONSTRAINT_KW "constraint"
-      WHITESPACE " "
-      NAME_REF
-        IDENT "c"
-      WHITESPACE " "
-      CONSTRAINT_OPTION_LIST
-        NOT_DEFERRABLE_CONSTRAINT_OPTION
-          NOT_KW "not"
-          WHITESPACE " "
-          DEFERRABLE_KW "deferrable"
+      NOT_DEFERRABLE_CONSTRAINT_OPTION
+        NOT_KW "not"
         WHITESPACE " "
-        INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
-          INITIALLY_KW "initially"
-          WHITESPACE " "
-          IMMEDIATE_KW "immediate"
+        DEFERRABLE_KW "deferrable"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_CONSTRAINT
+      ALTER_KW "alter"
+      WHITESPACE " "
+      CONSTRAINT_KW "constraint"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      NOT_DEFERRABLE_CONSTRAINT_OPTION
+        NOT_KW "not"
+        WHITESPACE " "
+        DEFERRABLE_KW "deferrable"
+      WHITESPACE " "
+      INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
+        INITIALLY_KW "initially"
+        WHITESPACE " "
+        IMMEDIATE_KW "immediate"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- validate_constraint"

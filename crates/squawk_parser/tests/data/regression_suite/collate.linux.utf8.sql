@@ -407,7 +407,7 @@ ALTER COLLATION "en_US" REFRESH VERSION;
 
 -- also test for database while we are here
 SELECT current_database() AS datname ;
-ALTER DATABASE :"datname" REFRESH COLLATION VERSION;
+ALTER DATABASE "datname" REFRESH COLLATION VERSION;
 
 
 -- dependencies

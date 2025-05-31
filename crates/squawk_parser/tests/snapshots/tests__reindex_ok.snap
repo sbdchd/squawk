@@ -10,8 +10,10 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "INDEX"
     WHITESPACE " "
-    NAME
-      IDENT "my_index"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "my_index"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -19,8 +21,10 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "TABLE"
     WHITESPACE " "
-    NAME
-      IDENT "my_table"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "my_table"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -30,8 +34,10 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "CONCURRENTLY"
     WHITESPACE " "
-    NAME
-      IDENT "my_broken_table"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "my_broken_table"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- complete_syntax"
@@ -62,8 +68,10 @@ SOURCE_FILE
     WHITESPACE " "
     CONCURRENTLY_KW "concurrently"
     WHITESPACE " "
-    NAME
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -71,8 +79,10 @@ SOURCE_FILE
     WHITESPACE " "
     SYSTEM_KW "system"
     WHITESPACE " "
-    NAME
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   REINDEX
@@ -80,8 +90,10 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_KW "index"
     WHITESPACE " "
-    NAME
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
@@ -89,8 +101,10 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_KW "table"
     WHITESPACE " "
-    NAME
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"
   REINDEX
@@ -98,7 +112,9 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    NAME
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"

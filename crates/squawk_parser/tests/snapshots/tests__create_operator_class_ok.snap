@@ -260,7 +260,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          TEXT_KW "text"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
       R_PAREN ")"
     COMMA ","
     WHITESPACE "\n    "
@@ -297,12 +300,18 @@ SOURCE_FILE
       L_PAREN "("
       PARAM
         PATH_TYPE
-          TEXT_KW "text"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
       COMMA ","
       WHITESPACE " "
       PARAM
         PATH_TYPE
-          TEXT_KW "text"
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -240,8 +240,7 @@ Role =
 
 CheckConstraint  =
   ('constraint' NameRef)
-  'check' '(' Expr ')' ('no' 'inherit')?
-  ConstraintOptionList?
+  'check' '(' Expr ')'
 
 UsingIndex =
   'using' 'index' NameRef
@@ -257,12 +256,10 @@ UniqueConstraint =
     UsingIndex 
   | ( 'nulls' 'not'? 'distinct' )? ColumnList
   )
-  ConstraintOptionList?
 
 PrimaryKeyConstraint =
   ('constraint' NameRef)
   'primary' 'key' (UsingIndex | ColumnList IndexParams)
-  ConstraintOptionList?
 
 SetNullColumns =
   'set' 'null' ColumnList?
@@ -327,25 +324,23 @@ InitiallyImmediateConstraintOption  =
 InitiallyDeferredConstraintOption =
   'initially' 'deferred'
 
-ConstraintOptionList =
-  (DeferrableConstraintOption | NotDeferrableConstraintOption)?
-  (InitiallyDeferredConstraintOption | InitiallyImmediateConstraintOption)?
+NotEnforced =
+  'not' 'enforced'
 
+Enforced =
+  'enforced'
 
 NotNullConstraint =
   ('constraint' NameRef)
   'not' 'null'
-  ConstraintOptionList?
 
 NullConstraint =
   ('constraint' NameRef)
   'null'
-  ConstraintOptionList?
 
 DefaultConstraint =
   ('constraint' NameRef)
   'default' Expr
-  ConstraintOptionList?
 
 // SequenceOption =
 //   'as' Type
@@ -370,7 +365,6 @@ GeneratedConstraint =
   ('constraint' NameRef)
   'generated'
   ('always' 'as' '(' Expr ')' 'stored' | ('always' | 'by' 'default') 'as' 'identity' SequenceOptionList? )
-  ConstraintOptionList?
 
 ReferencesConstraint =
   ('constraint' NameRef)
@@ -378,7 +372,6 @@ ReferencesConstraint =
   MatchType? 
   OnDeleteAction?
   OnUpdateAction?
-  ConstraintOptionList?
 
 AlterTableAction =
   ValidateConstraint
@@ -668,7 +661,15 @@ Constraint =
 | NotNullConstraint
 
 AddConstraint =
-  'add' Constraint NotValid?
+  'add' Constraint 
+  DeferrableConstraintOption?
+  NotDeferrableConstraintOption?
+  InitiallyDeferredConstraintOption?
+  InitiallyImmediateConstraintOption?
+  NotValid?
+  NoInherit?
+  NotEnforced?
+  Enforced?
 
 DropConstraint =
   'drop' Constraint IfExists? NameRef ('restrict' | 'cascade')?

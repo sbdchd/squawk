@@ -409,3 +409,9 @@ as '' language sql;
 create function f (internal, text[], bool) 
 returns void
 as '' language sql;
+
+-- path type
+create function f (foo.bar.buzz.boo, t.u[], bool) 
+returns void
+as '' language sql;
+
