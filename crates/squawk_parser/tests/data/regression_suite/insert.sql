@@ -621,9 +621,9 @@ create trigger donothingbrtrig2 before insert on donothingbrtrig_test2 for each 
 alter table donothingbrtrig_test attach partition donothingbrtrig_test1 for values in (1);
 alter table donothingbrtrig_test attach partition donothingbrtrig_test2 for values in (2);
 insert into donothingbrtrig_test values (1, 'foo'), (2, 'bar');
-copy donothingbrtrig_test from stdout;
-1	baz
-2	qux
+-- copy donothingbrtrig_test from stdout;
+-- 1	baz
+-- 2	qux
 select tableoid::regclass, * from donothingbrtrig_test;
 
 -- cleanup

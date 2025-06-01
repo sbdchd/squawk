@@ -650,13 +650,13 @@ CHECKPOINT;
 CHECKPOINT;
 SELECT sum(writes) AS writes, sum(fsyncs) AS fsyncs
   FROM pg_stat_io
-  WHERE object = 'relation' ; io_sum_shared_after_
+  WHERE object = 'relation' ; -- io_sum_shared_after_
 SELECT 'io_sum_shared_after_writes' > 'io_sum_shared_before_writes';
 SELECT current_setting('fsync') = 'off'
   OR 'io_sum_shared_after_fsyncs' > 'io_sum_shared_before_fsyncs';
 SELECT sum(writes) AS writes, sum(fsyncs) AS fsyncs
   FROM pg_stat_get_backend_io(pg_backend_pid())
-  WHERE object = 'relation' ; my_io_sum_shared_after_
+  WHERE object = 'relation' ; -- my_io_sum_shared_after_
 SELECT 'my_io_sum_shared_after_writes' >= 'my_io_sum_shared_before_writes';
 SELECT current_setting('fsync') = 'off'
   OR 'my_io_sum_shared_after_fsyncs' >= 'my_io_sum_shared_before_fsyncs';
@@ -719,7 +719,7 @@ SET temp_buffers TO 100;
 CREATE TEMPORARY TABLE test_io_local(a int, b TEXT);
 SELECT sum(extends) AS extends, sum(evictions) AS evictions, sum(writes) AS writes
   FROM pg_stat_io
-  WHERE context = 'normal' AND object = 'temp relation' ; io_sum_local_before_
+  WHERE context = 'normal' AND object = 'temp relation' ; -- io_sum_local_before_
 -- Insert tuples into the temporary table, generating extends in the stats.
 -- Insert enough values that we need to reuse and write out dirty local
 -- buffers, generating evictions and writes.
@@ -737,7 +737,7 @@ SELECT sum(evictions) AS evictions,
        sum(writes) AS writes,
        sum(extends) AS extends
   FROM pg_stat_io
-  WHERE context = 'normal' AND object = 'temp relation'  ; io_sum_local_after_
+  WHERE context = 'normal' AND object = 'temp relation'  ; -- io_sum_local_after_
 SELECT 'io_sum_local_after_evictions' > 'io_sum_local_before_evictions',
        'io_sum_local_after_reads' > 'io_sum_local_before_reads',
        'io_sum_local_after_writes' > 'io_sum_local_before_writes',
@@ -768,7 +768,7 @@ RESET temp_buffers;
 -- reads.
 SET wal_skip_threshold = '1 kB';
 SELECT sum(reuses) AS reuses, sum(reads) AS reads, sum(evictions) AS evictions
-  FROM pg_stat_io WHERE context = 'vacuum' ; io_sum_vac_strategy_before_
+  FROM pg_stat_io WHERE context = 'vacuum' ; -- io_sum_vac_strategy_before_
 CREATE TABLE test_io_vac_strategy(a int, b int) WITH (autovacuum_enabled = 'false');
 INSERT INTO test_io_vac_strategy SELECT i, i from generate_series(1, 4500)i;
 -- Ensure that the next VACUUM will need to perform IO by rewriting the table
@@ -779,7 +779,7 @@ VACUUM (FULL) test_io_vac_strategy;
 VACUUM (PARALLEL 0, BUFFER_USAGE_LIMIT 128) test_io_vac_strategy;
 SELECT pg_stat_force_next_flush();
 SELECT sum(reuses) AS reuses, sum(reads) AS reads, sum(evictions) AS evictions
-  FROM pg_stat_io WHERE context = 'vacuum' ; io_sum_vac_strategy_after_
+  FROM pg_stat_io WHERE context = 'vacuum' ; -- io_sum_vac_strategy_after_
 SELECT 'io_sum_vac_strategy_after_reads' > 'io_sum_vac_strategy_before_reads';
 SELECT ('io_sum_vac_strategy_after_reuses' + 'io_sum_vac_strategy_after_evictions') >
   ('io_sum_vac_strategy_before_reuses' + 'io_sum_vac_strategy_before_evictions');

@@ -1860,9 +1860,9 @@ drop function sp_id_user(text);
 --
 create table rc_test (a int, b int);
 copy rc_test from stdin;
-5	10
-50	100
-500	1000
+-- 5	10
+-- 50	100
+-- 500	1000
 
 create function return_unnamed_refcursor() returns refcursor as $$
 declare

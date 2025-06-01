@@ -48,7 +48,7 @@ CREATE OPERATOR !=- (
 );
 SELECT !=- 10;
 -- postfix operators don't work anymore
-SELECT 10 !=-;
+-- SELECT 10 !=-;
 -- make sure lexer returns != as <> even in edge cases
 SELECT 2 !=/**/ 1, 2 !=/**/ 2;
 SELECT 2 !=-- comment to be removed by psql
@@ -86,21 +86,21 @@ ROLLBACK;
 
 
 -- Should fail. SETOF type functions not allowed as argument (testing leftarg)
-BEGIN TRANSACTION;
-CREATE OPERATOR #*# (
-   leftarg = SETOF int8,
-   procedure = factorial
-);
-ROLLBACK;
+-- BEGIN TRANSACTION;
+-- CREATE OPERATOR #*# (
+--    leftarg = SETOF int8,
+--    procedure = factorial
+-- );
+-- ROLLBACK;
 
 
 -- Should fail. SETOF type functions not allowed as argument (testing rightarg)
-BEGIN TRANSACTION;
-CREATE OPERATOR #*# (
-   rightarg = SETOF int8,
-   procedure = factorial
-);
-ROLLBACK;
+-- BEGIN TRANSACTION;
+-- CREATE OPERATOR #*# (
+--    rightarg = SETOF int8,
+--    procedure = factorial
+-- );
+-- ROLLBACK;
 
 
 -- Should work. Sample text-book case

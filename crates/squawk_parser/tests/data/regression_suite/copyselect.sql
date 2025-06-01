@@ -45,7 +45,7 @@ copy (select * from test1) from stdin;
 --
 -- This should fail
 --
-copy (select * from test1) (t,id) to stdout;
+-- copy (select * from test1) (t,id) to stdout;
 --
 -- Test JOIN
 --
@@ -79,13 +79,13 @@ drop view v_test1;
 drop table test1;
 
 -- psql handling of COPY in multi-command strings
-copy (select 1) to stdout\; select 1/0;	-- row, then error
-select 1/0\; copy (select 1) to stdout; -- error only
-copy (select 1) to stdout\; copy (select 2) to stdout\; select 3\; select 4; -- 1 2 3 4
+-- copy (select 1) to stdout\; select 1/0;	-- row, then error
+-- select 1/0\; copy (select 1) to stdout; -- error only
+-- copy (select 1) to stdout\; copy (select 2) to stdout\; select 3\; select 4; -- 1 2 3 4
 
 create table test3 (c int);
-select 0\; copy test3 from stdin\; copy test3 from stdin\; select 1; -- 0 1
-1
-2
+-- select 0\; copy test3 from stdin\; copy test3 from stdin\; select 1; -- 0 1
+-- 1
+-- 2
 select * from test3;
 drop table test3;

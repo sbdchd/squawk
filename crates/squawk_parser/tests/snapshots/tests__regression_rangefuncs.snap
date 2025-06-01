@@ -283,13 +283,3 @@ ERROR@28936: expected L_PAREN
 ERROR@28936: expected command, found SEMICOLON
 ERROR@28937: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@28937: expected R_PAREN
-ERROR@29704: expected IDENT
-ERROR@29704: expected SEMICOLON
-ERROR@29705: expected command, found REF_KW
-ERROR@29708: expected command, found COMMA
-ERROR@29720: expected command, found IDENT
-ERROR@30331: expected IDENT
-ERROR@30331: expected SEMICOLON
-ERROR@30332: expected command, found REF_KW
-ERROR@30335: expected command, found COMMA
-ERROR@30347: expected command, found IDENT

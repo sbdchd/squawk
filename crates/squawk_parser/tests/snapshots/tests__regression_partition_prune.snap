@@ -168,7 +168,6 @@ ERROR@61855: expected command, found MATCHED_KW
 ERROR@61863: expected command, found THEN_KW
 ERROR@61874: expected INTO_KW
 ERROR@61883: expected R_PAREN
-ERROR@61883: expected select stmt
 ERROR@61883: expected SEMICOLON
 ERROR@61883: expected command, found INT_NUMBER
 ERROR@61884: expected command, found COMMA
@@ -214,7 +213,6 @@ ERROR@62061: expected command, found MATCHED_KW
 ERROR@62069: expected command, found THEN_KW
 ERROR@62080: expected INTO_KW
 ERROR@62089: expected R_PAREN
-ERROR@62089: expected select stmt
 ERROR@62089: expected SEMICOLON
 ERROR@62089: expected command, found INT_NUMBER
 ERROR@62090: expected command, found COMMA
@@ -263,7 +261,6 @@ ERROR@62451: expected command, found MATCHED_KW
 ERROR@62459: expected command, found THEN_KW
 ERROR@62470: expected INTO_KW
 ERROR@62479: expected R_PAREN
-ERROR@62479: expected select stmt
 ERROR@62479: expected SEMICOLON
 ERROR@62479: expected command, found INT_NUMBER
 ERROR@62480: expected command, found COMMA
@@ -315,7 +312,6 @@ ERROR@62746: expected command, found MATCHED_KW
 ERROR@62754: expected command, found THEN_KW
 ERROR@62765: expected INTO_KW
 ERROR@62774: expected R_PAREN
-ERROR@62774: expected select stmt
 ERROR@62774: expected SEMICOLON
 ERROR@62774: expected command, found INT_NUMBER
 ERROR@62775: expected command, found COMMA

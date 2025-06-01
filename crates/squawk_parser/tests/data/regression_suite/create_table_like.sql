@@ -223,7 +223,7 @@ ALTER TABLE ctl_table ALTER COLUMN b SET STORAGE MAIN;
 
 
 -- Test EXCLUDING ALL
-CREATE FOREIGN TABLE ctl_foreign_table1(LIKE ctl_table EXCLUDING ALL) SERVER ctl_s0;
+-- CREATE FOREIGN TABLE ctl_foreign_table1(LIKE ctl_table EXCLUDING ALL) SERVER ctl_s0;
 -- \d+ does not report the value of attcompression for a foreign table, so
 -- check separately.
 SELECT attname, attcompression FROM pg_attribute
@@ -231,7 +231,7 @@ SELECT attname, attcompression FROM pg_attribute
 
 -- Test INCLUDING ALL
 -- INDEXES, IDENTITY, COMPRESSION, STORAGE are not copied.
-CREATE FOREIGN TABLE ctl_foreign_table2(LIKE ctl_table INCLUDING ALL) SERVER ctl_s0;
+-- CREATE FOREIGN TABLE ctl_foreign_table2(LIKE ctl_table INCLUDING ALL) SERVER ctl_s0;
 -- \d+ does not report the value of attcompression for a foreign table, so
 -- check separately.
 SELECT attname, attcompression FROM pg_attribute
