@@ -3033,7 +3033,7 @@ enum ColumnDefKind {
 //                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // [ ( column_name [, ... ] ) ]
 fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
-    if !p.at(L_PAREN) || 
+    if !p.at(L_PAREN) ||
         // we're probably at (select)
         !p.nth_at_ts(1, COLUMN_FIRST)
     {
@@ -11605,29 +11605,29 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
                 // CREATE TEMP TABLE
                 // ^0     ^1   ^2
                 match p.nth(2) {
-                    RECURSIVE_KW | VIEW_KW => Some(create_view(p)),
-                    SEQUENCE_KW => Some(create_sequence(p)),
-                    _ => Some(create_table(p)),
+                    RECURSIVE_KW | VIEW_KW => create_view(p),
+                    SEQUENCE_KW => create_sequence(p),
+                    _ => create_table(p),
                 };
             }
             (CREATE_KW, OR_KW) => {
                 match p.nth(3) {
-                    CONSTRAINT_KW | TRIGGER_KW => Some(create_trigger(p)),
-                    RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => Some(create_view(p)),
+                    CONSTRAINT_KW | TRIGGER_KW => create_trigger(p),
+                    RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => create_view(p),
                     _ => return,
                 };
             }
             (CREATE_KW, RECURSIVE_KW | VIEW_KW) => {
-                Some(create_view(p));
+                create_view(p);
             }
             (CREATE_KW, UNLOGGED_KW) if p.nth_at(2, SEQUENCE_KW) => {
-                Some(create_sequence(p));
+                create_sequence(p);
             }
             (CREATE_KW, SEQUENCE_KW) => {
                 create_sequence(p);
             }
             (CREATE_KW, CONSTRAINT_KW | TRIGGER_KW) => {
-                Some(create_trigger(p));
+                create_trigger(p);
             }
             (CREATE_KW, INDEX_KW | UNIQUE_KW) => {
                 create_index(p);
