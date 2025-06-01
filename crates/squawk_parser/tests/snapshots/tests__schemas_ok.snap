@@ -368,15 +368,19 @@ SOURCE_FILE
   SHOW
     SHOW_KW "show"
     WHITESPACE " "
-    NAME_REF
-      IDENT "search_path"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "search_path"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
     SET_KW "set"
     WHITESPACE " "
-    NAME_REF
-      IDENT "search_path"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "search_path"
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
@@ -388,8 +392,10 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    NAME_REF
-      IDENT "search_path"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "search_path"
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "
@@ -399,8 +405,10 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    NAME_REF
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
     WHITESPACE " "
     EQ "="
     WHITESPACE " "
@@ -441,8 +449,10 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    NAME_REF
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
     WHITESPACE " "
     EQ "="
     WHITESPACE " "
@@ -452,8 +462,10 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    NAME_REF
-      IDENT "foo"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
     WHITESPACE " "
     TO_KW "to"
     WHITESPACE " "

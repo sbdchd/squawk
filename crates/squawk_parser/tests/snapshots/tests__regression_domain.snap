@@ -2,38 +2,13 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/domain.sql
 ---
-ERROR@991: expected L_PAREN
-ERROR@993: expected L_PAREN
-ERROR@994: expected L_PAREN
-ERROR@996: expected L_PAREN
-ERROR@999: expected L_PAREN
-ERROR@1006: expected L_PAREN
-ERROR@1008: expected L_PAREN
-ERROR@1015: expected L_PAREN
-ERROR@1022: expected L_PAREN
-ERROR@1029: expected L_PAREN
-ERROR@1032: expected L_PAREN
-ERROR@1037: expected L_PAREN
-ERROR@1048: expected L_PAREN
-ERROR@1051: expected L_PAREN
-ERROR@1065: expected L_PAREN
-ERROR@1067: expected L_PAREN
-ERROR@1068: expected L_PAREN
-ERROR@1070: expected L_PAREN
-ERROR@1080: expected L_PAREN
-ERROR@1239: expected L_PAREN
-ERROR@1246: expected L_PAREN
-ERROR@1253: expected L_PAREN
-ERROR@1267: expected L_PAREN
-ERROR@1277: expected R_PAREN
-ERROR@1277: expected R_PAREN
-ERROR@10391: expected EQ
-ERROR@10391: expected SEMICOLON
-ERROR@10391: expected command, found L_BRACK
-ERROR@10392: expected command, found INT_NUMBER
-ERROR@10393: expected command, found R_BRACK
-ERROR@10395: expected command, found EQ
-ERROR@10397: expected command, found ARRAY_KW
-ERROR@10402: expected command, found L_BRACK
-ERROR@10403: expected command, found INT_NUMBER
-ERROR@10405: expected command, found R_BRACK
+ERROR@10394: expected EQ
+ERROR@10394: expected SEMICOLON
+ERROR@10394: expected command, found L_BRACK
+ERROR@10395: expected command, found INT_NUMBER
+ERROR@10396: expected command, found R_BRACK
+ERROR@10398: expected command, found EQ
+ERROR@10400: expected command, found ARRAY_KW
+ERROR@10405: expected command, found L_BRACK
+ERROR@10406: expected command, found INT_NUMBER
+ERROR@10408: expected command, found R_BRACK

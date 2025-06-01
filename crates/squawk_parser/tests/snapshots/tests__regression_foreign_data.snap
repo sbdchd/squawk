@@ -31,11 +31,8 @@ ERROR@16614: expected command, found L_PAREN
 ERROR@16615: expected command, found DROP_KW
 ERROR@16620: expected command, found DELIMITER_KW
 ERROR@16629: expected command, found COMMA
-ERROR@16644: expected EQ
-ERROR@16644: expected config value, got COMMA
-ERROR@16644: expected SEMICOLON
-ERROR@16644: expected command, found COMMA
-ERROR@16646: expected command, found ADD_KW
+ERROR@16640: expected EQ
+ERROR@16649: expected SEMICOLON
 ERROR@16650: expected command, found ESCAPE_KW
 ERROR@16657: expected command, found STRING
 ERROR@16660: expected command, found R_PAREN
@@ -51,11 +48,8 @@ ERROR@18566: expected command, found L_PAREN
 ERROR@18567: expected command, found DROP_KW
 ERROR@18572: expected command, found DELIMITER_KW
 ERROR@18581: expected command, found COMMA
-ERROR@18596: expected EQ
-ERROR@18596: expected config value, got COMMA
-ERROR@18596: expected SEMICOLON
-ERROR@18596: expected command, found COMMA
-ERROR@18598: expected command, found ADD_KW
+ERROR@18592: expected EQ
+ERROR@18601: expected SEMICOLON
 ERROR@18602: expected command, found ESCAPE_KW
 ERROR@18609: expected command, found STRING
 ERROR@18612: expected command, found R_PAREN

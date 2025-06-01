@@ -29,8 +29,8 @@ $$;
 
 -- Verify failures
 CREATE TABLE ext_stats_test (x text, y int, z int);
-CREATE STATISTICS tst;
-CREATE STATISTICS tst ON a, b;
+-- CREATE STATISTICS tst;
+-- CREATE STATISTICS tst ON a, b;
 CREATE STATISTICS tst FROM sometab;
 CREATE STATISTICS tst ON a, b FROM nonexistent;
 CREATE STATISTICS tst ON a, b FROM ext_stats_test;
@@ -112,7 +112,7 @@ ANALYZE ab1 (a);
 ANALYZE ab1;
 DROP TABLE ab1;
 ALTER STATISTICS ab1_a_b_stats SET STATISTICS 0;
-ALTER STATISTICS IF EXISTS ab1_a_b_stats SET STATISTICS 0;
+-- ALTER STATISTICS IF EXISTS ab1_a_b_stats SET STATISTICS 0;
 
 -- Ensure we can build statistics for tables with inheritance.
 CREATE TABLE ab1 (a INTEGER, b INTEGER);

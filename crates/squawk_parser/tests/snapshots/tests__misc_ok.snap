@@ -5137,8 +5137,10 @@ SOURCE_FILE
   SET
     SET_KW "SET"
     WHITESPACE " "
-    NAME_REF
-      IDENT "max_parallel_workers_per_gather"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "max_parallel_workers_per_gather"
     WHITESPACE " "
     EQ "="
     WHITESPACE " "
@@ -5151,8 +5153,10 @@ SOURCE_FILE
   SET
     SET_KW "SET"
     WHITESPACE " "
-    NAME_REF
-      IDENT "parallel_setup_cost"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "parallel_setup_cost"
     WHITESPACE " "
     EQ "="
     WHITESPACE " "
@@ -5165,8 +5169,10 @@ SOURCE_FILE
   SET
     SET_KW "SET"
     WHITESPACE " "
-    NAME_REF
-      IDENT "parallel_tuple_cost"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "parallel_tuple_cost"
     WHITESPACE " "
     EQ "="
     WHITESPACE " "
@@ -5179,8 +5185,10 @@ SOURCE_FILE
   SET
     SET_KW "SET"
     WHITESPACE " "
-    NAME_REF
-      IDENT "min_parallel_table_scan_size"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "min_parallel_table_scan_size"
     WHITESPACE " "
     EQ "="
     WHITESPACE " "

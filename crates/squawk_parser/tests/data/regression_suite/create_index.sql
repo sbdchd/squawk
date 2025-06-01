@@ -12,7 +12,7 @@ CREATE INDEX onek_unique1 ON onek USING btree(unique1 int4_ops);
 
 CREATE INDEX IF NOT EXISTS onek_unique1 ON onek USING btree(unique1 int4_ops);
 
-CREATE INDEX IF NOT EXISTS ON onek USING btree(unique1 int4_ops);
+-- CREATE INDEX IF NOT EXISTS ON onek USING btree(unique1 int4_ops);
 
 CREATE INDEX onek_unique2 ON onek USING btree(unique2 int4_ops);
 
@@ -1382,7 +1382,7 @@ SELECT oid, relname, relfilenode, relkind, reltoastrelid
   FROM pg_class
   WHERE relname IN ('concur_temp_ind_1', 'concur_temp_ind_2');
 SELECT pg_my_temp_schema()::regnamespace as temp_schema_name ;
-REINDEX SCHEMA CONCURRENTLY 'temp_schema_name';
+REINDEX SCHEMA CONCURRENTLY "temp_schema_name";
 SELECT  b.relname,
         b.relkind,
         CASE WHEN a.relfilenode = b.relfilenode THEN 'relfilenode is unchanged'

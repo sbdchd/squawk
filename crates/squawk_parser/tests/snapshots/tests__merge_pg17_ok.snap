@@ -342,15 +342,19 @@ SOURCE_FILE
     NAME_REF
       IDENT "u"
     WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    IDENT "bar"
+    ALIAS
+      AS_KW "as"
+      WHITESPACE " "
+      NAME
+        IDENT "bar"
     COMMA ","
     WHITESPACE " "
     NAME_REF
       IDENT "t"
     WHITESPACE " "
-    IDENT "b"
+    ALIAS
+      NAME
+        IDENT "b"
     COMMA ","
     WHITESPACE " "
     CALL_EXPR

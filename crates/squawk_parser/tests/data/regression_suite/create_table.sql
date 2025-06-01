@@ -52,12 +52,12 @@ DEALLOCATE select1;
 -- create an extra wide table to test for issues related to that
 -- (temporarily hide query, to avoid the long CREATE TABLE stmt)
 SELECT 'CREATE TABLE extra_wide_table(firstc text, '|| array_to_string(array_agg('c'||i||' bool'),',')||', lastc text);'
-FROM generate_series(1, 1100) g(i)
+FROM generate_series(1, 1100) g(i);
 INSERT INTO extra_wide_table(firstc, lastc) VALUES('first col', 'last col');
 SELECT firstc, lastc FROM extra_wide_table;
 
 -- check that tables with oids cannot be created anymore
-CREATE TABLE withoid() WITH OIDS;
+-- CREATE TABLE withoid() WITH OIDS;
 CREATE TABLE withoid() WITH (oids);
 CREATE TABLE withoid() WITH (oids = true);
 
@@ -302,7 +302,7 @@ CREATE TABLE part_bogus_expr_fail PARTITION OF list_parted FOR VALUES IN (genera
 CREATE TABLE part_bogus_expr_fail PARTITION OF list_parted FOR VALUES IN ((1+1) collate "POSIX");
 
 -- syntax does not allow empty list of values for list partitions
-CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES IN ();
+-- CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES IN ();
 -- trying to specify range for list partitioned table
 CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES FROM (1) TO (2);
 -- trying to specify modulus and remainder for list partitioned table

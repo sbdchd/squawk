@@ -2,17 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/create_view.sql
 ---
-ERROR@3184: expected SEMICOLON
-ERROR@18138: expected IDENT
-ERROR@18138: expected SEMICOLON
-ERROR@18139: expected command, found REF_KW
-ERROR@18142: expected command, found COMMA
-ERROR@18154: expected command, found IDENT
-ERROR@19047: expected IDENT
-ERROR@19047: expected SEMICOLON
-ERROR@19048: expected command, found REF_KW
-ERROR@19051: expected command, found COMMA
-ERROR@19063: expected command, found IDENT
 ERROR@21388: expected SEMICOLON
 ERROR@21391: expected command, found COLLATION_KW
 ERROR@21401: expected command, found FOR_KW

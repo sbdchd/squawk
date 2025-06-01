@@ -8,8 +8,10 @@ SOURCE_FILE
   RESET
     RESET_KW "reset"
     WHITESPACE " "
-    NAME_REF
-      IDENT "some_config_param"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "some_config_param"
   SEMICOLON ";"
   WHITESPACE "\n"
   RESET

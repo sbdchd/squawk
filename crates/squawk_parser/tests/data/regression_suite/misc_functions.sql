@@ -147,7 +147,7 @@ DROP ROLE regress_log_memory;
 -- directly, but we can at least verify that the code doesn't fail.
 --
 select setting as segsize
-from pg_settings where name = 'wal_segment_size'
+from pg_settings where name = 'wal_segment_size';
 
 select count(*) > 0 as ok from pg_ls_waldir();
 -- Test ProjectSet as well as FunctionScan
@@ -360,7 +360,7 @@ SELECT segment_number > 0 AS ok_segment_number, timeline_id
   FROM pg_split_walfile_name('ffffffFF00000001000000af');
 SELECT setting::int8 AS segment_size
 FROM pg_settings
-WHERE name = 'wal_segment_size'
+WHERE name = 'wal_segment_size';
 SELECT segment_number, file_offset
 FROM pg_walfile_name_offset('0/0'::pg_lsn + 'segment_size'),
      pg_split_walfile_name(file_name);
@@ -387,9 +387,9 @@ CREATE TABLE test_chunk_id (a TEXT, b TEXT STORAGE EXTERNAL);
 INSERT INTO test_chunk_id VALUES ('x', repeat('x', 8192));
 SELECT t.relname AS toastrel FROM pg_class c
   LEFT JOIN pg_class t ON c.reltoastrelid = t.oid
-  WHERE c.relname = 'test_chunk_id'
+  WHERE c.relname = 'test_chunk_id';
 SELECT pg_column_toast_chunk_id(a) IS NULL,
-  pg_column_toast_chunk_id(b) IN (SELECT chunk_id FROM pg_toast.'toastrel')
+  pg_column_toast_chunk_id(b) IN (SELECT chunk_id FROM pg_toast."toastrel")
   FROM test_chunk_id;
 DROP TABLE test_chunk_id;
 DROP FUNCTION explain_mask_costs(text, bool, bool, bool, bool);

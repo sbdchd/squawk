@@ -85,10 +85,10 @@ END;
 -- Note: we intentionally don't remove the object created here;
 -- it's left behind to help test pg_dump.
 
-SELECT lo_from_bytea(0, lo_get(loid)) AS newloid FROM lotest_stash_values
+SELECT lo_from_bytea(0, lo_get(loid)) AS newloid FROM lotest_stash_values;
 
 -- Add a comment to it, as well, for pg_dump/pg_upgrade testing.
-COMMENT ON LARGE OBJECT 'newloid' IS 'I Wandered Lonely as a Cloud';
+COMMENT ON LARGE OBJECT 1235 IS 'I Wandered Lonely as a Cloud';
 
 -- Read out a portion
 BEGIN;
@@ -224,7 +224,7 @@ TRUNCATE lotest_stash_values;
 
 
 
-SELECT lo_from_bytea(0, lo_get('newloid_1')) AS newloid_2
+SELECT lo_from_bytea(0, lo_get('newloid_1')) AS newloid_2;
 
 SELECT fipshash(lo_get('newloid_1')) = fipshash(lo_get('newloid_2'));
 
@@ -239,10 +239,10 @@ SELECT lo_get('newloid_1', 4294967294, 100);
 
 
 -- This object is left in the database for pg_dump test purposes
-SELECT lo_from_bytea(0, E'\\xdeadbeef') AS newloid
+SELECT lo_from_bytea(0, E'\\xdeadbeef') AS newloid;
 
 SET bytea_output TO hex;
-SELECT lo_get('newloid');
+SELECT lo_get(1235);
 
 -- Create one more object that we leave behind for testing pg_dump/pg_upgrade;
 -- this one intentionally has an OID in the system range

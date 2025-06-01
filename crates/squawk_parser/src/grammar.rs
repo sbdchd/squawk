@@ -782,7 +782,6 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             p.bump(POSITIONAL_PARAM);
             m.complete(p, LITERAL)
         }
-        (VALUES_KW, _) => values(p, None),
         (EXTRACT_KW, L_PAREN) => extract_fn(p),
         (JSON_EXISTS_KW, L_PAREN) => json_exists_fn(p),
         (JSON_ARRAY_KW, L_PAREN) => json_array_fn(p),
@@ -3034,7 +3033,10 @@ enum ColumnDefKind {
 //                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 // [ ( column_name [, ... ] ) ]
 fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
-    if !p.at(L_PAREN) {
+    if !p.at(L_PAREN) ||
+        // we're probably at (select)
+        !p.nth_at_ts(1, COLUMN_FIRST)
+    {
         return false;
     }
     let m = p.start();
@@ -3800,14 +3802,13 @@ fn col_def(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
             // TODO: validation to check for missing types
             if opt_type_name(p) {
                 // [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ]
-                if p.eat(STORAGE_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
+                if p.eat(STORAGE_KW) && (p.at(DEFAULT_KW) || p.at(EXTERNAL_KW) || p.at(IDENT)) {
                     p.bump_any();
                 }
                 // [ COMPRESSION compression_method ]
                 if p.eat(COMPRESSION_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
                     p.bump_any();
                 }
-                opt_collate(p);
             }
         }
         ColDefType::ColumnNameOnly => {
@@ -3817,6 +3818,7 @@ fn col_def(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
             }
         }
     }
+    opt_collate(p);
     // [ column_constraint [ ... ] ]
     while !p.at(EOF) {
         if opt_column_constraint(p).is_none() {
@@ -4861,10 +4863,9 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
                 CONSTRAINT_KW | TRIGGER_KW => Some(create_trigger(p)),
                 PROCEDURAL_KW | TRUSTED_KW | LANGUAGE_KW => Some(create_language(p)),
                 PROCEDURE_KW => Some(create_procedure(p)),
-                RECURSIVE_KW | TEMP_KW | TEMPORARY_KW => Some(create_view(p)),
+                RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => Some(create_view(p)),
                 RULE_KW => Some(create_rule(p)),
                 TRANSFORM_KW => Some(create_transform(p)),
-                VIEW_KW => Some(create_view(p)),
                 _ => Some(create_function(p)),
             }
         }
@@ -10901,7 +10902,7 @@ fn reset(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(RESET_KW);
     if !p.eat(ALL_KW) {
-        name_ref(p);
+        path_name_ref(p);
     }
     m.complete(p, RESET)
 }
@@ -11367,6 +11368,7 @@ fn copy(p: &mut Parser<'_>) -> CompletedMarker {
         preparable_stmt(p);
         p.expect(R_PAREN);
     } else {
+        p.eat(BINARY_KW);
         // table_name
         path_name(p);
         // [ ( column_name [, ...] ) ]
@@ -11593,19 +11595,41 @@ fn opt_schema_auth(p: &mut Parser<'_>) -> bool {
 fn opt_schema_elements(p: &mut Parser<'_>) {
     while !p.at(EOF) {
         match (p.current(), p.nth(1)) {
-            (CREATE_KW, TABLE_KW) => {
+            (CREATE_KW, TABLE_KW | GLOBAL_KW | LOCAL_KW | UNLOGGED_KW)
+                if !p.nth_at(2, SEQUENCE_KW) =>
+            {
                 create_table(p);
             }
-            (CREATE_KW, VIEW_KW) => {
+            (CREATE_KW, TEMP_KW | TEMPORARY_KW) => {
+                // CREATE TEMP [ RECURSIVE ] VIEW
+                // CREATE TEMP TABLE
+                // ^0     ^1   ^2
+                match p.nth(2) {
+                    RECURSIVE_KW | VIEW_KW => create_view(p),
+                    SEQUENCE_KW => create_sequence(p),
+                    _ => create_table(p),
+                };
+            }
+            (CREATE_KW, OR_KW) => {
+                match p.nth(3) {
+                    CONSTRAINT_KW | TRIGGER_KW => create_trigger(p),
+                    RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => create_view(p),
+                    _ => return,
+                };
+            }
+            (CREATE_KW, RECURSIVE_KW | VIEW_KW) => {
                 create_view(p);
+            }
+            (CREATE_KW, UNLOGGED_KW) if p.nth_at(2, SEQUENCE_KW) => {
+                create_sequence(p);
             }
             (CREATE_KW, SEQUENCE_KW) => {
                 create_sequence(p);
             }
-            (CREATE_KW, TRIGGER_KW) => {
+            (CREATE_KW, CONSTRAINT_KW | TRIGGER_KW) => {
                 create_trigger(p);
             }
-            (CREATE_KW, INDEX_KW) => {
+            (CREATE_KW, INDEX_KW | UNIQUE_KW) => {
                 create_index(p);
             }
             _ => return,
@@ -11953,10 +11977,8 @@ fn opt_returning_clause(p: &mut Parser<'_>) {
             if !p.eat(STAR) {
                 if expr(p).is_none() {
                     p.error("expected output expression");
-                } else if p.eat(AS_KW) {
-                    p.expect(IDENT);
                 } else {
-                    p.eat(IDENT);
+                    opt_alias(p);
                 }
             }
             if !p.eat(COMMA) {
@@ -12778,7 +12800,7 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
     // configuration_parameter { TO | = } { value | 'value' | DEFAULT }
     } else {
         // configuration_parameter
-        name_ref(p);
+        path_name_ref(p);
         // { TO | = }
         let _ = p.eat(TO_KW) || p.expect(EQ);
         // { value | 'value' | DEFAULT }
@@ -12798,7 +12820,7 @@ fn show(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(SHOW_KW);
     if !p.eat(ALL_KW) {
-        name_ref(p);
+        path_name_ref(p);
     }
     m.complete(p, SHOW)
 }
