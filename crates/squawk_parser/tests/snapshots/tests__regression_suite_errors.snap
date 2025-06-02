@@ -2,8 +2,7 @@
 source: crates/squawk_parser/tests/tests.rs
 expression: "out.join(\"\\n\")"
 ---
-tests/snapshots/tests__regression_create_view.snap:254
-tests/snapshots/tests__regression_domain.snap:10
+tests/snapshots/tests__regression_create_view.snap:235
 tests/snapshots/tests__regression_errors.snap:286
 tests/snapshots/tests__regression_foreign_data.snap:51
 tests/snapshots/tests__regression_foreign_key.snap:24
@@ -22,10 +21,10 @@ tests/snapshots/tests__regression_rules.snap:59
 tests/snapshots/tests__regression_sqljson.snap:1073
 tests/snapshots/tests__regression_sqljson_jsontable.snap:185
 tests/snapshots/tests__regression_sqljson_queryfuncs.snap:51
-tests/snapshots/tests__regression_strings.snap:188
+tests/snapshots/tests__regression_strings.snap:187
 tests/snapshots/tests__regression_subselect.snap:52
 tests/snapshots/tests__regression_timestamp.snap:65
-tests/snapshots/tests__regression_timestamptz.snap:13
+tests/snapshots/tests__regression_timestamptz.snap:5
 tests/snapshots/tests__regression_transactions.snap:114
 tests/snapshots/tests__regression_triggers.snap:51
 tests/snapshots/tests__regression_tsearch.snap:62

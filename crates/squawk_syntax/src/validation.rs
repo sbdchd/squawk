@@ -8,7 +8,6 @@ use crate::ast::AstNode;
 use crate::{ast, match_ast, syntax_error::SyntaxError, SyntaxNode};
 use rowan::TextRange;
 use squawk_parser::SyntaxKind::*;
-
 pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     for node in root.descendants() {
         match_ast! {
@@ -18,7 +17,55 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
                 ast::DropAggregate(it) => validate_drop_aggregate(it, errors),
+                ast::Literal(it) => validate_literal(it, errors),
                 _ => (),
+            }
+        }
+    }
+}
+
+enum LookingFor {
+    OpeningString,
+    Comment,
+    ClosingString,
+}
+fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
+    let mut state = LookingFor::OpeningString;
+    let mut maybe_errors = vec![];
+    let message = "Comments between string literals are not allowed.";
+    for e in lit.syntax().children_with_tokens() {
+        match e {
+            rowan::NodeOrToken::Node(_) => {
+                // not sure when this would occur
+                state = LookingFor::OpeningString;
+            }
+            rowan::NodeOrToken::Token(token) => {
+                if token.kind() == WHITESPACE {
+                    continue;
+                }
+                match state {
+                    LookingFor::OpeningString => {
+                        if token.kind() == STRING {
+                            state = LookingFor::Comment;
+                        }
+                    }
+                    LookingFor::Comment => {
+                        if token.kind() == COMMENT {
+                            state = LookingFor::ClosingString;
+                            maybe_errors.push(SyntaxError::new(message, token.text_range()));
+                        }
+                    }
+                    LookingFor::ClosingString => {
+                        if token.kind() == STRING {
+                            acc.append(&mut maybe_errors);
+                            state = LookingFor::Comment;
+                        } else if token.kind() == COMMENT {
+                            maybe_errors.push(SyntaxError::new(message, token.text_range()));
+                        } else {
+                            state = LookingFor::OpeningString;
+                        }
+                    }
+                }
             }
         }
     }

@@ -101,20 +101,22 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "users"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "u"
+        FROM_ITEM
+          NAME_REF
+            IDENT "users"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "u"
         COMMA ","
         WHITESPACE " "
-        NAME_REF
-          IDENT "logs"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "l"
+        FROM_ITEM
+          NAME_REF
+            IDENT "logs"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "l"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -204,8 +206,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        NAME_REF
-          IDENT "t"
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- update"

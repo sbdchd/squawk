@@ -24,8 +24,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "films"
+      FROM_ITEM
+        NAME_REF
+          IDENT "films"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -72,7 +73,8 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t2"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t2"
   SEMICOLON ";"
   WHITESPACE "\n\n"

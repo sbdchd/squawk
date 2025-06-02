@@ -196,8 +196,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t1"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t1"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -321,12 +322,14 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
+      FROM_ITEM
+        NAME_REF
+          IDENT "a"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      FROM_ITEM
+        NAME_REF
+          IDENT "b"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -645,8 +648,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "accounts"
+      FROM_ITEM
+        NAME_REF
+          IDENT "accounts"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -733,8 +737,9 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "accounts"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "accounts"
             WHITESPACE " "
             WHERE_CLAUSE
               WHERE_KW "WHERE"
@@ -790,8 +795,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "employees"
+        FROM_ITEM
+          NAME_REF
+            IDENT "employees"
       WHITESPACE "\n     "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -846,8 +852,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "employees"
+      FROM_ITEM
+        NAME_REF
+          IDENT "employees"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -956,12 +963,13 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          DATA_KW "data"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "d"
+        FROM_ITEM
+          NAME_REF
+            DATA_KW "data"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "d"
       WHITESPACE "\n     "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -1133,14 +1141,15 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            NAME_REF
-              IDENT "work_item"
-            WHITESPACE " "
-            ALIAS
-              AS_KW "AS"
+            FROM_ITEM
+              NAME_REF
+                IDENT "work_item"
               WHITESPACE " "
-              NAME
-                IDENT "w"
+              ALIAS
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "w"
           WHITESPACE "\n    "
           WHERE_CLAUSE
             WHERE_KW "WHERE"
@@ -1220,14 +1229,15 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "exceeded_max_retries"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "AS"
+      FROM_ITEM
+        NAME_REF
+          IDENT "exceeded_max_retries"
         WHITESPACE " "
-        NAME
-          IDENT "emr"
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "emr"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "WHERE"

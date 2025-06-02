@@ -4573,8 +4573,23 @@ pub struct FromClause {
 }
 impl FromClause {
     #[inline]
+    pub fn from_items(&self) -> AstChildren<FromItem> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn from_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FromItem {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FromItem {
+    #[inline]
+    pub fn only_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ONLY_KW)
     }
 }
 
@@ -12342,6 +12357,24 @@ impl AstNode for FromClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::FROM_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for FromItem {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FROM_ITEM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

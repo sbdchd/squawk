@@ -1055,8 +1055,9 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            NAME_REF
-              IDENT "recent_transactions"
+            FROM_ITEM
+              NAME_REF
+                IDENT "recent_transactions"
         R_PAREN ")"
       WHITESPACE " "
       ALIAS

@@ -26,8 +26,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "t"
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
