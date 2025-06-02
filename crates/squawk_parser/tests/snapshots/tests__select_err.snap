@@ -70,22 +70,23 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "as"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
         WHITESPACE " "
-        NAME
-          IDENT "u"
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME
-              IDENT "a"
-          ERROR
-            COMMA ","
-          R_PAREN ")"
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "u"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "a"
+            ERROR
+              COMMA ","
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- missing comma"
@@ -119,8 +120,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--          ^ ^ comma missing"

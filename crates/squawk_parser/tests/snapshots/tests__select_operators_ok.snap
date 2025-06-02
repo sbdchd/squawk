@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select_operators.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   COMMENT "-- logical_operators"
@@ -3833,8 +3832,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -3861,8 +3861,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -3911,8 +3912,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -3945,8 +3947,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -3960,8 +3963,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "order"

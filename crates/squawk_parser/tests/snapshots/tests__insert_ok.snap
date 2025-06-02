@@ -256,8 +256,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        NAME_REF
-          IDENT "new_products"
+        FROM_ITEM
+          NAME_REF
+            IDENT "new_products"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "where"
@@ -669,8 +670,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "tmp_films"
+        FROM_ITEM
+          NAME_REF
+            IDENT "tmp_films"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -875,8 +877,9 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "FROM"
                     WHITESPACE " "
-                    NAME_REF
-                      IDENT "accounts"
+                    FROM_ITEM
+                      NAME_REF
+                        IDENT "accounts"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -922,8 +925,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "upd"
+        FROM_ITEM
+          NAME_REF
+            IDENT "upd"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT

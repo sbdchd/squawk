@@ -187,55 +187,57 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "films"
-      WHITESPACE " "
-      ALIAS
-        NAME
-          IDENT "f"
+      FROM_ITEM
+        NAME_REF
+          IDENT "films"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "f"
       COMMA ","
       WHITESPACE " "
-      PAREN_EXPR
-        L_PAREN "("
-        VALUES
-          VALUES_KW "VALUES"
+      FROM_ITEM
+        PAREN_EXPR
           L_PAREN "("
-          LITERAL
-            STRING "'MGM'"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            STRING "'Horror'"
+          VALUES
+            VALUES_KW "VALUES"
+            L_PAREN "("
+            LITERAL
+              STRING "'MGM'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'Horror'"
+            R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              STRING "'UA'"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              STRING "'Sci-Fi'"
+            R_PAREN ")"
           R_PAREN ")"
-          COMMA ","
-          WHITESPACE " "
-          L_PAREN "("
-          LITERAL
-            STRING "'UA'"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            STRING "'Sci-Fi'"
-          R_PAREN ")"
-        R_PAREN ")"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "AS"
         WHITESPACE " "
-        NAME
-          IDENT "t"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME
-              IDENT "studio"
-          COMMA ","
+        ALIAS
+          AS_KW "AS"
           WHITESPACE " "
-          COLUMN
-            NAME
-              IDENT "kind"
-          R_PAREN ")"
+          NAME
+            IDENT "t"
+          WHITESPACE " "
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "studio"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "kind"
+            R_PAREN ")"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -312,60 +314,61 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      PAREN_EXPR
-        L_PAREN "("
-        VALUES
-          VALUES_KW "VALUES"
+      FROM_ITEM
+        PAREN_EXPR
           L_PAREN "("
-          LITERAL
-            INT_NUMBER "1"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "200000"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            FLOAT_NUMBER "1.2"
+          VALUES
+            VALUES_KW "VALUES"
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "200000"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "1.2"
+            R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "2"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "400000"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "1.4"
+            R_PAREN ")"
           R_PAREN ")"
-          COMMA ","
-          WHITESPACE " "
-          L_PAREN "("
-          LITERAL
-            INT_NUMBER "2"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "400000"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            FLOAT_NUMBER "1.4"
-          R_PAREN ")"
-        R_PAREN ")"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "AS"
         WHITESPACE " "
-        NAME
-          IDENT "v"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME
-              IDENT "depno"
-          COMMA ","
+        ALIAS
+          AS_KW "AS"
           WHITESPACE " "
-          COLUMN
-            NAME
-              TARGET_KW "target"
-          COMMA ","
+          NAME
+            IDENT "v"
           WHITESPACE " "
-          COLUMN
-            NAME
-              IDENT "increase"
-          R_PAREN ")"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "depno"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME
+                TARGET_KW "target"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN
+              NAME
+                IDENT "increase"
+            R_PAREN ")"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -421,8 +424,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "machines"
+      FROM_ITEM
+        NAME_REF
+          IDENT "machines"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"

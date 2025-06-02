@@ -81,8 +81,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "films"
+        FROM_ITEM
+          NAME_REF
+            IDENT "films"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -120,8 +121,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "comedies"
+        FROM_ITEM
+          NAME_REF
+            IDENT "comedies"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -167,8 +169,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "comedies"
+        FROM_ITEM
+          NAME_REF
+            IDENT "comedies"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -261,12 +264,13 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "FROM"
                   WHITESPACE " "
-                  NAME_REF
-                    IDENT "user_ratings"
-                  WHITESPACE " "
-                  ALIAS
-                    NAME
-                      IDENT "r"
+                  FROM_ITEM
+                    NAME_REF
+                      IDENT "user_ratings"
+                    WHITESPACE " "
+                    ALIAS
+                      NAME
+                        IDENT "r"
                 WHITESPACE "\n            "
                 WHERE_CLAUSE
                   WHERE_KW "WHERE"
@@ -297,12 +301,13 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE " "
-        NAME_REF
-          IDENT "films"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "f"
+        FROM_ITEM
+          NAME_REF
+            IDENT "films"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "f"
       WHITESPACE "\n    "
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -376,8 +381,9 @@ SOURCE_FILE
         FROM_CLAUSE
           FROM_KW "FROM"
           WHITESPACE " "
-          NAME_REF
-            IDENT "nums_1_100"
+          FROM_ITEM
+            NAME_REF
+              IDENT "nums_1_100"
         WHITESPACE " "
         WHERE_CLAUSE
           WHERE_KW "WHERE"
@@ -549,7 +555,8 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        NAME_REF
-          IDENT "foo"
+        FROM_ITEM
+          NAME_REF
+            IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n"

@@ -62,8 +62,9 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        NAME_REF
-          IDENT "u"
+        FROM_ITEM
+          NAME_REF
+            IDENT "u"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "where"

@@ -131,12 +131,14 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
+      FROM_ITEM
+        NAME_REF
+          IDENT "foo"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
+      FROM_ITEM
+        NAME_REF
+          IDENT "bar"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -171,20 +173,22 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "foo"
-      WHITESPACE " "
-      ALIAS
-        NAME
-          IDENT "f"
+      FROM_ITEM
+        NAME_REF
+          IDENT "foo"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "f"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
-      WHITESPACE " "
-      ALIAS
-        NAME
-          IDENT "a"
+      FROM_ITEM
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
@@ -201,43 +205,45 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "order_items"
-      WHITESPACE " "
-      ALIAS
-        NAME
-          IDENT "oi"
-      WHITESPACE "\n  "
-      JOIN
-        LEFT_KW "left"
-        WHITESPACE " "
-        JOIN_KW "join"
-        WHITESPACE " "
+      FROM_ITEM
         NAME_REF
-          IDENT "orders"
+          IDENT "order_items"
         WHITESPACE " "
         ALIAS
           NAME
-            IDENT "o"
-        WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        BIN_EXPR
-          FIELD_EXPR
-            NAME_REF
-              IDENT "oi"
-            DOT "."
-            NAME_REF
-              IDENT "order_id"
+            IDENT "oi"
+        WHITESPACE "\n  "
+        JOIN
+          LEFT_KW "left"
           WHITESPACE " "
-          EQ "="
+          JOIN_KW "join"
           WHITESPACE " "
-          FIELD_EXPR
+          FROM_ITEM
             NAME_REF
-              IDENT "o"
-            DOT "."
-            NAME_REF
-              IDENT "id"
+              IDENT "orders"
+            WHITESPACE " "
+            ALIAS
+              NAME
+                IDENT "o"
+          WHITESPACE " "
+          ON_KW "on"
+          WHITESPACE " "
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "oi"
+              DOT "."
+              NAME_REF
+                IDENT "order_id"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "o"
+              DOT "."
+              NAME_REF
+                IDENT "id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE
@@ -256,59 +262,62 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "users"
-      WHITESPACE " "
-      ALIAS
-        NAME
-          IDENT "u"
+      FROM_ITEM
+        NAME_REF
+          IDENT "users"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "u"
       COMMA ","
       WHITESPACE "\n  "
-      PAREN_EXPR
-        L_PAREN "("
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                NAME_REF
-                  IDENT "user_id"
-              COMMA ","
+      FROM_ITEM
+        PAREN_EXPR
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
               WHITESPACE " "
-              TARGET
-                CALL_EXPR
+              TARGET_LIST
+                TARGET
                   NAME_REF
-                    IDENT "max"
-                  ARG_LIST
-                    L_PAREN "("
+                    IDENT "user_id"
+                COMMA ","
+                WHITESPACE " "
+                TARGET
+                  CALL_EXPR
                     NAME_REF
-                      IDENT "login_time"
-                    R_PAREN ")"
-                WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "last_login"
-          WHITESPACE "\n  "
-          FROM_CLAUSE
-            FROM_KW "from"
-            WHITESPACE " "
-            NAME_REF
-              IDENT "login_history"
-          WHITESPACE "\n  "
-          GROUP_BY_CLAUSE
-            GROUP_KW "group"
-            WHITESPACE " "
-            BY_KW "by"
-            WHITESPACE " "
-            NAME_REF
-              IDENT "user_id"
-        R_PAREN ")"
-      WHITESPACE " "
-      ALIAS
-        NAME
-          IDENT "lh"
+                      IDENT "max"
+                    ARG_LIST
+                      L_PAREN "("
+                      NAME_REF
+                        IDENT "login_time"
+                      R_PAREN ")"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "last_login"
+            WHITESPACE "\n  "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              FROM_ITEM
+                NAME_REF
+                  IDENT "login_history"
+            WHITESPACE "\n  "
+            GROUP_BY_CLAUSE
+              GROUP_KW "group"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "user_id"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "lh"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- where return"
@@ -384,8 +393,9 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "from"
               WHITESPACE " "
-              NAME_REF
-                IDENT "departments"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "departments"
             WHITESPACE " \n  "
             WHERE_CLAUSE
               WHERE_KW "where"
@@ -526,14 +536,15 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "q"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "as"
+      FROM_ITEM
+        NAME_REF
+          IDENT "q"
         WHITESPACE " "
-        NAME
-          IDENT "d"
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "d"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -598,14 +609,15 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "q"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "as"
+      FROM_ITEM
+        NAME_REF
+          IDENT "q"
         WHITESPACE " "
-        NAME
-          IDENT "d"
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "d"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -675,8 +687,9 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "from"
             WHITESPACE " "
-            NAME_REF
-              IDENT "t"
+            FROM_ITEM
+              NAME_REF
+                IDENT "t"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -693,8 +706,9 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t2"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
@@ -713,8 +727,9 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      NAME_REF
-        IDENT "producers"
+      FROM_ITEM
+        NAME_REF
+          IDENT "producers"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -783,8 +798,9 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "producers"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "producers"
             WHITESPACE " "
             WHERE_CLAUSE
               WHERE_KW "WHERE"
@@ -912,14 +928,15 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            NAME_REF
-              IDENT "user_logs"
-            WHITESPACE " "
-            ALIAS
-              AS_KW "AS"
+            FROM_ITEM
+              NAME_REF
+                IDENT "user_logs"
               WHITESPACE " "
-              NAME
-                IDENT "l"
+              ALIAS
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  IDENT "l"
           WHITESPACE "\n    "
           WHERE_CLAUSE
             WHERE_KW "WHERE"
@@ -979,14 +996,15 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      NAME_REF
-        IDENT "delete_batch"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "AS"
+      FROM_ITEM
+        NAME_REF
+          IDENT "delete_batch"
         WHITESPACE " "
-        NAME
-          IDENT "del"
+        ALIAS
+          AS_KW "AS"
+          WHITESPACE " "
+          NAME
+            IDENT "del"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "WHERE"

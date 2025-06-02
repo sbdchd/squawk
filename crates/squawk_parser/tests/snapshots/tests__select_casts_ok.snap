@@ -801,7 +801,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            TIME_TYPE
               TIMESTAMP_KW "timestamp"
               WHITESPACE " "
               WITH_KW "with"
@@ -824,7 +824,7 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
+              TIME_TYPE
                 TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 WITH_KW "with"
@@ -857,7 +857,7 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
+              TIME_TYPE
                 TIMESTAMP_KW "timestamp"
               WHITESPACE " "
               LITERAL
@@ -885,7 +885,7 @@ SOURCE_FILE
           BIN_EXPR
             BIN_EXPR
               CAST_EXPR
-                NAME_REF
+                TIME_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -922,7 +922,7 @@ SOURCE_FILE
         TARGET
           POSTFIX_EXPR
             CAST_EXPR
-              NAME_REF
+              TIME_TYPE
                 TIME_KW "time"
                 WHITESPACE " "
                 WITH_KW "with"
@@ -962,7 +962,7 @@ SOURCE_FILE
         TARGET
           POSTFIX_EXPR
             CAST_EXPR
-              NAME_REF
+              TIME_TYPE
                 TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 WITH_KW "with"
@@ -1996,7 +1996,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2012,7 +2012,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2028,7 +2028,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2044,7 +2044,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2060,7 +2060,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2076,7 +2076,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2092,7 +2092,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2112,7 +2112,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2132,7 +2132,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2152,7 +2152,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2172,7 +2172,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2196,7 +2196,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2216,7 +2216,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2236,7 +2236,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2260,7 +2260,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL
@@ -2280,7 +2280,7 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            NAME_REF
+            INTERVAL_TYPE
               INTERVAL_KW "interval"
             WHITESPACE " "
             LITERAL

@@ -851,8 +851,12 @@ LockingClause =
 OrderByClause =
   'order' 'by' 
 
+FromItem =
+  'only'?
+
 FromClause =
   'from'
+  (FromItem (',' FromItem)*)
 
 ConstraintIndexMethod =
   'using'

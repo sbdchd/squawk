@@ -27,7 +27,14 @@ fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    p.bump_any();
+    // E021-03 string continuation syntax
+    // If two string literals are next to each other, and don't have a comment
+    // between them, then they are automatically combined.
+    if p.eat(STRING) {
+        while !p.at(EOF) && p.eat(STRING) {}
+    } else {
+        p.bump_any();
+    }
     Some(m.complete(p, LITERAL))
 }
 
@@ -1795,27 +1802,33 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
+    // TODO: this needs to be cleaned up
     let mut is_interval_cast = false;
-    if p.eat(COLLATION_KW) {
+    let kind = if p.eat(COLLATION_KW) {
         p.expect(FOR_KW);
+        NAME_REF
     // timestamp with time zone / time with time zone
     } else if p.eat(TIMESTAMP_KW) || p.eat(TIME_KW) {
+        if p.eat(L_PAREN) {
+            if opt_numeric_literal(p).is_none() {
+                p.error("expected numeric literal");
+            }
+            p.expect(R_PAREN);
+        }
         if p.eat(WITH_KW) {
             p.expect(TIME_KW);
             p.expect(ZONE_KW);
         }
+        TIME_TYPE
     } else if p.eat(INTERVAL_KW) {
-        if p.eat(L_PAREN) {
-            if opt_numeric_literal(p).is_none() {
-                p.error("expected number");
-            }
-            p.expect(R_PAREN);
-        }
+        opt_interval_trailing(p);
         is_interval_cast = true;
+        INTERVAL_TYPE
     } else {
         p.bump_any();
-    }
-    let cm = m.complete(p, NAME_REF);
+        NAME_REF
+    };
+    let cm = m.complete(p, if p.at(STRING) { kind } else { NAME_REF });
     // A path followed by a string is a type cast so we insert a CAST_EXPR
     // preceding it to wrap the previously parsed data.
     // e.g., `select numeric '12312'`
@@ -2540,14 +2553,12 @@ fn opt_from_clause(p: &mut Parser<'_>) -> bool {
         m.abandon(p);
         return false;
     }
-    while !p.at(EOF) {
+    if !opt_from_item(p) {
+        p.error(format!("expected from item, got {:?}", p.current()));
+    }
+    while !p.at(EOF) && p.eat(COMMA) {
         if !opt_from_item(p) {
-            m.complete(p, FROM_CLAUSE);
-            return false;
-        }
-        // foo, bar, buzz
-        //    ^
-        if !p.eat(COMMA) {
+            p.error("expected from item");
             break;
         }
     }
@@ -2626,18 +2637,48 @@ const COL_NAME_KEYWORD_FIRST: TokenSet = TokenSet::new(&[
 // Generated via the above grammar, but we only take the keywords that are
 // single items. So `CURRENT_DATE` but not `COLLATION FOR '(' a_expr ')'`
 const FUNC_EXPR_COMMON_SUBEXPR_FIRST: TokenSet = TokenSet::new(&[
+    CAST_KW,
+    COALESCE_KW,
+    COLLATION_KW,
+    CURRENT_CATALOG_KW,
     CURRENT_DATE_KW,
+    CURRENT_ROLE_KW,
+    CURRENT_SCHEMA_KW,
     CURRENT_TIME_KW,
     CURRENT_TIMESTAMP_KW,
+    CURRENT_USER_KW,
+    EXTRACT_KW,
+    GREATEST_KW,
+    JSON_KW,
+    JSON_ARRAY_KW,
+    JSON_EXISTS_KW,
+    JSON_OBJECT_KW,
+    JSON_QUERY_KW,
+    JSON_SCALAR_KW,
+    JSON_SERIALIZE_KW,
+    JSON_VALUE_KW,
+    LEAST_KW,
     LOCALTIME_KW,
     LOCALTIMESTAMP_KW,
-    CURRENT_ROLE_KW,
-    CURRENT_USER_KW,
+    MERGE_ACTION_KW,
+    NORMALIZE_KW,
+    NULLIF_KW,
+    OVERLAY_KW,
+    POSITION_KW,
     SESSION_USER_KW,
+    SUBSTRING_KW,
     SYSTEM_USER_KW,
+    TREAT_KW,
+    TRIM_KW,
     USER_KW,
-    CURRENT_CATALOG_KW,
-    CURRENT_SCHEMA_KW,
+    XMLCONCAT_KW,
+    XMLELEMENT_KW,
+    XMLEXISTS_KW,
+    XMLFOREST_KW,
+    XMLPARSE_KW,
+    XMLPI_KW,
+    XMLROOT_KW,
+    XMLSERIALIZE_KW,
 ]);
 
 const FROM_ITEM_KEYWORDS_FIRST: TokenSet = TokenSet::new(&[])
@@ -2808,10 +2849,12 @@ fn opt_from_item(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(FROM_ITEM_FIRST) {
         return false;
     }
+    let m = p.start();
     data_source(p);
     while p.at_ts(JOIN_FIRST) {
         join(p);
     }
+    m.complete(p, FROM_ITEM);
     true
 }
 

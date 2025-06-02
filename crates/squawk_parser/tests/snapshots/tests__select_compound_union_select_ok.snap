@@ -1,7 +1,6 @@
 ---
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/ok/select_compound_union_select.sql
-snapshot_kind: text
 ---
 SOURCE_FILE
   SELECT
@@ -28,8 +27,9 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "FROM"
                     WHITESPACE " "
-                    NAME_REF
-                      IDENT "code_categories"
+                    FROM_ITEM
+                      NAME_REF
+                        IDENT "code_categories"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -89,8 +89,9 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "FROM"
                     WHITESPACE " "
-                    NAME_REF
-                      IDENT "code_categories"
+                    FROM_ITEM
+                      NAME_REF
+                        IDENT "code_categories"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -156,8 +157,9 @@ SOURCE_FILE
                   FROM_CLAUSE
                     FROM_KW "FROM"
                     WHITESPACE " "
-                    NAME_REF
-                      IDENT "code_categories"
+                    FROM_ITEM
+                      NAME_REF
+                        IDENT "code_categories"
                   WHITESPACE " "
                   WHERE_CLAUSE
                     WHERE_KW "WHERE"
@@ -215,8 +217,9 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "FROM"
                   WHITESPACE " "
-                  NAME_REF
-                    IDENT "code_categories"
+                  FROM_ITEM
+                    NAME_REF
+                      IDENT "code_categories"
                 WHITESPACE " "
                 WHERE_CLAUSE
                   WHERE_KW "WHERE"

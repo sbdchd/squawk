@@ -288,7 +288,7 @@ select f1, f1[1], (f1[2])[1] from dposintatable;
 -- it'd be nice if you could do something like this, but for now you can't:
 update dposintatable set f1[2][1] = array[97];
 -- maybe someday we can make this syntax work:
-update dposintatable set (f1[2])[1] = array[98];
+-- update dposintatable set (f1[2])[1] = array[98];
 
 drop table dposintatable;
 drop domain posint cascade;

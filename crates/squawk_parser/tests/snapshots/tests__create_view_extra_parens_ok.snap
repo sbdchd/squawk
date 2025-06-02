@@ -31,34 +31,37 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "from"
         WHITESPACE " "
-        PAREN_EXPR
-          L_PAREN "("
+        FROM_ITEM
           PAREN_EXPR
             L_PAREN "("
-            WHITESPACE " "
-            SELECT
-              SELECT_CLAUSE
-                SELECT_KW "select"
+            FROM_ITEM
+              PAREN_EXPR
+                L_PAREN "("
                 WHITESPACE " "
-                TARGET_LIST
-                  TARGET
-                    NAME_REF
-                      IDENT "y"
-              WHITESPACE " "
-              FROM_CLAUSE
-                FROM_KW "from"
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        NAME_REF
+                          IDENT "y"
+                  WHITESPACE " "
+                  FROM_CLAUSE
+                    FROM_KW "from"
+                    WHITESPACE " "
+                    FROM_ITEM
+                      NAME_REF
+                        IDENT "bar"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "bar"
-            WHITESPACE " "
+                R_PAREN ")"
             R_PAREN ")"
-          R_PAREN ")"
-        WHITESPACE " "
-        ALIAS
-          AS_KW "as"
           WHITESPACE " "
-          NAME
-            IDENT "b"
+          ALIAS
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "b"
       WHITESPACE "\n  "
       ORDER_BY_CLAUSE
         ORDER_KW "order"

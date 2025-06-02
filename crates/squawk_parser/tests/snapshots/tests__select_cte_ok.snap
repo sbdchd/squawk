@@ -61,8 +61,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with_values"
@@ -99,8 +100,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with"
@@ -140,8 +142,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column names"
@@ -195,8 +198,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- materialized "
@@ -236,8 +240,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- not materialized "
@@ -279,8 +284,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested"
@@ -348,8 +354,9 @@ SOURCE_FILE
               FROM_CLAUSE
                 FROM_KW "from"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "t"
+                FROM_ITEM
+                  NAME_REF
+                    IDENT "t"
             WHITESPACE "\n"
             R_PAREN ")"
   SEMICOLON ";"
@@ -421,12 +428,13 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "tree"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "t"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "tree"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "t"
           WHITESPACE "\n  "
           UNION_KW "UNION"
           WHITESPACE " "
@@ -466,20 +474,22 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "tree"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "t"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "tree"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "t"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "search_tree"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "st"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "search_tree"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "st"
             WHITESPACE "\n    "
             WHERE_CLAUSE
               WHERE_KW "WHERE"
@@ -529,8 +539,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "search_tree"
+      FROM_ITEM
+        NAME_REF
+          IDENT "search_tree"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"
@@ -608,12 +619,13 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "tree"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "t"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "tree"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "t"
           WHITESPACE "\n  "
           UNION_KW "UNION"
           WHITESPACE " "
@@ -653,20 +665,22 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "tree"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "t"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "tree"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "t"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "search_tree"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "st"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "search_tree"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "st"
             WHITESPACE "\n    "
             WHERE_CLAUSE
               WHERE_KW "WHERE"
@@ -716,8 +730,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "search_tree"
+      FROM_ITEM
+        NAME_REF
+          IDENT "search_tree"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"
@@ -805,12 +820,13 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "graph"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "g"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "graph"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "g"
           WHITESPACE "\n  "
           UNION_KW "UNION"
           WHITESPACE " "
@@ -865,20 +881,22 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "graph"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "g"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "graph"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "g"
               COMMA ","
               WHITESPACE " "
-              NAME_REF
-                IDENT "search_graph"
-              WHITESPACE " "
-              ALIAS
-                NAME
-                  IDENT "sg"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "search_graph"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "sg"
             WHITESPACE "\n    "
             WHERE_CLAUSE
               WHERE_KW "WHERE"
@@ -927,8 +945,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "search_graph"
+      FROM_ITEM
+        NAME_REF
+          IDENT "search_graph"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- search cycle with to and default values"
@@ -1019,8 +1038,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      NAME_REF
-        IDENT "search_graph"
+      FROM_ITEM
+        NAME_REF
+          IDENT "search_graph"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi"
@@ -1078,12 +1098,14 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      FROM_ITEM
+        NAME_REF
+          IDENT "b"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- recursive"
@@ -1123,8 +1145,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1172,8 +1195,9 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "from"
             WHITESPACE " "
-            NAME_REF
-              IDENT "t"
+            FROM_ITEM
+              NAME_REF
+                IDENT "t"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -1187,8 +1211,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t2"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- timestamp_edge_cases"
@@ -1231,8 +1256,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -1273,8 +1299,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- regression gh issue #509"
@@ -1341,12 +1368,13 @@ SOURCE_FILE
           FROM_CLAUSE
             FROM_KW "FROM"
             WHITESPACE " "
-            FIELD_EXPR
-              NAME_REF
-                IDENT "public"
-              DOT "."
-              NAME_REF
-                IDENT "notification"
+            FROM_ITEM
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "public"
+                DOT "."
+                NAME_REF
+                  IDENT "notification"
           WHITESPACE "\n  "
           WHERE_CLAUSE
             WHERE_KW "WHERE"
@@ -1409,8 +1437,9 @@ SOURCE_FILE
             FROM_CLAUSE
               FROM_KW "FROM"
               WHITESPACE " "
-              NAME_REF
-                IDENT "ranked_notifications"
+              FROM_ITEM
+                NAME_REF
+                  IDENT "ranked_notifications"
             WHITESPACE " "
             WHERE_CLAUSE
               WHERE_KW "WHERE"

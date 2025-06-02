@@ -2,28 +2,8 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/create_view.sql
 ---
-ERROR@21388: expected SEMICOLON
-ERROR@21391: expected command, found COLLATION_KW
-ERROR@21401: expected command, found FOR_KW
-ERROR@21405: expected command, found L_PAREN
-ERROR@21406: expected command, found STRING
-ERROR@21409: expected command, found COLON
-ERROR@21410: expected command, found COLON
-ERROR@21411: expected command, found TEXT_KW
-ERROR@21415: expected command, found R_PAREN
-ERROR@21417: expected command, found IDENT
-ERROR@21420: expected command, found COMMA
-ERROR@21424: expected command, found CURRENT_DATE_KW
-ERROR@21437: expected command, found AS_KW
-ERROR@21440: expected command, found IDENT
-ERROR@21441: expected command, found COMMA
-ERROR@21445: expected command, found LOCALTIMESTAMP_KW
-ERROR@21459: expected command, found L_PAREN
-ERROR@21460: expected command, found INT_NUMBER
-ERROR@21461: expected command, found R_PAREN
-ERROR@21463: expected command, found AS_KW
-ERROR@21466: expected command, found IDENT
-ERROR@21467: expected command, found COMMA
+ERROR@21471: expected name
+ERROR@21471: expected SEMICOLON
 ERROR@21471: expected command, found CAST_KW
 ERROR@21475: expected command, found L_PAREN
 ERROR@21476: expected command, found INT_NUMBER
@@ -47,6 +27,7 @@ ERROR@21516: expected command, found AS_KW
 ERROR@21519: expected command, found IDENT
 ERROR@21912: missing comma
 ERROR@22280: expected R_PAREN
+ERROR@22285: expected from item, got STRING
 ERROR@22285: expected SEMICOLON
 ERROR@22286: expected command, found STRING
 ERROR@22293: expected command, found R_PAREN

@@ -2187,8 +2187,9 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "from"
                   WHITESPACE " "
-                  NAME_REF
-                    IDENT "t"
+                  FROM_ITEM
+                    NAME_REF
+                      IDENT "t"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -2218,8 +2219,9 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "from"
                   WHITESPACE " "
-                  NAME_REF
-                    IDENT "u"
+                  FROM_ITEM
+                    NAME_REF
+                      IDENT "u"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2471,8 +2473,9 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "from"
                   WHITESPACE " "
-                  NAME_REF
-                    IDENT "t"
+                  FROM_ITEM
+                    NAME_REF
+                      IDENT "t"
                 WHITESPACE " "
                 WHERE_CLAUSE
                   WHERE_KW "where"
@@ -2530,8 +2533,9 @@ SOURCE_FILE
                 FROM_CLAUSE
                   FROM_KW "from"
                   WHITESPACE " "
-                  NAME_REF
-                    IDENT "t"
+                  FROM_ITEM
+                    NAME_REF
+                      IDENT "t"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2571,8 +2575,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
     WHITESPACE " "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -2948,7 +2953,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
+                TIME_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -2972,7 +2977,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
+                TIME_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -3044,7 +3049,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
+                TIME_TYPE
                   TIME_KW "time"
                 WHITESPACE " "
                 LITERAL
@@ -3068,7 +3073,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
+                TIME_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -3092,7 +3097,7 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
+                TIME_TYPE
                   TIMESTAMP_KW "timestamp"
                 WHITESPACE " "
                 LITERAL
@@ -3250,8 +3255,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "vals"
+      FROM_ITEM
+        NAME_REF
+          IDENT "vals"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 2"
@@ -3286,8 +3292,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "vals"
+      FROM_ITEM
+        NAME_REF
+          IDENT "vals"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 2 const"
@@ -3322,8 +3329,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order by param 1"
@@ -3358,8 +3366,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "\"table\""
+      FROM_ITEM
+        NAME_REF
+          IDENT "\"table\""
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- within group"
@@ -3397,8 +3406,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- filter expr simple"
@@ -3436,8 +3446,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- filter expr"
@@ -3495,30 +3506,31 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      CALL_EXPR
-        NAME_REF
-          IDENT "generate_series"
-        ARG_LIST
-          L_PAREN "("
-          LITERAL
-            INT_NUMBER "1"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "10"
-          R_PAREN ")"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "as"
+      FROM_ITEM
+        CALL_EXPR
+          NAME_REF
+            IDENT "generate_series"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10"
+            R_PAREN ")"
         WHITESPACE " "
-        NAME
-          IDENT "s"
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME
-              IDENT "i"
-          R_PAREN ")"
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "s"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME
+                IDENT "i"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -3763,8 +3775,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- window name"
@@ -3793,7 +3806,8 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      NAME_REF
-        IDENT "t"
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
   SEMICOLON ";"
   WHITESPACE "\n"

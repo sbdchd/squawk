@@ -1,0 +1,68 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/validate_string_continuation.sql
+---
+SOURCE_FILE@0..157
+  SELECT@0..18
+    SELECT_CLAUSE@0..18
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..18
+        TARGET@7..18
+          LITERAL@7..18
+            STRING@7..12 "'foo'"
+            WHITESPACE@12..13 " "
+            STRING@13..18 "'bar'"
+  SEMICOLON@18..19 ";"
+  WHITESPACE@19..20 "\n"
+  SELECT@20..52
+    SELECT_CLAUSE@20..52
+      SELECT_KW@20..26 "select"
+      WHITESPACE@26..27 " "
+      TARGET_LIST@27..52
+        TARGET@27..52
+          LITERAL@27..52
+            STRING@27..32 "'foo'"
+            WHITESPACE@32..33 " "
+            COMMENT@33..46 "/* comment */"
+            WHITESPACE@46..47 " "
+            STRING@47..52 "'bar'"
+  SEMICOLON@52..53 ";"
+  WHITESPACE@53..54 "\n"
+  SELECT@54..119
+    SELECT_CLAUSE@54..119
+      SELECT_KW@54..60 "select"
+      WHITESPACE@60..61 " "
+      TARGET_LIST@61..119
+        TARGET@61..119
+          LITERAL@61..119
+            STRING@61..68 "'hello'"
+            WHITESPACE@68..69 " "
+            COMMENT@69..82 "/* comment */"
+            WHITESPACE@82..83 " "
+            STRING@83..88 "'bar'"
+            WHITESPACE@88..89 " "
+            COMMENT@89..110 "/* another comment */"
+            WHITESPACE@110..111 " "
+            STRING@111..119 "' world'"
+  SEMICOLON@119..120 ";"
+  WHITESPACE@120..122 "\n\n"
+  SELECT@122..155
+    SELECT_CLAUSE@122..155
+      SELECT_KW@122..128 "select"
+      WHITESPACE@128..129 " "
+      TARGET_LIST@129..155
+        TARGET@129..155
+          LITERAL@129..155
+            STRING@129..136 "'hello'"
+            WHITESPACE@136..137 " "
+            COMMENT@137..147 "-- comment"
+            WHITESPACE@147..148 "\n"
+            STRING@148..155 "'world'"
+  SEMICOLON@155..156 ";"
+  WHITESPACE@156..157 "\n"
+
+ERROR@33:46 "Comments between string literals are not allowed."
+ERROR@69:82 "Comments between string literals are not allowed."
+ERROR@89:110 "Comments between string literals are not allowed."
+ERROR@137:147 "Comments between string literals are not allowed."
