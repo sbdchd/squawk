@@ -1318,6 +1318,18 @@ fn postfix_expr(
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
+            IS_KW if p.at(IS_NOT_NORMALIZED)=> {
+                let m = lhs.precede(p);
+                p.bump(IS_NOT_NORMALIZED);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_NORMALIZED)=> {
+                let m = lhs.precede(p);
+                p.bump(IS_NORMALIZED);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
             NOTNULL_KW => {
                 let m = lhs.precede(p);
                 p.bump(NOTNULL_KW);
@@ -2092,6 +2104,10 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         NOT_KW if !r.not_disabled && p.at(NOT_ILIKE) => (6, NOT_ILIKE, Left),
         // not in
         NOT_KW if !r.not_disabled && p.at(NOT_IN) => (6, NOT_IN, Left),
+        // is normalized
+        IS_KW if !r.is_disabled && p.at(IS_NORMALIZED) => NOT_AN_OP,
+        // is not normalized
+        IS_KW if !r.is_disabled && p.at(IS_NOT_NORMALIZED) => NOT_AN_OP,
         // is distinct from
         IS_KW if !r.is_disabled && p.at(IS_DISTINCT_FROM) => (4, IS_DISTINCT_FROM, Left),
         // is not distinct from
@@ -2765,6 +2781,12 @@ fn data_source(p: &mut Parser<'_>) {
             opt_alias(p);
         }
         IDENT => from_item_name(p),
+        CAST_KW | TREAT_KW => {
+            if expr(p).is_none() {
+                p.error("expected expression");
+            }
+            opt_alias(p);
+        }
         _ if p.at_ts(FROM_ITEM_KEYWORDS_FIRST) => from_item_name(p),
         _ => {}
     }

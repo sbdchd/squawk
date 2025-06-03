@@ -4940,6 +4940,25 @@ impl IsDistinctFrom {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNormalized {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNormalized {
+    #[inline]
+    pub fn unicode_normal_form(&self) -> Option<UnicodeNormalForm> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn normalized_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NORMALIZED_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IsNot {
     pub(crate) syntax: SyntaxNode,
 }
@@ -4970,6 +4989,29 @@ impl IsNotDistinctFrom {
     #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNotNormalized {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNotNormalized {
+    #[inline]
+    pub fn unicode_normal_form(&self) -> Option<UnicodeNormalForm> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn normalized_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NORMALIZED_KW)
     }
     #[inline]
     pub fn not_token(&self) -> Option<SyntaxToken> {
@@ -7822,6 +7864,29 @@ impl TupleExpr {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct UnicodeNormalForm {
+    pub(crate) syntax: SyntaxNode,
+}
+impl UnicodeNormalForm {
+    #[inline]
+    pub fn nfc_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NFC_KW)
+    }
+    #[inline]
+    pub fn nfd_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NFD_KW)
+    }
+    #[inline]
+    pub fn nfkc_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NFKC_KW)
+    }
+    #[inline]
+    pub fn nfkd_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NFKD_KW)
     }
 }
 
@@ -12713,6 +12778,24 @@ impl AstNode for IsDistinctFrom {
         &self.syntax
     }
 }
+impl AstNode for IsNormalized {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NORMALIZED
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for IsNot {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -12735,6 +12818,24 @@ impl AstNode for IsNotDistinctFrom {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::IS_NOT_DISTINCT_FROM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsNotNormalized {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NOT_NORMALIZED
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -15525,6 +15626,24 @@ impl AstNode for TupleExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::TUPLE_EXPR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for UnicodeNormalForm {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::UNICODE_NORMAL_FORM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

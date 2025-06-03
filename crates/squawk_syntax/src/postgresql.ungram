@@ -131,6 +131,18 @@ IsDistinctFrom =
 IsNotDistinctFrom =
   'is' 'not' 'distinct' 'from'
 
+UnicodeNormalForm =
+  'nfc'
+| 'nfd'
+| 'nfkc'
+| 'nfkd'
+
+IsNormalized =
+  'is' UnicodeNormalForm? 'normalized'
+
+IsNotNormalized =
+  'is' UnicodeNormalForm? 'not' 'normalized'
+
 OperatorCall =
   'operator' '(' (Path '.')? Op ')'
 
