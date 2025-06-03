@@ -2,7 +2,7 @@
 source: crates/squawk_parser/tests/tests.rs
 expression: "out.join(\"\\n\")"
 ---
-tests/snapshots/tests__regression_create_view.snap:235
+tests/snapshots/tests__regression_create_view.snap:211
 tests/snapshots/tests__regression_errors.snap:286
 tests/snapshots/tests__regression_foreign_data.snap:51
 tests/snapshots/tests__regression_foreign_key.snap:24
@@ -29,7 +29,6 @@ tests/snapshots/tests__regression_transactions.snap:114
 tests/snapshots/tests__regression_triggers.snap:51
 tests/snapshots/tests__regression_tsearch.snap:62
 tests/snapshots/tests__regression_tuplesort.snap:188
-tests/snapshots/tests__regression_unicode.snap:40
 tests/snapshots/tests__regression_union.snap:25
 tests/snapshots/tests__regression_update.snap:29
 tests/snapshots/tests__regression_vacuum.snap:21

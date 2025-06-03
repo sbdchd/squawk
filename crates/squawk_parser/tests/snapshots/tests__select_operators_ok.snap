@@ -1533,13 +1533,13 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          POSTFIX_EXPR
             LITERAL
               BYTE_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
-            IS_KW "is"
-            WHITESPACE " "
-            NAME_REF
+            IS_NORMALIZED
+              IS_KW "is"
+              WHITESPACE " "
               NORMALIZED_KW "normalized"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -1549,17 +1549,16 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          POSTFIX_EXPR
             LITERAL
               BYTE_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
-            IS_KW "is"
-            WHITESPACE " "
-            NAME_REF
+            IS_NORMALIZED
+              IS_KW "is"
+              WHITESPACE " "
               NFC_KW "nfc"
-          WHITESPACE " "
-          NAME
-            NORMALIZED_KW "normalized"
+              WHITESPACE " "
+              NORMALIZED_KW "normalized"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1568,17 +1567,16 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          POSTFIX_EXPR
             LITERAL
               BYTE_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
-            IS_KW "is"
-            WHITESPACE " "
-            NAME_REF
+            IS_NORMALIZED
+              IS_KW "is"
+              WHITESPACE " "
               NFD_KW "nfd"
-          WHITESPACE " "
-          NAME
-            NORMALIZED_KW "normalized"
+              WHITESPACE " "
+              NORMALIZED_KW "normalized"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1587,17 +1585,16 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          POSTFIX_EXPR
             LITERAL
               BYTE_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
-            IS_KW "is"
-            WHITESPACE " "
-            NAME_REF
+            IS_NORMALIZED
+              IS_KW "is"
+              WHITESPACE " "
               NFKC_KW "nfkc"
-          WHITESPACE " "
-          NAME
-            NORMALIZED_KW "normalized"
+              WHITESPACE " "
+              NORMALIZED_KW "normalized"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -1606,17 +1603,16 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          BIN_EXPR
+          POSTFIX_EXPR
             LITERAL
               BYTE_STRING "U&'\\0061\\0308bc'"
             WHITESPACE " "
-            IS_KW "is"
-            WHITESPACE " "
-            NAME_REF
+            IS_NORMALIZED
+              IS_KW "is"
+              WHITESPACE " "
               NFKD_KW "nfkd"
-          WHITESPACE " "
-          NAME
-            NORMALIZED_KW "normalized"
+              WHITESPACE " "
+              NORMALIZED_KW "normalized"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT

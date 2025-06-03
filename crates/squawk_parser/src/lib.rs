@@ -211,6 +211,39 @@ impl<'t> Parser<'t> {
                 m.complete(self, SyntaxKind::AT_TIME_ZONE);
                 return true;
             }
+            SyntaxKind::IS_NOT_NORMALIZED => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::NOT_KW);
+                if matches!(
+                    self.current(),
+                    SyntaxKind::NFC_KW
+                        | SyntaxKind::NFD_KW
+                        | SyntaxKind::NFKC_KW
+                        | SyntaxKind::NFKD_KW
+                ) {
+                    self.bump_any();
+                }
+                self.bump(SyntaxKind::NORMALIZED_KW);
+                m.complete(self, SyntaxKind::IS_NOT_NORMALIZED);
+                return true;
+            }
+            SyntaxKind::IS_NORMALIZED => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                if matches!(
+                    self.current(),
+                    SyntaxKind::NFC_KW
+                        | SyntaxKind::NFD_KW
+                        | SyntaxKind::NFKC_KW
+                        | SyntaxKind::NFKD_KW
+                ) {
+                    self.bump_any();
+                }
+                self.bump(SyntaxKind::NORMALIZED_KW);
+                m.complete(self, SyntaxKind::IS_NORMALIZED);
+                return true;
+            }
             SyntaxKind::IS_NOT_DISTINCT_FROM => {
                 let m = self.start();
                 self.bump(SyntaxKind::IS_KW);
@@ -564,6 +597,52 @@ impl<'t> Parser<'t> {
                 SyntaxKind::DISTINCT_KW,
                 SyntaxKind::FROM_KW,
             ),
+            // is normalized
+            SyntaxKind::IS_NORMALIZED => {
+                if self.at(SyntaxKind::IS_KW) {
+                    if matches!(
+                        self.nth(1),
+                        SyntaxKind::NFC_KW
+                            | SyntaxKind::NFD_KW
+                            | SyntaxKind::NFKC_KW
+                            | SyntaxKind::NFKD_KW
+                    ) {
+                        if self.nth_at(2, SyntaxKind::NORMALIZED_KW) {
+                            return true;
+                        }
+                    } else {
+                        if self.nth_at(1, SyntaxKind::NORMALIZED_KW) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+            // is not normalized
+            SyntaxKind::IS_NOT_NORMALIZED => {
+                if self.at(SyntaxKind::IS_KW) && self.nth_at(1, SyntaxKind::NOT_KW) {
+                    if matches!(
+                        self.nth(2),
+                        SyntaxKind::NFC_KW
+                            | SyntaxKind::NFD_KW
+                            | SyntaxKind::NFKC_KW
+                            | SyntaxKind::NFKD_KW
+                    ) {
+                        if self.nth_at(3, SyntaxKind::NOT_KW)
+                            && self.nth_at(4, SyntaxKind::NORMALIZED_KW)
+                        {
+                            return true;
+                        }
+                    } else {
+                        if self.nth_at(2, SyntaxKind::NOT_KW)
+                            && self.nth_at(3, SyntaxKind::NORMALIZED_KW)
+                        {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
             // similar to
             SyntaxKind::SIMILAR_TO => self.at_composite2(
                 n,
