@@ -160,7 +160,7 @@ ERROR@10684: expected an expression in target_el, found OLD_KW
 ERROR@13248: expected an expression, found WITH_KW
 ERROR@13252: expected output expression
 ERROR@13252: expected R_PAREN
-ERROR@13252: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@13252: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@13253: expected command, found L_PAREN
 ERROR@13254: expected command, found OLD_KW
 ERROR@13258: expected command, found AS_KW

@@ -286,26 +286,26 @@ fn position_fn(p: &mut Parser<'_>) -> CompletedMarker {
 fn trim_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(TRIM_KW));
     custom_fn(p, TRIM_KW, |p| {
-        if p.eat(BOTH_KW) {
-            if p.eat(FROM_KW) {
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
-            } else {
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
-                if p.eat(FROM_KW) && expr(p).is_none() {
-                    p.error("expected an expression");
-                }
+        let _ = p.eat(BOTH_KW) || p.eat(LEADING_KW) || p.eat(TRAILING_KW);
+        // | FROM expr_list
+        // | a_expr FROM expr_list
+        // | expr_list
+        if p.eat(FROM_KW) {
+            if !expr_list(p) {
+                p.error("expected expression")
             }
-        } else if p.eat(LEADING_KW) || p.eat(TRAILING_KW) {
+        } else {
             if expr(p).is_none() {
-                p.error("expected an expression");
+                p.error("expected expression");
             }
-        } else if expr(p).is_none() {
-            p.error("expected an expression");
-        }
+            if p.eat(FROM_KW) {
+                expr_list(p);
+            } else {
+                if p.eat(COMMA) {
+                    expr_list(p);
+                }
+            }
+        };
     })
 }
 
@@ -11970,14 +11970,14 @@ fn with(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
     with_query_clause(p);
     match p.current() {
         DELETE_KW => Some(delete(p, Some(m))),
-        SELECT_KW | TABLE_KW => select(p, Some(m)),
+        SELECT_KW | TABLE_KW | VALUES_KW => select(p, Some(m)),
         INSERT_KW => Some(insert(p, Some(m))),
         UPDATE_KW => Some(update(p, Some(m))),
         MERGE_KW => Some(merge(p, Some(m))),
         _ => {
             m.abandon(p);
             p.error(format!(
-                "expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: {:?}",
+                "expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: {:?}",
                 p.current()
             ));
             None

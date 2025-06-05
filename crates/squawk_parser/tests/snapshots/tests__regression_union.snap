@@ -6,16 +6,6 @@ ERROR@996: expected SEMICOLON
 ERROR@997: expected command, found ORDER_KW
 ERROR@1003: expected command, found BY_KW
 ERROR@1006: expected command, found INT_NUMBER
-ERROR@1841: expected an expression, found FROM_KW
-ERROR@1845: expected an expression
-ERROR@1845: expected R_PAREN
-ERROR@1848: expected SEMICOLON
-ERROR@1848: expected command, found R_PAREN
-ERROR@1850: expected command, found FROM_KW
-ERROR@1855: expected command, found IDENT
-ERROR@1864: expected command, found ORDER_KW
-ERROR@1870: expected command, found BY_KW
-ERROR@1873: expected command, found INT_NUMBER
 ERROR@10339: expected SEMICOLON
 ERROR@10340: expected command, found ORDER_KW
 ERROR@10346: expected command, found BY_KW

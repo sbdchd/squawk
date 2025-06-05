@@ -20,26 +20,6 @@ ERROR@1508: missing comma
 ERROR@1545: expected column label, got BYTE_STRING
 ERROR@1550: missing comma
 ERROR@1646: missing comma
-ERROR@3657: expected an expression, found FROM_KW
-ERROR@3661: expected an expression
-ERROR@3661: expected R_PAREN
-ERROR@3661: missing comma
-ERROR@3682: expected SEMICOLON
-ERROR@3682: expected command, found R_PAREN
-ERROR@3684: expected command, found EQ
-ERROR@3686: expected command, found STRING
-ERROR@3705: expected command, found AS_KW
-ERROR@3708: expected command, found IDENT
-ERROR@3750: expected an expression, found FROM_KW
-ERROR@3754: expected an expression
-ERROR@3754: expected R_PAREN
-ERROR@3754: missing comma
-ERROR@3775: expected SEMICOLON
-ERROR@3775: expected command, found R_PAREN
-ERROR@3777: expected command, found EQ
-ERROR@3779: expected command, found STRING
-ERROR@3798: expected command, found AS_KW
-ERROR@3801: expected command, found IDENT
 ERROR@6298: missing comma
 ERROR@6354: missing comma
 ERROR@6606: missing comma
@@ -163,29 +143,5 @@ ERROR@30094: expected command, found COMMA
 ERROR@30096: expected command, found STRING
 ERROR@30103: expected command, found AS_KW
 ERROR@30106: expected command, found IDENT
-ERROR@31129: expected R_PAREN
-ERROR@31134: expected from item, got ESC_STRING
-ERROR@31134: expected SEMICOLON
-ERROR@31135: expected command, found ESC_STRING
-ERROR@31151: expected command, found COLON
-ERROR@31152: expected command, found COLON
-ERROR@31153: expected command, found IDENT
-ERROR@31158: expected command, found R_PAREN
-ERROR@31196: expected R_PAREN
-ERROR@31201: expected from item, got ESC_STRING
-ERROR@31201: expected SEMICOLON
-ERROR@31202: expected command, found ESC_STRING
-ERROR@31218: expected command, found COLON
-ERROR@31219: expected command, found COLON
-ERROR@31220: expected command, found IDENT
-ERROR@31225: expected command, found R_PAREN
-ERROR@31264: expected R_PAREN
-ERROR@31269: expected from item, got ESC_STRING
-ERROR@31269: expected SEMICOLON
-ERROR@31270: expected command, found ESC_STRING
-ERROR@31286: expected command, found COLON
-ERROR@31287: expected command, found COLON
-ERROR@31288: expected command, found IDENT
-ERROR@31293: expected command, found R_PAREN
 ERROR@29864: unknown literal prefix
 ERROR@30010: unknown literal prefix

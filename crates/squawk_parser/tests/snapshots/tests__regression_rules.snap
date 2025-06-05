@@ -28,7 +28,7 @@ ERROR@6176: expected L_PAREN
 ERROR@6177: expected command, found EQ
 ERROR@6178: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@6178: expected R_PAREN
-ERROR@6178: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: INT_NUMBER
+ERROR@6178: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: INT_NUMBER
 ERROR@6179: expected command, found INT_NUMBER
 ERROR@6181: expected command, found IDENT
 ERROR@6186: expected command, found IDENT
