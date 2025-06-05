@@ -6,11 +6,6 @@ ERROR@22: expected an expression, found R_PAREN
 ERROR@22: expected expression
 ERROR@1596: expected an expression, found R_PAREN
 ERROR@1596: expected expression
-ERROR@8287: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: VALUES_KW
-ERROR@8287: expected R_PAREN
-ERROR@8294: missing comma
-ERROR@8301: expected SEMICOLON
-ERROR@8301: expected command, found R_PAREN
 ERROR@8559: expected R_PAREN
 ERROR@8559: expected SEMICOLON
 ERROR@8560: expected command, found RETURNING_KW
@@ -319,7 +314,7 @@ ERROR@10789: expected L_PAREN
 ERROR@10789: expected command, found UNIQUE_KW
 ERROR@10795: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@10795: expected R_PAREN
-ERROR@10795: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@10795: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@10796: expected command, found KEYS_KW
 ERROR@10800: expected command, found R_PAREN
 ERROR@10802: expected command, found FROM_KW
@@ -345,7 +340,7 @@ ERROR@10901: expected L_PAREN
 ERROR@10901: expected command, found UNIQUE_KW
 ERROR@10907: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@10907: expected R_PAREN
-ERROR@10907: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@10907: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@10908: expected command, found KEYS_KW
 ERROR@10912: expected command, found R_PAREN
 ERROR@10914: expected command, found FROM_KW
@@ -371,7 +366,7 @@ ERROR@11013: expected L_PAREN
 ERROR@11013: expected command, found UNIQUE_KW
 ERROR@11019: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@11019: expected R_PAREN
-ERROR@11019: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@11019: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@11020: expected command, found KEYS_KW
 ERROR@11024: expected command, found R_PAREN
 ERROR@11026: expected command, found FROM_KW
@@ -394,7 +389,7 @@ ERROR@11132: expected L_PAREN
 ERROR@11132: expected command, found UNIQUE_KW
 ERROR@11138: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@11138: expected R_PAREN
-ERROR@11138: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@11138: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@11139: expected command, found KEYS_KW
 ERROR@11144: expected command, found RETURNING_KW
 ERROR@11154: expected command, found IDENT
@@ -422,7 +417,7 @@ ERROR@11260: expected L_PAREN
 ERROR@11260: expected command, found UNIQUE_KW
 ERROR@11266: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@11266: expected R_PAREN
-ERROR@11266: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@11266: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@11267: expected command, found KEYS_KW
 ERROR@11272: expected command, found RETURNING_KW
 ERROR@11282: expected command, found IDENT
@@ -450,7 +445,7 @@ ERROR@11388: expected L_PAREN
 ERROR@11388: expected command, found UNIQUE_KW
 ERROR@11394: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@11394: expected R_PAREN
-ERROR@11394: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@11394: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@11395: expected command, found KEYS_KW
 ERROR@11400: expected command, found RETURNING_KW
 ERROR@11410: expected command, found IDENT
@@ -481,7 +476,7 @@ ERROR@11560: expected AS_KW
 ERROR@11560: expected L_PAREN
 ERROR@11560: expected command, found UNIQUE_KW
 ERROR@11566: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
-ERROR@11567: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: FROM_KW
+ERROR@11567: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: FROM_KW
 ERROR@11568: expected command, found FROM_KW
 ERROR@11573: expected command, found IDENT
 ERROR@11588: expected command, found L_PAREN
@@ -500,7 +495,7 @@ ERROR@11924: expected L_PAREN
 ERROR@11924: expected command, found UNIQUE_KW
 ERROR@11930: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@11930: expected R_PAREN
-ERROR@11930: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@11930: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@11931: expected command, found KEYS_KW
 ERROR@11935: expected command, found R_PAREN
 ERROR@11937: expected command, found OVER_KW
@@ -529,7 +524,7 @@ ERROR@12041: expected L_PAREN
 ERROR@12041: expected command, found UNIQUE_KW
 ERROR@12047: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@12047: expected R_PAREN
-ERROR@12047: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@12047: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@12048: expected command, found KEYS_KW
 ERROR@12052: expected command, found R_PAREN
 ERROR@12054: expected command, found OVER_KW
@@ -561,7 +556,7 @@ ERROR@12180: expected L_PAREN
 ERROR@12180: expected command, found UNIQUE_KW
 ERROR@12186: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@12186: expected R_PAREN
-ERROR@12186: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@12186: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@12187: expected command, found KEYS_KW
 ERROR@12191: expected command, found R_PAREN
 ERROR@12196: expected command, found OVER_KW
@@ -655,7 +650,7 @@ ERROR@12920: expected L_PAREN
 ERROR@12920: expected command, found UNIQUE_KW
 ERROR@12926: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@12926: expected R_PAREN
-ERROR@12926: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: RETURNING_KW
+ERROR@12926: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: RETURNING_KW
 ERROR@12927: expected command, found RETURNING_KW
 ERROR@12937: expected command, found TEXT_KW
 ERROR@12941: expected command, found R_PAREN
@@ -694,7 +689,7 @@ ERROR@13085: expected L_PAREN
 ERROR@13085: expected command, found UNIQUE_KW
 ERROR@13091: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@13091: expected R_PAREN
-ERROR@13091: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: RETURNING_KW
+ERROR@13091: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: RETURNING_KW
 ERROR@13092: expected command, found RETURNING_KW
 ERROR@13102: expected command, found TEXT_KW
 ERROR@13106: expected command, found R_PAREN
@@ -734,7 +729,7 @@ ERROR@13261: expected L_PAREN
 ERROR@13261: expected command, found UNIQUE_KW
 ERROR@13267: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@13267: expected R_PAREN
-ERROR@13267: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: RETURNING_KW
+ERROR@13267: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: RETURNING_KW
 ERROR@13268: expected command, found RETURNING_KW
 ERROR@13278: expected command, found TEXT_KW
 ERROR@13282: expected command, found R_PAREN
@@ -844,7 +839,7 @@ ERROR@15123: expected L_PAREN
 ERROR@15123: expected command, found UNIQUE_KW
 ERROR@15129: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@15129: expected R_PAREN
-ERROR@15129: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@15129: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@15130: expected command, found KEYS_KW
 ERROR@15135: expected command, found IDENT
 ERROR@15149: expected command, found FROM_KW
@@ -864,7 +859,7 @@ ERROR@15427: expected L_PAREN
 ERROR@15427: expected command, found UNIQUE_KW
 ERROR@15433: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@15433: expected R_PAREN
-ERROR@15433: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@15433: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@15434: expected command, found KEYS_KW
 ERROR@15439: expected command, found IDENT
 ERROR@15453: expected command, found FROM_KW
@@ -888,7 +883,7 @@ ERROR@15780: expected L_PAREN
 ERROR@15780: expected command, found UNIQUE_KW
 ERROR@15786: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@15786: expected R_PAREN
-ERROR@15786: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@15786: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@15787: expected command, found KEYS_KW
 ERROR@15792: expected command, found IDENT
 ERROR@15806: expected command, found FROM_KW
@@ -914,7 +909,7 @@ ERROR@16142: expected L_PAREN
 ERROR@16142: expected command, found UNIQUE_KW
 ERROR@16148: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@16148: expected R_PAREN
-ERROR@16148: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: KEYS_KW
+ERROR@16148: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: KEYS_KW
 ERROR@16149: expected command, found KEYS_KW
 ERROR@16154: expected command, found IDENT
 ERROR@16168: expected command, found FROM_KW
@@ -945,7 +940,7 @@ ERROR@16421: expected L_PAREN
 ERROR@16421: expected command, found UNIQUE_KW
 ERROR@16427: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@16427: expected R_PAREN
-ERROR@16427: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: AS_KW
+ERROR@16427: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: AS_KW
 ERROR@16428: expected command, found AS_KW
 ERROR@16431: expected command, found IDENT
 ERROR@16440: expected command, found FROM_KW
@@ -978,7 +973,7 @@ ERROR@16627: expected L_PAREN
 ERROR@16627: expected command, found UNIQUE_KW
 ERROR@16633: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@16633: expected R_PAREN
-ERROR@16633: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: AS_KW
+ERROR@16633: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: AS_KW
 ERROR@16634: expected command, found AS_KW
 ERROR@16637: expected command, found IDENT
 ERROR@16646: expected command, found FROM_KW
@@ -1030,7 +1025,7 @@ ERROR@17150: expected L_PAREN
 ERROR@17150: expected command, found UNIQUE_KW
 ERROR@17156: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@17156: expected R_PAREN
-ERROR@17156: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: RETURNING_KW
+ERROR@17156: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: RETURNING_KW
 ERROR@17157: expected command, found RETURNING_KW
 ERROR@17167: expected command, found VARCHAR_KW
 ERROR@17174: expected command, found L_PAREN

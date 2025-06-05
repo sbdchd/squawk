@@ -9,7 +9,7 @@ ERROR@1253: expected L_PAREN
 ERROR@1254: expected command, found IDENT
 ERROR@1255: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@1255: expected R_PAREN
-ERROR@1255: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@1255: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@1255: expected command, found L_PAREN
 ERROR@1256: expected command, found IDENT
 ERROR@1257: expected command, found COMMA
@@ -30,7 +30,7 @@ ERROR@1392: expected L_PAREN
 ERROR@1393: expected command, found IDENT
 ERROR@1394: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@1394: expected R_PAREN
-ERROR@1394: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@1394: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@1394: expected command, found L_PAREN
 ERROR@1395: expected command, found IDENT
 ERROR@1396: expected command, found COMMA
@@ -55,7 +55,7 @@ ERROR@1926: expected L_PAREN
 ERROR@1927: expected command, found IDENT
 ERROR@1928: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@1928: expected R_PAREN
-ERROR@1928: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@1928: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@1928: expected command, found L_PAREN
 ERROR@1929: expected command, found IDENT
 ERROR@1930: expected command, found COMMA
@@ -84,7 +84,7 @@ ERROR@2786: expected L_PAREN
 ERROR@2787: expected command, found IDENT
 ERROR@2788: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@2788: expected R_PAREN
-ERROR@2788: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@2788: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@2788: expected command, found L_PAREN
 ERROR@2789: expected command, found IDENT
 ERROR@2790: expected command, found COMMA
@@ -99,7 +99,7 @@ ERROR@9794: expected L_PAREN
 ERROR@9795: expected command, found IDENT
 ERROR@9797: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@9797: expected R_PAREN
-ERROR@9797: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@9797: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@9797: expected command, found L_PAREN
 ERROR@9798: expected command, found IDENT
 ERROR@9799: expected command, found COMMA
@@ -148,7 +148,7 @@ ERROR@10205: expected L_PAREN
 ERROR@10206: expected command, found IDENT
 ERROR@10208: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@10208: expected R_PAREN
-ERROR@10208: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@10208: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@10208: expected command, found L_PAREN
 ERROR@10209: expected command, found IDENT
 ERROR@10210: expected command, found COMMA
@@ -197,7 +197,7 @@ ERROR@10495: expected L_PAREN
 ERROR@10496: expected command, found IDENT
 ERROR@10498: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@10498: expected R_PAREN
-ERROR@10498: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@10498: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@10498: expected command, found L_PAREN
 ERROR@10499: expected command, found IDENT
 ERROR@10500: expected command, found COMMA
@@ -224,7 +224,7 @@ ERROR@12684: expected L_PAREN
 ERROR@12685: expected command, found IDENT
 ERROR@12686: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@12686: expected R_PAREN
-ERROR@12686: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: L_PAREN
+ERROR@12686: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: L_PAREN
 ERROR@12686: expected command, found L_PAREN
 ERROR@12687: expected command, found IDENT
 ERROR@12689: expected command, found COMMA
@@ -274,7 +274,7 @@ ERROR@28763: expected L_PAREN
 ERROR@28763: expected command, found SEMICOLON
 ERROR@28764: expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement
 ERROR@28764: expected R_PAREN
-ERROR@28764: expected DELETE, SELECT, TABLE, UPDATE, or MERGE, got: CREATE_KW
+ERROR@28764: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: CREATE_KW
 ERROR@28895: expected R_PAREN
 ERROR@28919: expected SEMICOLON
 ERROR@28919: expected command, found R_PAREN

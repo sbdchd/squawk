@@ -2,7 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 expression: "out.join(\"\\n\")"
 ---
-tests/snapshots/tests__regression_create_view.snap:211
 tests/snapshots/tests__regression_errors.snap:286
 tests/snapshots/tests__regression_foreign_data.snap:51
 tests/snapshots/tests__regression_foreign_key.snap:24
@@ -18,20 +17,20 @@ tests/snapshots/tests__regression_publication.snap:71
 tests/snapshots/tests__regression_rangefuncs.snap:281
 tests/snapshots/tests__regression_returning.snap:230
 tests/snapshots/tests__regression_rules.snap:59
-tests/snapshots/tests__regression_sqljson.snap:1073
+tests/snapshots/tests__regression_sqljson.snap:1068
 tests/snapshots/tests__regression_sqljson_jsontable.snap:185
 tests/snapshots/tests__regression_sqljson_queryfuncs.snap:51
-tests/snapshots/tests__regression_strings.snap:187
-tests/snapshots/tests__regression_subselect.snap:52
+tests/snapshots/tests__regression_strings.snap:143
+tests/snapshots/tests__regression_subselect.snap:44
 tests/snapshots/tests__regression_timestamp.snap:65
 tests/snapshots/tests__regression_timestamptz.snap:5
 tests/snapshots/tests__regression_transactions.snap:114
 tests/snapshots/tests__regression_triggers.snap:51
 tests/snapshots/tests__regression_tsearch.snap:62
 tests/snapshots/tests__regression_tuplesort.snap:188
-tests/snapshots/tests__regression_union.snap:25
+tests/snapshots/tests__regression_union.snap:15
 tests/snapshots/tests__regression_update.snap:29
-tests/snapshots/tests__regression_vacuum.snap:21
+tests/snapshots/tests__regression_vacuum.snap:15
 tests/snapshots/tests__regression_window.snap:72
-tests/snapshots/tests__regression_with.snap:27
+tests/snapshots/tests__regression_with.snap:9
 tests/snapshots/tests__regression_xml.snap:623

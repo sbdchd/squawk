@@ -6,7 +6,10 @@
   "[rust]": {
     "editor.defaultFormatter": "rust-lang.rust-analyzer"
   },
-  "[sql]": {
+  "files.associations": {
+    "*.sql": "postgres"
+  },
+  "[postgres]": {
     "editor.tabSize": 2
   },
   "[ungrammar]": {

@@ -1,0 +1,14 @@
+{
+  "recommendations": [
+    "ckolkman.vscode-postgres",
+    "rust-lang.rust-analyzer",
+    "usernamehw.errorlens",
+    "dbaeumer.vscode-eslint",
+    "mitsuhiko.insta",
+    "esbenp.prettier-vscode",
+    "vitest.explorer",
+    "binhtran432k.ungrammar-language-features",
+    "sleistner.vscode-fileutils",
+    "tamasfe.even-better-toml"
+  ]
+}
