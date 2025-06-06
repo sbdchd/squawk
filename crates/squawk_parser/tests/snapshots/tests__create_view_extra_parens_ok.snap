@@ -35,7 +35,7 @@ SOURCE_FILE
           PAREN_EXPR
             L_PAREN "("
             FROM_ITEM
-              PAREN_EXPR
+              PAREN_SELECT
                 L_PAREN "("
                 WHITESPACE " "
                 SELECT

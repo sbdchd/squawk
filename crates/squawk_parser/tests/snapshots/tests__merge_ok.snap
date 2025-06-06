@@ -341,7 +341,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      PAREN_EXPR
+      PAREN_SELECT
         L_PAREN "("
         SELECT
           SELECT_CLAUSE
@@ -406,7 +406,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      PAREN_EXPR
+      PAREN_SELECT
         L_PAREN "("
         SELECT
           SELECT_CLAUSE
@@ -509,7 +509,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      PAREN_EXPR
+      PAREN_SELECT
         L_PAREN "("
         SELECT
           SELECT_CLAUSE

@@ -1036,7 +1036,7 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "USING"
       WHITESPACE " "
-      PAREN_EXPR
+      PAREN_SELECT
         L_PAREN "("
         SELECT
           SELECT_CLAUSE

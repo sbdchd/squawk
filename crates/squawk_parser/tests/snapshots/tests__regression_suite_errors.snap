@@ -33,4 +33,4 @@ tests/snapshots/tests__regression_update.snap:29
 tests/snapshots/tests__regression_vacuum.snap:15
 tests/snapshots/tests__regression_window.snap:72
 tests/snapshots/tests__regression_with.snap:9
-tests/snapshots/tests__regression_xml.snap:623
+tests/snapshots/tests__regression_xml.snap:393
