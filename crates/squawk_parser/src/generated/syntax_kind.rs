@@ -851,6 +851,7 @@ pub enum SyntaxKind {
     PARAM_OUT,
     PARAM_VARIADIC,
     PAREN_EXPR,
+    PAREN_SELECT,
     PATH,
     PATH_SEGMENT,
     PATH_TYPE,

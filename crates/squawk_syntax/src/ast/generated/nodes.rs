@@ -6222,6 +6222,25 @@ impl ParenExpr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ParenSelect {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ParenSelect {
+    #[inline]
+    pub fn select(&self) -> Option<Select> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Path {
     pub(crate) syntax: SyntaxNode,
 }
@@ -8522,6 +8541,7 @@ pub enum Stmt {
     Merge(Merge),
     Move(Move),
     Notify(Notify),
+    ParenSelect(ParenSelect),
     Prepare(Prepare),
     PrepareTransaction(PrepareTransaction),
     Reassign(Reassign),
@@ -14020,6 +14040,24 @@ impl AstNode for ParenExpr {
         &self.syntax
     }
 }
+impl AstNode for ParenSelect {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PAREN_SELECT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Path {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -17492,6 +17530,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::MERGE
                 | SyntaxKind::MOVE
                 | SyntaxKind::NOTIFY
+                | SyntaxKind::PAREN_SELECT
                 | SyntaxKind::PREPARE
                 | SyntaxKind::PREPARE_TRANSACTION
                 | SyntaxKind::REASSIGN
@@ -17740,6 +17779,7 @@ impl AstNode for Stmt {
             SyntaxKind::MERGE => Stmt::Merge(Merge { syntax }),
             SyntaxKind::MOVE => Stmt::Move(Move { syntax }),
             SyntaxKind::NOTIFY => Stmt::Notify(Notify { syntax }),
+            SyntaxKind::PAREN_SELECT => Stmt::ParenSelect(ParenSelect { syntax }),
             SyntaxKind::PREPARE => Stmt::Prepare(Prepare { syntax }),
             SyntaxKind::PREPARE_TRANSACTION => {
                 Stmt::PrepareTransaction(PrepareTransaction { syntax })
@@ -17928,6 +17968,7 @@ impl AstNode for Stmt {
             Stmt::Merge(it) => &it.syntax,
             Stmt::Move(it) => &it.syntax,
             Stmt::Notify(it) => &it.syntax,
+            Stmt::ParenSelect(it) => &it.syntax,
             Stmt::Prepare(it) => &it.syntax,
             Stmt::PrepareTransaction(it) => &it.syntax,
             Stmt::Reassign(it) => &it.syntax,
@@ -18871,6 +18912,12 @@ impl From<Notify> for Stmt {
     #[inline]
     fn from(node: Notify) -> Stmt {
         Stmt::Notify(node)
+    }
+}
+impl From<ParenSelect> for Stmt {
+    #[inline]
+    fn from(node: ParenSelect) -> Stmt {
+        Stmt::ParenSelect(node)
     }
 }
 impl From<Prepare> for Stmt {

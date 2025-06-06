@@ -520,6 +520,13 @@ Join =
 | 'left' 'outer'? 'join'
 | 'full' 'outer'? 'join'
 
+
+// TODO: do we even want this in the AST?
+ParenSelect =
+ '('
+  Select
+ ')'
+
 Select =
  SelectClause
  FromClause?
@@ -1734,6 +1741,7 @@ Stmt =
 | Update
 | Vacuum
 | Values
+| ParenSelect
 | ';'
 
 

@@ -272,7 +272,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE

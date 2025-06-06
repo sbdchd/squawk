@@ -572,15 +572,15 @@ SOURCE_FILE
     WHITESPACE " "
     ANALYZE_KW "analyze"
     WHITESPACE " "
-    PAREN_EXPR
+    PAREN_SELECT
       L_PAREN "("
-      PAREN_EXPR
+      PAREN_SELECT
         L_PAREN "("
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
-          PAREN_EXPR
+          PAREN_SELECT
             L_PAREN "("
-            PAREN_EXPR
+            PAREN_SELECT
               L_PAREN "("
               SELECT
                 SELECT_CLAUSE
@@ -604,15 +604,15 @@ SOURCE_FILE
     WHITESPACE " "
     ANALYZE_KW "analyze"
     WHITESPACE " "
-    PAREN_EXPR
+    PAREN_SELECT
       L_PAREN "("
-      PAREN_EXPR
+      PAREN_SELECT
         L_PAREN "("
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
-          PAREN_EXPR
+          PAREN_SELECT
             L_PAREN "("
-            PAREN_EXPR
+            PAREN_SELECT
               L_PAREN "("
               VALUES
                 VALUES_KW "values"

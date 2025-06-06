@@ -89,7 +89,7 @@ fn paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
     }
     p.expect(R_PAREN);
-    Some(m.complete(p, PAREN_EXPR))
+    Some(m.complete(p, PAREN_SELECT))
 }
 
 const SELECT_FIRST: TokenSet = TokenSet::new(&[SELECT_KW, TABLE_KW, WITH_KW, VALUES_KW]);
@@ -889,6 +889,18 @@ fn opt_xml_passing_mech(p: &mut Parser<'_>) -> bool {
     }
 }
 
+fn xmlexists_arg(p: &mut Parser<'_>) {
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    p.expect(PASSING_KW);
+    opt_xml_passing_mech(p);
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_xml_passing_mech(p);
+}
+
 // XMLEXISTS '(' c_expr xmlexists_argument ')'
 //   xmlexists_argument:
 //     | PASSING c_expr
@@ -901,15 +913,7 @@ fn opt_xml_passing_mech(p: &mut Parser<'_>) -> bool {
 fn xmlexists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLEXISTS_KW));
     custom_fn(p, XMLEXISTS_KW, |p| {
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        p.expect(PASSING_KW);
-        opt_xml_passing_mech(p);
-        if expr(p).is_none() {
-            p.error("expected expression");
-        }
-        opt_xml_passing_mech(p);
+        xmlexists_arg(p);
     })
 }
 
@@ -2765,6 +2769,22 @@ fn data_source(p: &mut Parser<'_>) {
             json_table_fn(p);
             opt_alias(p);
         }
+        XMLTABLE_KW => {
+            p.bump(XMLTABLE_KW);
+            p.expect(L_PAREN);
+            if p.eat(XMLNAMESPACES_KW) {
+                p.expect(L_PAREN);
+                xml_namespace_list(p);
+                p.expect(R_PAREN);
+            }
+            if expr(p).is_none() {
+                p.error("expected expression");
+            }
+            xmlexists_arg(p);
+            p.expect(COLUMNS_KW);
+            xmltable_column_list(p);
+            p.expect(R_PAREN);
+        }
         ROWS_KW if p.nth_at(1, FROM_KW) => {
             p.bump(ROWS_KW);
             p.expect(FROM_KW);
@@ -2788,7 +2808,79 @@ fn data_source(p: &mut Parser<'_>) {
             opt_alias(p);
         }
         _ if p.at_ts(FROM_ITEM_KEYWORDS_FIRST) => from_item_name(p),
-        _ => {}
+
+        _ => {
+            p.error("expected table reference");
+        }
+    }
+}
+
+fn xmltable_column_list(p: &mut Parser<'_>) {
+    xmltable_column_el(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        xmltable_column_el(p);
+    }
+}
+
+fn xmltable_column_el(p: &mut Parser<'_>) {
+    name(p);
+    if p.eat(FOR_KW) {
+        p.expect(ORDINALITY_KW);
+    } else {
+        type_name(p);
+        opt_xmltable_column_option_list(p);
+    }
+}
+
+fn opt_xmltable_column_option_list(p: &mut Parser<'_>) {
+    if opt_xmltable_column_option_el(p) {
+        return;
+    }
+    while !p.at(EOF) && p.eat(COMMA) {
+        if !opt_xmltable_column_option_el(p) {
+            p.error("expected column option");
+        }
+    }
+}
+
+fn opt_xmltable_column_option_el(p: &mut Parser<'_>) -> bool {
+    match p.current() {
+        DEFAULT_KW | PATH_KW | IDENT => {
+            p.bump_any();
+            if expr(p).is_none() {
+                p.error("expected expression");
+            }
+        }
+        NOT_KW => {
+            p.bump(NOT_KW);
+            p.expect(NULL_KW);
+        }
+        NULL_KW => {
+            p.bump(NULL_KW);
+        }
+        _ => return false,
+    }
+    true
+}
+
+fn xml_namespace_list(p: &mut Parser<'_>) {
+    xml_namespace_element(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        xml_namespace_element(p);
+    }
+}
+
+fn xml_namespace_element(p: &mut Parser<'_>) {
+    if p.eat(DEFAULT_KW) {
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+    } else {
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+        p.expect(AS_KW);
+        col_label(p);
     }
 }
 
@@ -2801,7 +2893,7 @@ fn paren_data_source(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at_ts(SELECT_FIRST) {
         if select(p, None).is_some() {
             p.expect(R_PAREN);
-            return m.complete(p, PAREN_EXPR);
+            return m.complete(p, PAREN_SELECT);
         }
     }
 
@@ -2809,12 +2901,10 @@ fn paren_data_source(p: &mut Parser<'_>) -> CompletedMarker {
     if opt_from_item(p) {
         p.expect(R_PAREN);
         return m.complete(p, PAREN_EXPR);
+    } else {
+        p.error("expected table name or SELECT");
     }
 
-    // Fall back to general expression parsing
-    if expr(p).is_none() {
-        p.error("expected an expression");
-    }
     p.expect(R_PAREN);
     m.complete(p, PAREN_EXPR)
 }
@@ -9774,7 +9864,7 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
             | CREATE_TABLE_AS
             | CREATE_MATERIALIZED_VIEW
             // TODO: we need a validation to check inside this
-            | PAREN_EXPR => (),
+            | PAREN_SELECT => (),
             kind => {
                 p.error(format!(
                     "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {:?}",

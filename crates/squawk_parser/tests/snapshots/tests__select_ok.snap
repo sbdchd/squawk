@@ -5,7 +5,7 @@ input_file: crates/squawk_parser/tests/data/ok/select.sql
 SOURCE_FILE
   COMMENT "-- parens_and_unions"
   WHITESPACE "\n"
-  PAREN_EXPR
+  PAREN_SELECT
     L_PAREN "("
     SELECT
       SELECT_CLAUSE
@@ -18,9 +18,9 @@ SOURCE_FILE
     R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
-  PAREN_EXPR
+  PAREN_SELECT
     L_PAREN "("
-    PAREN_EXPR
+    PAREN_SELECT
       L_PAREN "("
       SELECT
         SELECT_CLAUSE
@@ -100,7 +100,7 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMPOUND_SELECT
-    PAREN_EXPR
+    PAREN_SELECT
       L_PAREN "("
       COMPOUND_SELECT
         SELECT
@@ -152,7 +152,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE
@@ -236,7 +236,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE
@@ -326,7 +326,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE
@@ -1651,7 +1651,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE
@@ -1678,7 +1678,7 @@ SOURCE_FILE
       FROM_ITEM
         LATERAL_KW "lateral"
         WHITESPACE " "
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE
@@ -2615,7 +2615,7 @@ SOURCE_FILE
       FROM_ITEM
         LATERAL_KW "lateral"
         WHITESPACE " "
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE
@@ -2662,7 +2662,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE
@@ -2709,7 +2709,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE
@@ -2738,7 +2738,7 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           SELECT
             SELECT_CLAUSE

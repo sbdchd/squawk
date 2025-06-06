@@ -197,7 +197,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           VALUES
             VALUES_KW "VALUES"
@@ -315,7 +315,7 @@ SOURCE_FILE
       FROM_KW "FROM"
       WHITESPACE " "
       FROM_ITEM
-        PAREN_EXPR
+        PAREN_SELECT
           L_PAREN "("
           VALUES
             VALUES_KW "VALUES"
