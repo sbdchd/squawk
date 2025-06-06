@@ -122,7 +122,7 @@ ERROR@41835: expected command, found WHEN_KW
 ERROR@41840: expected command, found MATCHED_KW
 ERROR@41848: expected command, found THEN_KW
 ERROR@41860: expected FROM_KW
-ERROR@41860: expected path name
+ERROR@41860: expected relation name
 ERROR@41953: expected ON_KW
 ERROR@41960: expected WHEN_KW
 ERROR@41960: expected MATCHED, or NOT MATCHED

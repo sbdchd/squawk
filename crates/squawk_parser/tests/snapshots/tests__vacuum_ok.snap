@@ -21,10 +21,11 @@ SOURCE_FILE
     ANALYZE_KW "ANALYZE"
     R_PAREN ")"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "onek"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "onek"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -188,10 +189,11 @@ SOURCE_FILE
     WHITESPACE "\n"
     R_PAREN ")"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "t1"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_pg_9_syntax"
@@ -207,16 +209,18 @@ SOURCE_FILE
     WHITESPACE " "
     ANALYZE_KW "analyze"
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
     COMMA ","
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
     COLUMN_LIST
       L_PAREN "("
       COLUMN
@@ -230,9 +234,10 @@ SOURCE_FILE
       R_PAREN ")"
     COMMA ","
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "c"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
   SEMICOLON ";"
   WHITESPACE "\n\n"

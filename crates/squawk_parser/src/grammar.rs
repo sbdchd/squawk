@@ -1845,7 +1845,8 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         NAME_REF
     };
     let cm = m.complete(p, if p.at(STRING) { kind } else { NAME_REF });
-    // A path followed by a string is a type cast so we insert a CAST_EXPR
+
+    // A type name followed by a string is a type cast so we insert a CAST_EXPR
     // preceding it to wrap the previously parsed data.
     // e.g., `select numeric '12312'`
     if opt_string_literal(p).is_some() {
@@ -2808,7 +2809,6 @@ fn data_source(p: &mut Parser<'_>) {
             opt_alias(p);
         }
         _ if p.at_ts(FROM_ITEM_KEYWORDS_FIRST) => from_item_name(p),
-
         _ => {
             p.error("expected table reference");
         }
@@ -11308,7 +11308,7 @@ fn vacuum(p: &mut Parser<'_>) -> CompletedMarker {
 //  table_name [ ( column_name [, ...] ) ]
 fn opt_relation_list(p: &mut Parser<'_>) {
     while !p.at(EOF) {
-        if opt_path_name_ref(p).is_none() {
+        if opt_relation_name(p).is_none() {
             break;
         }
         opt_column_list(p);
@@ -12990,6 +12990,12 @@ const NON_RESERVED_WORD: TokenSet = TokenSet::new(&[IDENT])
     .union(TYPE_FUNC_NAME_KEYWORDS);
 
 fn relation_name(p: &mut Parser<'_>) {
+    if opt_relation_name(p).is_none() {
+        p.error("expected relation name");
+    }
+}
+
+fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if p.eat(ONLY_KW) {
         let trailing_paren = p.eat(L_PAREN);
@@ -12999,10 +13005,13 @@ fn relation_name(p: &mut Parser<'_>) {
             p.expect(R_PAREN);
         }
     } else {
-        path_name_ref(p);
+        if opt_path_name_ref(p).is_none() {
+            m.abandon(p);
+            return None;
+        };
         p.eat(STAR);
     }
-    m.complete(p, RELATION_NAME);
+    Some(m.complete(p, RELATION_NAME))
 }
 
 // ALTER TABLE [ IF EXISTS ] [ ONLY ] name [ * ]

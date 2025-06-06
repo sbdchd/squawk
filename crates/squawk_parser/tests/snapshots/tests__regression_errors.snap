@@ -2,7 +2,7 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/errors.sql
 ---
-ERROR@948: expected path name
+ERROR@948: expected relation name
 ERROR@1074: expected path name
 ERROR@2188: expected path name
 ERROR@2219: expected path name

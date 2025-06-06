@@ -222,8 +222,7 @@ impl Cursor<'_> {
             '"' if allows_double => {
                 self.bump();
                 let terminated = self.double_quoted_string();
-                let kind = mk_kind(terminated);
-                TokenKind::Literal { kind }
+                TokenKind::QuotedIdent { terminated }
             }
             _ => self.ident_or_unknown_prefix(),
         }

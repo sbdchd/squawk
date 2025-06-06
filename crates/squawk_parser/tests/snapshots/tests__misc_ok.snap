@@ -1819,15 +1819,16 @@ SOURCE_FILE
     WHITESPACE " "
     ANALYZE_KW "ANALYZE"
     WHITESPACE " "
-    PATH
+    RELATION_NAME
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "time_taptest_table"
+            IDENT "time_taptest_table"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT

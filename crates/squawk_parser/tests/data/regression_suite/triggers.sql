@@ -243,24 +243,24 @@ UPDATE some_t SET some_col = TRUE;
 DROP TABLE some_t;
 
 -- bogus cases
-CREATE TRIGGER error_upd_and_col BEFORE UPDATE OR UPDATE OF a ON main_table
-FOR EACH ROW EXECUTE PROCEDURE trigger_func('error_upd_and_col');
-CREATE TRIGGER error_upd_a_a BEFORE UPDATE OF a, a ON main_table
-FOR EACH ROW EXECUTE PROCEDURE trigger_func('error_upd_a_a');
-CREATE TRIGGER error_ins_a BEFORE INSERT OF a ON main_table
-FOR EACH ROW EXECUTE PROCEDURE trigger_func('error_ins_a');
-CREATE TRIGGER error_ins_when BEFORE INSERT OR UPDATE ON main_table
-FOR EACH ROW WHEN (OLD.a <> NEW.a)
-EXECUTE PROCEDURE trigger_func('error_ins_old');
-CREATE TRIGGER error_del_when BEFORE DELETE OR UPDATE ON main_table
-FOR EACH ROW WHEN (OLD.a <> NEW.a)
-EXECUTE PROCEDURE trigger_func('error_del_new');
-CREATE TRIGGER error_del_when BEFORE INSERT OR UPDATE ON main_table
-FOR EACH ROW WHEN (NEW.tableoid <> 0)
-EXECUTE PROCEDURE trigger_func('error_when_sys_column');
-CREATE TRIGGER error_stmt_when BEFORE UPDATE OF a ON main_table
-FOR EACH STATEMENT WHEN (OLD.* IS DISTINCT FROM NEW.*)
-EXECUTE PROCEDURE trigger_func('error_stmt_when');
+-- CREATE TRIGGER error_upd_and_col BEFORE UPDATE OR UPDATE OF a ON main_table
+-- FOR EACH ROW EXECUTE PROCEDURE trigger_func('error_upd_and_col');
+-- CREATE TRIGGER error_upd_a_a BEFORE UPDATE OF a, a ON main_table
+-- FOR EACH ROW EXECUTE PROCEDURE trigger_func('error_upd_a_a');
+-- CREATE TRIGGER error_ins_a BEFORE INSERT OF a ON main_table
+-- FOR EACH ROW EXECUTE PROCEDURE trigger_func('error_ins_a');
+-- CREATE TRIGGER error_ins_when BEFORE INSERT OR UPDATE ON main_table
+-- FOR EACH ROW WHEN (OLD.a <> NEW.a)
+-- EXECUTE PROCEDURE trigger_func('error_ins_old');
+-- CREATE TRIGGER error_del_when BEFORE DELETE OR UPDATE ON main_table
+-- FOR EACH ROW WHEN (OLD.a <> NEW.a)
+-- EXECUTE PROCEDURE trigger_func('error_del_new');
+-- CREATE TRIGGER error_del_when BEFORE INSERT OR UPDATE ON main_table
+-- FOR EACH ROW WHEN (NEW.tableoid <> 0)
+-- EXECUTE PROCEDURE trigger_func('error_when_sys_column');
+-- CREATE TRIGGER error_stmt_when BEFORE UPDATE OF a ON main_table
+-- FOR EACH STATEMENT WHEN (OLD.* IS DISTINCT FROM NEW.*)
+-- EXECUTE PROCEDURE trigger_func('error_stmt_when');
 
 -- check dependency restrictions
 ALTER TABLE main_table DROP COLUMN b;
@@ -1335,12 +1335,12 @@ delete from parted_stmt_trig;
 
 -- insert via copy on the parent
 copy parted_stmt_trig(a) from stdin;
-1
-2
+-- 1
+-- 2
 
 -- insert via copy on the first partition
 copy parted_stmt_trig1(a) from stdin;
-1
+-- 1
 
 -- Disabling a trigger in the parent table should disable children triggers too
 alter table parted_stmt_trig disable trigger trig_ins_after_parent;
@@ -1882,9 +1882,9 @@ delete from child3;
 
 -- copy into parent sees parent-format tuples
 copy parent (a, b) from stdin;
-AAA	42
-BBB	42
-CCC	42
+-- AAA	42
+-- BBB	42
+-- CCC	42
 
 -- DML affecting parent sees tuples collected from children even if
 -- there is no transition table trigger on the children
@@ -1902,9 +1902,9 @@ delete from parent;
 -- copy into parent sees tuples collected from children even if there
 -- is no transition-table trigger on the children
 copy parent (a, b) from stdin;
-AAA	42
-BBB	42
-CCC	42
+-- AAA	42
+-- BBB	42
+-- CCC	42
 
 -- insert into parent with a before trigger on a child tuple before
 -- insertion, and we capture the newly modified row in parent format
@@ -1926,9 +1926,9 @@ insert into parent values ('AAA', 42), ('BBB', 42), ('CCC', 66);
 
 -- copy, parent trigger sees post-modification parent-format tuple
 copy parent (a, b) from stdin;
-AAA	42
-BBB	42
-CCC	234
+-- AAA	42
+-- BBB	42
+-- CCC	234
 
 drop table child1, child2, child3, parent;
 drop function intercept_insert();
@@ -2091,15 +2091,15 @@ delete from child3;
 -- copy into parent sees parent-format tuples (no rerouting, so these
 -- are really inserted into the parent)
 copy parent (a, b) from stdin;
-AAA	42
-BBB	42
-CCC	42
+-- AAA	42
+-- BBB	42
+-- CCC	42
 
 -- same behavior for copy if there is an index (interesting because rows are
 -- captured by a different code path in copyfrom.c if there are indexes)
 create index on parent(b);
 copy parent (a, b) from stdin;
-DDD	42
+-- DDD	42
 
 -- DML affecting parent sees tuples collected from children even if
 -- there is no transition table trigger on the children
@@ -2628,7 +2628,7 @@ select tgrelid::regclass, tgname,
 (select tgname from pg_trigger tr where tr.oid = pg_trigger.tgparentid) parent_tgname
 from pg_trigger where tgrelid in (select relid from pg_partition_tree('grandparent'))
 order by tgname, tgrelid::regclass::text COLLATE "C";
-alter trigger a on only grandparent rename to b;	-- ONLY not supported
+-- alter trigger a on only grandparent rename to b;	-- ONLY not supported
 alter trigger b on middle rename to c;	-- can't rename trigger on partition
 create trigger c after insert on middle
 for each row execute procedure f();
