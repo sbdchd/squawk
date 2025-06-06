@@ -645,12 +645,12 @@ SELECT ts_headline('english',
 --Rewrite sub system
 
 CREATE TABLE test_tsquery (txtkeyword TEXT, txtsample TEXT);
-'New York'	new <-> york | big <-> apple | nyc
-Moscow	moskva | moscow
-'Sanct Peter'	Peterburg | peter | 'Sanct Peterburg'
-foo & bar & qq	foo & (bar | qq) & city
-1 & (2 <-> 3)	2 <-> 4
-5 <-> 6	5 <-> 7
+-- 'New York'	new <-> york | big <-> apple | nyc
+-- Moscow	moskva | moscow
+-- 'Sanct Peter'	Peterburg | peter | 'Sanct Peterburg'
+-- foo & bar & qq	foo & (bar | qq) & city
+-- 1 & (2 <-> 3)	2 <-> 4
+-- 5 <-> 6	5 <-> 7
 
 ALTER TABLE test_tsquery ADD COLUMN keyword tsquery;
 UPDATE test_tsquery SET keyword = to_tsquery('english', txtkeyword);

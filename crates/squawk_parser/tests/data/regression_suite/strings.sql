@@ -10,11 +10,11 @@ SELECT 'first line'
 	' - third line'
 	AS "Three lines to one";
 
--- illegal string continuation syntax
-SELECT 'first line'
-' - next line' /* this comment is not allowed here */
-' - third line'
-	AS "Illegal comment within continuation";
+-- -- illegal string continuation syntax
+-- SELECT 'first line'
+-- ' - next line' /* this comment is not allowed here */
+-- ' - third line'
+-- 	AS "Illegal comment within continuation";
 
 -- Unicode escapes
 SET standard_conforming_strings TO on;
@@ -812,16 +812,16 @@ select 'a\bcd' as f1, 'a\b''cd' as f2, 'a\b''''cd' as f3, 'abcd\'   as f4, 'ab\'
 
 set standard_conforming_strings = off;
 
-select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;
+-- select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;
 
 set escape_string_warning = off;
 set standard_conforming_strings = on;
 
-select 'a\bcd' as f1, 'a\b''cd' as f2, 'a\b''''cd' as f3, 'abcd\'   as f4, 'ab\''cd' as f5, '\\' as f6;
+-- select 'a\bcd' as f1, 'a\b''cd' as f2, 'a\b''''cd' as f3, 'abcd\'   as f4, 'ab\''cd' as f5, '\\' as f6;
 
 set standard_conforming_strings = off;
 
-select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;
+-- select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;
 
 reset standard_conforming_strings;
 

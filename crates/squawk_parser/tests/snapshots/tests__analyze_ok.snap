@@ -20,26 +20,28 @@ SOURCE_FILE
     WHITESPACE " "
     VERBOSE_KW "verbose"
     WHITESPACE " "
-    PATH
+    RELATION_NAME
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     COMMA ","
     WHITESPACE " "
-    PATH
+    RELATION_NAME
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     COLUMN_LIST
       L_PAREN "("
       COLUMN
@@ -58,10 +60,11 @@ SOURCE_FILE
       R_PAREN ")"
     COMMA ","
     WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "foo"
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full_parens"
@@ -85,15 +88,16 @@ SOURCE_FILE
       INT_NUMBER "10"
     R_PAREN ")"
     WHITESPACE " "
-    PATH
+    RELATION_NAME
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     COLUMN_LIST
       L_PAREN "("
       COLUMN

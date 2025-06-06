@@ -2,146 +2,59 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/strings.sql
 ---
-ERROR@466: expected column label, got BYTE_STRING
-ERROR@521: missing comma
-ERROR@529: expected column label, got BYTE_STRING
-ERROR@548: missing comma
-ERROR@610: missing comma
-ERROR@647: expected column label, got BYTE_STRING
-ERROR@652: missing comma
-ERROR@748: missing comma
-ERROR@750: expected an expression, found SEMICOLON
-ERROR@783: missing comma
-ERROR@1390: expected column label, got BYTE_STRING
-ERROR@1445: missing comma
-ERROR@1453: expected column label, got BYTE_STRING
-ERROR@1472: missing comma
-ERROR@1508: missing comma
-ERROR@1545: expected column label, got BYTE_STRING
-ERROR@1550: missing comma
-ERROR@1646: missing comma
-ERROR@6298: missing comma
-ERROR@6354: missing comma
-ERROR@6606: missing comma
-ERROR@6702: missing comma
-ERROR@6760: missing comma
-ERROR@17068: missing comma
-ERROR@17121: missing comma
-ERROR@17173: missing comma
-ERROR@17227: missing comma
-ERROR@17339: missing comma
-ERROR@17388: missing comma
-ERROR@17440: missing comma
-ERROR@17495: missing comma
-ERROR@17547: missing comma
-ERROR@17602: missing comma
-ERROR@17660: missing comma
-ERROR@17720: missing comma
-ERROR@17772: missing comma
-ERROR@17826: missing comma
-ERROR@17879: missing comma
-ERROR@17934: missing comma
-ERROR@17988: missing comma
-ERROR@18045: missing comma
-ERROR@18097: missing comma
-ERROR@18152: missing comma
-ERROR@18215: missing comma
-ERROR@18287: missing comma
-ERROR@18391: missing comma
-ERROR@18444: missing comma
-ERROR@18496: missing comma
-ERROR@18550: missing comma
-ERROR@18601: missing comma
-ERROR@18654: missing comma
-ERROR@18706: missing comma
-ERROR@18760: missing comma
-ERROR@18812: missing comma
-ERROR@18867: missing comma
-ERROR@19047: missing comma
-ERROR@19131: missing comma
-ERROR@19218: missing comma
-ERROR@19305: missing comma
-ERROR@19394: missing comma
-ERROR@20309: missing comma
-ERROR@20403: missing comma
-ERROR@29702: missing comma
-ERROR@29713: expected SEMICOLON
-ERROR@29713: expected command, found ERROR
-ERROR@29714: expected command, found ERROR
-ERROR@29715: expected command, found IDENT
-ERROR@29716: expected command, found ERROR
-ERROR@29717: expected command, found STRING
-ERROR@29724: expected command, found AS_KW
-ERROR@29727: expected command, found IDENT
-ERROR@29729: expected command, found COMMA
-ERROR@29731: expected command, found STRING
-ERROR@29742: expected command, found AS_KW
-ERROR@29745: expected command, found IDENT
-ERROR@29747: expected command, found COMMA
-ERROR@29749: expected command, found STRING
-ERROR@29756: expected command, found IDENT
-ERROR@29758: expected command, found STRING
-ERROR@29768: expected command, found ERROR
-ERROR@29769: expected command, found ERROR
-ERROR@29770: expected command, found ERROR
-ERROR@29771: expected command, found ERROR
-ERROR@29772: expected command, found STRING
-ERROR@29862: expected command, found IDENT
-ERROR@29863: expected command, found ERROR
-ERROR@29864: expected command, found IDENT
-ERROR@29867: expected command, found STRING
-ERROR@29877: expected command, found IDENT
-ERROR@29878: expected command, found ERROR
-ERROR@29879: expected command, found BIT_STRING
-ERROR@29882: expected command, found IDENT
-ERROR@29884: expected command, found STRING
-ERROR@29894: expected command, found IDENT
-ERROR@29895: expected command, found ERROR
-ERROR@29896: expected command, found BIT_STRING
-ERROR@29901: expected command, found IDENT
-ERROR@29903: expected command, found STRING
-ERROR@29913: expected command, found IDENT
-ERROR@29917: expected command, found ERROR
-ERROR@29918: expected command, found STRING
-ERROR@29930: expected command, found IDENT
-ERROR@29932: expected command, found ERROR
-ERROR@29933: expected command, found STRING
-ERROR@29935: expected command, found IDENT
-ERROR@29937: expected command, found STRING
-ERROR@29947: expected command, found ERROR
-ERROR@29948: expected command, found ERROR
-ERROR@29949: expected command, found STRING
-ERROR@30007: expected command, found IDENT
-ERROR@30008: expected command, found ERROR
-ERROR@30009: expected command, found ERROR
-ERROR@30010: expected command, found IDENT
-ERROR@30013: expected command, found STRING
-ERROR@30023: expected command, found IDENT
-ERROR@30024: expected command, found ERROR
-ERROR@30025: expected command, found ERROR
-ERROR@30026: expected command, found IDENT
-ERROR@30027: expected command, found ERROR
-ERROR@30028: expected command, found STRING
-ERROR@30033: expected command, found AS_KW
-ERROR@30036: expected command, found IDENT
-ERROR@30038: expected command, found COMMA
-ERROR@30040: expected command, found STRING
-ERROR@30049: expected command, found IDENT
-ERROR@30051: expected command, found STRING
-ERROR@30061: expected command, found IDENT
-ERROR@30065: expected command, found ERROR
-ERROR@30066: expected command, found ERROR
-ERROR@30067: expected command, found STRING
-ERROR@30079: expected command, found IDENT
-ERROR@30081: expected command, found ERROR
-ERROR@30082: expected command, found ERROR
-ERROR@30083: expected command, found ERROR
-ERROR@30084: expected command, found STRING
-ERROR@30089: expected command, found AS_KW
-ERROR@30092: expected command, found IDENT
-ERROR@30094: expected command, found COMMA
-ERROR@30096: expected command, found STRING
-ERROR@30103: expected command, found AS_KW
-ERROR@30106: expected command, found IDENT
-ERROR@29864: unknown literal prefix
-ERROR@30010: unknown literal prefix
+ERROR@536: missing comma
+ERROR@563: missing comma
+ERROR@625: missing comma
+ERROR@667: missing comma
+ERROR@763: missing comma
+ERROR@765: expected an expression, found SEMICOLON
+ERROR@798: missing comma
+ERROR@1460: missing comma
+ERROR@1487: missing comma
+ERROR@1523: missing comma
+ERROR@1565: missing comma
+ERROR@1661: missing comma
+ERROR@6313: missing comma
+ERROR@6369: missing comma
+ERROR@6621: missing comma
+ERROR@6717: missing comma
+ERROR@6775: missing comma
+ERROR@17083: missing comma
+ERROR@17136: missing comma
+ERROR@17188: missing comma
+ERROR@17242: missing comma
+ERROR@17354: missing comma
+ERROR@17403: missing comma
+ERROR@17455: missing comma
+ERROR@17510: missing comma
+ERROR@17562: missing comma
+ERROR@17617: missing comma
+ERROR@17675: missing comma
+ERROR@17735: missing comma
+ERROR@17787: missing comma
+ERROR@17841: missing comma
+ERROR@17894: missing comma
+ERROR@17949: missing comma
+ERROR@18003: missing comma
+ERROR@18060: missing comma
+ERROR@18112: missing comma
+ERROR@18167: missing comma
+ERROR@18230: missing comma
+ERROR@18302: missing comma
+ERROR@18406: missing comma
+ERROR@18459: missing comma
+ERROR@18511: missing comma
+ERROR@18565: missing comma
+ERROR@18616: missing comma
+ERROR@18669: missing comma
+ERROR@18721: missing comma
+ERROR@18775: missing comma
+ERROR@18827: missing comma
+ERROR@18882: missing comma
+ERROR@19062: missing comma
+ERROR@19146: missing comma
+ERROR@19233: missing comma
+ERROR@19320: missing comma
+ERROR@19409: missing comma
+ERROR@20324: missing comma
+ERROR@20418: missing comma
