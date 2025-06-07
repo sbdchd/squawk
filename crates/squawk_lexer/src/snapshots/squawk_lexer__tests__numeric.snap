@@ -1,6 +1,6 @@
 ---
 source: crates/squawk_lexer/src/lib.rs
-expression: "lex(r#\"\n42\n3.5\n4.\n.001\n.123e10\n5e2\n1.925e-3\n1e-10\n1e+10\n1e10\n\"#)"
+expression: "lex(r#\"\n42\n3.5\n4.\n.001\n.123e10\n5e2\n1.925e-3\n1e-10\n1e+10\n1e10\n4664.E+5\n\"#)"
 ---
 [
     "\n" @ Whitespace,
@@ -23,5 +23,7 @@ expression: "lex(r#\"\n42\n3.5\n4.\n.001\n.123e10\n5e2\n1.925e-3\n1e-10\n1e+10\n
     "1e+10" @ Literal { kind: Float { base: Decimal, empty_exponent: false } },
     "\n" @ Whitespace,
     "1e10" @ Literal { kind: Float { base: Decimal, empty_exponent: false } },
+    "\n" @ Whitespace,
+    "4664.E+5" @ Literal { kind: Float { base: Decimal, empty_exponent: false } },
     "\n" @ Whitespace,
 ]

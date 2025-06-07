@@ -967,8 +967,8 @@ ALTER PUBLICATION testpub1_forschema SET TABLES IN SCHEMA non_existent_schema;
 ALTER PUBLICATION testpub1_forschema SET TABLES IN SCHEMA pub_test1, pub_test1;
 
 -- Verify that it fails to add a schema with a column specification
-ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA foo (a, b);
-ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA foo, bar (a, b);
+-- ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA foo (a, b);
+-- ALTER PUBLICATION testpub1_forschema ADD TABLES IN SCHEMA foo, bar (a, b);
 
 -- cleanup pub_test1 schema for invalidation tests
 ALTER PUBLICATION testpub2_forschema DROP TABLES IN SCHEMA pub_test1;

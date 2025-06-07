@@ -317,6 +317,24 @@ impl<'t> Parser<'t> {
                 m.complete(self, SyntaxKind::IS_NOT);
                 return true;
             }
+            // SyntaxKind::BYTE_STRING => {
+            //     let m = self.start();
+            //     self.bump(SyntaxKind::BYTE_STRING);
+            //     if self.eat(SyntaxKind::UESCAPE_KW) {
+            //         self.expect(SyntaxKind::STRING);
+            //     }
+            //     m.complete(self, SyntaxKind::BYTE_STRING);
+            //     return true;
+            // }
+            // SyntaxKind::IDENT => {
+            //     let m = self.start();
+            //     self.bump(SyntaxKind::IDENT);
+            //     if self.eat(SyntaxKind::UESCAPE_KW) {
+            //         self.expect(SyntaxKind::STRING);
+            //     }
+            //     m.complete(self, SyntaxKind::IDENT);
+            //     return true;
+            // }
             SyntaxKind::CUSTOM_OP => {
                 let m = self.start();
                 while !self.at(SyntaxKind::EOF) {
@@ -412,7 +430,7 @@ impl<'t> Parser<'t> {
         if kind == SyntaxKind::EOF {
             return;
         }
-        self.do_bump(kind, 1);
+        self.bump(kind);
     }
 
     /// Advances the parser by one token
@@ -566,6 +584,13 @@ impl<'t> Parser<'t> {
                 n,
                 SyntaxKind::NOT_KW,
                 SyntaxKind::LIKE_KW,
+                TrivaBetween::Allowed,
+            ),
+            // not ilike
+            SyntaxKind::NOT_ILIKE => self.at_composite2(
+                n,
+                SyntaxKind::NOT_KW,
+                SyntaxKind::ILIKE_KW,
                 TrivaBetween::Allowed,
             ),
             // not in

@@ -3537,8 +3537,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      NAME_REF
-        IDENT "f"
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
       WHITESPACE " "
       DEFAULT_KW "default"
   SEMICOLON ";"
@@ -3561,8 +3563,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      NAME_REF
-        IDENT "f"
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
       WHITESPACE " "
       FOR_KW "for"
       WHITESPACE " "

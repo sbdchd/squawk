@@ -94,14 +94,14 @@ fn regression_suite(fixture: Fixture<&str>) {
 
     let (_parsed, errors) = parse_text(content);
 
-    if !errors.is_empty() {
-        with_settings!({
-          omit_expression => true,
-          input_file => input_file
-        }, {
-          assert_snapshot!(format!("regression_{}", test_name), errors.join(""));
-        });
-    }
+    let snapshot_name = format!("regression_{}", test_name);
+
+    with_settings!({
+      omit_expression => true,
+      input_file => input_file
+    }, {
+      assert_snapshot!(snapshot_name, errors.join(""));
+    });
 }
 
 // Trying to burn down the errors in the postgres regression suite
