@@ -211,3 +211,60 @@ select cast(a as foo.bar);
 select treat(a as foo.b);
 select treat('1231' as numeric);
 
+-- prefix
+select json '{}';
+
+select timestamp(4) '';
+select timestamp '';
+
+select time(4) '';
+select time '';
+
+select character varying '';
+select character '';
+select char varying '';
+select char '';
+select varchar '';
+select national character varying '';
+select national character '';
+select national char varying '';
+select national char '';
+select nchar varying '';
+select nchar '';
+
+select character varying(10) '';
+select character(10) '';
+select char varying(10) '';
+select char(10) '';
+select varchar(10) '';
+select national character varying(10) '';
+select national character(10) '';
+select national char varying(10) '';
+select national char(10) '';
+select nchar varying(10) '';
+select nchar(10) '';
+
+select bit varying(10) '';
+select bit(10) '';
+
+select bit varying '';
+select bit '';
+
+select int '';
+select integer '';
+select smallint '';
+select bigint '';
+select real '';
+select float '';
+select float(8) '';
+select double precision  '';
+select decimal(10, 2) '10';
+select decimal '10';
+select dec(10, 2) '10';
+select dec '10';
+select numeric(10, 2) '10';
+select numeric '10';
+select boolean 'false';
+
+select foo.bar '100';
+select foo.bar(10, 2) '100';

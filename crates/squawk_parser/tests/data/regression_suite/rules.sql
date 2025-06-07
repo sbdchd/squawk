@@ -182,9 +182,9 @@ select * from rtest_v1;
 insert into rtest_v1 values (2, 12);
 insert into rtest_v1 values (2, 13);
 select * from rtest_v1;
-** Remember the delete rule on rtest_v1: It says
-** DO INSTEAD DELETE FROM rtest_t1 WHERE a = old.a
-** So this time both rows with a = 2 must get deleted
+-- ** Remember the delete rule on rtest_v1: It says
+-- ** DO INSTEAD DELETE FROM rtest_t1 WHERE a = old.a
+-- ** So this time both rows with a = 2 must get deleted
 delete from rtest_v1 where b = 12;
 select * from rtest_v1;
 delete from rtest_v1;

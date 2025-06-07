@@ -20,3 +20,48 @@ SOURCE_FILE
     ALL_KW "all"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  RESET
+    RESET_KW "reset"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "buzz"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET
+    RESET_KW "reset"
+    WHITESPACE " "
+    TIME_KW "time"
+    WHITESPACE " "
+    ZONE_KW "zone"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET
+    RESET_KW "reset"
+    WHITESPACE " "
+    TRANSACTION_KW "transaction"
+    WHITESPACE " "
+    ISOLATION_KW "isolation"
+    WHITESPACE " "
+    LEVEL_KW "level"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET_SESSION_AUTH
+    RESET_KW "reset"
+    WHITESPACE " "
+    SESSION_KW "session"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+  SEMICOLON ";"
+  WHITESPACE "\n"

@@ -3692,8 +3692,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      NAME_REF
-        IDENT "f"
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- concurrently"
@@ -3714,8 +3716,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      NAME_REF
-        IDENT "f"
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
       WHITESPACE " "
       CONCURRENTLY_KW "concurrently"
   SEMICOLON ";"
@@ -3738,8 +3742,10 @@ SOURCE_FILE
       WHITESPACE " "
       PARTITION_KW "partition"
       WHITESPACE " "
-      NAME_REF
-        IDENT "f"
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "f"
       WHITESPACE " "
       FINALIZE_KW "finalize"
   SEMICOLON ";"

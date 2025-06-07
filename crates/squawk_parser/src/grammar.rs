@@ -1819,29 +1819,51 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     // TODO: this needs to be cleaned up
     let mut is_interval_cast = false;
-    let kind = if p.eat(COLLATION_KW) {
-        p.expect(FOR_KW);
-        NAME_REF
-    // timestamp with time zone / time with time zone
-    } else if p.eat(TIMESTAMP_KW) || p.eat(TIME_KW) {
-        if p.eat(L_PAREN) {
-            if opt_numeric_literal(p).is_none() {
-                p.error("expected numeric literal");
+    let kind = match p.current() {
+        COLLATION_KW => {
+            p.bump(COLLATION_KW);
+            p.expect(FOR_KW);
+            NAME_REF
+        }
+        TIMESTAMP_KW | TIME_KW => {
+            p.bump_any();
+            if p.eat(L_PAREN) {
+                if opt_numeric_literal(p).is_none() {
+                    p.error("expected numeric literal");
+                }
+                p.expect(R_PAREN);
             }
-            p.expect(R_PAREN);
+            if p.eat(WITH_KW) || p.eat(WITHOUT_KW) {
+                p.expect(TIME_KW);
+                p.expect(ZONE_KW);
+            }
+            TIME_TYPE
         }
-        if p.eat(WITH_KW) {
-            p.expect(TIME_KW);
-            p.expect(ZONE_KW);
+        BIT_KW => {
+            p.bump(BIT_KW);
+            p.eat(VARYING_KW);
+            BIT_TYPE
         }
-        TIME_TYPE
-    } else if p.eat(INTERVAL_KW) {
-        opt_interval_trailing(p);
-        is_interval_cast = true;
-        INTERVAL_TYPE
-    } else {
-        p.bump_any();
-        NAME_REF
+        NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => {
+            p.bump(NATIONAL_KW);
+            char_type(p)
+        }
+        DOUBLE_KW if p.nth_at(1, PRECISION_KW) => {
+            p.bump(DOUBLE_KW);
+            p.bump(PRECISION_KW);
+            DOUBLE_TYPE
+        }
+        CHARACTER_KW | CHAR_KW | NCHAR_KW | VARCHAR_KW => char_type(p),
+        INTERVAL_KW => {
+            p.bump(INTERVAL_KW);
+            opt_interval_trailing(p);
+            is_interval_cast = true;
+            INTERVAL_TYPE
+        }
+        _ => {
+            p.bump_any();
+            NAME_REF
+        }
     };
     let cm = m.complete(p, if p.at(STRING) { kind } else { NAME_REF });
 
@@ -10920,7 +10942,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
         },
     ) {
         Some(statement) => match statement.kind() {
-            SELECT | COMPOUND_SELECT | SELECT_INTO => (),
+            SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | TABLE => (),
             kind => p.error(format!("expected SELECT, got {:?}", kind)),
         },
         None => p.error("expected SELECT"),
@@ -11033,8 +11055,26 @@ fn reset(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(RESET_KW));
     let m = p.start();
     p.bump(RESET_KW);
-    if !p.eat(ALL_KW) {
-        path_name_ref(p);
+    match p.current() {
+        ALL_KW => {
+            p.bump(ALL_KW);
+        }
+        SESSION_KW => {
+            p.bump(SESSION_KW);
+            p.expect(AUTHORIZATION_KW);
+        }
+        TRANSACTION_KW => {
+            p.bump(TRANSACTION_KW);
+            p.expect(ISOLATION_KW);
+            p.expect(LEVEL_KW);
+        }
+        TIME_KW => {
+            p.bump(TIME_KW);
+            p.expect(ZONE_KW);
+        }
+        _ => {
+            path_name_ref(p);
+        }
     }
     m.complete(p, RESET)
 }
@@ -12945,8 +12985,26 @@ fn show(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SHOW_KW));
     let m = p.start();
     p.bump(SHOW_KW);
-    if !p.eat(ALL_KW) {
-        path_name_ref(p);
+    match p.current() {
+        ALL_KW => {
+            p.bump(ALL_KW);
+        }
+        SESSION_KW => {
+            p.bump(SESSION_KW);
+            p.expect(AUTHORIZATION_KW);
+        }
+        TRANSACTION_KW => {
+            p.bump(TRANSACTION_KW);
+            p.expect(ISOLATION_KW);
+            p.expect(LEVEL_KW);
+        }
+        TIME_KW => {
+            p.bump(TIME_KW);
+            p.expect(ZONE_KW);
+        }
+        _ => {
+            path_name_ref(p);
+        }
     }
     m.complete(p, SHOW)
 }
@@ -13268,7 +13326,7 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             p.bump(DETACH_KW);
             p.expect(PARTITION_KW);
             // partition_name
-            name_ref(p);
+            path_name_ref(p);
             // [ CONCURRENTLY | FINALIZE ]
             if !p.eat(CONCURRENTLY_KW) {
                 p.eat(FINALIZE_KW);

@@ -1,0 +1,84 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/show.sql
+---
+SOURCE_FILE
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    TIME_KW "time"
+    WHITESPACE " "
+    ZONE_KW "zone"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    TRANSACTION_KW "transaction"
+    WHITESPACE " "
+    ISOLATION_KW "isolation"
+    WHITESPACE " "
+    LEVEL_KW "level"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    SESSION_KW "session"
+    WHITESPACE " "
+    AUTHORIZATION_KW "authorization"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    ALL_KW "all"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "v"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "a"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "a"
+          DOT "."
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "b"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "c"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "d"
+  SEMICOLON ";"
+  WHITESPACE "\n"

@@ -1,0 +1,38 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/select_casts_pg17.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CALL_EXPR
+              FIELD_EXPR
+                INDEX_EXPR
+                  NAME_REF
+                    IDENT "foo"
+                  L_BRACK "["
+                  LITERAL
+                    INT_NUMBER "10"
+                  R_BRACK "]"
+                DOT "."
+                NAME_REF
+                  IDENT "bar"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "10"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2"
+                R_PAREN ")"
+            WHITESPACE " "
+            LITERAL
+              STRING "'100'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
