@@ -13,20 +13,20 @@ create temp view gstest1(a,b,v)
 create temp table gstest2 (a integer, b integer, c integer, d integer,
                            e integer, f integer, g integer, h integer);
 copy gstest2 from stdin;
-1	1	1	1	1	1	1	1
-1	1	1	1	1	1	1	2
-1	1	1	1	1	1	2	2
-1	1	1	1	1	2	2	2
-1	1	1	1	2	2	2	2
-1	1	1	2	2	2	2	2
-1	1	2	2	2	2	2	2
-1	2	2	2	2	2	2	2
-2	2	2	2	2	2	2	2
+-- 1	1	1	1	1	1	1	1
+-- 1	1	1	1	1	1	1	2
+-- 1	1	1	1	1	1	2	2
+-- 1	1	1	1	1	2	2	2
+-- 1	1	1	1	2	2	2	2
+-- 1	1	1	2	2	2	2	2
+-- 1	1	2	2	2	2	2	2
+-- 1	2	2	2	2	2	2	2
+-- 2	2	2	2	2	2	2	2
 
 create temp table gstest3 (a integer, b integer, c integer, d integer);
 copy gstest3 from stdin;
-1	1	1	1
-2	2	2	2
+-- 1	1	1	1
+-- 2	2	2	2
 alter table gstest3 add primary key (a);
 
 create temp table gstest4(id integer, v integer,

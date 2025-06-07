@@ -2,9 +2,4 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/foreign_key.sql
 ---
-ERROR@65605: expected SEMICOLON
-ERROR@65605: expected command, found DOT
-ERROR@65606: expected command, found IDENT
-ERROR@66561: expected SEMICOLON
-ERROR@66561: expected command, found DOT
-ERROR@66562: expected command, found IDENT
+
