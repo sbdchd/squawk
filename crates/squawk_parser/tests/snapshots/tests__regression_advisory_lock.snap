@@ -1,0 +1,5 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/regression_suite/advisory_lock.sql
+---
+

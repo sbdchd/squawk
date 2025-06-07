@@ -217,12 +217,16 @@ SOURCE_FILE
       IDENT "a"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "b"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "b"
     COMMA ","
     WHITESPACE " "
-    NAME_REF
-      IDENT "c"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "c"
     COMMA ","
     WHITESPACE " "
     CURRENT_SCHEMA_KW "current_schema"

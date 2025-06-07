@@ -6,7 +6,7 @@
 
 use crate::ast::AstNode;
 use crate::{ast, match_ast, syntax_error::SyntaxError, SyntaxNode};
-use rowan::TextRange;
+use rowan::{TextRange, TextSize};
 use squawk_parser::SyntaxKind::*;
 pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     for node in root.descendants() {
@@ -25,46 +25,55 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
 }
 
 enum LookingFor {
-    OpeningString,
-    Comment,
-    ClosingString,
+    OpenString,
+    CloseString(TextSize, bool),
 }
 fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
-    let mut state = LookingFor::OpeningString;
+    let mut state = LookingFor::OpenString;
     let mut maybe_errors = vec![];
-    let message = "Comments between string literals are not allowed.";
+
+    // Checking for string continuation issues, like comments between string
+    // literals or missing new lines.
     for e in lit.syntax().children_with_tokens() {
         match e {
             rowan::NodeOrToken::Node(_) => {
                 // not sure when this would occur
-                state = LookingFor::OpeningString;
+                state = LookingFor::OpenString;
             }
             rowan::NodeOrToken::Token(token) => {
-                if token.kind() == WHITESPACE {
-                    continue;
-                }
                 match state {
-                    LookingFor::OpeningString => {
+                    LookingFor::OpenString => {
                         if token.kind() == STRING {
-                            state = LookingFor::Comment;
+                            state = LookingFor::CloseString(token.text_range().end(), false);
                         }
                     }
-                    LookingFor::Comment => {
-                        if token.kind() == COMMENT {
-                            state = LookingFor::ClosingString;
-                            maybe_errors.push(SyntaxError::new(message, token.text_range()));
+                    LookingFor::CloseString(text_range_end, seen_new_line) => match token.kind() {
+                        WHITESPACE => {
+                            let seen_new_line = token.text().contains("\n");
+                            state = LookingFor::CloseString(text_range_end, seen_new_line);
                         }
-                    }
-                    LookingFor::ClosingString => {
-                        if token.kind() == STRING {
+                        COMMENT => {
+                            maybe_errors.push(SyntaxError::new(
+                                "Comments between string literals are not allowed.",
+                                token.text_range(),
+                            ));
+                        }
+                        STRING => {
+                            // avoid warning twice for the same two string literals, so we check maybe_errors
+                            if !seen_new_line && maybe_errors.is_empty() {
+                                maybe_errors.push(SyntaxError::new(
+                                    "Expected new line or comma between string literals",
+                                    TextRange::new(text_range_end, token.text_range().start()),
+                                ));
+                            }
                             acc.append(&mut maybe_errors);
-                            state = LookingFor::Comment;
-                        } else if token.kind() == COMMENT {
-                            maybe_errors.push(SyntaxError::new(message, token.text_range()));
-                        } else {
-                            state = LookingFor::OpeningString;
+                            state = LookingFor::CloseString(token.text_range().end(), false);
                         }
-                    }
+                        _ => {
+                            maybe_errors.clear();
+                            state = LookingFor::OpenString;
+                        }
+                    },
                 }
             }
         }

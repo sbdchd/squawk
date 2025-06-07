@@ -789,6 +789,19 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             p.bump(POSITIONAL_PARAM);
             m.complete(p, LITERAL)
         }
+        (CAST_KW | TREAT_KW, L_PAREN) => {
+            let m = p.start();
+            p.bump_any();
+            p.bump(L_PAREN);
+            if expr(p).is_none() {
+                p.error("expected an expression");
+            }
+            p.expect(AS_KW);
+            type_name(p);
+            opt_collate(p);
+            p.expect(R_PAREN);
+            m.complete(p, CAST_EXPR)
+        }
         (EXTRACT_KW, L_PAREN) => extract_fn(p),
         (JSON_EXISTS_KW, L_PAREN) => json_exists_fn(p),
         (JSON_ARRAY_KW, L_PAREN) => json_array_fn(p),
@@ -1259,20 +1272,6 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<CompletedMarker> {
             m = p.start();
             p.bump_any();
             (PREFIX_EXPR, 3)
-        }
-        CAST_KW | TREAT_KW => {
-            m = p.start();
-            p.bump_any();
-            p.expect(L_PAREN);
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
-            p.expect(AS_KW);
-            type_name(p);
-            opt_collate(p);
-            p.expect(R_PAREN);
-            let cm = m.complete(p, CAST_EXPR);
-            return Some(cm);
         }
         OPERATOR_KW if p.at(OPERATOR_CALL) => {
             m = p.start();
@@ -1915,7 +1914,12 @@ fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
         }
         m.complete(p, OVER_CLAUSE);
     }
-    m.complete(p, CALL_EXPR)
+    let cm = m.complete(p, CALL_EXPR);
+    if opt_string_literal(p).is_some() {
+        cm.precede(p).complete(p, CAST_EXPR)
+    } else {
+        cm
+    }
 }
 
 // foo[]
@@ -2017,13 +2021,13 @@ fn postfix_dot_expr<const FLOAT_RECOVERY: bool>(
     if !FLOAT_RECOVERY {
         assert!(p.at(DOT));
     }
-    field_expr::<FLOAT_RECOVERY>(p, Some(lhs), allow_calls).map(|m| {
+    field_expr::<FLOAT_RECOVERY>(p, Some(lhs), allow_calls).map(|cm| {
         // A field followed by a literal is a type cast so we insert a CAST_EXPR
         // preceding it to wrap the previously parsed data.
-        if !p.at(NULL_KW) && !p.at(DEFAULT_KW) && literal(p).is_some() {
-            m.precede(p).complete(p, CAST_EXPR)
+        if opt_string_literal(p).is_some() {
+            cm.precede(p).complete(p, CAST_EXPR)
         } else {
-            m
+            cm
         }
     })
 }
@@ -4868,9 +4872,7 @@ fn savepoint(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SAVEPOINT_KW));
     let m = p.start();
     p.bump(SAVEPOINT_KW);
-    if name_ref_(p).is_none() {
-        p.error("expected a name");
-    }
+    name_ref(p);
     m.complete(p, SAVEPOINT)
 }
 
@@ -4882,9 +4884,7 @@ fn release(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(RELEASE_KW);
     p.eat(SAVEPOINT_KW);
-    if name_ref_(p).is_none() {
-        p.error("expected a name");
-    }
+    name_ref(p);
     m.complete(p, RELEASE_SAVEPOINT)
 }
 
@@ -4909,9 +4909,7 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
     let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
     if is_rollback && p.eat(TO_KW) {
         p.eat(SAVEPOINT_KW);
-        if name_ref_(p).is_none() {
-            p.error("expected a name");
-        }
+        name_ref(p);
     } else if p.eat(AND_KW) {
         p.eat(NO_KW);
         p.expect(CHAIN_KW);
@@ -5275,15 +5273,7 @@ fn alter_server(p: &mut Parser<'_>) -> CompletedMarker {
                 string_literal(p);
                 found_option = true;
             }
-            if p.eat(OPTIONS_KW) {
-                found_option = true;
-                p.expect(L_PAREN);
-                alter_option(p);
-                while !p.at(EOF) && p.eat(COMMA) {
-                    alter_option(p);
-                }
-                p.expect(R_PAREN);
-            }
+            found_option |= opt_options_list(p);
             if !found_option {
                 p.error("expected ALTER SERVER option");
             }
@@ -7543,13 +7533,9 @@ fn alter_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     role(p);
     p.expect(SERVER_KW);
     name_ref(p);
-    p.expect(OPTIONS_KW);
-    p.expect(L_PAREN);
-    alter_option(p);
-    while !p.at(EOF) && p.eat(COMMA) {
-        alter_option(p);
+    if !opt_options_list(p) {
+        p.error("expected options");
     }
-    p.expect(R_PAREN);
     m.complete(p, ALTER_USER_MAPPING)
 }
 
@@ -8337,13 +8323,9 @@ fn create_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
 fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
     match p.current() {
         OPTIONS_KW => {
-            p.bump(OPTIONS_KW);
-            p.expect(L_PAREN);
-            alter_option(p);
-            while !p.at(EOF) && p.eat(COMMA) {
-                alter_option(p);
+            if !opt_options_list(p) {
+                p.error("expected options");
             }
-            p.expect(R_PAREN);
             true
         }
         HANDLER_KW | VALIDATOR_KW => {
@@ -8684,10 +8666,12 @@ fn publication_object(p: &mut Parser<'_>) {
         if !p.eat(CURRENT_SCHEMA_KW) {
             name_ref(p);
         }
-        while !p.at(EOF) && p.eat(COMMA) {
-            if !p.eat(CURRENT_SCHEMA_KW) {
-                name_ref(p);
+        if p.eat(WHERE_KW) {
+            p.expect(L_PAREN);
+            if expr(p).is_none() {
+                p.error("expected expression");
             }
+            p.expect(R_PAREN);
         }
     } else if p.eat(CURRENT_SCHEMA_KW) {
         return;
@@ -9913,25 +9897,18 @@ fn explain_option(p: &mut Parser<'_>) {
     }
 }
 
-// TODO: I think we want something like deliminated where we give it a FIRST
-// token set so we can be robust to missing commas
-fn one_or_more(p: &mut Parser<'_>, mut parse: impl FnMut(&mut Parser<'_>)) {
-    parse(p);
-    while !p.at(EOF) && p.eat(COMMA) {
-        parse(p);
-    }
-}
-
 // [ OPTIONS ( option 'value' [, ... ] ) ]
-fn opt_options_list(p: &mut Parser<'_>) {
-    // [ OPTIONS ( option 'value' [, ... ] ) ]
+fn opt_options_list(p: &mut Parser<'_>) -> bool {
     if p.eat(OPTIONS_KW) {
         p.expect(L_PAREN);
-        one_or_more(p, |p| {
-            col_label(p);
-            string_literal(p);
-        });
+        alter_option(p);
+        while !p.at(EOF) && p.eat(COMMA) {
+            alter_option(p);
+        }
         p.expect(R_PAREN);
+        true
+    } else {
+        false
     }
 }
 
@@ -11900,15 +11877,9 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
         // ( { index_column_name | ( index_expression ) } [ COLLATE collation ] [ opclass ] [, ...] ) [ WHERE index_predicate ]
         } else if p.eat(L_PAREN) {
             while !p.at(EOF) {
-                // ( index_expression )
-                if p.eat(L_PAREN) {
-                    // TODO: more strict?
-                    if expr(p).is_none() {
-                        p.error("expected index_expression");
-                    }
-                    // index_column_name
+                if expr(p).is_none() {
+                    p.error("expected expression");
                 }
-                name_ref(p);
                 opt_collate(p);
                 // [ opclass ]
                 p.eat(IDENT);
@@ -13358,6 +13329,7 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 // column_name
                 name_ref(p);
                 type_name(p);
+                opt_options_list(p);
                 opt_collate(p);
                 // [ column_constraint [ ... ] ]
                 while !p.at(EOF) {
@@ -13373,7 +13345,7 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             p.bump(ATTACH_KW);
             p.expect(PARTITION_KW);
             // name
-            name_ref(p);
+            path_name_ref(p);
             // { FOR VALUES partition_bound_spec | DEFAULT }
             partition_option(p);
             ATTACH_PARTITION
@@ -13520,6 +13492,12 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 }
                 ALTER_COLUMN
             }
+        }
+        OPTIONS_KW => {
+            if !opt_options_list(p) {
+                p.error("expected options list");
+            }
+            OPTIONS_LIST
         }
         _ => return None,
     };
@@ -13759,13 +13737,9 @@ fn alter_column_option(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         }
         // OPTIONS ( [ ADD | SET | DROP ] option ['value'] [, ... ])
         OPTIONS_KW => {
-            p.bump(OPTIONS_KW);
-            p.expect(L_PAREN);
-            alter_option(p);
-            while !p.at(EOF) && p.eat(COMMA) {
-                alter_option(p);
+            if !opt_options_list(p) {
+                p.error("expected options");
             }
-            p.expect(R_PAREN);
             SET_OPTIONS_LIST
         }
         // SET DEFAULT expression

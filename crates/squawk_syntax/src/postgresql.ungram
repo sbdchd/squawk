@@ -426,6 +426,11 @@ AlterTableAction =
 | RenameColumn
 | AlterConstraint
 | AlterColumn
+| OptionsList
+
+OptionsList =
+ 'option' '(' ')'
+
 
 RelationName =
   'only' ( '(' Path ')' | Path )

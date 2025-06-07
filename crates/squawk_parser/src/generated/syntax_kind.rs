@@ -837,6 +837,7 @@ pub enum SyntaxKind {
     ON_UPDATE_ACTION,
     OP,
     OPERATOR_CALL,
+    OPTIONS_LIST,
     ORDER_BY_CLAUSE,
     OR_REPLACE,
     OVER_CLAUSE,

@@ -2,7 +2,7 @@
 source: crates/squawk_syntax/src/test.rs
 input_file: crates/squawk_syntax/test_data/validation/validate_string_continuation.sql
 ---
-SOURCE_FILE@0..157
+SOURCE_FILE@0..233
   SELECT@0..18
     SELECT_CLAUSE@0..18
       SELECT_KW@0..6 "select"
@@ -60,9 +60,40 @@ SOURCE_FILE@0..157
             WHITESPACE@147..148 "\n"
             STRING@148..155 "'world'"
   SEMICOLON@155..156 ";"
-  WHITESPACE@156..157 "\n"
+  WHITESPACE@156..158 "\n\n"
+  SELECT@158..177
+    SELECT_CLAUSE@158..177
+      SELECT_KW@158..164 "select"
+      WHITESPACE@164..165 " "
+      TARGET_LIST@165..177
+        TARGET@165..177
+          LITERAL@165..177
+            STRING@165..170 "'foo'"
+            WHITESPACE@170..172 " \n"
+            STRING@172..177 "'bar'"
+  SEMICOLON@177..178 ";"
+  WHITESPACE@178..179 "\n"
+  COMMENT@179..204 "-- ^ has new line so  ..."
+  WHITESPACE@204..206 "\n\n"
+  SELECT@206..231
+    SELECT_CLAUSE@206..231
+      SELECT_KW@206..212 "select"
+      WHITESPACE@212..213 " "
+      TARGET_LIST@213..231
+        TARGET@213..231
+          LITERAL@213..231
+            STRING@213..218 "'foo'"
+            WHITESPACE@218..219 " "
+            STRING@219..224 "'bar'"
+            WHITESPACE@224..225 " "
+            STRING@225..231 "'buzz'"
+  SEMICOLON@231..232 ";"
+  WHITESPACE@232..233 "\n"
 
+ERROR@12:13 "Expected new line or comma between string literals"
 ERROR@33:46 "Comments between string literals are not allowed."
 ERROR@69:82 "Comments between string literals are not allowed."
 ERROR@89:110 "Comments between string literals are not allowed."
 ERROR@137:147 "Comments between string literals are not allowed."
+ERROR@218:219 "Expected new line or comma between string literals"
+ERROR@224:225 "Expected new line or comma between string literals"

@@ -2,8 +2,4 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/timestamptz.sql
 ---
-ERROR@28897: expected COMMA
-ERROR@28900: expected COMMA
-ERROR@29074: expected COMMA
-ERROR@29077: expected COMMA
-ERROR@29280: missing comma
+

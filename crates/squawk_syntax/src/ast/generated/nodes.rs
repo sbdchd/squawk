@@ -6015,6 +6015,25 @@ impl OperatorCall {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OptionsList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OptionsList {
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn option_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPTION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OrReplace {
     pub(crate) syntax: SyntaxNode,
 }
@@ -8298,6 +8317,7 @@ pub enum AlterTableAction {
     NoInherit(NoInherit),
     NotOf(NotOf),
     OfType(OfType),
+    OptionsList(OptionsList),
     OwnerTo(OwnerTo),
     RenameColumn(RenameColumn),
     RenameConstraint(RenameConstraint),
@@ -13806,6 +13826,24 @@ impl AstNode for OperatorCall {
         &self.syntax
     }
 }
+impl AstNode for OptionsList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OPTIONS_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for OrReplace {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -16393,6 +16431,7 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::NO_INHERIT
                 | SyntaxKind::NOT_OF
                 | SyntaxKind::OF_TYPE
+                | SyntaxKind::OPTIONS_LIST
                 | SyntaxKind::OWNER_TO
                 | SyntaxKind::RENAME_COLUMN
                 | SyntaxKind::RENAME_CONSTRAINT
@@ -16456,6 +16495,7 @@ impl AstNode for AlterTableAction {
             SyntaxKind::NO_INHERIT => AlterTableAction::NoInherit(NoInherit { syntax }),
             SyntaxKind::NOT_OF => AlterTableAction::NotOf(NotOf { syntax }),
             SyntaxKind::OF_TYPE => AlterTableAction::OfType(OfType { syntax }),
+            SyntaxKind::OPTIONS_LIST => AlterTableAction::OptionsList(OptionsList { syntax }),
             SyntaxKind::OWNER_TO => AlterTableAction::OwnerTo(OwnerTo { syntax }),
             SyntaxKind::RENAME_COLUMN => AlterTableAction::RenameColumn(RenameColumn { syntax }),
             SyntaxKind::RENAME_CONSTRAINT => {
@@ -16521,6 +16561,7 @@ impl AstNode for AlterTableAction {
             AlterTableAction::NoInherit(it) => &it.syntax,
             AlterTableAction::NotOf(it) => &it.syntax,
             AlterTableAction::OfType(it) => &it.syntax,
+            AlterTableAction::OptionsList(it) => &it.syntax,
             AlterTableAction::OwnerTo(it) => &it.syntax,
             AlterTableAction::RenameColumn(it) => &it.syntax,
             AlterTableAction::RenameConstraint(it) => &it.syntax,
@@ -16687,6 +16728,12 @@ impl From<OfType> for AlterTableAction {
     #[inline]
     fn from(node: OfType) -> AlterTableAction {
         AlterTableAction::OfType(node)
+    }
+}
+impl From<OptionsList> for AlterTableAction {
+    #[inline]
+    fn from(node: OptionsList) -> AlterTableAction {
+        AlterTableAction::OptionsList(node)
     }
 }
 impl From<OwnerTo> for AlterTableAction {

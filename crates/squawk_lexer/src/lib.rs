@@ -302,6 +302,14 @@ impl Cursor<'_> {
                         }
                         _ => (),
                     }
+                } else {
+                    match self.first() {
+                        'e' | 'E' => {
+                            self.bump();
+                            empty_exponent = !self.eat_float_exponent();
+                        }
+                        _ => (),
+                    }
                 }
                 LiteralKind::Float {
                     base,
@@ -623,6 +631,7 @@ $foo$hello$world$bar$
 1e-10
 1e+10
 1e10
+4664.E+5
 "#))
     }
 
