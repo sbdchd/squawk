@@ -30,7 +30,7 @@ FROM debian:bookworm-slim
 # Metadata labels
 LABEL org.opencontainers.image.title="Squawk"
 LABEL org.opencontainers.image.description="Linter for PostgreSQL focused on database migrations"
-LABEL org.opencontainers.image.licenses="GPL-3.0"
+LABEL org.opencontainers.image.licenses="Apache-2.0 OR MIT"
 LABEL org.opencontainers.image.source="https://github.com/sbdchd/squawk"
 
 # Create a non-root user to run the application

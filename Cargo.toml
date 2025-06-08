@@ -6,7 +6,7 @@ resolver = "2"
 edition = "2021"
 rust-version = "1.81.0"
 authors = ["Squawk Team & Contributors"]
-license = "GPL-3.0"
+license = "Apache-2.0 OR MIT"
 
 [workspace.dependencies]
 # third party
