@@ -42,7 +42,7 @@
               meta = with lib; {
                 description = "Linter for PostgreSQL, focused on migrations";
                 homepage = "https://github.com/sbdchd/squawk";
-                license = licenses.gpl3Only;
+                license = with licenses; [ asl20 mit ];
                 platforms = platforms.all;
               };
             };

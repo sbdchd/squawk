@@ -7,7 +7,8 @@ name = "squawk-cli"
 description = "Linter for PostgreSQL migrations"
 requires-python = ">=3.8"
 classifiers = [
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: Apache Software License",
+    "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX :: Linux",
