@@ -253,9 +253,12 @@ SOURCE_FILE
     WHITESPACE " "
     NOTHING_KW "nothing"
     WHITESPACE "\n  "
-    RETURNING_KW "returning"
-    WHITESPACE " "
-    STAR "*"
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- returning_many"
@@ -334,42 +337,47 @@ SOURCE_FILE
     WHITESPACE " "
     NOTHING_KW "nothing"
     WHITESPACE "\n  "
-    RETURNING_KW "returning"
-    WHITESPACE " "
-    STAR "*"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
-    WHITESPACE " "
-    ALIAS
-      AS_KW "as"
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
       WHITESPACE " "
-      NAME
-        IDENT "bar"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
-    WHITESPACE " "
-    ALIAS
-      NAME
-        IDENT "b"
-    COMMA ","
-    WHITESPACE " "
-    CALL_EXPR
-      NAME_REF
-        MERGE_ACTION_KW "merge_action"
-      ARG_LIST
-        L_PAREN "("
-        R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    FIELD_EXPR
-      NAME_REF
-        IDENT "t"
-      DOT "."
-      STAR "*"
+      TARGET_LIST
+        TARGET
+          STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "u"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "bar"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "t"
+          WHITESPACE " "
+          NAME
+            IDENT "b"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              MERGE_ACTION_KW "merge_action"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_insert_simple"
@@ -1307,21 +1315,25 @@ SOURCE_FILE
     WHITESPACE "\n  "
     DELETE_KW "DELETE"
     WHITESPACE "\n"
-    RETURNING_KW "RETURNING"
-    WHITESPACE " "
-    CALL_EXPR
-      NAME_REF
-        MERGE_ACTION_KW "merge_action"
-      ARG_LIST
-        L_PAREN "("
-        R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    FIELD_EXPR
-      NAME_REF
-        IDENT "w"
-      DOT "."
-      STAR "*"
+    RETURNING_CLAUSE
+      RETURNING_KW "RETURNING"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NAME_REF
+              MERGE_ACTION_KW "merge_action"
+            ARG_LIST
+              L_PAREN "("
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "w"
+            DOT "."
+            STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_4"

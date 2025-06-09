@@ -531,12 +531,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 POSITIONAL_PARAM "$1"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      INTEGER_KW "integer"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                INTEGER_KW "integer"
           WHITESPACE " "
           AND_KW "AND"
           WHITESPACE " "
@@ -549,12 +548,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 POSITIONAL_PARAM "$2"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      INTEGER_KW "integer"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                INTEGER_KW "integer"
       WHITESPACE "\n    "
       GROUP_BY_CLAUSE
         GROUP_KW "GROUP"

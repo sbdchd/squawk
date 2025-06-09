@@ -343,25 +343,28 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
     WHITESPACE "\n"
-    RETURNING_KW "returning"
-    WHITESPACE " "
-    STAR "*"
-    COMMA ","
-    WHITESPACE " "
-    BIN_EXPR
-      NAME_REF
-        IDENT "foo"
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
       WHITESPACE " "
-      STAR "*"
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
-    WHITESPACE " "
-    ALIAS
-      AS_KW "as"
-      WHITESPACE " "
-      NAME
-        IDENT "bar"
+      TARGET_LIST
+        TARGET
+          STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "foo"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"
@@ -535,18 +538,23 @@ SOURCE_FILE
           LITERAL
             STRING "'2003-07-03'"
     WHITESPACE "\n  "
-    RETURNING_KW "RETURNING"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "temp_lo"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "temp_hi"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "prcp"
+    RETURNING_CLAUSE
+      RETURNING_KW "RETURNING"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "temp_lo"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "temp_hi"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "prcp"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE

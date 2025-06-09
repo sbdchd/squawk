@@ -1141,12 +1141,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'cat'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "tsquery"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "tsquery"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- subnet contain or equal subnet"
@@ -2906,12 +2905,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[{\"a\":\"foo\"},{\"b\":\"bar\"},{\"c\":\"baz\"}]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      JSON_KW "json"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               MINUS "-"
@@ -2931,12 +2929,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\": {\"b\":\"foo\"}}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      JSON_KW "json"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               MINUS "-"
@@ -2958,12 +2955,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[1,2,3]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      JSON_KW "json"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               MINUS "-"
@@ -2984,12 +2980,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\":1,\"b\":2}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      JSON_KW "json"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               MINUS "-"
@@ -3012,12 +3007,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\": {\"b\": [\"foo\",\"bar\"]}}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      JSON_KW "json"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               POUND "#"
@@ -3039,12 +3033,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\": {\"b\": [\"foo\",\"bar\"]}}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      JSON_KW "json"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               POUND "#"
@@ -3067,12 +3060,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'\"foo\"'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               AT "@"
@@ -3081,12 +3073,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'\"foo\"'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -3099,12 +3090,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"b\":2}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               L_ANGLE "<"
@@ -3113,12 +3103,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\":1, \"b\":2}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- existence"
@@ -3133,12 +3122,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\":1, \"b\":2}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               QUESTION "?"
@@ -3157,12 +3145,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[\"a\", \"b\", \"c\"]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               QUESTION "?"
@@ -3183,12 +3170,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\":1, \"b\":2, \"c\":3}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               QUESTION "?"
@@ -3218,12 +3204,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[\"a\", \"b\", \"c\"]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               QUESTION "?"
@@ -3253,12 +3238,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[\"a\", \"b\"]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3267,12 +3251,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[\"a\", \"d\"]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3285,12 +3268,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\": \"b\"}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3299,12 +3281,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"c\": \"d\"}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3317,12 +3298,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[1, 2]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3331,12 +3311,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'3'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3349,12 +3328,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\": \"b\"}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3363,12 +3341,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'42'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3381,12 +3358,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[1, 2]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3400,12 +3376,11 @@ SOURCE_FILE
                 CAST_EXPR
                   LITERAL
                     STRING "'[3, 4]'"
-                  COLON_COLON "::"
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
-                        NAME_REF
-                          IDENT "jsonb"
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+                  NAME_REF
+                    IDENT "jsonb"
                 R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3421,12 +3396,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\": \"b\", \"c\": \"d\"}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             MINUS "-"
             WHITESPACE " "
@@ -3444,12 +3418,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[\"a\", \"b\", \"c\", \"b\"]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             MINUS "-"
             WHITESPACE " "
@@ -3467,25 +3440,23 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\": \"b\", \"c\": \"d\"}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             MINUS "-"
             WHITESPACE " "
             CAST_EXPR
               LITERAL
                 STRING "'{a,c}'"
-              COLON_COLON "::"
-              ARRAY_TYPE
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        TEXT_KW "text"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              INDEX_EXPR
+                NAME_REF
+                  TEXT_KW "text"
                 L_BRACK "["
                 R_BRACK "]"
   SEMICOLON ";"
@@ -3500,12 +3471,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[\"a\", \"b\"]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             MINUS "-"
             WHITESPACE " "
@@ -3525,12 +3495,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[\"a\", {\"b\":1}]'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               POUND "#"
@@ -3552,12 +3521,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"items\": [1, 2, 3]}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               AT "@"
@@ -3579,12 +3547,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"a\":[1,2,3,4,5]}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "jsonb"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               AT "@"
@@ -3638,12 +3605,11 @@ SOURCE_FILE
               CAST_EXPR
                 LITERAL
                   STRING "'[1, \"2\", null]'"
-                COLON_COLON "::"
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        IDENT "jsonb"
+                COLON_COLON
+                  COLON ":"
+                  COLON ":"
+                NAME_REF
+                  IDENT "jsonb"
               R_PAREN ")"
             L_BRACK "["
             LITERAL
@@ -3663,12 +3629,11 @@ SOURCE_FILE
               CAST_EXPR
                 LITERAL
                   STRING "'{\"a\": 1}'"
-                COLON_COLON "::"
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        IDENT "jsonb"
+                COLON_COLON
+                  COLON ":"
+                  COLON ":"
+                NAME_REF
+                  IDENT "jsonb"
               R_PAREN ")"
             L_BRACK "["
             LITERAL
@@ -3690,12 +3655,11 @@ SOURCE_FILE
                   CAST_EXPR
                     LITERAL
                       STRING "'{\"a\": {\"b\": {\"c\": 1}}}'"
-                    COLON_COLON "::"
-                    PATH_TYPE
-                      PATH
-                        PATH_SEGMENT
-                          NAME_REF
-                            IDENT "jsonb"
+                    COLON_COLON
+                      COLON ":"
+                      COLON ":"
+                    NAME_REF
+                      IDENT "jsonb"
                   R_PAREN ")"
                 L_BRACK "["
                 LITERAL
@@ -4085,12 +4049,11 @@ SOURCE_FILE
                   DOT "."
                   NAME_REF
                     IDENT "b"
-                COLON_COLON "::"
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        IDENT "c"
+                COLON_COLON
+                  COLON ":"
+                  COLON ":"
+                NAME_REF
+                  IDENT "c"
             WHITESPACE " "
             COLLATE_KW "collate"
             WHITESPACE " "
@@ -4339,12 +4302,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'[2011-01-01,2011-03-01)'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      IDENT "tsrange"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                IDENT "tsrange"
             WHITESPACE " "
             CUSTOM_OP
               AT "@"
@@ -4353,10 +4315,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'2011-01-10'"
-              COLON_COLON "::"
-              TIME_TYPE
-                NAME_REF
-                  TIMESTAMP_KW "timestamp"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                TIMESTAMP_KW "timestamp"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first contained by second"

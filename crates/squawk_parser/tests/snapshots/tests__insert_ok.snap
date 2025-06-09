@@ -811,10 +811,13 @@ SOURCE_FILE
         STRING "'XYZ Widgets'"
       R_PAREN ")"
     WHITESPACE "\n   "
-    RETURNING_KW "RETURNING"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "did"
+    RETURNING_CLAUSE
+      RETURNING_KW "RETURNING"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "did"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -894,9 +897,12 @@ SOURCE_FILE
                         STRING "'Acme Corporation'"
                 R_PAREN ")"
           WHITESPACE "\n    "
-          RETURNING_KW "RETURNING"
-          WHITESPACE " "
-          STAR "*"
+          RETURNING_CLAUSE
+            RETURNING_KW "RETURNING"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                STAR "*"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"

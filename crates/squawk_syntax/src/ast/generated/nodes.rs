@@ -4940,6 +4940,117 @@ impl IsDistinctFrom {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsJson {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsJson {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsJsonArray {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsJsonArray {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsJsonObject {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsJsonObject {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+    #[inline]
+    pub fn object_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsJsonScalar {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsJsonScalar {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+    #[inline]
+    pub fn scalar_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCALAR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsJsonValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsJsonValue {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+    #[inline]
+    pub fn value_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IsNormalized {
     pub(crate) syntax: SyntaxNode,
 }
@@ -4993,6 +5104,137 @@ impl IsNotDistinctFrom {
     #[inline]
     pub fn not_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNotJson {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNotJson {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNotJsonArray {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNotJsonArray {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNotJsonObject {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNotJsonObject {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn object_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNotJsonScalar {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNotJsonScalar {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn scalar_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SCALAR_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNotJsonValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNotJsonValue {
+    #[inline]
+    pub fn json_keys_unique_clause(&self) -> Option<JsonKeysUniqueClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn json_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JSON_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn value_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUE_KW)
     }
 }
 
@@ -5870,11 +6112,47 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn is_json(&self) -> Option<IsJson> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_json_array(&self) -> Option<IsJsonArray> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_json_object(&self) -> Option<IsJsonObject> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_json_scalar(&self) -> Option<IsJsonScalar> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_json_value(&self) -> Option<IsJsonValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn is_not(&self) -> Option<IsNot> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn is_not_distinct_from(&self) -> Option<IsNotDistinctFrom> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_not_json(&self) -> Option<IsNotJson> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_not_json_array(&self) -> Option<IsNotJsonArray> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_not_json_scalar(&self) -> Option<IsNotJsonScalar> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_not_json_value(&self) -> Option<IsNotJsonValue> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -6870,6 +7148,21 @@ impl ReturnFuncOption {
     #[inline]
     pub fn return_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RETURN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ReturningClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ReturningClause {
+    #[inline]
+    pub fn target_list(&self) -> Option<TargetList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn returning_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RETURNING_KW)
     }
 }
 
@@ -7991,6 +8284,10 @@ pub struct Update {
     pub(crate) syntax: SyntaxNode,
 }
 impl Update {
+    #[inline]
+    pub fn returning_clause(&self) -> Option<ReturningClause> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn update_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::UPDATE_KW)
@@ -12818,6 +13115,96 @@ impl AstNode for IsDistinctFrom {
         &self.syntax
     }
 }
+impl AstNode for IsJson {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_JSON
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsJsonArray {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_JSON_ARRAY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsJsonObject {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_JSON_OBJECT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsJsonScalar {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_JSON_SCALAR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsJsonValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_JSON_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for IsNormalized {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -12858,6 +13245,96 @@ impl AstNode for IsNotDistinctFrom {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::IS_NOT_DISTINCT_FROM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsNotJson {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NOT_JSON
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsNotJsonArray {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NOT_JSON_ARRAY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsNotJsonObject {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NOT_JSON_OBJECT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsNotJsonScalar {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NOT_JSON_SCALAR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsNotJsonValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NOT_JSON_VALUE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14694,6 +15171,24 @@ impl AstNode for ReturnFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::RETURN_FUNC_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ReturningClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::RETURNING_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

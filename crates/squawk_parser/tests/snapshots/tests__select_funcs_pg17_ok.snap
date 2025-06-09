@@ -401,12 +401,11 @@ SOURCE_FILE
             CAST_EXPR
               LITERAL
                 STRING "'{\"favorites\":\n    {\"movies\":\n      [{\"name\": \"One\", \"director\": \"John Doe\"},\n       {\"name\": \"Two\", \"director\": \"Don Joe\"}],\n     \"books\":\n      [{\"name\": \"Mystery\", \"authors\": [{\"name\": \"Brown Dan\"}]},\n       {\"name\": \"Wonder\", \"authors\": [{\"name\": \"Jun Murakami\"}, {\"name\":\"Craig Doe\"}]}]\n}}'"
-              COLON_COLON "::"
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      JSON_KW "json"
+              COLON_COLON
+                COLON ":"
+                COLON ":"
+              NAME_REF
+                JSON_KW "json"
             COMMA ","
             WHITESPACE " "
             LITERAL

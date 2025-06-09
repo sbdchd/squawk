@@ -3641,13 +3641,12 @@ SOURCE_FILE
                   ARRAY_KW "array"
                   L_BRACK "["
                   R_BRACK "]"
-                COLON_COLON "::"
-                ARRAY_TYPE
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
-                        NAME_REF
-                          NUMERIC_KW "numeric"
+                COLON_COLON
+                  COLON ":"
+                  COLON ":"
+                INDEX_EXPR
+                  NAME_REF
+                    NUMERIC_KW "numeric"
                   L_BRACK "["
                   R_BRACK "]"
               R_PAREN ")"
