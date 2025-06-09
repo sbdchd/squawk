@@ -438,7 +438,7 @@ fn opt_json_null_clause(p: &mut Parser<'_>) {
 //   | WITHOUT UNIQUE KEYS
 //   | WITHOUT UNIQUE
 //   | /* EMPTY */
-fn opt_json_key_unique_constraint(p: &mut Parser<'_>) {
+pub(crate) fn opt_json_keys_unique_clause(p: &mut Parser<'_>) {
     if p.at(WITH_KW) || p.at(WITHOUT_KW) {
         let m = p.start();
         p.bump_any();
@@ -512,7 +512,7 @@ fn json_object_fn_arg_list(p: &mut Parser<'_>) {
         }
     }
     opt_json_null_clause(p);
-    opt_json_key_unique_constraint(p);
+    opt_json_keys_unique_clause(p);
     opt_json_returning_clause(p);
 }
 
@@ -520,6 +520,18 @@ fn json_object_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_OBJECT_KW));
     custom_fn(p, JSON_OBJECT_KW, |p| {
         json_object_fn_arg_list(p);
+    })
+}
+
+fn json_objectagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(JSON_OBJECTAGG_KW));
+    custom_fn(p, JSON_OBJECTAGG_KW, |p| {
+        if json_object_arg(p).is_none() {
+            p.error("expected expression");
+        }
+        opt_json_null_clause(p);
+        opt_json_keys_unique_clause(p);
+        opt_json_returning_clause(p);
     })
 }
 
@@ -542,9 +554,12 @@ fn custom_fn(
     name_ref.complete(p, NAME_REF);
     let args = p.start();
     p.expect(L_PAREN);
-    body(p);
+    if !p.at(R_PAREN) {
+        body(p);
+    }
     p.expect(R_PAREN);
     args.complete(p, ARG_LIST);
+    opt_agg_clauses(p);
     m.complete(p, CALL_EXPR)
 }
 
@@ -720,10 +735,6 @@ fn json_table_column(p: &mut Parser<'_>) {
 //  [ RETURNING data_type [ FORMAT JSON [ ENCODING UTF8 ] ] ]
 // )
 fn json_array_fn_arg_list(p: &mut Parser<'_>) {
-    // ()
-    if p.at(R_PAREN) {
-        return;
-    }
     // 1, 2, 3, 4
     while !p.at(EOF) && !p.at(R_PAREN) && !p.at(RETURNING_KW) {
         if p.at_ts(SELECT_FIRST) {
@@ -806,6 +817,8 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         (JSON_EXISTS_KW, L_PAREN) => json_exists_fn(p),
         (JSON_ARRAY_KW, L_PAREN) => json_array_fn(p),
         (JSON_OBJECT_KW, L_PAREN) => json_object_fn(p),
+        (JSON_OBJECTAGG_KW, L_PAREN) => json_objectagg_fn(p),
+        (JSON_ARRAYAGG_KW, L_PAREN) => json_arrayagg_fn(p),
         (JSON_QUERY_KW, L_PAREN) => json_query_fn(p),
         (JSON_SERIALIZE_KW, L_PAREN) => json_serialize_fn(p),
         (JSON_VALUE_KW, L_PAREN) => json_value_fn(p),
@@ -817,6 +830,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         (XMLROOT_KW, L_PAREN) => xmlroot_fn(p),
         (XMLSERIALIZE_KW, L_PAREN) => xmlserialize_fn(p),
         (XMLELEMENT_KW, L_PAREN) => xmlelement_fn(p),
+        (XMLFOREST_KW, L_PAREN) => xmlforest_fn(p),
         (XMLEXISTS_KW, L_PAREN) => xmlexists_fn(p),
         (XMLPARSE_KW, L_PAREN) => xmlparse_fn(p),
         (XMLPI_KW, L_PAREN) => xmlpi_fn(p),
@@ -840,6 +854,19 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
     };
     Some(done)
+}
+
+fn json_arrayagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(JSON_ARRAYAGG_KW));
+    custom_fn(p, JSON_ARRAYAGG_KW, |p| {
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+        opt_json_format_clause(p);
+        opt_order_by_clause(p);
+        opt_json_null_clause(p);
+        opt_json_returning_clause(p);
+    })
 }
 
 fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
@@ -950,17 +977,7 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
         if p.eat(COMMA) {
             if p.eat(XMLATTRIBUTES_KW) {
                 p.expect(L_PAREN);
-                while !p.at(EOF) && !p.at(R_PAREN) {
-                    if expr(p).is_none() {
-                        p.error("expected expression");
-                    }
-                    if p.eat(AS_KW) {
-                        col_label(p);
-                    }
-                    if !p.eat(COMMA) {
-                        break;
-                    }
-                }
+                xml_attribute_list(p);
                 p.expect(R_PAREN);
                 if p.eat(COMMA) && !expr_list(p) {
                     p.error("expected expression list");
@@ -969,6 +986,27 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
                 p.error("expected expression list");
             }
         }
+    })
+}
+
+fn xml_attribute_list(p: &mut Parser<'_>) {
+    while !p.at(EOF) && !p.at(R_PAREN) {
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
+        if p.eat(AS_KW) {
+            col_label(p);
+        }
+        if !p.eat(COMMA) {
+            break;
+        }
+    }
+}
+
+fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(XMLFOREST_KW));
+    custom_fn(p, XMLFOREST_KW, |p| {
+        xml_attribute_list(p);
     })
 }
 
@@ -1040,7 +1078,7 @@ fn json_fn(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected expression");
         }
         opt_json_format_clause(p);
-        opt_json_key_unique_constraint(p);
+        opt_json_keys_unique_clause(p);
     })
 }
 
@@ -1130,11 +1168,10 @@ fn opt_json_behavior_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.expect(ON_KW);
         if !p.eat(ERROR_KW) {
             p.expect(EMPTY_KW);
-            if !opt_json_behavior(p) {
-                p.error("expected json behavior");
+            if opt_json_behavior(p) {
+                p.expect(ON_KW);
+                p.expect(ERROR_KW);
             }
-            p.expect(ON_KW);
-            p.expect(ERROR_KW);
         }
         Some(m.complete(p, JSON_BEHAVIOR_CLAUSE))
     } else {
@@ -1330,6 +1367,66 @@ fn postfix_expr(
             IS_KW if p.at(IS_NORMALIZED)=> {
                 let m = lhs.precede(p);
                 p.bump(IS_NORMALIZED);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_NOT_JSON_OBJECT) => {
+                let m = lhs.precede(p);
+                p.bump(IS_NOT_JSON_OBJECT);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_NOT_JSON_ARRAY) => {
+                let m = lhs.precede(p);
+                p.bump(IS_NOT_JSON_ARRAY);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_NOT_JSON_VALUE) => {
+                let m = lhs.precede(p);
+                p.bump(IS_NOT_JSON_VALUE);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_NOT_JSON_SCALAR) => {
+                let m = lhs.precede(p);
+                p.bump(IS_NOT_JSON_SCALAR);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_NOT_JSON) => {
+                let m = lhs.precede(p);
+                p.bump(IS_NOT_JSON);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_JSON_OBJECT) => {
+                let m = lhs.precede(p);
+                p.bump(IS_JSON_OBJECT);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_JSON_ARRAY) => {
+                let m = lhs.precede(p);
+                p.bump(IS_JSON_ARRAY);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_JSON_VALUE) => {
+                let m = lhs.precede(p);
+                p.bump(IS_JSON_VALUE);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_JSON_SCALAR) => {
+                let m = lhs.precede(p);
+                p.bump(IS_JSON_SCALAR);
+                lhs = m.complete(p, POSTFIX_EXPR);
+                break;
+            }
+            IS_KW if p.at(IS_JSON) => {
+                let m = lhs.precede(p);
+                p.bump(IS_JSON);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
@@ -1685,28 +1782,6 @@ fn json_key_value(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     m.complete(p, JSON_KEY_VALUE)
 }
 
-fn named_arg(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
-    assert!(p.at(FAT_ARROW) || p.at(COLON_EQ));
-    let m = lhs.precede(p);
-    if p.at(COLON_EQ) {
-        p.bump(COLON_EQ);
-    } else {
-        p.bump(FAT_ARROW);
-    }
-    if expr(p).is_none() {
-        p.error("expected expr");
-    }
-    m.complete(p, NAMED_ARG)
-}
-
-fn cast_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
-    assert!(p.at(COLON_COLON));
-    let m = lhs.precede(p);
-    p.bump(COLON_COLON);
-    type_name(p);
-    m.complete(p, CAST_EXPR)
-}
-
 fn arg_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // https://www.postgresql.org/docs/17/typeconv-func.html
     p.eat(VARIADIC_KW);
@@ -1901,6 +1976,16 @@ fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     assert!(p.at(L_PAREN));
     let m = lhs.precede(p);
     arg_list(p);
+    opt_agg_clauses(p);
+    let cm = m.complete(p, CALL_EXPR);
+    if opt_string_literal(p).is_some() {
+        cm.precede(p).complete(p, CAST_EXPR)
+    } else {
+        cm
+    }
+}
+
+fn opt_agg_clauses(p: &mut Parser<'_>) {
     // postgres has:
     // func_expr: func_application within_group_clause filter_clause over_clause
     if p.at(WITHIN_KW) {
@@ -1935,12 +2020,6 @@ fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
             name_ref(p);
         }
         m.complete(p, OVER_CLAUSE);
-    }
-    let cm = m.complete(p, CALL_EXPR);
-    if opt_string_literal(p).is_some() {
-        cm.precede(p).complete(p, CAST_EXPR)
-    } else {
-        cm
     }
 }
 
@@ -2143,6 +2222,26 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         IS_KW if !r.is_disabled && p.at(IS_DISTINCT_FROM) => (4, IS_DISTINCT_FROM, Left),
         // is not distinct from
         IS_KW if !r.is_disabled && p.at(IS_NOT_DISTINCT_FROM) => (4, IS_NOT_DISTINCT_FROM, Left),
+        // is not json
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON) => NOT_AN_OP,
+        // is not json object
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_OBJECT) => NOT_AN_OP,
+        // is not json array
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_ARRAY) => NOT_AN_OP,
+        // is not json value
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_VALUE) => NOT_AN_OP,
+        // is not json scalar
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_SCALAR) => NOT_AN_OP,
+        // is json object
+        IS_KW if !r.is_disabled && p.at(IS_JSON_OBJECT) => NOT_AN_OP,
+        // is json array
+        IS_KW if !r.is_disabled && p.at(IS_JSON_ARRAY) => NOT_AN_OP,
+        // is json value
+        IS_KW if !r.is_disabled && p.at(IS_JSON_VALUE) => NOT_AN_OP,
+        // is json scalar
+        IS_KW if !r.is_disabled && p.at(IS_JSON_SCALAR) => NOT_AN_OP,
+        // is json
+        IS_KW if !r.is_disabled && p.at(IS_JSON) => NOT_AN_OP,
         // at time zone
         AT_KW if p.at(AT_TIME_ZONE) => (11, AT_TIME_ZONE, Left),
         // similar to
@@ -2241,14 +2340,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
             break;
         }
         match op {
-            COLON_COLON => {
-                lhs = cast_expr(p, lhs);
-                continue;
-            }
-            FAT_ARROW | COLON_EQ => {
-                lhs = named_arg(p, lhs);
-                continue;
-            }
+            // TODO: is this right?
             COLON | VALUE_KW => {
                 lhs = json_key_value(p, lhs);
                 continue;
@@ -2262,7 +2354,16 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
             Associativity::Right => op_bp,
         };
         let _ = expr_bp(p, op_bp, r);
-        lhs = m.complete(p, BIN_EXPR);
+        lhs = m.complete(
+            p,
+            if op == SyntaxKind::COLON_COLON {
+                CAST_EXPR
+            } else if matches!(op, FAT_ARROW | COLON_EQ) {
+                NAMED_ARG
+            } else {
+                BIN_EXPR
+            },
+        );
     }
     Some(lhs)
 }
@@ -4365,8 +4466,22 @@ const EXPR_FIRST: TokenSet = LHS_FIRST;
 const ATTRIBUTE_FIRST: TokenSet = TokenSet::new(&[POUND, GROUP_KW]);
 
 const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
-    SELECT_KW, FROM_KW, WHERE_KW, LIMIT_KW, ORDER_KW, OFFSET_KW, GROUP_KW, INTO_KW, HAVING_KW,
-    WINDOW_KW, HAVING_KW, FETCH_KW, FOR_KW, R_PAREN, R_BRACK,
+    SELECT_KW,
+    FROM_KW,
+    WHERE_KW,
+    LIMIT_KW,
+    ORDER_KW,
+    OFFSET_KW,
+    GROUP_KW,
+    INTO_KW,
+    HAVING_KW,
+    WINDOW_KW,
+    HAVING_KW,
+    FETCH_KW,
+    FOR_KW,
+    R_PAREN,
+    R_BRACK,
+    RETURNING_KW,
 ])
 .union(COMPOUND_SELECT_FIRST);
 
@@ -4848,9 +4963,7 @@ fn begin(p: &mut Parser<'_>) -> CompletedMarker {
 // Sconst
 fn opt_string_literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at_ts(STRING_FIRST) {
-        let m = p.start();
-        p.bump_any();
-        Some(m.complete(p, LITERAL))
+        literal(p)
     } else {
         None
     }
@@ -12138,20 +12251,30 @@ fn opt_where_current_of(p: &mut Parser<'_>) {
 }
 
 fn opt_returning_clause(p: &mut Parser<'_>) {
-    if p.eat(RETURNING_KW) {
-        while !p.at(EOF) {
-            if !p.eat(STAR) {
-                if expr(p).is_none() {
-                    p.error("expected output expression");
-                } else {
-                    opt_alias(p);
-                }
+    if p.at(RETURNING_KW) {
+        let m = p.start();
+        p.bump(RETURNING_KW);
+        if p.eat(WITH_KW) {
+            p.expect(L_PAREN);
+            returning_option(p);
+            while !p.at(EOF) && p.eat(COMMA) {
+                returning_option(p);
             }
-            if !p.eat(COMMA) {
-                break;
-            }
+            p.expect(R_PAREN);
         }
+        if opt_target_list(p).is_none() {
+            p.error("expected target");
+        }
+        m.complete(p, RETURNING_CLAUSE);
     }
+}
+
+fn returning_option(p: &mut Parser<'_>) {
+    if !p.eat(OLD_KW) && !p.eat(NEW_KW) {
+        p.error("expected OLD or NEW");
+    }
+    p.expect(AS_KW);
+    name(p);
 }
 
 // DROP TYPE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]

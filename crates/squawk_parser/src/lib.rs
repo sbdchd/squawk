@@ -189,8 +189,7 @@ impl<'t> Parser<'t> {
             return false;
         }
         let n_raw_tokens = match kind {
-            SyntaxKind::COLON_COLON
-            | SyntaxKind::COLON_EQ
+            SyntaxKind::COLON_EQ
             | SyntaxKind::NEQ
             | SyntaxKind::NEQB
             | SyntaxKind::LTEQ
@@ -242,6 +241,106 @@ impl<'t> Parser<'t> {
                 }
                 self.bump(SyntaxKind::NORMALIZED_KW);
                 m.complete(self, SyntaxKind::IS_NORMALIZED);
+                return true;
+            }
+            SyntaxKind::COLON_COLON => {
+                let m = self.start();
+                self.bump(SyntaxKind::COLON);
+                self.bump(SyntaxKind::COLON);
+                m.complete(self, SyntaxKind::COLON_COLON);
+                return true;
+            }
+            SyntaxKind::IS_JSON => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_JSON);
+                return true;
+            }
+            SyntaxKind::IS_NOT_JSON => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::NOT_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_NOT_JSON);
+                return true;
+            }
+            SyntaxKind::IS_NOT_JSON_OBJECT => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::NOT_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                self.bump(SyntaxKind::OBJECT_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_NOT_JSON_OBJECT);
+                return true;
+            }
+            SyntaxKind::IS_NOT_JSON_ARRAY => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::NOT_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                self.bump(SyntaxKind::ARRAY_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_NOT_JSON_ARRAY);
+                return true;
+            }
+            SyntaxKind::IS_NOT_JSON_VALUE => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::NOT_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                self.bump(SyntaxKind::VALUE_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_NOT_JSON_VALUE);
+                return true;
+            }
+            SyntaxKind::IS_NOT_JSON_SCALAR => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::NOT_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                self.bump(SyntaxKind::SCALAR_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_NOT_JSON_SCALAR);
+                return true;
+            }
+            SyntaxKind::IS_JSON_OBJECT => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                self.bump(SyntaxKind::OBJECT_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_JSON_OBJECT);
+                return true;
+            }
+            SyntaxKind::IS_JSON_ARRAY => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                self.bump(SyntaxKind::ARRAY_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_JSON_ARRAY);
+                return true;
+            }
+            SyntaxKind::IS_JSON_VALUE => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                self.bump(SyntaxKind::VALUE_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_JSON_VALUE);
+                return true;
+            }
+            SyntaxKind::IS_JSON_SCALAR => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::JSON_KW);
+                self.bump(SyntaxKind::SCALAR_KW);
+                grammar::opt_json_keys_unique_clause(self);
+                m.complete(self, SyntaxKind::IS_JSON_SCALAR);
                 return true;
             }
             SyntaxKind::IS_NOT_DISTINCT_FROM => {
@@ -430,7 +529,7 @@ impl<'t> Parser<'t> {
         if kind == SyntaxKind::EOF {
             return;
         }
-        self.bump(kind);
+        self.do_bump(kind, 1);
     }
 
     /// Advances the parser by one token
@@ -682,6 +781,80 @@ impl<'t> Parser<'t> {
                 SyntaxKind::OPERATOR_KW,
                 SyntaxKind::L_PAREN,
                 TrivaBetween::Allowed,
+            ),
+            // is json
+            SyntaxKind::IS_JSON => self.at_composite2(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::JSON_KW,
+                TrivaBetween::Allowed,
+            ),
+            // is not json
+            SyntaxKind::IS_NOT_JSON => self.at_composite3(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::NOT_KW,
+                SyntaxKind::JSON_KW,
+            ),
+            // is not json object
+            SyntaxKind::IS_NOT_JSON_OBJECT => self.at_composite4(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::NOT_KW,
+                SyntaxKind::JSON_KW,
+                SyntaxKind::OBJECT_KW,
+            ),
+            // is not json array
+            SyntaxKind::IS_NOT_JSON_ARRAY => self.at_composite4(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::NOT_KW,
+                SyntaxKind::JSON_KW,
+                SyntaxKind::ARRAY_KW,
+            ),
+            // is not json value
+            SyntaxKind::IS_NOT_JSON_VALUE => self.at_composite4(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::NOT_KW,
+                SyntaxKind::JSON_KW,
+                SyntaxKind::VALUE_KW,
+            ),
+            // is not json scalar
+            SyntaxKind::IS_NOT_JSON_SCALAR => self.at_composite4(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::NOT_KW,
+                SyntaxKind::JSON_KW,
+                SyntaxKind::SCALAR_KW,
+            ),
+            // is json object
+            SyntaxKind::IS_JSON_OBJECT => self.at_composite3(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::JSON_KW,
+                SyntaxKind::OBJECT_KW,
+            ),
+            // is json array
+            SyntaxKind::IS_JSON_ARRAY => self.at_composite3(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::JSON_KW,
+                SyntaxKind::ARRAY_KW,
+            ),
+            // is json value
+            SyntaxKind::IS_JSON_VALUE => self.at_composite3(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::JSON_KW,
+                SyntaxKind::VALUE_KW,
+            ),
+            // is json scalar
+            SyntaxKind::IS_JSON_SCALAR => self.at_composite3(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::JSON_KW,
+                SyntaxKind::SCALAR_KW,
             ),
             // <=
             SyntaxKind::LTEQ => self.at_composite2(

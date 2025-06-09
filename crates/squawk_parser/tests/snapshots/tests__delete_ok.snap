@@ -152,9 +152,12 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "10"
     WHITESPACE "\n  "
-    RETURNING_KW "returning"
-    WHITESPACE " "
-    STAR "*"
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using"
@@ -345,9 +348,12 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "10"
     WHITESPACE "\n  "
-    RETURNING_KW "returning"
-    WHITESPACE " "
-    STAR "*"
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- returning"
@@ -411,30 +417,35 @@ SOURCE_FILE
           WHITESPACE "\n"
           R_PAREN ")"
     WHITESPACE "\n"
-    RETURNING_KW "returning"
-    WHITESPACE " "
-    FIELD_EXPR
-      NAME_REF
-        IDENT "e"
-      DOT "."
-      NAME_REF
-        IDENT "employee_id"
-    COMMA ","
-    WHITESPACE " "
-    FIELD_EXPR
-      NAME_REF
-        IDENT "e"
-      DOT "."
-      NAME_REF
-        NAME_KW "name"
-    COMMA ","
-    WHITESPACE " "
-    FIELD_EXPR
-      NAME_REF
-        IDENT "e"
-      DOT "."
-      NAME_REF
-        IDENT "department_id"
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "e"
+            DOT "."
+            NAME_REF
+              IDENT "employee_id"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "e"
+            DOT "."
+            NAME_REF
+              NAME_KW "name"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "e"
+            DOT "."
+            NAME_REF
+              IDENT "department_id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cursor"
@@ -472,26 +483,31 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " \n"
-    RETURNING_KW "returning"
-    WHITESPACE " "
-    STAR "*"
-    COMMA ","
-    WHITESPACE " "
-    BIN_EXPR
-      NAME_REF
-        IDENT "foo"
+    RETURNING_CLAUSE
+      RETURNING_KW "returning"
       WHITESPACE " "
-      PLUS "+"
-      WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
-    COMMA ","
-    WHITESPACE " "
-    FIELD_EXPR
-      NAME_REF
-        IDENT "foo"
-      DOT "."
-      STAR "*"
+      TARGET_LIST
+        TARGET
+          STAR "*"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          BIN_EXPR
+            NAME_REF
+              IDENT "foo"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "bar"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          FIELD_EXPR
+            NAME_REF
+              IDENT "foo"
+            DOT "."
+            STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- with"
@@ -875,9 +891,12 @@ SOURCE_FILE
         LITERAL
           STRING "'DONE'"
     WHITESPACE " "
-    RETURNING_KW "RETURNING"
-    WHITESPACE " "
-    STAR "*"
+    RETURNING_CLAUSE
+      RETURNING_KW "RETURNING"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE

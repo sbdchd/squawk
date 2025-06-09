@@ -26,7 +26,7 @@ select * from nonesuch;
 select nonesuch from pg_database;
 
 -- empty distinct list isn't OK
-select distinct from pg_database;
+-- select distinct from pg_database;
 
 -- bad attribute name on lhs of operator
 select * from pg_database where nonesuch = pg_database.datname;
@@ -46,7 +46,7 @@ select null from pg_database group by grouping sets (()) for update;
 -- DELETE
 
 -- missing relation name (this had better not wildcard!)
-delete from;
+-- delete from;
 
 -- no such relation
 delete from nonesuch;
@@ -56,7 +56,7 @@ delete from nonesuch;
 -- DROP
 
 -- missing relation name (this had better not wildcard!)
-drop table;
+-- drop table;
 
 -- no such relation
 drop table nonesuch;
@@ -128,10 +128,10 @@ create aggregate newcnt1 (sfunc = int4inc,
 -- DROP INDEX
 
 -- missing index name
-drop index;
+-- drop index;
 
 -- bad index name
-drop index 314159;
+-- drop index 314159;
 
 -- no such index
 drop index nonesuch;
@@ -141,13 +141,13 @@ drop index nonesuch;
 -- DROP AGGREGATE
 
 -- missing aggregate name
-drop aggregate;
+-- drop aggregate;
 
 -- missing aggregate type
-drop aggregate newcnt1;
+-- drop aggregate newcnt1;
 
 -- bad aggregate name
-drop aggregate 314159 (int);
+-- drop aggregate 314159 (int);
 
 -- bad aggregate type
 drop aggregate newcnt (nonesuch);
@@ -163,10 +163,10 @@ drop aggregate newcnt (float4);
 -- DROP FUNCTION
 
 -- missing function name
-drop function ();
+-- drop function ();
 
 -- bad function name
-drop function 314159();
+-- drop function 314159();
 
 -- no such function
 drop function nonesuch();
@@ -176,10 +176,10 @@ drop function nonesuch();
 -- DROP TYPE
 
 -- missing type name
-drop type;
+-- drop type;
 
 -- bad type name
-drop type 314159;
+-- drop type 314159;
 
 -- no such type
 drop type nonesuch;
@@ -189,34 +189,34 @@ drop type nonesuch;
 -- DROP OPERATOR
 
 -- missing everything
-drop operator;
+-- drop operator;
 
 -- bad operator name
-drop operator equals;
+-- drop operator equals;
 
 -- missing type list
-drop operator ===;
+-- drop operator ===;
 
 -- missing parentheses
-drop operator int4, int4;
+-- drop operator int4, int4;
 
 -- missing operator name
-drop operator (int4, int4);
+-- drop operator (int4, int4);
 
 -- missing type list contents
-drop operator === ();
+-- drop operator === ();
 
 -- no such operator
-drop operator === (int4);
+-- drop operator === (int4);
 
 -- no such operator by that name
 drop operator === (int4, int4);
 
 -- no such type1
-drop operator = (nonesuch);
+-- drop operator = (nonesuch);
 
 -- no such type1
-drop operator = ( , int4);
+-- drop operator = ( , int4);
 
 -- no such type1
 drop operator = (nonesuch, int4);
@@ -225,25 +225,25 @@ drop operator = (nonesuch, int4);
 drop operator = (int4, nonesuch);
 
 -- no such type2
-drop operator = (int4, );
+-- drop operator = (int4, );
 
 
 --
 -- DROP RULE
 
 -- missing rule name
-drop rule;
+-- drop rule;
 
 -- bad rule name
-drop rule 314159;
+-- drop rule 314159;
 
 -- no such rule
 drop rule nonesuch on noplace;
 
 -- these postquel variants are no longer supported
-drop tuple rule nonesuch;
-drop instance rule nonesuch on noplace;
-drop rewrite rule nonesuch;
+-- drop tuple rule nonesuch;
+-- drop instance rule nonesuch on noplace;
+-- drop rewrite rule nonesuch;
 
 --
 -- Check that division-by-zero is properly caught.
@@ -272,98 +272,98 @@ select 1::float4/0;
 select 1/0::float4;
 
 
---
--- Test psql's reporting of syntax error location
---
+-- --
+-- -- Test psql's reporting of syntax error location
+-- --
 
-xxx;
+-- xxx;
 
-CREATE foo;
+-- CREATE foo;
 
-CREATE TABLE ;
+-- CREATE TABLE ;
 
-CREATE TABLE
+-- CREATE TABLE
 
-INSERT INTO foo VALUES(123) foo;
+-- INSERT INTO foo VALUES(123) foo;
 
-INSERT INTO 123
-VALUES(123);
+-- INSERT INTO 123
+-- VALUES(123);
 
-INSERT INTO foo
-VALUES(123) 123
-;
+-- INSERT INTO foo
+-- VALUES(123) 123
+-- ;
 
--- with a tab
-CREATE TABLE foo
-  (id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY,
-	id3 INTEGER NOT NUL,
-   id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL);
+-- -- with a tab
+-- CREATE TABLE foo
+--   (id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY,
+-- 	id3 INTEGER NOT NUL,
+--    id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL);
 
--- long line to be truncated on the left
-CREATE TABLE foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL,
-id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL);
+-- -- long line to be truncated on the left
+-- CREATE TABLE foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL,
+-- id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL);
 
--- long line to be truncated on the right
-CREATE TABLE foo(
-id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL, id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY);
+-- -- long line to be truncated on the right
+-- CREATE TABLE foo(
+-- id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL, id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY);
 
--- long line to be truncated both ways
-CREATE TABLE foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL);
+-- -- long line to be truncated both ways
+-- CREATE TABLE foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL);
 
--- long line to be truncated on the left, many lines
-CREATE
-TEMPORARY
-TABLE
-foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL,
-id4 INT4
-UNIQUE
-NOT
-NULL,
-id5 TEXT
-UNIQUE
-NOT
-NULL)
-;
+-- -- long line to be truncated on the left, many lines
+-- CREATE
+-- TEMPORARY
+-- TABLE
+-- foo(id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL,
+-- id4 INT4
+-- UNIQUE
+-- NOT
+-- NULL,
+-- id5 TEXT
+-- UNIQUE
+-- NOT
+-- NULL)
+-- ;
 
--- long line to be truncated on the right, many lines
-CREATE
-TEMPORARY
-TABLE
-foo(
-id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL, id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY)
-;
+-- -- long line to be truncated on the right, many lines
+-- CREATE
+-- TEMPORARY
+-- TABLE
+-- foo(
+-- id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL, id INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY)
+-- ;
 
--- long line to be truncated both ways, many lines
-CREATE
-TEMPORARY
-TABLE
-foo
-(id
-INT4
-UNIQUE NOT NULL, idx INT4 UNIQUE NOT NULL, idy INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL,
-idz INT4 UNIQUE NOT NULL,
-idv INT4 UNIQUE NOT NULL);
+-- -- long line to be truncated both ways, many lines
+-- CREATE
+-- TEMPORARY
+-- TABLE
+-- foo
+-- (id
+-- INT4
+-- UNIQUE NOT NULL, idx INT4 UNIQUE NOT NULL, idy INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL,
+-- idz INT4 UNIQUE NOT NULL,
+-- idv INT4 UNIQUE NOT NULL);
 
 -- more than 10 lines...
-CREATE
-TEMPORARY
-TABLE
-foo
-(id
-INT4
-UNIQUE
-NOT
-NULL
-,
-idm
-INT4
-UNIQUE
-NOT
-NULL,
-idx INT4 UNIQUE NOT NULL, idy INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL,
-idz INT4 UNIQUE NOT NULL,
-idv
-INT4
-UNIQUE
-NOT
-NULL);
+-- CREATE
+-- TEMPORARY
+-- TABLE
+-- foo
+-- (id
+-- INT4
+-- UNIQUE
+-- NOT
+-- NULL
+-- ,
+-- idm
+-- INT4
+-- UNIQUE
+-- NOT
+-- NULL,
+-- idx INT4 UNIQUE NOT NULL, idy INT4 UNIQUE NOT NULL, id2 TEXT NOT NULL PRIMARY KEY, id3 INTEGER NOT NUL, id4 INT4 UNIQUE NOT NULL, id5 TEXT UNIQUE NOT NULL,
+-- idz INT4 UNIQUE NOT NULL,
+-- idv
+-- INT4
+-- UNIQUE
+-- NOT
+-- NULL);

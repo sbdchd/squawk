@@ -2,29 +2,4 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/rules.sql
 ---
-ERROR@43277: expected an expression, found WITH_KW
-ERROR@43281: expected output expression
-ERROR@43282: expected command, found L_PAREN
-ERROR@43283: expected command, found OLD_KW
-ERROR@43287: expected command, found AS_KW
-ERROR@43290: expected command, found IDENT
-ERROR@43291: expected command, found COMMA
-ERROR@43293: expected command, found NEW_KW
-ERROR@43297: expected command, found AS_KW
-ERROR@43300: expected command, found IDENT
-ERROR@43301: expected command, found R_PAREN
-ERROR@43306: expected command, found MERGE_ACTION_KW
-ERROR@43318: expected command, found L_PAREN
-ERROR@43319: expected command, found R_PAREN
-ERROR@43321: expected command, found AS_KW
-ERROR@43324: expected command, found ACTION_KW
-ERROR@43330: expected command, found COMMA
-ERROR@43332: expected command, found STAR
-ERROR@43333: expected command, found COMMA
-ERROR@43335: expected command, found IDENT
-ERROR@43336: expected command, found DOT
-ERROR@43337: expected command, found STAR
-ERROR@43338: expected command, found COMMA
-ERROR@43340: expected command, found IDENT
-ERROR@43341: expected command, found DOT
-ERROR@43342: expected command, found STAR
+

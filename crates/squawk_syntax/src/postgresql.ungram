@@ -34,7 +34,7 @@ ParamVariadic =
   'variadic'
 
 ParamInOut =
-  'in' 'out' 
+  'in' 'out'
 | 'inout'
 
 ParamIn =
@@ -72,7 +72,7 @@ CallExpr =
 CastExpr =
   Expr ColonColon Type
 
-ArrayExpr = 
+ArrayExpr =
   'array' '[' (Expr (',' Expr)*) ']'
 | 'array' '(' Select ')'
 
@@ -152,10 +152,10 @@ ColonEq =
 ColonColon =
   ':' ':'
 
-Neq = 
+Neq =
  '!' '='
 
-SimilarTo = 
+SimilarTo =
   'similar' 'to'
 
 AtTimeZone =
@@ -165,7 +165,37 @@ IsNot =
   'is' 'not'
 
 Op =
-'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | 'ilike' | NotLike | NotIlike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | AtTimeZone
+'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | 'ilike' | NotLike | NotIlike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | AtTimeZone | IsJson | IsJsonValue | IsNotJson | IsJsonObject | IsJsonArray |IsJsonScalar | IsNotJsonValue | IsJsonObject | IsNotJsonArray | IsNotJsonScalar
+
+IsJson =
+  'is' 'json' JsonKeysUniqueClause?
+
+IsNotJson =
+  'is' 'not' 'json' JsonKeysUniqueClause?
+
+IsNotJsonValue =
+  'is' 'not' 'json' 'value' JsonKeysUniqueClause?
+
+IsNotJsonObject =
+  'is' 'not' 'json' 'object' JsonKeysUniqueClause?
+
+IsNotJsonArray =
+  'is' 'not' 'json' 'array' JsonKeysUniqueClause?
+
+IsNotJsonScalar =
+  'is' 'not' 'json' 'scalar' JsonKeysUniqueClause?
+
+IsJsonValue =
+  'is' 'json' 'value' JsonKeysUniqueClause?
+
+IsJsonObject =
+  'is' 'json' 'object' JsonKeysUniqueClause?
+
+IsJsonArray =
+  'is' 'json' 'array' JsonKeysUniqueClause?
+
+IsJsonScalar =
+  'is' 'json' 'scalar' JsonKeysUniqueClause?
 
 BinExpr =
   lhs:Expr Op rhs:Expr
@@ -210,13 +240,13 @@ BitType =
 DoubleType =
   'double' 'precision'
 
-TimeType = 
+TimeType =
   ('time' | 'timestamp')
   NameRef
   ('(' Literal ')')?
   (WithTimezone | WithoutTimezone)?
 
-IntervalType = 
+IntervalType =
   'interval'
   (
     'year'
@@ -234,7 +264,7 @@ IntervalType =
   | 'minute' 'to' 'second'
   )
   ('(' Literal ')')?
-  
+
 
 Type =
   ArrayType
@@ -263,9 +293,9 @@ Column =
 
 UniqueConstraint =
   ('constraint' NameRef)
-  'unique' 
+  'unique'
   (
-    UsingIndex 
+    UsingIndex
   | ( 'nulls' 'not'? 'distinct' )? ColumnList
   )
 
@@ -315,7 +345,7 @@ MatchType =
   MatchFull
 | MatchPartial
 | MatchSimple
-  
+
 
 ForeignKeyConstraint =
   'foreign' 'key' from_columns:ColumnList 'references' Path to_columns:ColumnList
@@ -380,8 +410,8 @@ GeneratedConstraint =
 
 ReferencesConstraint =
   ('constraint' NameRef)
-  'references' Path '(' NameRef ')' 
-  MatchType? 
+  'references' Path '(' NameRef ')'
+  MatchType?
   OnDeleteAction?
   OnUpdateAction?
 
@@ -436,10 +466,10 @@ RelationName =
   'only' ( '(' Path ')' | Path )
 | Path '*'
 
-TableList = 
+TableList =
   RelationName (',' RelationName)*
 
-Truncate = 
+Truncate =
   'truncate' 'table'? TableList
   ('restart' 'identity' | 'continue' 'identity')?
   ('cascade' | 'restrict')?
@@ -506,7 +536,7 @@ Alias =
 SequenceOptionList =
   '(' ')'
 
-ColumnList = 
+ColumnList =
   '(' ')'
 
 ConstraintIncludeClause =
@@ -558,7 +588,7 @@ ReadCommitted =
 ReadUncommitted =
   'read' 'uncommitted'
 
-TransactionModeIsolationLevel = 
+TransactionModeIsolationLevel =
   'isolation' 'level' ( Serializable | RepeatableRead | ReadCommitted | ReadUncommitted )
 
 ReadWrite =
@@ -598,7 +628,7 @@ CreateAggregate =
 
 IfExists =
  'if' 'exists'
-  
+
 DropType =
   'drop' 'type' IfExists? (Path (',' Path)*) ('cascade' | 'restrict')?
 
@@ -625,7 +655,7 @@ OrReplace =
 
 RetType =
   'returns' Type
- 
+
 BeginFuncOption =
   'begin' 'atomic' 'end'
 
@@ -655,12 +685,12 @@ FuncOption =
 
 
 
-CreateFunction = 
+CreateFunction =
   'create' OrReplace? 'function' Path ParamList RetType? option_list:FuncOptionList
 
 SetDefault =
-  'set' 'default' Expr 
-  
+  'set' 'default' Expr
+
 DropDefault =
   'drop' 'default'
 
@@ -670,7 +700,7 @@ SetNotNull =
 DropNotNull =
   'drop' 'not' 'null'
 
-NotValid = 
+NotValid =
   'not' 'valid'
 
 Constraint =
@@ -685,7 +715,7 @@ Constraint =
 | NotNullConstraint
 
 AddConstraint =
-  'add' Constraint 
+  'add' Constraint
   DeferrableConstraintOption?
   NotDeferrableConstraintOption?
   InitiallyDeferredConstraintOption?
@@ -698,7 +728,7 @@ AddConstraint =
 DropConstraint =
   'drop' Constraint IfExists? NameRef ('restrict' | 'cascade')?
 
-RenameConstraint = 
+RenameConstraint =
   'rename' 'constraint' NameRef 'to' Name
 
 ValidateConstraint =
@@ -735,7 +765,7 @@ AlterTable =
 Revoke =
   'revoke'
 
-Values = 
+Values =
   'values'
 
 Table =
@@ -746,6 +776,11 @@ Insert =
 
 Update =
   'update'
+  ReturningClause?
+
+ReturningClause =
+  'returning'
+  TargetList?
 
 Delete =
   'delete'
@@ -867,13 +902,13 @@ SelectInto =
   FilterClause?
 
 IntoClause =
-  'into' 
+  'into'
 
 LockingClause =
   'for'
 
 OrderByClause =
-  'order' 'by' 
+  'order' 'by'
 
 FromItem =
   'only'?
@@ -886,10 +921,10 @@ ConstraintIndexMethod =
   'using'
 
 ConstraintExclusions =
-  'exclude' 
+  'exclude'
 
 ConstraintWhereClause =
-  'where' 
+  'where'
 
 ExcludeConstraint =
   'exclude' ConstraintIndexMethod? ConstraintExclusions
@@ -898,7 +933,7 @@ WindowDef =
   '#ident'? ('partition' 'by' Expr)?
 
 AlterStatistics =
-  'alter' 'statistics' NameRef 
+  'alter' 'statistics' NameRef
 
 AlterServer =
   'alter' 'server' NameRef
@@ -970,19 +1005,19 @@ AlterDefaultPrivileges =
   'alter' 'default' 'privileges'
 
 AlterDatabase =
-  'alter' 'database' NameRef 
+  'alter' 'database' NameRef
 
 AlterConversion =
   'alter' 'conversion' NameRef
 
 AlterCollation =
-  'alter' 'collation' NameRef 
+  'alter' 'collation' NameRef
 
 AlterAggregate =
   'alter' 'aggregate' Aggregate
 
 AlterSubscription =
-  'alter' 'subscription' NameRef 
+  'alter' 'subscription' NameRef
 
 AlterSystem =
   'alter' 'system' 'set'
@@ -1000,13 +1035,13 @@ AlterTextSearchConfiguration =
   'alter' 'text' 'search' 'configuration' NameRef
 
 AlterTextSearchTemplate =
-  'alter' 'text' 'search' 'template' NameRef 
+  'alter' 'text' 'search' 'template' NameRef
 
 AlterTrigger =
   'alter' 'trigger' NameRef 'on'
 
 AlterType =
-  'alter' 'type' Type 
+  'alter' 'type' Type
 
 AlterUser =
   'alter' 'user' NameRef
@@ -1061,7 +1096,7 @@ CreateLanguage =
   'create' 'language' NameRef
 
 CreateOperator =
-  'create' 'operator' 
+  'create' 'operator'
 
 CreateOperatorClass =
   'create' 'operator' 'class' NameRef 'default'? 'for' 'type' Type 'using' NameRef
@@ -1103,13 +1138,13 @@ CreateTextSearchParser =
   'create' 'text' 'search' 'parser' NameRef
 
 CreateTextSearchDictionary =
-  'create' 'text' 'search' 'dictionary' NameRef 
+  'create' 'text' 'search' 'dictionary' NameRef
 
 CreateTextSearchConfiguration =
   'create' 'text' 'search' 'configuration' NameRef
 
 CreateTextSearchTemplate =
-  'create' 'text' 'search' 'template' NameRef 
+  'create' 'text' 'search' 'template' NameRef
 
 CreateTransform =
   'create' 'transform' 'for' Type 'language' NameRef
@@ -1163,25 +1198,25 @@ DropExtension =
   'drop' 'extension' IfExists? (NameRef (',' NameRef)*)
 
 DropMaterializedView =
-  'drop' 'materialized' 'view' IfExists? 
+  'drop' 'materialized' 'view' IfExists?
 
 DropOperatorFamily =
-  'drop' 'operator' 'family' IfExists? 
+  'drop' 'operator' 'family' IfExists?
 
 DropOperator =
-  'drop' 'operator' IfExists? 
+  'drop' 'operator' IfExists?
 
 DropOperatorClass =
-  'drop' 'operator' 'class' IfExists? NameRef 'using' 
+  'drop' 'operator' 'class' IfExists? NameRef 'using'
 
 DropOwned =
-  'drop' 'owned' 'by' 
+  'drop' 'owned' 'by'
 
 DropPolicy =
   'drop' 'policy' IfExists? NameRef 'on'
 
 DropProcedure =
-  'drop' 'procedure' IfExists? 
+  'drop' 'procedure' IfExists?
 
 DropPublication =
   'drop' 'publication' IfExists? (NameRef (',' NameRef)*)
@@ -1217,13 +1252,13 @@ DropTextSearchConfig =
   'drop' 'text' 'search' 'configuration' IfExists?
 
 DropTextSearchDict =
-  'drop' 'text' 'search' 'dictionary' IfExists? 
+  'drop' 'text' 'search' 'dictionary' IfExists?
 
 DropTextSearchTemplate =
-  'drop' 'text' 'search' 'template' IfExists? 
+  'drop' 'text' 'search' 'template' IfExists?
 
 DropTransform =
-  'drop' 'transform' IfExists? 
+  'drop' 'transform' IfExists?
 
 DropUser =
   'drop' 'user' IfExists? (NameRef (',' NameRef)*)
@@ -1232,49 +1267,49 @@ DropUserMapping =
   'drop' 'user' 'mapping' IfExists? 'for' NameRef 'server' NameRef
 
 DropView =
-  'drop' 'view' IfExists? 
+  'drop' 'view' IfExists?
 
 Explain =
-  'explain' 
+  'explain'
 
 ImportForeignSchema =
-  'import' 'foreign' 'schema' NameRef 
+  'import' 'foreign' 'schema' NameRef
 
 Lock =
-  'lock' 'table'? 
+  'lock' 'table'?
 
 Reassign =
-  'reassign' 
+  'reassign'
 
 Refresh =
   'refresh' 'materialized' 'view' 'concurrently'? NameRef 'with' 'data'?
 
 Grant =
-  'grant' 
+  'grant'
 
 SecurityLabel =
-  'security' 'label' 
+  'security' 'label'
 
 SetConstraints =
-  'set' 'constraints' 
+  'set' 'constraints'
 
 SetRole =
-  'set' 'role' 
+  'set' 'role'
 
 SetSessionAuth =
   'set' 'session' 'authorization'
 
 SetTransaction =
-  'set' 'transaction' 
+  'set' 'transaction'
 
 Reindex =
-  'reindex' 
+  'reindex'
 
 CreateView =
-  'create' 'view' NameRef 
+  'create' 'view' NameRef
 
 Prepare =
-  'prepare' NameRef 
+  'prepare' NameRef
 
 Unlisten =
   'unlisten' ('*' | NameRef)
@@ -1286,7 +1321,7 @@ Deallocate =
   'deallocate' ('prepare' NameRef | 'all')
 
 Load =
-  'load' 
+  'load'
 
 Listen =
   'listen' NameRef
@@ -1298,43 +1333,43 @@ Discard =
   'discard' ('all' | 'temp' | 'temporary' | 'plans' | 'sequences')
 
 Do =
-  'do' 
+  'do'
 
 Move =
-  'move' 
+  'move'
 
 Fetch =
-  'fetch' 
+  'fetch'
 
 Close =
-  'close' 
+  'close'
 
 Vacuum =
-  'vacuum' 
+  'vacuum'
 
 Copy =
   'copy'
 
 Call =
-  'call' 
+  'call'
 
 CreateTrigger =
-  'create' 
+  'create'
 
 DropSchema =
   'drop' 'schema' IfExists?
 
 CreateSchema =
-  'create' 'schema' 
+  'create' 'schema'
 
 DropTrigger =
-  'drop' 'trigger' IfExists? NameRef 'on' 
+  'drop' 'trigger' IfExists? NameRef 'on'
 
 IndexParams =
   '(' ')'
 
 CreateType =
-  'create' 'type' Type 
+  'create' 'type' Type
 
 CreateExtension =
   'create' 'extension'
@@ -1343,13 +1378,13 @@ Set =
   'set' SetOptions
 
 Show =
-  'show' 
+  'show'
 
 LanguageFuncOption =
   'language' NameRef
 
 TransformFuncOption =
-  'transform' 
+  'transform'
 
 WindowFuncOption =
   'window'
@@ -1373,22 +1408,22 @@ ParallelFuncOption =
   'parallel' '#ident'
 
 CostFuncOption =
-  'cost' 
+  'cost'
 
 RowsFuncOption =
-  'rows' 
+  'rows'
 
 SupportFuncOption =
-  'support' 
+  'support'
 
 SetFuncOption =
-  'set' 
+  'set'
 
 AsFuncOption =
   'as' (definition:Literal | obj_file:Literal ',' link_symbol:Literal)
 
 ReplicaIdentity =
-  'replica' 'identity' 
+  'replica' 'identity'
 
 OfType =
   'of' Type
@@ -1403,55 +1438,55 @@ NoForceRls =
   'no' 'force' 'row' 'level' 'security'
 
 Inherit =
-  'inherit' 
+  'inherit'
 
 NoInherit =
-  'no' 'inherit' 
+  'no' 'inherit'
 
 EnableTrigger =
   'enable' 'trigger'
 
 EnableReplicaTrigger =
-  'enable' 'replica' 'trigger' 
+  'enable' 'replica' 'trigger'
 
 EnableReplicaRule =
-  'enable' 'replica' 'rule' 
+  'enable' 'replica' 'rule'
 
 EnableAlwaysTrigger =
-  'enable' 'always' 'trigger' 
+  'enable' 'always' 'trigger'
 
 EnableAlwaysRule =
-  'enable' 'always' 'rule' 
+  'enable' 'always' 'rule'
 
 EnableRule =
-  'enable' 'rule' 
+  'enable' 'rule'
 
 EnableRls =
   'enable' 'row' 'level' 'security'
 
 DisableTrigger =
-  'disable' 'trigger' 
+  'disable' 'trigger'
 
 DisableRls =
   'disable' 'row' 'level' 'security'
 
 DisableRule =
-  'disable' 'rule' 
+  'disable' 'rule'
 
 ClusterOn =
-  'cluster' 'on' 
+  'cluster' 'on'
 
 DetachPartition =
-  'detach' 'partition' 
+  'detach' 'partition'
 
 DropColumn =
-  'drop' 'column'? IfExists? 
+  'drop' 'column'? IfExists?
 
 AddColumn =
   'add' 'column'? IfNotExists? NameRef Type Collate? (Constraint (',' Constraint)*)?
 
 AttachPartition =
-  'attach' 'partition' 
+  'attach' 'partition'
 
 SetTablespace =
   'set' 'tablespace' NameRef
@@ -1481,7 +1516,7 @@ RenameTable =
   'rename' 'to' NameRef
 
 RenameColumn =
-  'rename' 'column'? 
+  'rename' 'column'?
 
 AlterColumnOption =
   DropDefault
@@ -1510,13 +1545,13 @@ AlterColumn =
   'alter' 'column'? option:AlterColumnOption
 
 Restart =
-  'restart' 'with'? 
+  'restart' 'with'?
 
 SetSequenceOption =
-  'set' 
+  'set'
 
 SetGenerated =
-  'set' 
+  'set'
 
 DropExpression =
   'drop' 'expression' IfExists?
@@ -1525,7 +1560,7 @@ DropIdentity =
   'drop' 'identity' IfExists?
 
 AddGenerated =
-  'add' 
+  'add'
 
 ResetOptions =
   'reset' '(' ')'

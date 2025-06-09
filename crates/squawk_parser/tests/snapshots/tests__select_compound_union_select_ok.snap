@@ -46,14 +46,16 @@ SOURCE_FILE
                         CAST_EXPR
                           NAME_REF
                             LANGUAGE_KW "language"
-                          COLON_COLON "::"
-                          CHAR_TYPE
-                            CHAR_KW "char"
-                            L_PAREN "("
+                          COLON_COLON
+                            COLON ":"
+                            COLON ":"
+                          CALL_EXPR
+                            NAME_REF
+                              CHAR_KW "char"
                             ARG_LIST
-                              ARG
-                                LITERAL
-                                  INT_NUMBER "4"
+                              L_PAREN "("
+                              LITERAL
+                                INT_NUMBER "4"
                               R_PAREN ")"
                   WHITESPACE " "
                   ORDER_BY_CLAUSE
@@ -176,14 +178,16 @@ SOURCE_FILE
                         CAST_EXPR
                           NAME_REF
                             LANGUAGE_KW "language"
-                          COLON_COLON "::"
-                          CHAR_TYPE
-                            CHAR_KW "char"
-                            L_PAREN "("
+                          COLON_COLON
+                            COLON ":"
+                            COLON ":"
+                          CALL_EXPR
+                            NAME_REF
+                              CHAR_KW "char"
                             ARG_LIST
-                              ARG
-                                LITERAL
-                                  INT_NUMBER "4"
+                              L_PAREN "("
+                              LITERAL
+                                INT_NUMBER "4"
                               R_PAREN ")"
                   WHITESPACE " "
                   ORDER_BY_CLAUSE
