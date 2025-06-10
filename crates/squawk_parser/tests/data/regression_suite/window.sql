@@ -1086,7 +1086,7 @@ DELETE FROM empsalary RETURNING rank() OVER (ORDER BY random());
 
 SELECT count(*) OVER w FROM tenk1 WINDOW w AS (ORDER BY unique1), w AS (ORDER BY unique1);
 
-SELECT rank() OVER (PARTITION BY four, ORDER BY ten) FROM tenk1;
+-- SELECT rank() OVER (PARTITION BY four, ORDER BY ten) FROM tenk1;
 
 SELECT count() OVER () FROM tenk1;
 

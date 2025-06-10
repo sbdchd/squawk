@@ -13,9 +13,9 @@ SELECT * FROM JSON_TABLE('[]', 'strict $.a' COLUMNS (js2 int PATH '$') ERROR ON 
 SELECT * FROM JSON_TABLE(jsonb'"1.23"', '$.a' as js2 COLUMNS (js2 int path '$'));
 
 -- Should fail (no columns)
-SELECT * FROM JSON_TABLE(NULL, '$' COLUMNS ());
+-- SELECT * FROM JSON_TABLE(NULL, '$' COLUMNS ());
 
-SELECT * FROM JSON_TABLE (NULL::jsonb, '$' COLUMNS (v1 timestamp)) AS f (v1, v2);
+-- SELECT * FROM JSON_TABLE (NULL::jsonb, '$' COLUMNS (v1 timestamp)) AS f (v1, v2);
 
 --duplicated column name
 SELECT * FROM JSON_TABLE(jsonb'"1.23"', '$.a' COLUMNS (js2 int path '$', js2 int path '$'));

@@ -11,7 +11,8 @@ ERROR@60955: expected SEMICOLON
 ERROR@60956: expected command, found IDENT
 ERROR@60967: expected command, found IDENT
 ERROR@60971: expected command, found ON_KW
-ERROR@60974: expected command, found L_PAREN
+ERROR@60975: expected R_PAREN
+ERROR@60975: expected SEMICOLON
 ERROR@60975: expected command, found IDENT
 ERROR@60976: expected command, found DOT
 ERROR@60977: expected command, found IDENT
@@ -44,7 +45,8 @@ ERROR@61119: expected SEMICOLON
 ERROR@61120: expected command, found IDENT
 ERROR@61131: expected command, found IDENT
 ERROR@61135: expected command, found ON_KW
-ERROR@61138: expected command, found L_PAREN
+ERROR@61139: expected R_PAREN
+ERROR@61139: expected SEMICOLON
 ERROR@61139: expected command, found IDENT
 ERROR@61140: expected command, found DOT
 ERROR@61141: expected command, found IDENT
@@ -77,7 +79,8 @@ ERROR@61344: expected SEMICOLON
 ERROR@61345: expected command, found IDENT
 ERROR@61356: expected command, found IDENT
 ERROR@61360: expected command, found ON_KW
-ERROR@61363: expected command, found L_PAREN
+ERROR@61364: expected R_PAREN
+ERROR@61364: expected SEMICOLON
 ERROR@61364: expected command, found IDENT
 ERROR@61365: expected command, found DOT
 ERROR@61366: expected command, found IDENT
@@ -110,7 +113,8 @@ ERROR@61512: expected SEMICOLON
 ERROR@61513: expected command, found IDENT
 ERROR@61524: expected command, found IDENT
 ERROR@61528: expected command, found ON_KW
-ERROR@61531: expected command, found L_PAREN
+ERROR@61532: expected R_PAREN
+ERROR@61532: expected SEMICOLON
 ERROR@61532: expected command, found IDENT
 ERROR@61533: expected command, found DOT
 ERROR@61534: expected command, found IDENT
@@ -143,7 +147,8 @@ ERROR@61784: expected SEMICOLON
 ERROR@61785: expected command, found IDENT
 ERROR@61796: expected command, found IDENT
 ERROR@61800: expected command, found ON_KW
-ERROR@61803: expected command, found L_PAREN
+ERROR@61804: expected R_PAREN
+ERROR@61804: expected SEMICOLON
 ERROR@61804: expected command, found IDENT
 ERROR@61805: expected command, found DOT
 ERROR@61806: expected command, found IDENT
@@ -158,8 +163,7 @@ ERROR@61824: expected command, found DOT
 ERROR@61825: expected command, found IDENT
 ERROR@61827: expected command, found EQ
 ERROR@61829: expected command, found IDENT
-ERROR@61839: expected command, found L_PAREN
-ERROR@61840: expected command, found R_PAREN
+ERROR@61841: expected SEMICOLON
 ERROR@61842: expected command, found PLUS
 ERROR@61844: expected command, found INT_NUMBER
 ERROR@61846: expected command, found WHEN_KW
@@ -188,7 +192,8 @@ ERROR@61990: expected SEMICOLON
 ERROR@61991: expected command, found IDENT
 ERROR@62002: expected command, found IDENT
 ERROR@62006: expected command, found ON_KW
-ERROR@62009: expected command, found L_PAREN
+ERROR@62010: expected R_PAREN
+ERROR@62010: expected SEMICOLON
 ERROR@62010: expected command, found IDENT
 ERROR@62011: expected command, found DOT
 ERROR@62012: expected command, found IDENT
@@ -203,8 +208,7 @@ ERROR@62030: expected command, found DOT
 ERROR@62031: expected command, found IDENT
 ERROR@62033: expected command, found EQ
 ERROR@62035: expected command, found IDENT
-ERROR@62045: expected command, found L_PAREN
-ERROR@62046: expected command, found R_PAREN
+ERROR@62047: expected SEMICOLON
 ERROR@62048: expected command, found PLUS
 ERROR@62050: expected command, found INT_NUMBER
 ERROR@62052: expected command, found WHEN_KW
@@ -236,7 +240,8 @@ ERROR@62378: expected SEMICOLON
 ERROR@62379: expected command, found IDENT
 ERROR@62390: expected command, found IDENT
 ERROR@62394: expected command, found ON_KW
-ERROR@62397: expected command, found L_PAREN
+ERROR@62398: expected R_PAREN
+ERROR@62398: expected SEMICOLON
 ERROR@62398: expected command, found IDENT
 ERROR@62399: expected command, found DOT
 ERROR@62400: expected command, found IDENT
@@ -251,8 +256,7 @@ ERROR@62418: expected command, found DOT
 ERROR@62419: expected command, found IDENT
 ERROR@62421: expected command, found EQ
 ERROR@62423: expected command, found IDENT
-ERROR@62433: expected command, found L_PAREN
-ERROR@62434: expected command, found R_PAREN
+ERROR@62435: expected SEMICOLON
 ERROR@62436: expected command, found PLUS
 ERROR@62438: expected command, found INT_NUMBER
 ERROR@62442: expected command, found WHEN_KW
@@ -270,8 +274,7 @@ ERROR@62487: expected command, found FALSE_KW
 ERROR@62492: expected command, found R_PAREN
 ERROR@62494: expected command, found RETURNING_KW
 ERROR@62504: expected command, found MERGE_ACTION_KW
-ERROR@62516: expected command, found L_PAREN
-ERROR@62517: expected command, found R_PAREN
+ERROR@62518: expected SEMICOLON
 ERROR@62518: expected command, found COMMA
 ERROR@62520: expected command, found IDENT
 ERROR@62522: expected command, found DOT
@@ -287,7 +290,8 @@ ERROR@62673: expected DELETE, SELECT, TABLE, UPDATE, VALUES, or MERGE, got: IDEN
 ERROR@62674: expected command, found IDENT
 ERROR@62685: expected command, found IDENT
 ERROR@62689: expected command, found ON_KW
-ERROR@62692: expected command, found L_PAREN
+ERROR@62693: expected R_PAREN
+ERROR@62693: expected SEMICOLON
 ERROR@62693: expected command, found IDENT
 ERROR@62694: expected command, found DOT
 ERROR@62695: expected command, found IDENT
@@ -302,8 +306,7 @@ ERROR@62713: expected command, found DOT
 ERROR@62714: expected command, found IDENT
 ERROR@62716: expected command, found EQ
 ERROR@62718: expected command, found IDENT
-ERROR@62728: expected command, found L_PAREN
-ERROR@62729: expected command, found R_PAREN
+ERROR@62730: expected SEMICOLON
 ERROR@62731: expected command, found PLUS
 ERROR@62733: expected command, found INT_NUMBER
 ERROR@62737: expected command, found WHEN_KW
@@ -321,8 +324,7 @@ ERROR@62782: expected command, found FALSE_KW
 ERROR@62787: expected command, found R_PAREN
 ERROR@62789: expected command, found RETURNING_KW
 ERROR@62799: expected command, found MERGE_ACTION_KW
-ERROR@62811: expected command, found L_PAREN
-ERROR@62812: expected command, found R_PAREN
+ERROR@62813: expected SEMICOLON
 ERROR@62813: expected command, found COMMA
 ERROR@62815: expected command, found IDENT
 ERROR@62817: expected command, found DOT

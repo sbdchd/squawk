@@ -398,8 +398,9 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE " "
-        NAME_REF
-          IDENT "foo"
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   EXPLAIN
@@ -483,8 +484,9 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE " "
-        NAME_REF
-          IDENT "foo"
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_8"
@@ -559,8 +561,9 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE " "
-        NAME_REF
-          IDENT "foo"
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- parens_select"

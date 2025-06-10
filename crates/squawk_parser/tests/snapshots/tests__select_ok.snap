@@ -3486,7 +3486,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3508,7 +3509,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3538,7 +3540,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3565,7 +3568,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3592,7 +3596,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3621,7 +3626,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3654,7 +3660,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3685,7 +3692,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3716,7 +3724,8 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      IDENT "w"
+      NAME
+        IDENT "w"
       WHITESPACE " "
       AS_KW "as"
       WHITESPACE " "
@@ -3775,9 +3784,10 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      TUPLE_EXPR
-        L_PAREN "("
-        R_PAREN ")"
+      GROUPING_EXPR
+        TUPLE_EXPR
+          L_PAREN "("
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- simple expr"
@@ -3796,8 +3806,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multi expr"
@@ -3821,12 +3832,14 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
       COMMA ","
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all"
@@ -3847,8 +3860,9 @@ SOURCE_FILE
       WHITESPACE " "
       ALL_KW "all"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- distinct"
@@ -3869,8 +3883,9 @@ SOURCE_FILE
       WHITESPACE " "
       DISTINCT_KW "distinct"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rollup"
@@ -3889,9 +3904,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      ROLLUP_KW "rollup"
-      WHITESPACE " "
-      TUPLE_EXPR
+      GROUPING_ROLLUP
+        ROLLUP_KW "rollup"
+        WHITESPACE " "
         L_PAREN "("
         LITERAL
           INT_NUMBER "1"
@@ -3918,9 +3933,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      ROLLUP_KW "rollup"
-      WHITESPACE " "
-      TUPLE_EXPR
+      GROUPING_ROLLUP
+        ROLLUP_KW "rollup"
+        WHITESPACE " "
         L_PAREN "("
         LITERAL
           INT_NUMBER "1"
@@ -3931,9 +3946,9 @@ SOURCE_FILE
         R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      ROLLUP_KW "rollup"
-      WHITESPACE " "
-      PAREN_EXPR
+      GROUPING_ROLLUP
+        ROLLUP_KW "rollup"
+        WHITESPACE " "
         L_PAREN "("
         LITERAL
           INT_NUMBER "3"
@@ -3958,9 +3973,9 @@ SOURCE_FILE
       WHITESPACE " "
       DISTINCT_KW "distinct"
       WHITESPACE " "
-      CUBE_KW "cube"
-      WHITESPACE " "
-      TUPLE_EXPR
+      GROUPING_CUBE
+        CUBE_KW "cube"
+        WHITESPACE " "
         L_PAREN "("
         LITERAL
           INT_NUMBER "1"
@@ -3991,49 +4006,53 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      GROUPING_KW "grouping"
-      WHITESPACE " "
-      SETS_KW "sets"
-      WHITESPACE " "
-      TUPLE_EXPR
+      GROUPING_SETS
+        GROUPING_KW "grouping"
+        WHITESPACE " "
+        SETS_KW "sets"
+        WHITESPACE " "
         L_PAREN "("
         WHITESPACE "\n  "
-        TUPLE_EXPR
-          L_PAREN "("
-          LITERAL
-            INT_NUMBER "1"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "2"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "3"
-          R_PAREN ")"
+        GROUPING_EXPR
+          TUPLE_EXPR
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+            R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
-        TUPLE_EXPR
-          L_PAREN "("
-          LITERAL
-            INT_NUMBER "1"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "2"
-          R_PAREN ")"
+        GROUPING_EXPR
+          TUPLE_EXPR
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
-        PAREN_EXPR
-          L_PAREN "("
-          LITERAL
-            INT_NUMBER "1"
-          R_PAREN ")"
+        GROUPING_EXPR
+          PAREN_EXPR
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
         COMMA ","
         WHITESPACE "\n  "
-        TUPLE_EXPR
-          L_PAREN "("
-          R_PAREN ")"
+        GROUPING_EXPR
+          TUPLE_EXPR
+            L_PAREN "("
+            R_PAREN ")"
         WHITESPACE "\n"
         R_PAREN ")"
   SEMICOLON ";"
@@ -4725,8 +4744,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      NAME_REF
-        IDENT "f1"
+      GROUPING_EXPR
+        NAME_REF
+          IDENT "f1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using w/ join alias"
@@ -5930,22 +5950,24 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        IDENT "sensor_id"
+      GROUPING_EXPR
+        NAME_REF
+          IDENT "sensor_id"
       COMMA ","
       WHITESPACE " "
-      CALL_EXPR
-        NAME_REF
-          IDENT "DATE_TRUNC"
-        ARG_LIST
-          L_PAREN "("
-          LITERAL
-            STRING "'day'"
-          COMMA ","
-          WHITESPACE " "
+      GROUPING_EXPR
+        CALL_EXPR
           NAME_REF
-            IDENT "ts"
-          R_PAREN ")"
+            IDENT "DATE_TRUNC"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              STRING "'day'"
+            COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              IDENT "ts"
+            R_PAREN ")"
     WHITESPACE "\n"
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"

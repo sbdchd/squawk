@@ -481,7 +481,19 @@ WhereClause =
   'where'
 
 GroupByClause =
-  'group'
+  'group' 'by' ('all' | 'distinct') (GroupingRollup | GroupingCube | GroupingSets | GroupingExpr)
+
+GroupingRollup =
+  'rollup' Expr
+
+GroupingSets =
+  'grouping' 'sets' '(' Expr ')'
+
+GroupingCube = 
+  'cube' Expr
+
+GroupingExpr =
+  Expr
 
 HavingClause =
   'having'
@@ -830,6 +842,10 @@ IndexExpr =
 BetweenExpr =
   target:Expr 'between' (start:Expr) 'and' (end:Expr)
 
+JsonTableColumn =
+  Name 'for' 'ordinality'
+| Name Type
+| 'nested' 'path'? Expr
 
 JsonReturningClause =
   'returning' Type

@@ -4680,8 +4680,104 @@ pub struct GroupByClause {
 }
 impl GroupByClause {
     #[inline]
+    pub fn grouping_cube(&self) -> Option<GroupingCube> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn grouping_expr(&self) -> Option<GroupingExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn grouping_rollup(&self) -> Option<GroupingRollup> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn grouping_sets(&self) -> Option<GroupingSets> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn all_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALL_KW)
+    }
+    #[inline]
+    pub fn by_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BY_KW)
+    }
+    #[inline]
+    pub fn distinct_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DISTINCT_KW)
+    }
+    #[inline]
     pub fn group_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::GROUP_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct GroupingCube {
+    pub(crate) syntax: SyntaxNode,
+}
+impl GroupingCube {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cube_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CUBE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct GroupingExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl GroupingExpr {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct GroupingRollup {
+    pub(crate) syntax: SyntaxNode,
+}
+impl GroupingRollup {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn rollup_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROLLUP_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct GroupingSets {
+    pub(crate) syntax: SyntaxNode,
+}
+impl GroupingSets {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn grouping_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GROUPING_KW)
+    }
+    #[inline]
+    pub fn sets_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETS_KW)
     }
 }
 
@@ -5480,6 +5576,41 @@ impl JsonReturningClause {
     #[inline]
     pub fn returning_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RETURNING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonTableColumn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonTableColumn {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn nested_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NESTED_KW)
+    }
+    #[inline]
+    pub fn ordinality_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ORDINALITY_KW)
+    }
+    #[inline]
+    pub fn path_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::PATH_KW)
     }
 }
 
@@ -12863,6 +12994,78 @@ impl AstNode for GroupByClause {
         &self.syntax
     }
 }
+impl AstNode for GroupingCube {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::GROUPING_CUBE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for GroupingExpr {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::GROUPING_EXPR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for GroupingRollup {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::GROUPING_ROLLUP
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for GroupingSets {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::GROUPING_SETS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Gteq {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -13533,6 +13736,24 @@ impl AstNode for JsonReturningClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::JSON_RETURNING_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonTableColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_TABLE_COLUMN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

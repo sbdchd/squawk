@@ -314,8 +314,9 @@ SOURCE_FILE
               WHITESPACE " "
               BY_KW "by"
               WHITESPACE " "
-              NAME_REF
-                IDENT "user_id"
+              GROUPING_EXPR
+                NAME_REF
+                  IDENT "user_id"
           R_PAREN ")"
         WHITESPACE " "
         ALIAS

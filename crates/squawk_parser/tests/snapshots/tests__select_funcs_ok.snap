@@ -3809,4 +3809,60 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
   SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- window clause"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    WINDOW_CLAUSE
+      WINDOW_KW "window"
+      WHITESPACE " "
+      NAME
+        OWNER_KW "owner"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      L_PAREN "("
+      WINDOW_DEF
+        ORDER_BY_CLAUSE
+          ORDER_KW "order"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "a"
+      R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      NAME
+        IDENT "w2"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      L_PAREN "("
+      WINDOW_DEF
+        ORDER_BY_CLAUSE
+          ORDER_KW "order"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "b"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "--                     ^^^^^ make sure we allow using keywords"
   WHITESPACE "\n"
