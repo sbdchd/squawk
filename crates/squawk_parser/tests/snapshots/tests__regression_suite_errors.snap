@@ -2,19 +2,12 @@
 source: crates/squawk_parser/tests/tests.rs
 expression: "out.join(\"\\n\")"
 ---
-tests/snapshots/tests__regression_groupingsets.snap:16
-tests/snapshots/tests__regression_inherit.snap:30
+tests/snapshots/tests__regression_inherit.snap:34
 tests/snapshots/tests__regression_join.snap:20
 tests/snapshots/tests__regression_merge.snap:250
-tests/snapshots/tests__regression_partition_prune.snap:326
-tests/snapshots/tests__regression_privileges.snap:84
-tests/snapshots/tests__regression_rangefuncs.snap:281
-tests/snapshots/tests__regression_sqljson_jsontable.snap:185
+tests/snapshots/tests__regression_partition_prune.snap:328
+tests/snapshots/tests__regression_privileges.snap:14
 tests/snapshots/tests__regression_strings.snap:49
-tests/snapshots/tests__regression_subselect.snap:44
 tests/snapshots/tests__regression_tuplesort.snap:6
 tests/snapshots/tests__regression_union.snap:15
-tests/snapshots/tests__regression_update.snap:29
-tests/snapshots/tests__regression_window.snap:72
-tests/snapshots/tests__regression_with.snap:9
-tests/snapshots/tests__regression_xml.snap:379
+tests/snapshots/tests__regression_xml.snap:382

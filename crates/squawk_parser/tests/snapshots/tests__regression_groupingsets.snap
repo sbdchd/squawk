@@ -2,19 +2,4 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/groupingsets.sql
 ---
-ERROR@2795: expected COMMA
-ERROR@2813: expected COMMA
-ERROR@2908: expected COMMA
-ERROR@2926: expected COMMA
-ERROR@3023: expected COMMA
-ERROR@3048: expected COMMA
-ERROR@3147: expected COMMA
-ERROR@3245: expected COMMA
-ERROR@3341: expected COMMA
-ERROR@3435: expected COMMA
-ERROR@3452: expected COMMA
-ERROR@3545: expected COMMA
-ERROR@3562: expected COMMA
-ERROR@3579: expected COMMA
-ERROR@3607: expected COMMA
-ERROR@3717: expected COMMA
+

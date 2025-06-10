@@ -2,30 +2,6 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/privileges.sql
 ---
-ERROR@1281: missing comma
-ERROR@1289: expected OPTION, TRUE, or FALSE
-ERROR@1289: missing comma
-ERROR@1292: expected OPTION, TRUE, or FALSE
-ERROR@1292: missing comma
-ERROR@1311: expected OPTION, TRUE, or FALSE
-ERROR@1377: missing comma
-ERROR@1385: expected OPTION, TRUE, or FALSE
-ERROR@1385: missing comma
-ERROR@1388: expected OPTION, TRUE, or FALSE
-ERROR@1388: missing comma
-ERROR@1407: expected OPTION, TRUE, or FALSE
-ERROR@8877: missing comma
-ERROR@8885: expected OPTION, TRUE, or FALSE
-ERROR@8885: missing comma
-ERROR@8888: expected OPTION, TRUE, or FALSE
-ERROR@8888: missing comma
-ERROR@8906: expected OPTION, TRUE, or FALSE
-ERROR@9007: missing comma
-ERROR@9015: expected OPTION, TRUE, or FALSE
-ERROR@9015: missing comma
-ERROR@9018: expected OPTION, TRUE, or FALSE
-ERROR@9018: missing comma
-ERROR@9031: expected OPTION, TRUE, or FALSE
 ERROR@17722: expected R_PAREN
 ERROR@17782: expected SEMICOLON
 ERROR@17782: expected command, found R_PAREN
@@ -40,49 +16,3 @@ ERROR@17985: expected command, found WHERE_KW
 ERROR@17991: expected command, found IDENT
 ERROR@17993: expected command, found L_ANGLE
 ERROR@17995: expected command, found INT_NUMBER
-ERROR@37160: expected SELECT, TABLE, VALUES, or EXECUTE
-ERROR@37160: expected SEMICOLON
-ERROR@38499: expected SELECT, TABLE, VALUES, or EXECUTE
-ERROR@38499: expected SEMICOLON
-ERROR@56850: expected SEMICOLON
-ERROR@56851: expected command, found ORDER_KW
-ERROR@56857: expected command, found BY_KW
-ERROR@56860: expected command, found IDENT
-ERROR@56870: expected command, found COLLATE_KW
-ERROR@56878: expected command, found IDENT
-ERROR@56924: expected SEMICOLON
-ERROR@56925: expected command, found ORDER_KW
-ERROR@56931: expected command, found BY_KW
-ERROR@56934: expected command, found IDENT
-ERROR@56944: expected command, found COLLATE_KW
-ERROR@56952: expected command, found IDENT
-ERROR@61439: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
-ERROR@61439: expected TO_KW
-ERROR@61445: expected SEMICOLON
-ERROR@61446: expected command, found OBJECTS_KW
-ERROR@61454: expected command, found TO_KW
-ERROR@61457: expected command, found IDENT
-ERROR@61775: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
-ERROR@61775: expected TO_KW
-ERROR@61781: expected SEMICOLON
-ERROR@61782: expected command, found OBJECTS_KW
-ERROR@61790: expected command, found TO_KW
-ERROR@61793: expected command, found IDENT
-ERROR@62039: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
-ERROR@62039: expected FROM_KW
-ERROR@62045: expected SEMICOLON
-ERROR@62046: expected command, found OBJECTS_KW
-ERROR@62054: expected command, found FROM_KW
-ERROR@62059: expected command, found IDENT
-ERROR@62330: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
-ERROR@62330: expected TO_KW
-ERROR@62336: expected SEMICOLON
-ERROR@62337: expected command, found OBJECTS_KW
-ERROR@62345: expected command, found TO_KW
-ERROR@62348: expected command, found IDENT
-ERROR@62646: expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS
-ERROR@62646: expected TO_KW
-ERROR@62652: expected SEMICOLON
-ERROR@62653: expected command, found OBJECTS_KW
-ERROR@62661: expected command, found TO_KW
-ERROR@62664: expected command, found IDENT

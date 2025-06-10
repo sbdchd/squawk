@@ -249,3 +249,7 @@ select max(a) over (partition by b) as c from t;
 
 -- window name
 select max(a) over w_name from t;
+
+-- window clause
+select * from t window owner as (order by a), w2 as (order by b);
+--                     ^^^^^ make sure we allow using keywords

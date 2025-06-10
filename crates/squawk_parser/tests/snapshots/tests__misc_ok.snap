@@ -1089,16 +1089,19 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
       COMMA ","
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "2"
       COMMA ","
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "3"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "3"
     WHITESPACE "\n"
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"
@@ -2515,8 +2518,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "order"
@@ -3689,8 +3693,9 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_INDEX
@@ -4781,12 +4786,14 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
       COMMA ","
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Use CTEs to break down complex analytics"
@@ -4899,8 +4906,9 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            GROUPING_EXPR
+              LITERAL
+                INT_NUMBER "1"
         WHITESPACE "\n"
         R_PAREN ")"
       COMMA ","
@@ -5079,12 +5087,14 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
       COMMA ","
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   EXPLAIN
@@ -5161,8 +5171,9 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Key settings for parallel queries"
@@ -5326,8 +5337,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Remove unnecessary ORDER BY"
@@ -5388,8 +5400,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      GROUPING_EXPR
+        LITERAL
+          INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Gets all rows then filters"
@@ -5466,8 +5479,9 @@ SOURCE_FILE
               WHITESPACE " "
               BY_KW "BY"
               WHITESPACE " "
-              NAME_REF
-                IDENT "user_id"
+              GROUPING_EXPR
+                NAME_REF
+                  IDENT "user_id"
           WHITESPACE "\n"
           R_PAREN ")"
   SEMICOLON ";"
@@ -5789,12 +5803,13 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE "\n    "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "p"
-          DOT "."
-          NAME_REF
-            IDENT "sku"
+        GROUPING_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "p"
+            DOT "."
+            NAME_REF
+              IDENT "sku"
       WHITESPACE "\n"
       ORDER_BY_CLAUSE
         ORDER_KW "ORDER"
@@ -6155,16 +6170,19 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        DAY_KW "day"
+      GROUPING_EXPR
+        NAME_REF
+          DAY_KW "day"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "panel_id"
+      GROUPING_EXPR
+        NAME_REF
+          IDENT "panel_id"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "expected_power"
+      GROUPING_EXPR
+        NAME_REF
+          IDENT "expected_power"
     WHITESPACE "\n"
     HAVING_CLAUSE
       HAVING_KW "HAVING"
@@ -6272,8 +6290,9 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            NAME_REF
-              IDENT "turbine_id"
+            GROUPING_EXPR
+              NAME_REF
+                IDENT "turbine_id"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -6528,12 +6547,14 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        INTERVAL_KW "interval"
+      GROUPING_EXPR
+        NAME_REF
+          INTERVAL_KW "interval"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "resource_type"
+      GROUPING_EXPR
+        NAME_REF
+          IDENT "resource_type"
     WHITESPACE "\n"
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"
@@ -6669,8 +6690,9 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            NAME_REF
-              HOUR_KW "hour"
+            GROUPING_EXPR
+              NAME_REF
+                HOUR_KW "hour"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"

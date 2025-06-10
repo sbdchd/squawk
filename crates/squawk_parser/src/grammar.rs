@@ -584,20 +584,7 @@ fn json_table_arg_list(p: &mut Parser<'_>) {
         name(p);
     }
     // [ PASSING { value AS varname } [, ...] ]
-    if p.eat(PASSING_KW) {
-        while !p.at(EOF) {
-            // value
-            if expr(p).is_none() {
-                p.error("expected expression");
-            }
-            opt_json_format_clause(p);
-            p.expect(AS_KW);
-            col_label(p);
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-    }
+    opt_json_passing_clause(p);
     // COLUMNS ( json_table_column [, ...] )
     if p.eat(COLUMNS_KW) {
         p.expect(L_PAREN);
@@ -609,12 +596,7 @@ fn json_table_arg_list(p: &mut Parser<'_>) {
         }
         p.expect(R_PAREN);
     }
-    // [ { ERROR | EMPTY [ARRAY]} ON ERROR ]
-    if p.eat(ERROR_KW) {
-        p.expect(ON_KW);
-        p.expect(ERROR_KW);
-    } else if p.eat(EMPTY_KW) {
-        p.eat(ARRAY_KW);
+    if opt_json_behavior(p) {
         p.expect(ON_KW);
         p.expect(ERROR_KW);
     }
@@ -633,6 +615,7 @@ fn json_table_arg_list(p: &mut Parser<'_>) {
 //         [ { ERROR | TRUE | FALSE | UNKNOWN } ON ERROR ]
 //   | NESTED [ PATH ] path_expression [ AS json_path_name ] COLUMNS ( json_table_column [, ...] )
 fn json_table_column(p: &mut Parser<'_>) {
+    let m = p.start();
     // NESTED [ PATH ] path_expression [ AS json_path_name ] COLUMNS ( json_table_column [, ...] )
     if p.eat(NESTED_KW) {
         p.eat(PATH_KW);
@@ -669,60 +652,22 @@ fn json_table_column(p: &mut Parser<'_>) {
                         p.error("expected expression");
                     }
                 }
-                // [ { ERROR | TRUE | FALSE | UNKNOWN } ON ERROR ]
-                if p.at(ERROR_KW) || p.at(TRUE_KW) || p.at(FALSE_KW) || p.at(UNKNOWN_KW) {
-                    p.expect(ON_KW);
-                    p.expect(ERROR_KW);
-                }
+                opt_json_behavior_clause(p);
             } else {
                 // [ FORMAT JSON [ENCODING UTF8]]
                 opt_json_format_clause(p);
                 // [ PATH path_expression ]
                 if p.eat(PATH_KW) {
                     // path_expression
-                    if expr(p).is_none() {
-                        p.error("expected expression");
-                    }
+                    string_literal(p);
                 }
-                // [ { WITHOUT | WITH { CONDITIONAL | [UNCONDITIONAL] } } [ ARRAY ] WRAPPER ]
-                if p.at(WITHOUT_KW) || p.at(WITH_KW) {
-                    if p.eat(WITH_KW) {
-                        let _ = p.eat(CONDITIONAL_KW) || p.eat(UNCONDITIONAL_KW);
-                    } else {
-                        p.bump(WITHOUT_KW);
-                    }
-                    p.eat(ARRAY_KW);
-                    p.expect(WRAPPER_KW);
-                }
-                // [ { KEEP | OMIT } QUOTES [ ON SCALAR STRING ] ]
-                if p.eat(KEEP_KW) || p.eat(OMIT_KW) {
-                    p.expect(QUOTES_KW);
-                    if p.eat(ON_KW) {
-                        p.expect(SCALAR_KW);
-                        p.expect(STRING_KW);
-                    }
-                }
-                // [ { ERROR | NULL | EMPTY { [ARRAY] | OBJECT } | DEFAULT expression } ON EMPTY ]
-                // [ { ERROR | NULL | EMPTY { [ARRAY] | OBJECT } | DEFAULT expression } ON ERROR ]
-                if p.at(ERROR_KW) || p.at(NULL_KW) || p.at(EMPTY_KW) || p.at(DEFAULT_KW) {
-                    // EMPTY { [ARRAY] | OBJECT }
-                    if p.eat(EMPTY_KW) {
-                        let _ = p.eat(ARRAY_KW) || p.expect(OBJECT_KW);
-                    // DEFAULT
-                    } else if p.eat(DEFAULT_KW) {
-                        if expr(p).is_none() {
-                            p.error("expected an expression");
-                        }
-                    // ERROR | NULL
-                    } else {
-                        p.bump_any();
-                    }
-                    p.expect(ON_KW);
-                    let _ = p.eat(EMPTY_KW) || p.expect(ERROR_KW);
-                }
+                opt_json_wrapper_behavior(p);
+                opt_json_quotes_clause(p);
+                opt_json_behavior_clause(p);
             }
         }
     }
+    m.complete(p, JSON_TABLE_COLUMN);
 }
 
 // json_array (
@@ -2508,11 +2453,9 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
 fn select(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
     assert!(p.at_ts(SELECT_FIRST));
     let m = m.unwrap_or_else(|| p.start());
-    // table [only] name [*]
-    if p.eat(TABLE_KW) {
-        relation_name(p);
-        return Some(m.complete(p, TABLE));
-    }
+
+    let mut out_kind = SELECT;
+
     // with aka cte
     // [ WITH [ RECURSIVE ] with_query [, ...] ]
     if p.at(WITH_KW) {
@@ -2526,8 +2469,16 @@ fn select(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
             return Some(cm);
         }
     }
-    select_clause(p);
-    let is_select_into = opt_into_clause(p).is_some();
+    // table [only] name [*]
+    if p.eat(TABLE_KW) {
+        relation_name(p);
+        out_kind = TABLE;
+    } else {
+        select_clause(p);
+    }
+    if opt_into_clause(p).is_some() {
+        out_kind = SELECT_INTO;
+    }
     opt_from_clause(p);
     opt_where_clause(p);
     opt_group_by_clause(p);
@@ -2554,7 +2505,7 @@ fn select(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
             opt_locking_clause(p);
         }
     }
-    Some(m.complete(p, if is_select_into { SELECT_INTO } else { SELECT }))
+    Some(m.complete(p, out_kind))
 }
 
 // INTO [ TEMPORARY | TEMP | UNLOGGED ] [ TABLE ] new_table
@@ -2918,8 +2869,11 @@ fn data_source(p: &mut Parser<'_>) {
             p.expect(FROM_KW);
             p.expect(L_PAREN);
             call_expr(p);
-            // TODO: we should restrict this more
             opt_alias(p);
+            while !p.at(EOF) && p.eat(COMMA) {
+                call_expr(p);
+                opt_alias(p);
+            }
             p.expect(R_PAREN);
             // [ WITH ORDINALITY ]
             if p.eat(WITH_KW) {
@@ -4153,6 +4107,12 @@ fn opt_group_by_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(ALL_KW) || p.at(DISTINCT_KW) {
         p.bump_any();
     }
+    group_by_list(p);
+
+    Some(m.complete(p, GROUP_BY_CLAUSE))
+}
+
+fn group_by_list(p: &mut Parser<'_>) {
     // From pg docs:
     // An expression used inside a grouping_element can be an input column name,
     // or the name or ordinal number of an output column (SELECT list item), or
@@ -4160,20 +4120,46 @@ fn opt_group_by_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // ambiguity, a GROUP BY name will be interpreted as an input-column name
     // rather than an output column name.
     while !p.at(EOF) && !p.at(SEMICOLON) {
-        // TODO: handle errors?
-        p.eat(ROLLUP_KW);
-        p.eat(CUBE_KW);
-        if p.eat(GROUPING_KW) {
-            p.expect(SETS_KW);
-        }
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
+        let m = p.start();
+        let kind = match p.current() {
+            ROLLUP_KW => {
+                p.bump_any();
+                p.expect(L_PAREN);
+                if !expr_list(p) {
+                    p.error("expected expression list");
+                };
+                p.expect(R_PAREN);
+                GROUPING_ROLLUP
+            }
+            CUBE_KW => {
+                p.bump_any();
+                p.expect(L_PAREN);
+                if !expr_list(p) {
+                    p.error("expected expression list");
+                };
+                p.expect(R_PAREN);
+                GROUPING_CUBE
+            }
+            GROUPING_KW if p.nth_at(1, SETS_KW) => {
+                p.bump(GROUPING_KW);
+                p.bump(SETS_KW);
+                p.expect(L_PAREN);
+                group_by_list(p);
+                p.expect(R_PAREN);
+                GROUPING_SETS
+            }
+            _ => {
+                if expr(p).is_none() {
+                    p.error("expected an expression");
+                }
+                GROUPING_EXPR
+            }
+        };
+        m.complete(p, kind);
         if !p.eat(COMMA) {
             break;
         }
     }
-    Some(m.complete(p, GROUP_BY_CLAUSE))
 }
 
 /// <https://www.postgresql.org/docs/17/sql-select.html#SQL-HAVING>
@@ -4196,22 +4182,20 @@ fn opt_having_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 // offset PRECEDING
 // offset FOLLOWING
 fn frame_start_end(p: &mut Parser<'_>) {
-    if p.eat(UNBOUNDED_KW) {
-        if p.at(PRECEDING_KW) || p.at(FOLLOWING_KW) {
+    match (p.current(), p.nth(1)) {
+        (CURRENT_KW, ROW_KW) | (UNBOUNDED_KW, PRECEDING_KW | FOLLOWING_KW) => {
             p.bump_any();
-        } else {
-            p.err_and_bump("expected preceding or following");
-        }
-    } else if p.eat(CURRENT_KW) {
-        p.expect(ROW_KW);
-    } else {
-        if expr(p).is_none() {
-            p.error("expected an expression");
-        }
-        if p.at(PRECEDING_KW) || p.at(FOLLOWING_KW) {
             p.bump_any();
-        } else {
-            p.err_and_bump("expected preceding or following");
+        }
+        _ => {
+            if expr(p).is_none() {
+                p.error("expected an expression");
+            }
+            if p.at(PRECEDING_KW) || p.at(FOLLOWING_KW) {
+                p.bump_any();
+            } else {
+                p.err_and_bump("expected preceding or following");
+            }
         }
     }
 }
@@ -4290,12 +4274,19 @@ fn opt_window_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     p.bump(WINDOW_KW);
-    p.expect(IDENT);
+    window_def(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        window_def(p);
+    }
+    Some(m.complete(p, WINDOW_CLAUSE))
+}
+
+fn window_def(p: &mut Parser<'_>) {
+    name(p);
     p.expect(AS_KW);
     p.expect(L_PAREN);
     window_definition(p);
     p.expect(R_PAREN);
-    Some(m.complete(p, WINDOW_CLAUSE))
 }
 
 // [ LIMIT { count | ALL } ]
@@ -4848,13 +4839,20 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     // AS query
     // [ WITH [ NO ] DATA ]
     if p.eat(AS_KW) {
-        // query
-        if p.at_ts(SELECT_FIRST) {
-            select(p, None);
-        } else if p.at(EXECUTE_KW) {
-            execute(p);
-        } else {
-            p.error("expected SELECT, TABLE, VALUES, or EXECUTE");
+        match stmt(
+            p,
+            &StmtRestrictions {
+                begin_end_allowed: false,
+            },
+        )
+        .map(|x| x.kind())
+        {
+            Some(
+                SELECT | COMPOUND_SELECT | SELECT_INTO | PAREN_SELECT | TABLE | VALUES | EXECUTE,
+            ) => (),
+            _ => {
+                p.error("expected SELECT, TABLE, VALUES, or EXECUTE");
+            }
         }
         if p.eat(WITH_KW) {
             p.eat(NO_KW);
@@ -5272,7 +5270,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (GRANT_KW, _) => Some(grant(p)),
         (IMPORT_KW, FOREIGN_KW) => Some(import_foreign_schema(p)),
         (INSERT_KW, _) => Some(insert(p, None)),
-        (L_PAREN, L_PAREN | SELECT_KW) => {
+        (L_PAREN, _) if p.nth_at_ts(1, SELECT_FIRST) || p.at(L_PAREN) => {
             // can have select nested in parens, i.e., ((select 1));
             let cm = paren_select(p)?;
             let cm = if p.at_ts(COMPOUND_SELECT_FIRST) {
@@ -6913,11 +6911,15 @@ fn alter_default_privileges(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn privilege_target_type(p: &mut Parser<'_>) {
     match p.current() {
+        LARGE_KW => {
+            p.bump(LARGE_KW);
+            p.expect(OBJECTS_KW);
+        }
         TABLES_KW | FUNCTIONS_KW | ROUTINES_KW | SEQUENCES_KW | TYPES_KW | SCHEMAS_KW => {
             p.bump_any();
         }
         _ => p.error(
-            "expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS",
+            "expected privilege target, TABLES, FUNCTIONS, ROUTINES, SEQEUNCES, TYPES, SCHEMAS, LARGE OBJECTS",
         ),
     }
 }
@@ -10387,7 +10389,7 @@ fn grant_role_option_list(p: &mut Parser<'_>) {
             p.error("expected OPTION, TRUE, or FALSE")
         }
         if !p.eat(COMMA) {
-            if p.at_ts(COL_LABEL_FIRST) {
+            if p.at_ts(COL_LABEL_FIRST) && !p.at(GRANTED_KW) {
                 p.error("missing comma");
             } else {
                 break;
