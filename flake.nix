@@ -18,7 +18,7 @@
           {
             squawk = final.rustPlatform.buildRustPackage {
               pname = "squawk";
-              version = "2.11.0";
+              version = "2.12.0";
 
               cargoLock = {
                 lockFile = ./Cargo.lock;

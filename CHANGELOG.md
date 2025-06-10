@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.12.0 - 2025-06-09
+
+### Changed
+
+- Relicensed: gpl3 -> apache or mit (#534)
+
+### Fixed
+
+- `json_table`, `table`, `values`, `group by` (#536)
+- Cast expression issues (#533)
+- Float lexing (#532)
+- Unicode escaped quoted idents (#531)
+- `xmltable` (#530)
+- Many parser fixes for the pg regression test suite (#529), (#527), (#526), (#524), (#523), (#522)
+
 ## v2.11.0 - 2025-05-30
 
 ### Fixed
