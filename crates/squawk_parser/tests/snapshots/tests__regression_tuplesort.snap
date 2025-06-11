@@ -2,9 +2,4 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/tuplesort.sql
 ---
-ERROR@10543: expected command, found STRING
-ERROR@10548: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
-ERROR@10550: expected command, found STRING
-ERROR@10648: expected command, found STRING
-ERROR@10653: expected SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
-ERROR@10655: expected command, found STRING
+
