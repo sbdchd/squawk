@@ -296,6 +296,36 @@ LINE 1: set session query_max_run_time = 10m;
                                          ^
 ```
 
+### Rule: cross join
+
+```sql
+select * from t join u on true;
+select * from t1, t2;
+```
+
+suggests / autofixes to:
+
+```sql
+select * from t cross join u;
+select * from t1 cross join t2;
+```
+
+with config to change desired destination format
+
+### Rule: natural join
+
+warn about natural joins and autofix to the equivalent
+
+```sql
+select * from t natural join u;
+```
+
+suggests / autofixes to:
+
+```sql
+select * from t join u using (id, name, ip, description, meta);
+```
+
 ### Rule: using unsupported lambdas
 
 This actually parsers in Postgres, but could work off a heuristic

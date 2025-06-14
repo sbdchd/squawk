@@ -4400,12 +4400,14 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
         WHITESPACE " "
         JOIN
-          JOIN_KW "join"
+          JOIN_INNER
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4417,24 +4419,25 @@ SOURCE_FILE
               NAME
                 IDENT "tb"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          BIN_EXPR
-            FIELD_EXPR
-              NAME_REF
-                IDENT "tb"
-              DOT "."
-              NAME_REF
-                IDENT "id"
+          ON_CLAUSE
+            ON_KW "on"
             WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            FIELD_EXPR
-              NAME_REF
-                IDENT "t"
-              DOT "."
-              NAME_REF
-                IDENT "id"
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "tb"
+                DOT "."
+                NAME_REF
+                  IDENT "id"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "t"
+                DOT "."
+                NAME_REF
+                  IDENT "id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- left"
@@ -4450,14 +4453,16 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
         WHITESPACE " "
         JOIN
-          LEFT_KW "left"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_LEFT
+            LEFT_KW "left"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4485,14 +4490,16 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
         WHITESPACE " "
         JOIN
-          LEFT_KW "left"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_LEFT
+            LEFT_KW "left"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4527,14 +4534,16 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
         WHITESPACE " "
         JOIN
-          RIGHT_KW "right"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_RIGHT
+            RIGHT_KW "right"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4564,14 +4573,16 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
         WHITESPACE " "
         JOIN
-          FULL_KW "full"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_FULL
+            FULL_KW "full"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4601,55 +4612,58 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
         WHITESPACE " "
         JOIN
-          JOIN_KW "join"
+          JOIN_INNER
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
               IDENT "t2"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          BIN_EXPR
-            BIN_EXPR
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "t2"
-                DOT "."
-                NAME_REF
-                  IDENT "team_id"
-              WHITESPACE " "
-              EQ "="
-              WHITESPACE " "
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "t"
-                DOT "."
-                NAME_REF
-                  IDENT "team_id"
-            WHITESPACE " "
-            AND_KW "and"
+          ON_CLAUSE
+            ON_KW "on"
             WHITESPACE " "
             BIN_EXPR
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "t2"
-                DOT "."
-                NAME_REF
-                  IDENT "id"
+              BIN_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "t2"
+                  DOT "."
+                  NAME_REF
+                    IDENT "team_id"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "t"
+                  DOT "."
+                  NAME_REF
+                    IDENT "team_id"
               WHITESPACE " "
-              EQ "="
+              AND_KW "and"
               WHITESPACE " "
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "t"
-                DOT "."
-                NAME_REF
-                  IDENT "org_id"
+              BIN_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "t2"
+                  DOT "."
+                  NAME_REF
+                    IDENT "id"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "t"
+                  DOT "."
+                  NAME_REF
+                    IDENT "org_id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- nested joins"
@@ -4676,40 +4690,44 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE "\n"
-      FROM_ITEM
-        NAME_REF
-          IDENT "t1"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "x"
-          COLUMN_LIST
-            L_PAREN "("
-            COLUMN
-              NAME
-                IDENT "x0"
-            COMMA ","
-            COLUMN
-              NAME
-                IDENT "x1"
-            R_PAREN ")"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t1"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "x"
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME
+                  IDENT "x0"
+              COMMA ","
+              COLUMN
+                NAME
+                  IDENT "x1"
+              R_PAREN ")"
         WHITESPACE " "
         JOIN
-          LEFT_KW "left"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_LEFT
+            LEFT_KW "left"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             PAREN_EXPR
               L_PAREN "("
-              FROM_ITEM
-                NAME_REF
-                  IDENT "t1"
+              JOIN_EXPR
+                FROM_ITEM
+                  NAME_REF
+                    IDENT "t1"
                 WHITESPACE " "
                 JOIN
-                  LEFT_KW "left"
-                  WHITESPACE " "
-                  JOIN_KW "join"
+                  JOIN_LEFT
+                    LEFT_KW "left"
+                    WHITESPACE " "
+                    JOIN_KW "join"
                   WHITESPACE " "
                   FROM_ITEM
                     NAME_REF
@@ -4725,19 +4743,20 @@ SOURCE_FILE
                       R_PAREN ")"
               R_PAREN ")"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          PAREN_EXPR
-            L_PAREN "("
-            BIN_EXPR
-              NAME_REF
-                IDENT "x0"
-              WHITESPACE " "
-              EQ "="
-              WHITESPACE " "
-              LITERAL
-                INT_NUMBER "0"
-            R_PAREN ")"
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "x0"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "0"
+              R_PAREN ")"
     WHITESPACE "\n"
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -4762,12 +4781,14 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
         WHITESPACE " "
         JOIN
-          JOIN_KW "join"
+          JOIN_INNER
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4782,12 +4803,12 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "id"
               R_PAREN ")"
-          WHITESPACE " "
-          ALIAS
-            AS_KW "as"
             WHITESPACE " "
-            NAME
-              IDENT "foo"
+            ALIAS
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- cross join"
@@ -4817,18 +4838,20 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "colors"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "c"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "colors"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "c"
         WHITESPACE " "
         JOIN
-          CROSS_KW "CROSS"
-          WHITESPACE " "
-          JOIN_KW "JOIN"
+          JOIN_CROSS
+            CROSS_KW "CROSS"
+            WHITESPACE " "
+            JOIN_KW "JOIN"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4866,18 +4889,20 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "fruits"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "f"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "fruits"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "f"
         WHITESPACE " "
         JOIN
-          INNER_KW "inner"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_INNER
+            INNER_KW "inner"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4887,13 +4912,14 @@ SOURCE_FILE
               NAME
                 IDENT "c"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          PAREN_EXPR
-            L_PAREN "("
-            LITERAL
-              TRUE_KW "true"
-            R_PAREN ")"
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              LITERAL
+                TRUE_KW "true"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple join clauses"
@@ -4910,33 +4936,37 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
-        WHITESPACE "\n"
-        JOIN
-          LEFT_KW "left"
-          WHITESPACE " "
-          JOIN_KW "join"
-          WHITESPACE " "
+      JOIN_EXPR
+        JOIN_EXPR
           FROM_ITEM
             NAME_REF
-              IDENT "u"
-          WHITESPACE " "
-          USING_CLAUSE
-            USING_KW "using"
+              IDENT "t"
+          WHITESPACE "\n"
+          JOIN
+            JOIN_LEFT
+              LEFT_KW "left"
+              WHITESPACE " "
+              JOIN_KW "join"
             WHITESPACE " "
-            COLUMN_LIST
-              L_PAREN "("
-              COLUMN
-                NAME_REF
-                  IDENT "id"
-              R_PAREN ")"
+            FROM_ITEM
+              NAME_REF
+                IDENT "u"
+            WHITESPACE " "
+            USING_CLAUSE
+              USING_KW "using"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "id"
+                R_PAREN ")"
         WHITESPACE "\n"
         JOIN
-          LEFT_KW "left"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_LEFT
+            LEFT_KW "left"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4966,14 +4996,16 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "employees"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "employees"
         WHITESPACE " "
         JOIN
           NATURAL_KW "NATURAL"
           WHITESPACE " "
-          JOIN_KW "JOIN"
+          JOIN_INNER
+            JOIN_KW "JOIN"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -5036,16 +5068,18 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "distributors"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "d"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "distributors"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "d"
         WHITESPACE " "
         JOIN
-          JOIN_KW "JOIN"
+          JOIN_INNER
+            JOIN_KW "JOIN"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -5077,12 +5111,14 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "t"
         WHITESPACE " "
         JOIN
-          JOIN_KW "join"
+          JOIN_INNER
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -5127,18 +5163,20 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "manufacturers"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "m"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "manufacturers"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "m"
         WHITESPACE " "
         JOIN
-          LEFT_KW "LEFT"
-          WHITESPACE " "
-          JOIN_KW "JOIN"
+          JOIN_LEFT
+            LEFT_KW "LEFT"
+            WHITESPACE " "
+            JOIN_KW "JOIN"
           WHITESPACE " "
           FROM_ITEM
             LATERAL_KW "LATERAL"
@@ -5160,10 +5198,11 @@ SOURCE_FILE
               NAME
                 IDENT "pname"
           WHITESPACE " "
-          ON_KW "ON"
-          WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
+          ON_CLAUSE
+            ON_KW "ON"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"

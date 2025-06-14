@@ -17,6 +17,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
                 ast::DropAggregate(it) => validate_drop_aggregate(it, errors),
+                ast::JoinExpr(it) => validate_join_expr(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
                 _ => (),
             }
@@ -75,6 +76,72 @@ fn validate_literal(lit: ast::Literal, acc: &mut Vec<SyntaxError>) {
                         }
                     },
                 }
+            }
+        }
+    }
+}
+
+fn validate_join_expr(join_expr: ast::JoinExpr, acc: &mut Vec<SyntaxError>) {
+    let Some(join) = join_expr.join() else {
+        return;
+    };
+
+    let Some(join_type) = join.join_type() else {
+        return;
+    };
+
+    enum JoinClause {
+        Required,
+        NotAllowed,
+    }
+    use JoinClause::*;
+
+    let join_clause = if join.natural_token().is_some() {
+        NotAllowed
+    } else {
+        match join_type {
+            ast::JoinType::JoinCross(_) => NotAllowed,
+            ast::JoinType::JoinFull(_)
+            | ast::JoinType::JoinInner(_)
+            | ast::JoinType::JoinLeft(_)
+            | ast::JoinType::JoinRight(_) => Required,
+        }
+    };
+
+    let join_name = if join.natural_token().is_some() {
+        "natural"
+    } else {
+        match join_type {
+            ast::JoinType::JoinCross(_) => "cross",
+            ast::JoinType::JoinFull(_) => "full",
+            ast::JoinType::JoinInner(_) => "inner",
+            ast::JoinType::JoinLeft(_) => "left",
+            ast::JoinType::JoinRight(_) => "right",
+        }
+    };
+
+    match join_clause {
+        Required => {
+            if join.on_clause().is_none() && join.using_clause().is_none() {
+                let end = join_expr.syntax().text_range().end();
+                acc.push(SyntaxError::new(
+                    "Join missing condition.",
+                    TextRange::new(end, end),
+                ));
+            }
+        }
+        NotAllowed => {
+            if let Some(on_clause) = join.on_clause() {
+                acc.push(SyntaxError::new(
+                    format!("Join condition is not allowed for {join_name} joins."),
+                    on_clause.syntax().text_range(),
+                ));
+            }
+            if let Some(using_clause) = join.using_clause() {
+                acc.push(SyntaxError::new(
+                    format!("Join `using` clause is not allowed for {join_name} joins."),
+                    using_clause.syntax().text_range(),
+                ));
             }
         }
     }

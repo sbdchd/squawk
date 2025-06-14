@@ -296,12 +296,12 @@ SELECT $$
 $$ AS qry ;
 
 -- test mark/restore with in-memory sorts
-EXPLAIN (COSTS OFF) 'qry';
-'qry';
+-- EXPLAIN (COSTS OFF) 'qry';
+-- 'qry';
 
 -- test mark/restore with on-disk sorts
 SET LOCAL work_mem = '100kB';
-EXPLAIN (COSTS OFF) 'qry';
-'qry';
+-- EXPLAIN (COSTS OFF) 'qry';
+-- 'qry';
 
 COMMIT;

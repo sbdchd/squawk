@@ -4,10 +4,8 @@ expression: "out.join(\"\\n\")"
 ---
 tests/snapshots/tests__regression_inherit.snap:34
 tests/snapshots/tests__regression_join.snap:20
-tests/snapshots/tests__regression_merge.snap:250
-tests/snapshots/tests__regression_partition_prune.snap:328
+tests/snapshots/tests__regression_merge.snap:61
 tests/snapshots/tests__regression_privileges.snap:14
 tests/snapshots/tests__regression_strings.snap:49
-tests/snapshots/tests__regression_tuplesort.snap:6
 tests/snapshots/tests__regression_union.snap:15
 tests/snapshots/tests__regression_xml.snap:382

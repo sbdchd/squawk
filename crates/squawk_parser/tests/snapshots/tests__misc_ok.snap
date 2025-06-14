@@ -3027,16 +3027,18 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        FIELD_EXPR
-          NAME_REF
-            IDENT "cron"
-          DOT "."
-          NAME_REF
-            IDENT "job_run_details"
+      JOIN_EXPR
+        FROM_ITEM
+          FIELD_EXPR
+            NAME_REF
+              IDENT "cron"
+            DOT "."
+            NAME_REF
+              IDENT "job_run_details"
         WHITESPACE " "
         JOIN
-          JOIN_KW "join"
+          JOIN_INNER
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             FIELD_EXPR
@@ -3357,56 +3359,60 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        FIELD_EXPR
-          NAME_REF
-            IDENT "cal"
-          DOT "."
-          NAME_REF
-            IDENT "event_types"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          FIELD_EXPR
+            NAME_REF
+              IDENT "cal"
+            DOT "."
+            NAME_REF
+              IDENT "event_types"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "t"
         WHITESPACE "\n  "
         JOIN
-          CROSS_KW "cross"
-          WHITESPACE " "
-          JOIN_KW "join"
-          WHITESPACE " "
-          FROM_ITEM
-            CALL_EXPR
-              NAME_REF
-                IDENT "json_array_elements"
-              ARG_LIST
-                L_PAREN "("
-                CAST_EXPR
-                  PAREN_EXPR
-                    L_PAREN "("
-                    BIN_EXPR
-                      NAME_REF
-                        IDENT "attrs"
-                      CUSTOM_OP
-                        MINUS "-"
-                        R_ANGLE ">"
-                      LITERAL
-                        STRING "'eventTypeGroups'"
-                    R_PAREN ")"
-                  COLON_COLON
-                    COLON ":"
-                    COLON ":"
-                  NAME_REF
-                    JSON_KW "json"
-                R_PAREN ")"
+          JOIN_CROSS
+            CROSS_KW "cross"
             WHITESPACE " "
-            ALIAS
-              NAME
-                IDENT "etg"
+            JOIN_KW "join"
+          WHITESPACE " "
+          JOIN_EXPR
+            FROM_ITEM
+              CALL_EXPR
+                NAME_REF
+                  IDENT "json_array_elements"
+                ARG_LIST
+                  L_PAREN "("
+                  CAST_EXPR
+                    PAREN_EXPR
+                      L_PAREN "("
+                      BIN_EXPR
+                        NAME_REF
+                          IDENT "attrs"
+                        CUSTOM_OP
+                          MINUS "-"
+                          R_ANGLE ">"
+                        LITERAL
+                          STRING "'eventTypeGroups'"
+                      R_PAREN ")"
+                    COLON_COLON
+                      COLON ":"
+                      COLON ":"
+                    NAME_REF
+                      JSON_KW "json"
+                  R_PAREN ")"
+              WHITESPACE " "
+              ALIAS
+                NAME
+                  IDENT "etg"
             WHITESPACE "\n  "
             JOIN
-              CROSS_KW "cross"
-              WHITESPACE " "
-              JOIN_KW "join"
+              JOIN_CROSS
+                CROSS_KW "cross"
+                WHITESPACE " "
+                JOIN_KW "join"
               WHITESPACE " "
               FROM_ITEM
                 CALL_EXPR
@@ -3521,22 +3527,24 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      FROM_ITEM
-        FIELD_EXPR
-          NAME_REF
-            IDENT "cal"
-          DOT "."
-          NAME_REF
-            IDENT "bookings"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          FIELD_EXPR
+            NAME_REF
+              IDENT "cal"
+            DOT "."
+            NAME_REF
+              IDENT "bookings"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "t"
         WHITESPACE "\n  "
         JOIN
-          CROSS_KW "cross"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_CROSS
+            CROSS_KW "cross"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             CALL_EXPR
@@ -4100,50 +4108,55 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "events_core"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "e"
-        WHITESPACE "\n"
-        JOIN
-          LEFT_KW "LEFT"
-          WHITESPACE " "
-          JOIN_KW "JOIN"
-          WHITESPACE " "
+      JOIN_EXPR
+        JOIN_EXPR
           FROM_ITEM
             NAME_REF
-              IDENT "events_metadata"
+              IDENT "events_core"
             WHITESPACE " "
             ALIAS
               NAME
-                IDENT "m"
-          WHITESPACE "\n  "
-          ON_KW "ON"
-          WHITESPACE " "
-          BIN_EXPR
-            FIELD_EXPR
-              NAME_REF
                 IDENT "e"
-              DOT "."
-              NAME_REF
-                IDENT "event_id"
+          WHITESPACE "\n"
+          JOIN
+            JOIN_LEFT
+              LEFT_KW "LEFT"
+              WHITESPACE " "
+              JOIN_KW "JOIN"
             WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            FIELD_EXPR
+            FROM_ITEM
               NAME_REF
-                IDENT "m"
-              DOT "."
-              NAME_REF
-                IDENT "event_id"
+                IDENT "events_metadata"
+              WHITESPACE " "
+              ALIAS
+                NAME
+                  IDENT "m"
+            WHITESPACE "\n  "
+            ON_CLAUSE
+              ON_KW "ON"
+              WHITESPACE " "
+              BIN_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "e"
+                  DOT "."
+                  NAME_REF
+                    IDENT "event_id"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "m"
+                  DOT "."
+                  NAME_REF
+                    IDENT "event_id"
         WHITESPACE "\n"
         JOIN
-          LEFT_KW "LEFT"
-          WHITESPACE " "
-          JOIN_KW "JOIN"
+          JOIN_LEFT
+            LEFT_KW "LEFT"
+            WHITESPACE " "
+            JOIN_KW "JOIN"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -4153,24 +4166,25 @@ SOURCE_FILE
               NAME
                 IDENT "p"
           WHITESPACE "\n  "
-          ON_KW "ON"
-          WHITESPACE " "
-          BIN_EXPR
-            FIELD_EXPR
-              NAME_REF
-                IDENT "e"
-              DOT "."
-              NAME_REF
-                IDENT "event_id"
+          ON_CLAUSE
+            ON_KW "ON"
             WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            FIELD_EXPR
-              NAME_REF
-                IDENT "p"
-              DOT "."
-              NAME_REF
-                IDENT "event_id"
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "e"
+                DOT "."
+                NAME_REF
+                  IDENT "event_id"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "p"
+                DOT "."
+                NAME_REF
+                  IDENT "event_id"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -5044,16 +5058,18 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "events"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "e"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "events"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "e"
         WHITESPACE "\n"
         JOIN
-          JOIN_KW "JOIN"
+          JOIN_INNER
+            JOIN_KW "JOIN"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -5063,24 +5079,25 @@ SOURCE_FILE
               NAME
                 IDENT "s"
           WHITESPACE "\n  "
-          ON_KW "ON"
-          WHITESPACE " "
-          BIN_EXPR
-            FIELD_EXPR
-              NAME_REF
-                IDENT "e"
-              DOT "."
-              NAME_REF
-                IDENT "user_id"
+          ON_CLAUSE
+            ON_KW "ON"
             WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            FIELD_EXPR
-              NAME_REF
-                IDENT "s"
-              DOT "."
-              NAME_REF
-                IDENT "user_id"
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "e"
+                DOT "."
+                NAME_REF
+                  IDENT "user_id"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "s"
+                DOT "."
+                NAME_REF
+                  IDENT "user_id"
     WHITESPACE "\n"
     GROUP_BY_CLAUSE
       GROUP_KW "GROUP"
@@ -5714,46 +5731,51 @@ SOURCE_FILE
       FROM_CLAUSE
         FROM_KW "FROM"
         WHITESPACE "\n    "
-        FROM_ITEM
-          NAME_REF
-            IDENT "products"
-          WHITESPACE " "
-          ALIAS
-            NAME
-              IDENT "p"
-          WHITESPACE "\n    "
-          JOIN
-            JOIN_KW "JOIN"
-            WHITESPACE " "
+        JOIN_EXPR
+          JOIN_EXPR
             FROM_ITEM
               NAME_REF
-                IDENT "product_orders"
+                IDENT "products"
               WHITESPACE " "
               ALIAS
                 NAME
-                  IDENT "po"
-            WHITESPACE " "
-            ON_KW "ON"
-            WHITESPACE " "
-            BIN_EXPR
-              FIELD_EXPR
-                NAME_REF
                   IDENT "p"
-                DOT "."
-                NAME_REF
-                  IDENT "sku"
+            WHITESPACE "\n    "
+            JOIN
+              JOIN_INNER
+                JOIN_KW "JOIN"
               WHITESPACE " "
-              EQ "="
+              FROM_ITEM
+                NAME_REF
+                  IDENT "product_orders"
+                WHITESPACE " "
+                ALIAS
+                  NAME
+                    IDENT "po"
               WHITESPACE " "
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "po"
-                DOT "."
-                NAME_REF
-                  IDENT "sku"
+              ON_CLAUSE
+                ON_KW "ON"
+                WHITESPACE " "
+                BIN_EXPR
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "p"
+                    DOT "."
+                    NAME_REF
+                      IDENT "sku"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "po"
+                    DOT "."
+                    NAME_REF
+                      IDENT "sku"
           WHITESPACE "\n    "
           JOIN
-            JOIN_KW "JOIN"
+            JOIN_INNER
+              JOIN_KW "JOIN"
             WHITESPACE " "
             FROM_ITEM
               NAME_REF
@@ -5763,24 +5785,25 @@ SOURCE_FILE
                 NAME
                   IDENT "o"
             WHITESPACE " "
-            ON_KW "ON"
-            WHITESPACE " "
-            BIN_EXPR
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "po"
-                DOT "."
-                NAME_REF
-                  IDENT "order_id"
+            ON_CLAUSE
+              ON_KW "ON"
               WHITESPACE " "
-              EQ "="
-              WHITESPACE " "
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "o"
-                DOT "."
-                NAME_REF
-                  IDENT "order_id"
+              BIN_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "po"
+                  DOT "."
+                  NAME_REF
+                    IDENT "order_id"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "o"
+                  DOT "."
+                  NAME_REF
+                    IDENT "order_id"
       WHITESPACE "\n"
       WHERE_CLAUSE
         WHERE_KW "WHERE"
@@ -6117,27 +6140,30 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "solar_panel_metrics"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "solar_panel_metrics"
         WHITESPACE "\n"
         JOIN
-          JOIN_KW "JOIN"
+          JOIN_INNER
+            JOIN_KW "JOIN"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
               IDENT "panel_specifications"
           WHITESPACE " "
-          ON_KW "ON"
-          WHITESPACE " "
-          BIN_EXPR
-            NAME_REF
-              IDENT "panel_id"
+          ON_CLAUSE
+            ON_KW "ON"
             WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            NAME_REF
-              IDENT "specs_id"
+            BIN_EXPR
+              NAME_REF
+                IDENT "panel_id"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              NAME_REF
+                IDENT "specs_id"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"
@@ -6357,16 +6383,18 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "FROM"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "turbine_metrics"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "t"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "turbine_metrics"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "t"
         WHITESPACE "\n"
         JOIN
-          JOIN_KW "JOIN"
+          JOIN_INNER
+            JOIN_KW "JOIN"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF

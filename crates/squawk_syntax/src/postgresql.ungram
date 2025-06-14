@@ -560,13 +560,36 @@ ConstraintStorageParams =
 ConstraintIndexTablespace =
   'using' 'index' 'tablespace' NameRef
 
-Join =
-  'natural'
-| 'cross' 'join'
-| 'inner'? 'join'
-| 'left' 'outer'? 'join'
-| 'full' 'outer'? 'join'
+JoinInner =
+  'inner'? 'join'
 
+JoinLeft =
+  'left' 'outer'? 'join'
+
+JoinRight =
+  'right' 'outer'? 'join'
+
+JoinFull =
+  'full' 'outer'? 'join'
+
+JoinCross =
+  'cross' 'join'
+
+JoinType =
+  JoinInner
+| JoinLeft
+| JoinRight
+| JoinFull
+| JoinCross
+
+OnClause =
+  'on' Expr
+
+Join =
+  'natural'? JoinType (UsingClause | OnClause)?
+
+JoinExpr =
+  (FromItem | JoinExpr) Join
 
 // TODO: do we even want this in the AST?
 ParenSelect =
@@ -927,11 +950,12 @@ OrderByClause =
   'order' 'by'
 
 FromItem =
-  'only'?
+  'only'? NameRef
 
 FromClause =
   'from'
-  (FromItem (',' FromItem)*)
+  (FromItem (',' FromItem)*)?
+  (JoinExpr (',' JoinExpr)*)?
 
 ConstraintIndexMethod =
   'using'

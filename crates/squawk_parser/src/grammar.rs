@@ -2625,32 +2625,61 @@ fn opt_order_by_clause(p: &mut Parser<'_>) -> bool {
     true
 }
 
-const JOIN_TYPE_FIRST: TokenSet = TokenSet::new(&[INNER_KW, JOIN_KW, LEFT_KW, RIGHT_KW, FULL_KW]);
+const JOIN_TYPE_FIRST: TokenSet =
+    TokenSet::new(&[INNER_KW, JOIN_KW, LEFT_KW, RIGHT_KW, FULL_KW, CROSS_KW]);
 
 // where join_type is:
 //   [ INNER ] JOIN
 //   LEFT [ OUTER ] JOIN
 //   RIGHT [ OUTER ] JOIN
 //   FULL [ OUTER ] JOIN
-fn join_type(p: &mut Parser<'_>) -> bool {
+fn join_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     assert!(p.at_ts(JOIN_TYPE_FIRST));
-    if p.eat(INNER_KW) {
-        p.expect(JOIN_KW)
-    } else if p.eat(LEFT_KW) || p.eat(RIGHT_KW) || p.eat(FULL_KW) {
-        p.eat(OUTER_KW);
-        p.expect(JOIN_KW)
-    } else {
-        p.expect(JOIN_KW)
-    }
+    let m = p.start();
+    let kind = match p.current() {
+        CROSS_KW => {
+            p.bump(CROSS_KW);
+            p.expect(JOIN_KW);
+            JOIN_CROSS
+        }
+        INNER_KW | JOIN_KW => {
+            p.eat(INNER_KW);
+            p.expect(JOIN_KW);
+            JOIN_INNER
+        }
+        LEFT_KW => {
+            p.bump(LEFT_KW);
+            p.eat(OUTER_KW);
+            p.expect(JOIN_KW);
+            JOIN_LEFT
+        }
+        RIGHT_KW => {
+            p.bump(RIGHT_KW);
+            p.eat(OUTER_KW);
+            p.expect(JOIN_KW);
+            JOIN_RIGHT
+        }
+        FULL_KW => {
+            p.bump(FULL_KW);
+            p.eat(OUTER_KW);
+            p.expect(JOIN_KW);
+            JOIN_FULL
+        }
+        _ => {
+            p.error("expected join type");
+            return None;
+        }
+    };
+    Some(m.complete(p, kind))
 }
 
 const JOIN_FIRST: TokenSet = TokenSet::new(&[NATURAL_KW, CROSS_KW]).union(JOIN_TYPE_FIRST);
 
-fn opt_from_clause(p: &mut Parser<'_>) -> bool {
+fn opt_from_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if !p.eat(FROM_KW) {
         m.abandon(p);
-        return false;
+        return None;
     }
     if !opt_from_item(p) {
         p.error(format!("expected from item, got {:?}", p.current()));
@@ -2661,8 +2690,7 @@ fn opt_from_clause(p: &mut Parser<'_>) -> bool {
             break;
         }
     }
-    m.complete(p, FROM_CLAUSE);
-    true
+    Some(m.complete(p, FROM_CLAUSE))
 }
 
 // https://github.com/postgres/postgres/blob/b3219c69fc1e161df8d380c464b3f2cce3b6cab9/src/backend/parser/gram.y#L18042
@@ -2994,7 +3022,7 @@ fn paren_data_source(p: &mut Parser<'_>) -> CompletedMarker {
 fn merge_using_clause(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(USING_KW);
-    data_source(p);
+    opt_from_item(p);
     p.expect(ON_KW);
     // join_condition
     if expr(p).is_none() {
@@ -3037,17 +3065,18 @@ fn merge_using_clause(p: &mut Parser<'_>) {
 //    RIGHT [ OUTER ] JOIN
 //    FULL [ OUTER ] JOIN
 //
-#[must_use]
 fn opt_from_item(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(FROM_ITEM_FIRST) {
         return false;
     }
     let m = p.start();
     data_source(p);
+    let mut cm = m.complete(p, FROM_ITEM);
     while p.at_ts(JOIN_FIRST) {
+        let m = cm.precede(p);
         join(p);
+        cm = m.complete(p, JOIN_EXPR);
     }
-    m.complete(p, FROM_ITEM);
     true
 }
 
@@ -3066,52 +3095,40 @@ fn opt_from_item(p: &mut Parser<'_>) -> bool {
 fn join(p: &mut Parser<'_>) {
     assert!(p.at_ts(JOIN_FIRST));
     let m = p.start();
-    if p.eat(NATURAL_KW) {
-        if !join_type(p) {
-            p.error("expected join type");
+    p.eat(NATURAL_KW);
+    if join_type(p).is_none() {
+        p.error("expected join type");
+    }
+    if !opt_from_item(p) {
+        p.error("expected from_item");
+    }
+    if p.at(ON_KW) {
+        let m = p.start();
+        p.bump(ON_KW);
+        if expr(p).is_none() {
+            p.error("expected an expression");
         }
-        if !opt_from_item(p) {
-            p.error("expected from_item");
-        }
-    } else if p.eat(CROSS_KW) {
-        p.expect(JOIN_KW);
-        if !opt_from_item(p) {
-            p.error("expected from_item");
-        }
-    } else {
-        if !join_type(p) {
-            p.error("expected join type");
-        }
-        if !opt_from_item(p) {
-            p.error("expected from_item");
-        }
-        if p.eat(ON_KW) {
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
+        m.complete(p, ON_CLAUSE);
+    } else if p.at(USING_KW) {
+        let m = p.start();
+        // USING ( join_column [, ...] )
+        p.expect(USING_KW);
+        if p.at(L_PAREN) {
+            column_list(p);
         } else {
-            {
-                let m = p.start();
-                // USING ( join_column [, ...] )
-                p.expect(USING_KW);
-                if p.at(L_PAREN) {
-                    column_list(p);
-                } else {
-                    p.error("expected L_PAREN");
-                }
-                m.complete(p, USING_CLAUSE);
-            }
-            {
-                let m = p.start();
-                // [ AS join_using_alias ]
-                if p.eat(AS_KW) {
-                    name(p);
-                    m.complete(p, ALIAS);
-                } else {
-                    m.abandon(p);
-                }
+            p.error("expected L_PAREN");
+        }
+        {
+            let m = p.start();
+            // [ AS join_using_alias ]
+            if p.eat(AS_KW) {
+                name(p);
+                m.complete(p, ALIAS);
+            } else {
+                m.abandon(p);
             }
         }
+        m.complete(p, USING_CLAUSE);
     }
     m.complete(p, JOIN);
 }
