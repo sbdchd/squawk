@@ -2681,11 +2681,11 @@ fn opt_from_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         m.abandon(p);
         return None;
     }
-    if !table_ref(p) {
+    if !opt_table_ref(p) {
         p.error(format!("expected from item, got {:?}", p.current()));
     }
     while !p.at(EOF) && p.eat(COMMA) {
-        if !table_ref(p) {
+        if !opt_table_ref(p) {
             p.error("expected from item");
             break;
         }
@@ -3007,7 +3007,7 @@ fn paren_data_source(p: &mut Parser<'_>) -> CompletedMarker {
     }
 
     // Then try to parse as a FROM_ITEM (which includes table references and joins)
-    if table_ref(p) {
+    if opt_table_ref(p) {
         p.expect(R_PAREN);
         return m.complete(p, PAREN_EXPR);
     } else {
@@ -3022,7 +3022,7 @@ fn paren_data_source(p: &mut Parser<'_>) -> CompletedMarker {
 fn merge_using_clause(p: &mut Parser<'_>) {
     let m = p.start();
     p.expect(USING_KW);
-    table_ref(p);
+    opt_table_ref(p);
     p.expect(ON_KW);
     // join_condition
     if expr(p).is_none() {
@@ -3065,7 +3065,7 @@ fn merge_using_clause(p: &mut Parser<'_>) {
 //    RIGHT [ OUTER ] JOIN
 //    FULL [ OUTER ] JOIN
 //
-fn table_ref(p: &mut Parser<'_>) -> bool {
+fn opt_table_ref(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(FROM_ITEM_FIRST) {
         return false;
     }
@@ -3099,7 +3099,7 @@ fn join(p: &mut Parser<'_>) {
     if join_type(p).is_none() {
         p.error("expected join type");
     }
-    if !table_ref(p) {
+    if !opt_table_ref(p) {
         p.error("expected from_item");
     }
     if p.at(ON_KW) {
@@ -12238,7 +12238,7 @@ fn delete(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
         let m = p.start();
         if p.eat(USING_KW) {
             while p.at_ts(FROM_ITEM_FIRST) {
-                if !table_ref(p) || !p.eat(COMMA) {
+                if !opt_table_ref(p) || !p.eat(COMMA) {
                     break;
                 }
             }
