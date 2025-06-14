@@ -1,0 +1,537 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/join_clauses.sql
+---
+SOURCE_FILE@0..653
+  COMMENT@0..7 "-- errs"
+  WHITESPACE@7..8 "\n"
+  SELECT@8..30
+    SELECT_CLAUSE@8..16
+      SELECT_KW@8..14 "select"
+      WHITESPACE@14..15 " "
+      TARGET_LIST@15..16
+        TARGET@15..16
+          STAR@15..16 "*"
+    WHITESPACE@16..17 " "
+    FROM_CLAUSE@17..30
+      FROM_KW@17..21 "from"
+      WHITESPACE@21..22 " "
+      JOIN_EXPR@22..30
+        FROM_ITEM@22..23
+          NAME_REF@22..23
+            IDENT@22..23 "t"
+        WHITESPACE@23..24 " "
+        JOIN@24..30
+          JOIN_INNER@24..28
+            JOIN_KW@24..28 "join"
+          WHITESPACE@28..29 " "
+          FROM_ITEM@29..30
+            NAME_REF@29..30
+              IDENT@29..30 "u"
+  SEMICOLON@30..31 ";"
+  WHITESPACE@31..33 "\n\n"
+  SELECT@33..60
+    SELECT_CLAUSE@33..41
+      SELECT_KW@33..39 "select"
+      WHITESPACE@39..40 " "
+      TARGET_LIST@40..41
+        TARGET@40..41
+          STAR@40..41 "*"
+    WHITESPACE@41..42 " "
+    FROM_CLAUSE@42..60
+      FROM_KW@42..46 "from"
+      WHITESPACE@46..47 " "
+      JOIN_EXPR@47..60
+        FROM_ITEM@47..48
+          NAME_REF@47..48
+            IDENT@47..48 "t"
+        WHITESPACE@48..49 " "
+        JOIN@49..60
+          JOIN_LEFT@49..58
+            LEFT_KW@49..53 "left"
+            WHITESPACE@53..54 " "
+            JOIN_KW@54..58 "join"
+          WHITESPACE@58..59 " "
+          FROM_ITEM@59..60
+            NAME_REF@59..60
+              IDENT@59..60 "u"
+  SEMICOLON@60..61 ";"
+  WHITESPACE@61..63 "\n\n"
+  SELECT@63..91
+    SELECT_CLAUSE@63..71
+      SELECT_KW@63..69 "select"
+      WHITESPACE@69..70 " "
+      TARGET_LIST@70..71
+        TARGET@70..71
+          STAR@70..71 "*"
+    WHITESPACE@71..72 " "
+    FROM_CLAUSE@72..91
+      FROM_KW@72..76 "from"
+      WHITESPACE@76..77 " "
+      JOIN_EXPR@77..91
+        FROM_ITEM@77..78
+          NAME_REF@77..78
+            IDENT@77..78 "t"
+        WHITESPACE@78..79 " "
+        JOIN@79..91
+          JOIN_RIGHT@79..89
+            RIGHT_KW@79..84 "right"
+            WHITESPACE@84..85 " "
+            JOIN_KW@85..89 "join"
+          WHITESPACE@89..90 " "
+          FROM_ITEM@90..91
+            NAME_REF@90..91
+              IDENT@90..91 "u"
+  SEMICOLON@91..92 ";"
+  WHITESPACE@92..94 "\n\n"
+  SELECT@94..121
+    SELECT_CLAUSE@94..102
+      SELECT_KW@94..100 "select"
+      WHITESPACE@100..101 " "
+      TARGET_LIST@101..102
+        TARGET@101..102
+          STAR@101..102 "*"
+    WHITESPACE@102..103 " "
+    FROM_CLAUSE@103..121
+      FROM_KW@103..107 "from"
+      WHITESPACE@107..108 " "
+      JOIN_EXPR@108..121
+        FROM_ITEM@108..109
+          NAME_REF@108..109
+            IDENT@108..109 "t"
+        WHITESPACE@109..110 " "
+        JOIN@110..121
+          JOIN_FULL@110..119
+            FULL_KW@110..114 "full"
+            WHITESPACE@114..115 " "
+            JOIN_KW@115..119 "join"
+          WHITESPACE@119..120 " "
+          FROM_ITEM@120..121
+            NAME_REF@120..121
+              IDENT@120..121 "u"
+  SEMICOLON@121..122 ";"
+  WHITESPACE@122..125 "\n\n\n"
+  COMMENT@125..171 "-- err, can't use con ..."
+  WHITESPACE@171..172 "\n"
+  SELECT@172..213
+    SELECT_CLAUSE@172..180
+      SELECT_KW@172..178 "select"
+      WHITESPACE@178..179 " "
+      TARGET_LIST@179..180
+        TARGET@179..180
+          STAR@179..180 "*"
+    WHITESPACE@180..181 " "
+    FROM_CLAUSE@181..213
+      FROM_KW@181..185 "from"
+      WHITESPACE@185..186 " "
+      JOIN_EXPR@186..213
+        FROM_ITEM@186..187
+          NAME_REF@186..187
+            IDENT@186..187 "t"
+        WHITESPACE@187..188 " "
+        JOIN@188..213
+          NATURAL_KW@188..195 "natural"
+          WHITESPACE@195..196 " "
+          JOIN_INNER@196..200
+            JOIN_KW@196..200 "join"
+          WHITESPACE@200..201 " "
+          FROM_ITEM@201..202
+            NAME_REF@201..202
+              IDENT@201..202 "u"
+          WHITESPACE@202..203 " "
+          USING_CLAUSE@203..213
+            USING_KW@203..208 "using"
+            WHITESPACE@208..209 " "
+            COLUMN_LIST@209..213
+              L_PAREN@209..210 "("
+              COLUMN@210..212
+                NAME_REF@210..212
+                  IDENT@210..212 "id"
+              R_PAREN@212..213 ")"
+  SEMICOLON@213..214 ";"
+  WHITESPACE@214..215 "\n"
+  SELECT@215..260
+    SELECT_CLAUSE@215..223
+      SELECT_KW@215..221 "select"
+      WHITESPACE@221..222 " "
+      TARGET_LIST@222..223
+        TARGET@222..223
+          STAR@222..223 "*"
+    WHITESPACE@223..224 " "
+    FROM_CLAUSE@224..260
+      FROM_KW@224..228 "from"
+      WHITESPACE@228..229 " "
+      JOIN_EXPR@229..260
+        FROM_ITEM@229..230
+          NAME_REF@229..230
+            IDENT@229..230 "t"
+        WHITESPACE@230..231 " "
+        JOIN@231..260
+          NATURAL_KW@231..238 "natural"
+          WHITESPACE@238..239 " "
+          JOIN_INNER@239..243
+            JOIN_KW@239..243 "join"
+          WHITESPACE@243..244 " "
+          FROM_ITEM@244..245
+            NAME_REF@244..245
+              IDENT@244..245 "u"
+          WHITESPACE@245..246 " "
+          ON_CLAUSE@246..260
+            ON_KW@246..248 "on"
+            WHITESPACE@248..249 " "
+            BIN_EXPR@249..260
+              FIELD_EXPR@249..253
+                NAME_REF@249..250
+                  IDENT@249..250 "u"
+                DOT@250..251 "."
+                NAME_REF@251..253
+                  IDENT@251..253 "id"
+              WHITESPACE@253..254 " "
+              EQ@254..255 "="
+              WHITESPACE@255..256 " "
+              FIELD_EXPR@256..260
+                NAME_REF@256..257
+                  IDENT@256..257 "t"
+                DOT@257..258 "."
+                NAME_REF@258..260
+                  IDENT@258..260 "id"
+  SEMICOLON@260..261 ";"
+  WHITESPACE@261..263 "\n\n"
+  COMMENT@263..308 "-- err, can't use con ..."
+  WHITESPACE@308..309 "\n"
+  SELECT@309..348
+    SELECT_CLAUSE@309..317
+      SELECT_KW@309..315 "select"
+      WHITESPACE@315..316 " "
+      TARGET_LIST@316..317
+        TARGET@316..317
+          STAR@316..317 "*"
+    WHITESPACE@317..318 " "
+    FROM_CLAUSE@318..348
+      FROM_KW@318..322 "from"
+      WHITESPACE@322..323 " "
+      JOIN_EXPR@323..348
+        FROM_ITEM@323..324
+          NAME_REF@323..324
+            IDENT@323..324 "t"
+        WHITESPACE@324..325 " "
+        JOIN@325..348
+          JOIN_CROSS@325..335
+            CROSS_KW@325..330 "cross"
+            WHITESPACE@330..331 " "
+            JOIN_KW@331..335 "join"
+          WHITESPACE@335..336 " "
+          FROM_ITEM@336..337
+            NAME_REF@336..337
+              IDENT@336..337 "u"
+          WHITESPACE@337..338 " "
+          USING_CLAUSE@338..348
+            USING_KW@338..343 "using"
+            WHITESPACE@343..344 " "
+            COLUMN_LIST@344..348
+              L_PAREN@344..345 "("
+              COLUMN@345..347
+                NAME_REF@345..347
+                  IDENT@345..347 "id"
+              R_PAREN@347..348 ")"
+  SEMICOLON@348..349 ";"
+  WHITESPACE@349..350 "\n"
+  SELECT@350..393
+    SELECT_CLAUSE@350..358
+      SELECT_KW@350..356 "select"
+      WHITESPACE@356..357 " "
+      TARGET_LIST@357..358
+        TARGET@357..358
+          STAR@357..358 "*"
+    WHITESPACE@358..359 " "
+    FROM_CLAUSE@359..393
+      FROM_KW@359..363 "from"
+      WHITESPACE@363..364 " "
+      JOIN_EXPR@364..393
+        FROM_ITEM@364..365
+          NAME_REF@364..365
+            IDENT@364..365 "t"
+        WHITESPACE@365..366 " "
+        JOIN@366..393
+          JOIN_CROSS@366..376
+            CROSS_KW@366..371 "cross"
+            WHITESPACE@371..372 " "
+            JOIN_KW@372..376 "join"
+          WHITESPACE@376..377 " "
+          FROM_ITEM@377..378
+            NAME_REF@377..378
+              IDENT@377..378 "u"
+          WHITESPACE@378..379 " "
+          ON_CLAUSE@379..393
+            ON_KW@379..381 "on"
+            WHITESPACE@381..382 " "
+            BIN_EXPR@382..393
+              FIELD_EXPR@382..386
+                NAME_REF@382..383
+                  IDENT@382..383 "u"
+                DOT@383..384 "."
+                NAME_REF@384..386
+                  IDENT@384..386 "id"
+              WHITESPACE@386..387 " "
+              EQ@387..388 "="
+              WHITESPACE@388..389 " "
+              FIELD_EXPR@389..393
+                NAME_REF@389..390
+                  IDENT@389..390 "t"
+                DOT@390..391 "."
+                NAME_REF@391..393
+                  IDENT@391..393 "id"
+  SEMICOLON@393..394 ";"
+  WHITESPACE@394..395 "\n"
+  SELECT@395..431
+    SELECT_CLAUSE@395..403
+      SELECT_KW@395..401 "select"
+      WHITESPACE@401..402 " "
+      TARGET_LIST@402..403
+        TARGET@402..403
+          STAR@402..403 "*"
+    WHITESPACE@403..404 " "
+    FROM_CLAUSE@404..431
+      FROM_KW@404..408 "from"
+      WHITESPACE@408..409 " "
+      JOIN_EXPR@409..431
+        FROM_ITEM@409..410
+          NAME_REF@409..410
+            IDENT@409..410 "t"
+        WHITESPACE@410..411 " "
+        JOIN@411..431
+          JOIN_CROSS@411..421
+            CROSS_KW@411..416 "cross"
+            WHITESPACE@416..417 " "
+            JOIN_KW@417..421 "join"
+          WHITESPACE@421..422 " "
+          FROM_ITEM@422..423
+            NAME_REF@422..423
+              IDENT@422..423 "u"
+          WHITESPACE@423..424 " "
+          ON_CLAUSE@424..431
+            ON_KW@424..426 "on"
+            WHITESPACE@426..427 " "
+            LITERAL@427..431
+              TRUE_KW@427..431 "true"
+  SEMICOLON@431..432 ";"
+  WHITESPACE@432..434 "\n\n"
+  COMMENT@434..439 "-- ok"
+  WHITESPACE@439..440 "\n"
+  SELECT@440..470
+    SELECT_CLAUSE@440..448
+      SELECT_KW@440..446 "select"
+      WHITESPACE@446..447 " "
+      TARGET_LIST@447..448
+        TARGET@447..448
+          STAR@447..448 "*"
+    WHITESPACE@448..449 " "
+    FROM_CLAUSE@449..470
+      FROM_KW@449..453 "from"
+      WHITESPACE@453..454 " "
+      JOIN_EXPR@454..470
+        FROM_ITEM@454..455
+          NAME_REF@454..455
+            IDENT@454..455 "t"
+        WHITESPACE@455..456 " "
+        JOIN@456..470
+          NATURAL_KW@456..463 "natural"
+          WHITESPACE@463..464 " "
+          JOIN_INNER@464..468
+            JOIN_KW@464..468 "join"
+          WHITESPACE@468..469 " "
+          FROM_ITEM@469..470
+            NAME_REF@469..470
+              IDENT@469..470 "u"
+  SEMICOLON@470..471 ";"
+  WHITESPACE@471..473 "\n\n"
+  SELECT@473..521
+    SELECT_CLAUSE@473..481
+      SELECT_KW@473..479 "select"
+      WHITESPACE@479..480 " "
+      TARGET_LIST@480..481
+        TARGET@480..481
+          STAR@480..481 "*"
+    WHITESPACE@481..482 " "
+    FROM_CLAUSE@482..521
+      FROM_KW@482..486 "from"
+      WHITESPACE@486..487 " "
+      JOIN_EXPR@487..501
+        FROM_ITEM@487..488
+          NAME_REF@487..488
+            IDENT@487..488 "t"
+        WHITESPACE@488..489 " "
+        JOIN@489..501
+          JOIN_CROSS@489..499
+            CROSS_KW@489..494 "cross"
+            WHITESPACE@494..495 " "
+            JOIN_KW@495..499 "join"
+          WHITESPACE@499..500 " "
+          FROM_ITEM@500..501
+            NAME_REF@500..501
+              IDENT@500..501 "u"
+      COMMA@501..502 ","
+      WHITESPACE@502..503 " "
+      JOIN_EXPR@503..521
+        FROM_ITEM@503..504
+          NAME_REF@503..504
+            IDENT@503..504 "b"
+        WHITESPACE@504..505 " "
+        JOIN@505..521
+          JOIN_INNER@505..509
+            JOIN_KW@505..509 "join"
+          WHITESPACE@509..510 " "
+          FROM_ITEM@510..511
+            NAME_REF@510..511
+              IDENT@510..511 "c"
+          WHITESPACE@511..512 " "
+          USING_CLAUSE@512..521
+            USING_KW@512..517 "using"
+            COLUMN_LIST@517..521
+              L_PAREN@517..518 "("
+              COLUMN@518..520
+                NAME_REF@518..520
+                  IDENT@518..520 "id"
+              R_PAREN@520..521 ")"
+  SEMICOLON@521..522 ";"
+  WHITESPACE@522..524 "\n\n"
+  SELECT@524..561
+    SELECT_CLAUSE@524..532
+      SELECT_KW@524..530 "select"
+      WHITESPACE@530..531 " "
+      TARGET_LIST@531..532
+        TARGET@531..532
+          STAR@531..532 "*"
+    WHITESPACE@532..533 " "
+    FROM_CLAUSE@533..561
+      FROM_KW@533..537 "from"
+      WHITESPACE@537..538 " "
+      JOIN_EXPR@538..561
+        FROM_ITEM@538..539
+          NAME_REF@538..539
+            IDENT@538..539 "t"
+        WHITESPACE@539..540 " "
+        JOIN@540..561
+          JOIN_INNER@540..544
+            JOIN_KW@540..544 "join"
+          WHITESPACE@544..545 " "
+          FROM_ITEM@545..546
+            NAME_REF@545..546
+              IDENT@545..546 "u"
+          WHITESPACE@546..547 " "
+          ON_CLAUSE@547..561
+            ON_KW@547..549 "on"
+            WHITESPACE@549..550 " "
+            BIN_EXPR@550..561
+              FIELD_EXPR@550..554
+                NAME_REF@550..551
+                  IDENT@550..551 "u"
+                DOT@551..552 "."
+                NAME_REF@552..554
+                  IDENT@552..554 "id"
+              WHITESPACE@554..555 " "
+              EQ@555..556 "="
+              WHITESPACE@556..557 " "
+              FIELD_EXPR@557..561
+                NAME_REF@557..558
+                  IDENT@557..558 "t"
+                DOT@558..559 "."
+                NAME_REF@559..561
+                  IDENT@559..561 "id"
+  SEMICOLON@561..562 ";"
+  WHITESPACE@562..563 "\n"
+  SELECT@563..593
+    SELECT_CLAUSE@563..571
+      SELECT_KW@563..569 "select"
+      WHITESPACE@569..570 " "
+      TARGET_LIST@570..571
+        TARGET@570..571
+          STAR@570..571 "*"
+    WHITESPACE@571..572 " "
+    FROM_CLAUSE@572..593
+      FROM_KW@572..576 "from"
+      WHITESPACE@576..577 " "
+      JOIN_EXPR@577..593
+        FROM_ITEM@577..578
+          NAME_REF@577..578
+            IDENT@577..578 "t"
+        WHITESPACE@578..579 " "
+        JOIN@579..593
+          JOIN_INNER@579..583
+            JOIN_KW@579..583 "join"
+          WHITESPACE@583..584 " "
+          FROM_ITEM@584..585
+            NAME_REF@584..585
+              IDENT@584..585 "u"
+          WHITESPACE@585..586 " "
+          ON_CLAUSE@586..593
+            ON_KW@586..588 "on"
+            WHITESPACE@588..589 " "
+            LITERAL@589..593
+              TRUE_KW@589..593 "true"
+  SEMICOLON@593..594 ";"
+  WHITESPACE@594..596 "\n\n"
+  SELECT@596..651
+    SELECT_CLAUSE@596..604
+      SELECT_KW@596..602 "select"
+      WHITESPACE@602..603 " "
+      TARGET_LIST@603..604
+        TARGET@603..604
+          STAR@603..604 "*"
+    WHITESPACE@604..605 " "
+    FROM_CLAUSE@605..651
+      FROM_KW@605..609 "from"
+      WHITESPACE@609..610 " "
+      JOIN_EXPR@610..651
+        JOIN_EXPR@610..631
+          FROM_ITEM@610..611
+            NAME_REF@610..611
+              IDENT@610..611 "t"
+          WHITESPACE@611..614 "\n  "
+          JOIN@614..631
+            JOIN_INNER@614..618
+              JOIN_KW@614..618 "join"
+            WHITESPACE@618..619 " "
+            FROM_ITEM@619..620
+              NAME_REF@619..620
+                IDENT@619..620 "u"
+            WHITESPACE@620..621 " "
+            USING_CLAUSE@621..631
+              USING_KW@621..626 "using"
+              WHITESPACE@626..627 " "
+              COLUMN_LIST@627..631
+                L_PAREN@627..628 "("
+                COLUMN@628..630
+                  NAME_REF@628..630
+                    IDENT@628..630 "id"
+                R_PAREN@630..631 ")"
+        WHITESPACE@631..634 "\n  "
+        JOIN@634..651
+          JOIN_INNER@634..638
+            JOIN_KW@634..638 "join"
+          WHITESPACE@638..639 " "
+          FROM_ITEM@639..640
+            NAME_REF@639..640
+              IDENT@639..640 "c"
+          WHITESPACE@640..641 " "
+          USING_CLAUSE@641..651
+            USING_KW@641..646 "using"
+            WHITESPACE@646..647 " "
+            COLUMN_LIST@647..651
+              L_PAREN@647..648 "("
+              COLUMN@648..650
+                NAME_REF@648..650
+                  IDENT@648..650 "id"
+              R_PAREN@650..651 ")"
+  SEMICOLON@651..652 ";"
+  WHITESPACE@652..653 "\n"
+
+ERROR@30 "Join missing condition."
+ERROR@60 "Join missing condition."
+ERROR@91 "Join missing condition."
+ERROR@121 "Join missing condition."
+ERROR@203:213 "Join `using` clause is not allowed for natural joins."
+ERROR@246:260 "Join condition is not allowed for natural joins."
+ERROR@338:348 "Join `using` clause is not allowed for cross joins."
+ERROR@379:393 "Join condition is not allowed for cross joins."
+ERROR@424:431 "Join condition is not allowed for cross joins."

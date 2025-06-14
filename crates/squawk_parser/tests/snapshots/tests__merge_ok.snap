@@ -19,8 +19,9 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      FROM_ITEM
+        NAME_REF
+          IDENT "u"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -74,14 +75,15 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "as"
+      FROM_ITEM
+        NAME_REF
+          IDENT "bar"
         WHITESPACE " "
-        NAME
-          IDENT "b"
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "b"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -129,24 +131,25 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      ROWS_KW "rows"
-      WHITESPACE " "
-      FROM_KW "from"
-      WHITESPACE " "
-      L_PAREN "("
-      CALL_EXPR
-        NAME_REF
-          IDENT "f"
-        ARG_LIST
-          L_PAREN "("
-          LITERAL
-            INT_NUMBER "1"
-          COMMA ","
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "2"
-          R_PAREN ")"
-      R_PAREN ")"
+      FROM_ITEM
+        ROWS_KW "rows"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        L_PAREN "("
+        CALL_EXPR
+          NAME_REF
+            IDENT "f"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
+        R_PAREN ")"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -184,12 +187,13 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "bar"
-      WHITESPACE " "
-      ALIAS
-        NAME
-          IDENT "b"
+      FROM_ITEM
+        NAME_REF
+          IDENT "bar"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "b"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -239,8 +243,9 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      FROM_ITEM
+        NAME_REF
+          IDENT "u"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -290,8 +295,9 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      FROM_ITEM
+        NAME_REF
+          IDENT "u"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -341,24 +347,25 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      PAREN_SELECT
-        L_PAREN "("
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
+      FROM_ITEM
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "id"
             WHITESPACE " "
-            TARGET_LIST
-              TARGET
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              FROM_ITEM
                 NAME_REF
-                  IDENT "id"
-          WHITESPACE " "
-          FROM_CLAUSE
-            FROM_KW "from"
-            WHITESPACE " "
-            FROM_ITEM
-              NAME_REF
-                IDENT "bar"
-        R_PAREN ")"
+                  IDENT "bar"
+          R_PAREN ")"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -406,62 +413,66 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      PAREN_SELECT
-        L_PAREN "("
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
-            WHITESPACE " "
-            TARGET_LIST
-              TARGET
-                NAME_REF
-                  IDENT "id"
-          WHITESPACE " "
-          FROM_CLAUSE
-            FROM_KW "from"
-            WHITESPACE " "
-            FROM_ITEM
-              NAME_REF
-                IDENT "bar"
+      FROM_ITEM
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
               WHITESPACE " "
-              JOIN
-                JOIN_KW "join"
-                WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "id"
+            WHITESPACE " "
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              JOIN_EXPR
                 FROM_ITEM
                   NAME_REF
-                    IDENT "foo"
+                    IDENT "bar"
+                WHITESPACE " "
+                JOIN
+                  JOIN_INNER
+                    JOIN_KW "join"
                   WHITESPACE " "
-                  ALIAS
-                    AS_KW "as"
+                  FROM_ITEM
+                    NAME_REF
+                      IDENT "foo"
                     WHITESPACE " "
-                    NAME
-                      IDENT "f"
-                WHITESPACE " "
-                ON_KW "on"
-                WHITESPACE " "
-                BIN_EXPR
-                  FIELD_EXPR
-                    NAME_REF
-                      IDENT "f"
-                    DOT "."
-                    NAME_REF
-                      IDENT "id"
+                    ALIAS
+                      AS_KW "as"
+                      WHITESPACE " "
+                      NAME
+                        IDENT "f"
                   WHITESPACE " "
-                  EQ "="
-                  WHITESPACE " "
-                  FIELD_EXPR
-                    NAME_REF
-                      IDENT "bar"
-                    DOT "."
-                    NAME_REF
-                      IDENT "id"
-        R_PAREN ")"
-      WHITESPACE " "
-      ALIAS
-        AS_KW "as"
+                  ON_CLAUSE
+                    ON_KW "on"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "f"
+                        DOT "."
+                        NAME_REF
+                          IDENT "id"
+                      WHITESPACE " "
+                      EQ "="
+                      WHITESPACE " "
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "bar"
+                        DOT "."
+                        NAME_REF
+                          IDENT "id"
+          R_PAREN ")"
         WHITESPACE " "
-        NAME
-          IDENT "u"
+        ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          NAME
+            IDENT "u"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -509,28 +520,29 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      PAREN_SELECT
-        L_PAREN "("
-        SELECT
-          SELECT_CLAUSE
-            SELECT_KW "select"
+      FROM_ITEM
+        PAREN_SELECT
+          L_PAREN "("
+          SELECT
+            SELECT_CLAUSE
+              SELECT_KW "select"
+              WHITESPACE " "
+              TARGET_LIST
+                TARGET
+                  NAME_REF
+                    IDENT "id"
             WHITESPACE " "
-            TARGET_LIST
-              TARGET
+            FROM_CLAUSE
+              FROM_KW "from"
+              WHITESPACE " "
+              FROM_ITEM
                 NAME_REF
-                  IDENT "id"
-          WHITESPACE " "
-          FROM_CLAUSE
-            FROM_KW "from"
-            WHITESPACE " "
-            FROM_ITEM
-              NAME_REF
-                IDENT "bar"
-        R_PAREN ")"
-      WHITESPACE " "
-      ALIAS
-        NAME
-          IDENT "u"
+                  IDENT "bar"
+          R_PAREN ")"
+        WHITESPACE " "
+        ALIAS
+          NAME
+            IDENT "u"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "
@@ -578,8 +590,9 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      NAME_REF
-        IDENT "u"
+      FROM_ITEM
+        NAME_REF
+          IDENT "u"
       WHITESPACE "\n    "
       ON_KW "on"
       WHITESPACE " "

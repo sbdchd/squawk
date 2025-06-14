@@ -31,8 +31,9 @@ SOURCE_FILE
           USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
-            NAME_REF
-              IDENT "u"
+            FROM_ITEM
+              NAME_REF
+                IDENT "u"
             WHITESPACE " "
             ON_KW "on"
             WHITESPACE " "

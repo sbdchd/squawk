@@ -208,18 +208,20 @@ SOURCE_FILE
     USING_CLAUSE
       USING_KW "using"
       WHITESPACE " "
-      FROM_ITEM
-        NAME_REF
-          IDENT "order_items"
-        WHITESPACE " "
-        ALIAS
-          NAME
-            IDENT "oi"
+      JOIN_EXPR
+        FROM_ITEM
+          NAME_REF
+            IDENT "order_items"
+          WHITESPACE " "
+          ALIAS
+            NAME
+              IDENT "oi"
         WHITESPACE "\n  "
         JOIN
-          LEFT_KW "left"
-          WHITESPACE " "
-          JOIN_KW "join"
+          JOIN_LEFT
+            LEFT_KW "left"
+            WHITESPACE " "
+            JOIN_KW "join"
           WHITESPACE " "
           FROM_ITEM
             NAME_REF
@@ -229,24 +231,25 @@ SOURCE_FILE
               NAME
                 IDENT "o"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          BIN_EXPR
-            FIELD_EXPR
-              NAME_REF
-                IDENT "oi"
-              DOT "."
-              NAME_REF
-                IDENT "order_id"
+          ON_CLAUSE
+            ON_KW "on"
             WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            FIELD_EXPR
-              NAME_REF
-                IDENT "o"
-              DOT "."
-              NAME_REF
-                IDENT "id"
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "oi"
+                DOT "."
+                NAME_REF
+                  IDENT "order_id"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "o"
+                DOT "."
+                NAME_REF
+                  IDENT "id"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE

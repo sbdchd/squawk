@@ -4577,6 +4577,10 @@ impl FromClause {
         support::children(&self.syntax)
     }
     #[inline]
+    pub fn join_exprs(&self) -> AstChildren<JoinExpr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn from_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FROM_KW)
     }
@@ -4587,6 +4591,10 @@ pub struct FromItem {
     pub(crate) syntax: SyntaxNode,
 }
 impl FromItem {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn only_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ONLY_KW)
@@ -5363,17 +5371,96 @@ pub struct Join {
 }
 impl Join {
     #[inline]
+    pub fn join_type(&self) -> Option<JoinType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_clause(&self) -> Option<OnClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_clause(&self) -> Option<UsingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn natural_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NATURAL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JoinCross {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JoinCross {
+    #[inline]
     pub fn cross_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CROSS_KW)
     }
+    #[inline]
+    pub fn join_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JOIN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JoinExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JoinExpr {
+    #[inline]
+    pub fn from_item(&self) -> Option<FromItem> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn join(&self) -> Option<Join> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn join_expr(&self) -> Option<JoinExpr> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JoinFull {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JoinFull {
     #[inline]
     pub fn full_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FULL_KW)
     }
     #[inline]
+    pub fn join_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JOIN_KW)
+    }
+    #[inline]
+    pub fn outer_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OUTER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JoinInner {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JoinInner {
+    #[inline]
     pub fn inner_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INNER_KW)
     }
+    #[inline]
+    pub fn join_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JOIN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JoinLeft {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JoinLeft {
     #[inline]
     pub fn join_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::JOIN_KW)
@@ -5383,12 +5470,27 @@ impl Join {
         support::token(&self.syntax, SyntaxKind::LEFT_KW)
     }
     #[inline]
-    pub fn natural_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NATURAL_KW)
+    pub fn outer_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OUTER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JoinRight {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JoinRight {
+    #[inline]
+    pub fn join_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::JOIN_KW)
     }
     #[inline]
     pub fn outer_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OUTER_KW)
+    }
+    #[inline]
+    pub fn right_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RIGHT_KW)
     }
 }
 
@@ -6168,6 +6270,21 @@ impl OffsetClause {
     #[inline]
     pub fn offset_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OFFSET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OnClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OnClause {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
     }
 }
 
@@ -8808,6 +8925,15 @@ pub enum FuncOption {
     TransformFuncOption(TransformFuncOption),
     VolatilityFuncOption(VolatilityFuncOption),
     WindowFuncOption(WindowFuncOption),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum JoinType {
+    JoinCross(JoinCross),
+    JoinFull(JoinFull),
+    JoinInner(JoinInner),
+    JoinLeft(JoinLeft),
+    JoinRight(JoinRight),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -13588,6 +13714,114 @@ impl AstNode for Join {
         &self.syntax
     }
 }
+impl AstNode for JoinCross {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JOIN_CROSS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JoinExpr {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JOIN_EXPR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JoinFull {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JOIN_FULL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JoinInner {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JOIN_INNER
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JoinLeft {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JOIN_LEFT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JoinRight {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JOIN_RIGHT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for JsonBehaviorClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -14438,6 +14672,24 @@ impl AstNode for OffsetClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::OFFSET_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OnClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ON_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -17959,6 +18211,73 @@ impl From<WindowFuncOption> for FuncOption {
     #[inline]
     fn from(node: WindowFuncOption) -> FuncOption {
         FuncOption::WindowFuncOption(node)
+    }
+}
+impl AstNode for JoinType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::JOIN_CROSS
+                | SyntaxKind::JOIN_FULL
+                | SyntaxKind::JOIN_INNER
+                | SyntaxKind::JOIN_LEFT
+                | SyntaxKind::JOIN_RIGHT
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::JOIN_CROSS => JoinType::JoinCross(JoinCross { syntax }),
+            SyntaxKind::JOIN_FULL => JoinType::JoinFull(JoinFull { syntax }),
+            SyntaxKind::JOIN_INNER => JoinType::JoinInner(JoinInner { syntax }),
+            SyntaxKind::JOIN_LEFT => JoinType::JoinLeft(JoinLeft { syntax }),
+            SyntaxKind::JOIN_RIGHT => JoinType::JoinRight(JoinRight { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            JoinType::JoinCross(it) => &it.syntax,
+            JoinType::JoinFull(it) => &it.syntax,
+            JoinType::JoinInner(it) => &it.syntax,
+            JoinType::JoinLeft(it) => &it.syntax,
+            JoinType::JoinRight(it) => &it.syntax,
+        }
+    }
+}
+impl From<JoinCross> for JoinType {
+    #[inline]
+    fn from(node: JoinCross) -> JoinType {
+        JoinType::JoinCross(node)
+    }
+}
+impl From<JoinFull> for JoinType {
+    #[inline]
+    fn from(node: JoinFull) -> JoinType {
+        JoinType::JoinFull(node)
+    }
+}
+impl From<JoinInner> for JoinType {
+    #[inline]
+    fn from(node: JoinInner) -> JoinType {
+        JoinType::JoinInner(node)
+    }
+}
+impl From<JoinLeft> for JoinType {
+    #[inline]
+    fn from(node: JoinLeft) -> JoinType {
+        JoinType::JoinLeft(node)
+    }
+}
+impl From<JoinRight> for JoinType {
+    #[inline]
+    fn from(node: JoinRight) -> JoinType {
+        JoinType::JoinRight(node)
     }
 }
 impl AstNode for MatchType {
