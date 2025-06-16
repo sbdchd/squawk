@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.13.0 - 2025-06-15
+
+### Fixed
+
+- parsing compound select statements & their trailing clauses, i.e.
+
+  ```sql
+  (select 1) limit 1;
+
+  select * from (
+    (select 1)
+    union all
+    (select 1)
+  );
+  ```
+
+- join parsing to be more error resilent:
+
+  ```
+  error[syntax-error]: Join missing condition.
+   --> stdin:2:23
+    |
+  2 | select * from t join u;
+    |                       ^
+    |
+  error[syntax-error]: Join `using` clause is not allowed for cross joins.
+    --> stdin:16:30
+     |
+  16 | select * from t cross join u using (id);
+     |                              ^^^^^^^^^^
+     |
+  error[syntax-error]: Join condition is not allowed for cross joins.
+    --> stdin:18:30
+     |
+  18 | select * from t cross join u on true;
+     |                              ^^^^^^^
+     |
+  ```
+
 ## v2.12.0 - 2025-06-09
 
 ### Changed
