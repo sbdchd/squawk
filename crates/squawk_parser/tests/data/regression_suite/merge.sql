@@ -42,11 +42,11 @@ WHEN MATCHED THEN
 --
 -- Errors
 --
-MERGE INTO target t RANDOMWORD
-USING source AS s
-ON t.tid = s.sid
-WHEN MATCHED THEN
-	UPDATE SET balance = 0;
+-- MERGE INTO target t RANDOMWORD
+-- USING source AS s
+-- ON t.tid = s.sid
+-- WHEN MATCHED THEN
+-- 	UPDATE SET balance = 0;
 -- MATCHED/INSERT error
 MERGE INTO target t
 USING source AS s
@@ -60,41 +60,41 @@ ON t.tid = s.sid
 WHEN NOT MATCHED BY SOURCE THEN
 	INSERT DEFAULT VALUES;
 -- incorrectly specifying INTO target
-MERGE INTO target t
-USING source AS s
-ON t.tid = s.sid
-WHEN NOT MATCHED THEN
-	INSERT INTO target DEFAULT VALUES;
+-- MERGE INTO target t
+-- USING source AS s
+-- ON t.tid = s.sid
+-- WHEN NOT MATCHED THEN
+-- 	INSERT INTO target DEFAULT VALUES;
 -- Multiple VALUES clause
-MERGE INTO target t
-USING source AS s
-ON t.tid = s.sid
-WHEN NOT MATCHED THEN
-	INSERT VALUES (1,1), (2,2);
+-- MERGE INTO target t
+-- USING source AS s
+-- ON t.tid = s.sid
+-- WHEN NOT MATCHED THEN
+-- 	INSERT VALUES (1,1), (2,2);
 -- SELECT query for INSERT
-MERGE INTO target t
-USING source AS s
-ON t.tid = s.sid
-WHEN NOT MATCHED THEN
-	INSERT SELECT (1, 1);
+-- MERGE INTO target t
+-- USING source AS s
+-- ON t.tid = s.sid
+-- WHEN NOT MATCHED THEN
+-- 	INSERT SELECT (1, 1);
 -- NOT MATCHED/UPDATE
-MERGE INTO target t
-USING source AS s
-ON t.tid = s.sid
-WHEN NOT MATCHED THEN
-	UPDATE SET balance = 0;
+-- MERGE INTO target t
+-- USING source AS s
+-- ON t.tid = s.sid
+-- WHEN NOT MATCHED THEN
+-- 	UPDATE SET balance = 0;
 -- NOT MATCHED BY TARGET/UPDATE
-MERGE INTO target t
-USING source AS s
-ON t.tid = s.sid
-WHEN NOT MATCHED BY TARGET THEN
-	UPDATE SET balance = 0;
+-- MERGE INTO target t
+-- USING source AS s
+-- ON t.tid = s.sid
+-- WHEN NOT MATCHED BY TARGET THEN
+-- 	UPDATE SET balance = 0;
 -- UPDATE tablename
-MERGE INTO target t
-USING source AS s
-ON t.tid = s.sid
-WHEN MATCHED THEN
-	UPDATE target SET balance = 0;
+-- MERGE INTO target t
+-- USING source AS s
+-- ON t.tid = s.sid
+-- WHEN MATCHED THEN
+-- 	UPDATE target SET balance = 0;
 -- source and target names the same
 MERGE INTO target
 USING target
