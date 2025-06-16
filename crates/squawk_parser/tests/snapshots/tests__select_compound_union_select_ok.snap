@@ -77,7 +77,7 @@ SOURCE_FILE
               WHITESPACE "\n    "
               UNION_KW "UNION"
               WHITESPACE "\n    "
-              PAREN_EXPR
+              PAREN_SELECT
                 L_PAREN "("
                 SELECT
                   SELECT_CLAUSE

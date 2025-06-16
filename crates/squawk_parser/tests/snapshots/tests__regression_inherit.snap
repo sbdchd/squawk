@@ -2,37 +2,4 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/inherit.sql
 ---
-ERROR@30331: expected R_PAREN
-ERROR@30426: missing comma
-ERROR@30455: expected SEMICOLON
-ERROR@30455: expected command, found R_PAREN
-ERROR@30457: expected command, found FROM_KW
-ERROR@30462: expected command, found IDENT
-ERROR@30478: expected R_PAREN
-ERROR@30478: expected SEMICOLON
-ERROR@30478: expected command, found INT_NUMBER
-ERROR@30479: expected command, found COMMA
-ERROR@30481: expected command, found INT_NUMBER
-ERROR@30482: expected command, found R_PAREN
-ERROR@30484: expected command, found IDENT
-ERROR@30486: expected R_PAREN
-ERROR@30486: expected SEMICOLON
-ERROR@30486: expected command, found IDENT
-ERROR@30487: expected command, found R_PAREN
-ERROR@30594: expected R_PAREN
-ERROR@30689: missing comma
-ERROR@30718: expected SEMICOLON
-ERROR@30718: expected command, found R_PAREN
-ERROR@30720: expected command, found FROM_KW
-ERROR@30725: expected command, found IDENT
-ERROR@30741: expected R_PAREN
-ERROR@30741: expected SEMICOLON
-ERROR@30741: expected command, found INT_NUMBER
-ERROR@30742: expected command, found COMMA
-ERROR@30744: expected command, found INT_NUMBER
-ERROR@30745: expected command, found R_PAREN
-ERROR@30747: expected command, found IDENT
-ERROR@30749: expected R_PAREN
-ERROR@30749: expected SEMICOLON
-ERROR@30749: expected command, found IDENT
-ERROR@30750: expected command, found R_PAREN
+
