@@ -68,7 +68,7 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     m.complete(p, ARRAY_EXPR)
 }
 
-fn paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn opt_paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if !p.eat(L_PAREN) {
         m.abandon(p);
@@ -81,7 +81,7 @@ fn paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         if p.at_ts(SELECT_FIRST) && (select(p, None).is_none() || p.at(EOF) || p.at(R_PAREN)) {
             break;
         }
-        if paren_select(p).is_none() {
+        if opt_paren_select(p).is_none() {
             break;
         }
         if !p.at(R_PAREN) {
@@ -89,7 +89,14 @@ fn paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
     }
     p.expect(R_PAREN);
-    Some(m.complete(p, PAREN_SELECT))
+    let cm = m.complete(p, PAREN_SELECT);
+    let cm = if p.at_ts(COMPOUND_SELECT_FIRST) {
+        compound_select(p, cm)
+    } else {
+        cm
+    };
+    select_trailing_clauses(p);
+    Some(cm)
 }
 
 const SELECT_FIRST: TokenSet = TokenSet::new(&[SELECT_KW, TABLE_KW, WITH_KW, VALUES_KW]);
@@ -2436,7 +2443,7 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
         p.eat(DISTINCT_KW);
     }
     if p.at(L_PAREN) {
-        tuple_expr(p);
+        opt_paren_select(p);
     } else {
         if p.at_ts(SELECT_FIRST) {
             select(p, None);
@@ -2488,6 +2495,11 @@ fn select(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
         let cm = m.complete(p, SELECT);
         return Some(compound_select(p, cm));
     }
+    select_trailing_clauses(p);
+    Some(m.complete(p, out_kind))
+}
+
+fn select_trailing_clauses(p: &mut Parser<'_>) {
     opt_order_by_clause(p);
     let mut has_locking_clause = false;
     while p.at(FOR_KW) {
@@ -2505,7 +2517,6 @@ fn select(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
             opt_locking_clause(p);
         }
     }
-    Some(m.complete(p, out_kind))
 }
 
 // INTO [ TEMPORARY | TEMP | UNLOGGED ] [ TABLE ] new_table
@@ -2778,11 +2789,14 @@ const FUNC_EXPR_COMMON_SUBEXPR_FIRST: TokenSet = TokenSet::new(&[
     GREATEST_KW,
     JSON_KW,
     JSON_ARRAY_KW,
+    JSON_ARRAYAGG_KW,
     JSON_EXISTS_KW,
     JSON_OBJECT_KW,
+    JSON_OBJECTAGG_KW,
     JSON_QUERY_KW,
     JSON_SCALAR_KW,
     JSON_SERIALIZE_KW,
+    JSON_TABLE_KW,
     JSON_VALUE_KW,
     LEAST_KW,
     LOCALTIME_KW,
@@ -2806,6 +2820,7 @@ const FUNC_EXPR_COMMON_SUBEXPR_FIRST: TokenSet = TokenSet::new(&[
     XMLPI_KW,
     XMLROOT_KW,
     XMLSERIALIZE_KW,
+    XMLTABLE_KW,
 ]);
 
 const FROM_ITEM_KEYWORDS_FIRST: TokenSet = TokenSet::new(&[])
@@ -2993,29 +3008,23 @@ fn xml_namespace_element(p: &mut Parser<'_>) {
     }
 }
 
-fn paren_data_source(p: &mut Parser<'_>) -> CompletedMarker {
+fn paren_data_source(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     assert!(p.at(L_PAREN));
+    if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
+        return opt_paren_select(p);
+    }
     let m = p.start();
     p.bump(L_PAREN);
-
-    // Try to parse as a SELECT statement first
-    if p.at_ts(SELECT_FIRST) {
-        if select(p, None).is_some() {
-            p.expect(R_PAREN);
-            return m.complete(p, PAREN_SELECT);
-        }
-    }
-
     // Then try to parse as a FROM_ITEM (which includes table references and joins)
     if opt_from_item(p) {
         p.expect(R_PAREN);
-        return m.complete(p, PAREN_EXPR);
+        return Some(m.complete(p, PAREN_EXPR));
     } else {
         p.error("expected table name or SELECT");
     }
 
     p.expect(R_PAREN);
-    m.complete(p, PAREN_EXPR)
+    Some(m.complete(p, PAREN_EXPR))
 }
 
 // USING data_source ON join_condition
@@ -5289,17 +5298,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (INSERT_KW, _) => Some(insert(p, None)),
         (L_PAREN, _) if p.nth_at_ts(1, SELECT_FIRST) || p.at(L_PAREN) => {
             // can have select nested in parens, i.e., ((select 1));
-            let cm = paren_select(p)?;
-            let cm = if p.at_ts(COMPOUND_SELECT_FIRST) {
-                compound_select(p, cm)
-            } else {
-                cm
-            };
-            // TODO: this needs to be rethinked
-            if p.at(ORDER_KW) {
-                opt_order_by_clause(p);
-            }
-            Some(cm)
+            opt_paren_select(p)
         }
         (LISTEN_KW, _) => Some(listen(p)),
         (LOAD_KW, _) => Some(load(p)),
@@ -11987,7 +11986,7 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn query(p: &mut Parser<'_>) {
     // TODO: this needs to be more general
-    if (!p.at_ts(SELECT_FIRST) || select(p, None).is_none()) && paren_select(p).is_none() {
+    if (!p.at_ts(SELECT_FIRST) || select(p, None).is_none()) && opt_paren_select(p).is_none() {
         p.error("expected select stmt")
     }
 }

@@ -2,18 +2,4 @@
 source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/regression_suite/union.sql
 ---
-ERROR@996: expected SEMICOLON
-ERROR@997: expected command, found ORDER_KW
-ERROR@1003: expected command, found BY_KW
-ERROR@1006: expected command, found INT_NUMBER
-ERROR@10339: expected SEMICOLON
-ERROR@10340: expected command, found ORDER_KW
-ERROR@10346: expected command, found BY_KW
-ERROR@10349: expected command, found INT_NUMBER
-ERROR@11233: expected SEMICOLON
-ERROR@11234: expected command, found ORDER_KW
-ERROR@11240: expected command, found BY_KW
-ERROR@11243: expected command, found INT_NUMBER
-ERROR@18725: expected SEMICOLON
-ERROR@18726: expected command, found LIMIT_KW
-ERROR@18732: expected command, found INT_NUMBER
+
