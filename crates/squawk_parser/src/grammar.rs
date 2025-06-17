@@ -114,14 +114,13 @@ fn opt_paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
     }
     p.expect(R_PAREN);
-    let cm = m.complete(p, PAREN_SELECT);
-    let cm = if p.at_ts(COMPOUND_SELECT_FIRST) {
-        compound_select(p, cm)
+    if p.at_ts(COMPOUND_SELECT_FIRST) {
+        let cm = m.complete(p, PAREN_SELECT);
+        Some(compound_select(p, cm))
     } else {
-        cm
-    };
-    select_trailing_clauses(p);
-    Some(cm)
+        select_trailing_clauses(p);
+        Some(m.complete(p, PAREN_SELECT))
+    }
 }
 
 const SELECT_FIRST: TokenSet = TokenSet::new(&[SELECT_KW, TABLE_KW, WITH_KW, VALUES_KW]);
