@@ -95,14 +95,14 @@ SOURCE_FILE
           TARGET
             NAME_REF
               IDENT "bar"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
       WHITESPACE " "
-      ORDER_BY_CLAUSE
-        ORDER_KW "ORDER"
-        WHITESPACE " "
-        BY_KW "BY"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "baz"
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "baz"
   SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- equal to:"
