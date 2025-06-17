@@ -2,4 +2,4 @@
 source: crates/squawk_parser/tests/tests.rs
 expression: "out.join(\"\\n\")"
 ---
-tests/snapshots/tests__regression_strings.snap:49
+

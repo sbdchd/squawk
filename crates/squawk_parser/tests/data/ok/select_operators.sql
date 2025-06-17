@@ -180,9 +180,17 @@ select U&'\0061\0308bc' is not nfd normalized;
 -- pattern_matching
 -- like
 select 'foo' like 'bar';
-
+select 'foo' like 'bar' escape '#';
 -- not like
 select 'foo' not like 'bar';
+select 'foo' not like 'bar' escape '#';
+
+-- ilike
+select 'foo' ilike 'bar';
+select 'foo' ilike 'bar' escape '#';
+-- not ilike
+select 'foo' not ilike 'bar';
+select 'foo' not ilike 'bar' escape '#';
 
 -- ~~
 select 'a' ~~ 'b';
@@ -192,6 +200,10 @@ select 'a' !~~ 'b';
 
 -- similar to
 select 'abc' similar to 'abc';
+select 'abc' similar to 'abc' escape '#';
+
+select 'abc' not similar to 'abc';
+select 'abc' not similar to 'abc' escape '#';
 
 -- posix regex
 -- string matches regex case sensitive

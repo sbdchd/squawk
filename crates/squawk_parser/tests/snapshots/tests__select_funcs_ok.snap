@@ -730,13 +730,14 @@ SOURCE_FILE
               WHITESPACE " "
               SIMILAR_KW "similar"
               WHITESPACE " "
-              NAME_REF
-                IDENT "b"
-              WHITESPACE " "
-              ESCAPE_KW "escape"
-              WHITESPACE " "
-              NAME_REF
-                IDENT "c"
+              BIN_EXPR
+                NAME_REF
+                  IDENT "b"
+                WHITESPACE " "
+                ESCAPE_KW "escape"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

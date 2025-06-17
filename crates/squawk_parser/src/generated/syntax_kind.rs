@@ -848,6 +848,7 @@ pub enum SyntaxKind {
     NOT_LIKE,
     NOT_NULL_CONSTRAINT,
     NOT_OF,
+    NOT_SIMILAR_TO,
     NOT_VALID,
     NO_ACTION,
     NO_FORCE_RLS,

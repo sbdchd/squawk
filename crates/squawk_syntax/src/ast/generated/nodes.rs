@@ -6203,6 +6203,25 @@ impl NotOf {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NotSimilarTo {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NotSimilarTo {
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn similar_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SIMILAR_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NotValid {
     pub(crate) syntax: SyntaxNode,
 }
@@ -6425,6 +6444,10 @@ impl Op {
     }
     #[inline]
     pub fn not_like(&self) -> Option<NotLike> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn not_similar_to(&self) -> Option<NotSimilarTo> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14666,6 +14689,24 @@ impl AstNode for NotOf {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NOT_OF
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NotSimilarTo {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NOT_SIMILAR_TO
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
