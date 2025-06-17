@@ -158,6 +158,9 @@ Neq =
 SimilarTo =
   'similar' 'to'
 
+NotSimilarTo =
+  'not' 'similar' 'to'
+
 AtTimeZone =
   'at' 'time' 'zone'
 
@@ -165,7 +168,7 @@ IsNot =
   'is' 'not'
 
 Op =
-'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | 'ilike' | NotLike | NotIlike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | AtTimeZone | IsJson | IsJsonValue | IsNotJson | IsJsonObject | IsJsonArray |IsJsonScalar | IsNotJsonValue | IsJsonObject | IsNotJsonArray | IsNotJsonScalar
+'or' | Gteq | '<' | '>' | FatArrow | '=' | 'in' | Neqb | Lteq | '+' | 'overlaps' | 'like' | 'ilike' | NotLike | NotIlike | NotIn | CustomOp | IsDistinctFrom | IsNotDistinctFrom | OperatorCall | 'is' | '^' | '%' | 'and' | '/' | Neq | 'collate' | '-' | ColonEq | ColonColon | 'value' | ':' | IsNot | SimilarTo | NotSimilarTo | AtTimeZone | IsJson | IsJsonValue | IsNotJson | IsJsonObject | IsJsonArray |IsJsonScalar | IsNotJsonValue | IsJsonObject | IsNotJsonArray | IsNotJsonScalar
 
 IsJson =
   'is' 'json' JsonKeysUniqueClause?

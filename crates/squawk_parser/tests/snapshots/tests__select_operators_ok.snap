@@ -1655,7 +1655,29 @@ SOURCE_FILE
             LITERAL
               STRING "'bar'"
   SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            LIKE_KW "like"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'bar'"
+              WHITESPACE " "
+              ESCAPE_KW "escape"
+              WHITESPACE " "
+              LITERAL
+                STRING "'#'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
   COMMENT "-- not like"
   WHITESPACE "\n"
   SELECT
@@ -1675,6 +1697,117 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'bar'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            NOT_LIKE
+              NOT_KW "not"
+              WHITESPACE " "
+              LIKE_KW "like"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'bar'"
+              WHITESPACE " "
+              ESCAPE_KW "escape"
+              WHITESPACE " "
+              LITERAL
+                STRING "'#'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- ilike"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            ILIKE_KW "ilike"
+            WHITESPACE " "
+            LITERAL
+              STRING "'bar'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            ILIKE_KW "ilike"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'bar'"
+              WHITESPACE " "
+              ESCAPE_KW "escape"
+              WHITESPACE " "
+              LITERAL
+                STRING "'#'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- not ilike"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            NOT_ILIKE
+              NOT_KW "not"
+              WHITESPACE " "
+              ILIKE_KW "ilike"
+            WHITESPACE " "
+            LITERAL
+              STRING "'bar'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'foo'"
+            WHITESPACE " "
+            NOT_ILIKE
+              NOT_KW "not"
+              WHITESPACE " "
+              ILIKE_KW "ilike"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'bar'"
+              WHITESPACE " "
+              ESCAPE_KW "escape"
+              WHITESPACE " "
+              LITERAL
+                STRING "'#'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- ~~"
@@ -1737,6 +1870,79 @@ SOURCE_FILE
             WHITESPACE " "
             LITERAL
               STRING "'abc'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc'"
+            WHITESPACE " "
+            SIMILAR_TO
+              SIMILAR_KW "similar"
+              WHITESPACE " "
+              TO_KW "to"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'abc'"
+              WHITESPACE " "
+              ESCAPE_KW "escape"
+              WHITESPACE " "
+              LITERAL
+                STRING "'#'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc'"
+            WHITESPACE " "
+            NOT_SIMILAR_TO
+              NOT_KW "not"
+              WHITESPACE " "
+              SIMILAR_KW "similar"
+              WHITESPACE " "
+              TO_KW "to"
+            WHITESPACE " "
+            LITERAL
+              STRING "'abc'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'abc'"
+            WHITESPACE " "
+            NOT_SIMILAR_TO
+              NOT_KW "not"
+              WHITESPACE " "
+              SIMILAR_KW "similar"
+              WHITESPACE " "
+              TO_KW "to"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "'abc'"
+              WHITESPACE " "
+              ESCAPE_KW "escape"
+              WHITESPACE " "
+              LITERAL
+                STRING "'#'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- posix regex"

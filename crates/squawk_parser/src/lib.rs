@@ -343,6 +343,14 @@ impl<'t> Parser<'t> {
                 m.complete(self, SyntaxKind::IS_JSON_SCALAR);
                 return true;
             }
+            SyntaxKind::NOT_SIMILAR_TO => {
+                let m = self.start();
+                self.bump(SyntaxKind::NOT_KW);
+                self.bump(SyntaxKind::SIMILAR_KW);
+                self.bump(SyntaxKind::TO_KW);
+                m.complete(self, SyntaxKind::NOT_SIMILAR_TO);
+                return true;
+            }
             SyntaxKind::IS_NOT_DISTINCT_FROM => {
                 let m = self.start();
                 self.bump(SyntaxKind::IS_KW);
@@ -767,6 +775,12 @@ impl<'t> Parser<'t> {
                 }
                 return false;
             }
+            SyntaxKind::NOT_SIMILAR_TO => self.at_composite3(
+                n,
+                SyntaxKind::NOT_KW,
+                SyntaxKind::SIMILAR_KW,
+                SyntaxKind::TO_KW,
+            ),
             // similar to
             SyntaxKind::SIMILAR_TO => self.at_composite2(
                 n,

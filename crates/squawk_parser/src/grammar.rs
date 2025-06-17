@@ -27,10 +27,15 @@ fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
+    if p.eat(BYTE_STRING) {
+        if p.eat(UESCAPE_KW) {
+            p.eat(STRING);
+        }
+    }
     // E021-03 string continuation syntax
     // If two string literals are next to each other, and don't have a comment
     // between them, then they are automatically combined.
-    if p.eat(STRING) {
+    else if p.eat(STRING) {
         while !p.at(EOF) && p.eat(STRING) {}
     } else {
         p.bump_any();
@@ -359,10 +364,6 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
             // SIMILAR a_expr ESCAPE a_expr
             SIMILAR_KW => {
                 p.bump(SIMILAR_KW);
-                if expr(p).is_none() {
-                    p.error("expected an expression");
-                }
-                p.expect(ESCAPE_KW);
                 if expr(p).is_none() {
                     p.error("expected an expression");
                 }
@@ -1462,7 +1463,13 @@ fn opt_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    p.bump_any();
+    if p.eat(IDENT) {
+        if p.eat(UESCAPE_KW) {
+            p.expect(STRING);
+        }
+    } else {
+        p.bump_any();
+    }
     Some(m.complete(p, NAME))
 }
 
@@ -2156,10 +2163,14 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         PLUS if p.next_not_joined_op(0) => (8, PLUS, Left), // symbol
         // overlaps
         OVERLAPS_KW => (7, OVERLAPS_KW, Left),
+        // escape
+        ESCAPE_KW => (7, ESCAPE_KW, Left),
         // like
         LIKE_KW => (6, LIKE_KW, Left),
         // ilike
         ILIKE_KW => (6, ILIKE_KW, Left),
+        // not similar to
+        NOT_KW if !r.not_disabled && p.at(NOT_SIMILAR_TO) => (6, NOT_SIMILAR_TO, Left),
         // not like
         NOT_KW if !r.not_disabled && p.at(NOT_LIKE) => (6, NOT_LIKE, Left),
         // not ilike
@@ -13727,7 +13738,13 @@ fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
 fn opt_col_label(p: &mut Parser<'_>) -> bool {
     if p.at_ts(COL_LABEL_FIRST) {
         let m = p.start();
-        p.bump_any();
+        if p.eat(IDENT) {
+            if p.eat(UESCAPE_KW) {
+                p.expect(STRING);
+            }
+        } else {
+            p.bump_any();
+        }
         m.complete(p, NAME);
         true
     } else {
