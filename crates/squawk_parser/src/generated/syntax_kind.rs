@@ -993,6 +993,10 @@ pub enum SyntaxKind {
     WITH_CLAUSE,
     WITH_TABLE,
     WITH_TIMEZONE,
+    XML_COLUMN_OPTION,
+    XML_COLUMN_OPTION_LIST,
+    XML_TABLE_COLUMN,
+    XML_TABLE_COLUMN_LIST,
 
     #[doc(hidden)]
     __LAST,

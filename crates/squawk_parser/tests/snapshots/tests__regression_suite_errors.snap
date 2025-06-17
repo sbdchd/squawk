@@ -3,4 +3,3 @@ source: crates/squawk_parser/tests/tests.rs
 expression: "out.join(\"\\n\")"
 ---
 tests/snapshots/tests__regression_strings.snap:49
-tests/snapshots/tests__regression_xml.snap:382

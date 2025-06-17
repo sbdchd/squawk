@@ -957,6 +957,23 @@ FromClause =
   (FromItem (',' FromItem)*)?
   (JoinExpr (',' JoinExpr)*)?
 
+XmlTableColumnList =
+  (XmlTableColumn (',' XmlTableColumn)*)
+
+XmlTableColumn = 
+  Name Type XmlColumnOptionList?
+| Name 'for' 'ordinality'
+
+XmlColumnOptionList =
+  (XmlColumnOption (XmlColumnOption*))
+
+XmlColumnOption =
+  '#ident' Expr
+| 'default' Expr
+| 'not' 'null'
+| 'null'
+| 'path' Expr
+
 ConstraintIndexMethod =
   'using'
 
