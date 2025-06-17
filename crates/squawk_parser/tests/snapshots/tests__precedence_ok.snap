@@ -73,8 +73,6 @@ SOURCE_FILE
             R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
-  COMMENT "-- TODO!"
-  WHITESPACE "\n"
   COMPOUND_SELECT
     SELECT
       SELECT_CLAUSE
@@ -95,14 +93,14 @@ SOURCE_FILE
           TARGET
             NAME_REF
               IDENT "bar"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
       WHITESPACE " "
-      ORDER_BY_CLAUSE
-        ORDER_KW "ORDER"
-        WHITESPACE " "
-        BY_KW "BY"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "baz"
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "baz"
   SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- equal to:"
@@ -130,13 +128,13 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
     R_PAREN ")"
-  WHITESPACE " "
-  ORDER_BY_CLAUSE
-    ORDER_KW "ORDER"
     WHITESPACE " "
-    BY_KW "BY"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "baz"
+    ORDER_BY_CLAUSE
+      ORDER_KW "ORDER"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "baz"
   SEMICOLON ";"
   WHITESPACE "\n"

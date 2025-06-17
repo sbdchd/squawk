@@ -55,7 +55,11 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
         R_BRACK
     };
     while !p.at(EOF) && !p.at(closing) {
-        if p.at_ts(SELECT_FIRST) && (select(p, None).is_none() || p.at(EOF) || p.at(closing)) {
+        if p.at_ts(SELECT_FIRST)
+            && (select(p, None, &SelectRestrictions::default()).is_none()
+                || p.at(EOF)
+                || p.at(closing))
+        {
             break;
         }
         if expr(p).is_none() {
@@ -73,6 +77,18 @@ fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     m.complete(p, ARRAY_EXPR)
 }
 
+struct SelectRestrictions {
+    trailing_clauses: bool,
+}
+
+impl Default for SelectRestrictions {
+    fn default() -> Self {
+        Self {
+            trailing_clauses: true,
+        }
+    }
+}
+
 fn opt_paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if !p.eat(L_PAREN) {
@@ -83,7 +99,11 @@ fn opt_paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         // saw_expr = true;
         // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
-        if p.at_ts(SELECT_FIRST) && (select(p, None).is_none() || p.at(EOF) || p.at(R_PAREN)) {
+        if p.at_ts(SELECT_FIRST)
+            && (select(p, None, &SelectRestrictions::default()).is_none()
+                || p.at(EOF)
+                || p.at(R_PAREN))
+        {
             break;
         }
         if opt_paren_select(p).is_none() {
@@ -94,14 +114,13 @@ fn opt_paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
     }
     p.expect(R_PAREN);
-    let cm = m.complete(p, PAREN_SELECT);
-    let cm = if p.at_ts(COMPOUND_SELECT_FIRST) {
-        compound_select(p, cm)
+    if p.at_ts(COMPOUND_SELECT_FIRST) {
+        let cm = m.complete(p, PAREN_SELECT);
+        Some(compound_select(p, cm))
     } else {
-        cm
-    };
-    select_trailing_clauses(p);
-    Some(cm)
+        select_trailing_clauses(p);
+        Some(m.complete(p, PAREN_SELECT))
+    }
 }
 
 const SELECT_FIRST: TokenSet = TokenSet::new(&[SELECT_KW, TABLE_KW, WITH_KW, VALUES_KW]);
@@ -121,7 +140,11 @@ fn tuple_expr(p: &mut Parser<'_>) -> CompletedMarker {
         saw_expr = true;
         // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
-        if p.at_ts(SELECT_FIRST) && (select(p, None).is_none() || p.at(EOF) || p.at(R_PAREN)) {
+        if p.at_ts(SELECT_FIRST)
+            && (select(p, None, &SelectRestrictions::default()).is_none()
+                || p.at(EOF)
+                || p.at(R_PAREN))
+        {
             break;
         }
         if expr(p).is_none() {
@@ -691,7 +714,10 @@ fn json_array_fn_arg_list(p: &mut Parser<'_>) {
     // 1, 2, 3, 4
     while !p.at(EOF) && !p.at(R_PAREN) && !p.at(RETURNING_KW) {
         if p.at_ts(SELECT_FIRST) {
-            if select(p, None).is_none() || p.at(EOF) || p.at(R_PAREN) {
+            if select(p, None, &SelectRestrictions::default()).is_none()
+                || p.at(EOF)
+                || p.at(R_PAREN)
+            {
                 break;
             }
             opt_json_format_clause(p);
@@ -732,7 +758,7 @@ fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
     // args
     p.expect(L_PAREN);
     if p.at_ts(SELECT_FIRST) {
-        select(p, None);
+        select(p, None, &SelectRestrictions::default());
     } else {
         if expr(p).is_none() {
             p.error("expected expression or select");
@@ -826,7 +852,7 @@ fn exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(EXISTS_KW));
     custom_fn(p, EXISTS_KW, |p| {
         if p.at_ts(SELECT_FIRST) {
-            select(p, None);
+            select(p, None, &SelectRestrictions::default());
         } else {
             p.error("expected select")
         }
@@ -2457,18 +2483,25 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
         opt_paren_select(p);
     } else {
         if p.at_ts(SELECT_FIRST) {
-            select(p, None);
+            select(
+                p,
+                None,
+                &SelectRestrictions {
+                    trailing_clauses: false,
+                },
+            );
         } else {
             p.error("expected start of a select statement")
         }
     }
+    select_trailing_clauses(p);
     m.complete(p, COMPOUND_SELECT)
 }
 
 // error recovery:
 // - <https://youtu.be/0HlrqwLjCxA?feature=shared&t=2172>
 /// <https://www.postgresql.org/docs/17/sql-select.html>
-fn select(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
+fn select(p: &mut Parser, m: Option<Marker>, r: &SelectRestrictions) -> Option<CompletedMarker> {
     assert!(p.at_ts(SELECT_FIRST));
     let m = m.unwrap_or_else(|| p.start());
 
@@ -2506,7 +2539,9 @@ fn select(p: &mut Parser, m: Option<Marker>) -> Option<CompletedMarker> {
         let cm = m.complete(p, SELECT);
         return Some(compound_select(p, cm));
     }
-    select_trailing_clauses(p);
+    if r.trailing_clauses {
+        select_trailing_clauses(p);
+    }
     Some(m.complete(p, out_kind))
 }
 
@@ -5339,7 +5374,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (ROLLBACK_KW, _) => Some(rollback(p)),
         (SAVEPOINT_KW, _) => Some(savepoint(p)),
         (SECURITY_KW, LABEL_KW) => Some(security_label(p)),
-        (SELECT_KW | TABLE_KW | VALUES_KW, _) => select(p, None),
+        (SELECT_KW | TABLE_KW | VALUES_KW, _) => select(p, None, &SelectRestrictions::default()),
         (SET_KW, CONSTRAINTS_KW) => Some(set_constraints(p)),
         (SET_KW, LOCAL_KW) => match p.nth(2) {
             ROLE_KW => Some(set_role(p)),
@@ -12006,7 +12041,9 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn query(p: &mut Parser<'_>) {
     // TODO: this needs to be more general
-    if (!p.at_ts(SELECT_FIRST) || select(p, None).is_none()) && opt_paren_select(p).is_none() {
+    if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default()).is_none())
+        && opt_paren_select(p).is_none()
+    {
         p.error("expected select stmt")
     }
 }
@@ -12127,7 +12164,7 @@ fn set_clause(p: &mut Parser<'_>) {
             if p.eat(L_PAREN) {
                 // ( sub-SELECT )
                 if p.at(SELECT_KW) && !found_row {
-                    if select(p, None).is_none() {
+                    if select(p, None, &SelectRestrictions::default()).is_none() {
                         p.error("expected sub-SELECT");
                     }
                 } else {
@@ -12222,7 +12259,7 @@ fn with(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
     with_query_clause(p);
     match p.current() {
         DELETE_KW => Some(delete(p, Some(m))),
-        SELECT_KW | TABLE_KW | VALUES_KW => select(p, Some(m)),
+        SELECT_KW | TABLE_KW | VALUES_KW => select(p, Some(m), &SelectRestrictions::default()),
         INSERT_KW => Some(insert(p, Some(m))),
         UPDATE_KW => Some(update(p, Some(m))),
         MERGE_KW => Some(merge(p, Some(m))),

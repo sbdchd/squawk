@@ -3,7 +3,6 @@ SELECT (((SELECT 2)) + 3);
 SELECT (((SELECT 2)) UNION SELECT 2);
 
 
--- TODO!
 SELECT foo UNION SELECT bar ORDER BY baz;
 -- equal to:
 (SELECT foo UNION SELECT bar) ORDER BY baz;
