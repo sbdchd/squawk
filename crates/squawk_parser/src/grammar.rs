@@ -882,9 +882,6 @@ fn opt_xml_passing_mech(p: &mut Parser<'_>) -> bool {
 }
 
 fn xmlexists_arg(p: &mut Parser<'_>) {
-    if expr(p).is_none() {
-        p.error("expected expression");
-    }
     p.expect(PASSING_KW);
     opt_xml_passing_mech(p);
     if expr(p).is_none() {
@@ -905,6 +902,9 @@ fn xmlexists_arg(p: &mut Parser<'_>) {
 fn xmlexists_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLEXISTS_KW));
     custom_fn(p, XMLEXISTS_KW, |p| {
+        if expr(p).is_none() {
+            p.error("expected expression");
+        }
         xmlexists_arg(p);
     })
 }
@@ -979,7 +979,7 @@ fn xmlserialize_fn(p: &mut Parser<'_>) -> CompletedMarker {
             p.error("expected expression");
         }
         p.expect(AS_KW);
-        simple_type_name(p);
+        type_name(p);
         if p.eat(NO_KW) {
             p.expect(INDENT_KW);
         } else {
@@ -2898,14 +2898,15 @@ fn data_source(p: &mut Parser<'_>) {
                 p.expect(L_PAREN);
                 xml_namespace_list(p);
                 p.expect(R_PAREN);
+                p.expect(COMMA);
             }
             if expr(p).is_none() {
                 p.error("expected expression");
             }
             xmlexists_arg(p);
-            p.expect(COLUMNS_KW);
             xmltable_column_list(p);
             p.expect(R_PAREN);
+            opt_alias(p);
         }
         ROWS_KW if p.nth_at(1, FROM_KW) => {
             p.bump(ROWS_KW);
@@ -2940,13 +2941,17 @@ fn data_source(p: &mut Parser<'_>) {
 }
 
 fn xmltable_column_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(COLUMNS_KW);
     xmltable_column_el(p);
     while !p.at(EOF) && p.eat(COMMA) {
         xmltable_column_el(p);
     }
+    m.complete(p, XML_TABLE_COLUMN_LIST);
 }
 
 fn xmltable_column_el(p: &mut Parser<'_>) {
+    let m = p.start();
     name(p);
     if p.eat(FOR_KW) {
         p.expect(ORDINALITY_KW);
@@ -2954,20 +2959,21 @@ fn xmltable_column_el(p: &mut Parser<'_>) {
         type_name(p);
         opt_xmltable_column_option_list(p);
     }
+    m.complete(p, XML_TABLE_COLUMN);
 }
 
 fn opt_xmltable_column_option_list(p: &mut Parser<'_>) {
-    if opt_xmltable_column_option_el(p) {
+    let m = p.start();
+    if opt_xmltable_column_option_el(p).is_none() {
+        m.abandon(p);
         return;
     }
-    while !p.at(EOF) && p.eat(COMMA) {
-        if !opt_xmltable_column_option_el(p) {
-            p.error("expected column option");
-        }
-    }
+    while !p.at(EOF) && opt_xmltable_column_option_el(p).is_some() {}
+    m.complete(p, XML_COLUMN_OPTION_LIST);
 }
 
-fn opt_xmltable_column_option_el(p: &mut Parser<'_>) -> bool {
+fn opt_xmltable_column_option_el(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
     match p.current() {
         DEFAULT_KW | PATH_KW | IDENT => {
             p.bump_any();
@@ -2982,9 +2988,12 @@ fn opt_xmltable_column_option_el(p: &mut Parser<'_>) -> bool {
         NULL_KW => {
             p.bump(NULL_KW);
         }
-        _ => return false,
+        _ => {
+            m.abandon(p);
+            return None;
+        }
     }
-    true
+    Some(m.complete(p, XML_COLUMN_OPTION))
 }
 
 fn xml_namespace_list(p: &mut Parser<'_>) {
@@ -13098,6 +13107,10 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(SET_KW);
     let _ = p.eat(SESSION_KW) || p.eat(LOCAL_KW);
+    if p.eat(XML_KW) {
+        p.expect(OPTION_KW);
+        let _ = p.eat(DOCUMENT_KW) || p.eat(CONTENT_KW);
+    } else
     // TIME ZONE { value | 'value' | LOCAL | DEFAULT }
     if p.eat(TIME_KW) {
         p.expect(ZONE_KW);
