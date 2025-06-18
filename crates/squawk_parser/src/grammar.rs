@@ -516,9 +516,7 @@ fn json_object_fn_arg_list(p: &mut Parser<'_>) {
         // json_object(c_expr ,
         // json_object(a_expr :
         // json_object(a_expr value
-        if json_object_arg(p).is_none() {
-            p.error("expected expression");
-        }
+        json_object_arg(p);
         // if we're at a the end of the params or the start of the optional
         // null_clause break
         if p.at(R_PAREN)
@@ -557,9 +555,7 @@ fn json_object_fn(p: &mut Parser<'_>) -> CompletedMarker {
 fn json_objectagg_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(JSON_OBJECTAGG_KW));
     custom_fn(p, JSON_OBJECTAGG_KW, |p| {
-        if json_object_arg(p).is_none() {
-            p.error("expected expression");
-        }
+        json_object_arg(p);
         opt_json_null_clause(p);
         opt_json_keys_unique_clause(p);
         opt_json_returning_clause(p);
@@ -1313,11 +1309,11 @@ fn postfix_expr(
 ) -> CompletedMarker {
     loop {
         lhs = match p.current() {
-            | NOT_KW if p.nth_at(1, BETWEEN_KW) => between_expr(p, lhs),
-            | BETWEEN_KW => between_expr(p, lhs),
+            NOT_KW if p.nth_at(1, BETWEEN_KW) => between_expr(p),
+            BETWEEN_KW => between_expr(p),
             L_PAREN if allow_calls => call_expr_args(p, lhs),
-            L_BRACK /* if allow_calls */ => index_expr(p, lhs),
-            DOT => match postfix_dot_expr::<false>(p, lhs, allow_calls) {
+            L_BRACK => index_expr(p, lhs),
+            DOT => match postfix_dot_expr(p, lhs, allow_calls) {
                 Ok(it) => it,
                 Err(it) => {
                     lhs = it;
@@ -1325,92 +1321,92 @@ fn postfix_expr(
                 }
             },
             AT_KW if p.nth_at(1, LOCAL_KW) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(AT_KW);
                 p.bump(LOCAL_KW);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             ISNULL_KW => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(ISNULL_KW);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
-            IS_KW if p.at(IS_NOT_NORMALIZED)=> {
-                let m = lhs.precede(p);
+            IS_KW if p.at(IS_NOT_NORMALIZED) => {
+                let m = p.start();
                 p.bump(IS_NOT_NORMALIZED);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
-            IS_KW if p.at(IS_NORMALIZED)=> {
-                let m = lhs.precede(p);
+            IS_KW if p.at(IS_NORMALIZED) => {
+                let m = p.start();
                 p.bump(IS_NORMALIZED);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON_OBJECT) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_NOT_JSON_OBJECT);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON_ARRAY) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_NOT_JSON_ARRAY);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON_VALUE) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_NOT_JSON_VALUE);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON_SCALAR) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_NOT_JSON_SCALAR);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_NOT_JSON) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_NOT_JSON);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON_OBJECT) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_JSON_OBJECT);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON_ARRAY) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_JSON_ARRAY);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON_VALUE) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_JSON_VALUE);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON_SCALAR) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_JSON_SCALAR);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             IS_KW if p.at(IS_JSON) => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(IS_JSON);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
             }
             NOTNULL_KW => {
-                let m = lhs.precede(p);
+                let m = p.start();
                 p.bump(NOTNULL_KW);
                 lhs = m.complete(p, POSTFIX_EXPR);
                 break;
@@ -1750,23 +1746,6 @@ fn simple_type_name(p: &mut Parser<'_>) {
     }
 }
 
-// json_name_and_value:
-//   | c_expr VALUE_P json_value_expr
-//   | a_expr ':' json_value_expr
-//
-//   json_value_expr:
-//     a_expr json_format_clause_opt
-fn json_key_value(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
-    assert!(p.at(COLON) || p.at(VALUE_KW));
-    let m = lhs.precede(p);
-    p.bump_any();
-    if expr(p).is_none() {
-        p.error("expected expr");
-    }
-    opt_json_format_clause(p);
-    m.complete(p, JSON_KEY_VALUE)
-}
-
 fn arg_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // https://www.postgresql.org/docs/17/typeconv-func.html
     p.eat(VARIADIC_KW);
@@ -1794,11 +1773,9 @@ fn arg_list(p: &mut Parser<'_>) {
         R_PAREN,
         COMMA,
         || "expected expression".into(),
-        EXPR_FIRST.union(ATTRIBUTE_FIRST),
+        EXPR_FIRST,
         |p| {
-            if p.at(DISTINCT_KW) || p.at(ALL_KW) {
-                p.bump_any(); // consume DISTINCT or ALL
-            }
+            let _ = p.eat(DISTINCT_KW) || p.eat(ALL_KW);
             arg_expr(p).is_some()
         },
     );
@@ -1808,9 +1785,8 @@ fn arg_list(p: &mut Parser<'_>) {
 fn interval_second(p: &mut Parser<'_>) {
     p.expect(SECOND_KW);
     if p.eat(L_PAREN) {
-        // TODO: int expr
-        if expr(p).is_none() {
-            p.error("expected an expression");
+        if opt_numeric_literal(p).is_none() {
+            p.error("expected an integer");
         }
         p.expect(R_PAREN);
     }
@@ -1877,8 +1853,6 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    // TODO: this needs to be cleaned up
-    let mut is_interval_cast = false;
     let kind = match p.current() {
         COLLATION_KW => {
             p.bump(COLLATION_KW);
@@ -1917,7 +1891,6 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         INTERVAL_KW => {
             p.bump(INTERVAL_KW);
             opt_interval_trailing(p);
-            is_interval_cast = true;
             INTERVAL_TYPE
         }
         _ => {
@@ -1931,7 +1904,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // preceding it to wrap the previously parsed data.
     // e.g., `select numeric '12312'`
     if opt_string_literal(p).is_some() {
-        if is_interval_cast {
+        if kind == INTERVAL_TYPE {
             opt_interval_trailing(p);
         }
         Some(cm.precede(p).complete(p, CAST_EXPR))
@@ -1940,10 +1913,9 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-fn between_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
+fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(NOT_KW) || p.at(BETWEEN_KW));
-    // TODO: does this precede stuff matter?
-    let m = lhs.precede(p);
+    let m = p.start();
     p.eat(NOT_KW);
     p.expect(BETWEEN_KW);
     p.eat(SYMMETRIC_KW);
@@ -2062,29 +2034,24 @@ fn name_ref_or_index(p: &mut Parser<'_>) {
     m.complete(p, NAME_REF);
 }
 
-// TODO: do we need this float recovery stuff?
-fn field_expr<const FLOAT_RECOVERY: bool>(
+fn field_expr(
     p: &mut Parser<'_>,
     lhs: Option<CompletedMarker>,
     allow_calls: bool,
 ) -> Result<CompletedMarker, CompletedMarker> {
-    if !FLOAT_RECOVERY {
-        assert!(p.at(DOT));
-    }
+    assert!(p.at(DOT));
     let m = match lhs {
         Some(lhs) => lhs.precede(p),
         None => p.start(),
     };
-    if !FLOAT_RECOVERY {
-        p.bump(DOT);
-    }
+    p.bump(DOT);
     if p.at(IDENT) || p.at_ts(TYPE_KEYWORDS) || p.at(INT_NUMBER) || p.at_ts(ALL_KEYWORDS) {
         name_ref_or_index(p);
     } else if p.at(FLOAT_NUMBER) {
         return match p.split_float(m) {
             (true, m) => {
                 let lhs = m.complete(p, FIELD_EXPR);
-                postfix_dot_expr::<true>(p, lhs, allow_calls)
+                postfix_dot_expr(p, lhs, allow_calls)
             }
             (false, m) => Ok(m.complete(p, FIELD_EXPR)),
         };
@@ -2099,15 +2066,13 @@ fn field_expr<const FLOAT_RECOVERY: bool>(
     Ok(m.complete(p, FIELD_EXPR))
 }
 
-fn postfix_dot_expr<const FLOAT_RECOVERY: bool>(
+fn postfix_dot_expr(
     p: &mut Parser<'_>,
     lhs: CompletedMarker,
     allow_calls: bool,
 ) -> Result<CompletedMarker, CompletedMarker> {
-    if !FLOAT_RECOVERY {
-        assert!(p.at(DOT));
-    }
-    field_expr::<FLOAT_RECOVERY>(p, Some(lhs), allow_calls).map(|cm| {
+    assert!(p.at(DOT));
+    field_expr(p, Some(lhs), allow_calls).map(|cm| {
         // A field followed by a literal is a type cast so we insert a CAST_EXPR
         // preceding it to wrap the previously parsed data.
         if opt_string_literal(p).is_some() {
@@ -2141,14 +2106,20 @@ fn bexpr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 fn json_object_arg(p: &mut Parser) -> Option<CompletedMarker> {
-    expr_bp(
-        p,
-        1,
-        &Restrictions {
-            json_field_arg_allowed: true,
-            ..Restrictions::default()
-        },
-    )
+    let m = p.start();
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    // we're not at a json_key_value and are probably at just an expr
+    if !p.eat(VALUE_KW) && !p.eat(COLON) {
+        m.abandon(p);
+        return None;
+    }
+    if expr(p).is_none() {
+        p.error("expected expression");
+    }
+    opt_json_format_clause(p);
+    Some(m.complete(p, JSON_KEY_VALUE))
 }
 
 enum Associativity {
@@ -2262,12 +2233,6 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         COLON if p.at(COLON_EQ) => (5, COLON_EQ, Right), // symbol
         // ::
         COLON if p.at(COLON_COLON) => (15, COLON_COLON, Left), // symbol
-        // Only used in json_object, like json_object('a' value 1) instead of json_object('a': 1)
-        // value
-        VALUE_KW if r.json_field_arg_allowed => (7, VALUE_KW, Right),
-        // Later on we return a JSON_KEY_VALUE instead of BIN_EXPR
-        // a: b
-        COLON if r.json_field_arg_allowed => (7, COLON, Right),
         _ if p.at_ts(OPERATOR_FIRST) => (7, CUSTOM_OP, Right),
         _ => NOT_AN_OP,
     }
@@ -2279,7 +2244,6 @@ const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLA
 #[derive(Default)]
 struct Restrictions {
     order_by_allowed: bool,
-    json_field_arg_allowed: bool,
     in_disabled: bool,
     is_disabled: bool,
     not_disabled: bool,
@@ -2327,14 +2291,6 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
         let (op_bp, op, associativity) = current_op(p, r);
         if op_bp < bp {
             break;
-        }
-        match op {
-            // TODO: is this right?
-            COLON | VALUE_KW => {
-                lhs = json_key_value(p, lhs);
-                continue;
-            }
-            _ => {}
         }
         let m = lhs.precede(p);
         p.bump(op);
@@ -2417,12 +2373,10 @@ fn with_query(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.expect(SET_KW);
         name_ref(p);
         if p.eat(TO_KW) {
-            // TODO: we should limit this more
             if expr(p).is_none() {
                 p.error("expected an expression");
             }
             p.expect(DEFAULT_KW);
-            // TODO: we should limit this more
             if expr(p).is_none() {
                 p.error("expected an expression");
             }
@@ -2584,12 +2538,9 @@ fn lock_strength(p: &mut Parser<'_>) -> bool {
     if p.eat(NO_KW) {
         p.expect(KEY_KW);
         p.expect(UPDATE_KW)
-    // KEY SHARE
     } else if p.eat(KEY_KW) {
         p.expect(SHARE_KW)
-    // SHARE
     } else if !p.eat(SHARE_KW) {
-        // UPDATE
         p.expect(UPDATE_KW)
     } else {
         false
@@ -2969,7 +2920,6 @@ fn data_source(p: &mut Parser<'_>) {
             if p.eat(WITH_KW) {
                 p.expect(ORDINALITY_KW);
             }
-            // TODO: we should only alow col_alias, not def
             opt_alias(p);
         }
         IDENT => from_item_name(p),
@@ -3203,8 +3153,8 @@ fn opt_numeric_literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         let m = p.start();
         p.bump_any();
         Some(m.complete(p, LITERAL))
-    } else if p.at(MINUS) && p.nth_at_ts(1, NUMERIC_FIRST) {
-        // TODO: is this a good idea?
+    } else if p.at(MINUS) || p.at(PLUS) {
+        // TODO: add validation to check this is a prefix expression with a numeric literal inside
         expr(p)
     } else {
         None
@@ -3313,7 +3263,7 @@ fn opt_sequence_options(p: &mut Parser<'_>) -> bool {
         let m = p.start();
         p.bump(L_PAREN);
         while !p.at(EOF) {
-            // TODO: make sure we have at least one
+            // TODO: add validation to make sure we have at least one
             if !opt_sequence_option(p) {
                 break;
             }
@@ -3393,7 +3343,7 @@ fn column(p: &mut Parser<'_>, kind: &ColumnDefKind) -> CompletedMarker {
     match kind {
         ColumnDefKind::Name => name(p),
         ColumnDefKind::Ref => {
-            // support parsing things like:
+            // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
             name_ref(p).map(|lhs| postfix_expr(p, lhs, true));
         }
@@ -4403,55 +4353,47 @@ fn opt_offset_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 fn opt_all_or_distinct(p: &mut Parser) {
     // TODO: we probably don't want to be so specific here, we can be more
     // generous with parsing and handle error reporting later on.
-    if p.at(ALL_KW) {
-        p.bump(ALL_KW);
-    } else if p.at(DISTINCT_KW) {
-        let m = p.start();
-        // ```
-        // select DISTINCT [ ON ( expression [, ...] ) ]
-        // ```
-        //
-        // for example:
-        //
-        //  ```
-        //  select distinct name from users
-        //  ```
-        //
-        //  or
-        //
-        //  ```
-        //  select distinct on (url) url, request_duration
-        //  from logs
-        //  order by url, timestamp desc
-        //  ```
-        //
-        // from: [pg docs](https://www.postgresql.org/docs/current/sql-select.html#SQL-DISTINCT)
-        //
-        // `SELECT DISTINCT ON ( expression [, ...] )` keeps only the first row of
-        // each set of rows where the given expressions evaluate to equal. The
-        // DISTINCT ON expressions are interpreted using the same rules as for
-        // ORDER BY (see above). Note that the “first row” of each set is
-        // unpredictable unless ORDER BY is used to ensure that the desired row
-        // appears first.
-        p.bump(DISTINCT_KW);
-        if p.eat(ON_KW) && !paren_expr_list(p) {
-            m.abandon(p);
-            return;
+    if p.eat(ALL_KW) {
+        return;
+    }
+    // ```
+    // select DISTINCT [ ON ( expression [, ...] ) ]
+    // ```
+    //
+    // for example:
+    //
+    //  ```
+    //  select distinct name from users
+    //  ```
+    //
+    //  or
+    //
+    //  ```
+    //  select distinct on (url) url, request_duration
+    //  from logs
+    //  order by url, timestamp desc
+    //  ```
+    //
+    // from: [pg docs](https://www.postgresql.org/docs/current/sql-select.html#SQL-DISTINCT)
+    //
+    // `SELECT DISTINCT ON ( expression [, ...] )` keeps only the first row of
+    // each set of rows where the given expressions evaluate to equal. The
+    // DISTINCT ON expressions are interpreted using the same rules as for
+    // ORDER BY (see above). Note that the “first row” of each set is
+    // unpredictable unless ORDER BY is used to ensure that the desired row
+    // appears first.
+    let m = p.start();
+    if p.eat(DISTINCT_KW) {
+        if p.eat(ON_KW) {
+            p.expect(L_PAREN);
+            if !expr_list(p) {
+                p.error("expected expression in paren_expr_list");
+            }
+            p.expect(R_PAREN);
         }
         m.complete(p, DISTINCT_CLAUSE);
-    }
-}
-
-fn paren_expr_list(p: &mut Parser<'_>) -> bool {
-    if !p.eat(L_PAREN) {
-        return false;
-    }
-    if !expr_list(p) {
-        p.error("expected expression in paren_expr_list");
-        false
     } else {
-        p.eat(R_PAREN);
-        true
+        m.abandon(p);
     }
 }
 
@@ -4473,12 +4415,9 @@ const TARGET_LIST_START: TokenSet = TokenSet::new(&[STAR])
     .union(EXPR_FIRST)
     .union(TYPE_KEYWORDS);
 
-const LITERAL_FIRST: TokenSet = TokenSet::new(&[
-    TRUE_KW, FALSE_KW, NULL_KW, // TODO: should default be in this set?
-    DEFAULT_KW,
-])
-.union(NUMERIC_FIRST)
-.union(STRING_FIRST);
+const LITERAL_FIRST: TokenSet = TokenSet::new(&[TRUE_KW, FALSE_KW, NULL_KW, DEFAULT_KW])
+    .union(NUMERIC_FIRST)
+    .union(STRING_FIRST);
 
 const NUMERIC_FIRST: TokenSet = TokenSet::new(&[INT_NUMBER, FLOAT_NUMBER]);
 
@@ -4533,9 +4472,6 @@ const FUNC_KEYWORDS: TokenSet = TokenSet::new(&[
 const NAME_REF_FIRST: TokenSet = TYPE_KEYWORDS.union(IDENTS);
 
 const EXPR_FIRST: TokenSet = LHS_FIRST;
-
-// TODO: is this right? copied from rust analyzer
-const ATTRIBUTE_FIRST: TokenSet = TokenSet::new(&[POUND, GROUP_KW]);
 
 const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
     SELECT_KW,
