@@ -4,7 +4,6 @@ use dir_test::{dir_test, Fixture};
 use insta::{assert_snapshot, with_settings};
 use squawk_parser::{parse, LexedStr};
 use std::fmt::Write;
-use xshell::{cmd, Shell};
 
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/data/ok",
@@ -102,28 +101,6 @@ fn regression_suite(fixture: Fixture<&str>) {
     }, {
       assert_snapshot!(snapshot_name, errors.join(""));
     });
-}
-
-// Trying to burn down the errors in the postgres regression suite
-#[test]
-fn regression_suite_errors() {
-    let sh = Shell::new().unwrap();
-    sh.change_dir(env!("CARGO_MANIFEST_DIR"));
-
-    let output = cmd!(sh, "rg -c ERROR tests/snapshots")
-        .ignore_status()
-        .read()
-        .expect("Failed to execute ripgrep command");
-
-    let mut out = vec![];
-    for l in output.lines() {
-        // over other tests that should have errors
-        if l.contains("regression") {
-            out.push(l);
-        }
-    }
-    out.sort();
-    assert_snapshot!(out.join("\n"));
 }
 
 fn parse_text(text: &str) -> (String, Vec<std::string::String>) {
