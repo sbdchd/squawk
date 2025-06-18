@@ -7,11 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.14.0 - 2025-06-17
+
+### Added
+
+- The npm install script now checks an env var (`SQUAWK_LOCAL_CDNURL`), that
+  defaults to `https://github.com/sbdchd/squawk/releases/download`, for
+  downloading binaries. This should help when you want to use a cache or in case
+  GitHub is down.
+
+### Fixed
+
+- The last of the pg regression suite errors. (#543), (#542)
+
+- Precendence when parsing compound select statements. (#544)
+
+  ```sql
+  SELECT foo UNION SELECT bar ORDER BY baz;
+  -- equal to:
+  (SELECT foo UNION SELECT bar) ORDER BY baz;
+  ```
+
 ## v2.13.0 - 2025-06-15
 
 ### Fixed
 
-- parsing compound select statements & their trailing clauses, i.e.
+- parsing compound select statements & their trailing clauses, i.e. (#539)
 
   ```sql
   (select 1) limit 1;
@@ -23,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   );
   ```
 
-- join parsing to be more error resilent:
+- join parsing to be more error resilent: (#538)
 
   ```
   error[syntax-error]: Join missing condition.
