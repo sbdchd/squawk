@@ -44,7 +44,9 @@ const crypto = require("crypto")
 const { binaryPath } = require("./helpers")
 
 // e.g.: https://github.com/sbdchd/squawk/releases/download/v0.1.3/squawk-darwin-x86_64
-const RELEASES_BASE_URL = "https://github.com/sbdchd/squawk/releases/download"
+const RELEASES_BASE_URL =
+  process.env.SQUAWK_LOCAL_CDNURL ||
+  "https://github.com/sbdchd/squawk/releases/download"
 
 const SUPPORTED_PLATFORMS = new Set([
   "darwin-x64",
