@@ -223,6 +223,27 @@ SOURCE_FILE
       SELECT_KW "select"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- extra comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+        ERROR
+          COMMA ","
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- trailing comma at EOF"
   WHITESPACE "\n"
   SELECT
@@ -248,4 +269,5 @@ ERROR@396: expected expression
 ERROR@397: expected expression
 ERROR@520: missing comma
 ERROR@646: expected SEMICOLON
-ERROR@689: unexpected trailing comma
+ERROR@679: unexpected trailing comma
+ERROR@723: unexpected trailing comma
