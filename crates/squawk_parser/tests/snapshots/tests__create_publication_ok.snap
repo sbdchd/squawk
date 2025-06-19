@@ -30,7 +30,7 @@ SOURCE_FILE
     WHITESPACE " "
     TABLES_KW "tables"
     WHITESPACE "\n  "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("
@@ -170,7 +170,7 @@ SOURCE_FILE
           IDENT "foo"
     R_PAREN ")"
     WHITESPACE "\n  "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("

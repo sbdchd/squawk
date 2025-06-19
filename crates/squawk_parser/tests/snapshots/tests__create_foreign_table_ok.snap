@@ -295,9 +295,10 @@ SOURCE_FILE
     NAME_REF
       IDENT "a"
     WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    OPTIONS_KW "options"
+    WITH_OPTIONS
+      WITH_KW "with"
+      WHITESPACE " "
+      OPTIONS_KW "options"
     WHITESPACE " "
     NOT_NULL_CONSTRAINT
       NOT_KW "not"

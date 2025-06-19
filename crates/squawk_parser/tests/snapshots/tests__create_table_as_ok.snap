@@ -17,11 +17,13 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    ON_KW "on"
-    WHITESPACE " "
-    COMMIT_KW "commit"
-    WHITESPACE " "
-    DROP_KW "drop"
+    ON_COMMIT
+      ON_KW "on"
+      WHITESPACE " "
+      COMMIT_KW "commit"
+      WHITESPACE " "
+      DROP
+        DROP_KW "drop"
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE "\n  "
@@ -101,6 +103,199 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "u"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- more fields"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS
+    CREATE_KW "create"
+    WHITESPACE " "
+    LOCAL_KW "local"
+    WHITESPACE " "
+    TEMPORARY_KW "temporary"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " \n  "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        NAME
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME
+          IDENT "c"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+    WHITESPACE "\n  "
+    WITH_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "x"
+      WHITESPACE " "
+      EQ "="
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "b"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    ON_COMMIT
+      ON_KW "on"
+      WHITESPACE " "
+      COMMIT_KW "commit"
+      WHITESPACE " "
+      DELETE_ROWS
+        DELETE_KW "delete"
+        WHITESPACE " "
+        ROWS_KW "rows"
+    WHITESPACE "\n  "
+    TABLESPACE
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    WHITESPACE "\n  "
+    WITH_DATA
+      WITH_KW "with"
+      WHITESPACE " "
+      DATA_KW "data"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE_AS
+    CREATE_KW "create"
+    WHITESPACE " "
+    GLOBAL_KW "global"
+    WHITESPACE " "
+    TEMP_KW "temp"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " \n  "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " \n  "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "u"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        NAME
+          IDENT "a"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+    WHITESPACE "\n  "
+    WITHOUT_OIDS
+      WITHOUT_KW "without"
+      WHITESPACE " "
+      OIDS_KW "oids"
+    WHITESPACE "\n  "
+    ON_COMMIT
+      ON_KW "on"
+      WHITESPACE " "
+      COMMIT_KW "commit"
+      WHITESPACE " "
+      PRESERVE_ROWS
+        PRESERVE_KW "preserve"
+        WHITESPACE " "
+        ROWS_KW "rows"
+    WHITESPACE "\n  "
+    TABLESPACE
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "foo"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
+    WHITESPACE "\n  "
+    WITH_NO_DATA
+      WITH_KW "with"
+      WHITESPACE " "
+      NO_KW "no"
+      WHITESPACE " "
+      DATA_KW "data"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- unlogged"
+  WHITESPACE "\n"
+  CREATE_TABLE_AS
+    CREATE_KW "create"
+    WHITESPACE " "
+    UNLOGGED_KW "unlogged"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "u"
+    WHITESPACE "\n  "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- values"

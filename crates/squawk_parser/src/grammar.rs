@@ -3397,7 +3397,7 @@ fn opt_with_params(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             }
         }
         p.expect(R_PAREN);
-        Some(m.complete(p, CONSTRAINT_STORAGE_PARAMS))
+        Some(m.complete(p, WITH_PARAMS))
     } else {
         None
     }
@@ -4048,41 +4048,24 @@ fn col_def(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
     {
         return None;
     }
-    let m = p.start();
     // LIKE source_table [ like_option ... ]
-    if t == ColDefType::WithData && p.eat(LIKE_KW) {
-        path_name_ref(p);
-        while !p.at(EOF) {
-            if !like_option(p) {
-                break;
-            }
-        }
-        return Some(m.complete(p, LIKE_CLAUSE));
+    if t == ColDefType::WithData && p.at(LIKE_KW) {
+        return Some(like_clause(p));
     }
     if p.at_ts(TABLE_CONSTRAINT_FIRST) {
-        m.abandon(p);
         return Some(table_constraint(p));
     }
-    name_ref(p);
+    let m = p.start();
+    name(p);
     match t {
         ColDefType::WithData => {
-            // TODO: validation to check for missing types
             if opt_type_name(p) {
-                // [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ]
-                if p.eat(STORAGE_KW) && (p.at(DEFAULT_KW) || p.at(EXTERNAL_KW) || p.at(IDENT)) {
-                    p.bump_any();
-                }
-                // [ COMPRESSION compression_method ]
-                if p.eat(COMPRESSION_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
-                    p.bump_any();
-                }
+                opt_storage(p);
+                opt_compression_method(p);
             }
         }
         ColDefType::ColumnNameOnly => {
-            // [ WITH OPTIONS ]
-            if p.eat(WITH_KW) {
-                p.expect(OPTIONS_KW);
-            }
+            opt_with_options(p);
         }
     }
     opt_collate(p);
@@ -4093,6 +4076,43 @@ fn col_def(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
         }
     }
     Some(m.complete(p, COLUMN))
+}
+
+fn opt_compression_method(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    // [ COMPRESSION compression_method ]
+    if p.eat(COMPRESSION_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
+        p.bump_any();
+        Some(m.complete(p, COMPRESSION_METHOD))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn opt_storage(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    // [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ]
+    if p.eat(STORAGE_KW) && (p.at(DEFAULT_KW) || p.at(EXTERNAL_KW) || p.at(IDENT)) {
+        p.bump_any();
+        Some(m.complete(p, STORAGE))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn like_clause(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(LIKE_KW));
+    let m = p.start();
+    p.bump(LIKE_KW);
+    path_name_ref(p);
+    while !p.at(EOF) {
+        if !like_option(p) {
+            break;
+        }
+    }
+    m.complete(p, LIKE_CLAUSE)
 }
 
 // [ AS ] alias [ ( column_alias [, ...] ) ]
@@ -4661,7 +4681,8 @@ fn part_elem(p: &mut Parser<'_>, allow_extra_params: bool) -> bool {
     true
 }
 
-fn table_args(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
+fn table_arg_list(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
+    assert!(p.at(L_PAREN));
     let m = p.start();
     match t {
         ColDefType::WithData => {
@@ -4685,7 +4706,7 @@ fn table_args(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
         }
     }
     p.expect(R_PAREN);
-    Some(m.complete(p, TABLE_ARGS))
+    Some(m.complete(p, TABLE_ARG_LIST))
 }
 
 // { FOR VALUES partition_bound_spec | DEFAULT }
@@ -4781,36 +4802,24 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(CREATE_KW));
     let m = p.start();
     p.expect(CREATE_KW);
-    // [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ]
-    if !p.eat(UNLOGGED_KW) {
-        // [ GLOBAL | LOCAL ] { TEMPORARY | TEMP }
-        let require_temp = p.eat(GLOBAL_KW) || p.eat(LOCAL_KW);
-        if require_temp {
-            if !opt_temp(p) {
-                p.error("expected temp or temporary");
-            }
-        } else {
-            opt_temp(p);
-        }
-    }
+    opt_temp_or_unlogged(p);
     p.expect(TABLE_KW);
     opt_if_not_exists(p);
     path_name(p);
     let mut col_def_t = ColDefType::WithData;
     let mut is_partition = false;
     // OF type_name
-    if p.eat(OF_KW) {
-        simple_type_name(p);
+    if p.at(OF_KW) {
+        of_type(p);
         col_def_t = ColDefType::ColumnNameOnly;
     // PARTITION OF parent_table
-    } else if p.eat(PARTITION_KW) {
-        p.expect(OF_KW);
-        path_name_ref(p);
+    } else if p.at(PARTITION_KW) {
+        partition_of(p);
         col_def_t = ColDefType::ColumnNameOnly;
         is_partition = true;
     }
     if p.at(L_PAREN) {
-        table_args(p, col_def_t);
+        table_arg_list(p, col_def_t);
     }
     if is_partition {
         partition_option(p);
@@ -4819,44 +4828,13 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     if col_def_t == ColDefType::WithData {
         opt_inherits_tables(p);
     }
-    // [ PARTITION BY { RANGE | LIST | HASH } ( { column_name | ( expression ) } [ COLLATE collation ] [ opclass ] [, ... ] ) ]
-    if p.eat(PARTITION_KW) {
-        p.expect(BY_KW);
-        // name
-        if p.at_ts(TYPE_KEYWORDS) || p.at(IDENT) {
-            p.bump_any();
-        }
-        // (
-        //   { column_name | ( expression ) }
-        //   [ COLLATE collation ]
-        //   [ opclass ]
-        //   [, ... ]
-        // )
-        partition_items(p, false);
-    }
-    // [ USING method ]
-    if p.eat(USING_KW) {
-        path_name_ref(p);
-    }
-    // [ WITH ( storage_parameter [= value] [, ... ] ) | WITHOUT OIDS ]
+    opt_partition_by(p);
+    opt_using_method(p);
     if opt_with_params(p).is_none() {
-        if p.eat(WITHOUT_KW) {
-            p.expect(OIDS_KW);
-        }
+        opt_without_oids(p);
     }
-    // [ ON COMMIT { PRESERVE ROWS | DELETE ROWS | DROP } ]
-    if p.eat(ON_KW) {
-        p.expect(COMMIT_KW);
-        if p.eat(PRESERVE_KW) || p.eat(DELETE_KW) {
-            p.expect(ROWS_KW);
-        } else if !p.eat(DROP_KW) {
-            p.error("expected PRESERVE ROWS, DELETE ROWS, or DROP");
-        }
-    }
-    // [ TABLESPACE tablespace_name ]
-    if p.eat(TABLESPACE_KW) {
-        name_ref(p);
-    }
+    opt_on_commit(p);
+    opt_tablespace(p);
     // AS query
     // [ WITH [ NO ] DATA ]
     if p.eat(AS_KW) {
@@ -4875,13 +4853,149 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
                 p.error("expected SELECT, TABLE, VALUES, or EXECUTE");
             }
         }
-        if p.eat(WITH_KW) {
-            p.eat(NO_KW);
-            p.expect(DATA_KW);
-        }
+
+        opt_with_data(p);
+
         return m.complete(p, CREATE_TABLE_AS);
     }
     m.complete(p, CREATE_TABLE)
+}
+
+fn opt_temp_or_unlogged(p: &mut Parser<'_>) {
+    // [ [ GLOBAL | LOCAL ] { TEMPORARY | TEMP } | UNLOGGED ]
+    if !p.eat(UNLOGGED_KW) {
+        // [ GLOBAL | LOCAL ] { TEMPORARY | TEMP }
+        let require_temp = p.eat(GLOBAL_KW) || p.eat(LOCAL_KW);
+        if require_temp {
+            if !opt_temp(p) {
+                p.error("expected temp or temporary");
+            }
+        } else {
+            opt_temp(p);
+        }
+    }
+}
+
+fn of_type(p: &mut Parser<'_>) {
+    assert!(p.at(OF_KW));
+    let m = p.start();
+    p.bump(OF_KW);
+    simple_type_name(p);
+    m.complete(p, OF_TYPE);
+}
+
+fn partition_of(p: &mut Parser<'_>) {
+    assert!(p.at(PARTITION_KW));
+    let m = p.start();
+    p.bump(PARTITION_KW);
+    p.expect(OF_KW);
+    path_name_ref(p);
+    m.complete(p, PARTITION_OF);
+}
+
+fn opt_with_data(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    if p.eat(WITH_KW) {
+        let kind = if p.eat(NO_KW) {
+            WITH_NO_DATA
+        } else {
+            WITH_DATA
+        };
+        p.expect(DATA_KW);
+        Some(m.complete(p, kind))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn opt_tablespace(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    // [ TABLESPACE tablespace_name ]
+    if p.eat(TABLESPACE_KW) {
+        name_ref(p);
+        Some(m.complete(p, TABLESPACE))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn opt_without_oids(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    if p.eat(WITHOUT_KW) {
+        p.expect(OIDS_KW);
+        Some(m.complete(p, WITHOUT_OIDS))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn opt_using_method(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    // [ USING method ]
+    if p.eat(USING_KW) {
+        name_ref(p);
+        Some(m.complete(p, USING_METHOD))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn opt_partition_by(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    // [ PARTITION BY { RANGE | LIST | HASH } ( { column_name | ( expression ) } [ COLLATE collation ] [ opclass ] [, ... ] ) ]
+    if p.eat(PARTITION_KW) {
+        p.expect(BY_KW);
+        // name
+        if p.at_ts(TYPE_KEYWORDS) || p.at(IDENT) {
+            p.bump_any();
+        }
+        // (
+        //   { column_name | ( expression ) }
+        //   [ COLLATE collation ]
+        //   [ opclass ]
+        //   [, ... ]
+        // )
+        partition_items(p, false);
+        Some(m.complete(p, PARTITION_BY))
+    } else {
+        m.abandon(p);
+        None
+    }
+}
+
+fn on_commit_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    let kind = if p.eat(PRESERVE_KW) {
+        p.expect(ROWS_KW);
+        PRESERVE_ROWS
+    } else if p.eat(DELETE_KW) {
+        p.expect(ROWS_KW);
+        DELETE_ROWS
+    } else if p.eat(DROP_KW) {
+        DROP
+    } else {
+        p.error("expected PRESERVE ROWS, DELETE ROWS, or DROP");
+        m.abandon(p);
+        return None;
+    };
+    Some(m.complete(p, kind))
+}
+
+fn opt_on_commit(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    // [ ON COMMIT { PRESERVE ROWS | DELETE ROWS | DROP } ]
+    if p.eat(ON_KW) {
+        p.expect(COMMIT_KW);
+        on_commit_action(p);
+        Some(m.complete(p, ON_COMMIT))
+    } else {
+        m.abandon(p);
+        None
+    }
 }
 
 // COMMIT [ WORK | TRANSACTION ] [ AND [ NO ] CHAIN ]
@@ -4996,7 +5110,7 @@ fn string_literal(p: &mut Parser<'_>) {
 
 fn opt_bool_literal(p: &mut Parser<'_>) -> bool {
     let m = p.start();
-    // TOOD: we might want to check if its 1 or 0 specificially, not just `INT_NUMBER`
+    // TOOD: add validation to check for `1` or `0` inside the INT_NUMBER
     // https://www.postgresql.org/docs/current/sql-explain.html
     if p.eat(TRUE_KW) || p.eat(FALSE_KW) || p.eat(OFF_KW) || p.eat(ON_KW) || p.eat(INT_NUMBER) {
         m.complete(p, LITERAL);
@@ -8389,9 +8503,7 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
                 table_constraint(p);
             } else {
                 name_ref(p);
-                if p.eat(WITH_KW) {
-                    p.expect(OPTIONS_KW);
-                }
+                opt_with_options(p);
                 while !p.at(EOF) && opt_column_constraint(p).is_some() {
                     // pass
                 }
@@ -8401,9 +8513,7 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
                     table_constraint(p);
                 } else {
                     name_ref(p);
-                    if p.eat(WITH_KW) {
-                        p.expect(OPTIONS_KW);
-                    }
+                    opt_with_options(p);
                     while !p.at(EOF) && opt_column_constraint(p).is_some() {
                         // pass
                     }
@@ -8435,6 +8545,17 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     name_ref(p);
     opt_options_list(p);
     m.complete(p, CREATE_FOREIGN_TABLE)
+}
+
+fn opt_with_options(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if p.at(WITH_KW) {
+        let m = p.start();
+        p.bump(WITH_KW);
+        p.expect(OPTIONS_KW);
+        Some(m.complete(p, WITH_OPTIONS))
+    } else {
+        None
+    }
 }
 
 // CREATE FOREIGN DATA WRAPPER name

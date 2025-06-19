@@ -147,10 +147,10 @@ SOURCE_FILE
           NAME
             IDENT "t"
       WHITESPACE " "
-      TABLE_ARGS
+      TABLE_ARG_LIST
         L_PAREN "("
         COLUMN
-          NAME_REF
+          NAME
             IDENT "a"
           WHITESPACE " "
           PATH_TYPE
@@ -161,7 +161,7 @@ SOURCE_FILE
         COMMA ","
         WHITESPACE " "
         COLUMN
-          NAME_REF
+          NAME
             IDENT "b"
           WHITESPACE " "
           PATH_TYPE
@@ -181,10 +181,10 @@ SOURCE_FILE
           NAME
             IDENT "t1"
       WHITESPACE " "
-      TABLE_ARGS
+      TABLE_ARG_LIST
         L_PAREN "("
         COLUMN
-          NAME_REF
+          NAME
             IDENT "z"
           WHITESPACE " "
           PATH_TYPE

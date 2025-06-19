@@ -290,9 +290,18 @@ CheckConstraint  =
 UsingIndex =
   'using' 'index' NameRef
 
+WithOptions =
+  'with' 'options'
+
+Storage =
+  'storage' ('default' | 'external' | '#ident')
+
+CompressionMethod =
+  'compression' ('#ident' | 'default')
+
 Column =
   'period'?
-  (Name | Name Type Collate? | IndexExpr)
+  (Name WithOptions? | Name Type Storage? CompressionMethod? Collate? | IndexExpr)
 
 UniqueConstraint =
   ('constraint' NameRef)
@@ -536,7 +545,7 @@ TableArg =
 | LikeClause
 | TableConstraint
 
-TableArgs =
+TableArgList =
   '(' args:((TableArg (',' TableArg)*)?) ')'
 
 WhenClause =
@@ -557,7 +566,7 @@ ColumnList =
 ConstraintIncludeClause =
   'include'
 
-ConstraintStorageParams =
+WithParams =
   'with' '(' ')'
 
 ConstraintIndexTablespace =
@@ -682,8 +691,43 @@ DropDatabase =
 IfNotExists =
   'if' 'not' 'exists'
 
+PartitionOf =
+  'partition' 'of' Type
+
+PreserveRows =
+  'preserve' 'rows'
+
+DeleteRows =
+  'delete' 'rows'
+
+Drop =
+  'drop'
+
+OnCommitAction =
+  PreserveRows
+| DeleteRows
+| Drop
+
+OnCommit =
+  'on' 'commit' OnCommitAction
+
+Inherits =
+  'inherits' '(' (Path (',' Path)*) ')'
+
+Tablespace =
+  'tablespace' NameRef
+
+WithoutOids =
+  'without' 'oids'
+
+UsingMethod =
+  'using' NameRef
+
+PartitionBy =
+  'partition' 'by'
+
 CreateTable =
-  'create' 'table' IfNotExists? Path TableArgs
+  'create' 'table' IfNotExists? Path PartitionOf? OfType? TableArgList Inherits? PartitionBy? UsingMethod? (WithParams | WithoutOids)? OnCommit? Tablespace?
 
 CreateIndex =
   'create' 'unique'? 'index' 'concurrently'? (IfNotExists? Name)? 'on' RelationName
@@ -835,8 +879,14 @@ Declare =
 Execute =
   'execute'
 
+WithData =
+  'with' 'data'
+
+WithNoData =
+  'with' 'no' 'data'
+
 CreateTableAs =
-  'create'
+  'create' 'table' IfNotExists? Path UsingMethod? WithParams? OnCommit? Tablespace? 'as' Stmt (WithData | WithNoData)?
 
 CreateMaterializedView =
   'create'
