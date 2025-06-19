@@ -52,7 +52,7 @@ SOURCE_FILE
     NAME_REF
       IDENT "c"
     WHITESPACE "\n  "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("

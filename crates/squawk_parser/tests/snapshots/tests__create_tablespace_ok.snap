@@ -38,7 +38,7 @@ SOURCE_FILE
     LITERAL
       STRING "''"
     WHITESPACE "\n  "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("

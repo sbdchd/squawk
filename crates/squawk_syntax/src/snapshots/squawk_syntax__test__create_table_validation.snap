@@ -1,0 +1,40 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/create_table.sql
+---
+SOURCE_FILE@0..75
+  CREATE_TABLE@0..73
+    CREATE_KW@0..6 "create"
+    WHITESPACE@6..7 " "
+    TABLE_KW@7..12 "table"
+    WHITESPACE@12..13 " "
+    PATH@13..14
+      PATH_SEGMENT@13..14
+        NAME@13..14
+          IDENT@13..14 "t"
+    WHITESPACE@14..15 " "
+    TABLE_ARG_LIST@15..73
+      L_PAREN@15..16 "("
+      WHITESPACE@16..19 "\n  "
+      COLUMN@19..24
+        NAME@19..20
+          IDENT@19..20 "x"
+        WHITESPACE@20..21 " "
+        PATH_TYPE@21..24
+          PATH@21..24
+            PATH_SEGMENT@21..24
+              NAME_REF@21..24
+                INT_KW@21..24 "int"
+      COMMA@24..25 ","
+      WHITESPACE@25..28 "\n  "
+      COLUMN@28..39
+        NAME@28..39
+          IDENT@28..39 "description"
+      WHITESPACE@39..42 "\n  "
+      COMMENT@42..71 "--          ^^^^ miss ..."
+      WHITESPACE@71..72 "\n"
+      R_PAREN@72..73 ")"
+  SEMICOLON@73..74 ";"
+  WHITESPACE@74..75 "\n"
+
+ERROR@39 "Missing column type"

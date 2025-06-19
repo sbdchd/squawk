@@ -15,11 +15,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -30,7 +30,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -108,11 +108,11 @@ SOURCE_FILE
         NAME
           IDENT "orders"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -134,7 +134,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "address_id"
         WHITESPACE " "
         PATH_TYPE
@@ -150,7 +150,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "address_valid_at"
         WHITESPACE " "
         PATH_TYPE
@@ -166,7 +166,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           CONTENT_KW "content"
         WHITESPACE " "
         PATH_TYPE
@@ -237,11 +237,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -252,7 +252,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -291,11 +291,11 @@ SOURCE_FILE
         NAME
           IDENT "addresses"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -317,7 +317,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "valid_range"
         WHITESPACE " "
         PATH_TYPE
@@ -357,7 +357,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "recipient"
         WHITESPACE " "
         PATH_TYPE

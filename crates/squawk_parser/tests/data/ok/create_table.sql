@@ -301,6 +301,13 @@ create table t of bar.foo (
 create table t
 partition of foo.bar default;
 
+-- partition with some columns
+create table t partition of foo.bar (
+  a,
+  b with options,
+  c not null
+) default;
+
 -- partition with
 create table t
 partition of foo.bar 
@@ -328,4 +335,19 @@ CREATE TABLE sensors_uncompressed (
   sensor_id INTEGER, 
   ts TIMESTAMPTZ NOT NULL, 
   value REAL
+);
+
+-- compression method
+create table t (
+  a int compression pglz,
+  b int compression default
+);
+
+-- storage
+create table t (
+  a int storage plain,
+  b int storage external,
+  c int storage extended,
+  d int storage main,
+  e int storage default
 );
