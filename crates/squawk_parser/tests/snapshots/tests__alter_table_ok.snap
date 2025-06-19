@@ -2242,7 +2242,7 @@ SOURCE_FILE
               IDENT "c"
           R_PAREN ")"
         WHITESPACE " "
-        CONSTRAINT_STORAGE_PARAMS
+        WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
           L_PAREN "("
@@ -2342,7 +2342,7 @@ SOURCE_FILE
                 IDENT "b"
             R_PAREN ")"
         WHITESPACE "\n  "
-        CONSTRAINT_STORAGE_PARAMS
+        WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
           L_PAREN "("

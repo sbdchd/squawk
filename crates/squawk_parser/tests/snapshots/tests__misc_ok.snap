@@ -15,11 +15,11 @@ SOURCE_FILE
         NAME
           IDENT "sensors"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "sensorid"
         WHITESPACE " "
         PATH_TYPE
@@ -30,7 +30,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "ts"
         WHITESPACE " "
         PATH_TYPE
@@ -41,7 +41,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -1246,19 +1246,20 @@ SOURCE_FILE
         NAME
           IDENT "time_taptest_table_default"
     WHITESPACE " "
-    PARTITION_KW "PARTITION"
-    WHITESPACE " "
-    OF_KW "OF"
-    WHITESPACE " "
-    PATH
+    PARTITION_OF
+      PARTITION_KW "PARTITION"
+      WHITESPACE " "
+      OF_KW "OF"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "time_taptest_table"
+            IDENT "time_taptest_table"
     WHITESPACE " "
     DEFAULT_KW "DEFAULT"
   SEMICOLON ";"
@@ -1355,19 +1356,20 @@ SOURCE_FILE
         NAME
           IDENT "time_taptest_table_p20241225"
     WHITESPACE " "
-    PARTITION_KW "PARTITION"
-    WHITESPACE " "
-    OF_KW "OF"
-    WHITESPACE " "
-    PATH
+    PARTITION_OF
+      PARTITION_KW "PARTITION"
+      WHITESPACE " "
+      OF_KW "OF"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "time_taptest_table"
+            IDENT "time_taptest_table"
     WHITESPACE " "
     FOR_KW "FOR"
     WHITESPACE " "
@@ -1404,7 +1406,7 @@ SOURCE_FILE
         NAME
           IDENT "clean_default_temp"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       LIKE_CLAUSE
         LIKE_KW "LIKE"
@@ -1526,19 +1528,20 @@ SOURCE_FILE
         NAME
           IDENT "time_taptest_table_p20241225"
     WHITESPACE " "
-    PARTITION_KW "PARTITION"
-    WHITESPACE " "
-    OF_KW "OF"
-    WHITESPACE " "
-    PATH
+    PARTITION_OF
+      PARTITION_KW "PARTITION"
+      WHITESPACE " "
+      OF_KW "OF"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "partman_test"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "partman_test"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "time_taptest_table"
+            IDENT "time_taptest_table"
     WHITESPACE " "
     FOR_KW "FOR"
     WHITESPACE " "
@@ -1896,11 +1899,11 @@ SOURCE_FILE
         NAME
           IDENT "tng"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "title"
         WHITESPACE " "
         PATH_TYPE
@@ -1911,7 +1914,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "plot"
         WHITESPACE " "
         PATH_TYPE
@@ -2207,10 +2210,10 @@ SOURCE_FILE
         NAME
           IDENT "events"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
@@ -2221,7 +2224,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
@@ -2232,7 +2235,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -2243,7 +2246,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "response_time"
         WHITESPACE " "
         DOUBLE_TYPE
@@ -2263,10 +2266,10 @@ SOURCE_FILE
         NAME
           IDENT "view_counts"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
@@ -2277,7 +2280,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -2288,7 +2291,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "count"
         WHITESPACE " "
         PATH_TYPE
@@ -2551,10 +2554,10 @@ SOURCE_FILE
         NAME
           IDENT "events_json"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "id"
         WHITESPACE " "
         PATH_TYPE
@@ -2576,7 +2579,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "payload"
         WHITESPACE " "
         PATH_TYPE
@@ -2659,10 +2662,10 @@ SOURCE_FILE
         NAME
           IDENT "user_counts"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           HOUR_KW "hour"
         WHITESPACE " "
         PATH_TYPE
@@ -2673,7 +2676,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "user_count"
         WHITESPACE " "
         PATH_TYPE
@@ -3737,11 +3740,11 @@ SOURCE_FILE
         NAME
           IDENT "events"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
@@ -3752,7 +3755,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -3763,7 +3766,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
@@ -3774,16 +3777,17 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    PARTITION_KW "PARTITION"
-    WHITESPACE " "
-    BY_KW "BY"
-    WHITESPACE " "
-    RANGE_KW "RANGE"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "event_time"
-    R_PAREN ")"
+    PARTITION_BY
+      PARTITION_KW "PARTITION"
+      WHITESPACE " "
+      BY_KW "BY"
+      WHITESPACE " "
+      RANGE_KW "RANGE"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "event_time"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -3796,13 +3800,13 @@ SOURCE_FILE
         NAME
           IDENT "events"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COMMENT "-- Frequently queried columns"
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
@@ -3813,7 +3817,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -3824,7 +3828,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
@@ -3837,7 +3841,7 @@ SOURCE_FILE
       COMMENT "-- Rarely queried metadata"
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "user_agent"
         WHITESPACE " "
         PATH_TYPE
@@ -3848,7 +3852,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "ip_address"
         WHITESPACE " "
         PATH_TYPE
@@ -3861,7 +3865,7 @@ SOURCE_FILE
       COMMENT "-- Large payload rarely used in aggregations"
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_data"
         WHITESPACE " "
         PATH_TYPE
@@ -3883,11 +3887,11 @@ SOURCE_FILE
         NAME
           IDENT "events_core"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
@@ -3903,7 +3907,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_time"
         WHITESPACE " "
         PATH_TYPE
@@ -3914,7 +3918,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "user_id"
         WHITESPACE " "
         PATH_TYPE
@@ -3925,7 +3929,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_type"
         WHITESPACE " "
         PATH_TYPE
@@ -3946,11 +3950,11 @@ SOURCE_FILE
         NAME
           IDENT "events_metadata"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
@@ -3974,7 +3978,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "user_agent"
         WHITESPACE " "
         PATH_TYPE
@@ -3985,7 +3989,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "ip_address"
         WHITESPACE " "
         PATH_TYPE
@@ -4007,11 +4011,11 @@ SOURCE_FILE
         NAME
           IDENT "events_payload"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_id"
         WHITESPACE " "
         PATH_TYPE
@@ -4035,7 +4039,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "event_data"
         WHITESPACE " "
         PATH_TYPE
@@ -4392,11 +4396,11 @@ SOURCE_FILE
         NAME
           IDENT "metrics"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE " \n   "
       COLUMN
-        NAME_REF
+        NAME
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
@@ -4407,7 +4411,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
@@ -4418,7 +4422,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -4429,12 +4433,11 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    USING_KW "USING"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "duckdb"
+    USING_METHOD
+      USING_KW "USING"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "duckdb"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
@@ -4456,11 +4459,11 @@ SOURCE_FILE
         NAME
           IDENT "metrics"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           DAY_KW "day"
         WHITESPACE " "
         PATH_TYPE
@@ -4471,7 +4474,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "metric_name"
         WHITESPACE " "
         PATH_TYPE
@@ -4482,7 +4485,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -4493,12 +4496,11 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE " "
-    USING_KW "USING"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "columnstore"
+    USING_METHOD
+      USING_KW "USING"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "columnstore"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Instead of this complex self-join"
@@ -5612,7 +5614,7 @@ SOURCE_FILE
         TIMESTAMP_KW "timestamp"
       R_PAREN ")"
     WHITESPACE " "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "WITH"
       WHITESPACE " "
       L_PAREN "("
@@ -5945,11 +5947,11 @@ SOURCE_FILE
         NAME
           IDENT "solar_panel_metrics"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           TIME_KW "time"
         WHITESPACE "        "
         PATH_TYPE
@@ -5965,7 +5967,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "panel_id"
         WHITESPACE "    "
         PATH_TYPE
@@ -5976,7 +5978,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "voltage"
         WHITESPACE "     "
         DOUBLE_TYPE
@@ -5986,7 +5988,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           CURRENT_KW "current"
         WHITESPACE "     "
         DOUBLE_TYPE
@@ -5996,7 +5998,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "temperature"
         WHITESPACE " "
         DOUBLE_TYPE
@@ -6006,7 +6008,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "irradiance"
         WHITESPACE "  "
         DOUBLE_TYPE

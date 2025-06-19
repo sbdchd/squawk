@@ -17,11 +17,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -32,7 +32,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -61,11 +61,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -76,7 +76,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -100,11 +100,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -124,7 +124,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -148,11 +148,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -194,11 +194,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -283,11 +283,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -313,11 +313,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -343,11 +343,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -371,10 +371,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -423,10 +423,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -436,65 +436,66 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    RANGE_KW "range"
-    WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    BIN_EXPR
-      NAME_REF
-        IDENT "foo"
+    PARTITION_BY
+      PARTITION_KW "partition"
       WHITESPACE " "
-      COLLATE_KW "collate"
+      BY_KW "by"
       WHITESPACE " "
-      NAME_REF
-        IDENT "\"fr_FR\""
-    WHITESPACE " "
-    IDENT "text_pattern_ops"
-    COMMA ","
-    WHITESPACE " \n  "
-    NAME_REF
-      IDENT "bar"
-    COMMA ","
-    WHITESPACE "\n  "
-    CALL_EXPR
-      NAME_REF
-        EXTRACT_KW "extract"
-      ARG_LIST
-        L_PAREN "("
-        MONTH_KW "month"
+      RANGE_KW "range"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n  "
+      BIN_EXPR
+        NAME_REF
+          IDENT "foo"
         WHITESPACE " "
-        FROM_KW "from"
+        COLLATE_KW "collate"
         WHITESPACE " "
         NAME_REF
-          IDENT "b"
-        R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    BIN_EXPR
-      PAREN_EXPR
-        L_PAREN "("
-        BIN_EXPR
-          NAME_REF
-            IDENT "a"
+          IDENT "\"fr_FR\""
+      WHITESPACE " "
+      IDENT "text_pattern_ops"
+      COMMA ","
+      WHITESPACE " \n  "
+      NAME_REF
+        IDENT "bar"
+      COMMA ","
+      WHITESPACE "\n  "
+      CALL_EXPR
+        NAME_REF
+          EXTRACT_KW "extract"
+        ARG_LIST
+          L_PAREN "("
+          MONTH_KW "month"
           WHITESPACE " "
-          CUSTOM_OP
-            PIPE "|"
-            PIPE "|"
+          FROM_KW "from"
           WHITESPACE " "
           NAME_REF
             IDENT "b"
-        R_PAREN ")"
-      WHITESPACE " "
-      COLLATE_KW "collate"
-      WHITESPACE " "
-      NAME_REF
-        IDENT "buzz"
-    WHITESPACE "\n"
-    R_PAREN ")"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      BIN_EXPR
+        PAREN_EXPR
+          L_PAREN "("
+          BIN_EXPR
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+        WHITESPACE " "
+        COLLATE_KW "collate"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "buzz"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -509,10 +510,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -522,16 +523,17 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    IDENT "hash"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "z"
-    R_PAREN ")"
+    PARTITION_BY
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      IDENT "hash"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "z"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -546,10 +548,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -559,20 +561,21 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    BY_KW "by"
-    WHITESPACE " "
-    IDENT "list"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "z"
-    COMMA ","
-    WHITESPACE " "
-    NAME_REF
-      IDENT "b"
-    R_PAREN ")"
+    PARTITION_BY
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      IDENT "list"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "z"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -587,10 +590,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -600,12 +603,11 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    USING_KW "using"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -620,10 +622,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -633,7 +635,7 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("
@@ -685,10 +687,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -698,9 +700,10 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    WITHOUT_KW "without"
-    WHITESPACE " "
-    OIDS_KW "OIDS"
+    WITHOUT_OIDS
+      WITHOUT_KW "without"
+      WHITESPACE " "
+      OIDS_KW "OIDS"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -715,10 +718,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -728,13 +731,15 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    ON_KW "on"
-    WHITESPACE " "
-    COMMIT_KW "commit"
-    WHITESPACE " "
-    PRESERVE_KW "preserve"
-    WHITESPACE " "
-    ROWS_KW "rows"
+    ON_COMMIT
+      ON_KW "on"
+      WHITESPACE " "
+      COMMIT_KW "commit"
+      WHITESPACE " "
+      PRESERVE_ROWS
+        PRESERVE_KW "preserve"
+        WHITESPACE " "
+        ROWS_KW "rows"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -747,10 +752,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -760,13 +765,15 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    ON_KW "on"
-    WHITESPACE " "
-    COMMIT_KW "commit"
-    WHITESPACE " "
-    DELETE_KW "delete"
-    WHITESPACE " "
-    ROWS_KW "rows"
+    ON_COMMIT
+      ON_KW "on"
+      WHITESPACE " "
+      COMMIT_KW "commit"
+      WHITESPACE " "
+      DELETE_ROWS
+        DELETE_KW "delete"
+        WHITESPACE " "
+        ROWS_KW "rows"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -779,10 +786,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -792,11 +799,13 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    ON_KW "on"
-    WHITESPACE " "
-    COMMIT_KW "commit"
-    WHITESPACE " "
-    DROP_KW "drop"
+    ON_COMMIT
+      ON_KW "on"
+      WHITESPACE " "
+      COMMIT_KW "commit"
+      WHITESPACE " "
+      DROP
+        DROP_KW "drop"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -811,10 +820,10 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -824,10 +833,11 @@ SOURCE_FILE
                 INT_KW "int"
       R_PAREN ")"
     WHITESPACE "\n"
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "bar"
+    TABLESPACE
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   CREATE_TABLE
@@ -842,11 +852,11 @@ SOURCE_FILE
         NAME
           IDENT "u"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -857,7 +867,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "\"like\""
         WHITESPACE " "
         PATH_TYPE
@@ -892,11 +902,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -925,11 +935,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -956,11 +966,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -990,11 +1000,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1008,7 +1018,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1028,7 +1038,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -1040,7 +1050,7 @@ SOURCE_FILE
         UNIQUE_CONSTRAINT
           UNIQUE_KW "unique"
           WHITESPACE " "
-          CONSTRAINT_STORAGE_PARAMS
+          WITH_PARAMS
             WITH_KW "with"
             WHITESPACE " "
             L_PAREN "("
@@ -1100,7 +1110,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "d"
         WHITESPACE " "
         PATH_TYPE
@@ -1137,11 +1147,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1189,11 +1199,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1241,11 +1251,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1259,7 +1269,7 @@ SOURCE_FILE
           WHITESPACE " "
           KEY_KW "key"
           WHITESPACE " "
-          CONSTRAINT_STORAGE_PARAMS
+          WITH_PARAMS
             WITH_KW "with"
             WHITESPACE " "
             L_PAREN "("
@@ -1273,7 +1283,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1302,11 +1312,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1331,7 +1341,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -1374,11 +1384,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1406,7 +1416,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1427,7 +1437,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "c"
         WHITESPACE " "
         PATH_TYPE
@@ -1448,7 +1458,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "d"
         WHITESPACE " "
         PATH_TYPE
@@ -1482,11 +1492,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1520,11 +1530,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1535,7 +1545,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1583,11 +1593,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1598,7 +1608,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1647,11 +1657,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1662,7 +1672,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1701,11 +1711,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1716,7 +1726,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1747,7 +1757,7 @@ SOURCE_FILE
               IDENT "b"
           R_PAREN ")"
         WHITESPACE " "
-        CONSTRAINT_STORAGE_PARAMS
+        WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
           L_PAREN "("
@@ -1779,11 +1789,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1794,7 +1804,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1837,11 +1847,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1852,7 +1862,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1904,11 +1914,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -1919,7 +1929,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -1993,11 +2003,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2008,7 +2018,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2097,11 +2107,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2112,7 +2122,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2158,7 +2168,7 @@ SOURCE_FILE
                 IDENT "b"
             R_PAREN ")"
         WHITESPACE "\n    "
-        CONSTRAINT_STORAGE_PARAMS
+        WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
           L_PAREN "("
@@ -2235,11 +2245,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2250,7 +2260,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2317,11 +2327,11 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
         WHITESPACE " "
         PATH_TYPE
@@ -2332,7 +2342,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         PATH_TYPE
@@ -2403,7 +2413,7 @@ SOURCE_FILE
               IDENT "b"
           R_PAREN ")"
         WHITESPACE " "
-        CONSTRAINT_STORAGE_PARAMS
+        WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
           L_PAREN "("
@@ -2601,11 +2611,11 @@ SOURCE_FILE
         NAME
           IDENT "sal_emp"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           NAME_KW "name"
         WHITESPACE "            "
         PATH_TYPE
@@ -2616,7 +2626,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "pay_by_quarter"
         WHITESPACE "  "
         ARRAY_TYPE
@@ -2630,7 +2640,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "schedule"
         WHITESPACE "        "
         ARRAY_TYPE
@@ -2659,11 +2669,11 @@ SOURCE_FILE
         NAME
           IDENT "tictactoe"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "squares"
         WHITESPACE "   "
         ARRAY_TYPE
@@ -2696,11 +2706,11 @@ SOURCE_FILE
         NAME
           IDENT "tictactoe"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "pay_by_quarter"
         WHITESPACE "  "
         ARRAY_TYPE
@@ -2718,7 +2728,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "pay_by_quarter"
         WHITESPACE "  "
         ARRAY_TYPE
@@ -2747,18 +2757,19 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
+    OF_TYPE
+      OF_KW "of"
+      WHITESPACE " "
+      PATH_TYPE
         PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+          DOT "."
           PATH_SEGMENT
             NAME_REF
-              IDENT "bar"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
+              IDENT "foo"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -2773,29 +2784,30 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
+    OF_TYPE
+      OF_KW "of"
+      WHITESPACE " "
+      PATH_TYPE
         PATH
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+          DOT "."
           PATH_SEGMENT
             NAME_REF
-              IDENT "bar"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "foo"
+              IDENT "foo"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "a"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "b"
         WHITESPACE " "
         NOT_NULL_CONSTRAINT
@@ -2805,12 +2817,13 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "c"
         WHITESPACE " "
-        WITH_KW "with"
-        WHITESPACE " "
-        OPTIONS_KW "options"
+        WITH_OPTIONS
+          WITH_KW "with"
+          WHITESPACE " "
+          OPTIONS_KW "options"
         WHITESPACE " "
         NOT_NULL_CONSTRAINT
           NOT_KW "not"
@@ -2849,19 +2862,79 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE "\n"
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    PATH
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
+            IDENT "bar"
+    WHITESPACE " "
+    DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- partition with some columns"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
       PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "a"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        WITH_OPTIONS
+          WITH_KW "with"
+          WHITESPACE " "
+          OPTIONS_KW "options"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "c"
+        WHITESPACE " "
+        NOT_NULL_CONSTRAINT
+          NOT_KW "not"
+          WHITESPACE " "
+          NULL_KW "null"
+      WHITESPACE "\n"
+      R_PAREN ")"
     WHITESPACE " "
     DEFAULT_KW "default"
   SEMICOLON ";"
@@ -2878,19 +2951,20 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE "\n"
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    PATH
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     WHITESPACE " \n"
     FOR_KW "for"
     WHITESPACE " "
@@ -2922,19 +2996,20 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE "\n"
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    PATH
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     WHITESPACE " \n"
     FOR_KW "for"
     WHITESPACE " "
@@ -2964,19 +3039,20 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE "\n"
-    PARTITION_KW "partition"
-    WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    PATH
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
       PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
+            IDENT "bar"
     WHITESPACE "\n"
     FOR_KW "for"
     WHITESPACE " "
@@ -3007,20 +3083,21 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    PARTITION_KW "partition"
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
     WHITESPACE " "
-    OF_KW "of"
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "u"
-    WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "c"
         WHITESPACE " "
         GENERATED_CONSTRAINT
@@ -3076,7 +3153,7 @@ SOURCE_FILE
         NAME
           IDENT "t"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       R_PAREN ")"
   SEMICOLON ";"
@@ -3093,11 +3170,11 @@ SOURCE_FILE
         NAME
           IDENT "sensors_uncompressed"
     WHITESPACE " "
-    TABLE_ARGS
+    TABLE_ARG_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "sensor_id"
         WHITESPACE " "
         PATH_TYPE
@@ -3108,7 +3185,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n  "
       COLUMN
-        NAME_REF
+        NAME
           IDENT "ts"
         WHITESPACE " "
         PATH_TYPE
@@ -3124,7 +3201,7 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " \n  "
       COLUMN
-        NAME_REF
+        NAME
           VALUE_KW "value"
         WHITESPACE " "
         PATH_TYPE
@@ -3132,6 +3209,152 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 REAL_KW "REAL"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- compression method"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        COMPRESSION_METHOD
+          COMPRESSION_KW "compression"
+          WHITESPACE " "
+          IDENT "pglz"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        COMPRESSION_METHOD
+          COMPRESSION_KW "compression"
+          WHITESPACE " "
+          DEFAULT_KW "default"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    COMMENT "-- storage"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        STORAGE
+          STORAGE_KW "storage"
+          WHITESPACE " "
+          IDENT "plain"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        STORAGE
+          STORAGE_KW "storage"
+          WHITESPACE " "
+          EXTERNAL_KW "external"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        STORAGE
+          STORAGE_KW "storage"
+          WHITESPACE " "
+          IDENT "extended"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "d"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        STORAGE
+          STORAGE_KW "storage"
+          WHITESPACE " "
+          IDENT "main"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "e"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+        WHITESPACE " "
+        STORAGE
+          STORAGE_KW "storage"
+          WHITESPACE " "
+          DEFAULT_KW "default"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

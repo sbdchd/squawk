@@ -271,7 +271,7 @@ SOURCE_FILE
     WHITESPACE " "
     DISTINCT_KW "distinct"
     WHITESPACE "\n  "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
       L_PAREN "("
@@ -468,7 +468,7 @@ SOURCE_FILE
         IDENT "title"
       R_PAREN ")"
     WHITESPACE " "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "WITH"
       WHITESPACE " "
       L_PAREN "("
@@ -593,7 +593,7 @@ SOURCE_FILE
         IDENT "title"
       R_PAREN ")"
     WHITESPACE " "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "WITH"
       WHITESPACE " "
       L_PAREN "("
@@ -636,7 +636,7 @@ SOURCE_FILE
         IDENT "locations"
       R_PAREN ")"
     WHITESPACE " "
-    CONSTRAINT_STORAGE_PARAMS
+    WITH_PARAMS
       WITH_KW "WITH"
       WHITESPACE " "
       L_PAREN "("

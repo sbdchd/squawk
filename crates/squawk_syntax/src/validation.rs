@@ -14,6 +14,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
             match node {
                 ast::AlterAggregate(it) => validate_aggregate_params(it.aggregate().and_then(|x| x.param_list()), errors),
                 ast::CreateAggregate(it) => validate_aggregate_params(it.param_list(), errors),
+                ast::CreateTable(it) => validate_create_table(it, errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
                 ast::DropAggregate(it) => validate_drop_aggregate(it, errors),
@@ -21,6 +22,33 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::Literal(it) => validate_literal(it, errors),
                 _ => (),
             }
+        }
+    }
+}
+
+fn validate_create_table(it: ast::CreateTable, acc: &mut Vec<SyntaxError>) {
+    let Some(arg_list) = it.table_arg_list() else {
+        return;
+    };
+
+    let type_required = it.partition_of().is_none() && it.of_type().is_none();
+
+    for arg in arg_list.args() {
+        match arg {
+            ast::TableArg::Column(column) => {
+                let Some(col_name) = column.name() else {
+                    continue;
+                };
+                if type_required && column.ty().is_none() {
+                    let end = col_name.syntax().text_range().end();
+                    acc.push(SyntaxError::new(
+                        "Missing column type",
+                        TextRange::new(end, end),
+                    ));
+                }
+            }
+            ast::TableArg::LikeClause(_) => (),
+            ast::TableArg::TableConstraint(_) => (),
         }
     }
 }
