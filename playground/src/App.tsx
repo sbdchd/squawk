@@ -125,6 +125,13 @@ export function App() {
         >
           Rules
         </a>
+        <a
+          href="https://github.com/sbdchd/squawk"
+          target="_blank"
+          className="px-3 py-1 rounded hover:bg-gray-700 transition-colors"
+        >
+          GitHub
+        </a>
         <ShareButton text={text} />
       </Nav>
       <div className="flex flex-1 mt-1">
