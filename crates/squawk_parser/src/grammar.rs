@@ -6024,21 +6024,7 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
                 name_ref(p);
             }
             ALTER_KW | CLUSTER_KW | SET_KW | RESET_KW | OWNER_KW => {
-                // TODO: we should be robust to missing commas
-                while !p.at(EOF) {
-                    let action = p.start();
-                    match alter_table_action(p) {
-                        Some(action_kind) => {
-                            action.complete(p, action_kind);
-                        }
-                        None => {
-                            action.abandon(p);
-                        }
-                    };
-                    if !p.eat(COMMA) {
-                        break;
-                    }
-                }
+                opt_alter_table_action_list(p);
             }
             _ => {
                 p.error("Expected RENAME, SET SCHEMA, [NO] DEPENDS, or action (ALTER, CLUSTER, SET, RESET, OWNER)");
@@ -6046,6 +6032,24 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         }
     }
     m.complete(p, ALTER_MATERIALIZED_VIEW)
+}
+
+fn opt_alter_table_action_list(p: &mut Parser<'_>) {
+    while !p.at(EOF) {
+        let m = p.start();
+        let Some(kind) = opt_alter_table_action(p) else {
+            m.abandon(p);
+            break;
+        };
+        m.complete(p, kind);
+        if !p.eat(COMMA) {
+            if p.at_ts(ALTER_TABLE_ACTION_FIRST) {
+                p.error("missing comma");
+            } else {
+                break;
+            }
+        }
+    }
 }
 
 // ALTER LARGE OBJECT large_object_oid OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
@@ -6352,21 +6356,7 @@ fn alter_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
             name_ref(p);
         }
         _ => {
-            // TODO: we should be robust to missing commas
-            while !p.at(EOF) {
-                let action = p.start();
-                match alter_table_action(p) {
-                    Some(action_kind) => {
-                        action.complete(p, action_kind);
-                    }
-                    None => {
-                        action.abandon(p);
-                    }
-                };
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
+            opt_alter_table_action_list(p);
         }
     }
     m.complete(p, ALTER_FOREIGN_TABLE)
@@ -13278,25 +13268,37 @@ fn alter_table(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
     }
-    // TODO: we should be robust to missing commas
-    while !p.at(EOF) {
-        let action = p.start();
-        match alter_table_action(p) {
-            Some(action_kind) => {
-                action.complete(p, action_kind);
-            }
-            None => {
-                action.abandon(p);
-            }
-        };
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
+    opt_alter_table_action_list(p);
     m.complete(p, ALTER_TABLE)
 }
 
-fn alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
+const ALTER_TABLE_ACTION_FIRST: TokenSet = TokenSet::new(&[
+    VALIDATE_KW,
+    REPLICA_KW,
+    OF_KW,
+    NOT_KW,
+    FORCE_KW,
+    NO_KW,
+    INHERIT_KW,
+    ENABLE_KW,
+    DISABLE_KW,
+    CLUSTER_KW,
+    OWNER_KW,
+    DETACH_KW,
+    DROP_KW,
+    ADD_KW,
+    ATTACH_KW,
+    SET_KW,
+    RESET_KW,
+    RENAME_KW,
+    ALTER_KW,
+    OPTIONS_KW,
+]);
+
+fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
+    if !p.at_ts(ALTER_TABLE_ACTION_FIRST) {
+        return None;
+    }
     let kind = match p.current() {
         // VALIDATE CONSTRAINT constraint_name
         VALIDATE_KW => {
