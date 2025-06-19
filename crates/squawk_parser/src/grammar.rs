@@ -4490,6 +4490,8 @@ const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
     R_PAREN,
     R_BRACK,
     RETURNING_KW,
+    SEMICOLON,
+    EOF,
 ])
 .union(COMPOUND_SELECT_FIRST);
 
@@ -4547,7 +4549,7 @@ fn opt_target_list(p: &mut Parser) -> Option<CompletedMarker> {
     let m = p.start();
     while !p.at(EOF) && !p.at(SEMICOLON) {
         if opt_target_el(p).is_some() {
-            if p.at(COMMA) && matches!(p.nth(1), SEMICOLON | EOF) {
+            if p.at(COMMA) && p.nth_at_ts(1, TARGET_FOLLOW) {
                 p.err_and_bump("unexpected trailing comma");
                 break;
             }
@@ -4564,6 +4566,8 @@ fn opt_target_list(p: &mut Parser) -> Option<CompletedMarker> {
                     break;
                 }
             }
+        } else {
+            break;
         }
     }
     Some(m.complete(p, TARGET_LIST))

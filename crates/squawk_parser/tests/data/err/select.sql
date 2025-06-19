@@ -29,5 +29,8 @@ select numeric 1234;
 -- warns about a missing semicolon
 select select;
 
+-- extra comma
+select a, from t;
+
 -- trailing comma at EOF
 select 1,
