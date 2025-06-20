@@ -40,7 +40,8 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    IDENT "addons"
+    NAME_REF
+      IDENT "addons"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
@@ -55,7 +56,8 @@ SOURCE_FILE
     WHITESPACE " "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    IDENT "bar"
+    NAME_REF
+      IDENT "bar"
     WHITESPACE "\n  "
     VERSION_KW "version"
     WHITESPACE " "
@@ -74,7 +76,8 @@ SOURCE_FILE
     WHITESPACE "\n  "
     SCHEMA_KW "schema"
     WHITESPACE " "
-    IDENT "bar"
+    NAME_REF
+      IDENT "bar"
     WHITESPACE "\n  "
     VERSION_KW "version"
     WHITESPACE " "

@@ -90,9 +90,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    IDENT "a"
+    ALIAS
+      AS_KW "as"
+      WHITESPACE " "
+      NAME
+        IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n"
   DELETE
@@ -106,7 +108,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    IDENT "a"
+    ALIAS
+      NAME
+        IDENT "a"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- using, where, return"
@@ -124,9 +128,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    IDENT "a"
+    ALIAS
+      AS_KW "as"
+      WHITESPACE " "
+      NAME
+        IDENT "a"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -263,7 +269,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "user_sessions"
     WHITESPACE " "
-    IDENT "us"
+    ALIAS
+      NAME
+        IDENT "us"
     WHITESPACE "\n"
     USING_CLAUSE
       USING_KW "using"
@@ -373,7 +381,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "employees"
     WHITESPACE " "
-    IDENT "e"
+    ALIAS
+      NAME
+        IDENT "e"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -549,9 +559,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    IDENT "a"
+    ALIAS
+      AS_KW "as"
+      WHITESPACE " "
+      NAME
+        IDENT "a"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -622,9 +634,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    AS_KW "as"
-    WHITESPACE " "
-    IDENT "a"
+    ALIAS
+      AS_KW "as"
+      WHITESPACE " "
+      NAME
+        IDENT "a"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "using"
@@ -1012,9 +1026,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "user_logs"
     WHITESPACE " "
-    AS_KW "AS"
-    WHITESPACE " "
-    IDENT "dl"
+    ALIAS
+      AS_KW "AS"
+      WHITESPACE " "
+      NAME
+        IDENT "dl"
     WHITESPACE "\n  "
     USING_CLAUSE
       USING_KW "USING"
