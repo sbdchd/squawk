@@ -45,3 +45,13 @@ create unlogged table t (
     cycle
   )
 );
+
+create table z (
+  a int
+)
+-- ^ missing semi
+
+with t as (
+  select 1
+)
+select * from t;

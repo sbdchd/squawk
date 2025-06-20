@@ -498,6 +498,10 @@ WHERE ts >= DATE '2023-12-21' AND ts < DATE '2023-12-22'
 GROUP BY sensor_id, DATE_TRUNC('day', ts)
 ORDER BY sensor_id, day;
 
+-- select with uescape;
+select U&"d!0061t!+000061" UESCAPE '!';
+SELECT U&' \' UESCAPE '!';
+
 -- select_from_user_table
 select * from user;
 

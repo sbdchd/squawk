@@ -6021,6 +6021,36 @@ SOURCE_FILE
         DAY_KW "day"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- select with uescape;"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "U&\"d!0061t!+000061\""
+            WHITESPACE " "
+            UESCAPE_KW "UESCAPE"
+            WHITESPACE " "
+            STRING "'!'"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "SELECT"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            BYTE_STRING "U&' \\'"
+            WHITESPACE " "
+            UESCAPE_KW "UESCAPE"
+            WHITESPACE " "
+            STRING "'!'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- select_from_user_table"
   WHITESPACE "\n"
   SELECT

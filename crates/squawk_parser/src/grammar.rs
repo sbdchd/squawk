@@ -1485,11 +1485,7 @@ fn opt_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    if p.eat(IDENT) {
-        if p.eat(UESCAPE_KW) {
-            p.expect(STRING);
-        }
-    } else {
+    if !opt_ident(p) {
         p.bump_any();
     }
     Some(m.complete(p, NAME))
@@ -1894,7 +1890,9 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             INTERVAL_TYPE
         }
         _ => {
-            p.bump_any();
+            if !opt_ident(p) {
+                p.bump_any();
+            }
             NAME_REF
         }
     };
@@ -3384,7 +3382,8 @@ fn opt_include_columns(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 
 // [ WITH ( storage_parameter [= value] [, ... ] ) ]
 fn opt_with_params(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if p.at(WITH_KW) {
+    // check for both in case someone forgot a semi after `create table`
+    if p.at(WITH_KW) && p.nth_at(1, L_PAREN) {
         let m = p.start();
         p.bump(WITH_KW);
         p.expect(L_PAREN);
@@ -4082,7 +4081,9 @@ fn opt_compression_method(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     // [ COMPRESSION compression_method ]
     if p.eat(COMPRESSION_KW) && (p.at(DEFAULT_KW) || p.at(IDENT)) {
-        p.bump_any();
+        if !opt_ident(p) && !p.eat(DEFAULT_KW) {
+            p.error("expected default or identifier");
+        }
         Some(m.complete(p, COMPRESSION_METHOD))
     } else {
         m.abandon(p);
@@ -4094,7 +4095,9 @@ fn opt_storage(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     // [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ]
     if p.eat(STORAGE_KW) && (p.at(DEFAULT_KW) || p.at(EXTERNAL_KW) || p.at(IDENT)) {
-        p.bump_any();
+        if !opt_ident(p) {
+            p.bump_any();
+        }
         Some(m.complete(p, STORAGE))
     } else {
         m.abandon(p);
@@ -4290,7 +4293,7 @@ fn window_definition(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         return None;
     }
     let m = p.start();
-    p.eat(IDENT);
+    opt_ident(p);
     if p.eat(PARTITION_KW) {
         p.expect(BY_KW);
         if expr(p).is_none() {
@@ -4656,7 +4659,7 @@ fn part_elem(p: &mut Parser<'_>, allow_extra_params: bool) -> bool {
     }
     opt_collate(p);
     // [ opclass ]
-    p.eat(IDENT);
+    opt_ident(p);
     if allow_extra_params {
         // [ ( opclass_parameter = value [, ... ] ) ]
         if p.eat(L_PAREN) {
@@ -4716,10 +4719,10 @@ fn partition_option(p: &mut Parser<'_>) {
         // FOR VALUES WITH (modulus 5, remainder 0)
         if p.eat(WITH_KW) {
             p.expect(L_PAREN);
-            p.expect(IDENT);
+            ident(p);
             p.expect(INT_NUMBER);
             p.expect(COMMA);
-            p.expect(IDENT);
+            ident(p);
             p.expect(INT_NUMBER);
             p.expect(R_PAREN);
         // FOR VALUES IN '(' expr_list ')'
@@ -4951,7 +4954,9 @@ fn opt_partition_by(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.expect(BY_KW);
         // name
         if p.at_ts(TYPE_KEYWORDS) || p.at(IDENT) {
-            p.bump_any();
+            if !opt_ident(p) {
+                p.bump_any();
+            }
         }
         // (
         //   { column_name | ( expression ) }
@@ -8435,7 +8440,7 @@ fn create_event_trigger(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(TRIGGER_KW);
     name(p);
     p.expect(ON_KW);
-    p.expect(IDENT);
+    ident(p);
     if p.eat(WHEN_KW) {
         event_trigger_when(p);
         while !p.at(EOF) && p.eat(AND_KW) {
@@ -8860,7 +8865,7 @@ fn create_policy(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(ON_KW);
     path_name_ref(p);
     if p.eat(AS_KW) {
-        p.expect(IDENT);
+        ident(p);
     }
     if p.eat(FOR_KW) {
         let _ = p.eat(ALL_KW)
@@ -10148,7 +10153,7 @@ fn explain_option(p: &mut Parser<'_>) {
                 return;
             }
             // { TEXT | XML | JSON | YAML }
-            if p.eat(TEXT_KW) || p.eat(XML_KW) || p.eat(JSON_KW) || p.eat(IDENT) {
+            if p.eat(TEXT_KW) || p.eat(XML_KW) || p.eat(JSON_KW) || opt_ident(p) {
                 return;
             }
         }
@@ -10954,7 +10959,7 @@ fn set_role(p: &mut Parser<'_>) -> CompletedMarker {
         p.bump(SET_KW);
         let _ = p.eat(SESSION_KW) || p.eat(LOCAL_KW);
         p.expect(ROLE_KW);
-        if !p.eat(NONE_KW) && !p.eat(IDENT) && opt_string_literal(p).is_none() {
+        if !p.eat(NONE_KW) && !opt_ident(p) && opt_string_literal(p).is_none() {
             p.error("expected NONE or role_name");
         }
     }
@@ -12161,7 +12166,7 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
                 }
                 opt_collate(p);
                 // [ opclass ]
-                p.eat(IDENT);
+                opt_ident(p);
                 // [, ...]
                 if !p.eat(COMMA) {
                     break;
@@ -12336,11 +12341,7 @@ fn delete(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     p.bump(DELETE_KW);
     p.expect(FROM_KW);
     relation_name(p);
-    if p.eat(AS_KW) {
-        p.expect(IDENT);
-    } else {
-        p.eat(IDENT);
-    }
+    opt_as_alias(p);
     {
         let m = p.start();
         if p.eat(USING_KW) {
@@ -12371,7 +12372,7 @@ fn opt_where_current_of(p: &mut Parser<'_>) {
     if p.eat(WHERE_KW) {
         if p.eat(CURRENT_KW) {
             p.expect(OF_KW);
-            p.expect(IDENT);
+            ident(p);
         }
     }
 }
@@ -12746,7 +12747,9 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
             // string for language is deprecated but let's support it
             if opt_string_literal(p).is_none() {
                 if p.at_ts(UNRESERVED_KEYWORDS) || p.at(IDENT) {
-                    p.bump_any();
+                    if !opt_ident(p) {
+                        p.bump_any();
+                    }
                 } else {
                     p.error(format!("expected a language name, got {:?}", p.current()));
                 }
@@ -12817,7 +12820,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
         // PARALLEL { UNSAFE | RESTRICTED | SAFE }
         PARALLEL_KW => {
             p.bump(PARALLEL_KW);
-            p.expect(IDENT);
+            ident(p);
             PARALLEL_FUNC_OPTION
         }
         // COST execution_cost
@@ -13157,15 +13160,32 @@ fn create_extension(p: &mut Parser<'_>) -> CompletedMarker {
     name(p);
     p.eat(WITH_KW);
     if p.eat(SCHEMA_KW) {
-        p.expect(IDENT);
+        name_ref(p);
     }
     if p.eat(VERSION_KW) {
-        if opt_string_literal(p).is_none() && !p.eat(IDENT) {
+        if opt_string_literal(p).is_none() && !opt_ident(p) {
             p.error("expected string literal or IDENT");
         }
     }
     p.eat(CASCADE_KW);
     m.complete(p, CREATE_EXTENSION)
+}
+
+fn opt_ident(p: &mut Parser<'_>) -> bool {
+    if p.eat(IDENT) {
+        if p.eat(UESCAPE_KW) {
+            p.expect(STRING);
+        }
+        true
+    } else {
+        false
+    }
+}
+
+fn ident(p: &mut Parser<'_>) {
+    if !opt_ident(p) {
+        p.error("expected identifier");
+    }
 }
 
 // { value | 'value' | DEFAULT }
@@ -13180,7 +13200,7 @@ fn config_value(p: &mut Parser<'_>) -> bool {
     while !p.at(EOF) {
         if opt_string_literal(p).is_none()
             && opt_numeric_literal(p).is_none()
-            && !p.eat(IDENT)
+            && !opt_ident(p)
             && !opt_bool_literal(p)
         {
             if p.at_ts(BARE_LABEL_KEYWORDS) {
@@ -13838,11 +13858,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
 fn opt_col_label(p: &mut Parser<'_>) -> bool {
     if p.at_ts(COL_LABEL_FIRST) {
         let m = p.start();
-        if p.eat(IDENT) {
-            if p.eat(UESCAPE_KW) {
-                p.expect(STRING);
-            }
-        } else {
+        if !opt_ident(p) {
             p.bump_any();
         }
         m.complete(p, NAME);
