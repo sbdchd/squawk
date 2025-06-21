@@ -73,20 +73,20 @@ SOURCE_FILE
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "o"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "v"
-    R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "v"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- set_multiple_options"
@@ -103,34 +103,33 @@ SOURCE_FILE
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "o1"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "v1"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "v1"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "o2"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "v2"
-    R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "v2"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_option"
@@ -147,12 +146,12 @@ SOURCE_FILE
     WHITESPACE " "
     RESET_KW "reset"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "o"
-    R_PAREN ")"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_multiple_options"
@@ -169,17 +168,16 @@ SOURCE_FILE
     WHITESPACE " "
     RESET_KW "reset"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "o1"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "o2"
-    R_PAREN ")"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

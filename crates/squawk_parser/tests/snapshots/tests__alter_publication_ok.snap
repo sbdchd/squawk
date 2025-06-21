@@ -234,26 +234,25 @@ SOURCE_FILE
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "param1"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "param2"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            VALUE_KW "value"
-    R_PAREN ")"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                VALUE_KW "value"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_table"

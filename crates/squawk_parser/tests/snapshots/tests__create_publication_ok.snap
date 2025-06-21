@@ -33,26 +33,25 @@ SOURCE_FILE
     WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "foo"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "bar"
-      COMMA ","
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "bar"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "bar"
-      R_PAREN ")"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table"
@@ -173,26 +172,25 @@ SOURCE_FILE
     WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "foo"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "bar"
-      COMMA ","
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "bar"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "bar"
-      R_PAREN ")"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- table_in_schema"

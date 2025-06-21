@@ -24,21 +24,24 @@ SOURCE_FILE
         NAME_REF
           IDENT "d"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      IDENT "a"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "b"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "b"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"

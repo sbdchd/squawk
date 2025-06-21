@@ -3274,18 +3274,6 @@ fn opt_sequence_options(p: &mut Parser<'_>) -> bool {
     }
 }
 
-// storage_parameter [= value]
-fn storage_parameter(p: &mut Parser<'_>) -> bool {
-    // storage_parameter
-    path_name_ref(p);
-    // [= value]
-    if p.eat(EQ) && !def_arg(p) {
-        p.error("expected a value for storage parameter");
-        return false;
-    }
-    true
-}
-
 enum ColumnDefKind {
     Name,
     Ref,
@@ -3386,16 +3374,7 @@ fn opt_with_params(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(WITH_KW) && p.nth_at(1, L_PAREN) {
         let m = p.start();
         p.bump(WITH_KW);
-        p.expect(L_PAREN);
-        while !p.at(EOF) && !p.at(R_PAREN) {
-            if !storage_parameter(p) {
-                break;
-            }
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
+        attribute_list(p);
         Some(m.complete(p, WITH_PARAMS))
     } else {
         None
@@ -4652,7 +4631,8 @@ fn drop_table(p: &mut Parser<'_>) -> CompletedMarker {
 //  | ColId opt_collate opt_qualified_name
 //  | func_expr_windowless opt_collate opt_qualified_name
 //  | '(' a_expr ')' opt_collate opt_qualified_name
-fn part_elem(p: &mut Parser<'_>, allow_extra_params: bool) -> bool {
+fn partition_item(p: &mut Parser<'_>, allow_extra_params: bool) {
+    let m = p.start();
     // TODO: this can be more strict
     if expr(p).is_none() {
         p.error("expected expr")
@@ -4662,17 +4642,8 @@ fn part_elem(p: &mut Parser<'_>, allow_extra_params: bool) -> bool {
     opt_ident(p);
     if allow_extra_params {
         // [ ( opclass_parameter = value [, ... ] ) ]
-        if p.eat(L_PAREN) {
-            // TODO:
-            while !p.at(EOF) {
-                if !attribute_option(p, AttributeValue::Required) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+        if p.at(L_PAREN) {
+            attribute_list(p);
         }
         // [ ASC | DESC ]
         let _ = p.eat(ASC_KW) || p.eat(DESC_KW);
@@ -4681,7 +4652,7 @@ fn part_elem(p: &mut Parser<'_>, allow_extra_params: bool) -> bool {
             let _ = p.eat(FIRST_KW) || p.expect(LAST_KW);
         }
     }
-    true
+    m.complete(p, PARTITION_ITEM);
 }
 
 fn table_arg_list(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
@@ -5788,16 +5759,8 @@ fn alter_publication(p: &mut Parser<'_>) -> CompletedMarker {
         }
         SET_KW => {
             p.bump(SET_KW);
-            if p.eat(L_PAREN) {
-                while !p.at(EOF) && !p.at(R_PAREN) {
-                    if !storage_parameter(p) {
-                        break;
-                    }
-                    if !p.eat(COMMA) {
-                        break;
-                    }
-                }
-                p.expect(R_PAREN);
+            if p.at(L_PAREN) {
+                attribute_list(p);
             } else {
                 publication_object(p);
                 while !p.at(EOF) && p.eat(COMMA) {
@@ -6053,16 +6016,7 @@ fn alter_operator(p: &mut Parser<'_>) -> CompletedMarker {
             if p.eat(SCHEMA_KW) {
                 name_ref(p);
             } else {
-                p.expect(L_PAREN);
-                if !attribute_option(p, AttributeValue::Either) {
-                    p.error("expected option");
-                }
-                while !p.at(EOF) && p.eat(COMMA) {
-                    if !attribute_option(p, AttributeValue::Either) {
-                        p.error("expected option");
-                    }
-                }
-                p.expect(R_PAREN);
+                attribute_list(p);
             }
         }
         _ => {
@@ -6263,12 +6217,7 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
                     p.bump(TABLESPACE_KW);
                     path_name_ref(p);
                 } else {
-                    p.expect(L_PAREN);
-                    storage_parameter(p);
-                    while !p.at(EOF) && p.eat(COMMA) {
-                        storage_parameter(p);
-                    }
-                    p.expect(R_PAREN);
+                    attribute_list(p);
                 }
             }
             ATTACH_KW => {
@@ -6285,12 +6234,7 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
             }
             RESET_KW => {
                 p.bump(RESET_KW);
-                p.expect(L_PAREN);
-                storage_parameter(p);
-                while !p.at(EOF) && p.eat(COMMA) {
-                    storage_parameter(p);
-                }
-                p.expect(R_PAREN);
+                attribute_list(p);
             }
             ALTER_KW => {
                 p.bump(ALTER_KW);
@@ -6299,16 +6243,8 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
                     p.error("expected numeric literal or name");
                 }
                 p.expect(SET_KW);
-                if p.eat(L_PAREN) {
-                    while !p.at(EOF) && !p.at(R_PAREN) {
-                        if !attribute_option(p, AttributeValue::Either) {
-                            break;
-                        }
-                        if !p.eat(COMMA) {
-                            break;
-                        }
-                    }
-                    p.expect(R_PAREN);
+                if p.at(L_PAREN) {
+                    attribute_list(p);
                 } else {
                     p.expect(STATISTICS_KW);
                     if opt_numeric_literal(p).is_none() {
@@ -7237,16 +7173,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
         }
         SET_KW if p.nth_at(1, L_PAREN) => {
             p.bump(SET_KW);
-            p.expect(L_PAREN);
-            while !p.at(EOF) && !p.at(R_PAREN) {
-                if !attribute_option(p, AttributeValue::Either) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+            attribute_list(p);
         }
         SET_KW | ADD_KW => {
             p.bump_any();
@@ -7276,16 +7203,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
         }
         SKIP_KW => {
             p.bump(SKIP_KW);
-            p.expect(L_PAREN);
-            while !p.at(EOF) && !p.at(R_PAREN) {
-                if !attribute_option(p, AttributeValue::Either) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+            attribute_list(p);
         }
         OWNER_KW => {
             p.bump(OWNER_KW);
@@ -7308,16 +7226,7 @@ fn alter_subscription(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn opt_with_options_list(p: &mut Parser<'_>) {
     if p.eat(WITH_KW) {
-        p.expect(L_PAREN);
-        while !p.at(EOF) && !p.at(R_PAREN) {
-            if !attribute_option(p, AttributeValue::Either) {
-                break;
-            }
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
+        attribute_list(p);
     }
 }
 
@@ -7358,16 +7267,7 @@ fn alter_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(TO_KW);
         role(p);
     } else if p.eat(SET_KW) || p.eat(RESET_KW) {
-        p.expect(L_PAREN);
-        while !p.at(EOF) && !p.at(R_PAREN) {
-            if !storage_parameter(p) {
-                break;
-            }
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
+        attribute_list(p);
     } else {
         p.error("expected RENAME, OWNER, SET, or RESET after tablespace name");
     }
@@ -7417,16 +7317,8 @@ fn alter_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(DICTIONARY_KW);
     path_name_ref(p);
-    if p.eat(L_PAREN) {
-        while !p.at(EOF) {
-            if !attribute_option(p, AttributeValue::Either) {
-                break;
-            }
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
+    if p.at(L_PAREN) {
+        attribute_list(p);
     } else if p.eat(RENAME_KW) {
         p.expect(TO_KW);
         name(p);
@@ -7661,16 +7553,7 @@ fn alter_type(p: &mut Parser<'_>) -> CompletedMarker {
             if p.eat(SCHEMA_KW) {
                 name_ref(p);
             } else {
-                p.expect(L_PAREN);
-                while !p.at(EOF) {
-                    if !attribute_option(p, AttributeValue::Either) {
-                        break;
-                    }
-                    if !p.eat(COMMA) {
-                        break;
-                    }
-                }
-                p.expect(R_PAREN);
+                attribute_list(p);
             }
         }
         RENAME_KW => {
@@ -7869,30 +7752,12 @@ fn alter_view(p: &mut Parser<'_>) -> CompletedMarker {
             if p.eat(SCHEMA_KW) {
                 name_ref(p);
             } else {
-                p.expect(L_PAREN);
-                while !p.at(EOF) {
-                    if !attribute_option(p, AttributeValue::Either) {
-                        break;
-                    }
-                    if !p.eat(COMMA) {
-                        break;
-                    }
-                }
-                p.expect(R_PAREN);
+                attribute_list(p);
             }
         }
         RESET_KW => {
             p.bump(RESET_KW);
-            p.expect(L_PAREN);
-            while !p.at(EOF) {
-                if !attribute_option(p, AttributeValue::Either) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+            attribute_list(p);
         }
         _ => p.error("expected ALTER, OWNER, RENAME, or SET"),
     }
@@ -8221,16 +8086,7 @@ fn create_aggregate(p: &mut Parser<'_>) -> CompletedMarker {
     if !at_old_syntax {
         aggregate_arg_list(p);
     }
-    p.expect(L_PAREN);
-    while !p.at(EOF) {
-        if !attribute_option(p, AttributeValue::Either) {
-            break;
-        }
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    attribute_list(p);
     m.complete(p, CREATE_AGGREGATE)
 }
 
@@ -8290,16 +8146,7 @@ fn create_collation(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(FROM_KW) {
         path_name_ref(p);
     } else {
-        p.expect(L_PAREN);
-        while !p.at(EOF) {
-            if !attribute_option(p, AttributeValue::Required) {
-                break;
-            }
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
+        attribute_list(p);
     }
     m.complete(p, CREATE_COLLATION)
 }
@@ -8679,9 +8526,7 @@ fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         name_ref(p);
     }
     opt_with_params(p);
-    if p.eat(TABLESPACE_KW) {
-        name_ref(p);
-    }
+    opt_tablespace(p);
     p.expect(AS_KW);
     // A SELECT, TABLE, or VALUES command.
     let statement = stmt(
@@ -8722,16 +8567,7 @@ fn create_operator(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CREATE_KW);
     p.bump(OPERATOR_KW);
     operator(p);
-    p.expect(L_PAREN);
-    while !p.at(EOF) {
-        if !attribute_option(p, AttributeValue::Either) {
-            break;
-        }
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    attribute_list(p);
     m.complete(p, CREATE_OPERATOR)
 }
 
@@ -9222,16 +9058,7 @@ fn create_text_search_parser(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(PARSER_KW);
     path_name(p);
-    p.expect(L_PAREN);
-    while !p.at(EOF) {
-        if !attribute_option(p, AttributeValue::Required) {
-            break;
-        }
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    attribute_list(p);
     m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
@@ -9247,16 +9074,7 @@ fn create_text_search_dict(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(DICTIONARY_KW);
     path_name(p);
-    p.expect(L_PAREN);
-    while !p.at(EOF) {
-        if !attribute_option(p, AttributeValue::Required) {
-            break;
-        }
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    attribute_list(p);
     m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
@@ -9272,16 +9090,7 @@ fn create_text_search_config(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(CONFIGURATION_KW);
     path_name(p);
-    p.expect(L_PAREN);
-    while !p.at(EOF) {
-        if !attribute_option(p, AttributeValue::Required) {
-            break;
-        }
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    attribute_list(p);
     m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
@@ -9297,17 +9106,7 @@ fn create_text_search_template(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SEARCH_KW);
     p.bump(TEMPLATE_KW);
     path_name(p);
-    p.expect(L_PAREN);
-    // definition in postgres grammar
-    while !p.at(EOF) {
-        if !attribute_option(p, AttributeValue::Required) {
-            break;
-        }
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    attribute_list(p);
     m.complete(p, CREATE_TEXT_SEARCH_PARSER)
 }
 
@@ -12538,9 +12337,7 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
     //   [ NULLS { FIRST | LAST } ]
     //   [, ...]
     // )
-    let param_list = p.start();
-    partition_items(p, true);
-    param_list.complete(p, INDEX_PARAMS);
+    index_params(p);
     // [ INCLUDE ( column_name [, ...] ) ]
     opt_include_columns(p);
     // [ NULLS [ NOT ] DISTINCT ]
@@ -12548,15 +12345,16 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
         p.eat(NOT_KW);
         p.expect(DISTINCT_KW);
     }
-    // [ WITH ( storage_parameter [= value] [, ... ] ) ]
     opt_with_params(p);
-    // [ TABLESPACE tablespace_name ]
-    if p.eat(TABLESPACE_KW) {
-        name_ref(p);
-    }
-    // [ WHERE predicate ]
+    opt_tablespace(p);
     opt_where_clause(p);
     m.complete(p, CREATE_INDEX)
+}
+
+fn index_params(p: &mut Parser<'_>) {
+    let m = p.start();
+    partition_items(p, true);
+    m.complete(p, INDEX_PARAMS);
 }
 
 // (
@@ -12578,9 +12376,7 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
 fn partition_items(p: &mut Parser<'_>, allow_extra_params: bool) {
     p.expect(L_PAREN);
     while !p.at(EOF) && !p.at(R_PAREN) {
-        if !part_elem(p, allow_extra_params) {
-            break;
-        }
+        partition_item(p, allow_extra_params);
         if !p.eat(COMMA) {
             break;
         }
@@ -13106,16 +12902,7 @@ fn create_type(p: &mut Parser<'_>) -> CompletedMarker {
             p.expect(R_PAREN);
             // AS RANGE
         } else if p.eat(RANGE_KW) {
-            p.expect(L_PAREN);
-            while !p.at(EOF) {
-                if !attribute_option(p, AttributeValue::Required) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+            attribute_list(p);
             // AS
         } else {
             p.expect(L_PAREN);
@@ -13131,16 +12918,8 @@ fn create_type(p: &mut Parser<'_>) -> CompletedMarker {
             }
             p.expect(R_PAREN);
         }
-    } else if p.eat(L_PAREN) {
-        while !p.at(EOF) {
-            if !attribute_option(p, AttributeValue::Either) {
-                break;
-            }
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
+    } else if p.at(L_PAREN) {
+        attribute_list(p);
     }
     m.complete(p, CREATE_TYPE)
 }
@@ -13738,31 +13517,13 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 SET_UNLOGGED
             // SET ( storage_parameter [= value] [, ... ] )
             } else {
-                p.expect(L_PAREN);
-                while !p.at(EOF) && !p.at(R_PAREN) {
-                    if !storage_parameter(p) {
-                        break;
-                    }
-                    if !p.eat(COMMA) {
-                        break;
-                    }
-                }
-                p.expect(R_PAREN);
+                attribute_list(p);
                 SET_STORAGE_PARAMS
             }
         }
         RESET_KW => {
             p.bump(RESET_KW);
-            p.expect(L_PAREN);
-            while !p.at(EOF) && !p.at(R_PAREN) {
-                if !storage_parameter(p) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+            attribute_list(p);
             RESET_STORAGE_PARAMS
         }
         // RENAME CONSTRAINT constraint_name TO new_constraint_name
@@ -13874,12 +13635,6 @@ fn col_label(p: &mut Parser<'_>) {
     }
 }
 
-enum AttributeValue {
-    Either,
-    Required,
-    Disallowed,
-}
-
 // reloption_list:
 //   | reloption_elem
 //   | reloption_list ',' reloption_elem
@@ -13888,25 +13643,19 @@ enum AttributeValue {
 //   | ColLabel
 //   | ColLabel '.' ColLabel '=' def_arg
 //   | ColLabel '.' ColLabel
-fn attribute_option(p: &mut Parser<'_>, option: AttributeValue) -> bool {
+fn attribute_option(p: &mut Parser<'_>) -> bool {
+    let m = p.start();
     if !opt_col_label(p) {
+        m.abandon(p);
         return false;
     }
     if p.eat(DOT) && !opt_col_label(p) {
         p.error("expected column label")
     }
-    match option {
-        AttributeValue::Required => {
-            p.expect(EQ);
-            def_arg(p);
-        }
-        AttributeValue::Disallowed => {}
-        AttributeValue::Either => {
-            if p.eat(EQ) {
-                def_arg(p);
-            }
-        }
+    if p.eat(EQ) {
+        def_arg(p);
     }
+    m.complete(p, ATTRIBUTE_OPTION);
     true
 }
 
@@ -14041,16 +13790,7 @@ fn alter_column_option(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         // RESET ( attribute_option [, ... ] )
         RESET_KW => {
             p.bump(RESET_KW);
-            p.expect(L_PAREN);
-            while !p.at(EOF) && !p.at(R_PAREN) {
-                if !attribute_option(p, AttributeValue::Disallowed) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+            attribute_list(p);
             RESET_OPTIONS
         }
         // TYPE data_type [ COLLATE collation ] [ USING expression ]
@@ -14122,16 +13862,7 @@ fn alter_column_option(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         // SET ( attribute_option = value [, ... ] )
         SET_KW if p.nth_at(1, L_PAREN) => {
             p.bump(SET_KW);
-            p.bump(L_PAREN);
-            while !p.at(EOF) && !p.at(R_PAREN) {
-                if !attribute_option(p, AttributeValue::Either) {
-                    break;
-                }
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+            attribute_list(p);
             SET_OPTIONS
         }
         // SET STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT }
@@ -14170,6 +13901,21 @@ fn alter_column_option(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         _ => return None,
     };
     Some(kind)
+}
+
+fn attribute_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.expect(L_PAREN);
+    while !p.at(EOF) && !p.at(R_PAREN) {
+        if !attribute_option(p) {
+            break;
+        }
+        if !p.eat(COMMA) {
+            break;
+        }
+    }
+    p.expect(R_PAREN);
+    m.complete(p, ATTRIBUTE_LIST);
 }
 
 fn opt_collate(p: &mut Parser<'_>) -> Option<CompletedMarker> {

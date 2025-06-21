@@ -19,56 +19,61 @@ SOURCE_FILE
         NAME
           NAME_KW "name"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      START_KW "start"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "start_function"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "gettoken"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "gettoken_function"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      END_KW "end"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "end_function"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "lextypes"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "lextypes_function"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          START_KW "start"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "start_function"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "gettoken"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "gettoken_function"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          END_KW "end"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "end_function"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "lextypes"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "lextypes_function"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -92,67 +97,73 @@ SOURCE_FILE
         NAME
           NAME_KW "name"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      START_KW "start"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "start_function"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "gettoken"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "gettoken_function"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      END_KW "end"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "end_function"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "lextypes"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "lextypes_function"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "headline"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "headline_function"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          START_KW "start"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "start_function"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "gettoken"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "gettoken_function"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          END_KW "end"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "end_function"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "lextypes"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "lextypes_function"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "headline"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "headline_function"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

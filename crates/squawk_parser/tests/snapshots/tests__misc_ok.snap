@@ -891,44 +891,48 @@ SOURCE_FILE
       WHITESPACE " "
       R_PAREN ")"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n    "
-    NAME
-      IDENT "sfunc"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "sum_per_hour"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "stype"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    ARRAY_TYPE
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "int8"
-      L_BRACK "["
-      R_BRACK "]"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "initcond"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "sfunc"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "sum_per_hour"
+      COMMA ","
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "stype"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ARRAY_TYPE
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "int8"
+          L_BRACK "["
+          R_BRACK "]"
+      COMMA ","
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "initcond"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'[0:23]={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}'"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2342,8 +2346,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "event_id"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "event_id"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2610,8 +2615,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "id"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "id"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2722,8 +2728,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "event_time"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "event_time"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3725,8 +3732,9 @@ SOURCE_FILE
             IDENT "hourly_stats"
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        HOUR_KW "hour"
+      PARTITION_ITEM
+        NAME_REF
+          HOUR_KW "hour"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3785,8 +3793,9 @@ SOURCE_FILE
       RANGE_KW "RANGE"
       WHITESPACE " "
       L_PAREN "("
-      NAME_REF
-        IDENT "event_time"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "event_time"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5572,18 +5581,19 @@ SOURCE_FILE
     INDEX_PARAMS
       L_PAREN "("
       WHITESPACE "\n  "
-      CALL_EXPR
-        NAME_REF
-          IDENT "date_trunc"
-        ARG_LIST
-          L_PAREN "("
-          LITERAL
-            STRING "'month'"
-          COMMA ","
-          WHITESPACE " "
+      PARTITION_ITEM
+        CALL_EXPR
           NAME_REF
-            TIMESTAMP_KW "timestamp"
-          R_PAREN ")"
+            IDENT "date_trunc"
+          ARG_LIST
+            L_PAREN "("
+            LITERAL
+              STRING "'month'"
+            COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              TIMESTAMP_KW "timestamp"
+            R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -5610,24 +5620,25 @@ SOURCE_FILE
       IDENT "brin"
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        TIMESTAMP_KW "timestamp"
+      PARTITION_ITEM
+        NAME_REF
+          TIMESTAMP_KW "timestamp"
       R_PAREN ")"
     WHITESPACE " "
     WITH_PARAMS
       WITH_KW "WITH"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "pages_per_range"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "128"
-      R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "128"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -5865,8 +5876,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "sku"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "sku"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -5902,8 +5914,9 @@ SOURCE_FILE
             IDENT "recent_product_sales"
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "sku"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "sku"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

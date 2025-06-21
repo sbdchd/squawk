@@ -147,23 +147,22 @@ SOURCE_FILE
     WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "x"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "b"
-      R_PAREN ")"
+        R_PAREN ")"
     WHITESPACE "\n  "
     ON_COMMIT
       ON_KW "on"

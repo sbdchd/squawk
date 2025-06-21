@@ -41,51 +41,48 @@ SOURCE_FILE
     WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
-      L_PAREN "("
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "seq_page_cost"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "10"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "random_page_cost"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "effective_io_concurrency"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "0"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "0"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "maintenance_io_concurrency"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "4"
-      WHITESPACE "\n  "
-      R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "4"
+        WHITESPACE "\n  "
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

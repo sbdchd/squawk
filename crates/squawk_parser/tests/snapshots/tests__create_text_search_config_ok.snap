@@ -19,20 +19,22 @@ SOURCE_FILE
         NAME
           NAME_KW "name"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      PARSER_KW "parser"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "parser_name"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          PARSER_KW "parser"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "parser_name"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -56,19 +58,21 @@ SOURCE_FILE
         NAME
           NAME_KW "name"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      IDENT "config"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "source_config"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "config"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "source_config"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

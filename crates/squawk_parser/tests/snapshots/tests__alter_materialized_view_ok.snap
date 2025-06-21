@@ -380,15 +380,17 @@ SOURCE_FILE
       SET_OPTIONS
         SET_KW "set"
         WHITESPACE " "
-        L_PAREN "("
-        NAME
-          IDENT "n_distinct"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          FLOAT_NUMBER "1.0"
-        R_PAREN ")"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "n_distinct"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              FLOAT_NUMBER "1.0"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_MATERIALIZED_VIEW
@@ -411,24 +413,27 @@ SOURCE_FILE
       SET_OPTIONS
         SET_KW "set"
         WHITESPACE " "
-        L_PAREN "("
-        NAME
-          IDENT "a"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          TRUE_KW "true"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "b"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
-        R_PAREN ")"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "a"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_reset"
@@ -453,10 +458,12 @@ SOURCE_FILE
       RESET_OPTIONS
         RESET_KW "reset"
         WHITESPACE " "
-        L_PAREN "("
-        NAME
-          IDENT "n_distinct"
-        R_PAREN ")"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "n_distinct"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_MATERIALIZED_VIEW
@@ -481,14 +488,17 @@ SOURCE_FILE
       RESET_OPTIONS
         RESET_KW "reset"
         WHITESPACE " "
-        L_PAREN "("
-        NAME
-          IDENT "n_distinct"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "n_distinct_inherited"
-        R_PAREN ")"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "n_distinct"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "n_distinct_inherited"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_alter_col_storage"

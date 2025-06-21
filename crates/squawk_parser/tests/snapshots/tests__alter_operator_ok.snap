@@ -96,80 +96,87 @@ SOURCE_FILE
     WHITESPACE " \n  "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n    "
-    NAME
-      RESTRICT_KW "restrict"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "r"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      JOIN_KW "join"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "j"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "commutator"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "c"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "negator"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "n"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "hashes"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "enabled"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "merges"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "enabled"
-    WHITESPACE "\n  "
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          RESTRICT_KW "restrict"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "r"
+      COMMA ","
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          JOIN_KW "join"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "j"
+      COMMA ","
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "commutator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "c"
+      COMMA ","
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "negator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "n"
+      COMMA ","
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "hashes"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "enabled"
+      COMMA ","
+      WHITESPACE "\n    "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "merges"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "enabled"
+      WHITESPACE "\n  "
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- none_options"
@@ -198,21 +205,24 @@ SOURCE_FILE
     WHITESPACE " \n  "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      RESTRICT_KW "restrict"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    NONE_KW "none"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      JOIN_KW "join"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    NONE_KW "none"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          RESTRICT_KW "restrict"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        NONE_KW "none"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          JOIN_KW "join"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        NONE_KW "none"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -19,20 +19,22 @@ SOURCE_FILE
         NAME
           NAME_KW "name"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      TEMPLATE_KW "template"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          TEMPLATE_KW "template"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -56,43 +58,47 @@ SOURCE_FILE
         NAME
           NAME_KW "name"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      TEMPLATE_KW "template"
-    WHITESPACE "  "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "foo"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "bar"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "a"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "b"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          TEMPLATE_KW "template"
+        WHITESPACE "  "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "t"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "foo"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "bar"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "b"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

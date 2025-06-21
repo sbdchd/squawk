@@ -1232,6 +1232,36 @@ impl AttachPartition {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AttributeList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AttributeList {
+    #[inline]
+    pub fn attribute_options(&self) -> AstChildren<AttributeOption> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AttributeOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AttributeOption {
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Begin {
     pub(crate) syntax: SyntaxNode,
 }
@@ -2608,6 +2638,10 @@ pub struct CreateTextSearchConfiguration {
     pub(crate) syntax: SyntaxNode,
 }
 impl CreateTextSearchConfiguration {
+    #[inline]
+    pub fn attribute_list(&self) -> Option<AttributeList> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -5019,6 +5053,10 @@ pub struct IndexParams {
 }
 impl IndexParams {
     #[inline]
+    pub fn partition_items(&self) -> AstChildren<PartitionItem> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -6980,6 +7018,21 @@ impl PartitionBy {
     #[inline]
     pub fn partition_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PARTITION_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PartitionItem {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PartitionItem {
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
     }
 }
 
@@ -10649,6 +10702,42 @@ impl AstNode for AttachPartition {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ATTACH_PARTITION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AttributeList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ATTRIBUTE_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AttributeOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ATTRIBUTE_OPTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -15599,6 +15688,24 @@ impl AstNode for PartitionBy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PARTITION_BY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PartitionItem {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION_ITEM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

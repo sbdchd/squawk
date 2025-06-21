@@ -80,39 +80,38 @@ SOURCE_FILE
     WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "x"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "10"
-      COMMA ","
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "10"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "bar"
-      COMMA ","
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "buzz"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        TRUE_KW "true"
-      R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
+        R_PAREN ")"
     WHITESPACE "\n  "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "t"
+    TABLESPACE
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "t"
     WHITESPACE "\n  "
     AS_KW "as"
     WHITESPACE " "
