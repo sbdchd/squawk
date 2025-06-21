@@ -38,32 +38,35 @@ SOURCE_FILE@0..101
                 IDENT@68..69 "y"
       R_PAREN@69..70 ")"
     WHITESPACE@70..71 " "
-    L_PAREN@71..72 "("
-    WHITESPACE@72..75 "\n  "
-    NAME@75..80
-      IDENT@75..80 "sfunc"
-    WHITESPACE@80..81 " "
-    EQ@81..82 "="
-    WHITESPACE@82..83 " "
-    PATH_TYPE@83..84
-      PATH@83..84
-        PATH_SEGMENT@83..84
-          NAME_REF@83..84
-            IDENT@83..84 "f"
-    COMMA@84..85 ","
-    WHITESPACE@85..88 "\n  "
-    NAME@88..93
-      IDENT@88..93 "stype"
-    WHITESPACE@93..94 " "
-    EQ@94..95 "="
-    WHITESPACE@95..96 " "
-    PATH_TYPE@96..97
-      PATH@96..97
-        PATH_SEGMENT@96..97
-          NAME_REF@96..97
-            IDENT@96..97 "t"
-    WHITESPACE@97..98 "\n"
-    R_PAREN@98..99 ")"
+    ATTRIBUTE_LIST@71..99
+      L_PAREN@71..72 "("
+      WHITESPACE@72..75 "\n  "
+      ATTRIBUTE_OPTION@75..84
+        NAME@75..80
+          IDENT@75..80 "sfunc"
+        WHITESPACE@80..81 " "
+        EQ@81..82 "="
+        WHITESPACE@82..83 " "
+        PATH_TYPE@83..84
+          PATH@83..84
+            PATH_SEGMENT@83..84
+              NAME_REF@83..84
+                IDENT@83..84 "f"
+      COMMA@84..85 ","
+      WHITESPACE@85..88 "\n  "
+      ATTRIBUTE_OPTION@88..97
+        NAME@88..93
+          IDENT@88..93 "stype"
+        WHITESPACE@93..94 " "
+        EQ@94..95 "="
+        WHITESPACE@95..96 " "
+        PATH_TYPE@96..97
+          PATH@96..97
+            PATH_SEGMENT@96..97
+              NAME_REF@96..97
+                IDENT@96..97 "t"
+      WHITESPACE@97..98 "\n"
+      R_PAREN@98..99 ")"
   SEMICOLON@99..100 ";"
   WHITESPACE@100..101 "\n"
 

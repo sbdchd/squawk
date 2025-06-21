@@ -22,8 +22,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "c"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -65,8 +66,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "c"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -87,20 +89,21 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      BIN_EXPR
-        NAME_REF
-          IDENT "c"
+      PARTITION_ITEM
+        BIN_EXPR
+          NAME_REF
+            IDENT "c"
+          WHITESPACE " "
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"fr_FR\""
         WHITESPACE " "
-        COLLATE_KW "collate"
+        ASC_KW "asc"
         WHITESPACE " "
-        NAME_REF
-          IDENT "\"fr_FR\""
-      WHITESPACE " "
-      ASC_KW "asc"
-      WHITESPACE " "
-      NULLS_KW "nulls"
-      WHITESPACE " "
-      LAST_KW "last"
+        NULLS_KW "nulls"
+        WHITESPACE " "
+        LAST_KW "last"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -119,14 +122,15 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "c"
-      WHITESPACE " "
-      DESC_KW "desc"
-      WHITESPACE " "
-      NULLS_KW "nulls"
-      WHITESPACE " "
-      FIRST_KW "first"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        DESC_KW "desc"
+        WHITESPACE " "
+        NULLS_KW "nulls"
+        WHITESPACE " "
+        FIRST_KW "first"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -148,42 +152,49 @@ SOURCE_FILE
     INDEX_PARAMS
       L_PAREN "("
       WHITESPACE "\n  "
-      NAME_REF
-        IDENT "a"
-      WHITESPACE " "
-      IDENT "text_pattern_ops"
-      WHITESPACE " "
-      L_PAREN "("
-      NAME
-        IDENT "strength"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      PRIMARY_KW "primary"
-      COMMA ","
-      WHITESPACE " "
-      NAME
-        IDENT "variant"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      DEFAULT_KW "default"
-      R_PAREN ")"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        IDENT "text_pattern_ops"
+        WHITESPACE " "
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "strength"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            PRIMARY_KW "primary"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "variant"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            DEFAULT_KW "default"
+          R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
-      NAME_REF
-        IDENT "b"
-      WHITESPACE " "
-      IDENT "text_pattern_ops"
-      WHITESPACE " "
-      L_PAREN "("
-      NAME
-        IDENT "strength"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      PRIMARY_KW "primary"
-      R_PAREN ")"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        IDENT "text_pattern_ops"
+        WHITESPACE " "
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "strength"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            PRIMARY_KW "primary"
+          R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -205,27 +216,29 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      PAREN_EXPR
-        L_PAREN "("
-        BIN_EXPR
-          CALL_EXPR
-            NAME_REF
-              IDENT "f"
-            ARG_LIST
-              L_PAREN "("
+      PARTITION_ITEM
+        PAREN_EXPR
+          L_PAREN "("
+          BIN_EXPR
+            CALL_EXPR
               NAME_REF
-                IDENT "c"
-              R_PAREN ")"
-          WHITESPACE " "
-          PLUS "+"
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "2"
-        R_PAREN ")"
+                IDENT "f"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "c"
+                R_PAREN ")"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+          R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "b"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -246,8 +259,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "c"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
     CONSTRAINT_INCLUDE_CLAUSE
@@ -274,31 +288,31 @@ SOURCE_FILE
     WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "foo"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      PATH_TYPE
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "bar"
-      COMMA ","
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "bar"
+        COMMA ","
+        WHITESPACE " "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "buzz"
-      R_PAREN ")"
+        R_PAREN ")"
     WHITESPACE "\n  "
-    TABLESPACE_KW "tablespace"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "space"
+    TABLESPACE
+      TABLESPACE_KW "tablespace"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "space"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -328,8 +342,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "c"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
     NULLS_KW "nulls"
@@ -374,8 +389,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "c"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "c"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -401,8 +417,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "title"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "title"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -426,8 +443,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "title"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "title"
       R_PAREN ")"
     WHITESPACE " "
     CONSTRAINT_INCLUDE_CLAUSE
@@ -464,24 +482,25 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "title"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "title"
       R_PAREN ")"
     WHITESPACE " "
     WITH_PARAMS
       WITH_KW "WITH"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "deduplicate_items"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        OFF_KW "off"
-      R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            OFF_KW "off"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -499,17 +518,18 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      PAREN_EXPR
-        L_PAREN "("
-        CALL_EXPR
-          NAME_REF
-            IDENT "lower"
-          ARG_LIST
-            L_PAREN "("
+      PARTITION_ITEM
+        PAREN_EXPR
+          L_PAREN "("
+          CALL_EXPR
             NAME_REF
-              IDENT "title"
-            R_PAREN ")"
-        R_PAREN ")"
+              IDENT "lower"
+            ARG_LIST
+              L_PAREN "("
+              NAME_REF
+                IDENT "title"
+              R_PAREN ")"
+          R_PAREN ")"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -531,14 +551,15 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      BIN_EXPR
-        NAME_REF
-          IDENT "title"
-        WHITESPACE " "
-        COLLATE_KW "COLLATE"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "\"de_DE\""
+      PARTITION_ITEM
+        BIN_EXPR
+          NAME_REF
+            IDENT "title"
+          WHITESPACE " "
+          COLLATE_KW "COLLATE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "\"de_DE\""
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -560,12 +581,13 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "title"
-      WHITESPACE " "
-      NULLS_KW "NULLS"
-      WHITESPACE " "
-      FIRST_KW "FIRST"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "title"
+        WHITESPACE " "
+        NULLS_KW "NULLS"
+        WHITESPACE " "
+        FIRST_KW "FIRST"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -589,24 +611,25 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "title"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "title"
       R_PAREN ")"
     WHITESPACE " "
     WITH_PARAMS
       WITH_KW "WITH"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "fillfactor"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "70"
-      R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "70"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -632,24 +655,25 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "locations"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "locations"
       R_PAREN ")"
     WHITESPACE " "
     WITH_PARAMS
       WITH_KW "WITH"
       WHITESPACE " "
-      L_PAREN "("
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "fastupdate"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        OFF_KW "off"
-      R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            OFF_KW "off"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -670,14 +694,16 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "code"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "code"
       R_PAREN ")"
     WHITESPACE " "
-    TABLESPACE_KW "TABLESPACE"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "indexspace"
+    TABLESPACE
+      TABLESPACE_KW "TABLESPACE"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "indexspace"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -703,17 +729,18 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      CALL_EXPR
-        NAME_REF
-          IDENT "box"
-        ARG_LIST
-          L_PAREN "("
+      PARTITION_ITEM
+        CALL_EXPR
           NAME_REF
-            LOCATION_KW "location"
-          COMMA ","
-          NAME_REF
-            LOCATION_KW "location"
-          R_PAREN ")"
+            IDENT "box"
+          ARG_LIST
+            L_PAREN "("
+            NAME_REF
+              LOCATION_KW "location"
+            COMMA ","
+            NAME_REF
+              LOCATION_KW "location"
+            R_PAREN ")"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -737,8 +764,9 @@ SOURCE_FILE
     WHITESPACE " "
     INDEX_PARAMS
       L_PAREN "("
-      NAME_REF
-        IDENT "quantity"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "quantity"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

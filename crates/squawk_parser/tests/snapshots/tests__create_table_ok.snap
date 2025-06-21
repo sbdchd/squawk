@@ -445,55 +445,59 @@ SOURCE_FILE
       WHITESPACE " "
       L_PAREN "("
       WHITESPACE "\n  "
-      BIN_EXPR
-        NAME_REF
-          IDENT "foo"
-        WHITESPACE " "
-        COLLATE_KW "collate"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "\"fr_FR\""
-      WHITESPACE " "
-      IDENT "text_pattern_ops"
-      COMMA ","
-      WHITESPACE " \n  "
-      NAME_REF
-        IDENT "bar"
-      COMMA ","
-      WHITESPACE "\n  "
-      CALL_EXPR
-        NAME_REF
-          EXTRACT_KW "extract"
-        ARG_LIST
-          L_PAREN "("
-          MONTH_KW "month"
+      PARTITION_ITEM
+        BIN_EXPR
+          NAME_REF
+            IDENT "foo"
           WHITESPACE " "
-          FROM_KW "from"
+          COLLATE_KW "collate"
           WHITESPACE " "
           NAME_REF
-            IDENT "b"
-          R_PAREN ")"
+            IDENT "\"fr_FR\""
+        WHITESPACE " "
+        IDENT "text_pattern_ops"
+      COMMA ","
+      WHITESPACE " \n  "
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "bar"
       COMMA ","
       WHITESPACE "\n  "
-      BIN_EXPR
-        PAREN_EXPR
-          L_PAREN "("
-          BIN_EXPR
-            NAME_REF
-              IDENT "a"
+      PARTITION_ITEM
+        CALL_EXPR
+          NAME_REF
+            EXTRACT_KW "extract"
+          ARG_LIST
+            L_PAREN "("
+            MONTH_KW "month"
             WHITESPACE " "
-            CUSTOM_OP
-              PIPE "|"
-              PIPE "|"
+            FROM_KW "from"
             WHITESPACE " "
             NAME_REF
               IDENT "b"
-          R_PAREN ")"
-        WHITESPACE " "
-        COLLATE_KW "collate"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "buzz"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      PARTITION_ITEM
+        BIN_EXPR
+          PAREN_EXPR
+            L_PAREN "("
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "b"
+            R_PAREN ")"
+          WHITESPACE " "
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "buzz"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -531,8 +535,9 @@ SOURCE_FILE
       IDENT "hash"
       WHITESPACE " "
       L_PAREN "("
-      NAME_REF
-        IDENT "z"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "z"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -569,12 +574,14 @@ SOURCE_FILE
       IDENT "list"
       WHITESPACE " "
       L_PAREN "("
-      NAME_REF
-        IDENT "z"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "z"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        IDENT "b"
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "b"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -638,41 +645,37 @@ SOURCE_FILE
     WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
-      L_PAREN "("
-      WHITESPACE "\n  "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "foo"
-      COMMA ","
-      WHITESPACE "\n  "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+        COMMA ","
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "bar"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE "\n  "
-      PATH
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "buzz"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE "\n  "
+        ATTRIBUTE_OPTION
+          NAME
+            IDENT "buzz"
+          DOT "."
+          NAME
             IDENT "bar"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        FALSE_KW "false"
-      WHITESPACE "\n"
-      R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            FALSE_KW "false"
+        WHITESPACE "\n"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -1053,60 +1056,56 @@ SOURCE_FILE
           WITH_PARAMS
             WITH_KW "with"
             WHITESPACE " "
-            L_PAREN "("
-            WHITESPACE "\n    "
-            PATH
-              PATH_SEGMENT
-                NAME_REF
+            ATTRIBUTE_LIST
+              L_PAREN "("
+              WHITESPACE "\n    "
+              ATTRIBUTE_OPTION
+                NAME
                   IDENT "fillfactor"
-            COMMA ","
-            WHITESPACE "\n    "
-            PATH
-              PATH_SEGMENT
-                NAME_REF
+              COMMA ","
+              WHITESPACE "\n    "
+              ATTRIBUTE_OPTION
+                NAME
                   IDENT "toast_tuple_target"
-            WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "100"
-            COMMA ","
-            WHITESPACE "\n    "
-            PATH
-              PATH_SEGMENT
-                NAME_REF
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "100"
+              COMMA ","
+              WHITESPACE "\n    "
+              ATTRIBUTE_OPTION
+                NAME
                   IDENT "parallel_workers"
-            WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "5"
-            COMMA ","
-            WHITESPACE "\n    "
-            PATH
-              PATH_SEGMENT
-                NAME_REF
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "5"
+              COMMA ","
+              WHITESPACE "\n    "
+              ATTRIBUTE_OPTION
+                NAME
                   IDENT "autovacuum_enabled"
-            WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            LITERAL
-              FALSE_KW "false"
-            COMMA ","
-            WHITESPACE "\n    "
-            PATH
-              PATH_SEGMENT
-                NAME_REF
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  FALSE_KW "false"
+              COMMA ","
+              WHITESPACE "\n    "
+              ATTRIBUTE_OPTION
+                NAME
                   IDENT "autovacuum_vacuum_cost_delay"
-            WHITESPACE " "
-            EQ "="
-            WHITESPACE " "
-            LITERAL
-              FLOAT_NUMBER "10.1"
-            WHITESPACE "\n    "
-            COMMENT "-- others omitted"
-            WHITESPACE "\n  "
-            R_PAREN ")"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "10.1"
+              WHITESPACE "\n    "
+              COMMENT "-- others omitted"
+              WHITESPACE "\n  "
+              R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1272,14 +1271,14 @@ SOURCE_FILE
           WITH_PARAMS
             WITH_KW "with"
             WHITESPACE " "
-            L_PAREN "("
-            WHITESPACE " "
-            PATH
-              PATH_SEGMENT
-                NAME_REF
+            ATTRIBUTE_LIST
+              L_PAREN "("
+              WHITESPACE " "
+              ATTRIBUTE_OPTION
+                NAME
                   IDENT "autovacuum_enabled"
-            WHITESPACE " "
-            R_PAREN ")"
+              WHITESPACE " "
+              R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1760,19 +1759,19 @@ SOURCE_FILE
         WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
-          L_PAREN "("
-          WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
+          ATTRIBUTE_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            ATTRIBUTE_OPTION
+              NAME
                 IDENT "bar"
-          WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
-          WHITESPACE " "
-          R_PAREN ")"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                FALSE_KW "false"
+            WHITESPACE " "
+            R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -2171,23 +2170,22 @@ SOURCE_FILE
         WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
-          L_PAREN "("
-          PATH
-            PATH_SEGMENT
-              NAME_REF
+          ATTRIBUTE_LIST
+            L_PAREN "("
+            ATTRIBUTE_OPTION
+              NAME
                 IDENT "x"
-          WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "10"
-          COMMA ","
-          WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+            COMMA ","
+            WHITESPACE " "
+            ATTRIBUTE_OPTION
+              NAME
                 IDENT "z"
-          R_PAREN ")"
+            R_PAREN ")"
         WHITESPACE "\n    "
         CONSTRAINT_INDEX_TABLESPACE
           USING_KW "using"
@@ -2416,19 +2414,19 @@ SOURCE_FILE
         WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
-          L_PAREN "("
-          WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
+          ATTRIBUTE_LIST
+            L_PAREN "("
+            WHITESPACE " "
+            ATTRIBUTE_OPTION
+              NAME
                 IDENT "bar"
-          WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
-          WHITESPACE " "
-          R_PAREN ")"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                FALSE_KW "false"
+            WHITESPACE " "
+            R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       PRIMARY_KEY_CONSTRAINT

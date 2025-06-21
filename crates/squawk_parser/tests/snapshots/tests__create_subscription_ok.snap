@@ -55,150 +55,138 @@ SOURCE_FILE
     WITH_PARAMS
       WITH_KW "with"
       WHITESPACE " "
-      L_PAREN "("
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "connect"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        FALSE_KW "false"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            FALSE_KW "false"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "create_slot"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        TRUE_KW "true"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "enabled"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        FALSE_KW "false"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            FALSE_KW "false"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "slot_name"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        STRING "'bar'"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'bar'"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             BINARY_KW "binary"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        TRUE_KW "true"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "copy_data"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        TRUE_KW "true"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "synchronous_commit"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        OFF_KW "off"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            OFF_KW "off"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "two_phase"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        FALSE_KW "false"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            FALSE_KW "false"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "disable_on_error"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        TRUE_KW "true"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "password_required"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        FALSE_KW "false"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            FALSE_KW "false"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "run_as_owner"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        TRUE_KW "true"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            TRUE_KW "true"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "origin"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        STRING "'foo'"
-      COMMA ","
-      WHITESPACE "\n    "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            STRING "'foo'"
+        COMMA ","
+        WHITESPACE "\n    "
+        ATTRIBUTE_OPTION
+          NAME
             IDENT "failover"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        FALSE_KW "false"
-      WHITESPACE "\n  "
-      R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            FALSE_KW "false"
+        WHITESPACE "\n  "
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

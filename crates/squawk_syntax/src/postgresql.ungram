@@ -956,6 +956,12 @@ WithTimezone =
 WithoutTimezone =
   'without' 'time' 'zone'
 
+AttributeOption =
+  '='?
+
+AttributeList =
+  '(' ( AttributeOption (',' AttributeOption)* ) ')'
+
 FilterClause =
   'filter' '(' 'where' Expr ')'
 
@@ -1251,7 +1257,7 @@ CreateTextSearchDictionary =
   'create' 'text' 'search' 'dictionary' NameRef
 
 CreateTextSearchConfiguration =
-  'create' 'text' 'search' 'configuration' NameRef
+  'create' 'text' 'search' 'configuration' NameRef AttributeList
 
 CreateTextSearchTemplate =
   'create' 'text' 'search' 'template' NameRef
@@ -1475,8 +1481,11 @@ CreateSchema =
 DropTrigger =
   'drop' 'trigger' IfExists? NameRef 'on'
 
+PartitionItem =
+  Expr Collate?
+
 IndexParams =
-  '(' ')'
+  '(' (PartitionItem (',' PartitionItem)*) ')'
 
 CreateType =
   'create' 'type' Type

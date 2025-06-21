@@ -753,32 +753,35 @@ SOURCE_FILE
       SET_OPTIONS
         SET_KW "set"
         WHITESPACE " "
-        L_PAREN "("
-        WHITESPACE " "
-        NAME
-          IDENT "foo"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "bar"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "buzz"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "b"
-        WHITESPACE " "
-        R_PAREN ")"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "foo"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "bar"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "buzz"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "b"
+          WHITESPACE " "
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -800,20 +803,24 @@ SOURCE_FILE
       RESET_OPTIONS
         RESET_KW "reset"
         WHITESPACE " "
-        L_PAREN "("
-        WHITESPACE " "
-        NAME
-          IDENT "foo"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "buzz"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "b"
-        WHITESPACE " "
-        R_PAREN ")"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "foo"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "buzz"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "b"
+          WHITESPACE " "
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -835,23 +842,27 @@ SOURCE_FILE
       RESET_OPTIONS
         RESET_KW "reset"
         WHITESPACE " "
-        L_PAREN "("
-        WHITESPACE " "
-        NAME
-          IDENT "p"
-        DOT "."
-        NAME
-          IDENT "foo"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "buzz"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "b"
-        WHITESPACE " "
-        R_PAREN ")"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "p"
+            DOT "."
+            NAME
+              IDENT "foo"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "buzz"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "b"
+          WHITESPACE " "
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -873,51 +884,56 @@ SOURCE_FILE
       SET_OPTIONS
         SET_KW "set"
         WHITESPACE " "
-        L_PAREN "("
-        WHITESPACE " "
-        NAME
-          IDENT "b"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        PATH_TYPE
-          PATH
-            PATH
-              PATH_SEGMENT
-                NAME_REF
-                  IDENT "a"
-            DOT "."
-            PATH_SEGMENT
-              NAME_REF
-                IDENT "b"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "z"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          STRING "'foo'"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          IDENT "w"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "10"
-        COMMA ","
-        WHITESPACE " "
-        NAME
-          JSON_KW "json"
-        WHITESPACE " "
-        EQ "="
-        WHITESPACE " "
-        CONSTRAINT_KW "constraint"
-        WHITESPACE " "
-        R_PAREN ")"
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "a"
+                DOT "."
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "b"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "z"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              STRING "'foo'"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "w"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "10"
+          COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              JSON_KW "json"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            CONSTRAINT_KW "constraint"
+          WHITESPACE " "
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -2245,28 +2261,27 @@ SOURCE_FILE
         WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
-          L_PAREN "("
-          PATH
-            PATH_SEGMENT
-              NAME_REF
+          ATTRIBUTE_LIST
+            L_PAREN "("
+            ATTRIBUTE_OPTION
+              NAME
                 IDENT "foo"
-          WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            FALSE_KW "false"
-          COMMA ","
-          WHITESPACE " "
-          PATH
-            PATH_SEGMENT
-              NAME_REF
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                FALSE_KW "false"
+            COMMA ","
+            WHITESPACE " "
+            ATTRIBUTE_OPTION
+              NAME
                 IDENT "a"
-          WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            TRUE_KW "true"
-          R_PAREN ")"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                TRUE_KW "true"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2345,17 +2360,17 @@ SOURCE_FILE
         WITH_PARAMS
           WITH_KW "with"
           WHITESPACE " "
-          L_PAREN "("
-          PATH
-            PATH_SEGMENT
-              NAME_REF
+          ATTRIBUTE_LIST
+            L_PAREN "("
+            ATTRIBUTE_OPTION
+              NAME
                 IDENT "a"
-          WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          LITERAL
-            INT_NUMBER "1"
-          R_PAREN ")"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "1"
+            R_PAREN ")"
         WHITESPACE " \n  "
         CONSTRAINT_INDEX_TABLESPACE
           USING_KW "using"

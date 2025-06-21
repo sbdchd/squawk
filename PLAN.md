@@ -889,6 +889,30 @@ select foo, "a" from t;
 select foo, 'a' from t;
 ```
 
+### Quick Fix: in array
+
+```sql
+select 1 in [1,2,3];
+-- or
+select 1 in array[1,2,3];
+
+-- become
+
+select 1 = any(array[1,2,3]);
+```
+
+### Quick Fix: in array to in tuple
+
+```sql
+select 1 in [1,2,3];
+-- or
+select 1 in array[1,2,3];
+
+-- become
+
+select 1 in (1,2,3);
+```
+
 ### Quick Fix: subquery to CTE
 
 ### Quick Fix: CTE to subquery

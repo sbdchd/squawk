@@ -121,12 +121,12 @@ SOURCE_FILE
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "a"
-    R_PAREN ")"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -151,24 +151,23 @@ SOURCE_FILE
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "a"
-    EQ "="
-    LITERAL
-      INT_NUMBER "1"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+        EQ "="
+        LITERAL
+          INT_NUMBER "1"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "b"
-    EQ "="
-    LITERAL
-      STRING "'v'"
-    R_PAREN ")"
+        EQ "="
+        LITERAL
+          STRING "'v'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_params"
@@ -185,12 +184,12 @@ SOURCE_FILE
     WHITESPACE " "
     RESET_KW "reset"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "a"
-    R_PAREN ")"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_INDEX
@@ -215,18 +214,17 @@ SOURCE_FILE
     WHITESPACE " "
     RESET_KW "reset"
     WHITESPACE " "
-    L_PAREN "("
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
           IDENT "b"
-    R_PAREN ")"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- attach"

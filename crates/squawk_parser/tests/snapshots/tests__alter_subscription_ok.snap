@@ -62,19 +62,22 @@ SOURCE_FILE
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- add_publication"
@@ -120,19 +123,22 @@ SOURCE_FILE
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- drop_publication"
@@ -178,19 +184,22 @@ SOURCE_FILE
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "1"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- refresh"
@@ -209,15 +218,17 @@ SOURCE_FILE
     WHITESPACE " "
     WITH_KW "with"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "copy_data"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "copy_data"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- enable"
@@ -258,24 +269,27 @@ SOURCE_FILE
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "slot_name"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'new_slot'"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "synchronous_commit"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'off'"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "slot_name"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'new_slot'"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "synchronous_commit"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'off'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- skip"
@@ -290,15 +304,17 @@ SOURCE_FILE
     WHITESPACE " "
     SKIP_KW "skip"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "lsn"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'0/12345678'"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "lsn"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'0/12345678'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"

@@ -268,37 +268,42 @@ SOURCE_FILE
     WHITESPACE " "
     SET_KW "set"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      STRING "'x'"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "c"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "d"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'x'"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "d"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- reset_options"
@@ -315,17 +320,21 @@ SOURCE_FILE
     WHITESPACE " "
     RESET_KW "reset"
     WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "c"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "c"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

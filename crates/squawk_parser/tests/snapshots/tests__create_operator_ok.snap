@@ -12,20 +12,22 @@ SOURCE_FILE
     WHITESPACE " "
     R_ANGLE ">"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      FUNCTION_KW "function"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          FUNCTION_KW "function"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "f"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- procedure"
@@ -38,20 +40,22 @@ SOURCE_FILE
     CUSTOM_OP
       POUND "#"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      PROCEDURE_KW "procedure"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "p"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          PROCEDURE_KW "procedure"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "p"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"
@@ -79,116 +83,126 @@ SOURCE_FILE
       MINUS "-"
       POUND "#"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      FUNCTION_KW "function"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          FUNCTION_KW "function"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "foo"
+              DOT "."
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "bar"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "f"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "leftarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CHAR_TYPE
+          VARCHAR_KW "varchar"
+          L_PAREN "("
+          ARG_LIST
+            ARG
+              LITERAL
+                INT_NUMBER "100"
+            R_PAREN ")"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "rightarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "foo"
+            DOT "."
+            PATH_SEGMENT
+              NAME_REF
+                BIGINT_KW "bigint"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "commutator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CUSTOM_OP
+          AMP "&"
+          AMP "&"
+          AMP "&"
+          AMP "&"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "negator"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        CUSTOM_OP
+          L_ANGLE "<"
+          MINUS "-"
+          R_ANGLE ">"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          RESTRICT_KW "restrict"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
           PATH
             PATH_SEGMENT
               NAME_REF
-                IDENT "foo"
-          DOT "."
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "bar"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "f"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "leftarg"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    CHAR_TYPE
-      VARCHAR_KW "varchar"
-      L_PAREN "("
-      ARG_LIST
-        ARG
-          LITERAL
-            INT_NUMBER "100"
-        R_PAREN ")"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "rightarg"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "foo"
-        DOT "."
-        PATH_SEGMENT
-          NAME_REF
-            BIGINT_KW "bigint"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "commutator"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    CUSTOM_OP
-      AMP "&"
-      AMP "&"
-      AMP "&"
-      AMP "&"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "negator"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    CUSTOM_OP
-      L_ANGLE "<"
-      MINUS "-"
-      R_ANGLE ">"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      RESTRICT_KW "restrict"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "r"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      JOIN_KW "join"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "j"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "hashes"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME
-      IDENT "merges"
-    WHITESPACE "\n"
-    R_PAREN ")"
+                IDENT "r"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          JOIN_KW "join"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "j"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "hashes"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        NAME
+          IDENT "merges"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
