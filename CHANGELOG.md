@@ -7,6 +7,76 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.15.0 - 2025-06-21
+
+### Added
+
+- validation for missing types in `create table` args. (#550)
+
+  The following now parses with an error:
+
+  ```sql
+  create table t (
+    x int,
+    description
+  );
+  ```
+
+  ```
+  error[syntax-error]: Missing column type
+   --> stdin:3:14
+    |
+  3 |   description
+    |              ^
+    |
+  ```
+
+- Make `alter table` actions robust to missing commas. (#549)
+
+  The following now parses with an error:
+
+  ```sql
+  alter table t
+    validate constraint foo
+    validate constraint b;
+  ```
+
+  ```
+  error[syntax-error]: missing comma
+   --> stdin:2:26
+    |
+  2 |   validate constraint foo
+    |                          ^
+    |
+  ```
+
+### Fixed
+
+- Crash with trailing comma in select target list. (#551)
+
+  The following now parses with an error:
+
+  ```sql
+  select a, from t;
+  ```
+
+  ```
+  error[syntax-error]: unexpected trailing comma
+  --> stdin:1:9
+  |
+  1 | select a, from t;
+  |         ^
+  |
+  ```
+
+- Parsing idents with `uescape`. (#533)
+
+  The following now parses:
+
+  ```sql
+  select U&"d!0061t!+000061" UESCAPE '!';
+  ```
+
 ## v2.14.0 - 2025-06-17
 
 ### Added
