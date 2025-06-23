@@ -13841,7 +13841,7 @@ fn attribute_list(p: &mut Parser<'_>) {
         COMMA,
         || "unexpected comma".to_string(),
         COL_LABEL_FIRST,
-        |p| opt_attribute_option(p),
+        opt_attribute_option,
     );
     m.complete(p, ATTRIBUTE_LIST);
 }
