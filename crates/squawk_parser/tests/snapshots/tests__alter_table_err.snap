@@ -120,6 +120,90 @@ SOURCE_FILE
         WHITESPACE " "
         VALID_KW "valid"
   SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing comma"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_OPTIONS
+        SET_KW "set"
+        WHITESPACE " "
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "a"
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+          R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- extra comma"
+  WHITESPACE "\n"
+  ALTER_FOREIGN_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE "\n  "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      IDENT "c"
+      WHITESPACE " "
+      SET_OPTIONS
+        SET_KW "set"
+        WHITESPACE " "
+        ATTRIBUTE_LIST
+          L_PAREN "("
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          ERROR
+            COMMA ","
+          WHITESPACE " "
+          ATTRIBUTE_OPTION
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+          R_PAREN ")"
+  SEMICOLON ";"
   WHITESPACE "\n"
 ---
 ERROR@23: expected command, found ADD_KW
@@ -127,3 +211,5 @@ ERROR@27: expected command, found COLUMN_KW
 ERROR@34: expected command, found IDENT
 ERROR@38: expected command, found BOOLEAN_KW
 ERROR@175: missing comma
+ERROR@505: expected COMMA
+ERROR@570: unexpected comma

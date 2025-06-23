@@ -210,6 +210,74 @@ SOURCE_FILE
             INT_NUMBER "1234"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- missing comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          ARRAY_EXPR
+            ARRAY_KW "array"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "3"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- extra comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          ARRAY_EXPR
+            ARRAY_KW "array"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            ERROR
+              COMMA ","
+            LITERAL
+              INT_NUMBER "3"
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "-- trailing comma"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          ARRAY_EXPR
+            ARRAY_KW "array"
+            L_BRACK "["
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "2"
+            COMMA ","
+            LITERAL
+              INT_NUMBER "3"
+            ERROR
+              COMMA ","
+            R_BRACK "]"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- regression test: this would cause the parser to get stuck & panic, now it"
   WHITESPACE "\n"
   COMMENT "-- warns about a missing semicolon"
@@ -268,6 +336,9 @@ ERROR@395: expected expression
 ERROR@396: expected expression
 ERROR@397: expected expression
 ERROR@520: missing comma
-ERROR@646: expected SEMICOLON
-ERROR@679: unexpected trailing comma
-ERROR@723: unexpected trailing comma
+ERROR@559: expected COMMA
+ERROR@597: unexpected comma
+ERROR@638: unexpected trailing comma
+ERROR@761: expected SEMICOLON
+ERROR@794: unexpected trailing comma
+ERROR@838: unexpected trailing comma

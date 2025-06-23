@@ -139,7 +139,7 @@ SOURCE_FILE@0..653
             NAME_REF@201..202
               IDENT@201..202 "u"
           WHITESPACE@202..203 " "
-          USING_CLAUSE@203..213
+          JOIN_USING_CLAUSE@203..213
             USING_KW@203..208 "using"
             WHITESPACE@208..209 " "
             COLUMN_LIST@209..213
@@ -225,7 +225,7 @@ SOURCE_FILE@0..653
             NAME_REF@336..337
               IDENT@336..337 "u"
           WHITESPACE@337..338 " "
-          USING_CLAUSE@338..348
+          JOIN_USING_CLAUSE@338..348
             USING_KW@338..343 "using"
             WHITESPACE@343..344 " "
             COLUMN_LIST@344..348
@@ -385,7 +385,7 @@ SOURCE_FILE@0..653
             NAME_REF@510..511
               IDENT@510..511 "c"
           WHITESPACE@511..512 " "
-          USING_CLAUSE@512..521
+          JOIN_USING_CLAUSE@512..521
             USING_KW@512..517 "using"
             COLUMN_LIST@517..521
               L_PAREN@517..518 "("
@@ -496,7 +496,7 @@ SOURCE_FILE@0..653
               NAME_REF@619..620
                 IDENT@619..620 "u"
             WHITESPACE@620..621 " "
-            USING_CLAUSE@621..631
+            JOIN_USING_CLAUSE@621..631
               USING_KW@621..626 "using"
               WHITESPACE@626..627 " "
               COLUMN_LIST@627..631
@@ -514,7 +514,7 @@ SOURCE_FILE@0..653
             NAME_REF@639..640
               IDENT@639..640 "c"
           WHITESPACE@640..641 " "
-          USING_CLAUSE@641..651
+          JOIN_USING_CLAUSE@641..651
             USING_KW@641..646 "using"
             WHITESPACE@646..647 " "
             COLUMN_LIST@647..651

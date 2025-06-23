@@ -3070,7 +3070,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "job"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             COLUMN_LIST
@@ -6441,7 +6441,7 @@ SOURCE_FILE
               NAME
                 IDENT "b"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "USING"
             WHITESPACE " "
             COLUMN_LIST

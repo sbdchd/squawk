@@ -171,8 +171,7 @@ SOURCE_FILE
             IDENT "a"
           WHITESPACE " "
           TIME_TYPE
-            NAME_REF
-              TIMESTAMP_KW "timestamp"
+            TIMESTAMP_KW "timestamp"
         COMMA ","
         WHITESPACE "\n    "
         PARAM
@@ -228,8 +227,7 @@ SOURCE_FILE
             IDENT "a"
           WHITESPACE " "
           TIME_TYPE
-            NAME_REF
-              TIMESTAMP_KW "timestamp"
+            TIMESTAMP_KW "timestamp"
         COMMA ","
         WHITESPACE "\n    "
         PARAM

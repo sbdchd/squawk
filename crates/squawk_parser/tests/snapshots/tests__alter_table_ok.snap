@@ -2685,21 +2685,25 @@ SOURCE_FILE
           WHITESPACE " "
           FULL_KW "full"
         WHITESPACE " "
-        ON_KW "on"
+        ON_DELETE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          NO_ACTION
+            NO_KW "no"
+            WHITESPACE " "
+            ACTION_KW "action"
         WHITESPACE " "
-        DELETE_KW "delete"
-        WHITESPACE " "
-        NO_KW "no"
-        WHITESPACE " "
-        ACTION_KW "action"
-        WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        UPDATE_KW "update"
-        WHITESPACE " "
-        SET_KW "set"
-        WHITESPACE " "
-        NULL_KW "null"
+        ON_UPDATE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          UPDATE_KW "update"
+          WHITESPACE " "
+          SET_NULL_COLUMNS
+            SET_KW "set"
+            WHITESPACE " "
+            NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -2735,189 +2739,15 @@ SOURCE_FILE
             NAME_REF
               IDENT "t1"
         WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        DELETE_KW "delete"
-        WHITESPACE " "
-        NO_KW "no"
-        WHITESPACE " "
-        ACTION_KW "action"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  ALTER_TABLE
-    ALTER_KW "alter"
-    WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    ADD_CONSTRAINT
-      ADD_KW "add"
-      WHITESPACE " "
-      FOREIGN_KEY_CONSTRAINT
-        FOREIGN_KW "foreign"
-        WHITESPACE " "
-        KEY_KW "key"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          R_PAREN ")"
-        WHITESPACE " "
-        REFERENCES_KW "references"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "t1"
-        WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        DELETE_KW "delete"
-        WHITESPACE " "
-        RESTRICT_KW "restrict"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  ALTER_TABLE
-    ALTER_KW "alter"
-    WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    ADD_CONSTRAINT
-      ADD_KW "add"
-      WHITESPACE " "
-      FOREIGN_KEY_CONSTRAINT
-        FOREIGN_KW "foreign"
-        WHITESPACE " "
-        KEY_KW "key"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          R_PAREN ")"
-        WHITESPACE " "
-        REFERENCES_KW "references"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "t1"
-        WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        DELETE_KW "delete"
-        WHITESPACE " "
-        CASCADE_KW "cascade"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  ALTER_TABLE
-    ALTER_KW "alter"
-    WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    ADD_CONSTRAINT
-      ADD_KW "add"
-      WHITESPACE " "
-      FOREIGN_KEY_CONSTRAINT
-        FOREIGN_KW "foreign"
-        WHITESPACE " "
-        KEY_KW "key"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          R_PAREN ")"
-        WHITESPACE " "
-        REFERENCES_KW "references"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "t1"
-        WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        DELETE_KW "delete"
-        WHITESPACE " "
-        SET_KW "set"
-        WHITESPACE " "
-        NULL_KW "null"
-  SEMICOLON ";"
-  WHITESPACE "\n"
-  ALTER_TABLE
-    ALTER_KW "alter"
-    WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    RELATION_NAME
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE " "
-    ADD_CONSTRAINT
-      ADD_KW "add"
-      WHITESPACE " "
-      FOREIGN_KEY_CONSTRAINT
-        FOREIGN_KW "foreign"
-        WHITESPACE " "
-        KEY_KW "key"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          R_PAREN ")"
-        WHITESPACE " "
-        REFERENCES_KW "references"
-        WHITESPACE " "
-        PATH
-          PATH_SEGMENT
-            NAME_REF
-              IDENT "t1"
-        WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        DELETE_KW "delete"
-        WHITESPACE " "
-        SET_KW "set"
-        WHITESPACE " "
-        NULL_KW "null"
-        WHITESPACE " "
-        COLUMN_LIST
-          L_PAREN "("
-          COLUMN
-            NAME_REF
-              IDENT "a"
-          COMMA ","
+        ON_DELETE_ACTION
+          ON_KW "on"
           WHITESPACE " "
-          COLUMN
-            NAME_REF
-              IDENT "b"
-          R_PAREN ")"
+          DELETE_KW "delete"
+          WHITESPACE " "
+          NO_ACTION
+            NO_KW "no"
+            WHITESPACE " "
+            ACTION_KW "action"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2953,13 +2783,12 @@ SOURCE_FILE
             NAME_REF
               IDENT "t1"
         WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        DELETE_KW "delete"
-        WHITESPACE " "
-        SET_KW "set"
-        WHITESPACE " "
-        DEFAULT_KW "default"
+        ON_DELETE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          RESTRICT_KW "restrict"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2995,22 +2824,212 @@ SOURCE_FILE
             NAME_REF
               IDENT "t1"
         WHITESPACE " "
-        ON_KW "on"
+        ON_DELETE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          CASCADE_KW "cascade"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
         WHITESPACE " "
-        DELETE_KW "delete"
+        KEY_KW "key"
         WHITESPACE " "
-        SET_KW "set"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
         WHITESPACE " "
-        DEFAULT_KW "default"
+        REFERENCES_KW "references"
         WHITESPACE " "
-        L_PAREN "("
-        NAME_REF
-          IDENT "a"
-        COMMA ","
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
         WHITESPACE " "
-        NAME_REF
-          IDENT "b"
-        R_PAREN ")"
+        ON_DELETE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          SET_NULL_COLUMNS
+            SET_KW "set"
+            WHITESPACE " "
+            NULL_KW "null"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_DELETE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          SET_NULL_COLUMNS
+            SET_KW "set"
+            WHITESPACE " "
+            NULL_KW "null"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "b"
+              R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_DELETE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          SET_DEFAULT_COLUMNS
+            SET_KW "set"
+            WHITESPACE " "
+            DEFAULT_KW "default"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      FOREIGN_KEY_CONSTRAINT
+        FOREIGN_KW "foreign"
+        WHITESPACE " "
+        KEY_KW "key"
+        WHITESPACE " "
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          R_PAREN ")"
+        WHITESPACE " "
+        REFERENCES_KW "references"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t1"
+        WHITESPACE " "
+        ON_DELETE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          SET_DEFAULT_COLUMNS
+            SET_KW "set"
+            WHITESPACE " "
+            DEFAULT_KW "default"
+            WHITESPACE " "
+            COLUMN_LIST
+              L_PAREN "("
+              COLUMN
+                NAME_REF
+                  IDENT "a"
+              COMMA ","
+              WHITESPACE " "
+              COLUMN
+                NAME_REF
+                  IDENT "b"
+              R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_TABLE
@@ -3819,16 +3838,18 @@ SOURCE_FILE
               IDENT "id"
           R_PAREN ")"
         WHITESPACE " "
-        ON_KW "on"
+        ON_UPDATE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          UPDATE_KW "update"
+          WHITESPACE " "
+          CASCADE_KW "cascade"
         WHITESPACE " "
-        UPDATE_KW "update"
-        WHITESPACE " "
-        CASCADE_KW "cascade"
-        WHITESPACE " "
-        ON_KW "on"
-        WHITESPACE " "
-        DELETE_KW "delete"
-        WHITESPACE " "
-        CASCADE_KW "cascade"
+        ON_DELETE_ACTION
+          ON_KW "on"
+          WHITESPACE " "
+          DELETE_KW "delete"
+          WHITESPACE " "
+          CASCADE_KW "cascade"
   SEMICOLON ";"
   WHITESPACE "\n"

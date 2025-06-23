@@ -25,6 +25,13 @@ select 1 in c;
 -- type cast must use a string literal
 select numeric 1234;
 
+-- missing comma
+select array[1 2,3];
+-- extra comma
+select array[1, ,3];
+-- trailing comma
+select array[1,2,3,];
+
 -- regression test: this would cause the parser to get stuck & panic, now it
 -- warns about a missing semicolon
 select select;

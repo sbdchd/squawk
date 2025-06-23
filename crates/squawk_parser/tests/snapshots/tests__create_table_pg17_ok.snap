@@ -64,35 +64,39 @@ SOURCE_FILE
             WHITESPACE " "
             PARTIAL_KW "partial"
           WHITESPACE "\n    "
-          ON_KW "on"
-          WHITESPACE " "
-          DELETE_KW "delete"
-          WHITESPACE " "
-          NO_KW "no"
-          WHITESPACE " "
-          ACTION_KW "action"
+          ON_DELETE_ACTION
+            ON_KW "on"
+            WHITESPACE " "
+            DELETE_KW "delete"
+            WHITESPACE " "
+            NO_ACTION
+              NO_KW "no"
+              WHITESPACE " "
+              ACTION_KW "action"
           WHITESPACE "\n    "
-          ON_KW "on"
-          WHITESPACE " "
-          UPDATE_KW "update"
-          WHITESPACE " "
-          SET_KW "set"
-          WHITESPACE " "
-          NULL_KW "null"
-          WHITESPACE " "
-          COLUMN_LIST
-            L_PAREN "("
+          ON_UPDATE_ACTION
+            ON_KW "on"
             WHITESPACE " "
-            COLUMN
-              NAME_REF
-                IDENT "a"
-            COMMA ","
+            UPDATE_KW "update"
             WHITESPACE " "
-            COLUMN
-              NAME_REF
-                IDENT "b"
-            WHITESPACE " "
-            R_PAREN ")"
+            SET_NULL_COLUMNS
+              SET_KW "set"
+              WHITESPACE " "
+              NULL_KW "null"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                WHITESPACE " "
+                COLUMN
+                  NAME_REF
+                    IDENT "a"
+                COMMA ","
+                WHITESPACE " "
+                COLUMN
+                  NAME_REF
+                    IDENT "b"
+                WHITESPACE " "
+                R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

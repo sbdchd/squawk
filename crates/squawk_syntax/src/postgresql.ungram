@@ -245,7 +245,6 @@ DoubleType =
 
 TimeType =
   ('time' | 'timestamp')
-  NameRef
   ('(' Literal ')')?
   (WithTimezone | WithoutTimezone)?
 
@@ -603,8 +602,11 @@ JoinType =
 OnClause =
   'on' Expr
 
+JoinUsingClause =
+  'using' ColumnList Alias?
+
 Join =
-  'natural'? JoinType (UsingClause | OnClause)?
+  'natural'? JoinType (using_clause:JoinUsingClause | OnClause)?
 
 JoinExpr =
   (FromItem | JoinExpr) Join
