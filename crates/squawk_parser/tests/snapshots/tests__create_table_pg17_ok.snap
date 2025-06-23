@@ -59,9 +59,10 @@ SOURCE_FILE
           WHITESPACE " "
           R_PAREN ")"
           WHITESPACE " "
-          MATCH_KW "match"
-          WHITESPACE " "
-          PARTIAL_KW "partial"
+          MATCH_PARTIAL
+            MATCH_KW "match"
+            WHITESPACE " "
+            PARTIAL_KW "partial"
           WHITESPACE "\n    "
           ON_KW "on"
           WHITESPACE " "
@@ -209,18 +210,21 @@ SOURCE_FILE
             NAME_REF
               IDENT "addresses"
         WHITESPACE " "
-        L_PAREN "("
-        WHITESPACE " "
-        NAME_REF
-          IDENT "id"
-        COMMA ","
-        WHITESPACE " "
-        PERIOD_KW "PERIOD"
-        WHITESPACE " "
-        NAME_REF
-          IDENT "valid_range"
-        WHITESPACE " "
-        R_PAREN ")"
+        COLUMN_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "id"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            PERIOD_KW "PERIOD"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "valid_range"
+          WHITESPACE " "
+          R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

@@ -549,8 +549,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        IDENT "ordercol"
+      SORT_BY
+        NAME_REF
+          IDENT "ordercol"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- search breadth first (from pg docs)"
@@ -740,8 +741,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        IDENT "ordercol"
+      SORT_BY
+        NAME_REF
+          IDENT "ordercol"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- search cycle (from pg docs)"
@@ -1359,10 +1361,12 @@ SOURCE_FILE
                         WHITESPACE " "
                         BY_KW "BY"
                         WHITESPACE " "
-                        NAME_REF
-                          IDENT "created_at"
-                        WHITESPACE " "
-                        DESC_KW "DESC"
+                        SORT_BY
+                          NAME_REF
+                            IDENT "created_at"
+                          WHITESPACE " "
+                          SORT_DESC
+                            DESC_KW "DESC"
                     WHITESPACE "\n    "
                     R_PAREN ")"
           WHITESPACE "\n  "

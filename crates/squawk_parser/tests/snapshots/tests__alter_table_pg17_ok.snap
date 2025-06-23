@@ -100,8 +100,9 @@ SOURCE_FILE
             NAME_REF
               IDENT "t1"
         WHITESPACE " "
-        MATCH_KW "match"
-        WHITESPACE " "
-        PARTIAL_KW "partial"
+        MATCH_PARTIAL
+          MATCH_KW "match"
+          WHITESPACE " "
+          PARTIAL_KW "partial"
   SEMICOLON ";"
   WHITESPACE "\n"

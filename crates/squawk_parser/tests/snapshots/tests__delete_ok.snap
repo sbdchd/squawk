@@ -996,12 +996,13 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            FIELD_EXPR
-              NAME_REF
-                IDENT "l"
-              DOT "."
-              NAME_REF
-                IDENT "creation_date"
+            SORT_BY
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "l"
+                DOT "."
+                NAME_REF
+                  IDENT "creation_date"
           WHITESPACE "\n    "
           LOCKING_CLAUSE
             FOR_KW "FOR"

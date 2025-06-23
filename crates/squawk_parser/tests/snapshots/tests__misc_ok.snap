@@ -404,56 +404,58 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      CALL_EXPR
-        NAME_REF
-          IDENT "ts_rank_cd"
-        ARG_LIST
-          L_PAREN "("
-          CALL_EXPR
-            NAME_REF
-              IDENT "to_tsvector"
-            ARG_LIST
-              L_PAREN "("
-              LITERAL
-                STRING "'english'"
-              COMMA ","
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "title"
-                WHITESPACE " "
-                CUSTOM_OP
-                  PIPE "|"
-                  PIPE "|"
+      SORT_BY
+        CALL_EXPR
+          NAME_REF
+            IDENT "ts_rank_cd"
+          ARG_LIST
+            L_PAREN "("
+            CALL_EXPR
+              NAME_REF
+                IDENT "to_tsvector"
+              ARG_LIST
+                L_PAREN "("
+                LITERAL
+                  STRING "'english'"
+                COMMA ","
                 WHITESPACE " "
                 BIN_EXPR
-                  LITERAL
-                    STRING "' '"
+                  NAME_REF
+                    IDENT "title"
                   WHITESPACE " "
                   CUSTOM_OP
                     PIPE "|"
                     PIPE "|"
                   WHITESPACE " "
-                  CALL_EXPR
-                    NAME_REF
-                      COALESCE_KW "COALESCE"
-                    ARG_LIST
-                      L_PAREN "("
+                  BIN_EXPR
+                    LITERAL
+                      STRING "' '"
+                    WHITESPACE " "
+                    CUSTOM_OP
+                      PIPE "|"
+                      PIPE "|"
+                    WHITESPACE " "
+                    CALL_EXPR
                       NAME_REF
-                        IDENT "overview"
-                      COMMA ","
-                      WHITESPACE " "
-                      LITERAL
-                        STRING "''"
-                      R_PAREN ")"
-              R_PAREN ")"
-          COMMA ","
-          WHITESPACE " "
-          NAME_REF
-            IDENT "query"
-          R_PAREN ")"
-      WHITESPACE " "
-      DESC_KW "DESC"
+                        COALESCE_KW "COALESCE"
+                      ARG_LIST
+                        L_PAREN "("
+                        NAME_REF
+                          IDENT "overview"
+                        COMMA ","
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "''"
+                        R_PAREN ")"
+                R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            NAME_REF
+              IDENT "query"
+            R_PAREN ")"
+        WHITESPACE " "
+        SORT_DESC
+          DESC_KW "DESC"
     WHITESPACE "\n"
     LIMIT_CLAUSE
       LIMIT_KW "LIMIT"
@@ -553,25 +555,26 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "movies"
-          DOT "."
-          NAME_REF
-            IDENT "embedding"
-        WHITESPACE " "
-        CUSTOM_OP
-          L_ANGLE "<"
-          EQ "="
-          R_ANGLE ">"
-        WHITESPACE " "
-        FIELD_EXPR
-          NAME_REF
-            IDENT "query_embedding"
-          DOT "."
-          NAME_REF
-            IDENT "embedding"
+      SORT_BY
+        BIN_EXPR
+          FIELD_EXPR
+            NAME_REF
+              IDENT "movies"
+            DOT "."
+            NAME_REF
+              IDENT "embedding"
+          WHITESPACE " "
+          CUSTOM_OP
+            L_ANGLE "<"
+            EQ "="
+            R_ANGLE ">"
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "query_embedding"
+            DOT "."
+            NAME_REF
+              IDENT "embedding"
     WHITESPACE "\n"
     LIMIT_CLAUSE
       LIMIT_KW "LIMIT"
@@ -739,10 +742,12 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        IDENT "relevance_score"
-      WHITESPACE " "
-      DESC_KW "DESC"
+      SORT_BY
+        NAME_REF
+          IDENT "relevance_score"
+        WHITESPACE " "
+        SORT_DESC
+          DESC_KW "DESC"
     WHITESPACE "\n"
     LIMIT_CLAUSE
       LIMIT_KW "LIMIT"
@@ -1112,16 +1117,19 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "1"
       COMMA ","
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "2"
       COMMA ","
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "3"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "3"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -2090,42 +2098,43 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      BIN_EXPR
-        NAME_REF
-          IDENT "vec"
-        WHITESPACE " "
-        CUSTOM_OP
-          L_ANGLE "<"
-          MINUS "-"
-          R_ANGLE ">"
-        WHITESPACE " "
-        PAREN_EXPR
-          L_PAREN "("
-          SELECT
-            SELECT_CLAUSE
-              SELECT_KW "SELECT"
-              WHITESPACE " "
-              TARGET_LIST
-                TARGET
-                  CAST_EXPR
-                    CALL_EXPR
-                      FIELD_EXPR
-                        NAME_REF
-                          IDENT "openai"
-                        DOT "."
-                        NAME_REF
-                          IDENT "vector"
-                      ARG_LIST
-                        L_PAREN "("
-                        LITERAL
-                          STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
-                        R_PAREN ")"
-                    COLON_COLON
-                      COLON ":"
-                      COLON ":"
-                    NAME_REF
-                      IDENT "vector"
-          R_PAREN ")"
+      SORT_BY
+        BIN_EXPR
+          NAME_REF
+            IDENT "vec"
+          WHITESPACE " "
+          CUSTOM_OP
+            L_ANGLE "<"
+            MINUS "-"
+            R_ANGLE ">"
+          WHITESPACE " "
+          PAREN_EXPR
+            L_PAREN "("
+            SELECT
+              SELECT_CLAUSE
+                SELECT_KW "SELECT"
+                WHITESPACE " "
+                TARGET_LIST
+                  TARGET
+                    CAST_EXPR
+                      CALL_EXPR
+                        FIELD_EXPR
+                          NAME_REF
+                            IDENT "openai"
+                          DOT "."
+                          NAME_REF
+                            IDENT "vector"
+                        ARG_LIST
+                          L_PAREN "("
+                          LITERAL
+                            STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
+                          R_PAREN ")"
+                      COLON_COLON
+                        COLON ":"
+                        COLON ":"
+                      NAME_REF
+                        IDENT "vector"
+            R_PAREN ")"
     WHITESPACE "\n"
     LIMIT_CLAUSE
       LIMIT_KW "LIMIT"
@@ -2535,10 +2544,12 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
-      WHITESPACE " "
-      DESC_KW "desc"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "2"
+        WHITESPACE " "
+        SORT_DESC
+          DESC_KW "desc"
     WHITESPACE " "
     LIMIT_CLAUSE
       LIMIT_KW "limit"
@@ -2793,8 +2804,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* define a function that wraps a COPY TO command to export data */"
@@ -3085,10 +3097,12 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-      WHITESPACE " "
-      DESC_KW "desc"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        SORT_DESC
+          DESC_KW "desc"
     WHITESPACE " "
     LIMIT_CLAUSE
       LIMIT_KW "limit"
@@ -4666,8 +4680,9 @@ SOURCE_FILE
                   WHITESPACE " "
                   BY_KW "BY"
                   WHITESPACE " "
-                  NAME_REF
-                    MONTH_KW "month"
+                  SORT_BY
+                    NAME_REF
+                      MONTH_KW "month"
                 WHITESPACE " \n    "
                 ROWS_KW "ROWS"
                 WHITESPACE " "
@@ -4779,18 +4794,19 @@ SOURCE_FILE
                   WHITESPACE " "
                   BY_KW "BY"
                   WHITESPACE " "
-                  CALL_EXPR
-                    NAME_REF
-                      IDENT "date_trunc"
-                    ARG_LIST
-                      L_PAREN "("
-                      LITERAL
-                        STRING "'month'"
-                      COMMA ","
-                      WHITESPACE " "
+                  SORT_BY
+                    CALL_EXPR
                       NAME_REF
-                        TIMESTAMP_KW "timestamp"
-                      R_PAREN ")"
+                        IDENT "date_trunc"
+                      ARG_LIST
+                        L_PAREN "("
+                        LITERAL
+                          STRING "'month'"
+                        COMMA ","
+                        WHITESPACE " "
+                        NAME_REF
+                          TIMESTAMP_KW "timestamp"
+                        R_PAREN ")"
               WHITESPACE "\n  "
               R_PAREN ")"
           WHITESPACE " "
@@ -5351,8 +5367,9 @@ SOURCE_FILE
               WHITESPACE " "
               BY_KW "BY"
               WHITESPACE " "
-              NAME_REF
-                TIMESTAMP_KW "timestamp"
+              SORT_BY
+                NAME_REF
+                  TIMESTAMP_KW "timestamp"
           WHITESPACE "\n"
           R_PAREN ")"
         WHITESPACE " "
@@ -5552,14 +5569,17 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        IDENT "user_id"
+      SORT_BY
+        NAME_REF
+          IDENT "user_id"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        TIMESTAMP_KW "timestamp"
-      WHITESPACE " "
-      DESC_KW "DESC"
+      SORT_BY
+        NAME_REF
+          TIMESTAMP_KW "timestamp"
+        WHITESPACE " "
+        SORT_DESC
+          DESC_KW "DESC"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -5852,10 +5872,12 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE "\n    "
-        LITERAL
-          INT_NUMBER "2"
-        WHITESPACE " "
-        DESC_KW "DESC"
+        SORT_BY
+          LITERAL
+            INT_NUMBER "2"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "DESC"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -6604,10 +6626,12 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        INTERVAL_KW "interval"
-      WHITESPACE " "
-      DESC_KW "DESC"
+      SORT_BY
+        NAME_REF
+          INTERVAL_KW "interval"
+        WHITESPACE " "
+        SORT_DESC
+          DESC_KW "DESC"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Identify optimal trading windows"
@@ -6686,8 +6710,9 @@ SOURCE_FILE
                       WHITESPACE " "
                       BY_KW "BY"
                       WHITESPACE " "
-                      NAME_REF
-                        IDENT "price"
+                      SORT_BY
+                        NAME_REF
+                          IDENT "price"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_KW "AS"
@@ -6820,7 +6845,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        HOUR_KW "hour"
+      SORT_BY
+        NAME_REF
+          HOUR_KW "hour"
   SEMICOLON ";"
   WHITESPACE "\n"

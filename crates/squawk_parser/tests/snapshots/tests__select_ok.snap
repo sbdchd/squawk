@@ -3394,8 +3394,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- nulls"
@@ -3414,12 +3415,14 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-      WHITESPACE " "
-      NULLS_KW "nulls"
-      WHITESPACE " "
-      FIRST_KW "first"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        NULLS_FIRST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          FIRST_KW "first"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3436,12 +3439,14 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-      WHITESPACE " "
-      NULLS_KW "nulls"
-      WHITESPACE " "
-      LAST_KW "last"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        NULLS_LAST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          LAST_KW "last"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   SELECT
@@ -3458,16 +3463,19 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
-      WHITESPACE " "
-      USING_KW "using"
-      WHITESPACE " "
-      R_ANGLE ">"
-      WHITESPACE " "
-      NULLS_KW "nulls"
-      WHITESPACE " "
-      LAST_KW "last"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "1"
+        WHITESPACE " "
+        SORT_USING
+          USING_KW "using"
+          WHITESPACE " "
+          R_ANGLE ">"
+        WHITESPACE " "
+        NULLS_LAST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          LAST_KW "last"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_window_clause"
@@ -3521,8 +3529,9 @@ SOURCE_FILE
           WHITESPACE " "
           BY_KW "by"
           WHITESPACE " "
-          LITERAL
-            INT_NUMBER "1"
+          SORT_BY
+            LITERAL
+              INT_NUMBER "1"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -4157,8 +4166,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      SORT_BY
+        LITERAL
+          INT_NUMBER "1"
     WHITESPACE " "
     FETCH_CLAUSE
       FETCH_KW "fetch"
@@ -5871,15 +5881,17 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      NAME_REF
-        IDENT "a"
-      WHITESPACE " "
-      USING_KW "using"
-      WHITESPACE " "
-      CUSTOM_OP
-        R_ANGLE ">"
-        R_ANGLE ">"
-        R_ANGLE ">"
+      SORT_BY
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        SORT_USING
+          USING_KW "using"
+          WHITESPACE " "
+          CUSTOM_OP
+            R_ANGLE ">"
+            R_ANGLE ">"
+            R_ANGLE ">"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- order_by_regression"
@@ -6013,12 +6025,14 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        IDENT "sensor_id"
+      SORT_BY
+        NAME_REF
+          IDENT "sensor_id"
       COMMA ","
       WHITESPACE " "
-      NAME_REF
-        DAY_KW "day"
+      SORT_BY
+        NAME_REF
+          DAY_KW "day"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select with uescape;"

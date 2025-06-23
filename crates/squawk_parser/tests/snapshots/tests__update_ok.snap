@@ -1196,12 +1196,13 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            FIELD_EXPR
-              NAME_REF
-                IDENT "w"
-              DOT "."
-              NAME_REF
-                IDENT "retry_timestamp"
+            SORT_BY
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "w"
+                DOT "."
+                NAME_REF
+                  IDENT "retry_timestamp"
           WHITESPACE "\n    "
           LOCKING_CLAUSE
             FOR_KW "FOR"

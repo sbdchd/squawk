@@ -3247,10 +3247,12 @@ SOURCE_FILE
                 WHITESPACE " "
                 BY_KW "by"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "v"
-                WHITESPACE " "
-                DESC_KW "desc"
+                SORT_BY
+                  NAME_REF
+                    IDENT "v"
+                  WHITESPACE " "
+                  SORT_DESC
+                    DESC_KW "desc"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3286,8 +3288,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 BY_KW "by"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "v"
+                SORT_BY
+                  NAME_REF
+                    IDENT "v"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3323,8 +3326,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 BY_KW "by"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "a"
+                SORT_BY
+                  NAME_REF
+                    IDENT "a"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3356,12 +3360,14 @@ SOURCE_FILE
                 WHITESPACE " "
                 BY_KW "by"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "a"
+                SORT_BY
+                  NAME_REF
+                    IDENT "a"
                 COMMA ","
                 WHITESPACE " "
-                LITERAL
-                  STRING "','"
+                SORT_BY
+                  LITERAL
+                    STRING "','"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3400,8 +3406,9 @@ SOURCE_FILE
                 WHITESPACE " "
                 BY_KW "by"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "c"
+                SORT_BY
+                  NAME_REF
+                    IDENT "c"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE
@@ -3843,8 +3850,9 @@ SOURCE_FILE
           WHITESPACE " "
           BY_KW "by"
           WHITESPACE " "
-          NAME_REF
-            IDENT "a"
+          SORT_BY
+            NAME_REF
+              IDENT "a"
       R_PAREN ")"
       COMMA ","
       WHITESPACE " "
@@ -3860,8 +3868,9 @@ SOURCE_FILE
           WHITESPACE " "
           BY_KW "by"
           WHITESPACE " "
-          NAME_REF
-            IDENT "b"
+          SORT_BY
+            NAME_REF
+              IDENT "b"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"

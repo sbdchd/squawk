@@ -68,9 +68,11 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "by"
         WHITESPACE " "
-        NAME_REF
-          IDENT "y"
-        WHITESPACE " "
-        DESC_KW "desc"
+        SORT_BY
+          NAME_REF
+            IDENT "y"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "desc"
   SEMICOLON ";"
   WHITESPACE "\n"

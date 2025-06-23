@@ -18,5 +18,11 @@ drop table if exists t;
 -- cascade
 drop table foo, bar cascade;
 
+-- cascade is the table name
+drop table cascade;
+
+-- restrict is the table name
+drop table restrict;
+
 -- restrict
 drop table t restrict;

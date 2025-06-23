@@ -44,6 +44,148 @@ SOURCE_FILE
         NAME_REF
           IDENT "t"
   SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- search depth missing item"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+        WHITESPACE "\n"
+        SEARCH_KW "search"
+        WHITESPACE " "
+        DEPTH_KW "depth"
+        WHITESPACE " "
+        FIRST_KW "first"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        ERROR
+          COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        SET_KW "set"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "ordercol"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY
+        NAME_REF
+          IDENT "ordercol"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- search depth missing comma"
+  WHITESPACE "\n"
+  SELECT
+    WITH_CLAUSE
+      WITH_KW "with"
+      WHITESPACE " "
+      WITH_TABLE
+        NAME
+          IDENT "t"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        SELECT
+          SELECT_CLAUSE
+            SELECT_KW "select"
+            WHITESPACE " "
+            TARGET_LIST
+              TARGET
+                LITERAL
+                  INT_NUMBER "1"
+        R_PAREN ")"
+        WHITESPACE "\n"
+        SEARCH_KW "search"
+        WHITESPACE " "
+        DEPTH_KW "depth"
+        WHITESPACE " "
+        FIRST_KW "first"
+        WHITESPACE " "
+        BY_KW "by"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "c"
+        WHITESPACE " "
+        SET_KW "set"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "ordercol"
+    WHITESPACE "\n"
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FROM_ITEM
+        NAME_REF
+          IDENT "t"
+    WHITESPACE " "
+    ORDER_BY_CLAUSE
+      ORDER_KW "order"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      SORT_BY
+        NAME_REF
+          IDENT "ordercol"
+  SEMICOLON ";"
   WHITESPACE "\n"
 ---
 ERROR@24: unexpected comma
+ERROR@140: unexpected comma, expected a column name
+ERROR@270: expected COMMA
