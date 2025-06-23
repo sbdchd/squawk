@@ -303,12 +303,18 @@ Column =
   'period'?
   (Name WithOptions? | Name Type Storage? CompressionMethod? Collate? | IndexExpr)
 
+NullsDistinct =
+  'nulls' 'distinct'
+
+NullsNotDistinct =
+  'nulls' 'not' 'distinct'
+
 UniqueConstraint =
   ('constraint' NameRef)
   'unique'
   (
     UsingIndex
-  | ( 'nulls' 'not'? 'distinct' )? ColumnList
+  | (NullsNotDistinct | NullsDistinct)? ColumnList
   )
 
 PrimaryKeyConstraint =
@@ -1005,8 +1011,26 @@ IntoClause =
 LockingClause =
   'for'
 
+NullsFirst =
+  'nulls' 'first'
+
+NullsLast =
+  'nulls' 'last'
+
+SortAsc =
+  'asc'
+
+SortDesc =
+  'desc'
+
+SortUsing =
+  'using' Op
+
+SortBy =
+  Expr (SortAsc | SortDesc | SortUsing)? (NullsFirst | NullsLast)?
+
 OrderByClause =
-  'order' 'by'
+  'order' 'by' (SortBy (',' SortBy)*)
 
 FromItem =
   'only'? NameRef

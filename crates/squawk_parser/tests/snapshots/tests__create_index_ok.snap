@@ -99,11 +99,13 @@ SOURCE_FILE
           NAME_REF
             IDENT "\"fr_FR\""
         WHITESPACE " "
-        ASC_KW "asc"
+        SORT_ASC
+          ASC_KW "asc"
         WHITESPACE " "
-        NULLS_KW "nulls"
-        WHITESPACE " "
-        LAST_KW "last"
+        NULLS_LAST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          LAST_KW "last"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -126,11 +128,13 @@ SOURCE_FILE
         NAME_REF
           IDENT "c"
         WHITESPACE " "
-        DESC_KW "desc"
+        SORT_DESC
+          DESC_KW "desc"
         WHITESPACE " "
-        NULLS_KW "nulls"
-        WHITESPACE " "
-        FIRST_KW "first"
+        NULLS_FIRST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          FIRST_KW "first"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -279,11 +283,12 @@ SOURCE_FILE
             IDENT "b"
         R_PAREN ")"
     WHITESPACE "\n  "
-    NULLS_KW "nulls"
-    WHITESPACE " "
-    NOT_KW "not"
-    WHITESPACE " "
-    DISTINCT_KW "distinct"
+    NULLS_NOT_DISTINCT
+      NULLS_KW "nulls"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      DISTINCT_KW "distinct"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"
@@ -347,9 +352,10 @@ SOURCE_FILE
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
-    NULLS_KW "nulls"
-    WHITESPACE " "
-    DISTINCT_KW "distinct"
+    NULLS_DISTINCT
+      NULLS_KW "nulls"
+      WHITESPACE " "
+      DISTINCT_KW "distinct"
     WHITESPACE "\n  "
     WHERE_CLAUSE
       WHERE_KW "where"
@@ -585,9 +591,10 @@ SOURCE_FILE
         NAME_REF
           IDENT "title"
         WHITESPACE " "
-        NULLS_KW "NULLS"
-        WHITESPACE " "
-        FIRST_KW "FIRST"
+        NULLS_FIRST
+          NULLS_KW "NULLS"
+          WHITESPACE " "
+          FIRST_KW "FIRST"
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

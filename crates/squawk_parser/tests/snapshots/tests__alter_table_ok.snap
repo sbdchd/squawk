@@ -2235,11 +2235,12 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        NULLS_KW "nulls"
-        WHITESPACE " "
-        NOT_KW "not"
-        WHITESPACE " "
-        DISTINCT_KW "distinct"
+        NULLS_NOT_DISTINCT
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          NOT_KW "not"
+          WHITESPACE " "
+          DISTINCT_KW "distinct"
         WHITESPACE " "
         COLUMN_LIST
           L_PAREN "("
@@ -2580,9 +2581,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "t1"
         WHITESPACE " "
-        MATCH_KW "match"
-        WHITESPACE " "
-        FULL_KW "full"
+        MATCH_FULL
+          MATCH_KW "match"
+          WHITESPACE " "
+          FULL_KW "full"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2623,9 +2625,10 @@ SOURCE_FILE
             NAME_REF
               IDENT "t1"
         WHITESPACE " "
-        MATCH_KW "match"
-        WHITESPACE " "
-        SIMPLE_KW "simple"
+        MATCH_SIMPLE
+          MATCH_KW "match"
+          WHITESPACE " "
+          SIMPLE_KW "simple"
   SEMICOLON ";"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -2665,18 +2668,22 @@ SOURCE_FILE
           PATH_SEGMENT
             NAME_REF
               IDENT "t1"
-        L_PAREN "("
-        NAME_REF
-          IDENT "e"
-        COMMA ","
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "e"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "f"
+          R_PAREN ")"
         WHITESPACE " "
-        NAME_REF
-          IDENT "f"
-        R_PAREN ")"
-        WHITESPACE " "
-        MATCH_KW "match"
-        WHITESPACE " "
-        FULL_KW "full"
+        MATCH_FULL
+          MATCH_KW "match"
+          WHITESPACE " "
+          FULL_KW "full"
         WHITESPACE " "
         ON_KW "on"
         WHITESPACE " "
@@ -3805,10 +3812,12 @@ SOURCE_FILE
             NAME_REF
               IDENT "bar"
         WHITESPACE " "
-        L_PAREN "("
-        NAME_REF
-          IDENT "id"
-        R_PAREN ")"
+        COLUMN_LIST
+          L_PAREN "("
+          COLUMN
+            NAME_REF
+              IDENT "id"
+          R_PAREN ")"
         WHITESPACE " "
         ON_KW "on"
         WHITESPACE " "

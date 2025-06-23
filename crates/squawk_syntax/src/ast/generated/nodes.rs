@@ -6446,6 +6446,70 @@ impl NullConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NullsDistinct {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NullsDistinct {
+    #[inline]
+    pub fn distinct_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DISTINCT_KW)
+    }
+    #[inline]
+    pub fn nulls_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULLS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NullsFirst {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NullsFirst {
+    #[inline]
+    pub fn first_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FIRST_KW)
+    }
+    #[inline]
+    pub fn nulls_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULLS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NullsLast {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NullsLast {
+    #[inline]
+    pub fn last_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LAST_KW)
+    }
+    #[inline]
+    pub fn nulls_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULLS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NullsNotDistinct {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NullsNotDistinct {
+    #[inline]
+    pub fn distinct_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DISTINCT_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn nulls_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NULLS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct OfType {
     pub(crate) syntax: SyntaxNode,
 }
@@ -6800,6 +6864,10 @@ pub struct OrderByClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl OrderByClause {
+    #[inline]
+    pub fn sort_bys(&self) -> AstChildren<SortBy> {
+        support::children(&self.syntax)
+    }
     #[inline]
     pub fn by_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BY_KW)
@@ -8466,6 +8534,74 @@ impl SimilarTo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SortAsc {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SortAsc {
+    #[inline]
+    pub fn asc_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ASC_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SortBy {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SortBy {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn nulls_first(&self) -> Option<NullsFirst> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn nulls_last(&self) -> Option<NullsLast> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn sort_asc(&self) -> Option<SortAsc> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn sort_desc(&self) -> Option<SortDesc> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn sort_using(&self) -> Option<SortUsing> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SortDesc {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SortDesc {
+    #[inline]
+    pub fn desc_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DESC_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SortUsing {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SortUsing {
+    #[inline]
+    pub fn op(&self) -> Option<Op> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SourceFile {
     pub(crate) syntax: SyntaxNode,
 }
@@ -8806,24 +8942,20 @@ impl UniqueConstraint {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn nulls_distinct(&self) -> Option<NullsDistinct> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn nulls_not_distinct(&self) -> Option<NullsNotDistinct> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn using_index(&self) -> Option<UsingIndex> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn constraint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
-    }
-    #[inline]
-    pub fn distinct_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::DISTINCT_KW)
-    }
-    #[inline]
-    pub fn not_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NOT_KW)
-    }
-    #[inline]
-    pub fn nulls_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NULLS_KW)
     }
     #[inline]
     pub fn unique_token(&self) -> Option<SyntaxToken> {
@@ -15270,6 +15402,78 @@ impl AstNode for NullConstraint {
         &self.syntax
     }
 }
+impl AstNode for NullsDistinct {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NULLS_DISTINCT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NullsFirst {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NULLS_FIRST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NullsLast {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NULLS_LAST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NullsNotDistinct {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NULLS_NOT_DISTINCT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for OfType {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -17128,6 +17332,78 @@ impl AstNode for SimilarTo {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SIMILAR_TO
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SortAsc {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SORT_ASC
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SortBy {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SORT_BY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SortDesc {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SORT_DESC
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SortUsing {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SORT_USING
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

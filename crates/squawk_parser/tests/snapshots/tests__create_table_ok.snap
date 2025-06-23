@@ -1033,11 +1033,12 @@ SOURCE_FILE
         UNIQUE_CONSTRAINT
           UNIQUE_KW "unique"
           WHITESPACE " "
-          NULLS_KW "nulls"
-          WHITESPACE " "
-          NOT_KW "not"
-          WHITESPACE " "
-          DISTINCT_KW "distinct"
+          NULLS_NOT_DISTINCT
+            NULLS_KW "nulls"
+            WHITESPACE " "
+            NOT_KW "not"
+            WHITESPACE " "
+            DISTINCT_KW "distinct"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1738,11 +1739,12 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        NULLS_KW "nulls"
-        WHITESPACE " "
-        NOT_KW "not"
-        WHITESPACE " "
-        DISTINCT_KW "distinct"
+        NULLS_NOT_DISTINCT
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          NOT_KW "not"
+          WHITESPACE " "
+          DISTINCT_KW "distinct"
         WHITESPACE " "
         COLUMN_LIST
           L_PAREN "("
@@ -2299,16 +2301,19 @@ SOURCE_FILE
             NAME_REF
               IDENT "bar"
         WHITESPACE " "
-        L_PAREN "("
-        WHITESPACE " "
-        NAME_REF
-          IDENT "a"
-        COMMA ","
-        WHITESPACE " "
-        NAME_REF
-          IDENT "b"
-        WHITESPACE " "
-        R_PAREN ")"
+        COLUMN_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
@@ -2393,11 +2398,12 @@ SOURCE_FILE
       UNIQUE_CONSTRAINT
         UNIQUE_KW "unique"
         WHITESPACE " "
-        NULLS_KW "nulls"
-        WHITESPACE " "
-        NOT_KW "not"
-        WHITESPACE " "
-        DISTINCT_KW "distinct"
+        NULLS_NOT_DISTINCT
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          NOT_KW "not"
+          WHITESPACE " "
+          DISTINCT_KW "distinct"
         WHITESPACE " "
         COLUMN_LIST
           L_PAREN "("
@@ -2533,16 +2539,19 @@ SOURCE_FILE
             NAME_REF
               IDENT "bar"
         WHITESPACE " "
-        L_PAREN "("
-        WHITESPACE " "
-        NAME_REF
-          IDENT "a"
-        COMMA ","
-        WHITESPACE " "
-        NAME_REF
-          IDENT "b"
-        WHITESPACE " "
-        R_PAREN ")"
+        COLUMN_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          R_PAREN ")"
       COMMA ","
       WHITESPACE "\n  "
       UNIQUE_CONSTRAINT

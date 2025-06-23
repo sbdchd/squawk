@@ -99,8 +99,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        IDENT "baz"
+      SORT_BY
+        NAME_REF
+          IDENT "baz"
   SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- equal to:"
@@ -134,7 +135,8 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      NAME_REF
-        IDENT "baz"
+      SORT_BY
+        NAME_REF
+          IDENT "baz"
   SEMICOLON ";"
   WHITESPACE "\n"
