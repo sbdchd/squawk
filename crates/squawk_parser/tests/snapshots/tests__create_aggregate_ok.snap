@@ -760,8 +760,7 @@ SOURCE_FILE
           IDENT "value2"
         WHITESPACE " "
         TIME_TYPE
-          NAME_REF
-            TIMESTAMP_KW "timestamp"
+          TIMESTAMP_KW "timestamp"
       WHITESPACE " "
       ORDER_KW "ORDER"
       WHITESPACE " "

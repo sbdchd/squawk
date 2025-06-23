@@ -141,11 +141,12 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          UPDATE_KW "update"
-          WHITESPACE " "
-          CASCADE_KW "cascade"
+          ON_UPDATE_ACTION
+            ON_KW "on"
+            WHITESPACE " "
+            UPDATE_KW "update"
+            WHITESPACE " "
+            CASCADE_KW "cascade"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -166,13 +167,15 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          UPDATE_KW "update"
-          WHITESPACE " "
-          SET_KW "set"
-          WHITESPACE " "
-          NULL_KW "null"
+          ON_UPDATE_ACTION
+            ON_KW "on"
+            WHITESPACE " "
+            UPDATE_KW "update"
+            WHITESPACE " "
+            SET_NULL_COLUMNS
+              SET_KW "set"
+              WHITESPACE " "
+              NULL_KW "null"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -193,13 +196,15 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          UPDATE_KW "update"
-          WHITESPACE " "
-          SET_KW "set"
-          WHITESPACE " "
-          DEFAULT_KW "default"
+          ON_UPDATE_ACTION
+            ON_KW "on"
+            WHITESPACE " "
+            UPDATE_KW "update"
+            WHITESPACE " "
+            SET_DEFAULT_COLUMNS
+              SET_KW "set"
+              WHITESPACE " "
+              DEFAULT_KW "default"
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -220,26 +225,32 @@ SOURCE_FILE
               NAME_REF
                 IDENT "bar"
           WHITESPACE " "
-          ON_KW "on"
-          WHITESPACE " "
-          UPDATE_KW "update"
-          WHITESPACE " "
-          SET_KW "set"
-          WHITESPACE " "
-          DEFAULT_KW "default"
-          WHITESPACE " "
-          L_PAREN "("
-          NAME_REF
-            IDENT "a"
-          COMMA ","
-          WHITESPACE " "
-          NAME_REF
-            IDENT "b"
-          COMMA ","
-          WHITESPACE " "
-          NAME_REF
-            IDENT "c"
-          R_PAREN ")"
+          ON_UPDATE_ACTION
+            ON_KW "on"
+            WHITESPACE " "
+            UPDATE_KW "update"
+            WHITESPACE " "
+            SET_DEFAULT_COLUMNS
+              SET_KW "set"
+              WHITESPACE " "
+              DEFAULT_KW "default"
+              WHITESPACE " "
+              COLUMN_LIST
+                L_PAREN "("
+                COLUMN
+                  NAME_REF
+                    IDENT "a"
+                COMMA ","
+                WHITESPACE " "
+                COLUMN
+                  NAME_REF
+                    IDENT "b"
+                COMMA ","
+                WHITESPACE " "
+                COLUMN
+                  NAME_REF
+                    IDENT "c"
+                R_PAREN ")"
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"

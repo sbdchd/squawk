@@ -160,8 +160,7 @@ SOURCE_FILE
         WHITESPACE " "
         PARAM
           TIME_TYPE
-            NAME_REF
-              TIMESTAMP_KW "timestamp"
+            TIMESTAMP_KW "timestamp"
         R_PAREN ")"
     WHITESPACE " "
     IS_KW "is"

@@ -5558,7 +5558,7 @@ impl Join {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn using_clause(&self) -> Option<UsingClause> {
+    pub fn using_clause(&self) -> Option<JoinUsingClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5670,6 +5670,25 @@ impl JoinRight {
     #[inline]
     pub fn right_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RIGHT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JoinUsingClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JoinUsingClause {
+    #[inline]
+    pub fn alias(&self) -> Option<Alias> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USING_KW)
     }
 }
 
@@ -8766,10 +8785,6 @@ pub struct TimeType {
 impl TimeType {
     #[inline]
     pub fn literal(&self) -> Option<Literal> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -14542,6 +14557,24 @@ impl AstNode for JoinRight {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::JOIN_RIGHT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JoinUsingClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JOIN_USING_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

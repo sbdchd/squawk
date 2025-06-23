@@ -382,3 +382,98 @@ fn api_walkthrough() {
     }
     assert_eq!(exprs_cast, exprs_visit);
 }
+
+#[test]
+fn create_table() {
+    use insta::assert_debug_snapshot;
+
+    let source_code = "
+        create table users (
+            id int8 primary key,
+            name varchar(255) not null,
+            email text,
+            created_at timestamp default now()
+        );
+        
+        create table posts (
+            id serial primary key,
+            title varchar(500),
+            content text,
+            user_id int8 references users(id)
+        );
+    ";
+
+    let parse = SourceFile::parse(source_code);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+
+    let mut tables: Vec<(String, Vec<(String, String)>)> = vec![];
+
+    for stmt in file.stmts() {
+        if let ast::Stmt::CreateTable(create_table) = stmt {
+            let table_name = create_table.path().unwrap().syntax().to_string();
+            let mut columns = vec![];
+            for arg in create_table.table_arg_list().unwrap().args() {
+                match arg {
+                    ast::TableArg::Column(column) => {
+                        let column_name = column.name().unwrap();
+                        let column_type = column.ty().unwrap();
+                        columns.push((
+                            column_name.syntax().to_string(),
+                            column_type.syntax().to_string(),
+                        ));
+                    }
+                    ast::TableArg::TableConstraint(_) | ast::TableArg::LikeClause(_) => (),
+                }
+            }
+            tables.push((table_name, columns));
+        }
+    }
+
+    assert_debug_snapshot!(tables, @r#"
+    [
+        (
+            "users",
+            [
+                (
+                    "id",
+                    "int8",
+                ),
+                (
+                    "name",
+                    "varchar(255)",
+                ),
+                (
+                    "email",
+                    "text",
+                ),
+                (
+                    "created_at",
+                    "timestamp",
+                ),
+            ],
+        ),
+        (
+            "posts",
+            [
+                (
+                    "id",
+                    "serial",
+                ),
+                (
+                    "title",
+                    "varchar(500)",
+                ),
+                (
+                    "content",
+                    "text",
+                ),
+                (
+                    "user_id",
+                    "int8",
+                ),
+            ],
+        ),
+    ]
+    "#)
+}

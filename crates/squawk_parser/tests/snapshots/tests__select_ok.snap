@@ -4478,7 +4478,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "t2"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             COLUMN_LIST
@@ -4515,7 +4515,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "t2"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             COLUMN_LIST
@@ -4559,7 +4559,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "t2"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             COLUMN_LIST
@@ -4598,7 +4598,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "t2"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             COLUMN_LIST
@@ -4743,7 +4743,7 @@ SOURCE_FILE
                     NAME_REF
                       IDENT "t2"
                   WHITESPACE " "
-                  USING_CLAUSE
+                  JOIN_USING_CLAUSE
                     USING_KW "using"
                     COLUMN_LIST
                       L_PAREN "("
@@ -4804,7 +4804,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "t2"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             COLUMN_LIST
@@ -4962,7 +4962,7 @@ SOURCE_FILE
               NAME_REF
                 IDENT "u"
             WHITESPACE " "
-            USING_CLAUSE
+            JOIN_USING_CLAUSE
               USING_KW "using"
               WHITESPACE " "
               COLUMN_LIST
@@ -4982,7 +4982,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "k"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             COLUMN_LIST
@@ -5099,7 +5099,7 @@ SOURCE_FILE
               NAME
                 IDENT "f"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "USING"
             WHITESPACE " "
             COLUMN_LIST
@@ -5134,7 +5134,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "t2"
           WHITESPACE " "
-          USING_CLAUSE
+          JOIN_USING_CLAUSE
             USING_KW "using"
             WHITESPACE " "
             COLUMN_LIST
