@@ -5300,15 +5300,9 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, ROLLBACK)
 }
 
+#[derive(Default)]
 struct StmtRestrictions {
     begin_end_allowed: bool,
-}
-impl Default for StmtRestrictions {
-    fn default() -> Self {
-        Self {
-            begin_end_allowed: false,
-        }
-    }
 }
 
 fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
