@@ -1959,17 +1959,12 @@ fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
 }
 
 fn opt_agg_clauses(p: &mut Parser<'_>) {
-    // postgres has:
-    // func_expr: func_application within_group_clause filter_clause over_clause
-    if p.at(WITHIN_KW) {
-        let m = p.start();
-        p.expect(WITHIN_KW);
-        p.expect(GROUP_KW);
-        p.expect(L_PAREN);
-        opt_order_by_clause(p);
-        p.expect(R_PAREN);
-        m.complete(p, WITHIN_CLAUSE);
-    }
+    opt_within_clause(p);
+    opt_filter_clause(p);
+    opt_over_clause(p);
+}
+
+fn opt_filter_clause(p: &mut Parser<'_>) {
     if p.at(FILTER_KW) {
         let m = p.start();
         p.expect(FILTER_KW);
@@ -1981,18 +1976,33 @@ fn opt_agg_clauses(p: &mut Parser<'_>) {
         p.expect(R_PAREN);
         m.complete(p, FILTER_CLAUSE);
     }
+}
+
+fn opt_over_clause(p: &mut Parser<'_>) {
     if p.at(OVER_KW) {
         // OVER window_name
         // OVER ( window_definition )
         let m = p.start();
         p.expect(OVER_KW);
         if p.eat(L_PAREN) {
-            window_definition(p);
+            window_spec(p);
             p.expect(R_PAREN);
         } else {
             name_ref(p);
         }
         m.complete(p, OVER_CLAUSE);
+    }
+}
+
+fn opt_within_clause(p: &mut Parser<'_>) {
+    if p.at(WITHIN_KW) {
+        let m = p.start();
+        p.expect(WITHIN_KW);
+        p.expect(GROUP_KW);
+        p.expect(L_PAREN);
+        opt_order_by_clause(p);
+        p.expect(R_PAREN);
+        m.complete(p, WITHIN_CLAUSE);
     }
 }
 
@@ -2360,12 +2370,7 @@ fn with_query(p: &mut Parser<'_>) -> CompletedMarker {
     name(p);
     opt_column_list_with(p, ColumnDefKind::Name);
     p.expect(AS_KW);
-    // [ [ NOT ] MATERIALIZED ]
-    if p.eat(NOT_KW) {
-        p.expect(MATERIALIZED_KW);
-    } else {
-        p.eat(MATERIALIZED_KW);
-    }
+    opt_materialized(p);
     p.expect(L_PAREN);
     preparable_stmt(p);
     p.expect(R_PAREN);
@@ -2387,31 +2392,50 @@ fn with_query(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(SET_KW);
         name_ref(p);
     }
-    // [ CYCLE column_name [, ...] SET cycle_mark_col_name [ TO cycle_mark_value DEFAULT cycle_mark_default ] USING cycle_path_col_name ]
-    if p.eat(CYCLE_KW) {
-        separated(
-            p,
-            COMMA,
-            || "unexpected comma, expected a column name".to_string(),
-            NAME_REF_FIRST,
-            TokenSet::new(&[SET_KW]),
-            |p| opt_name_ref(p).is_some(),
-        );
-        p.expect(SET_KW);
-        name_ref(p);
-        if p.eat(TO_KW) {
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
-            p.expect(DEFAULT_KW);
-            if expr(p).is_none() {
-                p.error("expected an expression");
-            }
-        }
-        p.expect(USING_KW);
-        name_ref(p);
-    }
+    opt_cycle_clause(p);
     m.complete(p, WITH_TABLE)
+}
+
+// [ CYCLE column_name [, ...] SET cycle_mark_col_name [ TO cycle_mark_value DEFAULT cycle_mark_default ] USING cycle_path_col_name ]
+fn opt_cycle_clause(p: &mut Parser<'_>) {
+    if !p.at(CYCLE_KW) {
+        return;
+    }
+    p.expect(CYCLE_KW);
+    separated(
+        p,
+        COMMA,
+        || "unexpected comma, expected a column name".to_string(),
+        NAME_REF_FIRST,
+        TokenSet::new(&[SET_KW]),
+        |p| opt_name_ref(p).is_some(),
+    );
+    p.expect(SET_KW);
+    name_ref(p);
+    if p.eat(TO_KW) {
+        if expr(p).is_none() {
+            p.error("expected an expression");
+        }
+        p.expect(DEFAULT_KW);
+        if expr(p).is_none() {
+            p.error("expected an expression");
+        }
+    }
+    p.expect(USING_KW);
+    name_ref(p);
+}
+
+// [ [ NOT ] MATERIALIZED ]
+fn opt_materialized(p: &mut Parser<'_>) {
+    let m = p.start();
+    if p.eat(NOT_KW) {
+        p.expect(MATERIALIZED_KW);
+        m.complete(p, NOT_MATERIALIZED);
+    } else if p.eat(MATERIALIZED_KW) {
+        m.complete(p, MATERIALIZED);
+    } else {
+        m.abandon(p);
+    }
 }
 
 const WITH_FOLLOW: TokenSet = TokenSet::new(&[
@@ -4350,7 +4374,7 @@ const WINDOW_DEF_START: TokenSet =
 // The frame_clause can be one of
 // { RANGE | ROWS | GROUPS } frame_start [ frame_exclusion ]
 // { RANGE | ROWS | GROUPS } BETWEEN frame_start AND frame_end [ frame_exclusion ]
-fn window_definition(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn window_spec(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if !p.at_ts(WINDOW_DEF_START) {
         return None;
     }
@@ -4363,7 +4387,13 @@ fn window_definition(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
     }
     opt_order_by_clause(p);
+    opt_frame_clause(p);
+    Some(m.complete(p, WINDOW_SPEC))
+}
+
+fn opt_frame_clause(p: &mut Parser<'_>) {
     if p.at(RANGE_KW) || p.at(ROWS_KW) || p.at(GROUPS_KW) {
+        let m = p.start();
         p.bump_any();
         if p.eat(BETWEEN_KW) {
             frame_start_end(p);
@@ -4374,8 +4404,8 @@ fn window_definition(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             frame_start_end(p);
             opt_frame_exclusion(p);
         }
+        m.complete(p, FRAME_CLAUSE);
     }
-    Some(m.complete(p, WINDOW_DEF))
 }
 
 /// <https://www.postgresql.org/docs/17/sql-select.html#SQL-WINDOW>
@@ -4393,11 +4423,13 @@ fn opt_window_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 fn window_def(p: &mut Parser<'_>) {
+    let m = p.start();
     name(p);
     p.expect(AS_KW);
     p.expect(L_PAREN);
-    window_definition(p);
+    window_spec(p);
     p.expect(R_PAREN);
+    m.complete(p, WINDOW_DEF);
 }
 
 // [ LIMIT { count | ALL } ]
@@ -4787,7 +4819,8 @@ fn table_arg_list(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> 
 
 // { FOR VALUES partition_bound_spec | DEFAULT }
 fn partition_option(p: &mut Parser<'_>) {
-    if p.eat(FOR_KW) {
+    let m = p.start();
+    let kind = if p.eat(FOR_KW) {
         p.expect(VALUES_KW);
         // FOR VALUES WITH (modulus 5, remainder 0)
         if p.eat(WITH_KW) {
@@ -4798,6 +4831,7 @@ fn partition_option(p: &mut Parser<'_>) {
             ident(p);
             p.expect(INT_NUMBER);
             p.expect(R_PAREN);
+            PARTITION_FOR_VALUES_WITH
         // FOR VALUES IN '(' expr_list ')'
         } else if p.eat(IN_KW) {
             p.expect(L_PAREN);
@@ -4805,6 +4839,7 @@ fn partition_option(p: &mut Parser<'_>) {
                 p.error("expected expr list");
             }
             p.expect(R_PAREN);
+            PARTITION_FOR_VALUES_IN
         // FOR VALUES FROM '(' expr_list ')' TO '(' expr_list ')'
         } else if p.eat(FROM_KW) {
             p.expect(L_PAREN);
@@ -4818,11 +4853,17 @@ fn partition_option(p: &mut Parser<'_>) {
                 p.error("expected expr list");
             }
             p.expect(R_PAREN);
+            PARTITION_FOR_VALUES_FROM
+        } else {
+            p.error("expected partition option");
+            PARTITION_DEFAULT
         }
     // DEFAULT
     } else {
         p.expect(DEFAULT_KW);
-    }
+        PARTITION_DEFAULT
+    };
+    m.complete(p, kind);
 }
 
 fn opt_inherits_tables(p: &mut Parser<'_>) {
@@ -4909,14 +4950,7 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     // AS query
     // [ WITH [ NO ] DATA ]
     if p.eat(AS_KW) {
-        match stmt(
-            p,
-            &StmtRestrictions {
-                begin_end_allowed: false,
-            },
-        )
-        .map(|x| x.kind())
-        {
+        match stmt(p, &StmtRestrictions::default()).map(|x| x.kind()) {
             Some(
                 SELECT | COMPOUND_SELECT | SELECT_INTO | PAREN_SELECT | TABLE | VALUES | EXECUTE,
             ) => (),
@@ -5104,38 +5138,46 @@ fn opt_transaction_mode(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(TRANSACTION_MODE_FIRST) {
         return false;
     }
+    let m = p.start();
     // ISOLATION LEVEL { SERIALIZABLE | REPEATABLE READ | READ COMMITTED | READ UNCOMMITTED }
-    if p.eat(ISOLATION_KW) {
+    let kind = if p.eat(ISOLATION_KW) {
         p.expect(LEVEL_KW);
         if p.eat(SERIALIZABLE_KW) {
-            true
+            SERIALIZABLE
         } else if p.eat(REPEATABLE_KW) {
-            p.expect(READ_KW)
+            p.expect(READ_KW);
+            REPEATABLE_READ
         } else if p.eat(READ_KW) {
-            p.eat(UNCOMMITTED_KW) || p.expect(COMMITTED_KW)
+            if p.eat(UNCOMMITTED_KW) {
+                READ_UNCOMMITTED
+            } else {
+                p.expect(COMMITTED_KW);
+                READ_COMMITTED
+            }
         } else {
-            false
+            p.error("expected isolation level");
+            READ_COMMITTED
         }
     // READ WRITE | READ ONLY
     } else if p.eat(READ_KW) {
-        p.eat(WRITE_KW) || p.expect(ONLY_KW)
+        if p.eat(WRITE_KW) {
+            READ_WRITE
+        } else {
+            p.expect(ONLY_KW);
+            READ_ONLY
+        }
     // [ NOT ] DEFERRABLE
     } else {
-        p.eat(NOT_KW);
-        p.expect(DEFERRABLE_KW)
-    }
-}
-
-// [ transaction_mode [, ...] ]
-fn opt_transaction_mode_list(p: &mut Parser<'_>) {
-    while !p.at(EOF) {
-        if !opt_transaction_mode(p) {
-            break;
-        }
-        if !p.eat(COMMA) && !p.at_ts(TRANSACTION_MODE_FIRST) {
-            break;
-        }
-    }
+        let kind = if p.eat(NOT_KW) {
+            NOT_DEFERRABLE
+        } else {
+            DEFERRABLE
+        };
+        p.expect(DEFERRABLE_KW);
+        kind
+    };
+    m.complete(p, kind);
+    true
 }
 
 // BEGIN [ WORK | TRANSACTION ] [ transaction_mode [, ...] ]
@@ -5156,12 +5198,12 @@ fn begin(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(BEGIN_KW) {
         // [ WORK | TRANSACTION ]
         let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
-        opt_transaction_mode_list(p);
+        transaction_mode_list(p);
     } else {
         // START TRANSACTION [ transaction_mode [, ...] ]
         p.bump(START_KW);
         p.expect(TRANSACTION_KW);
-        opt_transaction_mode_list(p);
+        transaction_mode_list(p);
     }
     m.complete(p, BEGIN)
 }
@@ -5260,6 +5302,13 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
 
 struct StmtRestrictions {
     begin_end_allowed: bool,
+}
+impl Default for StmtRestrictions {
+    fn default() -> Self {
+        Self {
+            begin_end_allowed: false,
+        }
+    }
 }
 
 fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
@@ -8601,12 +8650,7 @@ fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
     opt_tablespace(p);
     p.expect(AS_KW);
     // A SELECT, TABLE, or VALUES command.
-    let statement = stmt(
-        p,
-        &StmtRestrictions {
-            begin_end_allowed: false,
-        },
-    );
+    let statement = stmt(p, &StmtRestrictions::default());
     match statement.map(|x| x.kind()) {
         Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES) => (),
         Some(kind) => {
@@ -8922,12 +8966,7 @@ fn create_role(p: &mut Parser<'_>) -> CompletedMarker {
 fn select_insert_delete_update_or_notify(p: &mut Parser<'_>) {
     // statement
     // Any SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement.
-    let statement = stmt(
-        p,
-        &StmtRestrictions {
-            begin_end_allowed: false,
-        },
-    );
+    let statement = stmt(p, &StmtRestrictions::default());
     if let Some(statement) = statement {
         match statement.kind() {
             SELECT | VALUES | INSERT | UPDATE | DELETE | NOTIFY => (),
@@ -9907,12 +9946,7 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(R_PAREN);
     }
     // statement is SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
-    let statement = stmt(
-        p,
-        &StmtRestrictions {
-            begin_end_allowed: false,
-        },
-    );
+    let statement = stmt(p, &StmtRestrictions::default());
     if let Some(statement) = statement {
         match statement.kind() {
             SELECT
@@ -10954,12 +10988,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     // TODO: this can be more specific
     opt_with_params(p);
     p.expect(AS_KW);
-    match stmt(
-        p,
-        &StmtRestrictions {
-            begin_end_allowed: false,
-        },
-    ) {
+    match stmt(p, &StmtRestrictions::default()) {
         Some(statement) => match statement.kind() {
             SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | TABLE => (),
             kind => p.error(format!("expected SELECT, got {:?}", kind)),
@@ -11156,12 +11185,7 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
     }
     p.expect(FOR_KW);
     // select stmt
-    let statement = stmt(
-        p,
-        &StmtRestrictions {
-            begin_end_allowed: false,
-        },
-    );
+    let statement = stmt(p, &StmtRestrictions::default());
     match statement.map(|x| x.kind()) {
         Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES) => (),
         Some(kind) => {
@@ -11588,12 +11612,7 @@ fn copy(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn preparable_stmt(p: &mut Parser<'_>) {
-    let statement = stmt(
-        p,
-        &StmtRestrictions {
-            begin_end_allowed: false,
-        },
-    );
+    let statement = stmt(p, &StmtRestrictions::default());
     match statement.map(|x| x.kind()) {
         // select | insert | update | delete | merge
         Some(
@@ -12624,12 +12643,7 @@ fn opt_function_option(p: &mut Parser<'_>) -> bool {
                         p.error("expected expr")
                     }
                 } else {
-                    stmt(
-                        p,
-                        &StmtRestrictions {
-                            begin_end_allowed: false,
-                        },
-                    );
+                    stmt(p, &StmtRestrictions::default());
                 }
                 if p.at(END_KW) {
                     p.expect(SEMICOLON);

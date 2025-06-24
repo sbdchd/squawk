@@ -32,7 +32,9 @@ pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
         ast::Type::BitType(_) => false,
         ast::Type::DoubleType(_) => false,
         ast::Type::TimeType(time_type) => {
-            if time_type.timestamp_token().is_some() && time_type.with_timezone().is_none() {
+            if time_type.timestamp_token().is_some()
+                && !matches!(time_type.timezone(), Some(ast::Timezone::WithTimezone(_)))
+            {
                 return true;
             }
             false

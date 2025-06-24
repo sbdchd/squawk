@@ -243,10 +243,14 @@ BitType =
 DoubleType =
   'double' 'precision'
 
+Timezone =
+  WithTimezone 
+| WithoutTimezone
+
 TimeType =
   ('time' | 'timestamp')
   ('(' Literal ')')?
-  (WithTimezone | WithoutTimezone)?
+  Timezone?
 
 IntervalType =
   'interval'
@@ -515,8 +519,11 @@ GroupingExpr =
 HavingClause =
   'having'
 
+WindowDef =
+  Name 'as' '(' WindowSpec ')'
+
 WindowClause =
-  'window' '#ident'
+  'window' (WindowDef (',' WindowDef)*)
 
 LimitClause =
   'limit'
@@ -632,19 +639,17 @@ Select =
  FilterClause?
 
 Serializable =
-  'serializable'
+  'isolation' 'level' 'serializable'
 
 RepeatableRead =
-  'repeatable' 'read'
+  'isolation' 'level' 'repeatable' 'read'
 
 ReadCommitted =
-  'read' 'committed'
+  'isolation' 'level' 'read' 'committed'
 
 ReadUncommitted =
-  'read' 'uncommitted'
+  'isolation' 'level' 'read' 'uncommitted'
 
-TransactionModeIsolationLevel =
-  'isolation' 'level' ( Serializable | RepeatableRead | ReadCommitted | ReadUncommitted )
 
 ReadWrite =
   'read' 'write'
@@ -659,7 +664,10 @@ NotDeferrable =
   'not' 'deferrable'
 
 TransactionMode =
-  TransactionModeIsolationLevel
+  Serializable 
+| RepeatableRead 
+| ReadCommitted 
+| ReadUncommitted
 | ReadWrite
 | ReadOnly
 | Deferrable
@@ -979,8 +987,14 @@ OverClause =
 WithinClause =
   'within' 'group' '(' OrderByClause ')'
 
+Materialized =
+  'materialized'
+
+NotMaterialized =
+  'not' 'materialized'
+
 WithTable =
-  'with'
+  'with' (Materialized | NotMaterialized)?
 
 WithClause =
   'with' 'recursive'? (WithTable (',' WithTable)*)
@@ -1071,8 +1085,11 @@ ConstraintWhereClause =
 ExcludeConstraint =
   'exclude' ConstraintIndexMethod? ConstraintExclusions
 
-WindowDef =
-  '#ident'? ('partition' 'by' Expr)?
+FrameClause =
+  ('range' | 'rows' | 'groups')
+
+WindowSpec =
+  '#ident'? ('partition' 'by' (Expr (',' Expr)*))? OrderByClause? FrameClause?
 
 AlterStatistics =
   'alter' 'statistics' NameRef
@@ -1630,8 +1647,26 @@ DropColumn =
 AddColumn =
   'add' 'column'? IfNotExists? NameRef Type Collate? (Constraint (',' Constraint)*)?
 
+PartitionForValuesWith =
+  'for' 'values' 'with' '(' '#ident' Literal ',' '#ident' Literal ')'
+
+PartitionForValuesIn =
+  'for' 'values' 'in' '(' (Expr (',' Expr)*) ')'
+
+PartitionForValuesFrom =
+  'for' 'values' 'from' '(' (Expr (',' Expr)*) ')' 'to' '(' (Expr (',' Expr)*) ')'
+
+PartitionDefault =
+  'default'
+
+PartitionType =
+  PartitionForValuesWith
+| PartitionForValuesIn
+| PartitionForValuesFrom
+| PartitionDefault
+
 AttachPartition =
-  'attach' 'partition'
+  'attach' 'partition' Path PartitionType
 
 SetTablespace =
   'set' 'tablespace' NameRef

@@ -3583,7 +3583,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "f"
       WHITESPACE " "
-      DEFAULT_KW "default"
+      PARTITION_DEFAULT
+        DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- partition spec"
@@ -3609,20 +3610,21 @@ SOURCE_FILE
           NAME_REF
             IDENT "f"
       WHITESPACE " "
-      FOR_KW "for"
-      WHITESPACE " "
-      VALUES_KW "values"
-      WHITESPACE " "
-      IN_KW "in"
-      WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        STRING "'bar'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        STRING "'buzz'"
-      R_PAREN ")"
+      PARTITION_FOR_VALUES_IN
+        FOR_KW "for"
+        WHITESPACE " "
+        VALUES_KW "values"
+        WHITESPACE " "
+        IN_KW "in"
+        WHITESPACE " "
+        L_PAREN "("
+        LITERAL
+          STRING "'bar'"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'buzz'"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple_actions"

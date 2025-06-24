@@ -1273,7 +1273,8 @@ SOURCE_FILE
           NAME_REF
             IDENT "time_taptest_table"
     WHITESPACE " "
-    DEFAULT_KW "DEFAULT"
+    PARTITION_DEFAULT
+      DEFAULT_KW "DEFAULT"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -1383,23 +1384,24 @@ SOURCE_FILE
           NAME_REF
             IDENT "time_taptest_table"
     WHITESPACE " "
-    FOR_KW "FOR"
-    WHITESPACE " "
-    VALUES_KW "VALUES"
-    WHITESPACE " "
-    FROM_KW "FROM"
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      STRING "'2024-12-25'"
-    R_PAREN ")"
-    WHITESPACE " "
-    TO_KW "TO"
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      STRING "'2024-12-26'"
-    R_PAREN ")"
+    PARTITION_FOR_VALUES_FROM
+      FOR_KW "FOR"
+      WHITESPACE " "
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      FROM_KW "FROM"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'2024-12-25'"
+      R_PAREN ")"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'2024-12-26'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   BEGIN
@@ -1555,23 +1557,24 @@ SOURCE_FILE
           NAME_REF
             IDENT "time_taptest_table"
     WHITESPACE " "
-    FOR_KW "FOR"
-    WHITESPACE " "
-    VALUES_KW "VALUES"
-    WHITESPACE " "
-    FROM_KW "FROM"
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      STRING "'2024-12-25'"
-    R_PAREN ")"
-    WHITESPACE " "
-    TO_KW "TO"
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      STRING "'2024-12-26'"
-    R_PAREN ")"
+    PARTITION_FOR_VALUES_FROM
+      FOR_KW "FOR"
+      WHITESPACE " "
+      VALUES_KW "VALUES"
+      WHITESPACE " "
+      FROM_KW "FROM"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'2024-12-25'"
+      R_PAREN ")"
+      WHITESPACE " "
+      TO_KW "TO"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'2024-12-26'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -4674,7 +4677,7 @@ SOURCE_FILE
               WHITESPACE " "
               L_PAREN "("
               WHITESPACE "\n    "
-              WINDOW_DEF
+              WINDOW_SPEC
                 ORDER_BY_CLAUSE
                   ORDER_KW "ORDER"
                   WHITESPACE " "
@@ -4684,20 +4687,21 @@ SOURCE_FILE
                     NAME_REF
                       MONTH_KW "month"
                 WHITESPACE " \n    "
-                ROWS_KW "ROWS"
-                WHITESPACE " "
-                BETWEEN_KW "BETWEEN"
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
-                WHITESPACE " "
-                PRECEDING_KW "PRECEDING"
-                WHITESPACE " "
-                AND_KW "AND"
-                WHITESPACE " "
-                CURRENT_KW "CURRENT"
-                WHITESPACE " "
-                ROW_KW "ROW"
+                FRAME_CLAUSE
+                  ROWS_KW "ROWS"
+                  WHITESPACE " "
+                  BETWEEN_KW "BETWEEN"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "2"
+                  WHITESPACE " "
+                  PRECEDING_KW "PRECEDING"
+                  WHITESPACE " "
+                  AND_KW "AND"
+                  WHITESPACE " "
+                  CURRENT_KW "CURRENT"
+                  WHITESPACE " "
+                  ROW_KW "ROW"
               WHITESPACE "\n  "
               R_PAREN ")"
           WHITESPACE " "
@@ -4781,7 +4785,7 @@ SOURCE_FILE
               WHITESPACE " "
               L_PAREN "("
               WHITESPACE "\n    "
-              WINDOW_DEF
+              WINDOW_SPEC
                 PARTITION_KW "PARTITION"
                 WHITESPACE " "
                 BY_KW "BY"
