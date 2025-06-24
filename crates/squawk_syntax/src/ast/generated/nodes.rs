@@ -1222,6 +1222,14 @@ pub struct AttachPartition {
 }
 impl AttachPartition {
     #[inline]
+    pub fn partition_type(&self) -> Option<PartitionType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn attach_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ATTACH_KW)
     }
@@ -4720,6 +4728,25 @@ impl ForeignKeyConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FrameClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FrameClause {
+    #[inline]
+    pub fn groups_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GROUPS_KW)
+    }
+    #[inline]
+    pub fn range_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RANGE_KW)
+    }
+    #[inline]
+    pub fn rows_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROWS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FromClause {
     pub(crate) syntax: SyntaxNode,
 }
@@ -6123,6 +6150,17 @@ impl MatchSimple {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Materialized {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Materialized {
+    #[inline]
+    pub fn materialized_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATERIALIZED_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Merge {
     pub(crate) syntax: SyntaxNode,
 }
@@ -6355,6 +6393,21 @@ impl NotLike {
     #[inline]
     pub fn like_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LIKE_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NotMaterialized {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NotMaterialized {
+    #[inline]
+    pub fn materialized_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATERIALIZED_KW)
     }
     #[inline]
     pub fn not_token(&self) -> Option<SyntaxToken> {
@@ -7109,6 +7162,122 @@ impl PartitionBy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PartitionDefault {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PartitionDefault {
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PartitionForValuesFrom {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PartitionForValuesFrom {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn values_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PartitionForValuesIn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PartitionForValuesIn {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn in_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IN_KW)
+    }
+    #[inline]
+    pub fn values_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PartitionForValuesWith {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PartitionForValuesWith {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+    #[inline]
+    pub fn values_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUES_KW)
+    }
+    #[inline]
+    pub fn with_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WITH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PartitionItem {
     pub(crate) syntax: SyntaxNode,
 }
@@ -7337,6 +7506,14 @@ impl ReadCommitted {
         support::token(&self.syntax, SyntaxKind::COMMITTED_KW)
     }
     #[inline]
+    pub fn isolation_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ISOLATION_KW)
+    }
+    #[inline]
+    pub fn level_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LEVEL_KW)
+    }
+    #[inline]
     pub fn read_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::READ_KW)
     }
@@ -7362,6 +7539,14 @@ pub struct ReadUncommitted {
     pub(crate) syntax: SyntaxNode,
 }
 impl ReadUncommitted {
+    #[inline]
+    pub fn isolation_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ISOLATION_KW)
+    }
+    #[inline]
+    pub fn level_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LEVEL_KW)
+    }
     #[inline]
     pub fn read_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::READ_KW)
@@ -7618,6 +7803,14 @@ pub struct RepeatableRead {
     pub(crate) syntax: SyntaxNode,
 }
 impl RepeatableRead {
+    #[inline]
+    pub fn isolation_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ISOLATION_KW)
+    }
+    #[inline]
+    pub fn level_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LEVEL_KW)
+    }
     #[inline]
     pub fn read_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::READ_KW)
@@ -8048,6 +8241,14 @@ pub struct Serializable {
     pub(crate) syntax: SyntaxNode,
 }
 impl Serializable {
+    #[inline]
+    pub fn isolation_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ISOLATION_KW)
+    }
+    #[inline]
+    pub fn level_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LEVEL_KW)
+    }
     #[inline]
     pub fn serializable_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SERIALIZABLE_KW)
@@ -8788,11 +8989,7 @@ impl TimeType {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn with_timezone(&self) -> Option<WithTimezone> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn without_timezone(&self) -> Option<WithoutTimezone> {
+    pub fn timezone(&self) -> Option<Timezone> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -8810,37 +9007,6 @@ impl TimeType {
     #[inline]
     pub fn timestamp_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TIMESTAMP_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TransactionModeIsolationLevel {
-    pub(crate) syntax: SyntaxNode,
-}
-impl TransactionModeIsolationLevel {
-    #[inline]
-    pub fn read_committed(&self) -> Option<ReadCommitted> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn read_uncommitted(&self) -> Option<ReadUncommitted> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn repeatable_read(&self) -> Option<RepeatableRead> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn serializable(&self) -> Option<Serializable> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn isolation_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ISOLATION_KW)
-    }
-    #[inline]
-    pub fn level_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::LEVEL_KW)
     }
 }
 
@@ -9145,8 +9311,8 @@ pub struct WindowClause {
 }
 impl WindowClause {
     #[inline]
-    pub fn ident_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::IDENT)
+    pub fn window_defs(&self) -> AstChildren<WindowDef> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn window_token(&self) -> Option<SyntaxToken> {
@@ -9160,7 +9326,53 @@ pub struct WindowDef {
 }
 impl WindowDef {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn window_spec(&self) -> Option<WindowSpec> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct WindowFuncOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl WindowFuncOption {
+    #[inline]
+    pub fn window_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WINDOW_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct WindowSpec {
+    pub(crate) syntax: SyntaxNode,
+}
+impl WindowSpec {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn frame_clause(&self) -> Option<FrameClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn order_by_clause(&self) -> Option<OrderByClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9174,17 +9386,6 @@ impl WindowDef {
     #[inline]
     pub fn partition_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PARTITION_KW)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct WindowFuncOption {
-    pub(crate) syntax: SyntaxNode,
-}
-impl WindowFuncOption {
-    #[inline]
-    pub fn window_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::WINDOW_KW)
     }
 }
 
@@ -9280,6 +9481,14 @@ pub struct WithTable {
     pub(crate) syntax: SyntaxNode,
 }
 impl WithTable {
+    #[inline]
+    pub fn materialized(&self) -> Option<Materialized> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn not_materialized(&self) -> Option<NotMaterialized> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn with_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WITH_KW)
@@ -9611,6 +9820,14 @@ pub enum ParamMode {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum PartitionType {
+    PartitionDefault(PartitionDefault),
+    PartitionForValuesFrom(PartitionForValuesFrom),
+    PartitionForValuesIn(PartitionForValuesIn),
+    PartitionForValuesWith(PartitionForValuesWith),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RefAction {
     Cascade(Cascade),
     NoAction(NoAction),
@@ -9818,12 +10035,21 @@ pub enum TableConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Timezone {
+    WithTimezone(WithTimezone),
+    WithoutTimezone(WithoutTimezone),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum TransactionMode {
     Deferrable(Deferrable),
     NotDeferrable(NotDeferrable),
+    ReadCommitted(ReadCommitted),
     ReadOnly(ReadOnly),
+    ReadUncommitted(ReadUncommitted),
     ReadWrite(ReadWrite),
-    TransactionModeIsolationLevel(TransactionModeIsolationLevel),
+    RepeatableRead(RepeatableRead),
+    Serializable(Serializable),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -13743,6 +13969,24 @@ impl AstNode for ForeignKeyConstraint {
         &self.syntax
     }
 }
+impl AstNode for FrameClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FRAME_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for FromClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -15039,6 +15283,24 @@ impl AstNode for MatchSimple {
         &self.syntax
     }
 }
+impl AstNode for Materialized {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MATERIALIZED
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Merge {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -15313,6 +15575,24 @@ impl AstNode for NotLike {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NOT_LIKE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NotMaterialized {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NOT_MATERIALIZED
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -15925,6 +16205,78 @@ impl AstNode for PartitionBy {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::PARTITION_BY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PartitionDefault {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION_DEFAULT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PartitionForValuesFrom {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION_FOR_VALUES_FROM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PartitionForValuesIn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION_FOR_VALUES_IN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for PartitionForValuesWith {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION_FOR_VALUES_WITH
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -17649,24 +18001,6 @@ impl AstNode for TimeType {
         &self.syntax
     }
 }
-impl AstNode for TransactionModeIsolationLevel {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::TRANSACTION_MODE_ISOLATION_LEVEL
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
 impl AstNode for TransactionModeList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -18013,6 +18347,24 @@ impl AstNode for WindowFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::WINDOW_FUNC_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for WindowSpec {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WINDOW_SPEC
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -19665,6 +20017,72 @@ impl From<ParamVariadic> for ParamMode {
     #[inline]
     fn from(node: ParamVariadic) -> ParamMode {
         ParamMode::ParamVariadic(node)
+    }
+}
+impl AstNode for PartitionType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::PARTITION_DEFAULT
+                | SyntaxKind::PARTITION_FOR_VALUES_FROM
+                | SyntaxKind::PARTITION_FOR_VALUES_IN
+                | SyntaxKind::PARTITION_FOR_VALUES_WITH
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::PARTITION_DEFAULT => {
+                PartitionType::PartitionDefault(PartitionDefault { syntax })
+            }
+            SyntaxKind::PARTITION_FOR_VALUES_FROM => {
+                PartitionType::PartitionForValuesFrom(PartitionForValuesFrom { syntax })
+            }
+            SyntaxKind::PARTITION_FOR_VALUES_IN => {
+                PartitionType::PartitionForValuesIn(PartitionForValuesIn { syntax })
+            }
+            SyntaxKind::PARTITION_FOR_VALUES_WITH => {
+                PartitionType::PartitionForValuesWith(PartitionForValuesWith { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            PartitionType::PartitionDefault(it) => &it.syntax,
+            PartitionType::PartitionForValuesFrom(it) => &it.syntax,
+            PartitionType::PartitionForValuesIn(it) => &it.syntax,
+            PartitionType::PartitionForValuesWith(it) => &it.syntax,
+        }
+    }
+}
+impl From<PartitionDefault> for PartitionType {
+    #[inline]
+    fn from(node: PartitionDefault) -> PartitionType {
+        PartitionType::PartitionDefault(node)
+    }
+}
+impl From<PartitionForValuesFrom> for PartitionType {
+    #[inline]
+    fn from(node: PartitionForValuesFrom) -> PartitionType {
+        PartitionType::PartitionForValuesFrom(node)
+    }
+}
+impl From<PartitionForValuesIn> for PartitionType {
+    #[inline]
+    fn from(node: PartitionForValuesIn) -> PartitionType {
+        PartitionType::PartitionForValuesIn(node)
+    }
+}
+impl From<PartitionForValuesWith> for PartitionType {
+    #[inline]
+    fn from(node: PartitionForValuesWith) -> PartitionType {
+        PartitionType::PartitionForValuesWith(node)
     }
 }
 impl AstNode for RefAction {
@@ -21545,6 +21963,45 @@ impl From<UniqueConstraint> for TableConstraint {
         TableConstraint::UniqueConstraint(node)
     }
 }
+impl AstNode for Timezone {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::WITH_TIMEZONE | SyntaxKind::WITHOUT_TIMEZONE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::WITH_TIMEZONE => Timezone::WithTimezone(WithTimezone { syntax }),
+            SyntaxKind::WITHOUT_TIMEZONE => Timezone::WithoutTimezone(WithoutTimezone { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            Timezone::WithTimezone(it) => &it.syntax,
+            Timezone::WithoutTimezone(it) => &it.syntax,
+        }
+    }
+}
+impl From<WithTimezone> for Timezone {
+    #[inline]
+    fn from(node: WithTimezone) -> Timezone {
+        Timezone::WithTimezone(node)
+    }
+}
+impl From<WithoutTimezone> for Timezone {
+    #[inline]
+    fn from(node: WithoutTimezone) -> Timezone {
+        Timezone::WithoutTimezone(node)
+    }
+}
 impl AstNode for TransactionMode {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -21552,9 +22009,12 @@ impl AstNode for TransactionMode {
             kind,
             SyntaxKind::DEFERRABLE
                 | SyntaxKind::NOT_DEFERRABLE
+                | SyntaxKind::READ_COMMITTED
                 | SyntaxKind::READ_ONLY
+                | SyntaxKind::READ_UNCOMMITTED
                 | SyntaxKind::READ_WRITE
-                | SyntaxKind::TRANSACTION_MODE_ISOLATION_LEVEL
+                | SyntaxKind::REPEATABLE_READ
+                | SyntaxKind::SERIALIZABLE
         )
     }
     #[inline]
@@ -21562,13 +22022,16 @@ impl AstNode for TransactionMode {
         let res = match syntax.kind() {
             SyntaxKind::DEFERRABLE => TransactionMode::Deferrable(Deferrable { syntax }),
             SyntaxKind::NOT_DEFERRABLE => TransactionMode::NotDeferrable(NotDeferrable { syntax }),
+            SyntaxKind::READ_COMMITTED => TransactionMode::ReadCommitted(ReadCommitted { syntax }),
             SyntaxKind::READ_ONLY => TransactionMode::ReadOnly(ReadOnly { syntax }),
-            SyntaxKind::READ_WRITE => TransactionMode::ReadWrite(ReadWrite { syntax }),
-            SyntaxKind::TRANSACTION_MODE_ISOLATION_LEVEL => {
-                TransactionMode::TransactionModeIsolationLevel(TransactionModeIsolationLevel {
-                    syntax,
-                })
+            SyntaxKind::READ_UNCOMMITTED => {
+                TransactionMode::ReadUncommitted(ReadUncommitted { syntax })
             }
+            SyntaxKind::READ_WRITE => TransactionMode::ReadWrite(ReadWrite { syntax }),
+            SyntaxKind::REPEATABLE_READ => {
+                TransactionMode::RepeatableRead(RepeatableRead { syntax })
+            }
+            SyntaxKind::SERIALIZABLE => TransactionMode::Serializable(Serializable { syntax }),
             _ => {
                 return None;
             }
@@ -21580,9 +22043,12 @@ impl AstNode for TransactionMode {
         match self {
             TransactionMode::Deferrable(it) => &it.syntax,
             TransactionMode::NotDeferrable(it) => &it.syntax,
+            TransactionMode::ReadCommitted(it) => &it.syntax,
             TransactionMode::ReadOnly(it) => &it.syntax,
+            TransactionMode::ReadUncommitted(it) => &it.syntax,
             TransactionMode::ReadWrite(it) => &it.syntax,
-            TransactionMode::TransactionModeIsolationLevel(it) => &it.syntax,
+            TransactionMode::RepeatableRead(it) => &it.syntax,
+            TransactionMode::Serializable(it) => &it.syntax,
         }
     }
 }
@@ -21598,10 +22064,22 @@ impl From<NotDeferrable> for TransactionMode {
         TransactionMode::NotDeferrable(node)
     }
 }
+impl From<ReadCommitted> for TransactionMode {
+    #[inline]
+    fn from(node: ReadCommitted) -> TransactionMode {
+        TransactionMode::ReadCommitted(node)
+    }
+}
 impl From<ReadOnly> for TransactionMode {
     #[inline]
     fn from(node: ReadOnly) -> TransactionMode {
         TransactionMode::ReadOnly(node)
+    }
+}
+impl From<ReadUncommitted> for TransactionMode {
+    #[inline]
+    fn from(node: ReadUncommitted) -> TransactionMode {
+        TransactionMode::ReadUncommitted(node)
     }
 }
 impl From<ReadWrite> for TransactionMode {
@@ -21610,10 +22088,16 @@ impl From<ReadWrite> for TransactionMode {
         TransactionMode::ReadWrite(node)
     }
 }
-impl From<TransactionModeIsolationLevel> for TransactionMode {
+impl From<RepeatableRead> for TransactionMode {
     #[inline]
-    fn from(node: TransactionModeIsolationLevel) -> TransactionMode {
-        TransactionMode::TransactionModeIsolationLevel(node)
+    fn from(node: RepeatableRead) -> TransactionMode {
+        TransactionMode::RepeatableRead(node)
+    }
+}
+impl From<Serializable> for TransactionMode {
+    #[inline]
+    fn from(node: Serializable) -> TransactionMode {
+        TransactionMode::Serializable(node)
     }
 }
 impl AstNode for Type {

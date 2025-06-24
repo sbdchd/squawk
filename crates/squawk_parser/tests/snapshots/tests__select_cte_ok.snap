@@ -216,7 +216,8 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
-        MATERIALIZED_KW "materialized"
+        MATERIALIZED
+          MATERIALIZED_KW "materialized"
         WHITESPACE " "
         L_PAREN "("
         WHITESPACE "\n  "
@@ -258,9 +259,10 @@ SOURCE_FILE
         WHITESPACE " "
         AS_KW "as"
         WHITESPACE " "
-        NOT_KW "not"
-        WHITESPACE " "
-        MATERIALIZED_KW "materialized"
+        NOT_MATERIALIZED
+          NOT_KW "not"
+          WHITESPACE " "
+          MATERIALIZED_KW "materialized"
         WHITESPACE " "
         L_PAREN "("
         WHITESPACE "\n  "
@@ -1344,7 +1346,7 @@ SOURCE_FILE
                     WHITESPACE " "
                     L_PAREN "("
                     WHITESPACE "\n      "
-                    WINDOW_DEF
+                    WINDOW_SPEC
                       PARTITION_KW "PARTITION"
                       WHITESPACE " "
                       BY_KW "BY"

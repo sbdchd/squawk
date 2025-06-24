@@ -3765,7 +3765,7 @@ SOURCE_FILE
               OVER_KW "over"
               WHITESPACE " "
               L_PAREN "("
-              WINDOW_DEF
+              WINDOW_SPEC
                 PARTITION_KW "partition"
                 WHITESPACE " "
                 BY_KW "by"
@@ -3838,40 +3838,42 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        OWNER_KW "owner"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        ORDER_BY_CLAUSE
-          ORDER_KW "order"
-          WHITESPACE " "
-          BY_KW "by"
-          WHITESPACE " "
-          SORT_BY
-            NAME_REF
-              IDENT "a"
-      R_PAREN ")"
+        NAME
+          OWNER_KW "owner"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WINDOW_SPEC
+          ORDER_BY_CLAUSE
+            ORDER_KW "order"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            SORT_BY
+              NAME_REF
+                IDENT "a"
+        R_PAREN ")"
       COMMA ","
       WHITESPACE " "
-      NAME
-        IDENT "w2"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        ORDER_BY_CLAUSE
-          ORDER_KW "order"
-          WHITESPACE " "
-          BY_KW "by"
-          WHITESPACE " "
-          SORT_BY
-            NAME_REF
-              IDENT "b"
-      R_PAREN ")"
+        NAME
+          IDENT "w2"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WINDOW_SPEC
+          ORDER_BY_CLAUSE
+            ORDER_KW "order"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            SORT_BY
+              NAME_REF
+                IDENT "b"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "--                     ^^^^^ make sure we allow using keywords"

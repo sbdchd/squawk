@@ -3494,13 +3494,14 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
-      R_PAREN ")"
+      WINDOW_DEF
+        NAME
+          IDENT "w"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with window def order by"
@@ -3517,22 +3518,23 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        ORDER_BY_CLAUSE
-          ORDER_KW "order"
-          WHITESPACE " "
-          BY_KW "by"
-          WHITESPACE " "
-          SORT_BY
-            LITERAL
-              INT_NUMBER "1"
-      R_PAREN ")"
+        NAME
+          IDENT "w"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WINDOW_SPEC
+          ORDER_BY_CLAUSE
+            ORDER_KW "order"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            SORT_BY
+              LITERAL
+                INT_NUMBER "1"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with window def frame_start, frame_end"
@@ -3549,20 +3551,22 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        RANGE_KW "range"
+        NAME
+          IDENT "w"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        AS_KW "as"
         WHITESPACE " "
-        PRECEDING_KW "preceding"
-      R_PAREN ")"
+        L_PAREN "("
+        WINDOW_SPEC
+          FRAME_CLAUSE
+            RANGE_KW "range"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            PRECEDING_KW "preceding"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3577,20 +3581,22 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        ROWS_KW "rows"
+        NAME
+          IDENT "w"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        AS_KW "as"
         WHITESPACE " "
-        PRECEDING_KW "preceding"
-      R_PAREN ")"
+        L_PAREN "("
+        WINDOW_SPEC
+          FRAME_CLAUSE
+            ROWS_KW "rows"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            PRECEDING_KW "preceding"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3605,20 +3611,22 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        GROUPS_KW "groups"
+        NAME
+          IDENT "w"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        AS_KW "as"
         WHITESPACE " "
-        PRECEDING_KW "preceding"
-      R_PAREN ")"
+        L_PAREN "("
+        WINDOW_SPEC
+          FRAME_CLAUSE
+            GROUPS_KW "groups"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            PRECEDING_KW "preceding"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with window def frame_exclusion"
@@ -3635,26 +3643,28 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        ROWS_KW "rows"
+        NAME
+          IDENT "w"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        AS_KW "as"
         WHITESPACE " "
-        PRECEDING_KW "preceding"
-        WHITESPACE " "
-        EXCLUDE_KW "exclude"
-        WHITESPACE " "
-        CURRENT_KW "current"
-        WHITESPACE " "
-        ROW_KW "row"
-      R_PAREN ")"
+        L_PAREN "("
+        WINDOW_SPEC
+          FRAME_CLAUSE
+            ROWS_KW "rows"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            PRECEDING_KW "preceding"
+            WHITESPACE " "
+            EXCLUDE_KW "exclude"
+            WHITESPACE " "
+            CURRENT_KW "current"
+            WHITESPACE " "
+            ROW_KW "row"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3669,24 +3679,26 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        ROWS_KW "rows"
+        NAME
+          IDENT "w"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        AS_KW "as"
         WHITESPACE " "
-        PRECEDING_KW "preceding"
-        WHITESPACE " "
-        EXCLUDE_KW "exclude"
-        WHITESPACE " "
-        GROUP_KW "group"
-      R_PAREN ")"
+        L_PAREN "("
+        WINDOW_SPEC
+          FRAME_CLAUSE
+            ROWS_KW "rows"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            PRECEDING_KW "preceding"
+            WHITESPACE " "
+            EXCLUDE_KW "exclude"
+            WHITESPACE " "
+            GROUP_KW "group"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3701,24 +3713,26 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        ROWS_KW "rows"
+        NAME
+          IDENT "w"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        AS_KW "as"
         WHITESPACE " "
-        PRECEDING_KW "preceding"
-        WHITESPACE " "
-        EXCLUDE_KW "exclude"
-        WHITESPACE " "
-        TIES_KW "ties"
-      R_PAREN ")"
+        L_PAREN "("
+        WINDOW_SPEC
+          FRAME_CLAUSE
+            ROWS_KW "rows"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            PRECEDING_KW "preceding"
+            WHITESPACE " "
+            EXCLUDE_KW "exclude"
+            WHITESPACE " "
+            TIES_KW "ties"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3733,26 +3747,28 @@ SOURCE_FILE
     WINDOW_CLAUSE
       WINDOW_KW "window"
       WHITESPACE " "
-      NAME
-        IDENT "w"
-      WHITESPACE " "
-      AS_KW "as"
-      WHITESPACE " "
-      L_PAREN "("
       WINDOW_DEF
-        ROWS_KW "rows"
+        NAME
+          IDENT "w"
         WHITESPACE " "
-        LITERAL
-          INT_NUMBER "1"
+        AS_KW "as"
         WHITESPACE " "
-        PRECEDING_KW "preceding"
-        WHITESPACE " "
-        EXCLUDE_KW "exclude"
-        WHITESPACE " "
-        NO_KW "no"
-        WHITESPACE " "
-        OTHERS_KW "others"
-      R_PAREN ")"
+        L_PAREN "("
+        WINDOW_SPEC
+          FRAME_CLAUSE
+            ROWS_KW "rows"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            PRECEDING_KW "preceding"
+            WHITESPACE " "
+            EXCLUDE_KW "exclude"
+            WHITESPACE " "
+            NO_KW "no"
+            WHITESPACE " "
+            OTHERS_KW "others"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- select_having_clause"
