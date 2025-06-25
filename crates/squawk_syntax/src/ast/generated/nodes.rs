@@ -6311,6 +6311,21 @@ impl NoInherit {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NonStandardParam {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NonStandardParam {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NotDeferrable {
     pub(crate) syntax: SyntaxNode,
 }
@@ -15467,6 +15482,24 @@ impl AstNode for NoInherit {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NO_INHERIT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NonStandardParam {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NON_STANDARD_PARAM
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

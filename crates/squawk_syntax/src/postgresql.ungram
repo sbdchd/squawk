@@ -928,6 +928,9 @@ PrefixExpr =
 PostfixExpr =
   Expr
 
+NonStandardParam =
+  ':' NameRef
+
 IndexExpr =
   base:Expr '[' index:Expr ']'
 

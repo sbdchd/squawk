@@ -847,6 +847,7 @@ pub enum SyntaxKind {
     NAME_REF,
     NEQ,
     NEQB,
+    NON_STANDARD_PARAM,
     NOTIFY,
     NOT_DEFERRABLE,
     NOT_DEFERRABLE_CONSTRAINT_OPTION,
