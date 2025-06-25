@@ -113,8 +113,8 @@ SOURCE_FILE
             WHITESPACE " "
             BIT_TYPE
               BIT_KW "bit"
-              L_PAREN "("
               ARG_LIST
+                L_PAREN "("
                 ARG
                   LITERAL
                     INT_NUMBER "12"
@@ -2690,8 +2690,8 @@ SOURCE_FILE
             WHITESPACE " "
             BIT_TYPE
               BIT_KW "bit"
-              L_PAREN "("
               ARG_LIST
+                L_PAREN "("
                 ARG
                   LITERAL
                     INT_NUMBER "12"
