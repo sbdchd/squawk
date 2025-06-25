@@ -88,10 +88,14 @@ SOURCE_FILE
     WHITESPACE " "
     TABLE_ARG_LIST
       L_PAREN "("
-      COMMA ","
-      COMMA ","
-      COMMA ","
-      COMMA ","
+      ERROR
+        COMMA ","
+      ERROR
+        COMMA ","
+      ERROR
+        COMMA ","
+      ERROR
+        COMMA ","
       ERROR
         COMMA ","
       R_PAREN ")"
@@ -486,5 +490,9 @@ SOURCE_FILE
 ---
 ERROR@39: expected path name
 ERROR@143: unexpected trailing comma
-ERROR@201: unexpected trailing comma
+ERROR@197: unexpected comma
+ERROR@198: unexpected comma
+ERROR@199: unexpected comma
+ERROR@200: unexpected comma
+ERROR@201: unexpected comma
 ERROR@947: expected SEMICOLON

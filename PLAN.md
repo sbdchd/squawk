@@ -434,6 +434,21 @@ suggest using an aggregate or grouping by
 
 Provide options to select from in quick fix
 
+```sql
+create table t (t_id int, name text, created timestampz);
+create table u (u_id int, t_id int, created timestampz);
+
+select name, created from u join t using (t_id);
+--           ^^^^^^^ error: ambiguous column name `created`, prefix with either `t` or `u`
+--                   action: Prefix with...
+--                            Prefix with `t`
+--                            Prefix with `u`
+
+-- gives
+
+select name, u.created from u join t using (t_id);
+```
+
 ### Rule: column label is the same as an existing column
 
 ```sql
@@ -792,7 +807,7 @@ becomes after filling in alias name with `b`
 select b.name, b.email from bar
 ```
 
-should prompt for table name for each entry when there is an ambigous column
+should prompt for table name for each entry when there is an ambiguous column
 
 related:
 

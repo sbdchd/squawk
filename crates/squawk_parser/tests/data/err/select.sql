@@ -32,6 +32,11 @@ select array[1, ,3];
 -- trailing comma
 select array[1,2,3,];
 
+-- cast with malformed type mod args
+select cast(x as varchar(100 200));
+select cast(x as varchar(100, , 200));
+select cast(x as t(a, b,));
+
 -- regression test: this would cause the parser to get stuck & panic, now it
 -- warns about a missing semicolon
 select select;
