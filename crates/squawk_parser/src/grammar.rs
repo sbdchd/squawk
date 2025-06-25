@@ -1254,6 +1254,11 @@ fn lhs(p: &mut Parser<'_>, r: &Restrictions) -> Option<CompletedMarker> {
             p.bump_any();
             (PREFIX_EXPR, 13)
         }
+        COLON => {
+            m = p.start();
+            p.bump(COLON);
+            (NON_STANDARD_PARAM, 7)
+        }
         _ if p.at_ts(OPERATOR_FIRST) && p.at(CUSTOM_OP) => {
             m = p.start();
             p.bump(CUSTOM_OP);
