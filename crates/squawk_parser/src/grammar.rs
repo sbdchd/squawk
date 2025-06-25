@@ -548,14 +548,15 @@ fn json_table_fn(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn custom_fn(
     p: &mut Parser<'_>,
-    kind: SyntaxKind,
+    name: SyntaxKind,
     mut body: impl FnMut(&mut Parser<'_>),
 ) -> CompletedMarker {
-    assert!(p.at(kind));
+    assert!(p.at(name));
     let m = p.start();
     let name_ref = p.start();
-    p.expect(kind);
+    p.expect(name);
     name_ref.complete(p, NAME_REF);
+
     let args = p.start();
     p.expect(L_PAREN);
     if !p.at(R_PAREN) {
@@ -563,6 +564,7 @@ fn custom_fn(
     }
     p.expect(R_PAREN);
     args.complete(p, ARG_LIST);
+
     opt_agg_clauses(p);
     m.complete(p, CALL_EXPR)
 }
@@ -1618,21 +1620,26 @@ fn type_mods(
         return Some(m.complete(p, PERCENT_TYPE));
     }
     if p.at(L_PAREN) && type_args_enabled {
-        p.bump(L_PAREN);
-        let type_args = p.start();
-        while !p.at(EOF) && !p.at(R_PAREN) {
-            let arg = p.start();
-            if expr(p).is_none() {
-                arg.abandon(p);
-                break;
-            }
-            arg.complete(p, ARG);
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
-        type_args.complete(p, ARG_LIST);
+        let m = p.start();
+        delimited(
+            p,
+            L_PAREN,
+            R_PAREN,
+            COMMA,
+            || "unexpected comma".to_string(),
+            EXPR_FIRST,
+            |p| {
+                let m = p.start();
+                if expr(p).is_some() {
+                    m.complete(p, ARG);
+                    true
+                } else {
+                    m.abandon(p);
+                    false
+                }
+            },
+        );
+        m.complete(p, ARG_LIST);
     }
     let cm = m.complete(p, kind);
     if !p.at(L_BRACK) && !p.at(ARRAY_KW) {
@@ -1719,6 +1726,13 @@ fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<Com
             p.bump(DOUBLE_KW);
             p.bump(PRECISION_KW);
             DOUBLE_TYPE
+        }
+        // Column constraint start sequence that can also overlap with a type
+        // since `generated` is a valid type name. Special case this so we can
+        // be more generous in our parsing.
+        GENERATED_KW if p.nth_at(1, ALWAYS_KW) => {
+            m.abandon(p);
+            return None;
         }
         _ if p.at_ts(TYPE_KEYWORDS) || p.at(IDENT) => {
             path_name_ref(p);
@@ -3790,12 +3804,6 @@ fn index_elem(p: &mut Parser<'_>) {
     }
 }
 
-#[derive(PartialEq, Eq, Clone, Copy)]
-enum ColDefType {
-    WithData,
-    ColumnNameOnly,
-}
-
 fn opt_operator(p: &mut Parser<'_>) -> bool {
     let (power, kind, _) = current_op(p, &Restrictions::default());
     if power == 0 {
@@ -4127,20 +4135,21 @@ const COLUMN_NAME_KEYWORDS: TokenSet = TokenSet::new(&[
     XMLTABLE_KW,
 ]);
 
+const COL_DEF_FIRST: TokenSet = TokenSet::new(&[LIKE_KW])
+    .union(TABLE_CONSTRAINT_FIRST)
+    .union(NAME_FIRST);
+
 // column_name data_type [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ] [ COMPRESSION compression_method ] [ COLLATE collation ] [ column_constraint [ ... ] ]
 //   { column_name data_type [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ] [ COMPRESSION compression_method ] [ COLLATE collation ] [ column_constraint [ ... ] ]
 //     | table_constraint
 //     | LIKE source_table [ like_option ... ] }
-fn col_def(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
-    if !(p.at(LIKE_KW)
-        || p.at_ts(TABLE_CONSTRAINT_FIRST)
-        // ColId
-        || p.at_ts(NAME_FIRST))
-    {
+fn opt_col_def(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(COL_DEF_FIRST) {
         return None;
     }
+    // TODO: add validation to check we only specify this when data types are allowed for args
     // LIKE source_table [ like_option ... ]
-    if t == ColDefType::WithData && p.at(LIKE_KW) {
+    if p.at(LIKE_KW) {
         return Some(like_clause(p));
     }
     if p.at_ts(TABLE_CONSTRAINT_FIRST) {
@@ -4148,17 +4157,11 @@ fn col_def(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
     }
     let m = p.start();
     name(p);
-    match t {
-        ColDefType::WithData => {
-            if opt_type_name(p) {
-                opt_storage(p);
-                opt_compression_method(p);
-            }
-        }
-        ColDefType::ColumnNameOnly => {
-            opt_with_options(p);
-        }
+    if opt_type_name(p) {
+        opt_storage(p);
+        opt_compression_method(p);
     }
+    opt_with_options(p);
     opt_collate(p);
     opt_column_constraint_list(p);
     Some(m.complete(p, COLUMN))
@@ -4563,6 +4566,8 @@ const LHS_FIRST: TokenSet = TokenSet::new(&[
     ARRAY_KW,
     ROW_KW,
     DEFAULT_KW,
+    // for non-standard params, like :foo
+    COLON,
 ])
 .union(OPERATOR_FIRST)
 .union(LITERAL_FIRST)
@@ -4794,31 +4799,18 @@ fn opt_nulls_order(p: &mut Parser<'_>) {
     }
 }
 
-fn table_arg_list(p: &mut Parser<'_>, t: ColDefType) -> Option<CompletedMarker> {
+fn table_arg_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     assert!(p.at(L_PAREN));
     let m = p.start();
-    match t {
-        ColDefType::WithData => {
-            p.expect(L_PAREN);
-        }
-        ColDefType::ColumnNameOnly => {
-            if !p.eat(L_PAREN) {
-                m.abandon(p);
-                return None;
-            }
-        }
-    }
-    while !p.at(EOF) && !p.at(R_PAREN) {
-        col_def(p, t);
-        if p.at(COMMA) && p.nth_at(1, R_PAREN) {
-            p.err_and_bump("unexpected trailing comma");
-            break;
-        }
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        COL_DEF_FIRST,
+        |p| opt_col_def(p).is_some(),
+    );
     Some(m.complete(p, TABLE_ARG_LIST))
 }
 
@@ -4923,28 +4915,25 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(TABLE_KW);
     opt_if_not_exists(p);
     path_name(p);
-    let mut col_def_t = ColDefType::WithData;
     let mut is_partition = false;
     // OF type_name
     if p.at(OF_KW) {
         of_type(p);
-        col_def_t = ColDefType::ColumnNameOnly;
-    // PARTITION OF parent_table
+        // TODO: add validation to check that table args don't have data types
+        // PARTITION OF parent_table
     } else if p.at(PARTITION_KW) {
         partition_of(p);
-        col_def_t = ColDefType::ColumnNameOnly;
+        // TODO: add validation to check that table args don't have data types
         is_partition = true;
     }
     if p.at(L_PAREN) {
-        table_arg_list(p, col_def_t);
+        table_arg_list(p);
     }
     if is_partition {
         partition_option(p);
     }
-    // [ INHERITS ( parent_table [, ... ] ) ]
-    if col_def_t == ColDefType::WithData {
-        opt_inherits_tables(p);
-    }
+    // TODO: add validation to check we don't specify this when data types aren't allowed
+    opt_inherits_tables(p);
     opt_partition_by(p);
     opt_using_method(p);
     if opt_with_params(p).is_none() {

@@ -59,8 +59,8 @@ SOURCE_FILE
             PATH_SEGMENT
               NAME_REF
                 NUMERIC_KW "numeric"
-          L_PAREN "("
           ARG_LIST
+            L_PAREN "("
             ARG
               LITERAL
                 INT_NUMBER "10"
@@ -3687,8 +3687,8 @@ SOURCE_FILE
       WHITESPACE " "
       CHAR_TYPE
         VARCHAR_KW "varchar"
-        L_PAREN "("
         ARG_LIST
+          L_PAREN "("
           ARG
             LITERAL
               INT_NUMBER "30"

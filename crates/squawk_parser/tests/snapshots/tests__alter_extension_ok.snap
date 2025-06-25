@@ -231,8 +231,8 @@ SOURCE_FILE
     L_PAREN "("
     CHAR_TYPE
       VARCHAR_KW "varchar"
-      L_PAREN "("
       ARG_LIST
+        L_PAREN "("
         ARG
           LITERAL
             INT_NUMBER "100"
@@ -671,8 +671,8 @@ SOURCE_FILE
         WHITESPACE " "
         CHAR_TYPE
           VARCHAR_KW "varchar"
-          L_PAREN "("
           ARG_LIST
+            L_PAREN "("
             ARG
               LITERAL
                 INT_NUMBER "100"
@@ -752,8 +752,8 @@ SOURCE_FILE
         WHITESPACE " "
         CHAR_TYPE
           VARCHAR_KW "varchar"
-          L_PAREN "("
           ARG_LIST
+            L_PAREN "("
             ARG
               LITERAL
                 INT_NUMBER "100"
@@ -881,8 +881,8 @@ SOURCE_FILE
     WHITESPACE " "
     CHAR_TYPE
       VARCHAR_KW "varchar"
-      L_PAREN "("
       ARG_LIST
+        L_PAREN "("
         ARG
           LITERAL
             INT_NUMBER "100"
@@ -916,8 +916,8 @@ SOURCE_FILE
     WHITESPACE " "
     CHAR_TYPE
       VARCHAR_KW "varchar"
-      L_PAREN "("
       ARG_LIST
+        L_PAREN "("
         ARG
           LITERAL
             INT_NUMBER "100"
@@ -1140,8 +1140,8 @@ SOURCE_FILE
         WHITESPACE " "
         CHAR_TYPE
           VARCHAR_KW "varchar"
-          L_PAREN "("
           ARG_LIST
+            L_PAREN "("
             ARG
               LITERAL
                 INT_NUMBER "100"
@@ -1221,8 +1221,8 @@ SOURCE_FILE
         WHITESPACE " "
         CHAR_TYPE
           VARCHAR_KW "varchar"
-          L_PAREN "("
           ARG_LIST
+            L_PAREN "("
             ARG
               LITERAL
                 INT_NUMBER "100"
@@ -1279,8 +1279,8 @@ SOURCE_FILE
         WHITESPACE " "
         CHAR_TYPE
           VARCHAR_KW "varchar"
-          L_PAREN "("
           ARG_LIST
+            L_PAREN "("
             ARG
               LITERAL
                 INT_NUMBER "100"
@@ -1360,8 +1360,8 @@ SOURCE_FILE
         WHITESPACE " "
         CHAR_TYPE
           VARCHAR_KW "varchar"
-          L_PAREN "("
           ARG_LIST
+            L_PAREN "("
             ARG
               LITERAL
                 INT_NUMBER "100"

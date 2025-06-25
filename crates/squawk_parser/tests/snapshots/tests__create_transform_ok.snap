@@ -79,8 +79,8 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "t"
-      L_PAREN "("
       ARG_LIST
+        L_PAREN "("
         ARG
           LITERAL
             INT_NUMBER "10231"

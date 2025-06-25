@@ -278,6 +278,105 @@ SOURCE_FILE
             R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- cast with malformed type mod args"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_KW "cast"
+            L_PAREN "("
+            NAME_REF
+              IDENT "x"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            CHAR_TYPE
+              VARCHAR_KW "varchar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "100"
+                WHITESPACE " "
+                ARG
+                  LITERAL
+                    INT_NUMBER "200"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_KW "cast"
+            L_PAREN "("
+            NAME_REF
+              IDENT "x"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            CHAR_TYPE
+              VARCHAR_KW "varchar"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  LITERAL
+                    INT_NUMBER "100"
+                COMMA ","
+                WHITESPACE " "
+                ERROR
+                  COMMA ","
+                WHITESPACE " "
+                ARG
+                  LITERAL
+                    INT_NUMBER "200"
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            CAST_KW "cast"
+            L_PAREN "("
+            NAME_REF
+              IDENT "x"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "t"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  NAME_REF
+                    IDENT "a"
+                COMMA ","
+                WHITESPACE " "
+                ARG
+                  NAME_REF
+                    IDENT "b"
+                ERROR
+                  COMMA ","
+                R_PAREN ")"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- regression test: this would cause the parser to get stuck & panic, now it"
   WHITESPACE "\n"
   COMMENT "-- warns about a missing semicolon"
@@ -339,6 +438,9 @@ ERROR@520: missing comma
 ERROR@559: expected COMMA
 ERROR@597: unexpected comma
 ERROR@638: unexpected trailing comma
-ERROR@761: expected SEMICOLON
-ERROR@794: unexpected trailing comma
-ERROR@838: unexpected trailing comma
+ERROR@708: expected COMMA
+ERROR@746: unexpected comma
+ERROR@778: unexpected trailing comma
+ERROR@902: expected SEMICOLON
+ERROR@935: unexpected trailing comma
+ERROR@979: unexpected trailing comma
