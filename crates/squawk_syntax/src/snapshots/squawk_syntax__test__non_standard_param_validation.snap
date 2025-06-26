@@ -1,0 +1,35 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/non_standard_param.sql
+---
+SOURCE_FILE@0..47
+  COMMENT@0..21 "-- invalid param type"
+  WHITESPACE@21..22 "\n"
+  SELECT@22..31
+    SELECT_CLAUSE@22..31
+      SELECT_KW@22..28 "select"
+      WHITESPACE@28..29 " "
+      TARGET_LIST@29..31
+        TARGET@29..31
+          NON_STANDARD_PARAM@29..31
+            COLON@29..30 ":"
+            NAME_REF@30..31
+              IDENT@30..31 "x"
+  SEMICOLON@31..32 ";"
+  WHITESPACE@32..33 "\n"
+  SELECT@33..45
+    SELECT_CLAUSE@33..45
+      SELECT_KW@33..39 "select"
+      WHITESPACE@39..40 " "
+      TARGET_LIST@40..45
+        TARGET@40..45
+          NON_STANDARD_PARAM@40..45
+            COLON@40..41 ":"
+            WHITESPACE@41..42 " "
+            NAME_REF@42..45
+              IDENT@42..45 "foo"
+  SEMICOLON@45..46 ";"
+  WHITESPACE@46..47 "\n"
+
+ERROR@29:31 "Invalid parameter type. Use positional params like $1 instead."
+ERROR@40:45 "Invalid parameter type. Use positional params like $1 instead."
