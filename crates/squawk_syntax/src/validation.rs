@@ -20,6 +20,7 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::DropAggregate(it) => validate_drop_aggregate(it, errors),
                 ast::JoinExpr(it) => validate_join_expr(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
+                ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
                 _ => (),
             }
         }
@@ -249,4 +250,11 @@ fn validate_aggregate_params(aggregate_params: Option<ast::ParamList>, acc: &mut
             }
         }
     }
+}
+
+fn validate_non_standard_param(param: ast::NonStandardParam, acc: &mut Vec<SyntaxError>) {
+    acc.push(SyntaxError::new(
+        "Invalid parameter type. Use positional params like $1 instead.",
+        param.syntax().text_range(),
+    ))
 }
