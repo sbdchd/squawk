@@ -6,8 +6,8 @@ use serde_json::json;
 use squawk_syntax::{ast::AstNode, syntax_error::SyntaxError};
 
 use crate::{
-    file::{sql_from_path, sql_from_stdin},
     DebugOption,
+    file::{sql_from_path, sql_from_stdin},
 };
 
 pub(crate) fn debug<W: io::Write>(
@@ -26,9 +26,9 @@ pub(crate) fn debug<W: io::Write>(
                     if verbose {
                         let content = &sql[start as usize..(start + token.len) as usize];
                         start += token.len;
-                        writeln!(f, "{:?} @ {:?}", content, token.kind)?;
+                        writeln!(f, "{content:?} @ {:?}", token.kind)?;
                     } else {
-                        writeln!(f, "{:?}", token)?;
+                        writeln!(f, "{token:?}")?;
                     }
                 }
             }
@@ -54,7 +54,7 @@ pub(crate) fn debug<W: io::Write>(
                             snap += &format!("@{:?}:{:?} {:?}", range.start(), range.end(), text);
                         }
                     }
-                    writeln!(f, "{}", snap)?;
+                    writeln!(f, "{snap}")?;
                     let renderer = Renderer::styled();
                     render_syntax_errors(&errors, filename, sql, |message| {
                         writeln!(f, "{}", renderer.render(message))?;

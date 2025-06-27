@@ -29,10 +29,10 @@ use anyhow::{Context, Result};
 use convert_case::{Case, Casing};
 use quote::{format_ident, quote};
 use ungrammar::{Grammar, Rule};
-use xshell::{cmd, Shell};
+use xshell::{Shell, cmd};
 
 use crate::{
-    keywords::{keyword_kinds, KeywordKinds},
+    keywords::{KeywordKinds, keyword_kinds},
     path::project_root,
 };
 
@@ -623,7 +623,9 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
                 acc.push(field);
                 return;
             }
-            panic!("unhandled rule: {rule:?}. Instead of `'foo' T (',', T)`, write `'foo' (T (',', T))`");
+            panic!(
+                "unhandled rule: {rule:?}. Instead of `'foo' T (',', T)`, write `'foo' (T (',', T))`"
+            );
         }
         Rule::Labeled { label: l, rule } => {
             assert!(label.is_none());
@@ -678,7 +680,7 @@ fn lower_separated_list(
     if !matches!(
         repeat.as_slice(),
         [comma, Rule::Node(n)]
-            if trailing_sep.map_or(true, |it| comma == &**it) && n == node
+            if trailing_sep.is_none_or(|it| comma == &**it) && n == node
     ) {
         return false;
     }

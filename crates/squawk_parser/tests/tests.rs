@@ -1,8 +1,8 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/tests.rs
 use camino::Utf8Path;
-use dir_test::{dir_test, Fixture};
+use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
-use squawk_parser::{parse, LexedStr};
+use squawk_parser::{LexedStr, parse};
 use std::fmt::Write;
 
 #[dir_test(
@@ -39,8 +39,7 @@ fn parser_ok(fixture: Fixture<&str>) {
         if let Err(e) = &pg_result {
             assert!(
                 &pg_result.is_ok(),
-                "tests defined in the `ok` can't have Postgres parser errors. Found {}",
-                e
+                "tests defined in the `ok` can't have Postgres parser errors. Found {e}",
             );
         }
     }
@@ -93,7 +92,7 @@ fn regression_suite(fixture: Fixture<&str>) {
 
     let (_parsed, errors) = parse_text(content);
 
-    let snapshot_name = format!("regression_{}", test_name);
+    let snapshot_name = format!("regression_{test_name}");
 
     with_settings!({
       omit_expression => true,

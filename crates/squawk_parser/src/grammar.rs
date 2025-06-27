@@ -2,13 +2,13 @@
 // https://github.com/rust-lang/rust-analyzer/tree/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/grammar
 
 use crate::{
+    CompletedMarker, Marker, Parser,
     generated::token_sets::{
         ALL_KEYWORDS, BARE_LABEL_KEYWORDS, COLUMN_OR_TABLE_KEYWORDS, RESERVED_KEYWORDS,
         TYPE_KEYWORDS, UNRESERVED_KEYWORDS,
     },
     syntax_kind::SyntaxKind::{self, *},
     token_set::TokenSet,
-    CompletedMarker, Marker, Parser,
 };
 
 const EXPR_RECOVERY_SET: TokenSet = TokenSet::new(&[
@@ -2951,7 +2951,7 @@ fn from_item_name(p: &mut Parser<'_>) {
                 }
             }
             got => {
-                p.error(format!("expected a name, got {:?}", got));
+                p.error(format!("expected a name, got {got:?}"));
             }
         },
         None => p.error("expected name"),
@@ -3829,11 +3829,7 @@ fn operator(p: &mut Parser<'_>) {
 
 pub(crate) fn current_operator(p: &Parser<'_>) -> Option<SyntaxKind> {
     let (power, kind, _) = current_op(p, &Restrictions::default());
-    if power == 0 {
-        None
-    } else {
-        Some(kind)
-    }
+    if power == 0 { None } else { Some(kind) }
 }
 
 fn using_index(p: &mut Parser<'_>) {
@@ -5565,7 +5561,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
             // commands are outlined in:
             // https://www.postgresql.org/docs/17/sql-commands.html
             // TODO: see error recovery in rust-analyzer's expr_bp
-            p.err_and_bump(&format!("expected command, found {:?}", command));
+            p.err_and_bump(&format!("expected command, found {command:?}"));
             // m.abandon(p);
             None
         }
@@ -8643,8 +8639,7 @@ fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
         Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES) => (),
         Some(kind) => {
             p.error(format!(
-                "expected SELECT, TABLE, or VALUES statement, got {:?}",
-                kind
+                "expected SELECT, TABLE, or VALUES statement, got {kind:?}"
             ));
         }
         None => {
@@ -8960,8 +8955,7 @@ fn select_insert_delete_update_or_notify(p: &mut Parser<'_>) {
             SELECT | VALUES | INSERT | UPDATE | DELETE | NOTIFY => (),
             kind => {
                 p.error(format!(
-                    "expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement, got {:?}",
-                    kind
+                    "expected SELECT, INSERT, UPDATE, DELETE, NOTIFY, or VALUES statement, got {kind:?}"
                 ));
             }
         }
@@ -9953,8 +9947,7 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
             | PAREN_SELECT => (),
             kind => {
                 p.error(format!(
-                    "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {:?}",
-                    kind
+                    "expected SELECT, INSERT, UPDATE, DELETE, MERGE, or VALUES statement, got {kind:?}",
                 ));
             }
         }
@@ -10906,8 +10899,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
                 }
                 kind => {
                     p.error(format!(
-                        "expected CONCURRENTLY, TABLESPACE, or VERBOSE option, got {:?}",
-                        kind
+                        "expected CONCURRENTLY, TABLESPACE, or VERBOSE option, got {kind:?}",
                     ));
                     break;
                 }
@@ -10979,7 +10971,7 @@ fn create_view(p: &mut Parser<'_>) -> CompletedMarker {
     match stmt(p, &StmtRestrictions::default()) {
         Some(statement) => match statement.kind() {
             SELECT | COMPOUND_SELECT | SELECT_INTO | VALUES | TABLE => (),
-            kind => p.error(format!("expected SELECT, got {:?}", kind)),
+            kind => p.error(format!("expected SELECT, got {kind:?}")),
         },
         None => p.error("expected SELECT"),
     }
@@ -11178,8 +11170,7 @@ fn declare(p: &mut Parser<'_>) -> CompletedMarker {
         Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES) => (),
         Some(kind) => {
             p.error(format!(
-                "expected SELECT, TABLE, or VALUES statement, got {:?}",
-                kind
+                "expected SELECT, TABLE, or VALUES statement, got {kind:?}",
             ));
         }
         None => {
@@ -11609,8 +11600,7 @@ fn preparable_stmt(p: &mut Parser<'_>) {
         ) => (),
         Some(kind) => {
             p.error(format!(
-                    "expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement, got {:?}",
-                    kind
+                    "expected SELECT, TABLE, VALUES, INSERT, UPDATE, DELETE, or MERGE statement, got {kind:?}"
                 ));
         }
         None => {
