@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::{ast, Parse, SourceFile};
+use squawk_syntax::{Parse, SourceFile, ast};
 
 use crate::{Linter, Rule, Violation};
 

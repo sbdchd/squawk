@@ -1,10 +1,10 @@
 use std::collections::HashSet;
 use std::fmt;
 
-use enum_iterator::all;
 use enum_iterator::Sequence;
-use ignore::find_ignores;
+use enum_iterator::all;
 pub use ignore::Ignore;
+use ignore::find_ignores;
 use ignore_index::IgnoreIndex;
 use lazy_static::lazy_static;
 use rowan::TextRange;
@@ -152,7 +152,7 @@ impl TryFrom<&str> for Rule {
             "ban-alter-domain-with-add-constraint" => Ok(Rule::BanAlterDomainWithAddConstraint),
             "ban-truncate-cascade" => Ok(Rule::BanTruncateCascade),
             // xtask:new-rule:str-name
-            _ => Err(format!("Unknown violation name: {}", s)),
+            _ => Err(format!("Unknown violation name: {s}")),
         }
     }
 }
@@ -211,7 +211,7 @@ impl fmt::Display for Rule {
             Rule::BanTruncateCascade => "ban-truncate-cascade",
             // xtask:new-rule:variant-to-name
         };
-        write!(f, "{}", val)
+        write!(f, "{val}")
     }
 }
 

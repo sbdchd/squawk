@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use squawk_syntax::ast;
 
-use crate::{text::trim_quotes, Linter};
+use crate::{Linter, text::trim_quotes};
 
 pub(crate) fn is_not_valid_int_type(ty: &ast::Type, invalid_type_names: &HashSet<&str>) -> bool {
     match ty {

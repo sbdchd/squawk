@@ -5,7 +5,7 @@
 //! A failed validation emits a diagnostic.
 
 use crate::ast::AstNode;
-use crate::{ast, match_ast, syntax_error::SyntaxError, SyntaxNode};
+use crate::{SyntaxNode, ast, match_ast, syntax_error::SyntaxError};
 use rowan::{TextRange, TextSize};
 use squawk_parser::SyntaxKind::*;
 pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use convert_case::{Case, Casing};
 
-use crate::{path::project_root, NewRuleArgs};
+use crate::{NewRuleArgs, path::project_root};
 use std::fs;
 
 fn make_lint(name: &str) -> String {
@@ -72,7 +72,7 @@ mod test {{
 fn create_rule_file(name: &str) -> Result<()> {
     let name = name.to_case(Case::Snake);
     let root = project_root();
-    let lint_path = root.join(format!("crates/squawk_linter/src/rules/{}.rs", name));
+    let lint_path = root.join(format!("crates/squawk_linter/src/rules/{name}.rs"));
 
     if fs::exists(&lint_path)? {
         println!("skipping rule file creation, it already exists {lint_path}");

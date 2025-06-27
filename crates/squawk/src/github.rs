@@ -1,11 +1,11 @@
-use crate::config::Config;
-use crate::reporter::{fmt_tty_violation, CheckReport};
 use crate::Command;
+use crate::config::Config;
+use crate::reporter::{CheckReport, fmt_tty_violation};
 use crate::{file_finding::find_paths, reporter::check_files};
-use anyhow::{anyhow, bail, Result};
+use anyhow::{Result, anyhow, bail};
 use console::strip_ansi_codes;
 use log::info;
-use squawk_github::{actions, app, comment_on_pr, GitHubApi};
+use squawk_github::{GitHubApi, actions, app, comment_on_pr};
 use squawk_linter::{Rule, Version};
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -178,11 +178,7 @@ fn get_comment_body(files: &[CheckReport], version: &str) -> String {
 }
 
 const fn get_violations_emoji(count: usize) -> &'static str {
-    if count > 0 {
-        "🚒"
-    } else {
-        "✅"
-    }
+    if count > 0 { "🚒" } else { "✅" }
 }
 
 fn get_sql_file_content(violation: &CheckReport) -> Result<String> {

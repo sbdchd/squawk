@@ -204,10 +204,10 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
         conf.assume_in_transaction.unwrap_or_default()
     };
 
-    info!("pg version: {:?}", pg_version);
+    info!("pg version: {pg_version:?}");
     info!("excluded rules: {:?}", &excluded_rules);
     info!("excluded paths: {:?}", &excluded_paths);
-    info!("assume in a transaction: {:?}", assume_in_transaction);
+    info!("assume in a transaction: {assume_in_transaction:?}");
 
     let mut clap_app = Opt::clap();
     let stdout = io::stdout();

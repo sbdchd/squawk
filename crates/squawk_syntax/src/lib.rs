@@ -307,10 +307,12 @@ fn api_walkthrough() {
         .ancestors()
         .find_map(ast::CreateFunction::cast);
     assert_eq!(f, Some(func));
-    assert!(param
-        .syntax()
-        .siblings_with_tokens(Direction::Next)
-        .any(|it| it.kind() == SyntaxKind::R_PAREN));
+    assert!(
+        param
+            .syntax()
+            .siblings_with_tokens(Direction::Next)
+            .any(|it| it.kind() == SyntaxKind::R_PAREN)
+    );
     assert_eq!(
         func_option_syntax.descendants_with_tokens().count(),
         5, // 5 tokens `1`, ` `, `+`, ` `, `1`

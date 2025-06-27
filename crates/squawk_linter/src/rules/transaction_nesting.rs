@@ -1,6 +1,6 @@
 use squawk_syntax::{
-    ast::{self, AstNode},
     Parse, SourceFile,
+    ast::{self, AstNode},
 };
 
 use crate::{Linter, Rule, Violation};

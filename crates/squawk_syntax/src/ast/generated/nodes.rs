@@ -1,8 +1,8 @@
+use crate::SyntaxKind;
 use crate::ast::AstNode;
-use crate::ast::{support, AstChildren};
+use crate::ast::{AstChildren, support};
 use crate::syntax_node::SyntaxNode;
 use crate::syntax_node::SyntaxToken;
-use crate::SyntaxKind;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AddColumn {

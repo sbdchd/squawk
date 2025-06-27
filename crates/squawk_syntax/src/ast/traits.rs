@@ -1,7 +1,7 @@
 // based on rust-analyzer's ast traits
 // https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/syntax/src/ast/traits.rs
 use crate::ast;
-use crate::ast::{support, AstNode};
+use crate::ast::{AstNode, support};
 
 pub trait HasName: AstNode {
     fn name(&self) -> Option<ast::Name> {

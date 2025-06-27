@@ -1,6 +1,6 @@
 // based on https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/parser/src/tests.rs
 use camino::Utf8Path;
-use dir_test::{dir_test, Fixture};
+use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
 
 use crate::SourceFile;

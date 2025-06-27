@@ -1,7 +1,7 @@
-use anyhow::{bail, Result};
+use anyhow::{Result, bail};
 use camino::Utf8PathBuf;
 use regex::Regex;
-use std::fs::{create_dir_all, remove_dir_all, File};
+use std::fs::{File, create_dir_all, remove_dir_all};
 use std::io::{BufRead, Cursor, Write};
 use std::process::Command;
 
@@ -11,7 +11,7 @@ pub(crate) fn download_regression_tests() -> Result<()> {
     let target_dir = Utf8PathBuf::from(OUTPUT_DIR);
 
     if target_dir.exists() {
-        println!("Cleaning target directory: {:?}", target_dir);
+        println!("Cleaning target directory: {target_dir:?}");
         remove_dir_all(&target_dir)?;
     }
 
@@ -21,7 +21,7 @@ pub(crate) fn download_regression_tests() -> Result<()> {
     let total_files = urls.len();
 
     for (index, url) in urls.iter().enumerate() {
-        let filename = url.split('/').last().unwrap();
+        let filename = url.split('/').next_back().unwrap();
         if filename.contains("psql") {
             // skipping this for now, we don't support psql
             continue;
@@ -51,7 +51,7 @@ pub(crate) fn download_regression_tests() -> Result<()> {
         let cursor = Cursor::new(&output.stdout);
 
         if let Err(e) = preprocess_sql(cursor, &mut processed_content) {
-            eprintln!("Error: Failed to process file: {}", e);
+            eprintln!("Error: Failed to process file: {e}");
             continue;
         }
 
@@ -195,7 +195,7 @@ fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Result<()> {
                         let m = caps.get(1).or_else(|| caps.get(2)).unwrap();
                         let matched_var = &remaining[m.start()..m.end()];
 
-                        println!("#{} Replacing template variable {}", idx, matched_var);
+                        println!("#{idx} Replacing template variable {matched_var}");
 
                         result.push('\'');
                         result.push_str(matched_var);
@@ -213,7 +213,7 @@ fn preprocess_sql<R: BufRead, W: Write>(source: R, mut dest: W) -> Result<()> {
         }
 
         // Write the cleaned line
-        writeln!(dest, "{}", result)?;
+        writeln!(dest, "{result}")?;
     }
 
     Ok(())

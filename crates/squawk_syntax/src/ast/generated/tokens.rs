@@ -1,4 +1,4 @@
-use crate::{ast::AstToken, SyntaxKind, SyntaxToken};
+use crate::{SyntaxKind, SyntaxToken, ast::AstToken};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Null {

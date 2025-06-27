@@ -16,8 +16,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use crate::{
-    file::{sql_from_path, sql_from_stdin},
     Reporter,
+    file::{sql_from_path, sql_from_stdin},
 };
 
 fn check_sql(
@@ -223,11 +223,23 @@ fn print_summary<W: io::Write>(f: &mut W, summary: &Summary) -> Result<()> {
             f,
             "Found {total_violations} issue{plural} in {files_with_violations} file{files_plural} (checked {files_checked} {files_checked_plural})",
             total_violations = summary.total_violations,
-            plural = if summary.total_violations == 1 { "" } else { "s" },
+            plural = if summary.total_violations == 1 {
+                ""
+            } else {
+                "s"
+            },
             files_with_violations = summary.files_with_violations,
-            files_plural = if summary.files_with_violations == 1 { "" } else { "s" },
+            files_plural = if summary.files_with_violations == 1 {
+                ""
+            } else {
+                "s"
+            },
             files_checked = summary.files_checked,
-            files_checked_plural = if summary.files_checked == 1 { "source file" } else { "source files" }
+            files_checked_plural = if summary.files_checked == 1 {
+                "source file"
+            } else {
+                "source files"
+            }
         )?;
     }
     Ok(())
@@ -355,7 +367,7 @@ select \;
 #[cfg(test)]
 mod test_reporter {
     use super::check_sql;
-    use crate::reporter::{print_violations, Reporter};
+    use crate::reporter::{Reporter, print_violations};
     use console::strip_ansi_codes;
     use insta::{assert_debug_snapshot, assert_snapshot};
 
