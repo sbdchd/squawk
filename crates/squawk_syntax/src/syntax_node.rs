@@ -26,7 +26,7 @@
 
 use rowan::{GreenNode, GreenNodeBuilder, Language, TextSize};
 
-use crate::{syntax_error::SyntaxError, SyntaxKind};
+use crate::{SyntaxKind, syntax_error::SyntaxError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum Sql {}

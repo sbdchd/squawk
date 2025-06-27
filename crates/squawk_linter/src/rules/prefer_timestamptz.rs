@@ -1,10 +1,10 @@
 use squawk_syntax::{
-    ast::{self, AstNode},
     Parse, SourceFile,
+    ast::{self, AstNode},
 };
 
-use crate::{text::trim_quotes, visitors::check_not_allowed_types};
 use crate::{Linter, Rule, Violation};
+use crate::{text::trim_quotes, visitors::check_not_allowed_types};
 
 pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
     match ty {

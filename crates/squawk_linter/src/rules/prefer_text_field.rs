@@ -1,11 +1,11 @@
 use std::collections::HashSet;
 
 use squawk_syntax::{
-    ast::{self, AstNode},
     Parse, SourceFile,
+    ast::{self, AstNode},
 };
 
-use crate::{text::trim_quotes, Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation, text::trim_quotes};
 
 use crate::visitors::check_not_allowed_types;
 

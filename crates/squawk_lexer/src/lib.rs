@@ -279,7 +279,7 @@ impl Cursor<'_> {
                     return LiteralKind::Int {
                         base,
                         empty_int: false,
-                    }
+                    };
                 }
             }
         } else {

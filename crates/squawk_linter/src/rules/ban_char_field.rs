@@ -1,6 +1,6 @@
 use squawk_syntax::{
-    ast::{self, AstNode},
     Parse, SourceFile, TokenText,
+    ast::{self, AstNode},
 };
 
 use crate::visitors::check_not_allowed_types;

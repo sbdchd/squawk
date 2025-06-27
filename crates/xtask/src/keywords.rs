@@ -1,6 +1,6 @@
 use crate::path::project_root;
 use anyhow::{Context, Ok, Result};
-use enum_iterator::{all, Sequence};
+use enum_iterator::{Sequence, all};
 use std::collections::{HashMap, HashSet};
 
 struct KeywordMeta {
