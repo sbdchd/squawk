@@ -449,6 +449,15 @@ select name, created from u join t using (t_id);
 select name, u.created from u join t using (t_id);
 ```
 
+### Rule: invalid literal
+
+Check for invalid literals
+
+```sql
+select '{"foo": 1,}'::json;
+--               ^ invalid json, unexpected trailing comma
+```
+
 ### Rule: column label is the same as an existing column
 
 ```sql

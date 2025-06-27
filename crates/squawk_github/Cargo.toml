@@ -1,13 +1,10 @@
 [package]
 name = "squawk_github"
 version = "0.0.0"
-authors = ["Steve Dignam <steve@dignam.xyz>"]
-edition = "2018"
+authors.workspace = true
+edition.workspace = true
 license.workspace = true
-description = "Postgres SQL linter Github APIs used in Squawk"
-repository = "https://github.com/sbdchd/squawk"
-readme = "README.md"
-keywords = ["bot", "github", "linter"]
+readme.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
