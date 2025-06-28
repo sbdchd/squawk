@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.16.0 - 2025-06-27
+
+### Added
+
+- Parsing non-standard placeholders with format `:name`. (#560), (#561)
+- Error recovery for `drop table` when there's extra commas or missing commas. (#556)
+- Improved `order by` parsing. (#556)
+- Error recovery for array exprs & improvements for constraints. (#557)
+- Improved CTE parsing. (#558)
+- Error recovery for type args & more forgiving create table args parsing. (#559)
+
+## Changed
+
+- Internal: bumped rust to 1.88.0
+
 ## v2.15.0 - 2025-06-21
 
 ### Added
