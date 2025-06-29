@@ -91,8 +91,13 @@ jobs:
       - name: Build
         run: RUSTFLAGS="${{ matrix.rustflags }}" cargo build --target ${{ matrix.target }} --release
 
-      - name: Rename artifact
-        run: mv target/${{ matrix.target }}/release/squawk* target/release/${{ matrix.artifact_name }}
+      - name: Rename artifact (windows)
+        if: matrix.target == 'x86_64-pc-windows-msvc'
+        run: mv target/${{ matrix.target }}/release/squawk.exe target/release/${{ matrix.artifact_name }}
+
+      - name: Rename artifact (linux, mac)
+        if: matrix.target != 'x86_64-pc-windows-msvc'
+        run: mv target/${{ matrix.target }}/release/squawk target/release/${{ matrix.artifact_name }}
 
       - name: Artifact
         uses: actions/upload-artifact@v4
