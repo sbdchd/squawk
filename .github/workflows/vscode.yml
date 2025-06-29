@@ -1,0 +1,96 @@
+name: VSCode
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "**"
+  pull_request:
+
+jobs:
+  pre_job:
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+      paths_result: ${{ steps.skip_check.outputs.paths_result }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@c449d86cf33a2a6c7a4193264cc2578e2c3266d4 # pin@v4
+        with:
+          paths: '["squawk-vscode/**"]'
+
+  typecheck:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: "squawk-vscode/package.json"
+          cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
+          cache: "pnpm"
+      - name: Install JS dependencies
+        working-directory: "squawk-vscode"
+        run: pnpm install
+
+      - name: Run type check
+        working-directory: "squawk-vscode"
+        run: pnpm run check-types
+
+  lint:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: "squawk-vscode/package.json"
+          cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
+          cache: "pnpm"
+      - name: Install JS dependencies
+        working-directory: "squawk-vscode"
+        run: pnpm install
+
+      - name: Run lints
+        working-directory: "squawk-vscode"
+        run: pnpm run lint
+
+  test:
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true'
+
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: "squawk-vscode/package.json"
+          cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
+          cache: "pnpm"
+      - name: Install JS dependencies
+        working-directory: "squawk-vscode"
+        run: pnpm install
+
+      - name: Run tests
+        working-directory: "squawk-vscode"
+        run: xvfb-run pnpm run test
