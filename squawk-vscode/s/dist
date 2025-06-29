@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+
+
+# 1. build squawk release for arch
+# 2. copy build to vscode folder
+# 3. package extension
+# 4. publish extension
+
+pnpm exec vsce pack

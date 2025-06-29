@@ -1,0 +1,13 @@
+build/
+node_modules/
+playground/
+coverage/
+extension/
+dist/
+out/
+.venv/
+.mypy_cache/
+.terraform/
+.pytest_cache/
+target/
+docs
