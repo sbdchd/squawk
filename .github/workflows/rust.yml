@@ -238,7 +238,14 @@ jobs:
 
   publish-npm:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-linux-x64, build-linux-musl-x64, build-mac, build-windows]
+    needs:
+      [
+        build-linux-x64,
+        build-linux-musl-x64,
+        build-linux-arm64,
+        build-mac,
+        build-windows,
+      ]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -300,7 +307,8 @@ jobs:
           cache-to: type=gha,mode=max
 
   deploy-playground:
-    if: startsWith(github.ref, 'refs/tags/')
+    needs: pre_job
+    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
@@ -387,9 +395,6 @@ jobs:
 
       - name: Cache
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
-
-      - name: Install ripgrep
-        run: cargo install ripgrep
 
       - name: Test
         run: ./s/test

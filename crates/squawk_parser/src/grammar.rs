@@ -589,10 +589,16 @@ fn json_table_arg_list(p: &mut Parser<'_>) {
     if p.eat(AS_KW) {
         name(p);
     }
-    // [ PASSING { value AS varname } [, ...] ]
     opt_json_passing_clause(p);
-    // COLUMNS ( json_table_column [, ...] )
-    if p.eat(COLUMNS_KW) {
+    json_table_column_list(p);
+    opt_json_on_error_clause(p);
+}
+
+// COLUMNS ( json_table_column [, ...] )
+fn json_table_column_list(p: &mut Parser<'_>) {
+    if p.at(COLUMNS_KW) {
+        let m = p.start();
+        p.bump(COLUMNS_KW);
         p.expect(L_PAREN);
         while !p.at(EOF) {
             json_table_column(p);
@@ -601,10 +607,9 @@ fn json_table_arg_list(p: &mut Parser<'_>) {
             }
         }
         p.expect(R_PAREN);
-    }
-    if opt_json_behavior(p) {
-        p.expect(ON_KW);
-        p.expect(ERROR_KW);
+        m.complete(p, JSON_TABLE_COLUMN_LIST);
+    } else {
+        p.error("expected json table columns");
     }
 }
 
@@ -633,15 +638,7 @@ fn json_table_column(p: &mut Parser<'_>) {
         if p.eat(AS_KW) {
             name(p);
         }
-        p.expect(COLUMNS_KW);
-        p.expect(L_PAREN);
-        while !p.at(EOF) {
-            json_table_column(p);
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
+        json_table_column_list(p);
     } else {
         name(p);
         // FOR ORDINALITY
@@ -1116,21 +1113,20 @@ fn opt_json_quotes_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
 }
 
-fn opt_json_behavior_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn opt_json_behavior_clause(p: &mut Parser<'_>) {
     let m = p.start();
-    if opt_json_behavior(p) {
+    if opt_json_behavior(p).is_some() {
         p.expect(ON_KW);
-        if !p.eat(ERROR_KW) {
+        let kind = if p.eat(ERROR_KW) {
+            JSON_ON_ERROR_CLAUSE
+        } else {
             p.expect(EMPTY_KW);
-            if opt_json_behavior(p) {
-                p.expect(ON_KW);
-                p.expect(ERROR_KW);
-            }
-        }
-        Some(m.complete(p, JSON_BEHAVIOR_CLAUSE))
+            JSON_ON_EMPTY_CLAUSE
+        };
+        m.complete(p, kind);
+        opt_json_on_error_clause(p);
     } else {
         m.abandon(p);
-        None
     }
 }
 
@@ -1192,7 +1188,7 @@ fn json_exists_fn(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn opt_json_on_error_clause(p: &mut Parser<'_>) {
     let m = p.start();
-    if opt_json_behavior(p) {
+    if opt_json_behavior(p).is_some() {
         p.expect(ON_KW);
         p.expect(ERROR_KW);
         m.complete(p, JSON_ON_ERROR_CLAUSE);
@@ -1201,44 +1197,78 @@ fn opt_json_on_error_clause(p: &mut Parser<'_>) {
     }
 }
 
-fn opt_json_behavior(p: &mut Parser<'_>) -> bool {
-    match p.current() {
+fn opt_json_behavior(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let m = p.start();
+    let kind = match p.current() {
         DEFAULT_KW => {
             p.bump(DEFAULT_KW);
             if expr(p).is_none() {
                 p.error("expected expression");
             }
+            JSON_BEHAVIOR_DEFAULT
         }
-        ERROR_KW | NULL_KW | TRUE_KW | FALSE_KW | UNKNOWN_KW => {
-            p.bump_any();
+        ERROR_KW => {
+            p.bump(ERROR_KW);
+            JSON_BEHAVIOR_ERROR
+        }
+        NULL_KW => {
+            p.bump(NULL_KW);
+            JSON_BEHAVIOR_NULL
+        }
+        TRUE_KW => {
+            p.bump(TRUE_KW);
+            JSON_BEHAVIOR_TRUE
+        }
+        FALSE_KW => {
+            p.bump(FALSE_KW);
+            JSON_BEHAVIOR_FALSE
+        }
+        UNKNOWN_KW => {
+            p.bump(UNKNOWN_KW);
+            JSON_BEHAVIOR_UNKNOWN
         }
         EMPTY_KW => {
             p.bump(EMPTY_KW);
-            let _ = p.eat(ARRAY_KW) || p.eat(OBJECT_KW);
+            if p.eat(OBJECT_KW) {
+                JSON_BEHAVIOR_EMPTY_OBJECT
+            } else {
+                p.eat(ARRAY_KW);
+                JSON_BEHAVIOR_EMPTY_ARRAY
+            }
         }
-        _ => return false,
-    }
-    true
+        _ => {
+            m.abandon(p);
+            return None;
+        }
+    };
+    Some(m.complete(p, kind))
 }
 
-fn json_args(p: &mut Parser<'_>) {
-    while !p.at(EOF) {
-        if expr(p).is_none() {
-            p.error("expected expr");
-        }
-        opt_json_format_clause(p);
-        p.expect(AS_KW);
-        col_label(p);
-        if !p.eat(COMMA) {
-            break;
-        }
+fn opt_json_passing_arg(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(EXPR_FIRST) {
+        return None;
     }
+    let m = p.start();
+    if expr(p).is_none() {
+        p.error("expected expr");
+    }
+    opt_json_format_clause(p);
+    p.expect(AS_KW);
+    col_label(p);
+    Some(m.complete(p, JSON_PASSING_ARG))
 }
 
 fn opt_json_passing_clause(p: &mut Parser<'_>) {
     let m = p.start();
     if p.eat(PASSING_KW) {
-        json_args(p);
+        while !p.at(EOF) {
+            if opt_json_passing_arg(p).is_none() {
+                break;
+            }
+            if !p.eat(COMMA) {
+                break;
+            }
+        }
         m.complete(p, JSON_PASSING_CLAUSE);
     } else {
         m.abandon(p);

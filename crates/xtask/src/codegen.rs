@@ -81,12 +81,7 @@ pub(crate) fn codegen() -> Result<()> {
     let token_sets_file = project_root().join("crates/squawk_parser/src/generated/token_sets.rs");
     std::fs::write(token_sets_file, token_sets).context("problem writing generated token sets")?;
 
-    let kinds = generate_kind_src(
-        &ast_src.nodes,
-        &ast_src.enums,
-        &grammar,
-        keyword_kinds.all_keywords,
-    );
+    let kinds = generate_kind_src(&ast_src.nodes, &grammar, keyword_kinds.all_keywords);
 
     let syntax_kinds = generate_syntax_kinds(kinds)?;
     let syntax_kinds_file =
@@ -143,7 +138,6 @@ const PUNCT: &[(&str, &str)] = &[
 
 fn generate_kind_src(
     nodes: &[AstNodeSrc],
-    enums: &[AstEnumSrc],
     grammar: &ungrammar::Grammar,
     pg_keywords: Vec<String>,
 ) -> KindsSrc {
@@ -195,7 +189,8 @@ fn generate_kind_src(
     let nodes = nodes
         .iter()
         .map(|it| &it.name)
-        .chain(enums.iter().map(|it| &it.name))
+        // We don't include enums since they don't compare against a specific syntax kind
+        // .chain(enums.iter().map(|it| &it.name))
         .map(|it| it.to_case(Case::UpperSnake))
         .map(String::leak)
         .map(|it| &*it)

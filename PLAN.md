@@ -624,6 +624,22 @@ create function pg_catalog.jsonb_extract_path(
   as $$jsonb_extract_path$$
 ```
 
+#### Json path expressions
+
+```sql
+select * from json_table(
+  jsonb '[1,2,3]',
+  '$[*] ? (@ < $x)'
+  --           ^^ go to def jumps to the def in the passing clause
+  passing 10 as x, 3 as y
+  --                    ^ find references
+  --            ^ find references
+  columns (a text format json path '$ ? (@ < $y)')
+  --      references json_table arg ^
+  --          also references passing clause ^^
+);
+```
+
 ### Autocomplete
 
 - [datagrip postfix completion](https://blog.jetbrains.com/datagrip/2019/03/11/top-9-sql-features-of-datagrip-you-have-to-know/#postfix_completion)

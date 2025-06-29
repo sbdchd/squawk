@@ -40,76 +40,77 @@ SOURCE_FILE
             LITERAL
               STRING "'$.favorites[*]'"
             WHITESPACE " "
-            COLUMNS_KW "COLUMNS"
-            WHITESPACE " "
-            L_PAREN "("
-            WHITESPACE "\n   "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "id"
+            JSON_TABLE_COLUMN_LIST
+              COLUMNS_KW "COLUMNS"
               WHITESPACE " "
-              FOR_KW "FOR"
-              WHITESPACE " "
-              ORDINALITY_KW "ORDINALITY"
-            COMMA ","
-            WHITESPACE "\n   "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "kind"
-              WHITESPACE " "
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      TEXT_KW "text"
-              WHITESPACE " "
-              PATH_KW "PATH"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.kind'"
-            COMMA ","
-            WHITESPACE "\n   "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "title"
-              WHITESPACE " "
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      TEXT_KW "text"
-              WHITESPACE " "
-              PATH_KW "PATH"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.films[*].title'"
-              WHITESPACE " "
-              JSON_WRAPPER_BEHAVIOR_CLAUSE
-                WITH_KW "WITH"
+              L_PAREN "("
+              WHITESPACE "\n   "
+              JSON_TABLE_COLUMN
+                NAME
+                  IDENT "id"
                 WHITESPACE " "
-                WRAPPER_KW "WRAPPER"
-            COMMA ","
-            WHITESPACE "\n   "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "director"
-              WHITESPACE " "
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      TEXT_KW "text"
-              WHITESPACE " "
-              PATH_KW "PATH"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.films[*].director'"
-              WHITESPACE " "
-              JSON_WRAPPER_BEHAVIOR_CLAUSE
-                WITH_KW "WITH"
+                FOR_KW "FOR"
                 WHITESPACE " "
-                WRAPPER_KW "WRAPPER"
-            R_PAREN ")"
+                ORDINALITY_KW "ORDINALITY"
+              COMMA ","
+              WHITESPACE "\n   "
+              JSON_TABLE_COLUMN
+                NAME
+                  IDENT "kind"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+                WHITESPACE " "
+                PATH_KW "PATH"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'$.kind'"
+              COMMA ","
+              WHITESPACE "\n   "
+              JSON_TABLE_COLUMN
+                NAME
+                  IDENT "title"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+                WHITESPACE " "
+                PATH_KW "PATH"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'$.films[*].title'"
+                WHITESPACE " "
+                JSON_WRAPPER_BEHAVIOR_CLAUSE
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  WRAPPER_KW "WRAPPER"
+              COMMA ","
+              WHITESPACE "\n   "
+              JSON_TABLE_COLUMN
+                NAME
+                  IDENT "director"
+                WHITESPACE " "
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        TEXT_KW "text"
+                WHITESPACE " "
+                PATH_KW "PATH"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'$.films[*].director'"
+                WHITESPACE " "
+                JSON_WRAPPER_BEHAVIOR_CLAUSE
+                  WITH_KW "WITH"
+                  WHITESPACE " "
+                  WRAPPER_KW "WRAPPER"
+              R_PAREN ")"
             R_PAREN ")"
         WHITESPACE " "
         ALIAS
@@ -159,84 +160,32 @@ SOURCE_FILE
             JSON_PASSING_CLAUSE
               PASSING_KW "PASSING"
               WHITESPACE " "
-              LITERAL
-                STRING "'Alfred Hitchcock'"
-              WHITESPACE " "
-              AS_KW "AS"
-              WHITESPACE " "
-              NAME
-                FILTER_KW "filter"
+              JSON_PASSING_ARG
+                LITERAL
+                  STRING "'Alfred Hitchcock'"
+                WHITESPACE " "
+                AS_KW "AS"
+                WHITESPACE " "
+                NAME
+                  FILTER_KW "filter"
             WHITESPACE "\n   "
-            COLUMNS_KW "COLUMNS"
-            WHITESPACE " "
-            L_PAREN "("
-            WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "id"
-              WHITESPACE " "
-              FOR_KW "FOR"
-              WHITESPACE " "
-              ORDINALITY_KW "ORDINALITY"
-            COMMA ","
-            WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "kind"
-              WHITESPACE " "
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      TEXT_KW "text"
-              WHITESPACE " "
-              PATH_KW "PATH"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.kind'"
-            COMMA ","
-            WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
-              NESTED_KW "NESTED"
-              WHITESPACE " "
-              PATH_KW "PATH"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.films[*]'"
-              WHITESPACE " "
+            JSON_TABLE_COLUMN_LIST
               COLUMNS_KW "COLUMNS"
               WHITESPACE " "
               L_PAREN "("
-              WHITESPACE "\n      "
+              WHITESPACE "\n    "
               JSON_TABLE_COLUMN
                 NAME
-                  IDENT "title"
+                  IDENT "id"
                 WHITESPACE " "
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        TEXT_KW "text"
+                FOR_KW "FOR"
                 WHITESPACE " "
-                JSON_FORMAT_CLAUSE
-                  FORMAT_KW "FORMAT"
-                  WHITESPACE " "
-                  JSON_KW "JSON"
-                WHITESPACE " "
-                PATH_KW "PATH"
-                WHITESPACE " "
-                LITERAL
-                  STRING "'$.title'"
-                WHITESPACE " "
-                JSON_QUOTES_CLAUSE
-                  OMIT_KW "OMIT"
-                  WHITESPACE " "
-                  QUOTES_KW "QUOTES"
+                ORDINALITY_KW "ORDINALITY"
               COMMA ","
-              WHITESPACE "\n      "
+              WHITESPACE "\n    "
               JSON_TABLE_COLUMN
                 NAME
-                  IDENT "director"
+                  IDENT "kind"
                 WHITESPACE " "
                 PATH_TYPE
                   PATH
@@ -247,14 +196,69 @@ SOURCE_FILE
                 PATH_KW "PATH"
                 WHITESPACE " "
                 LITERAL
-                  STRING "'$.director'"
+                  STRING "'$.kind'"
+              COMMA ","
+              WHITESPACE "\n    "
+              JSON_TABLE_COLUMN
+                NESTED_KW "NESTED"
                 WHITESPACE " "
-                JSON_QUOTES_CLAUSE
-                  KEEP_KW "KEEP"
+                PATH_KW "PATH"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'$.films[*]'"
+                WHITESPACE " "
+                JSON_TABLE_COLUMN_LIST
+                  COLUMNS_KW "COLUMNS"
                   WHITESPACE " "
-                  QUOTES_KW "QUOTES"
+                  L_PAREN "("
+                  WHITESPACE "\n      "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "title"
+                    WHITESPACE " "
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                    WHITESPACE " "
+                    JSON_FORMAT_CLAUSE
+                      FORMAT_KW "FORMAT"
+                      WHITESPACE " "
+                      JSON_KW "JSON"
+                    WHITESPACE " "
+                    PATH_KW "PATH"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.title'"
+                    WHITESPACE " "
+                    JSON_QUOTES_CLAUSE
+                      OMIT_KW "OMIT"
+                      WHITESPACE " "
+                      QUOTES_KW "QUOTES"
+                  COMMA ","
+                  WHITESPACE "\n      "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "director"
+                    WHITESPACE " "
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                    WHITESPACE " "
+                    PATH_KW "PATH"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.director'"
+                    WHITESPACE " "
+                    JSON_QUOTES_CLAUSE
+                      KEEP_KW "KEEP"
+                      WHITESPACE " "
+                      QUOTES_KW "QUOTES"
+                  R_PAREN ")"
               R_PAREN ")"
-            R_PAREN ")"
             R_PAREN ")"
         WHITESPACE " "
         ALIAS
@@ -301,76 +305,23 @@ SOURCE_FILE
             LITERAL
               STRING "'$.favorites[*]'"
             WHITESPACE "\n   "
-            COLUMNS_KW "COLUMNS"
-            WHITESPACE " "
-            L_PAREN "("
-            WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "id"
-              WHITESPACE " "
-              FOR_KW "FOR"
-              WHITESPACE " "
-              ORDINALITY_KW "ORDINALITY"
-            COMMA ","
-            WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "kind"
-              WHITESPACE " "
-              PATH_TYPE
-                PATH
-                  PATH_SEGMENT
-                    NAME_REF
-                      TEXT_KW "text"
-              WHITESPACE " "
-              PATH_KW "PATH"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.kind'"
-            COMMA ","
-            WHITESPACE "\n    "
-            JSON_TABLE_COLUMN
-              NESTED_KW "NESTED"
-              WHITESPACE " "
-              PATH_KW "PATH"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.films[*]'"
-              WHITESPACE " "
+            JSON_TABLE_COLUMN_LIST
               COLUMNS_KW "COLUMNS"
               WHITESPACE " "
               L_PAREN "("
-              WHITESPACE "\n      "
+              WHITESPACE "\n    "
               JSON_TABLE_COLUMN
                 NAME
-                  IDENT "title"
+                  IDENT "id"
                 WHITESPACE " "
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        TEXT_KW "text"
+                FOR_KW "FOR"
                 WHITESPACE " "
-                JSON_FORMAT_CLAUSE
-                  FORMAT_KW "FORMAT"
-                  WHITESPACE " "
-                  JSON_KW "JSON"
-                WHITESPACE " "
-                PATH_KW "PATH"
-                WHITESPACE " "
-                LITERAL
-                  STRING "'$.title'"
-                WHITESPACE " "
-                JSON_QUOTES_CLAUSE
-                  OMIT_KW "OMIT"
-                  WHITESPACE " "
-                  QUOTES_KW "QUOTES"
+                ORDINALITY_KW "ORDINALITY"
               COMMA ","
-              WHITESPACE "\n      "
+              WHITESPACE "\n    "
               JSON_TABLE_COLUMN
                 NAME
-                  IDENT "director"
+                  IDENT "kind"
                 WHITESPACE " "
                 PATH_TYPE
                   PATH
@@ -381,14 +332,69 @@ SOURCE_FILE
                 PATH_KW "PATH"
                 WHITESPACE " "
                 LITERAL
-                  STRING "'$.director'"
+                  STRING "'$.kind'"
+              COMMA ","
+              WHITESPACE "\n    "
+              JSON_TABLE_COLUMN
+                NESTED_KW "NESTED"
                 WHITESPACE " "
-                JSON_QUOTES_CLAUSE
-                  KEEP_KW "KEEP"
+                PATH_KW "PATH"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'$.films[*]'"
+                WHITESPACE " "
+                JSON_TABLE_COLUMN_LIST
+                  COLUMNS_KW "COLUMNS"
                   WHITESPACE " "
-                  QUOTES_KW "QUOTES"
+                  L_PAREN "("
+                  WHITESPACE "\n      "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "title"
+                    WHITESPACE " "
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                    WHITESPACE " "
+                    JSON_FORMAT_CLAUSE
+                      FORMAT_KW "FORMAT"
+                      WHITESPACE " "
+                      JSON_KW "JSON"
+                    WHITESPACE " "
+                    PATH_KW "PATH"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.title'"
+                    WHITESPACE " "
+                    JSON_QUOTES_CLAUSE
+                      OMIT_KW "OMIT"
+                      WHITESPACE " "
+                      QUOTES_KW "QUOTES"
+                  COMMA ","
+                  WHITESPACE "\n      "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "director"
+                    WHITESPACE " "
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                    WHITESPACE " "
+                    PATH_KW "PATH"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.director'"
+                    WHITESPACE " "
+                    JSON_QUOTES_CLAUSE
+                      KEEP_KW "KEEP"
+                      WHITESPACE " "
+                      QUOTES_KW "QUOTES"
+                  R_PAREN ")"
               R_PAREN ")"
-            R_PAREN ")"
             R_PAREN ")"
         WHITESPACE " "
         ALIAS
@@ -432,137 +438,141 @@ SOURCE_FILE
             LITERAL
               STRING "'$.favorites[*]'"
             WHITESPACE "\n"
-            COLUMNS_KW "COLUMNS"
-            WHITESPACE " "
-            L_PAREN "("
-            WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
-              NAME
-                IDENT "user_id"
-              WHITESPACE " "
-              FOR_KW "FOR"
-              WHITESPACE " "
-              ORDINALITY_KW "ORDINALITY"
-            COMMA ","
-            WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
-              NESTED_KW "NESTED"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.movies[*]'"
-              WHITESPACE "\n    "
+            JSON_TABLE_COLUMN_LIST
               COLUMNS_KW "COLUMNS"
               WHITESPACE " "
               L_PAREN "("
-              WHITESPACE "\n    "
+              WHITESPACE "\n  "
               JSON_TABLE_COLUMN
                 NAME
-                  IDENT "movie_id"
+                  IDENT "user_id"
                 WHITESPACE " "
                 FOR_KW "FOR"
                 WHITESPACE " "
                 ORDINALITY_KW "ORDINALITY"
               COMMA ","
-              WHITESPACE "\n    "
-              JSON_TABLE_COLUMN
-                NAME
-                  IDENT "mname"
-                WHITESPACE " "
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        TEXT_KW "text"
-                WHITESPACE " "
-                PATH_KW "PATH"
-                WHITESPACE " "
-                LITERAL
-                  STRING "'$.name'"
-              COMMA ","
-              WHITESPACE "\n    "
-              JSON_TABLE_COLUMN
-                NAME
-                  IDENT "director"
-                WHITESPACE " "
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        TEXT_KW "text"
-              R_PAREN ")"
-            COMMA ","
-            WHITESPACE "\n  "
-            JSON_TABLE_COLUMN
-              NESTED_KW "NESTED"
-              WHITESPACE " "
-              LITERAL
-                STRING "'$.books[*]'"
-              WHITESPACE "\n    "
-              COLUMNS_KW "COLUMNS"
-              WHITESPACE " "
-              L_PAREN "("
-              WHITESPACE "\n      "
-              JSON_TABLE_COLUMN
-                NAME
-                  IDENT "book_id"
-                WHITESPACE " "
-                FOR_KW "FOR"
-                WHITESPACE " "
-                ORDINALITY_KW "ORDINALITY"
-              COMMA ","
-              WHITESPACE "\n      "
-              JSON_TABLE_COLUMN
-                NAME
-                  IDENT "bname"
-                WHITESPACE " "
-                PATH_TYPE
-                  PATH
-                    PATH_SEGMENT
-                      NAME_REF
-                        TEXT_KW "text"
-                WHITESPACE " "
-                PATH_KW "PATH"
-                WHITESPACE " "
-                LITERAL
-                  STRING "'$.name'"
-              COMMA ","
-              WHITESPACE "\n      "
+              WHITESPACE "\n  "
               JSON_TABLE_COLUMN
                 NESTED_KW "NESTED"
                 WHITESPACE " "
                 LITERAL
-                  STRING "'$.authors[*]'"
-                WHITESPACE "\n        "
-                COLUMNS_KW "COLUMNS"
+                  STRING "'$.movies[*]'"
+                WHITESPACE "\n    "
+                JSON_TABLE_COLUMN_LIST
+                  COLUMNS_KW "COLUMNS"
+                  WHITESPACE " "
+                  L_PAREN "("
+                  WHITESPACE "\n    "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "movie_id"
+                    WHITESPACE " "
+                    FOR_KW "FOR"
+                    WHITESPACE " "
+                    ORDINALITY_KW "ORDINALITY"
+                  COMMA ","
+                  WHITESPACE "\n    "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "mname"
+                    WHITESPACE " "
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                    WHITESPACE " "
+                    PATH_KW "PATH"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                  COMMA ","
+                  WHITESPACE "\n    "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "director"
+                    WHITESPACE " "
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE "\n  "
+              JSON_TABLE_COLUMN
+                NESTED_KW "NESTED"
                 WHITESPACE " "
-                L_PAREN "("
-                WHITESPACE "\n          "
-                JSON_TABLE_COLUMN
-                  NAME
-                    IDENT "author_id"
+                LITERAL
+                  STRING "'$.books[*]'"
+                WHITESPACE "\n    "
+                JSON_TABLE_COLUMN_LIST
+                  COLUMNS_KW "COLUMNS"
                   WHITESPACE " "
-                  FOR_KW "FOR"
-                  WHITESPACE " "
-                  ORDINALITY_KW "ORDINALITY"
-                COMMA ","
-                WHITESPACE "\n          "
-                JSON_TABLE_COLUMN
-                  NAME
-                    IDENT "author_name"
-                  WHITESPACE " "
-                  PATH_TYPE
-                    PATH
-                      PATH_SEGMENT
-                        NAME_REF
-                          TEXT_KW "text"
-                  WHITESPACE " "
-                  PATH_KW "PATH"
-                  WHITESPACE " "
-                  LITERAL
-                    STRING "'$.name'"
-                R_PAREN ")"
+                  L_PAREN "("
+                  WHITESPACE "\n      "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "book_id"
+                    WHITESPACE " "
+                    FOR_KW "FOR"
+                    WHITESPACE " "
+                    ORDINALITY_KW "ORDINALITY"
+                  COMMA ","
+                  WHITESPACE "\n      "
+                  JSON_TABLE_COLUMN
+                    NAME
+                      IDENT "bname"
+                    WHITESPACE " "
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            TEXT_KW "text"
+                    WHITESPACE " "
+                    PATH_KW "PATH"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.name'"
+                  COMMA ","
+                  WHITESPACE "\n      "
+                  JSON_TABLE_COLUMN
+                    NESTED_KW "NESTED"
+                    WHITESPACE " "
+                    LITERAL
+                      STRING "'$.authors[*]'"
+                    WHITESPACE "\n        "
+                    JSON_TABLE_COLUMN_LIST
+                      COLUMNS_KW "COLUMNS"
+                      WHITESPACE " "
+                      L_PAREN "("
+                      WHITESPACE "\n          "
+                      JSON_TABLE_COLUMN
+                        NAME
+                          IDENT "author_id"
+                        WHITESPACE " "
+                        FOR_KW "FOR"
+                        WHITESPACE " "
+                        ORDINALITY_KW "ORDINALITY"
+                      COMMA ","
+                      WHITESPACE "\n          "
+                      JSON_TABLE_COLUMN
+                        NAME
+                          IDENT "author_name"
+                        WHITESPACE " "
+                        PATH_TYPE
+                          PATH
+                            PATH_SEGMENT
+                              NAME_REF
+                                TEXT_KW "text"
+                        WHITESPACE " "
+                        PATH_KW "PATH"
+                        WHITESPACE " "
+                        LITERAL
+                          STRING "'$.name'"
+                      R_PAREN ")"
+                  R_PAREN ")"
               R_PAREN ")"
-            R_PAREN ")"
             R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -850,22 +860,24 @@ SOURCE_FILE
               JSON_PASSING_CLAUSE
                 PASSING_KW "passing"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "c"
-                WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "foo"
+                JSON_PASSING_ARG
+                  NAME_REF
+                    IDENT "c"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "foo"
                 COMMA ","
                 WHITESPACE " \n  "
-                NAME_REF
-                  IDENT "d"
-                WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "bar"
+                JSON_PASSING_ARG
+                  NAME_REF
+                    IDENT "d"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "bar"
               WHITESPACE " \n  "
               JSON_RETURNING_CLAUSE
                 RETURNING_KW "returning"
@@ -901,16 +913,19 @@ SOURCE_FILE
                 WHITESPACE " "
                 STRING_KW "string"
               WHITESPACE "\n  "
-              JSON_BEHAVIOR_CLAUSE
-                UNKNOWN_KW "unknown"
+              JSON_ON_EMPTY_CLAUSE
+                JSON_BEHAVIOR_UNKNOWN
+                  UNKNOWN_KW "unknown"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
                 EMPTY_KW "empty"
-                WHITESPACE "\n  "
-                EMPTY_KW "empty"
-                WHITESPACE " "
-                ARRAY_KW "array"
+              WHITESPACE "\n  "
+              JSON_ON_ERROR_CLAUSE
+                JSON_BEHAVIOR_EMPTY_ARRAY
+                  EMPTY_KW "empty"
+                  WHITESPACE " "
+                  ARRAY_KW "array"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
@@ -968,19 +983,21 @@ SOURCE_FILE
               JSON_PASSING_CLAUSE
                 PASSING_KW "passing"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "c"
-                WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "d"
+                JSON_PASSING_ARG
+                  NAME_REF
+                    IDENT "c"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "d"
               WHITESPACE "\n  "
               JSON_ON_ERROR_CLAUSE
-                DEFAULT_KW "default"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "z"
+                JSON_BEHAVIOR_DEFAULT
+                  DEFAULT_KW "default"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "z"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
@@ -1016,13 +1033,14 @@ SOURCE_FILE
               JSON_PASSING_CLAUSE
                 PASSING_KW "PASSING"
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
-                WHITESPACE " "
-                AS_KW "AS"
-                WHITESPACE " "
-                NAME
-                  IDENT "x"
+                JSON_PASSING_ARG
+                  LITERAL
+                    INT_NUMBER "2"
+                  WHITESPACE " "
+                  AS_KW "AS"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "x"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -1049,7 +1067,8 @@ SOURCE_FILE
                 STRING "'lax $.a[5]'"
               WHITESPACE " "
               JSON_ON_ERROR_CLAUSE
-                ERROR_KW "ERROR"
+                JSON_BEHAVIOR_ERROR
+                  ERROR_KW "ERROR"
                 WHITESPACE " "
                 ON_KW "ON"
                 WHITESPACE " "
@@ -1080,7 +1099,8 @@ SOURCE_FILE
                 STRING "'strict $.a[5]'"
               WHITESPACE " "
               JSON_ON_ERROR_CLAUSE
-                ERROR_KW "ERROR"
+                JSON_BEHAVIOR_ERROR
+                  ERROR_KW "ERROR"
                 WHITESPACE " "
                 ON_KW "ON"
                 WHITESPACE " "
@@ -1137,13 +1157,14 @@ SOURCE_FILE
               JSON_PASSING_CLAUSE
                 PASSING_KW "passing"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "c"
-                WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "d"
+                JSON_PASSING_ARG
+                  NAME_REF
+                    IDENT "c"
+                  WHITESPACE " "
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "d"
               WHITESPACE "\n  "
               JSON_RETURNING_CLAUSE
                 RETURNING_KW "returning"
@@ -1159,17 +1180,20 @@ SOURCE_FILE
                   WHITESPACE " "
                   JSON_KW "json"
               WHITESPACE "\n  "
-              JSON_BEHAVIOR_CLAUSE
-                UNKNOWN_KW "unknown"
+              JSON_ON_EMPTY_CLAUSE
+                JSON_BEHAVIOR_UNKNOWN
+                  UNKNOWN_KW "unknown"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
                 EMPTY_KW "empty"
-                WHITESPACE "\n  "
-                DEFAULT_KW "default"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "z"
+              WHITESPACE "\n  "
+              JSON_ON_ERROR_CLAUSE
+                JSON_BEHAVIOR_DEFAULT
+                  DEFAULT_KW "default"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "z"
                 WHITESPACE " "
                 ON_KW "on"
                 WHITESPACE " "
