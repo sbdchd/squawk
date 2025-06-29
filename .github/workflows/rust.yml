@@ -144,7 +144,7 @@ jobs:
 
       - name: VSCode - Build
         working-directory: "squawk-vscode"
-        run: pnpm exec vsce pack --yarn --target ${{ matrix.vscode_artifact_name }}
+        run: pnpm exec vsce pack --no-dependencies --target ${{ matrix.vscode_artifact_name }}
 
       - name: VSCode - Artifact
         uses: actions/upload-artifact@v4
