@@ -1,5 +1,10 @@
 #!/bin/sh
-set -eu
+set -e
 
-cargo fmt -- --check
-cargo clippy --all-targets --all-features -- -D warnings
+if [[ "$CI" ]]; then
+  cargo fmt -- --check
+  cargo clippy --all-targets --all-features -- -D warnings
+else
+  cargo fmt 
+  cargo clippy --fix --allow-staged --allow-dirty --all-targets --all-features -- -D warnings
+fi
