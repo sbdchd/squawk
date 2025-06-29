@@ -257,6 +257,7 @@ jobs:
         run: pnpm build
 
       - name: Deploy to Netlify
+        if: startsWith(github.ref, 'refs/tags/')
         uses: nwtgck/actions-netlify@v2
         with:
           publish-dir: "playground/dist"
