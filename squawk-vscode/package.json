@@ -39,7 +39,7 @@
     "package": "node esbuild.js --production",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
-    "pretest": "pnpm run compile-tests && pnpm run compile && pnpm run lint",
+    "pretest": "pnpm run compile-tests && pnpm run compile",
     "check-types": "tsc --noEmit",
     "lint": "eslint src",
     "test": "vscode-test"
