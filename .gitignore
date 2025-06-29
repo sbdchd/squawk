@@ -6,7 +6,7 @@
 
 # IntelliJ IDE users
 .idea
-dist
+dist/
 
 .DS_Store
 temp.sql

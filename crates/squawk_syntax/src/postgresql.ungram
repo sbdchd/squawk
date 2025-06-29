@@ -942,6 +942,9 @@ JsonTableColumn =
 | Name Type
 | 'nested' 'path'? Expr
 
+JsonTableColumnList =
+  'columns' '(' (JsonTableColumn (',' JsonTableColumn)*) ')'
+
 JsonReturningClause =
   'returning' Type
 
@@ -954,17 +957,54 @@ JsonKeysUniqueClause =
 JsonQuotesClause =
   'keep' 'quotes' | 'omit' 'quotes'
 
-JsonBehaviorClause =
-  'error' 'on' 'error' | 'null' 'on' 'error' | 'empty' 'on' 'error' | 'default' Expr 'on' 'error'
+JsonBehaviorDefault =
+ 'default' Expr
+
+JsonBehaviorError =
+  'error'
+
+JsonBehaviorNull =
+  'null'
+
+JsonBehaviorTrue =
+  'true'
+
+JsonBehaviorFalse =
+  'false'
+
+JsonBehaviorUnknown =
+  'unknown'
+
+JsonBehaviorEmptyArray =
+  'empty' 'array'?
+
+JsonBehaviorEmptyObject =
+  'empty' 'object'
+
+JsonBehavior =
+  JsonBehaviorDefault
+| JsonBehaviorError
+| JsonBehaviorNull
+| JsonBehaviorTrue
+| JsonBehaviorFalse
+| JsonBehaviorUnknown
+| JsonBehaviorEmptyArray
+| JsonBehaviorEmptyObject
 
 JsonWrapperBehaviorClause =
   'with' 'wrapper' | 'without' 'wrapper' | 'with' 'conditional' 'wrapper'
 
 JsonOnErrorClause =
-  'error' 'on' 'error' | 'null' 'on' 'error' | 'empty' 'on' 'error'
+  JsonBehavior 'on' 'error'
+
+JsonOnEmptyClause =
+  JsonBehavior 'on' 'empty'
+
+JsonPassingArg =
+  Expr JsonFormatClause? 'as' Name
 
 JsonPassingClause =
-  'passing' (NamedArg (',' NamedArg)*)
+  'passing' (JsonPassingArg (',' JsonPassingArg)*)
 
 PercentTypeClause =
   Path PercentTypeClause

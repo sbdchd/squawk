@@ -1,8 +1,8 @@
-use crate::SyntaxKind;
 use crate::ast::AstNode;
-use crate::ast::{AstChildren, support};
+use crate::ast::{support, AstChildren};
 use crate::syntax_node::SyntaxNode;
 use crate::syntax_node::SyntaxToken;
+use crate::SyntaxKind;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AddColumn {
@@ -5720,10 +5720,10 @@ impl JoinUsingClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct JsonBehaviorClause {
+pub struct JsonBehaviorDefault {
     pub(crate) syntax: SyntaxNode,
 }
-impl JsonBehaviorClause {
+impl JsonBehaviorDefault {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
@@ -5732,21 +5732,90 @@ impl JsonBehaviorClause {
     pub fn default_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonBehaviorEmptyArray {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonBehaviorEmptyArray {
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
+    }
+    #[inline]
+    pub fn empty_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EMPTY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonBehaviorEmptyObject {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonBehaviorEmptyObject {
     #[inline]
     pub fn empty_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EMPTY_KW)
     }
     #[inline]
+    pub fn object_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OBJECT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonBehaviorError {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonBehaviorError {
+    #[inline]
     pub fn error_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ERROR_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonBehaviorFalse {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonBehaviorFalse {
+    #[inline]
+    pub fn false_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FALSE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonBehaviorNull {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonBehaviorNull {
     #[inline]
     pub fn null_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NULL_KW)
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonBehaviorTrue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonBehaviorTrue {
     #[inline]
-    pub fn on_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ON_KW)
+    pub fn true_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TRUE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonBehaviorUnknown {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonBehaviorUnknown {
+    #[inline]
+    pub fn unknown_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UNKNOWN_KW)
     }
 }
 
@@ -5835,25 +5904,63 @@ impl JsonNullClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonOnEmptyClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonOnEmptyClause {
+    #[inline]
+    pub fn json_behavior(&self) -> Option<JsonBehavior> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn empty_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EMPTY_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct JsonOnErrorClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl JsonOnErrorClause {
     #[inline]
-    pub fn empty_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EMPTY_KW)
+    pub fn json_behavior(&self) -> Option<JsonBehavior> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn error_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ERROR_KW)
     }
     #[inline]
-    pub fn null_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::NULL_KW)
-    }
-    #[inline]
     pub fn on_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonPassingArg {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonPassingArg {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn json_format_clause(&self) -> Option<JsonFormatClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
     }
 }
 
@@ -5863,7 +5970,7 @@ pub struct JsonPassingClause {
 }
 impl JsonPassingClause {
     #[inline]
-    pub fn named_args(&self) -> AstChildren<NamedArg> {
+    pub fn json_passing_args(&self) -> AstChildren<JsonPassingArg> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -5938,6 +6045,29 @@ impl JsonTableColumn {
     #[inline]
     pub fn path_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PATH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct JsonTableColumnList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl JsonTableColumnList {
+    #[inline]
+    pub fn json_table_columns(&self) -> AstChildren<JsonTableColumn> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn columns_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLUMNS_KW)
     }
 }
 
@@ -9810,6 +9940,18 @@ pub enum JoinType {
     JoinInner(JoinInner),
     JoinLeft(JoinLeft),
     JoinRight(JoinRight),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum JsonBehavior {
+    JsonBehaviorDefault(JsonBehaviorDefault),
+    JsonBehaviorEmptyArray(JsonBehaviorEmptyArray),
+    JsonBehaviorEmptyObject(JsonBehaviorEmptyObject),
+    JsonBehaviorError(JsonBehaviorError),
+    JsonBehaviorFalse(JsonBehaviorFalse),
+    JsonBehaviorNull(JsonBehaviorNull),
+    JsonBehaviorTrue(JsonBehaviorTrue),
+    JsonBehaviorUnknown(JsonBehaviorUnknown),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -14848,10 +14990,136 @@ impl AstNode for JoinUsingClause {
         &self.syntax
     }
 }
-impl AstNode for JsonBehaviorClause {
+impl AstNode for JsonBehaviorDefault {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::JSON_BEHAVIOR_CLAUSE
+        kind == SyntaxKind::JSON_BEHAVIOR_DEFAULT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonBehaviorEmptyArray {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_BEHAVIOR_EMPTY_ARRAY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonBehaviorEmptyObject {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_BEHAVIOR_EMPTY_OBJECT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonBehaviorError {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_BEHAVIOR_ERROR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonBehaviorFalse {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_BEHAVIOR_FALSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonBehaviorNull {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_BEHAVIOR_NULL
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonBehaviorTrue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_BEHAVIOR_TRUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonBehaviorUnknown {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_BEHAVIOR_UNKNOWN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -14938,10 +15206,46 @@ impl AstNode for JsonNullClause {
         &self.syntax
     }
 }
+impl AstNode for JsonOnEmptyClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_ON_EMPTY_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for JsonOnErrorClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::JSON_ON_ERROR_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonPassingArg {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_PASSING_ARG
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -15014,6 +15318,24 @@ impl AstNode for JsonTableColumn {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::JSON_TABLE_COLUMN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for JsonTableColumnList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::JSON_TABLE_COLUMN_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -19898,6 +20220,116 @@ impl From<JoinRight> for JoinType {
     #[inline]
     fn from(node: JoinRight) -> JoinType {
         JoinType::JoinRight(node)
+    }
+}
+impl AstNode for JsonBehavior {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::JSON_BEHAVIOR_DEFAULT
+                | SyntaxKind::JSON_BEHAVIOR_EMPTY_ARRAY
+                | SyntaxKind::JSON_BEHAVIOR_EMPTY_OBJECT
+                | SyntaxKind::JSON_BEHAVIOR_ERROR
+                | SyntaxKind::JSON_BEHAVIOR_FALSE
+                | SyntaxKind::JSON_BEHAVIOR_NULL
+                | SyntaxKind::JSON_BEHAVIOR_TRUE
+                | SyntaxKind::JSON_BEHAVIOR_UNKNOWN
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::JSON_BEHAVIOR_DEFAULT => {
+                JsonBehavior::JsonBehaviorDefault(JsonBehaviorDefault { syntax })
+            }
+            SyntaxKind::JSON_BEHAVIOR_EMPTY_ARRAY => {
+                JsonBehavior::JsonBehaviorEmptyArray(JsonBehaviorEmptyArray { syntax })
+            }
+            SyntaxKind::JSON_BEHAVIOR_EMPTY_OBJECT => {
+                JsonBehavior::JsonBehaviorEmptyObject(JsonBehaviorEmptyObject { syntax })
+            }
+            SyntaxKind::JSON_BEHAVIOR_ERROR => {
+                JsonBehavior::JsonBehaviorError(JsonBehaviorError { syntax })
+            }
+            SyntaxKind::JSON_BEHAVIOR_FALSE => {
+                JsonBehavior::JsonBehaviorFalse(JsonBehaviorFalse { syntax })
+            }
+            SyntaxKind::JSON_BEHAVIOR_NULL => {
+                JsonBehavior::JsonBehaviorNull(JsonBehaviorNull { syntax })
+            }
+            SyntaxKind::JSON_BEHAVIOR_TRUE => {
+                JsonBehavior::JsonBehaviorTrue(JsonBehaviorTrue { syntax })
+            }
+            SyntaxKind::JSON_BEHAVIOR_UNKNOWN => {
+                JsonBehavior::JsonBehaviorUnknown(JsonBehaviorUnknown { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            JsonBehavior::JsonBehaviorDefault(it) => &it.syntax,
+            JsonBehavior::JsonBehaviorEmptyArray(it) => &it.syntax,
+            JsonBehavior::JsonBehaviorEmptyObject(it) => &it.syntax,
+            JsonBehavior::JsonBehaviorError(it) => &it.syntax,
+            JsonBehavior::JsonBehaviorFalse(it) => &it.syntax,
+            JsonBehavior::JsonBehaviorNull(it) => &it.syntax,
+            JsonBehavior::JsonBehaviorTrue(it) => &it.syntax,
+            JsonBehavior::JsonBehaviorUnknown(it) => &it.syntax,
+        }
+    }
+}
+impl From<JsonBehaviorDefault> for JsonBehavior {
+    #[inline]
+    fn from(node: JsonBehaviorDefault) -> JsonBehavior {
+        JsonBehavior::JsonBehaviorDefault(node)
+    }
+}
+impl From<JsonBehaviorEmptyArray> for JsonBehavior {
+    #[inline]
+    fn from(node: JsonBehaviorEmptyArray) -> JsonBehavior {
+        JsonBehavior::JsonBehaviorEmptyArray(node)
+    }
+}
+impl From<JsonBehaviorEmptyObject> for JsonBehavior {
+    #[inline]
+    fn from(node: JsonBehaviorEmptyObject) -> JsonBehavior {
+        JsonBehavior::JsonBehaviorEmptyObject(node)
+    }
+}
+impl From<JsonBehaviorError> for JsonBehavior {
+    #[inline]
+    fn from(node: JsonBehaviorError) -> JsonBehavior {
+        JsonBehavior::JsonBehaviorError(node)
+    }
+}
+impl From<JsonBehaviorFalse> for JsonBehavior {
+    #[inline]
+    fn from(node: JsonBehaviorFalse) -> JsonBehavior {
+        JsonBehavior::JsonBehaviorFalse(node)
+    }
+}
+impl From<JsonBehaviorNull> for JsonBehavior {
+    #[inline]
+    fn from(node: JsonBehaviorNull) -> JsonBehavior {
+        JsonBehavior::JsonBehaviorNull(node)
+    }
+}
+impl From<JsonBehaviorTrue> for JsonBehavior {
+    #[inline]
+    fn from(node: JsonBehaviorTrue) -> JsonBehavior {
+        JsonBehavior::JsonBehaviorTrue(node)
+    }
+}
+impl From<JsonBehaviorUnknown> for JsonBehavior {
+    #[inline]
+    fn from(node: JsonBehaviorUnknown) -> JsonBehavior {
+        JsonBehavior::JsonBehaviorUnknown(node)
     }
 }
 impl AstNode for MatchType {
