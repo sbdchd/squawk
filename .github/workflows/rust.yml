@@ -90,6 +90,7 @@ jobs:
 
       - name: Build
         run: RUSTFLAGS="${{ matrix.rustflags }}" cargo build --target ${{ matrix.target }} --release
+        shell: bash
 
       - name: Rename artifact (windows)
         if: matrix.target == 'x86_64-pc-windows-msvc'
