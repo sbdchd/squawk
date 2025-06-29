@@ -20,175 +20,7 @@ jobs:
         with:
           paths_ignore: '["docs/**", "*.md"]'
 
-  build-linux-x64:
-    needs: pre_job
-    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
-
-    name: Linux x86_64
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Toolchain
-        uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
-        with:
-          toolchain: stable
-          target: x86_64-unknown-linux-gnu
-          profile: minimal
-          override: true
-
-      - name: Cache
-        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
-
-      - name: Build
-        run: cargo build --target x86_64-unknown-linux-gnu --release && mv target/x86_64-unknown-linux-gnu/release/squawk target/release/squawk-linux-x64
-
-      - name: Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-squawk-linux-x64
-          path: target/release/squawk-linux-x64
-
-      - name: Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            target/release/squawk-linux-x64
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-linux-arm64:
-    needs: pre_job
-    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
-
-    name: Linux arm64
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Apt
-        run: sudo apt-get install gcc-aarch64-linux-gnu
-
-      - name: Install Toolchain
-        uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
-        with:
-          toolchain: stable
-          target: aarch64-unknown-linux-gnu
-          profile: minimal
-          override: true
-
-      - name: Cache
-        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
-
-      - name: Build
-        run: RUSTFLAGS="-C linker=aarch64-linux-gnu-gcc" cargo build --target aarch64-unknown-linux-gnu --release && mv target/aarch64-unknown-linux-gnu/release/squawk target/release/squawk-linux-arm64
-
-      - name: Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-squawk-linux-arm64
-          path: target/release/squawk-linux-arm64
-
-      - name: Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            target/release/squawk-linux-arm64
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-linux-musl-x64:
-    needs: pre_job
-    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
-
-    name: Linux Alpine x86_64
-    runs-on: ubuntu-22.04
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install musl-tools
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y musl-tools
-
-      - name: Install Toolchain
-        uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
-        with:
-          toolchain: stable
-          target: x86_64-unknown-linux-musl
-          profile: minimal
-          override: true
-
-      - name: Cache
-        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
-
-      - name: Build
-        run: RUSTFLAGS="-C linker=rust-lld" cargo build --target x86_64-unknown-linux-musl --release && mv target/x86_64-unknown-linux-musl/release/squawk target/release/squawk-linux-musl-x64
-
-      - name: Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-squawk-linux-musl-x64
-          path: target/release/squawk-linux-musl-x64
-
-      - name: Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            target/release/squawk-linux-musl-x64
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-windows:
-    needs: pre_job
-    if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
-    name: Windows
-
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Install Toolchain
-        uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
-        with:
-          toolchain: stable
-          target: x86_64-pc-windows-msvc
-          profile: minimal
-          override: true
-
-      - name: Cache
-        uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
-
-      - name: Build
-        run: cargo build --target x86_64-pc-windows-msvc --release && mv target/x86_64-pc-windows-msvc/release/squawk.exe target/release/squawk-windows-x64.exe
-
-      - name: Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: release-squawk-windows-x64.exe
-          path: target/release/squawk-windows-x64.exe
-
-      - name: Release
-        uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            target/release/squawk-windows-x64.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  build-mac:
+  build:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
 
@@ -196,21 +28,61 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - arch: x64
-            target: x86_64-apple-darwin
-          - arch: arm64
-            target: aarch64-apple-darwin
+          - name: Linux x86_64
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-gnu
+            artifact_name: squawk-linux-x64
 
-    name: macOS ${{ matrix.arch }}
-    runs-on: macos-latest
+          - name: Linux arm64
+            os: ubuntu-22.04
+            target: aarch64-unknown-linux-gnu
+            artifact_name: squawk-linux-arm64
+            rustflags: "-C linker=aarch64-linux-gnu-gcc"
+
+          - name: Linux Alpine x86_64
+            os: ubuntu-22.04
+            target: x86_64-unknown-linux-musl
+            artifact_name: squawk-linux-musl-x64
+            rustflags: "-C linker=rust-lld"
+
+          - name: Windows x86_64
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
+            artifact_name: squawk-windows-x64.exe
+
+          - name: macOS x86_64
+            os: macos-latest
+            target: x86_64-apple-darwin
+            artifact_name: squawk-darwin-x64
+
+          - name: macOS arm64
+            os: macos-latest
+            target: aarch64-apple-darwin
+            artifact_name: squawk-darwin-arm64
+
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Update apt repositories
+        if: matrix.target == 'aarch64-unknown-linux-gnu' || matrix.target == 'arm-unknown-linux-gnueabihf'
+        run: sudo apt-get update
+
+      - name: Install AArch64 target toolchain
+        if: matrix.target == 'aarch64-unknown-linux-gnu'
+        run: sudo apt-get install gcc-aarch64-linux-gnu
+
+      - name: Install x86_64-musl target toolchain
+        if: matrix.target == 'x86_64-unknown-linux-musl'
+        run: sudo apt-get install musl-tools
+
       - name: Install Toolchain
         uses: oxidecomputer/actions-rs_toolchain@ad3f86084a8a5acf2c09cb691421b31cf8af7a36 # pin@oxide/master
         with:
+          toolchain: stable
           target: ${{ matrix.target }}
           profile: minimal
           override: true
@@ -218,34 +90,30 @@ jobs:
       - name: Cache
         uses: Swatinem/rust-cache@9d47c6ad4b02e050fd481d890b2ea34778fd09d6 # pin@v2
 
-      - name: Build for mac
-        run: cargo build --release --target=${{ matrix.target }} && mv target/${{ matrix.target }}/release/squawk target/release/squawk-darwin-${{ matrix.arch }}
+      - name: Build
+        run: RUSTFLAGS="${{ matrix.rustflags }}" cargo build --target ${{ matrix.target }} --release
+
+      - name: Rename artifact
+        run: mv target/${{ matrix.target }}/release/squawk* target/release/${{ matrix.artifact_name }}
 
       - name: Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: release-squawk-darwin-${{ matrix.arch }}
-          path: target/release/squawk-darwin-${{ matrix.arch }}
+          name: release-${{ matrix.artifact_name }}
+          path: target/release/${{ matrix.artifact_name }}
 
       - name: Release
         uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # pin@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            target/release/squawk-darwin-${{ matrix.arch }}
+            target/release/${{ matrix.artifact_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish-npm:
     if: startsWith(github.ref, 'refs/tags/')
-    needs:
-      [
-        build-linux-x64,
-        build-linux-musl-x64,
-        build-linux-arm64,
-        build-mac,
-        build-windows,
-      ]
+    needs: [build]
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
@@ -259,7 +127,7 @@ jobs:
 
   publish-docker:
     if: startsWith(github.ref, 'refs/tags/')
-    needs: [build-linux-x64, build-linux-musl-x64, build-mac, build-windows]
+    needs: [build]
     runs-on: ubuntu-22.04
     permissions:
       contents: read
