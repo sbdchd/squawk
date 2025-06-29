@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -e
+
+
+if [ -z "$CI"]; then
+  pnpm exec eslint src
+  pnpm exec prettier --check
+else
+  pnpm exec eslint --fix src
+  pnpm exec prettier -w '**/*.{js,ts,mjs,tsx,md,json}'
+fi
