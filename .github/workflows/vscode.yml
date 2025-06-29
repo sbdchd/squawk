@@ -93,4 +93,4 @@ jobs:
 
       - name: Run tests
         working-directory: "squawk-vscode"
-        run: pnpm run test
+        run: xvfb-run pnpm run test
