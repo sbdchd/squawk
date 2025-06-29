@@ -149,6 +149,7 @@ jobs:
       - name: VSCode - Artifact
         uses: actions/upload-artifact@v4
         with:
+          name: squawk-vscode-${{ matrix.vscode_artifact_name }}
           path: squawk-vscode/*.vsix
 
       - name: Release
