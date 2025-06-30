@@ -22,39 +22,44 @@ use std::process::{self, ExitCode};
 use structopt::StructOpt;
 
 #[derive(StructOpt, Debug)]
+pub struct UploadToGithubArgs {
+    /// Paths to search
+    paths: Vec<String>,
+    /// Exits with an error if violations are found
+    #[structopt(long)]
+    fail_on_violations: bool,
+    #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
+    github_private_key: Option<String>,
+    #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
+    github_private_key_base64: Option<String>,
+    #[structopt(long, env = "SQUAWK_GITHUB_TOKEN")]
+    github_token: Option<String>,
+    /// GitHub App Id.
+    #[structopt(long, env = "SQUAWK_GITHUB_APP_ID")]
+    github_app_id: Option<i64>,
+    /// GitHub Install Id. The installation that squawk is acting on.
+    #[structopt(long, env = "SQUAWK_GITHUB_INSTALL_ID")]
+    github_install_id: Option<i64>,
+    /// GitHub Repo Owner
+    /// github.com/sbdchd/squawk, sbdchd is the owner
+    #[structopt(long, env = "SQUAWK_GITHUB_REPO_OWNER")]
+    github_repo_owner: String,
+    /// GitHub Repo Name
+    /// github.com/sbdchd/squawk, squawk is the name
+    #[structopt(long, env = "SQUAWK_GITHUB_REPO_NAME")]
+    github_repo_name: String,
+    /// GitHub Pull Request Number
+    /// github.com/sbdchd/squawk/pull/10, 10 is the PR number
+    #[structopt(long, env = "SQUAWK_GITHUB_PR_NUMBER")]
+    github_pr_number: i64,
+}
+
+#[derive(StructOpt, Debug)]
 pub enum Command {
+    /// Run the language server
+    Server,
     /// Comment on a PR with Squawk's results.
-    UploadToGithub {
-        /// Paths to search
-        paths: Vec<String>,
-        /// Exits with an error if violations are found
-        #[structopt(long)]
-        fail_on_violations: bool,
-        #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
-        github_private_key: Option<String>,
-        #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
-        github_private_key_base64: Option<String>,
-        #[structopt(long, env = "SQUAWK_GITHUB_TOKEN")]
-        github_token: Option<String>,
-        /// GitHub App Id.
-        #[structopt(long, env = "SQUAWK_GITHUB_APP_ID")]
-        github_app_id: Option<i64>,
-        /// GitHub Install Id. The installation that squawk is acting on.
-        #[structopt(long, env = "SQUAWK_GITHUB_INSTALL_ID")]
-        github_install_id: Option<i64>,
-        /// GitHub Repo Owner
-        /// github.com/sbdchd/squawk, sbdchd is the owner
-        #[structopt(long, env = "SQUAWK_GITHUB_REPO_OWNER")]
-        github_repo_owner: String,
-        /// GitHub Repo Name
-        /// github.com/sbdchd/squawk, squawk is the name
-        #[structopt(long, env = "SQUAWK_GITHUB_REPO_NAME")]
-        github_repo_name: String,
-        /// GitHub Pull Request Number
-        /// github.com/sbdchd/squawk/pull/10, 10 is the PR number
-        #[structopt(long, env = "SQUAWK_GITHUB_PR_NUMBER")]
-        github_pr_number: i64,
-    },
+    UploadToGithub(UploadToGithubArgs),
 }
 
 arg_enum! {
@@ -210,55 +215,64 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
     info!("assume in a transaction: {assume_in_transaction:?}");
 
     let mut clap_app = Opt::clap();
-    let stdout = io::stdout();
-    let mut handle = stdout.lock();
-
     let is_stdin = !atty::is(Stream::Stdin);
 
-    let found_paths = find_paths(&opts.path_patterns, &excluded_paths).unwrap_or_else(|e| {
-        eprintln!("Failed to find files: {e}");
-        process::exit(1);
-    });
-    if found_paths.is_empty() && !opts.path_patterns.is_empty() {
-        eprintln!(
-            "Failed to find files for provided patterns: {:?}",
-            opts.path_patterns
-        );
-        process::exit(1);
-    }
     if let Some(subcommand) = opts.cmd {
-        github::check_and_comment_on_pr(
-            subcommand,
-            &conf,
-            is_stdin,
-            opts.stdin_filepath,
-            &excluded_rules,
-            &excluded_paths,
-            pg_version,
-            assume_in_transaction,
-        )
-        .context("Upload to GitHub failed")?;
-    } else if !found_paths.is_empty() || is_stdin {
-        let read_stdin = found_paths.is_empty() && is_stdin;
-        if let Some(kind) = opts.debug {
-            debug(&mut handle, &found_paths, read_stdin, &kind, opts.verbose)?;
-        } else {
-            let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-            let exit_code = check_and_dump_files(
-                &mut handle,
-                &found_paths,
-                read_stdin,
-                opts.stdin_filepath,
-                &excluded_rules,
-                pg_version,
-                assume_in_transaction,
-                &reporter,
-            )?;
-            return Ok(exit_code);
+        match subcommand {
+            Command::Server => {
+                squawk_server::run_server().context("language server failed")?;
+            }
+            Command::UploadToGithub(args) => {
+                github::check_and_comment_on_pr(
+                    args,
+                    &conf,
+                    is_stdin,
+                    opts.stdin_filepath,
+                    &excluded_rules,
+                    &excluded_paths,
+                    pg_version,
+                    assume_in_transaction,
+                )
+                .context("Upload to GitHub failed")?;
+            }
         }
     } else {
-        clap_app.print_long_help()?;
-        println!();
+        let found_paths = find_paths(&opts.path_patterns, &excluded_paths).unwrap_or_else(|e| {
+            eprintln!("Failed to find files: {e}");
+            process::exit(1);
+        });
+        if found_paths.is_empty() && !opts.path_patterns.is_empty() {
+            eprintln!(
+                "Failed to find files for provided patterns: {:?}",
+                opts.path_patterns
+            );
+            process::exit(1);
+        }
+        if !found_paths.is_empty() || is_stdin {
+            let stdout = io::stdout();
+            let mut handle = stdout.lock();
+
+            let read_stdin = found_paths.is_empty() && is_stdin;
+            if let Some(kind) = opts.debug {
+                debug(&mut handle, &found_paths, read_stdin, &kind, opts.verbose)?;
+            } else {
+                let reporter = opts.reporter.unwrap_or(Reporter::Tty);
+                let exit_code = check_and_dump_files(
+                    &mut handle,
+                    &found_paths,
+                    read_stdin,
+                    opts.stdin_filepath,
+                    &excluded_rules,
+                    pg_version,
+                    assume_in_transaction,
+                    &reporter,
+                )?;
+                return Ok(exit_code);
+            }
+        } else {
+            clap_app.print_long_help()?;
+            println!();
+        }
     }
     Ok(ExitCode::SUCCESS)
 }

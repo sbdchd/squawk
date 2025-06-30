@@ -30,11 +30,14 @@ squawk_syntax.workspace = true
 squawk_linter.workspace = true
 squawk_lexer.workspace = true
 squawk_github.workspace = true
+squawk_server.workspace = true
 toml.workspace = true
 glob.workspace = true
 anyhow.workspace = true
 annotate-snippets.workspace = true
 line-index.workspace = true
+lsp-server.workspace = true
+lsp-types.workspace = true
 
 [dev-dependencies]
 insta.workspace = true
