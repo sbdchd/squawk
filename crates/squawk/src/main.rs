@@ -220,7 +220,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
     if let Some(subcommand) = opts.cmd {
         match subcommand {
             Command::Server => {
-                squawk_server::run_server().context("language server failed")?;
+                squawk_server::run().context("language server failed")?;
             }
             Command::UploadToGithub(args) => {
                 github::check_and_comment_on_pr(
