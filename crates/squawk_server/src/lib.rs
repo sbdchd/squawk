@@ -127,11 +127,11 @@ fn handle_did_change(connection: &Connection, notif: lsp_server::Notification) -
 }
 
 fn lint(connection: &Connection, uri: lsp_types::Url, content: &str, version: i32) -> Result<()> {
-    let parse: Parse<SourceFile> = SourceFile::parse(&content);
+    let parse: Parse<SourceFile> = SourceFile::parse(content);
     let parse_errors = parse.errors();
     let mut linter = Linter::with_all_rules();
-    let violations = linter.lint(parse, &content);
-    let line_index = LineIndex::new(&content);
+    let violations = linter.lint(parse, content);
+    let line_index = LineIndex::new(content);
 
     let mut diagnostics = vec![];
 
@@ -194,7 +194,7 @@ fn lint(connection: &Connection, uri: lsp_types::Url, content: &str, version: i3
     }
 
     let publish_params = PublishDiagnosticsParams {
-        uri: uri,
+        uri,
         diagnostics,
         version: Some(version),
     };
