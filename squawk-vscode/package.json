@@ -33,8 +33,31 @@
   "contributes": {
     "commands": [
       {
-        "command": "squawk.helloWorld",
-        "title": "Hello World"
+        "command": "squawk.serverVersion",
+        "title": "Show Server Version",
+        "category": "Squawk"
+      }
+    ],
+    "languages": [
+      {
+        "id": "sql",
+        "extensions": [
+          ".sql"
+        ],
+        "aliases": [
+          "SQL",
+          "sql"
+        ]
+      },
+      {
+        "id": "postgres",
+        "extensions": [
+          ".psql"
+        ],
+        "aliases": [
+          "PostgreSQL",
+          "postgres"
+        ]
       }
     ]
   },
@@ -72,5 +95,8 @@
   "volta": {
     "node": "18.7.0",
     "pnpm": "8.15.8"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
   }
 }

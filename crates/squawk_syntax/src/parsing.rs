@@ -28,9 +28,6 @@ use rowan::{GreenNode, TextRange};
 
 use crate::{syntax_error::SyntaxError, syntax_node::SyntaxTreeBuilder};
 
-// 1. lex input into vec of tokens
-// 2. run the parser over the tokens generating an array of events
-// 3. intersperse trivia TODO
 pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
     let lexed = squawk_parser::LexedStr::new(text);
     let parser_input = lexed.to_input();
@@ -38,43 +35,6 @@ pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
     let (node, errors, _eof) = build_tree(lexed, parser_output);
     (node, errors)
 }
-
-// 5. check for lexer errors and add them to the parser errors
-// 6. return
-// (node, errors)
-
-// 7. then some other function passes this stuff to SyntaxNode::new_root
-// pub fn parse(text: &str, edition: Edition) -> Parse<SourceFile> {
-//     let _p = tracing::info_span!("SourceFile::parse").entered();
-//     let (green, errors) = parsing::parse_text(text, edition);
-//     let root = SyntaxNode::new_root(green.clone());
-
-//     assert_eq!(root.kind(), SyntaxKind::SOURCE_FILE);
-//     Parse::new(green, errors)
-// }
-
-// 8. rust analyzer has another validation layer that traverses the syntax tree to cover issues not caught by the lexer or parser
-
-// ast nodes wrap
-//  - rowan::syntax nodes
-//      - rowan::green nodes
-
-//
-// they do some stuff to support having proper types for it
-//
-// also have can_cast and cast methods to support casting between the two
-//
-// #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-// pub struct IfExpr {
-//     pub(crate) syntax: SyntaxNode,
-// }
-// impl ast::HasAttrs for IfExpr {}
-// impl IfExpr {
-//     #[inline]
-//     pub fn else_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![else]) }
-//     #[inline]
-//     pub fn if_token(&self) -> Option<SyntaxToken> { support::token(&self.syntax, T![if]) }
-// }
 
 pub(crate) fn build_tree(
     lexed: squawk_parser::LexedStr<'_>,

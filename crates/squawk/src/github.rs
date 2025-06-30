@@ -1,4 +1,4 @@
-use crate::Command;
+use crate::UploadToGithubArgs;
 use crate::config::Config;
 use crate::reporter::{CheckReport, fmt_tty_violation};
 use crate::{file_finding::find_paths, reporter::check_files};
@@ -69,7 +69,7 @@ fn create_gh_app(
 const COMMENT_HEADER: &str = "# Squawk Report";
 
 pub fn check_and_comment_on_pr(
-    cmd: Command,
+    args: UploadToGithubArgs,
     cfg: &Config,
     is_stdin: bool,
     stdin_path: Option<String>,
@@ -78,7 +78,7 @@ pub fn check_and_comment_on_pr(
     pg_version: Option<Version>,
     assume_in_transaction: bool,
 ) -> Result<()> {
-    let Command::UploadToGithub {
+    let UploadToGithubArgs {
         paths,
         fail_on_violations,
         github_private_key,
@@ -89,7 +89,7 @@ pub fn check_and_comment_on_pr(
         github_repo_name,
         github_pr_number,
         github_private_key_base64,
-    } = cmd;
+    } = args;
 
     let fail_on_violations =
         if let Some(fail_on_violations_cfg) = cfg.upload_to_github.fail_on_violations {
