@@ -330,3 +330,38 @@ jobs:
 
       - name: Check versions are consistent
         run: ./s/check-version
+
+  publish-vscode:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [build]
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: "squawk-vscode/package.json"
+          cache-dependency-path: "squawk-vscode/pnpm-lock.yaml"
+          cache: "pnpm"
+      - name: Install JS dependencies
+        working-directory: "squawk-vscode"
+        run: pnpm install
+
+      - name: Download all VS Code artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: squawk-vscode-*
+          path: ./dist
+
+      - name: Publish Extension (VS Code Marketplace)
+        working-directory: ./squawk-vscode
+        run: pnpm exec vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix
+      # - name: Publish Extension (Open VSX)
+      #   working-directory: ./squawk-vscode
+      #   run: pnpm exec ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix
+      #   timeout-minutes: 2
