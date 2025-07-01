@@ -31,6 +31,7 @@ module.exports = {
       "ban-create-domain-with-constraint",
       "ban-alter-domain-with-add-constraint",
       "ban-truncate-cascade",
+      "syntax-error",
       // xtask:new-rule:error-name
     ],
   },

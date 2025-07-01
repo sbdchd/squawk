@@ -32,6 +32,24 @@ export async function activate(context: vscode.ExtensionContext) {
   )
   context.subscriptions.push(serverVersionCommand)
 
+  const showLogsCommand = vscode.commands.registerCommand(
+    "squawk.showLogs",
+    () => {
+      client?.outputChannel?.show()
+    },
+  )
+  context.subscriptions.push(showLogsCommand)
+
+  const statusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right,
+    100,
+  )
+  statusBarItem.text = "Squawk"
+  statusBarItem.tooltip = "Click to show Squawk Language Server logs"
+  statusBarItem.command = "squawk.showLogs"
+  statusBarItem.show()
+  context.subscriptions.push(statusBarItem)
+
   await startServer(context)
 }
 
@@ -66,10 +84,7 @@ async function startServer(context: vscode.ExtensionContext) {
   }
   const serverOptions: ServerOptions = serverExecutable
   const clientOptions: LanguageClientOptions = {
-    documentSelector: [
-      { scheme: "file", language: "sql" },
-      { scheme: "file", language: "postgres" },
-    ],
+    documentSelector: [{ language: "sql" }, { language: "postgres" }],
     outputChannel: vscode.window.createOutputChannel("Squawk Language Server"),
   }
   client = new LanguageClient(

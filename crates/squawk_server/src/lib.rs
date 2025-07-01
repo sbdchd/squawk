@@ -4,18 +4,19 @@ use log::info;
 use lsp_server::{Connection, Message, Notification, Response};
 use lsp_types::{
     CodeDescription, Diagnostic, DiagnosticSeverity, DidChangeTextDocumentParams,
-    DidOpenTextDocumentParams, GotoDefinitionParams, GotoDefinitionResponse, InitializeParams,
-    Location, OneOf, Position, PublishDiagnosticsParams, Range, ServerCapabilities,
-    TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+    DidCloseTextDocumentParams, DidOpenTextDocumentParams, GotoDefinitionParams,
+    GotoDefinitionResponse, InitializeParams, Location, OneOf, Position, PublishDiagnosticsParams,
+    Range, ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
     notification::{
-        DidChangeTextDocument, DidOpenTextDocument, Notification as _, PublishDiagnostics,
+        DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
+        PublishDiagnostics,
     },
     request::{GotoDefinition, Request},
 };
 use squawk_linter::Linter;
 use squawk_syntax::{Parse, SourceFile};
 
-pub fn run_server() -> Result<()> {
+pub fn run() -> Result<()> {
     info!("Starting Squawk LSP server");
 
     let (connection, io_threads) = Connection::stdio();
@@ -74,6 +75,8 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     handle_did_open(&connection, notif)?;
                 } else if notif.method == DidChangeTextDocument::METHOD {
                     handle_did_change(&connection, notif)?;
+                } else if notif.method == DidCloseTextDocument::METHOD {
+                    handle_did_close(&connection, notif)?;
                 }
             }
         }
@@ -122,6 +125,28 @@ fn handle_did_change(connection: &Connection, notif: lsp_server::Notification) -
     if let Some(change) = params.content_changes.last() {
         lint(connection, uri, &change.text, version)?;
     }
+
+    Ok(())
+}
+
+fn handle_did_close(connection: &Connection, notif: lsp_server::Notification) -> Result<()> {
+    let params: DidCloseTextDocumentParams = serde_json::from_value(notif.params)?;
+    let uri = params.text_document.uri;
+
+    let publish_params = PublishDiagnosticsParams {
+        uri,
+        diagnostics: vec![],
+        version: None,
+    };
+
+    let notification = Notification {
+        method: PublishDiagnostics::METHOD.to_owned(),
+        params: serde_json::to_value(publish_params)?,
+    };
+
+    connection
+        .sender
+        .send(Message::Notification(notification))?;
 
     Ok(())
 }

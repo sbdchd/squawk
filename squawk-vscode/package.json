@@ -36,6 +36,11 @@
         "command": "squawk.serverVersion",
         "title": "Show Server Version",
         "category": "Squawk"
+      },
+      {
+        "command": "squawk.showLogs",
+        "title": "Show Server Logs",
+        "category": "Squawk"
       }
     ],
     "languages": [
