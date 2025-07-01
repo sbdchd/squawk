@@ -9,6 +9,7 @@ function main {
     fastmod --accept-all '^version = ".*"' 'version = "'$NEW_VERSION'"' crates/squawk/Cargo.toml
     fastmod --accept-all -m '(name = "squawk"\n)version = ".*?"' '${1}version = "'$NEW_VERSION'"' Cargo.lock
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' package.json
+    fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' squawk-vscode/package.json
     fastmod --accept-all -m '(pname = "squawk";.*?)version = ".*?"' '${1}version = "'$NEW_VERSION'"' flake.nix
 }
 
