@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.17.0 - 2025-06-30
+
+## Added
+
+- Basic VSCode extension. (#567), (#569), (#571), (#572)
+
+- Improved `json_table` parsing. (#564)
+
 ## v2.16.0 - 2025-06-27
 
 ### Added

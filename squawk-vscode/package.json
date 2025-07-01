@@ -9,7 +9,7 @@
   "icon": "icon.png",
   "author": "Squawk Team & Contributors",
   "license": "(Apache-2.0 OR MIT)",
-  "version": "0.0.2",
+  "version": "2.17.0",
   "engines": {
     "vscode": "^1.101.0"
   },
