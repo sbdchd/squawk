@@ -2677,6 +2677,7 @@ dependencies = [
  "log",
  "lsp-server",
  "lsp-types",
+ "serde",
  "serde_json",
  "simplelog",
  "squawk_linter",

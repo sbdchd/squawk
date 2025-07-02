@@ -41,6 +41,16 @@
         "command": "squawk.showLogs",
         "title": "Show Server Logs",
         "category": "Squawk"
+      },
+      {
+        "command": "squawk.showSyntaxTree",
+        "title": "Show Syntax Tree",
+        "category": "Squawk"
+      },
+      {
+        "command": "squawk.showClientLogs",
+        "title": "Show Client Logs",
+        "category": "Squawk"
       }
     ],
     "languages": [
