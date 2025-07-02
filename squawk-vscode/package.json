@@ -51,6 +51,16 @@
         "command": "squawk.showClientLogs",
         "title": "Show Client Logs",
         "category": "Squawk"
+      },
+      {
+        "command": "squawk.startServer",
+        "title": "Start Server",
+        "category": "Squawk"
+      },
+      {
+        "command": "squawk.stopServer",
+        "title": "Stop Server",
+        "category": "Squawk"
       }
     ],
     "languages": [

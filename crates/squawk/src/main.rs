@@ -216,62 +216,61 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
 
     let mut clap_app = Opt::clap();
     let is_stdin = !atty::is(Stream::Stdin);
-
-    if let Some(subcommand) = opts.cmd {
-        match subcommand {
-            Command::Server => {
-                squawk_server::run().context("language server failed")?;
-            }
-            Command::UploadToGithub(args) => {
-                github::check_and_comment_on_pr(
-                    args,
-                    &conf,
-                    is_stdin,
-                    opts.stdin_filepath,
-                    &excluded_rules,
-                    &excluded_paths,
-                    pg_version,
-                    assume_in_transaction,
-                )
-                .context("Upload to GitHub failed")?;
-            }
+    match opts.cmd {
+        Some(Command::Server) => {
+            squawk_server::run().context("language server failed")?;
         }
-    } else {
-        let found_paths = find_paths(&opts.path_patterns, &excluded_paths).unwrap_or_else(|e| {
-            eprintln!("Failed to find files: {e}");
-            process::exit(1);
-        });
-        if found_paths.is_empty() && !opts.path_patterns.is_empty() {
-            eprintln!(
-                "Failed to find files for provided patterns: {:?}",
-                opts.path_patterns
-            );
-            process::exit(1);
+        Some(Command::UploadToGithub(args)) => {
+            github::check_and_comment_on_pr(
+                args,
+                &conf,
+                is_stdin,
+                opts.stdin_filepath,
+                &excluded_rules,
+                &excluded_paths,
+                pg_version,
+                assume_in_transaction,
+            )
+            .context("Upload to GitHub failed")?;
         }
-        if !found_paths.is_empty() || is_stdin {
-            let stdout = io::stdout();
-            let mut handle = stdout.lock();
+        None => {
+            let found_paths =
+                find_paths(&opts.path_patterns, &excluded_paths).unwrap_or_else(|e| {
+                    eprintln!("Failed to find files: {e}");
+                    process::exit(1);
+                });
+            if found_paths.is_empty() && !opts.path_patterns.is_empty() {
+                eprintln!(
+                    "Failed to find files for provided patterns: {:?}",
+                    opts.path_patterns
+                );
+                process::exit(1);
+            }
+            if !found_paths.is_empty() || is_stdin {
+                let stdout = io::stdout();
+                let mut handle = stdout.lock();
 
-            let read_stdin = found_paths.is_empty() && is_stdin;
-            if let Some(kind) = opts.debug {
-                debug(&mut handle, &found_paths, read_stdin, &kind, opts.verbose)?;
+                let read_stdin = found_paths.is_empty() && is_stdin;
+                if let Some(kind) = opts.debug {
+                    debug(&mut handle, &found_paths, read_stdin, &kind, opts.verbose)?;
+                } else {
+                    let reporter = opts.reporter.unwrap_or(Reporter::Tty);
+                    let exit_code = check_and_dump_files(
+                        &mut handle,
+                        &found_paths,
+                        read_stdin,
+                        opts.stdin_filepath,
+                        &excluded_rules,
+                        pg_version,
+                        assume_in_transaction,
+                        &reporter,
+                    )?;
+                    return Ok(exit_code);
+                }
             } else {
-                let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-                let exit_code = check_and_dump_files(
-                    &mut handle,
-                    &found_paths,
-                    read_stdin,
-                    opts.stdin_filepath,
-                    &excluded_rules,
-                    pg_version,
-                    assume_in_transaction,
-                    &reporter,
-                )?;
-                return Ok(exit_code);
+                clap_app.print_long_help()?;
+                println!();
             }
-        } else {
-            clap_app.print_long_help()?;
-            println!();
         }
     }
     Ok(ExitCode::SUCCESS)

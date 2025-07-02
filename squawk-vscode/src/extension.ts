@@ -5,6 +5,8 @@ import {
   LanguageClientOptions,
   Executable,
   ServerOptions,
+  State,
+  StateChangeEvent,
 } from "vscode-languageclient/node"
 
 let client: LanguageClient | undefined
@@ -12,6 +14,7 @@ let log: Pick<
   vscode.LogOutputChannel,
   "trace" | "debug" | "info" | "warn" | "error" | "show"
 >
+const onClientStateChange = new vscode.EventEmitter<StateChangeEvent>()
 
 export async function activate(context: vscode.ExtensionContext) {
   log = vscode.window.createOutputChannel("Squawk Client", {
@@ -41,10 +44,14 @@ export async function activate(context: vscode.ExtensionContext) {
         )
         return version
       } catch (error) {
-        vscode.window.showErrorMessage(`Failed to get server version: ${error}`)
+        vscode.window.showErrorMessage(
+          `Failed to get server version: ${String(error)}`,
+        )
       }
     }),
   )
+
+  setupStatusBarItem(context)
 
   context.subscriptions.push(
     vscode.commands.registerCommand("squawk.showLogs", () => {
@@ -58,15 +65,19 @@ export async function activate(context: vscode.ExtensionContext) {
     }),
   )
 
-  const statusBarItem = vscode.window.createStatusBarItem(
-    vscode.StatusBarAlignment.Right,
-    100,
+  context.subscriptions.push(
+    vscode.commands.registerCommand("squawk.startServer", async () => {
+      await startServer(context)
+    }),
   )
-  statusBarItem.text = "Squawk"
-  statusBarItem.tooltip = "Click to show Squawk Language Server logs"
-  statusBarItem.command = "squawk.showLogs"
-  statusBarItem.show()
-  context.subscriptions.push(statusBarItem)
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("squawk.stopServer", async () => {
+      await stopServer()
+    }),
+  )
+
+  context.subscriptions.push(onClientStateChange)
 
   await startServer(context)
 }
@@ -83,12 +94,88 @@ function isSqlEditor(editor: vscode.TextEditor): boolean {
   return isSqlDocument(editor.document)
 }
 
+function setupStatusBarItem(context: vscode.ExtensionContext) {
+  const statusBarItem = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left,
+  )
+  statusBarItem.text = "Squawk"
+  statusBarItem.command = "squawk.showLogs"
+  context.subscriptions.push(statusBarItem)
+
+  const onDidChangeActiveTextEditor = (
+    editor: vscode.TextEditor | undefined,
+  ) => {
+    if (editor && isSqlEditor(editor)) {
+      updateStatusBarItem(statusBarItem)
+      statusBarItem.show()
+    } else {
+      statusBarItem.hide()
+    }
+  }
+
+  onDidChangeActiveTextEditor(vscode.window.activeTextEditor)
+
+  context.subscriptions.push(
+    vscode.window.onDidChangeActiveTextEditor((editor) => {
+      onDidChangeActiveTextEditor(editor)
+    }),
+  )
+
+  context.subscriptions.push(
+    onClientStateChange.event(() => {
+      updateStatusBarItem(statusBarItem)
+    }),
+  )
+}
+
+function updateStatusBarItem(statusBarItem: vscode.StatusBarItem) {
+  if (!client) {
+    return
+  }
+  let statusText: string
+  let icon: string
+  let backgroundColor: vscode.ThemeColor | undefined
+  switch (client.state) {
+    case State.Stopped:
+      statusText = "Stopped"
+      icon = "$(error) "
+      backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground")
+      break
+    case State.Starting:
+      statusText = "Starting..."
+      icon = "$(loading~spin) "
+      backgroundColor = undefined
+      break
+    case State.Running:
+      statusText = "Running"
+      icon = ""
+      backgroundColor = undefined
+      break
+    default:
+      assertNever(client.state)
+  }
+
+  statusBarItem.text = `${icon}Squawk`
+  statusBarItem.backgroundColor = backgroundColor
+  statusBarItem.tooltip = `Status: ${statusText}\nClick to show server logs`
+}
+
 function getSquawkPath(context: vscode.ExtensionContext): vscode.Uri {
   const ext = process.platform === "win32" ? ".exe" : ""
   return vscode.Uri.joinPath(context.extensionUri, "server", `squawk${ext}`)
 }
 
 async function startServer(context: vscode.ExtensionContext) {
+  if (client?.state === State.Running) {
+    log.info("Server is already running")
+    return
+  }
+
+  if (client?.state === State.Starting) {
+    log.info("Server is already starting")
+    return
+  }
+
   log.info("Starting Squawk Language Server...")
 
   const squawkPath = getSquawkPath(context)
@@ -120,9 +207,38 @@ async function startServer(context: vscode.ExtensionContext) {
     clientOptions,
   )
 
-  log.info("Language client created, starting...")
-  client.start()
-  log.info("Language client started")
+  context.subscriptions.push(
+    client.onDidChangeState((event) => {
+      onClientStateChange.fire(event)
+    }),
+  )
+
+  log.info("server starting...")
+  try {
+    await client.start()
+    log.info("server started successfully")
+  } catch (error) {
+    log.error(`Failed to start server:`, error)
+    vscode.window.showErrorMessage(`Failed to start server: ${String(error)}`)
+  }
+}
+
+async function stopServer() {
+  if (!client) {
+    log.info("No client to stop server")
+    return
+  }
+
+  if (client.state === State.Stopped) {
+    log.info("Server is already stopped")
+    return
+  }
+
+  log.info("Stopping server...")
+
+  await client.stop()
+
+  log.info("server stopped")
 }
 
 // Based on rust-analyzer's SyntaxTree support:
@@ -181,18 +297,24 @@ class SyntaxTreeProvider implements vscode.TextDocumentContentProvider {
       if (!document) {
         return "Error: no active editor found"
       }
+      if (!client) {
+        return "Error: no client found"
+      }
       const text = document.getText()
       const uri = document.uri.toString()
       log.info(`Requesting syntax tree for: ${uri}`)
-      const response = await client?.sendRequest("squawk/syntaxTree", {
+      const response = await client.sendRequest<string>("squawk/syntaxTree", {
         textDocument: { uri },
         text,
       })
       log.info("Syntax tree received")
-      return response as string
+      return response
     } catch (error) {
-      log.error(`Failed to get syntax tree: ${error}`)
-      return `Error: Failed to get syntax tree: ${error}`
+      log.error(`Failed to get syntax tree:`, error)
+      return `Error: Failed to get syntax tree: ${String(error)}`
     }
   }
+}
+function assertNever(param: never): never {
+  throw new Error(`should never get here, but got ${String(param)}`)
 }
