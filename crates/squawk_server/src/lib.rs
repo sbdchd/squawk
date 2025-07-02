@@ -63,6 +63,11 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     continue;
                 }
 
+                if req.method == "squawk/syntaxTree" {
+                    handle_syntax_tree(&connection, req)?;
+                    continue;
+                }
+
                 info!("Ignoring unhandled request: {}", req.method);
             }
             Message::Response(resp) => {
@@ -233,5 +238,34 @@ fn lint(connection: &Connection, uri: lsp_types::Url, content: &str, version: i3
         .sender
         .send(Message::Notification(notification))?;
 
+    Ok(())
+}
+
+#[derive(serde::Deserialize)]
+struct SyntaxTreeParams {
+    #[serde(rename = "textDocument")]
+    text_document: lsp_types::TextDocumentIdentifier,
+    // TODO: once we start storing the text doc on the server we won't need to
+    // send the content across the wire
+    text: String,
+}
+
+fn handle_syntax_tree(connection: &Connection, req: lsp_server::Request) -> Result<()> {
+    let params: SyntaxTreeParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document.uri;
+    let content = params.text;
+
+    info!("Generating syntax tree for: {}", uri);
+
+    let parse: Parse<SourceFile> = SourceFile::parse(&content);
+    let syntax_tree = format!("{:#?}", parse.syntax_node());
+
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&syntax_tree).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
     Ok(())
 }
