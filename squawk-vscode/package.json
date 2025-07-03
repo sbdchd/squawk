@@ -13,7 +13,6 @@
   "engines": {
     "vscode": "^1.101.0"
   },
-  "preview": true,
   "keywords": [
     "postgres",
     "postgreSQL",
