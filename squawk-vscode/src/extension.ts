@@ -31,6 +31,14 @@ export async function activate(context: vscode.ExtensionContext) {
     ),
   )
 
+  const tokensProvider = new TokensProvider(context)
+  context.subscriptions.push(
+    vscode.workspace.registerTextDocumentContentProvider(
+      "squawk-tokens",
+      tokensProvider,
+    ),
+  )
+
   context.subscriptions.push(
     vscode.commands.registerCommand("squawk.serverVersion", () => {
       try {
@@ -82,9 +90,7 @@ export async function activate(context: vscode.ExtensionContext) {
   await startServer(context)
 }
 
-export async function deactivate() {
-  await client?.stop()
-}
+export async function deactivate() {}
 
 function isSqlDocument(document: vscode.TextDocument): boolean {
   return document.languageId === "sql" || document.languageId === "postgres"
@@ -166,14 +172,17 @@ function getSquawkPath(context: vscode.ExtensionContext): vscode.Uri {
 }
 
 async function startServer(context: vscode.ExtensionContext) {
-  if (client?.state === State.Running) {
-    log.info("Server is already running")
-    return
-  }
-
-  if (client?.state === State.Starting) {
-    log.info("Server is already starting")
-    return
+  const state = client?.state
+  switch (state) {
+    case State.Running:
+    case State.Starting:
+      log.info("Server is already running")
+      break
+    case State.Stopped:
+    case undefined:
+      break
+    default:
+      assertNever(state)
   }
 
   log.info("Starting Squawk Language Server...")
@@ -212,6 +221,7 @@ async function startServer(context: vscode.ExtensionContext) {
       onClientStateChange.fire(event)
     }),
   )
+  context.subscriptions.push(client)
 
   log.info("server starting...")
   try {
@@ -315,6 +325,78 @@ class SyntaxTreeProvider implements vscode.TextDocumentContentProvider {
     }
   }
 }
+
+class TokensProvider implements vscode.TextDocumentContentProvider {
+  _eventEmitter = new vscode.EventEmitter<vscode.Uri>()
+  _activeEditor: vscode.TextEditor | undefined
+  _uri = vscode.Uri.parse("squawk-tokens://tokens/tokens.rast")
+
+  constructor(context: vscode.ExtensionContext) {
+    context.subscriptions.push(
+      vscode.window.onDidChangeActiveTextEditor((editor) => {
+        this._onDidChangeActiveTextEditor(editor)
+      }),
+    )
+    context.subscriptions.push(
+      vscode.workspace.onDidChangeTextDocument((event) => {
+        this._onDidChangeTextDocument(event.document)
+      }),
+    )
+    context.subscriptions.push(
+      vscode.commands.registerCommand("squawk.showTokens", async () => {
+        const doc = await vscode.workspace.openTextDocument(this._uri)
+        await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside)
+      }),
+    )
+
+    // initial kick off to make sure we have the editor set
+    this._onDidChangeActiveTextEditor(vscode.window.activeTextEditor)
+  }
+
+  onDidChange = this._eventEmitter.event
+
+  _onDidChangeActiveTextEditor(editor: vscode.TextEditor | undefined) {
+    if (editor && isSqlEditor(editor)) {
+      this._activeEditor = editor
+      this._eventEmitter.fire(this._uri)
+    }
+  }
+
+  _onDidChangeTextDocument(document: vscode.TextDocument) {
+    if (
+      isSqlDocument(document) &&
+      this._activeEditor &&
+      document === this._activeEditor.document
+    ) {
+      this._eventEmitter.fire(this._uri)
+    }
+  }
+
+  async provideTextDocumentContent(_uri: vscode.Uri): Promise<string> {
+    try {
+      const document = this._activeEditor?.document
+      if (!document) {
+        return "Error: no active editor found"
+      }
+      if (!client) {
+        return "Error: no client found"
+      }
+      const text = document.getText()
+      const uri = document.uri.toString()
+      log.info(`Requesting tokens for: ${uri}`)
+      const response = await client.sendRequest<string>("squawk/tokens", {
+        textDocument: { uri },
+        text,
+      })
+      log.info("Tokens received")
+      return response
+    } catch (error) {
+      log.error(`Failed to get tokens:`, error)
+      return `Error: Failed to get tokens: ${String(error)}`
+    }
+  }
+}
+
 function assertNever(param: never): never {
   throw new Error(`should never get here, but got ${String(param)}`)
 }

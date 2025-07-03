@@ -48,6 +48,11 @@
         "category": "Squawk"
       },
       {
+        "command": "squawk.showTokens",
+        "title": "Show Tokens",
+        "category": "Squawk"
+      },
+      {
         "command": "squawk.showClientLogs",
         "title": "Show Client Logs",
         "category": "Squawk"
