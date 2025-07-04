@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.18.0 - 2025-07-03
+
+## Added
+
+- vscode: `Show tokens` command to get lexer output. (#579)
+- vscode: `Show server` & `Stop server` commands. (#576)
+- vscode: `show client logs` & `show syntax tree` commands. (#575)
+
 ## v2.17.0 - 2025-06-30
 
 ## Added

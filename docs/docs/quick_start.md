@@ -29,6 +29,10 @@ Use the WASM powered playground to check your SQL locally in the browser!
 
 <https://play.squawkhq.com>
 
+### Or via VSCode
+
+<https://marketplace.visualstudio.com/items?itemName=sbdchd.squawk>
+
 ## Usage
 
 <details><summary><code>example-migration.sql</code></summary>
