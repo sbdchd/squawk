@@ -15,6 +15,13 @@ use lsp_types::{
 };
 use squawk_linter::Linter;
 use squawk_syntax::{Parse, SourceFile};
+use std::collections::HashMap;
+mod lsp_utils;
+
+struct DocumentState {
+    content: String,
+    version: i32,
+}
 
 pub fn run() -> Result<()> {
     info!("Starting Squawk LSP server");
@@ -22,7 +29,9 @@ pub fn run() -> Result<()> {
     let (connection, io_threads) = Connection::stdio();
 
     let server_capabilities = serde_json::to_value(&ServerCapabilities {
-        text_document_sync: Some(TextDocumentSyncCapability::Kind(TextDocumentSyncKind::FULL)),
+        text_document_sync: Some(TextDocumentSyncCapability::Kind(
+            TextDocumentSyncKind::INCREMENTAL,
+        )),
         // definition_provider: Some(OneOf::Left(true)),
         ..Default::default()
     })
@@ -48,6 +57,8 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
     let client_name = init_params.client_info.map(|x| x.name);
     info!("Client name: {client_name:?}");
 
+    let mut documents: HashMap<Url, DocumentState> = HashMap::new();
+
     for msg in &connection.receiver {
         match msg {
             Message::Request(req) => {
@@ -63,10 +74,10 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                         handle_goto_definition(&connection, req)?;
                     }
                     "squawk/syntaxTree" => {
-                        handle_syntax_tree(&connection, req)?;
+                        handle_syntax_tree(&connection, req, &documents)?;
                     }
                     "squawk/tokens" => {
-                        handle_tokens(&connection, req)?;
+                        handle_tokens(&connection, req, &documents)?;
                     }
                     _ => {
                         info!("Ignoring unhandled request: {}", req.method);
@@ -78,13 +89,19 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
             }
             Message::Notification(notif) => {
                 info!("Received notification: method={}", notif.method);
-
-                if notif.method == DidOpenTextDocument::METHOD {
-                    handle_did_open(&connection, notif)?;
-                } else if notif.method == DidChangeTextDocument::METHOD {
-                    handle_did_change(&connection, notif)?;
-                } else if notif.method == DidCloseTextDocument::METHOD {
-                    handle_did_close(&connection, notif)?;
+                match notif.method.as_ref() {
+                    DidOpenTextDocument::METHOD => {
+                        handle_did_open(&connection, notif, &mut documents)?;
+                    }
+                    DidChangeTextDocument::METHOD => {
+                        handle_did_change(&connection, notif, &mut documents)?;
+                    }
+                    DidCloseTextDocument::METHOD => {
+                        handle_did_close(&connection, notif, &mut documents)?;
+                    }
+                    _ => {
+                        info!("Ignoring unhandled notification: {}", notif.method);
+                    }
                 }
             }
         }
@@ -97,10 +114,7 @@ fn handle_goto_definition(connection: &Connection, req: lsp_server::Request) -> 
 
     let location = Location {
         uri: params.text_document_position_params.text_document.uri,
-        range: Range {
-            start: Position::new(1, 2),
-            end: Position::new(1, 3),
-        },
+        range: Range::new(Position::new(1, 2), Position::new(1, 3)),
     };
 
     let result = GotoDefinitionResponse::Scalar(location);
@@ -114,32 +128,82 @@ fn handle_goto_definition(connection: &Connection, req: lsp_server::Request) -> 
     Ok(())
 }
 
-fn handle_did_open(connection: &Connection, notif: lsp_server::Notification) -> Result<()> {
+fn publish_diagnostics(
+    connection: &Connection,
+    uri: Url,
+    version: i32,
+    diagnostics: Vec<Diagnostic>,
+) -> Result<()> {
+    let publish_params = PublishDiagnosticsParams {
+        uri,
+        diagnostics,
+        version: Some(version),
+    };
+
+    let notification = Notification {
+        method: PublishDiagnostics::METHOD.to_owned(),
+        params: serde_json::to_value(publish_params)?,
+    };
+
+    connection
+        .sender
+        .send(Message::Notification(notification))?;
+    Ok(())
+}
+
+fn handle_did_open(
+    connection: &Connection,
+    notif: lsp_server::Notification,
+    documents: &mut HashMap<Url, DocumentState>,
+) -> Result<()> {
     let params: DidOpenTextDocumentParams = serde_json::from_value(notif.params)?;
     let uri = params.text_document.uri;
     let content = params.text_document.text;
     let version = params.text_document.version;
 
-    lint(connection, uri, &content, version)?;
+    documents.insert(uri.clone(), DocumentState { content, version });
+
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+
+    // TODO: we need a better setup for "run func when input changed"
+    let diagnostics = lint(content);
+    publish_diagnostics(connection, uri, version, diagnostics)?;
 
     Ok(())
 }
 
-fn handle_did_change(connection: &Connection, notif: lsp_server::Notification) -> Result<()> {
+fn handle_did_change(
+    connection: &Connection,
+    notif: lsp_server::Notification,
+    documents: &mut HashMap<Url, DocumentState>,
+) -> Result<()> {
     let params: DidChangeTextDocumentParams = serde_json::from_value(notif.params)?;
     let uri = params.text_document.uri;
     let version = params.text_document.version;
 
-    if let Some(change) = params.content_changes.last() {
-        lint(connection, uri, &change.text, version)?;
-    }
+    let Some(doc_state) = documents.get_mut(&uri) else {
+        return Ok(());
+    };
+
+    doc_state.content =
+        lsp_utils::apply_incremental_changes(&doc_state.content, params.content_changes);
+    doc_state.version = version;
+
+    let diagnostics = lint(&doc_state.content);
+    publish_diagnostics(connection, uri, version, diagnostics)?;
 
     Ok(())
 }
 
-fn handle_did_close(connection: &Connection, notif: lsp_server::Notification) -> Result<()> {
+fn handle_did_close(
+    connection: &Connection,
+    notif: lsp_server::Notification,
+    documents: &mut HashMap<Url, DocumentState>,
+) -> Result<()> {
     let params: DidCloseTextDocumentParams = serde_json::from_value(notif.params)?;
     let uri = params.text_document.uri;
+
+    documents.remove(&uri);
 
     let publish_params = PublishDiagnosticsParams {
         uri,
@@ -159,14 +223,14 @@ fn handle_did_close(connection: &Connection, notif: lsp_server::Notification) ->
     Ok(())
 }
 
-fn lint(connection: &Connection, uri: lsp_types::Url, content: &str, version: i32) -> Result<()> {
+fn lint(content: &str) -> Vec<Diagnostic> {
     let parse: Parse<SourceFile> = SourceFile::parse(content);
     let parse_errors = parse.errors();
     let mut linter = Linter::with_all_rules();
     let violations = linter.lint(parse, content);
     let line_index = LineIndex::new(content);
 
-    let mut diagnostics = vec![];
+    let mut diagnostics = Vec::with_capacity(violations.len() + parse_errors.len());
 
     for error in parse_errors {
         let range_start = error.range().start();
@@ -179,10 +243,10 @@ fn lint(connection: &Connection, uri: lsp_types::Url, content: &str, version: i3
         }
 
         let diagnostic = Diagnostic {
-            range: Range {
-                start: Position::new(start_line_col.line, start_line_col.col),
-                end: Position::new(end_line_col.line, end_line_col.col),
-            },
+            range: Range::new(
+                Position::new(start_line_col.line, start_line_col.col),
+                Position::new(end_line_col.line, end_line_col.col),
+            ),
             severity: Some(DiagnosticSeverity::ERROR),
             code: Some(lsp_types::NumberOrString::String(
                 "syntax-error".to_string(),
@@ -208,10 +272,10 @@ fn lint(connection: &Connection, uri: lsp_types::Url, content: &str, version: i3
         }
 
         let diagnostic = Diagnostic {
-            range: Range {
-                start: Position::new(start_line_col.line, start_line_col.col),
-                end: Position::new(end_line_col.line, end_line_col.col),
-            },
+            range: Range::new(
+                Position::new(start_line_col.line, start_line_col.col),
+                Position::new(end_line_col.line, end_line_col.col),
+            ),
             severity: Some(DiagnosticSeverity::WARNING),
             code: Some(lsp_types::NumberOrString::String(
                 violation.code.to_string(),
@@ -225,42 +289,28 @@ fn lint(connection: &Connection, uri: lsp_types::Url, content: &str, version: i3
         };
         diagnostics.push(diagnostic);
     }
-
-    let publish_params = PublishDiagnosticsParams {
-        uri,
-        diagnostics,
-        version: Some(version),
-    };
-
-    let notification = Notification {
-        method: PublishDiagnostics::METHOD.to_owned(),
-        params: serde_json::to_value(publish_params)?,
-    };
-
-    connection
-        .sender
-        .send(Message::Notification(notification))?;
-
-    Ok(())
+    diagnostics
 }
 
 #[derive(serde::Deserialize)]
 struct SyntaxTreeParams {
     #[serde(rename = "textDocument")]
     text_document: lsp_types::TextDocumentIdentifier,
-    // TODO: once we start storing the text doc on the server we won't need to
-    // send the content across the wire
-    text: String,
 }
 
-fn handle_syntax_tree(connection: &Connection, req: lsp_server::Request) -> Result<()> {
+fn handle_syntax_tree(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
     let params: SyntaxTreeParams = serde_json::from_value(req.params)?;
     let uri = params.text_document.uri;
-    let content = params.text;
 
     info!("Generating syntax tree for: {}", uri);
 
-    let parse: Parse<SourceFile> = SourceFile::parse(&content);
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+
+    let parse: Parse<SourceFile> = SourceFile::parse(content);
     let syntax_tree = format!("{:#?}", parse.syntax_node());
 
     let resp = Response {
@@ -277,19 +327,21 @@ fn handle_syntax_tree(connection: &Connection, req: lsp_server::Request) -> Resu
 struct TokensParams {
     #[serde(rename = "textDocument")]
     text_document: lsp_types::TextDocumentIdentifier,
-    // TODO: once we start storing the text doc on the server we won't need to
-    // send the content across the wire
-    text: String,
 }
 
-fn handle_tokens(connection: &Connection, req: lsp_server::Request) -> Result<()> {
+fn handle_tokens(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
     let params: TokensParams = serde_json::from_value(req.params)?;
     let uri = params.text_document.uri;
-    let content = params.text;
 
     info!("Generating tokens for: {}", uri);
 
-    let tokens = squawk_lexer::tokenize(&content);
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+
+    let tokens = squawk_lexer::tokenize(content);
 
     let mut output = Vec::new();
     let mut char_pos = 0;

@@ -268,13 +268,16 @@ class SyntaxTreeProvider implements vscode.TextDocumentContentProvider {
     )
     context.subscriptions.push(
       vscode.workspace.onDidChangeTextDocument((event) => {
-        this._onDidChangeTextDocument(event.document)
+        this._onDidChangeTextDocument(event)
       }),
     )
     context.subscriptions.push(
       vscode.commands.registerCommand("squawk.showSyntaxTree", async () => {
         const doc = await vscode.workspace.openTextDocument(this._uri)
-        await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside)
+        await vscode.window.showTextDocument(doc, {
+          viewColumn: vscode.ViewColumn.Beside,
+          preserveFocus: true,
+        })
       }),
     )
 
@@ -291,13 +294,12 @@ class SyntaxTreeProvider implements vscode.TextDocumentContentProvider {
     }
   }
 
-  _onDidChangeTextDocument(document: vscode.TextDocument) {
-    if (
-      isSqlDocument(document) &&
-      this._activeEditor &&
-      document === this._activeEditor.document
-    ) {
-      this._eventEmitter.fire(this._uri)
+  _onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
+    if (isSqlDocument(event.document)) {
+      // via rust-analzyer:
+      // We need to order this after language server updates, but there's no API for that.
+      // Hence, good old sleep().
+      void sleep(10).then(() => this._eventEmitter.fire(this._uri))
     }
   }
 
@@ -310,12 +312,10 @@ class SyntaxTreeProvider implements vscode.TextDocumentContentProvider {
       if (!client) {
         return "Error: no client found"
       }
-      const text = document.getText()
       const uri = document.uri.toString()
       log.info(`Requesting syntax tree for: ${uri}`)
       const response = await client.sendRequest<string>("squawk/syntaxTree", {
         textDocument: { uri },
-        text,
       })
       log.info("Syntax tree received")
       return response
@@ -339,13 +339,16 @@ class TokensProvider implements vscode.TextDocumentContentProvider {
     )
     context.subscriptions.push(
       vscode.workspace.onDidChangeTextDocument((event) => {
-        this._onDidChangeTextDocument(event.document)
+        this._onDidChangeTextDocument(event)
       }),
     )
     context.subscriptions.push(
       vscode.commands.registerCommand("squawk.showTokens", async () => {
         const doc = await vscode.workspace.openTextDocument(this._uri)
-        await vscode.window.showTextDocument(doc, vscode.ViewColumn.Beside)
+        await vscode.window.showTextDocument(doc, {
+          viewColumn: vscode.ViewColumn.Beside,
+          preserveFocus: true,
+        })
       }),
     )
 
@@ -362,13 +365,12 @@ class TokensProvider implements vscode.TextDocumentContentProvider {
     }
   }
 
-  _onDidChangeTextDocument(document: vscode.TextDocument) {
-    if (
-      isSqlDocument(document) &&
-      this._activeEditor &&
-      document === this._activeEditor.document
-    ) {
-      this._eventEmitter.fire(this._uri)
+  _onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
+    if (isSqlDocument(event.document)) {
+      // via rust-analzyer:
+      // We need to order this after language server updates, but there's no API for that.
+      // Hence, good old sleep().
+      void sleep(10).then(() => this._eventEmitter.fire(this._uri))
     }
   }
 
@@ -381,12 +383,10 @@ class TokensProvider implements vscode.TextDocumentContentProvider {
       if (!client) {
         return "Error: no client found"
       }
-      const text = document.getText()
       const uri = document.uri.toString()
       log.info(`Requesting tokens for: ${uri}`)
       const response = await client.sendRequest<string>("squawk/tokens", {
         textDocument: { uri },
-        text,
       })
       log.info("Tokens received")
       return response
@@ -395,6 +395,10 @@ class TokensProvider implements vscode.TextDocumentContentProvider {
       return `Error: Failed to get tokens: ${String(error)}`
     }
   }
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 function assertNever(param: never): never {
