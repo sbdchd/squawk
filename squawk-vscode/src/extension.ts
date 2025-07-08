@@ -9,6 +9,65 @@ import {
   StateChangeEvent,
 } from "vscode-languageclient/node"
 
+// via rust-analyzer
+// https://github.com/rust-lang/rust-analyzer/blob/f14bf95931f17ae1830a77d6f0dff38cabb401da/editors/code/src/util.ts#L157C1-L157C1
+class LazyOutputChannel implements vscode.OutputChannel {
+  constructor(name: string) {
+    this.name = name
+  }
+
+  name: string
+  _channel: vscode.OutputChannel | undefined
+
+  get channel(): vscode.OutputChannel {
+    if (!this._channel) {
+      this._channel = vscode.window.createOutputChannel(this.name)
+    }
+    return this._channel
+  }
+
+  append(value: string): void {
+    this.channel.append(value)
+  }
+
+  appendLine(value: string): void {
+    this.channel.appendLine(value)
+  }
+
+  replace(value: string): void {
+    this.channel.replace(value)
+  }
+
+  clear(): void {
+    if (this._channel) {
+      this._channel.clear()
+    }
+  }
+
+  show(
+    columnOrPreserveFocus?: vscode.ViewColumn | boolean,
+    preserveFocus?: boolean,
+  ): void {
+    if (typeof columnOrPreserveFocus === "boolean") {
+      this.channel.show(columnOrPreserveFocus)
+    } else {
+      this.channel.show(columnOrPreserveFocus, preserveFocus)
+    }
+  }
+
+  hide(): void {
+    if (this._channel) {
+      this._channel.hide()
+    }
+  }
+
+  dispose(): void {
+    if (this._channel) {
+      this._channel.dispose()
+    }
+  }
+}
+
 let client: LanguageClient | undefined
 let log: Pick<
   vscode.LogOutputChannel,
@@ -144,7 +203,7 @@ function updateStatusBarItem(statusBarItem: vscode.StatusBarItem) {
   switch (client.state) {
     case State.Stopped:
       statusText = "Stopped"
-      icon = "$(error) "
+      icon = "$(stop-circle) "
       backgroundColor = new vscode.ThemeColor("statusBarItem.warningBackground")
       break
     case State.Starting:
@@ -207,6 +266,7 @@ async function startServer(context: vscode.ExtensionContext) {
   const serverOptions: ServerOptions = serverExecutable
   const clientOptions: LanguageClientOptions = {
     documentSelector: [{ language: "sql" }, { language: "postgres" }],
+    traceOutputChannel: new LazyOutputChannel("Squawk Trace"),
     outputChannel: vscode.window.createOutputChannel("Squawk Language Server"),
   }
   client = new LanguageClient(
@@ -228,7 +288,7 @@ async function startServer(context: vscode.ExtensionContext) {
     await client.start()
     log.info("server started successfully")
   } catch (error) {
-    log.error(`Failed to start server:`, error)
+    log.error("Failed to start server:", error)
     vscode.window.showErrorMessage(`Failed to start server: ${String(error)}`)
   }
 }
@@ -307,10 +367,12 @@ class SyntaxTreeProvider implements vscode.TextDocumentContentProvider {
     try {
       const document = this._activeEditor?.document
       if (!document) {
-        return "Error: no active editor found"
+        vscode.window.showErrorMessage("Error: no active editor found")
+        return ""
       }
       if (!client) {
-        return "Error: no client found"
+        vscode.window.showErrorMessage("Error: no client found")
+        return ""
       }
       const uri = document.uri.toString()
       log.info(`Requesting syntax tree for: ${uri}`)
@@ -320,8 +382,11 @@ class SyntaxTreeProvider implements vscode.TextDocumentContentProvider {
       log.info("Syntax tree received")
       return response
     } catch (error) {
-      log.error(`Failed to get syntax tree:`, error)
-      return `Error: Failed to get syntax tree: ${String(error)}`
+      log.error("Failed to get syntax tree:", error)
+      vscode.window.showErrorMessage(
+        `Failed to get syntax tree:\n${String(error)}`,
+      )
+      return ""
     }
   }
 }
@@ -378,10 +443,12 @@ class TokensProvider implements vscode.TextDocumentContentProvider {
     try {
       const document = this._activeEditor?.document
       if (!document) {
-        return "Error: no active editor found"
+        vscode.window.showErrorMessage("Error: no active editor found")
+        return ""
       }
       if (!client) {
-        return "Error: no client found"
+        vscode.window.showErrorMessage("Error: no client found")
+        return ""
       }
       const uri = document.uri.toString()
       log.info(`Requesting tokens for: ${uri}`)
@@ -391,8 +458,11 @@ class TokensProvider implements vscode.TextDocumentContentProvider {
       log.info("Tokens received")
       return response
     } catch (error) {
-      log.error(`Failed to get tokens:`, error)
-      return `Error: Failed to get tokens: ${String(error)}`
+      log.error("Failed to get tokens:", error)
+      vscode.window.showErrorMessage(
+        `Error: Failed to get tokens:\n${String(error)}`,
+      )
+      return ""
     }
   }
 }
