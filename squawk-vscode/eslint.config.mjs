@@ -21,6 +21,7 @@ export default tseslint.config(
     plugins: {},
     rules: {
       "no-console": "error",
+      "quotes": ["error", "double", { "avoidEscape": true }],
       "@typescript-eslint/no-unused-vars": [
         "error",
         {

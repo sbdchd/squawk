@@ -6,10 +6,6 @@ Surface SQL related lint errors directly in VSCode.
 
 ## Install
 
-Install via the [VSCode marketplace](https://marketplace.visualstudio.com/items?itemName=sbdchd.squawk).
-
-## Install
-
 ### From online marketplace
 
 Open the [online marketplace listing](https://marketplace.visualstudio.com/items?itemName=sbdchd.squawk) for Squawk and click "Install". Follow the prompts to open VSCode and install Squawk.
@@ -25,6 +21,15 @@ Download the extension package from the [latest Github release](https://github.c
 ### From source
 
 With `vsce` installed from NPM (`npm install -g @vscode/vsce`), clone [this repo](https://github.com/sbdchd/vscode-squawk) and run `vsce package`. Install the resulting package with `code --install-extension squawk-*.vsix`
+
+## Settings
+
+```json
+{
+  // enable tracing logs
+  "squawk.trace.server": "verbose"
+}
+```
 
 ## Dev
 
