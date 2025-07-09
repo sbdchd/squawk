@@ -88,7 +88,22 @@
           "postgres"
         ]
       }
-    ]
+    ],
+    "configuration": {
+      "title": "Squawk",
+      "properties": {
+        "squawk.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Trace the communication between VS Code and the Squawk language server"
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run package",
