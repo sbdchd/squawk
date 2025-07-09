@@ -41,6 +41,7 @@ fn comment_body(token: &SyntaxToken) -> Option<(&str, TextRange)> {
     None
 }
 
+// TODO: maybe in a future version we can rename this to squawk-ignore-line
 const IGNORE_LINE_TEXT: &str = "squawk-ignore";
 const IGNORE_FILE_TEXT: &str = "squawk-ignore-file";
 

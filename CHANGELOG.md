@@ -7,6 +7,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.19.0 - 2025-07-09
+
+## Added
+
+- linter: file level rule violation ignore comments. (#585)
+
+  Now you can ignore all violations in a file via:
+
+  ```sql
+  -- squawk-ignore-file
+  ```
+
+  or ignore a specific rule for the file:
+
+  ```sql
+  -- squawk-ignore-file prefer-robust-stmts
+  ```
+
+  This works with the existing line level ignores:
+
+  ```sql
+  create table t (id int);
+  -- squawk-ignore prefer-robust-stmts
+  create table u (id int);
+  ```
+
+- vscode: incremental sync. (#583)
+
+  No more debouncing of file updates making squawk in vscode snappier!
+
+- vscode: tracing setting `squawk.trace.server` & output channel. (#584), (#585)
+
 ## v2.18.0 - 2025-07-03
 
 ## Added
