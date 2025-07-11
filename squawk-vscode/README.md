@@ -31,6 +31,16 @@ With `vsce` installed from NPM (`npm install -g @vscode/vsce`), clone [this repo
 }
 ```
 
+## Prior Art / Related
+
+- <https://marketplace.visualstudio.com/items?itemName=mtxr.sqltools>
+- <https://marketplace.visualstudio.com/items?itemName=uniquevision.vscode-plpgsql-lsp>
+- <https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql>
+- <https://marketplace.visualstudio.com/items?itemName=Supabase.postgrestools>
+- <https://marketplace.visualstudio.com/items?itemName=dorzey.vscode-sqlfluff>
+- <https://marketplace.visualstudio.com/items?itemName=Oracle.sql-developer>
+- <https://marketplace.visualstudio.com/items?itemName=ManuelDeLaRosa.postgresql-snippets>
+
 ## Dev
 
 Make sure you're on a vscode version >= the one defined in the `package.json`,

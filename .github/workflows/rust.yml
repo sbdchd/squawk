@@ -361,7 +361,8 @@ jobs:
       - name: Publish Extension (VS Code Marketplace)
         working-directory: ./squawk-vscode
         run: pnpm exec vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix
-      # - name: Publish Extension (Open VSX)
-      #   working-directory: ./squawk-vscode
-      #   run: pnpm exec ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix
-      #   timeout-minutes: 2
+
+      - name: Publish Extension (Open VSX)
+        working-directory: ./squawk-vscode
+        run: pnpm exec ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix
+        timeout-minutes: 2
