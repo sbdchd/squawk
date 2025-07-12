@@ -1,0 +1,55 @@
+---
+source: crates/squawk/src/reporter.rs
+expression: "strip_ansi_codes(&String::from_utf8_lossy(&buff))"
+---
+::warning file=main.sql,line=2,col=29,endLine=2,endColumn=62,title=adding-required-field::Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+::warning file=main.sql,line=2,col=29,endLine=2,endColumn=62,title=prefer-robust-stmts::Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+::warning file=main.sql,line=2,col=46,endLine=2,endColumn=53,title=prefer-bigint-over-int::Using 32-bit integer fields can result in hitting the max `int` limit.
+::warning file=main.sql,line=5,col=2,endLine=6,endColumn=20,title=adding-required-field::Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+::warning file=main.sql,line=5,col=2,endLine=6,endColumn=20,title=prefer-robust-stmts::Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+::warning file=main.sql,line=6,col=4,endLine=6,endColumn=11,title=prefer-bigint-over-int::Using 32-bit integer fields can result in hitting the max `int` limit.
+warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+ --> main.sql:2:30
+  |
+2 |    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+  |                              ---------------------------------
+  |
+  = help: Make the field nullable or add a non-VOLATILE DEFAULT
+warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+ --> main.sql:2:30
+  |
+2 |    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+  |                              ---------------------------------
+  |
+warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+ --> main.sql:2:47
+  |
+2 |    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+  |                                               -------
+  |
+  = help: Use 64-bit integer values instead to prevent hitting this limit.
+warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+ --> main.sql:5:3
+  |
+5 | /   ADD COLUMN "bar" 
+6 | |     integer NOT NULL;
+  | |____________________-
+  |
+  = help: Make the field nullable or add a non-VOLATILE DEFAULT
+warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+ --> main.sql:5:3
+  |
+5 | /   ADD COLUMN "bar" 
+6 | |     integer NOT NULL;
+  | |____________________-
+  |
+warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
+ --> main.sql:6:5
+  |
+6 |     integer NOT NULL;
+  |     -------
+  |
+  = help: Use 64-bit integer values instead to prevent hitting this limit.
+
+Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
+Found 6 issues in 1 file (checked 1 source file)

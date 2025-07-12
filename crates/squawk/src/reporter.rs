@@ -42,10 +42,14 @@ fn check_sql(
     for e in parse_errors {
         let range_start = e.range().start();
         let line_col = line_index.line_col(range_start);
+        let range_end = e.range().end();
+        let line_end = line_index.line_col(range_end);
         violations.push(ReportViolation {
             file: path.to_string(),
             line: line_col.line as usize,
+            line_end: line_end.line as usize,
             column: line_col.col as usize,
+            column_end: line_end.col as usize,
             level: ViolationLevel::Error,
             help: None,
             range: e.range(),
@@ -56,10 +60,14 @@ fn check_sql(
     for e in errors {
         let range_start = e.text_range.start();
         let line_col = line_index.line_col(range_start);
+        let range_end = e.text_range.end();
+        let line_end = line_index.line_col(range_end);
         violations.push(ReportViolation {
             file: path.to_string(),
             line: line_col.line as usize,
+            line_end: line_end.line as usize,
             column: line_col.col as usize,
+            column_end: line_end.col as usize,
             range: e.text_range,
             help: e.help,
             level: ViolationLevel::Warning,
@@ -158,6 +166,7 @@ pub fn check_and_dump_files<W: io::Write>(
     pg_version: Option<Version>,
     assume_in_transaction: bool,
     reporter: &Reporter,
+    github_annotations: bool,
 ) -> Result<ExitCode> {
     let violations = check_files(
         path_patterns,
@@ -170,7 +179,7 @@ pub fn check_and_dump_files<W: io::Write>(
 
     let ok = violations.iter().map(|x| x.violations.len()).sum::<usize>() == 0;
 
-    print_violations(f, violations, reporter)?;
+    print_violations(f, violations, reporter, github_annotations)?;
 
     Ok(if ok {
         ExitCode::SUCCESS
@@ -273,6 +282,8 @@ pub struct ReportViolation {
     pub message: String,
     pub help: Option<String>,
     pub rule_name: String,
+    pub column_end: usize,
+    pub line_end: usize,
 }
 
 fn fmt_gcc<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
@@ -324,6 +335,30 @@ fn fmt_json<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> {
     Ok(())
 }
 
+pub fn fmt_github_annotations<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
+    for report in reports {
+        for violation in &report.violations {
+            let level = match violation.level {
+                ViolationLevel::Warning => "warning",
+                ViolationLevel::Error => "error",
+            };
+
+            writeln!(
+                f,
+                "::{level} file={file},line={line},col={col},endLine={line_end},endColumn={col_end},title={title}::{message}",
+                file = violation.file,
+                line = violation.line + 1,
+                line_end = violation.line_end + 1,
+                col = violation.column,
+                col_end = violation.column_end,
+                title = violation.rule_name,
+                message = violation.message,
+            )?;
+        }
+    }
+    Ok(())
+}
+
 #[derive(Debug)]
 pub struct CheckReport {
     pub filename: String,
@@ -335,7 +370,11 @@ pub fn print_violations<W: io::Write>(
     writer: &mut W,
     reports: Vec<CheckReport>,
     reporter: &Reporter,
+    github_annotations: bool,
 ) -> Result<()> {
+    if github_annotations {
+        fmt_github_annotations(writer, &reports)?;
+    }
     match reporter {
         Reporter::Gcc => fmt_gcc(writer, &reports),
         Reporter::Json => fmt_json(writer, reports),
@@ -387,6 +426,7 @@ SELECT 1;
             &mut buff,
             vec![check_sql(sql, filename, &[], None, false)],
             &Reporter::Gcc,
+            false,
         );
         assert!(res.is_ok());
 
@@ -398,6 +438,31 @@ SELECT 1;
         main.sql:2:23: warning: prefer-robust-stmts Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
         main.sql:2:40: warning: prefer-bigint-over-int Using 32-bit integer fields can result in hitting the max `int` limit.
         "###);
+    }
+
+    #[test]
+    fn display_violations_tty_and_github_annotations() {
+        let sql = r#" 
+   ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+-- multi line example
+ALTER TABLE "core_foo" 
+  ADD COLUMN "bar" 
+    integer NOT NULL;
+SELECT 1;
+"#;
+        let filename = "main.sql";
+        let mut buff = Vec::new();
+
+        let res = print_violations(
+            &mut buff,
+            vec![check_sql(sql, filename, &[], None, false)],
+            &Reporter::Tty,
+            true,
+        );
+
+        assert!(res.is_ok());
+        // remove the color codes so tests behave in CI as they do locally
+        assert_snapshot!(strip_ansi_codes(&String::from_utf8_lossy(&buff)));
     }
 
     #[test]
@@ -414,6 +479,7 @@ SELECT 1;
             &mut buff,
             vec![check_sql(sql, filename, &[], None, false)],
             &Reporter::Tty,
+            false,
         );
 
         assert!(res.is_ok());
@@ -429,6 +495,7 @@ SELECT 1;
             &mut buff,
             vec![check_sql(sql, "main.sql", &[], None, false)],
             &Reporter::Tty,
+            false,
         );
 
         assert!(res.is_ok());
@@ -450,10 +517,11 @@ SELECT 1;
             &mut buff,
             vec![check_sql(sql, filename, &[], None, false)],
             &Reporter::Json,
+            false,
         );
 
         assert!(res.is_ok());
-        assert_snapshot!(String::from_utf8_lossy(&buff), @r###"[{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field"},{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","help":null,"rule_name":"prefer-robust-stmts"},{"file":"main.sql","line":1,"column":46,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int"},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field"},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","help":null,"rule_name":"prefer-robust-stmts"},{"file":"main.sql","line":2,"column":40,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int"}]"###);
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field","column_end":62,"line_end":1},{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","help":null,"rule_name":"prefer-robust-stmts","column_end":62,"line_end":1},{"file":"main.sql","line":1,"column":46,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int","column_end":53,"line_end":1},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field","column_end":56,"line_end":2},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","help":null,"rule_name":"prefer-robust-stmts","column_end":56,"line_end":2},{"file":"main.sql","line":2,"column":40,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int","column_end":47,"line_end":2}]"#);
     }
 
     #[test]

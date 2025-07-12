@@ -1,12 +1,13 @@
 use crate::UploadToGithubArgs;
 use crate::config::Config;
-use crate::reporter::{CheckReport, fmt_tty_violation};
+use crate::reporter::{CheckReport, fmt_github_annotations, fmt_tty_violation};
 use crate::{file_finding::find_paths, reporter::check_files};
 use anyhow::{Result, anyhow, bail};
 use console::strip_ansi_codes;
 use log::info;
 use squawk_github::{GitHubApi, actions, app, comment_on_pr};
 use squawk_linter::{Rule, Version};
+use std::io;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -135,6 +136,10 @@ pub fn check_and_comment_on_pr(
         COMMENT_HEADER,
     )?;
 
+    let stdout = io::stdout();
+    let mut handle = stdout.lock();
+    fmt_github_annotations(&mut handle, &file_results)?;
+
     let violations: usize = file_results.iter().map(|f| f.violations.len()).sum();
 
     if fail_on_violations && violations > 0 {
@@ -257,6 +262,8 @@ SELECT 1;
                 message: "Adding a NOT NULL field requires exclusive locks and table rewrites."
                     .to_string(),
                 help: Some("Make the field nullable.".to_string()),
+                column_end: 0,
+                line_end: 1,
             }],
         }];
 
