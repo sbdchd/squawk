@@ -5,9 +5,9 @@ expression: "strip_ansi_codes(&String::from_utf8_lossy(&buff))"
 ::warning file=main.sql,line=2,col=29,endLine=2,endColumn=62,title=adding-required-field::Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
 ::warning file=main.sql,line=2,col=29,endLine=2,endColumn=62,title=prefer-robust-stmts::Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
 ::warning file=main.sql,line=2,col=46,endLine=2,endColumn=53,title=prefer-bigint-over-int::Using 32-bit integer fields can result in hitting the max `int` limit.
-::warning file=main.sql,line=3,col=23,endLine=3,endColumn=56,title=adding-required-field::Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
-::warning file=main.sql,line=3,col=23,endLine=3,endColumn=56,title=prefer-robust-stmts::Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
-::warning file=main.sql,line=3,col=40,endLine=3,endColumn=47,title=prefer-bigint-over-int::Using 32-bit integer fields can result in hitting the max `int` limit.
+::warning file=main.sql,line=5,col=2,endLine=6,endColumn=20,title=adding-required-field::Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
+::warning file=main.sql,line=5,col=2,endLine=6,endColumn=20,title=prefer-robust-stmts::Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
+::warning file=main.sql,line=6,col=4,endLine=6,endColumn=11,title=prefer-bigint-over-int::Using 32-bit integer fields can result in hitting the max `int` limit.
 warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
  --> main.sql:2:30
   |
@@ -29,23 +29,25 @@ warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitti
   |
   = help: Use 64-bit integer values instead to prevent hitting this limit.
 warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
- --> main.sql:3:24
+ --> main.sql:5:3
   |
-3 | ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
-  |                        ---------------------------------
+5 | /   ADD COLUMN "bar" 
+6 | |     integer NOT NULL;
+  | |____________________-
   |
   = help: Make the field nullable or add a non-VOLATILE DEFAULT
 warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.
- --> main.sql:3:24
+ --> main.sql:5:3
   |
-3 | ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
-  |                        ---------------------------------
+5 | /   ADD COLUMN "bar" 
+6 | |     integer NOT NULL;
+  | |____________________-
   |
 warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
- --> main.sql:3:41
+ --> main.sql:6:5
   |
-3 | ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
-  |                                         -------
+6 |     integer NOT NULL;
+  |     -------
   |
   = help: Use 64-bit integer values instead to prevent hitting this limit.
 

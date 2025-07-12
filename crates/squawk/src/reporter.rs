@@ -444,7 +444,10 @@ SELECT 1;
     fn display_violations_tty_and_github_annotations() {
         let sql = r#" 
    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
-ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
+-- multi line example
+ALTER TABLE "core_foo" 
+  ADD COLUMN "bar" 
+    integer NOT NULL;
 SELECT 1;
 "#;
         let filename = "main.sql";
