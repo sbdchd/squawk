@@ -1,5 +1,5 @@
 ---
-source: crates/cli/src/reporter.rs
+source: crates/squawk/src/reporter.rs
 expression: val
 ---
-[{"column":6,"file":"test.sql","help":null,"level":"Error","line":1,"message":"expected SEMICOLON","rule_name":"syntax-error"},{"column":7,"file":"test.sql","help":null,"level":"Error","line":1,"message":"expected command, found ERROR","rule_name":"syntax-error"}]
+[{"column":6,"column_end":6,"file":"test.sql","help":null,"level":"Error","line":1,"line_end":1,"message":"expected SEMICOLON","rule_name":"syntax-error"},{"column":7,"column_end":7,"file":"test.sql","help":null,"level":"Error","line":1,"line_end":1,"message":"expected command, found ERROR","rule_name":"syntax-error"}]
