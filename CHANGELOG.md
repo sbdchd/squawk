@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.20.0 - 2025-07-12
+
+## Added
+
+- GitHub annotations when run with `GITHUB_ACTIONS` set. (#589), (#590)
+
+  This can be disabled by setting `SQUAWK_DISABLE_GITHUB_ANNOTATIONS`.
+
+- Docs for `squawk-ignore-file`. (#588)
+
+- Publishing to open vsx in CI. (#587)
+
 ## v2.19.0 - 2025-07-09
 
 ## Added
