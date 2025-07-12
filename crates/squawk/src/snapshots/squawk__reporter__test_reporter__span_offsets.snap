@@ -1,5 +1,5 @@
 ---
-source: crates/cli/src/reporter.rs
+source: crates/squawk/src/reporter.rs
 expression: "check_sql(sql, filename, &[], None, false)"
 ---
 CheckReport {
@@ -17,6 +17,8 @@ CheckReport {
                 "Make the field nullable or add a non-VOLATILE DEFAULT",
             ),
             rule_name: "adding-required-field",
+            column_end: 62,
+            line_end: 2,
         },
         ReportViolation {
             file: "main.sql",
@@ -27,6 +29,8 @@ CheckReport {
             message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
             help: None,
             rule_name: "prefer-robust-stmts",
+            column_end: 62,
+            line_end: 2,
         },
         ReportViolation {
             file: "main.sql",
@@ -39,6 +43,8 @@ CheckReport {
                 "Use 64-bit integer values instead to prevent hitting this limit.",
             ),
             rule_name: "prefer-bigint-over-int",
+            column_end: 53,
+            line_end: 2,
         },
         ReportViolation {
             file: "main.sql",
@@ -51,6 +57,8 @@ CheckReport {
                 "Make the field nullable or add a non-VOLATILE DEFAULT",
             ),
             rule_name: "adding-required-field",
+            column_end: 56,
+            line_end: 3,
         },
         ReportViolation {
             file: "main.sql",
@@ -61,6 +69,8 @@ CheckReport {
             message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
             help: None,
             rule_name: "prefer-robust-stmts",
+            column_end: 56,
+            line_end: 3,
         },
         ReportViolation {
             file: "main.sql",
@@ -73,6 +83,8 @@ CheckReport {
                 "Use 64-bit integer values instead to prevent hitting this limit.",
             ),
             rule_name: "prefer-bigint-over-int",
+            column_end: 47,
+            line_end: 3,
         },
     ],
 }

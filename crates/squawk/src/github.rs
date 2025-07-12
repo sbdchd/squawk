@@ -262,6 +262,8 @@ SELECT 1;
                 message: "Adding a NOT NULL field requires exclusive locks and table rewrites."
                     .to_string(),
                 help: Some("Make the field nullable.".to_string()),
+                column_end: 0,
+                line_end: 1,
             }],
         }];
 
