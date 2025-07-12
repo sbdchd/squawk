@@ -1,12 +1,13 @@
 use crate::UploadToGithubArgs;
 use crate::config::Config;
-use crate::reporter::{CheckReport, fmt_tty_violation};
+use crate::reporter::{CheckReport, fmt_github_annotations, fmt_tty_violation};
 use crate::{file_finding::find_paths, reporter::check_files};
 use anyhow::{Result, anyhow, bail};
 use console::strip_ansi_codes;
 use log::info;
 use squawk_github::{GitHubApi, actions, app, comment_on_pr};
 use squawk_linter::{Rule, Version};
+use std::io;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
@@ -134,6 +135,10 @@ pub fn check_and_comment_on_pr(
         &comment_body,
         COMMENT_HEADER,
     )?;
+
+    let stdout = io::stdout();
+    let mut handle = stdout.lock();
+    fmt_github_annotations(&mut handle, &file_results)?;
 
     let violations: usize = file_results.iter().map(|f| f.violations.len()).sum();
 

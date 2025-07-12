@@ -1,13 +1,13 @@
 name: python
 
 on:
-  push:
-    branches:
-      - master
-    tags:
-      - "**"
-  pull_request:
   workflow_dispatch:
+  # Disabled - push:
+  #   branches:
+  #     - master
+  #   tags:
+  #     - "**"
+  # Disabled - pull_request:
 
 permissions:
   contents: read

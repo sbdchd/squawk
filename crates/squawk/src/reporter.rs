@@ -42,10 +42,14 @@ fn check_sql(
     for e in parse_errors {
         let range_start = e.range().start();
         let line_col = line_index.line_col(range_start);
+        let range_end = e.range().end();
+        let line_end = line_index.line_col(range_end);
         violations.push(ReportViolation {
             file: path.to_string(),
             line: line_col.line as usize,
+            line_end: line_end.line as usize,
             column: line_col.col as usize,
+            column_end: line_end.col as usize,
             level: ViolationLevel::Error,
             help: None,
             range: e.range(),
@@ -56,10 +60,14 @@ fn check_sql(
     for e in errors {
         let range_start = e.text_range.start();
         let line_col = line_index.line_col(range_start);
+        let range_end = e.text_range.end();
+        let line_end = line_index.line_col(range_end);
         violations.push(ReportViolation {
             file: path.to_string(),
             line: line_col.line as usize,
+            line_end: line_end.line as usize,
             column: line_col.col as usize,
+            column_end: line_end.col as usize,
             range: e.text_range,
             help: e.help,
             level: ViolationLevel::Warning,
@@ -273,6 +281,8 @@ pub struct ReportViolation {
     pub message: String,
     pub help: Option<String>,
     pub rule_name: String,
+    column_end: usize,
+    line_end: usize,
 }
 
 fn fmt_gcc<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
@@ -324,6 +334,30 @@ fn fmt_json<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> {
     Ok(())
 }
 
+pub fn fmt_github_annotations<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {
+    for report in reports {
+        for violation in &report.violations {
+            let level = match violation.level {
+                ViolationLevel::Warning => "warning",
+                ViolationLevel::Error => "error",
+            };
+
+            writeln!(
+                f,
+                "::{level} file={file},line={line},col={col},endLine={line_end},endColumn={col_end},title={title}::{message}",
+                file = violation.file,
+                line = violation.line,
+                line_end = violation.line_end,
+                col = violation.column,
+                col_end = violation.column_end,
+                title = violation.rule_name,
+                message = violation.message,
+            )?;
+        }
+    }
+    Ok(())
+}
+
 #[derive(Debug)]
 pub struct CheckReport {
     pub filename: String,
@@ -336,6 +370,9 @@ pub fn print_violations<W: io::Write>(
     reports: Vec<CheckReport>,
     reporter: &Reporter,
 ) -> Result<()> {
+    if std::env::var("GITHUB_ACTIONS").is_ok() {
+        fmt_github_annotations(writer, &reports)?;
+    }
     match reporter {
         Reporter::Gcc => fmt_gcc(writer, &reports),
         Reporter::Json => fmt_json(writer, reports),
