@@ -78,6 +78,7 @@ pub fn check_and_comment_on_pr(
     exclude_paths: &[String],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
+    github_annotations: bool,
 ) -> Result<()> {
     let UploadToGithubArgs {
         paths,
@@ -136,9 +137,11 @@ pub fn check_and_comment_on_pr(
         COMMENT_HEADER,
     )?;
 
-    let stdout = io::stdout();
-    let mut handle = stdout.lock();
-    fmt_github_annotations(&mut handle, &file_results)?;
+    if github_annotations {
+        let stdout = io::stdout();
+        let mut handle = stdout.lock();
+        fmt_github_annotations(&mut handle, &file_results)?;
+    }
 
     let violations: usize = file_results.iter().map(|f| f.violations.len()).sum();
 

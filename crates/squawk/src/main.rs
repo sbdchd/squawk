@@ -216,6 +216,8 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
 
     let mut clap_app = Opt::clap();
     let is_stdin = !atty::is(Stream::Stdin);
+    let github_annotations = std::env::var("GITHUB_ACTIONS").is_ok()
+        && !std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_ok();
     match opts.cmd {
         Some(Command::Server) => {
             squawk_server::run().context("language server failed")?;
@@ -230,6 +232,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
                 &excluded_paths,
                 pg_version,
                 assume_in_transaction,
+                github_annotations,
             )
             .context("Upload to GitHub failed")?;
         }
@@ -255,8 +258,6 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
                     debug(&mut handle, &found_paths, read_stdin, &kind, opts.verbose)?;
                 } else {
                     let reporter = opts.reporter.unwrap_or(Reporter::Tty);
-                    let github_annotations = std::env::var("GITHUB_ACTIONS").is_ok()
-                        && !std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_ok();
                     let exit_code = check_and_dump_files(
                         &mut handle,
                         &found_paths,
