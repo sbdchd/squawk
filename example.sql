@@ -9,9 +9,6 @@ CREATE TABLE "core_bar" (
 
 CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
 
-ALTER TABLE table_name 
-  ADD CONSTRAINT 
-    field_name_constraint 
-      UNIQUE (field_name);
+ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
 
 COMMIT;
