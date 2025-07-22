@@ -704,8 +704,6 @@ name: nullable varchar(255)
 The name of the user in the system.
 ```
 
-- https://r.ena.to/blog/optimizing-postgres-table-layout-for-maximum-efficiency/
-
 rust analyzer gives:
 
 ```
@@ -714,13 +712,21 @@ Error { pub(crate) msg: String, }
 size = 24 (0x18), align = 0x8, needs Drop
 ```
 
-does alignment make sense to have with postgres?
+other fields?
 
-maybe have common values and distribution somehow?
+- alignment
 
-show index size on hover too?
+  - https://r.ena.to/blog/optimizing-postgres-table-layout-for-maximum-efficiency/
 
-- https://www.peterbe.com/plog/index-size-postgresql
+- common values and distribution
+
+  - https://observablehq.com/documentation/cells/data-table#data-table-cell
+
+- index size on hover
+
+  - https://www.peterbe.com/plog/index-size-postgresql
+
+- data staleness -- if you have a daily batch job to calculate data, we could expose the staleness date
 
 #### Table
 
