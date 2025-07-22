@@ -1,0 +1,31 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/call_expr.sql
+---
+SOURCE_FILE@0..97
+  COMMENT@0..69 "-- Trino/Snowflake/Da ..."
+  WHITESPACE@69..70 "\n"
+  SELECT@70..95
+    SELECT_CLAUSE@70..95
+      SELECT_KW@70..76 "select"
+      WHITESPACE@76..77 " "
+      TARGET_LIST@77..95
+        TARGET@77..95
+          CALL_EXPR@77..95
+            NAME_REF@77..85
+              IDENT@77..85 "try_cast"
+            ARG_LIST@85..95
+              L_PAREN@85..86 "("
+              CAST_EXPR@86..94
+                NAME_REF@86..87
+                  IDENT@86..87 "x"
+                WHITESPACE@87..88 " "
+                AS_KW@88..90 "as"
+                WHITESPACE@90..91 " "
+                NAME_REF@91..94
+                  INT_KW@91..94 "int"
+              R_PAREN@94..95 ")"
+  SEMICOLON@95..96 ";"
+  WHITESPACE@96..97 "\n"
+
+ERROR@86:94 "Invalid cast. Use `cast`, `treat`, or `::` instead."

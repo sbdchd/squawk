@@ -1814,6 +1814,7 @@ fn arg_expr(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     p.eat(VARIADIC_KW);
     let r = Restrictions {
         order_by_allowed: true,
+        as_allowed: true,
         ..Restrictions::default()
     };
     expr_bp(p, 1, &r)
@@ -2300,6 +2301,7 @@ fn current_op(p: &Parser<'_>, r: &Restrictions) -> (u8, SyntaxKind, Associativit
         PERCENT if p.next_not_joined_op(0) => (9, PERCENT, Left), // symbol
         // and
         AND_KW if !r.and_disabled => (2, AND_KW, Left),
+        AS_KW if r.as_allowed => (7, AS_KW, Left),
         // /
         SLASH if p.next_not_joined_op(0) => (9, SLASH, Left), // symbol
         // *
@@ -2326,6 +2328,7 @@ const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLA
 #[derive(Default)]
 struct Restrictions {
     order_by_allowed: bool,
+    as_allowed: bool,
     in_disabled: bool,
     is_disabled: bool,
     not_disabled: bool,
@@ -2383,7 +2386,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
         let _ = expr_bp(p, op_bp, r);
         lhs = m.complete(
             p,
-            if op == SyntaxKind::COLON_COLON {
+            if matches!(op, COLON_COLON | AS_KW) {
                 CAST_EXPR
             } else if matches!(op, FAT_ARROW | COLON_EQ) {
                 NAMED_ARG
