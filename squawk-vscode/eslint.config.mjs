@@ -22,6 +22,13 @@ export default tseslint.config(
     rules: {
       "no-console": "error",
       "quotes": ["error", "double", { "avoidEscape": true }],
+      "no-restricted-syntax": [
+        "error",
+        {
+          "selector": "MemberExpression[property.name='path']",
+          "message": "Use .fsPath instead of .path"
+        }
+      ],
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
