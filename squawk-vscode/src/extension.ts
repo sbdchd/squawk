@@ -102,7 +102,7 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("squawk.serverVersion", () => {
       try {
         const serverPath = getSquawkPath(context)
-        const stdout = execFileSync(serverPath.path, ["--version"], {
+        const stdout = execFileSync(serverPath.fsPath, ["--version"], {
           encoding: "utf8",
         })
         const version = stdout.trim()
@@ -252,15 +252,15 @@ async function startServer(context: vscode.ExtensionContext) {
     () => false,
   )
   if (!hasBinary) {
-    const errorMsg = `Squawk binary not found at: ${squawkPath.path}`
+    const errorMsg = `Squawk binary not found at: ${squawkPath.fsPath}`
     log.error(`ERROR: ${errorMsg}`)
     vscode.window.showErrorMessage(errorMsg)
     return
   }
-  log.info(`Found Squawk binary at: ${squawkPath.path}`)
+  log.info(`Found Squawk binary at: ${squawkPath.fsPath}`)
 
   const serverExecutable: Executable = {
-    command: squawkPath.path,
+    command: squawkPath.fsPath,
     args: ["server", "--verbose"],
   }
   const serverOptions: ServerOptions = serverExecutable
