@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.21.0 - 2025-07-23
+
+## Added
+
+- parser: warn about `try_cast` and don't fail to parse casts that are invalid. (#593)
+
+## Fixed
+
+- vscode: invalid binary path on windows causing extension not to load. (#595)
+
 ## v2.20.0 - 2025-07-12
 
 ## Added
