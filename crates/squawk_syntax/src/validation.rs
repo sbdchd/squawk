@@ -18,26 +18,11 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::PrefixExpr(it) => validate_prefix_expr(it, errors),
                 ast::ArrayExpr(it) => validate_array_expr(it, errors),
                 ast::DropAggregate(it) => validate_drop_aggregate(it, errors),
-                ast::CallExpr(it) => validate_call_expr(it, errors),
                 ast::JoinExpr(it) => validate_join_expr(it, errors),
                 ast::Literal(it) => validate_literal(it, errors),
                 ast::NonStandardParam(it) => validate_non_standard_param(it, errors),
                 _ => (),
             }
-        }
-    }
-}
-
-fn validate_call_expr(it: ast::CallExpr, acc: &mut Vec<SyntaxError>) {
-    let Some(arg_list) = it.arg_list() else {
-        return;
-    };
-    for arg in arg_list.args() {
-        if let ast::Expr::CastExpr(cast_expr) = &arg {
-            acc.push(SyntaxError::new(
-                "Invalid cast. Use `cast`, `treat`, or `::` instead.",
-                cast_expr.syntax().text_range(),
-            ));
         }
     }
 }

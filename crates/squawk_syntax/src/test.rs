@@ -43,9 +43,17 @@ fn syntaxtest(fixture: Fixture<&str>) {
       assert_snapshot!(format!("{}_{}", test_name, parent_dir), buffer);
     });
 
-    assert_ne!(
-        errors.len(),
-        0,
-        "tests defined in the `syntax/test_data` must have errors."
-    );
+    if test_name.ends_with("_ok") {
+        assert_eq!(
+            errors.len(),
+            0,
+            "tests defined in the `syntax/test_data` ending with `_ok` can't have errors."
+        );
+    } else {
+        assert_ne!(
+            errors.len(),
+            0,
+            "tests defined in the `syntax/test_data` must have errors."
+        );
+    }
 }
