@@ -1,0 +1,134 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/alter_table_ok.sql
+---
+SOURCE_FILE@0..470
+  COMMENT@0..66 "-- regression test fo ..."
+  WHITESPACE@66..67 "\n"
+  ALTER_TABLE@67..243
+    ALTER_KW@67..72 "alter"
+    WHITESPACE@72..73 " "
+    TABLE_KW@73..78 "table"
+    WHITESPACE@78..79 " "
+    RELATION_NAME@79..92
+      PATH@79..92
+        PATH@79..85
+          PATH_SEGMENT@79..85
+            NAME_REF@79..85
+              IDENT@79..85 "public"
+        DOT@85..86 "."
+        PATH_SEGMENT@86..92
+          NAME_REF@86..92
+            IDENT@86..92 "widget"
+    WHITESPACE@92..95 "\n  "
+    ADD_CONSTRAINT@95..243
+      ADD_KW@95..98 "add"
+      WHITESPACE@98..99 " "
+      CHECK_CONSTRAINT@99..233
+        CONSTRAINT_KW@99..109 "constraint"
+        WHITESPACE@109..110 " "
+        NAME@110..136
+          IDENT@110..136 "widget_config_schema_ ..."
+        WHITESPACE@136..137 " "
+        CHECK_KW@137..142 "check"
+        WHITESPACE@142..143 " "
+        L_PAREN@143..144 "("
+        WHITESPACE@144..149 "\n    "
+        CALL_EXPR@149..229
+          FIELD_EXPR@149..178
+            NAME_REF@149..155
+              IDENT@149..155 "checks"
+            DOT@155..156 "."
+            NAME_REF@156..178
+              IDENT@156..178 "is_widget_config_valid"
+          ARG_LIST@178..229
+            L_PAREN@178..179 "("
+            CAST_EXPR@179..220
+              LITERAL@179..187
+                STRING@179..187 "'widget'"
+              COLON_COLON@187..189
+                COLON@187..188 ":"
+                COLON@188..189 ":"
+              FIELD_EXPR@189..220
+                NAME_REF@189..201
+                  IDENT@189..201 "custom_types"
+                DOT@201..202 "."
+                NAME_REF@202..220
+                  IDENT@202..220 "widget_schema_type"
+            COMMA@220..221 ","
+            WHITESPACE@221..222 " "
+            NAME_REF@222..228
+              IDENT@222..228 "config"
+            R_PAREN@228..229 ")"
+        WHITESPACE@229..232 "\n  "
+        R_PAREN@232..233 ")"
+      WHITESPACE@233..234 " "
+      NOT_VALID@234..243
+        NOT_KW@234..237 "not"
+        WHITESPACE@237..238 " "
+        VALID_KW@238..243 "valid"
+  SEMICOLON@243..244 ";"
+  WHITESPACE@244..246 "\n\n"
+  ALTER_TABLE@246..469
+    ALTER_KW@246..251 "alter"
+    WHITESPACE@251..252 " "
+    TABLE_KW@252..257 "table"
+    WHITESPACE@257..258 " "
+    RELATION_NAME@258..280
+      PATH@258..280
+        PATH@258..264
+          PATH_SEGMENT@258..264
+            NAME_REF@258..264
+              IDENT@258..264 "public"
+        DOT@264..265 "."
+        PATH_SEGMENT@265..280
+          NAME_REF@265..280
+            IDENT@265..280 "widget_instance"
+    WHITESPACE@280..283 "\n  "
+    ADD_CONSTRAINT@283..469
+      ADD_KW@283..286 "add"
+      WHITESPACE@286..287 " "
+      CHECK_CONSTRAINT@287..459
+        CONSTRAINT_KW@287..297 "constraint"
+        WHITESPACE@297..298 " "
+        NAME@298..343
+          IDENT@298..343 "widget_instance_confi ..."
+        WHITESPACE@343..344 " "
+        CHECK_KW@344..349 "check"
+        WHITESPACE@349..350 " "
+        L_PAREN@350..351 "("
+        WHITESPACE@351..356 "\n    "
+        CALL_EXPR@356..455
+          FIELD_EXPR@356..385
+            NAME_REF@356..362
+              IDENT@356..362 "checks"
+            DOT@362..363 "."
+            NAME_REF@363..385
+              IDENT@363..385 "is_widget_config_valid"
+          ARG_LIST@385..455
+            L_PAREN@385..386 "("
+            CAST_EXPR@386..436
+              LITERAL@386..403
+                STRING@386..403 "'widget_instance'"
+              COLON_COLON@403..405
+                COLON@403..404 ":"
+                COLON@404..405 ":"
+              FIELD_EXPR@405..436
+                NAME_REF@405..417
+                  IDENT@405..417 "custom_types"
+                DOT@417..418 "."
+                NAME_REF@418..436
+                  IDENT@418..436 "widget_schema_type"
+            COMMA@436..437 ","
+            WHITESPACE@437..438 " "
+            NAME_REF@438..454
+              IDENT@438..454 "config_overrides"
+            R_PAREN@454..455 ")"
+        WHITESPACE@455..458 "\n  "
+        R_PAREN@458..459 ")"
+      WHITESPACE@459..460 " "
+      NOT_VALID@460..469
+        NOT_KW@460..463 "not"
+        WHITESPACE@463..464 " "
+        VALID_KW@464..469 "valid"
+  WHITESPACE@469..470 "\n"

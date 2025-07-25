@@ -1445,6 +1445,10 @@ impl CastExpr {
     pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
     }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
