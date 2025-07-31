@@ -67,18 +67,21 @@ create table users (
 create table users (
     id bigserial
 );
+create table users (
+    id BIGSERIAL
+);
         "#;
         let file = squawk_syntax::SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::PreferIdentity]);
         let errors = linter.lint(file, sql);
         assert_ne!(errors.len(), 0);
-        assert_eq!(errors.len(), 6);
+        assert_eq!(errors.len(), 7);
         assert_eq!(
             errors
                 .iter()
                 .filter(|x| x.code == Rule::PreferIdentity)
                 .count(),
-            6
+            7
         );
         assert_debug_snapshot!(errors);
     }

@@ -24,7 +24,7 @@ pub(crate) fn is_not_valid_int_type(ty: &ast::Type, invalid_type_names: &HashSet
                 return false;
             };
             let name = trim_quotes(ty_name.as_str());
-            invalid_type_names.contains(name)
+            invalid_type_names.contains(name.to_lowercase().as_str())
         }
         ast::Type::CharType(_) => false,
         ast::Type::BitType(_) => false,
