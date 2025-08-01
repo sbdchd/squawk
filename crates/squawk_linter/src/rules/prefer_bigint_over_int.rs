@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, ast};
 
+use crate::text::Identifier;
 use crate::{Linter, Rule, Violation};
 
 use crate::visitors::check_not_allowed_types;
@@ -11,8 +12,12 @@ use crate::visitors::is_not_valid_int_type;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref INT_TYPES: HashSet<&'static str> =
-        HashSet::from(["integer", "int4", "serial", "serial4",]);
+    static ref INT_TYPES: HashSet<Identifier> = HashSet::from([
+        Identifier::new("integer"),
+        Identifier::new("int4"),
+        Identifier::new("serial"),
+        Identifier::new("serial4"),
+    ]);
 }
 
 fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {

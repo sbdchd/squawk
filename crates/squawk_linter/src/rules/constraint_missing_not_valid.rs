@@ -5,12 +5,15 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, text::trim_quotes};
+use crate::{
+    Linter, Rule, Violation,
+    text::Identifier,
+};
 
 pub fn tables_created_in_transaction(
     assume_in_transaction: bool,
     file: &ast::SourceFile,
-) -> HashSet<String> {
+) -> HashSet<Identifier> {
     let mut created_table_names = HashSet::new();
     let mut inside_transaction = assume_in_transaction;
     for stmt in file.stmts() {
@@ -29,7 +32,7 @@ pub fn tables_created_in_transaction(
                 else {
                     continue;
                 };
-                created_table_names.insert(trim_quotes(&table_name.text()).to_string());
+                created_table_names.insert(Identifier::new(&table_name.text()));
             }
             _ => (),
         }
@@ -43,7 +46,7 @@ fn not_valid_validate_in_transaction(
     file: &ast::SourceFile,
 ) {
     let mut inside_transaction = assume_in_transaction;
-    let mut not_valid_names: HashSet<String> = HashSet::new();
+    let mut not_valid_names: HashSet<Identifier> = HashSet::new();
     for stmt in file.stmts() {
         match stmt {
             ast::Stmt::AlterTable(alter_table) => {
@@ -54,7 +57,7 @@ fn not_valid_validate_in_transaction(
                                 validate_constraint.name_ref().map(|x| x.text().to_string())
                             {
                                 if inside_transaction
-                                    && not_valid_names.contains(trim_quotes(&constraint_name))
+                                    && not_valid_names.contains(&Identifier::new(&constraint_name))
                                 {
                                     ctx.report(
                                         Violation::new(
@@ -70,9 +73,7 @@ fn not_valid_validate_in_transaction(
                             if add_constraint.not_valid().is_some() {
                                 if let Some(constraint) = add_constraint.constraint() {
                                     if let Some(constraint_name) = constraint.name() {
-                                        not_valid_names.insert(
-                                            trim_quotes(&constraint_name.text()).to_string(),
-                                        );
+                                        not_valid_names.insert(Identifier::new(&constraint_name.text()));
                                     }
                                 }
                             }
@@ -117,7 +118,7 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
             };
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddConstraint(add_constraint) = action {
-                    if !tables_created.contains(trim_quotes(&table_name))
+                    if !tables_created.contains(&Identifier::new(&table_name))
                         && add_constraint.not_valid().is_none()
                     {
                         if let Some(ast::Constraint::UniqueConstraint(uc)) =

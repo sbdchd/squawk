@@ -19,8 +19,8 @@ mod ignore_index;
 mod version;
 mod visitors;
 
+mod identifier;
 mod rules;
-mod text;
 use rules::adding_field_with_default;
 use rules::adding_foreign_key_constraint;
 use rules::adding_not_null_field;

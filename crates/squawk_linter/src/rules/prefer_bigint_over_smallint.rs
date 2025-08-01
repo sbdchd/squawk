@@ -3,6 +3,7 @@ use std::collections::HashSet;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, ast};
 
+use crate::text::Identifier;
 use crate::{Linter, Rule, Violation};
 
 use crate::visitors::check_not_allowed_types;
@@ -11,8 +12,12 @@ use crate::visitors::is_not_valid_int_type;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref SMALL_INT_TYPES: HashSet<&'static str> =
-        HashSet::from(["smallint", "int2", "smallserial", "serial2",]);
+    static ref SMALL_INT_TYPES: HashSet<Identifier> = HashSet::from([
+        Identifier::new("smallint"),
+        Identifier::new("int2"),
+        Identifier::new("smallserial"),
+        Identifier::new("serial2"),
+    ]);
 }
 
 fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {

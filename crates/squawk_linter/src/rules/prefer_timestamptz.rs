@@ -4,7 +4,7 @@ use squawk_syntax::{
 };
 
 use crate::{Linter, Rule, Violation};
-use crate::{text::trim_quotes, visitors::check_not_allowed_types};
+use crate::{text::Identifier, visitors::check_not_allowed_types};
 
 pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
     match ty {
@@ -26,7 +26,8 @@ pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
                 return false;
             };
             // if we don't have any args, then it's the same as `text`
-            trim_quotes(ty_name.as_str()) == "varchar" && path_type.arg_list().is_some()
+            Identifier::new(ty_name.as_str()) == Identifier::new("varchar")
+                && path_type.arg_list().is_some()
         }
         ast::Type::CharType(_) => false,
         ast::Type::BitType(_) => false,
