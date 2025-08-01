@@ -2,9 +2,12 @@ use std::collections::HashSet;
 
 use squawk_syntax::ast;
 
-use crate::{Linter, text::trim_quotes};
+use crate::{Linter, identifier::Identifier};
 
-pub(crate) fn is_not_valid_int_type(ty: &ast::Type, invalid_type_names: &HashSet<&str>) -> bool {
+pub(crate) fn is_not_valid_int_type(
+    ty: &ast::Type,
+    invalid_type_names: &HashSet<Identifier>,
+) -> bool {
     match ty {
         ast::Type::ArrayType(array_type) => {
             if let Some(ty) = array_type.ty() {
@@ -23,8 +26,8 @@ pub(crate) fn is_not_valid_int_type(ty: &ast::Type, invalid_type_names: &HashSet
             else {
                 return false;
             };
-            let name = trim_quotes(ty_name.as_str());
-            invalid_type_names.contains(name.to_lowercase().as_str())
+            let name = Identifier::new(ty_name.as_str());
+            invalid_type_names.contains(&name)
         }
         ast::Type::CharType(_) => false,
         ast::Type::BitType(_) => false,

@@ -3,7 +3,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, text::trim_quotes};
+use crate::{Linter, Rule, Violation, identifier::Identifier};
 
 use super::constraint_missing_not_valid::tables_created_in_transaction;
 
@@ -19,7 +19,7 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
                 .and_then(|x| x.name_ref())
             {
                 if create_index.concurrently_token().is_none()
-                    && !tables_created.contains(trim_quotes(table_name.text().as_str()))
+                    && !tables_created.contains(&Identifier::new(&table_name.text()))
                 {
                     ctx.report(Violation::new(
                         Rule::RequireConcurrentIndexCreation,

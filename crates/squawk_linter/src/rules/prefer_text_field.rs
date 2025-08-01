@@ -5,7 +5,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, text::trim_quotes};
+use crate::{Linter, Rule, Violation, identifier::Identifier};
 
 use crate::visitors::check_not_allowed_types;
 
@@ -35,10 +35,10 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
                 return false;
             };
             // if we don't have any args, then it's the same as `text`
-            trim_quotes(ty_name.as_str()) == "varchar" && path_type.arg_list().is_some()
+            Identifier::new(ty_name.as_str()) == Identifier::new("varchar") && path_type.arg_list().is_some()
         }
         ast::Type::CharType(char_type) => {
-            trim_quotes(&char_type.text()) == "varchar" && char_type.arg_list().is_some()
+            Identifier::new(&char_type.text()) == Identifier::new("varchar") && char_type.arg_list().is_some()
         }
         ast::Type::BitType(_) => false,
         ast::Type::DoubleType(_) => false,

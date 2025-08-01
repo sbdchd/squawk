@@ -1,0 +1,22 @@
+---
+source: crates/squawk_linter/src/rules/prefer_identity.rs
+expression: errors
+---
+[
+    Violation {
+        code: PreferIdentity,
+        message: "Serial types make schema, dependency, and permission management difficult.",
+        text_range: 29..37,
+        help: Some(
+            "Use an `IDENTITY` column instead.",
+        ),
+    },
+    Violation {
+        code: PreferIdentity,
+        message: "Serial types make schema, dependency, and permission management difficult.",
+        text_range: 69..80,
+        help: Some(
+            "Use an `IDENTITY` column instead.",
+        ),
+    },
+]

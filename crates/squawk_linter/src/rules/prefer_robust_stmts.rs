@@ -5,7 +5,10 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, text::trim_quotes};
+use crate::{
+    Linter, Rule, Violation,
+    identifier::Identifier,
+};
 
 #[derive(PartialEq)]
 enum Constraint {
@@ -16,7 +19,7 @@ enum Constraint {
 pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     let mut inside_transaction = ctx.settings.assume_in_transaction;
-    let mut constraint_names: HashMap<String, Constraint> = HashMap::new();
+    let mut constraint_names: HashMap<Identifier, Constraint> = HashMap::new();
 
     let mut total_stmts = 0;
     for _ in file.stmts() {
@@ -50,7 +53,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         ast::AlterTableAction::DropConstraint(drop_constraint) => {
                             if let Some(constraint_name) = drop_constraint.name_ref() {
                                 constraint_names.insert(
-                                    trim_quotes(constraint_name.text().as_str()).to_string(),
+                                    Identifier::new(constraint_name.text().as_str()),
                                     Constraint::Dropped,
                                 );
                             }
@@ -68,7 +71,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
                             if let Some(constraint_name) = validate_constraint.name_ref() {
                                 if constraint_names
-                                    .contains_key(trim_quotes(constraint_name.text().as_str()))
+                                    .contains_key(&Identifier::new(constraint_name.text().as_str()))
                                 {
                                     continue;
                                 }
@@ -79,8 +82,8 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                             let constraint = add_constraint.constraint();
                             if let Some(constraint_name) = constraint.and_then(|x| x.name()) {
                                 let name_text = constraint_name.text();
-                                let name = trim_quotes(name_text.as_str());
-                                if let Some(constraint) = constraint_names.get_mut(name) {
+                                let name = Identifier::new(name_text.as_str());
+                                if let Some(constraint) = constraint_names.get_mut(&name) {
                                     if *constraint == Constraint::Dropped {
                                         *constraint = Constraint::Added;
                                         continue;

@@ -5,6 +5,7 @@ use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile};
 
+use crate::identifier::Identifier;
 use crate::{Linter, Rule, Violation};
 
 fn is_const_expr(expr: &ast::Expr) -> bool {
@@ -16,11 +17,12 @@ fn is_const_expr(expr: &ast::Expr) -> bool {
 }
 
 lazy_static! {
-    static ref NON_VOLATILE_FUNCS: HashSet<String> = {
+    static ref NON_VOLATILE_FUNCS: HashSet<Identifier> = {
         NON_VOLATILE_BUILT_IN_FUNCTIONS
             .split('\n')
-            .map(|x| x.trim().to_lowercase())
+            .map(|x| x.trim())
             .filter(|x| !x.is_empty())
+            .map(|x| Identifier::new(x))
             .collect()
     };
 }
@@ -36,7 +38,8 @@ fn is_non_volatile(expr: &ast::Expr) -> bool {
                     return false;
                 };
 
-                let non_volatile_name = NON_VOLATILE_FUNCS.contains(name_ref.text().as_str());
+                let non_volatile_name =
+                    NON_VOLATILE_FUNCS.contains(&Identifier::new(name_ref.text().as_str()));
 
                 no_args && non_volatile_name
             } else {

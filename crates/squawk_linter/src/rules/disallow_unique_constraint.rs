@@ -3,7 +3,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, text::trim_quotes};
+use crate::{Linter, Rule, Violation, identifier::Identifier};
 
 use super::constraint_missing_not_valid::tables_created_in_transaction;
 
@@ -30,7 +30,7 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                             add_constraint.constraint()
                         {
                             if unique_constraint.using_index().is_none()
-                                && !tables_created.contains(trim_quotes(&table_name))
+                                && !tables_created.contains(&Identifier::new(&table_name))
                             {
                                 ctx.report(Violation::new(
                                     Rule::DisallowedUniqueConstraint,

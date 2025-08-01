@@ -5,20 +5,20 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation, identifier::Identifier};
 
 use lazy_static::lazy_static;
 
 use crate::visitors::{check_not_allowed_types, is_not_valid_int_type};
 
 lazy_static! {
-    static ref SERIAL_TYPES: HashSet<&'static str> = HashSet::from([
-        "serial",
-        "serial2",
-        "serial4",
-        "serial8",
-        "smallserial",
-        "bigserial",
+    static ref SERIAL_TYPES: HashSet<Identifier> = HashSet::from([
+        Identifier::new("serial"),
+        Identifier::new("serial2"),
+        Identifier::new("serial4"),
+        Identifier::new("serial8"),
+        Identifier::new("smallserial"),
+        Identifier::new("bigserial"),
     ]);
 }
 
@@ -83,6 +83,23 @@ create table users (
                 .count(),
             7
         );
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn ok_when_quoted() {
+        let sql = r#"
+create table users (
+    id "serial"
+);
+create table users (
+    id "bigserial"
+);
+        "#;
+        let file = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::from([Rule::PreferIdentity]);
+        let errors = linter.lint(file, sql);
+        assert_eq!(errors.len(), 2);
         assert_debug_snapshot!(errors);
     }
 
