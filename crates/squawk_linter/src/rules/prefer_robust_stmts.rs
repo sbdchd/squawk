@@ -7,7 +7,7 @@ use squawk_syntax::{
 
 use crate::{
     Linter, Rule, Violation,
-    text::Identifier,
+    identifier::Identifier,
 };
 
 #[derive(PartialEq)]

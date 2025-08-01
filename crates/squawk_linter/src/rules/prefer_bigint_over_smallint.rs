@@ -3,7 +3,7 @@ use std::collections::HashSet;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, ast};
 
-use crate::text::Identifier;
+use crate::identifier::Identifier;
 use crate::{Linter, Rule, Violation};
 
 use crate::visitors::check_not_allowed_types;

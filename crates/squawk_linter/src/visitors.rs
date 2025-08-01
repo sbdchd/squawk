@@ -2,10 +2,7 @@ use std::collections::HashSet;
 
 use squawk_syntax::ast;
 
-use crate::{
-    Linter,
-    text::Identifier,
-};
+use crate::{Linter, identifier::Identifier};
 
 pub(crate) fn is_not_valid_int_type(
     ty: &ast::Type,

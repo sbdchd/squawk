@@ -5,7 +5,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, text::Identifier};
+use crate::{Linter, Rule, Violation, identifier::Identifier};
 
 use crate::visitors::check_not_allowed_types;
 

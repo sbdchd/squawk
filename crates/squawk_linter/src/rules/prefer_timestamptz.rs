@@ -4,7 +4,7 @@ use squawk_syntax::{
 };
 
 use crate::{Linter, Rule, Violation};
-use crate::{text::Identifier, visitors::check_not_allowed_types};
+use crate::{identifier::Identifier, visitors::check_not_allowed_types};
 
 pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
     match ty {

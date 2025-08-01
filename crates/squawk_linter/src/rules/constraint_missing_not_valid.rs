@@ -7,7 +7,7 @@ use squawk_syntax::{
 
 use crate::{
     Linter, Rule, Violation,
-    text::Identifier,
+    identifier::Identifier,
 };
 
 pub fn tables_created_in_transaction(

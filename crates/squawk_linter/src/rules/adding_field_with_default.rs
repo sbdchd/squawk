@@ -5,7 +5,7 @@ use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile};
 
-use crate::text::Identifier;
+use crate::identifier::Identifier;
 use crate::{Linter, Rule, Violation};
 
 fn is_const_expr(expr: &ast::Expr) -> bool {

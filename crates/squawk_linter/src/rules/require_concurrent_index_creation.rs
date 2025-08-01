@@ -3,7 +3,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, text::Identifier};
+use crate::{Linter, Rule, Violation, identifier::Identifier};
 
 use super::constraint_missing_not_valid::tables_created_in_transaction;
 
