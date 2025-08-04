@@ -8,5 +8,6 @@ expression: errors
         message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
         text_range: 240..297,
         help: None,
+        fix: None,
     },
 ]

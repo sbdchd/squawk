@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Add the `PRIMARY KEY` constraint `USING` an index.",
         ),
+        fix: None,
     },
 ]

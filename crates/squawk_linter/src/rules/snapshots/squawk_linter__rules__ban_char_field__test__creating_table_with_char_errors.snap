@@ -8,23 +8,27 @@ expression: errors
         message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 77..86,
         help: None,
+        fix: None,
     },
     Violation {
         code: BanCharField,
         message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 108..122,
         help: None,
+        fix: None,
     },
     Violation {
         code: BanCharField,
         message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 147..151,
         help: None,
+        fix: None,
     },
     Violation {
         code: BanCharField,
         message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 174..183,
         help: None,
+        fix: None,
     },
 ]

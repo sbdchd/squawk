@@ -22,7 +22,7 @@ lazy_static! {
             .split('\n')
             .map(|x| x.trim())
             .filter(|x| !x.is_empty())
-            .map(|x| Identifier::new(x))
+            .map(Identifier::new)
             .collect()
     };
 }

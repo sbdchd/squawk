@@ -8,17 +8,20 @@ expression: errors
         message: "Dropping a database may break existing clients.",
         text_range: 9..35,
         help: None,
+        fix: None,
     },
     Violation {
         code: BanDropDatabase,
         message: "Dropping a database may break existing clients.",
         text_range: 45..81,
         help: None,
+        fix: None,
     },
     Violation {
         code: BanDropDatabase,
         message: "Dropping a database may break existing clients.",
         text_range: 91..127,
         help: None,
+        fix: None,
     },
 ]

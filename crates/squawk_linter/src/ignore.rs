@@ -284,7 +284,7 @@ alter table t drop column c cascade;
         let errors: Vec<_> = linter
             .lint(parse, sql)
             .into_iter()
-            .map(|x| x.code.clone())
+            .map(|x| x.code)
             .collect();
         assert!(errors.is_empty());
     }
@@ -355,7 +355,7 @@ alter table t2 drop column c2 cascade;
         let errors: Vec<_> = linter
             .lint(parse, sql)
             .into_iter()
-            .map(|x| x.code.clone())
+            .map(|x| x.code)
             .collect();
 
         assert_debug_snapshot!(errors, @r"
@@ -379,7 +379,7 @@ alter table t2 drop column c2 cascade;
         let errors: Vec<_> = linter
             .lint(parse, sql)
             .into_iter()
-            .map(|x| x.code.clone())
+            .map(|x| x.code)
             .collect();
 
         assert_debug_snapshot!(errors, @r"

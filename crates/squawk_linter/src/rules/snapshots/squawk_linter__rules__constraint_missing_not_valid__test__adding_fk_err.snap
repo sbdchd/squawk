@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.",
         ),
+        fix: None,
     },
 ]

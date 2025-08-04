@@ -10,6 +10,7 @@ expression: errors
         help: Some(
             "Use 64-bit integer values instead to prevent hitting this limit.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferBigintOverSmallint,
@@ -18,6 +19,7 @@ expression: errors
         help: Some(
             "Use 64-bit integer values instead to prevent hitting this limit.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferBigintOverSmallint,
@@ -26,6 +28,7 @@ expression: errors
         help: Some(
             "Use 64-bit integer values instead to prevent hitting this limit.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferBigintOverSmallint,
@@ -34,5 +37,6 @@ expression: errors
         help: Some(
             "Use 64-bit integer values instead to prevent hitting this limit.",
         ),
+        fix: None,
     },
 ]

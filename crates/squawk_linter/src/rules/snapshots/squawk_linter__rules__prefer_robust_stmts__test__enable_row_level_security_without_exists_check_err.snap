@@ -8,5 +8,6 @@ expression: errors
         message: "Missing transaction, the migration can't be rerun if it fails part way through.",
         text_range: 53..78,
         help: None,
+        fix: None,
     },
 ]

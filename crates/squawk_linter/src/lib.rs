@@ -8,6 +8,7 @@ use ignore::find_ignores;
 use ignore_index::IgnoreIndex;
 use lazy_static::lazy_static;
 use rowan::TextRange;
+use rowan::TextSize;
 use serde::{Deserialize, Serialize};
 
 use squawk_syntax::{Parse, SourceFile};
@@ -222,6 +223,36 @@ pub struct Violation {
     pub message: String,
     pub text_range: TextRange,
     pub help: Option<String>,
+    pub fix: Option<Fix>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Fix {
+    pub title: String,
+    pub edits: Vec<Edit>,
+}
+
+impl Fix {
+    fn new<T: Into<String>>(title: T, edits: Vec<Edit>) -> Fix {
+        Fix {
+            title: title.into(),
+            edits,
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Edit {
+    pub text_range: TextRange,
+    pub text: Option<String>,
+}
+impl Edit {
+    fn insert<T: Into<String>>(text: T, at: TextSize) -> Self {
+        Self {
+            text_range: TextRange::new(at, at),
+            text: Some(text.into()),
+        }
+    }
 }
 
 impl Violation {
@@ -237,7 +268,13 @@ impl Violation {
             text_range,
             message,
             help: help.into(),
+            fix: None,
         }
+    }
+
+    fn with_fix(mut self, fix: Option<Fix>) -> Violation {
+        self.fix = fix;
+        self
     }
 }
 

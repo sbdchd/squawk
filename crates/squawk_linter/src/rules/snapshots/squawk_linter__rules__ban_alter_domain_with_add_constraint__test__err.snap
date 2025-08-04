@@ -8,5 +8,6 @@ expression: errors
         message: "Domains with constraints have poor support for online migrations. Use table and column constraints instead.",
         text_range: 31..79,
         help: None,
+        fix: None,
     },
 ]

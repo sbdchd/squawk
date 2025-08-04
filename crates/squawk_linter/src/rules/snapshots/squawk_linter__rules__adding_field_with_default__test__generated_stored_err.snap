@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.",
         ),
+        fix: None,
     },
 ]

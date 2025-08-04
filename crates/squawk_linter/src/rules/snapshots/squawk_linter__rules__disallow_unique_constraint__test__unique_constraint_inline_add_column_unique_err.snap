@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Create an index `CONCURRENTLY` and create the constraint using the index.",
         ),
+        fix: None,
     },
 ]

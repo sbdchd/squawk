@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Use a `TEXT` field with a `CHECK` constraint.",
         ),
+        fix: None,
     },
 ]

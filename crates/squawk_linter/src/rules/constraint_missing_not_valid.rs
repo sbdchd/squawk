@@ -5,10 +5,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{
-    Linter, Rule, Violation,
-    identifier::Identifier,
-};
+use crate::{Linter, Rule, Violation, identifier::Identifier};
 
 pub fn tables_created_in_transaction(
     assume_in_transaction: bool,
@@ -73,7 +70,8 @@ fn not_valid_validate_in_transaction(
                             if add_constraint.not_valid().is_some() {
                                 if let Some(constraint) = add_constraint.constraint() {
                                     if let Some(constraint_name) = constraint.name() {
-                                        not_valid_names.insert(Identifier::new(&constraint_name.text()));
+                                        not_valid_names
+                                            .insert(Identifier::new(&constraint_name.text()));
                                     }
                                 }
                             }

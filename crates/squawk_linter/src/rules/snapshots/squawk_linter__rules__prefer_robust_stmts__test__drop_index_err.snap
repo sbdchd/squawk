@@ -5,8 +5,21 @@ expression: errors
 [
     Violation {
         code: PreferRobustStmts,
-        message: "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.",
+        message: "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
         text_range: 40..75,
         help: None,
+        fix: Some(
+            Fix {
+                title: "Insert `if exists`",
+                edits: [
+                    Edit {
+                        text_range: 64..64,
+                        text: Some(
+                            "if exists ",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]
