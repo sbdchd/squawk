@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Make the field nullable or add a non-VOLATILE DEFAULT",
         ),
+        fix: None,
     },
 ]

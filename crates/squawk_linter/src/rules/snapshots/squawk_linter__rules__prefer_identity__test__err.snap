@@ -1,6 +1,5 @@
 ---
 source: crates/squawk_linter/src/rules/prefer_identity.rs
-assertion_line: 86
 expression: errors
 ---
 [
@@ -11,6 +10,7 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferIdentity,
@@ -19,6 +19,7 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferIdentity,
@@ -27,6 +28,7 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferIdentity,
@@ -35,6 +37,7 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferIdentity,
@@ -43,6 +46,7 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferIdentity,
@@ -51,6 +55,7 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferIdentity,
@@ -59,5 +64,6 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
 ]

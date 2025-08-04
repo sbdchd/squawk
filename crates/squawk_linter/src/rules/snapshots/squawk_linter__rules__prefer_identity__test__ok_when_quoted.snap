@@ -10,6 +10,7 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferIdentity,
@@ -18,5 +19,6 @@ expression: errors
         help: Some(
             "Use an `IDENTITY` column instead.",
         ),
+        fix: None,
     },
 ]

@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Use `CONCURRENTLY` to avoid blocking writes.",
         ),
+        fix: None,
     },
 ]

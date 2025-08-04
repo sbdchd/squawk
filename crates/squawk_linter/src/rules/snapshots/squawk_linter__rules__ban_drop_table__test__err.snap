@@ -8,17 +8,20 @@ expression: errors
         message: "Dropping a table may break existing clients.",
         text_range: 1..24,
         help: None,
+        fix: None,
     },
     Violation {
         code: BanDropTable,
         message: "Dropping a table may break existing clients.",
         text_range: 26..59,
         help: None,
+        fix: None,
     },
     Violation {
         code: BanDropTable,
         message: "Dropping a table may break existing clients.",
         text_range: 61..94,
         help: None,
+        fix: None,
     },
 ]

@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Build the index outside any transactions.",
         ),
+        fix: None,
     },
 ]

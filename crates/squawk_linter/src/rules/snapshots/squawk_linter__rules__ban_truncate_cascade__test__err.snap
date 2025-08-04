@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Remove the `CASCADE` and specify exactly which tables you want to truncate.",
         ),
+        fix: None,
     },
 ]

@@ -217,7 +217,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
     let mut clap_app = Opt::clap();
     let is_stdin = !atty::is(Stream::Stdin);
     let github_annotations = std::env::var("GITHUB_ACTIONS").is_ok()
-        && !std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_ok();
+        && std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_err();
     match opts.cmd {
         Some(Command::Server) => {
             squawk_server::run().context("language server failed")?;

@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Add constraint as `NOT VALID` in one transaction and `VALIDATE CONSTRAINT` in a separate transaction.",
         ),
+        fix: None,
     },
 ]

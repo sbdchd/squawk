@@ -10,6 +10,7 @@ expression: errors
         help: Some(
             "Use timestamptz instead of timestamp for your column type.",
         ),
+        fix: None,
     },
     Violation {
         code: PreferTimestampTz,
@@ -18,5 +19,6 @@ expression: errors
         help: Some(
             "Use timestamptz instead of timestamp for your column type.",
         ),
+        fix: None,
     },
 ]

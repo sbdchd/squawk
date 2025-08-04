@@ -10,5 +10,18 @@ expression: errors
         help: Some(
             "Use an explicit name for a concurrently created index",
         ),
+        fix: Some(
+            Fix {
+                title: "Insert `if not exists`",
+                edits: [
+                    Edit {
+                        text_range: 66..66,
+                        text: Some(
+                            "if not exists ",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]

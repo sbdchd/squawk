@@ -8,5 +8,6 @@ expression: errors
         message: "Renaming a table may break existing clients.",
         text_range: 26..52,
         help: None,
+        fix: None,
     },
 ]

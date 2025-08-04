@@ -8,5 +8,6 @@ expression: errors
         message: "Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten. Changing the type of the column may also break other clients reading from the table.",
         text_range: 92..121,
         help: None,
+        fix: None,
     },
 ]

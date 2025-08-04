@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Make the field nullable and use a `CHECK` constraint instead.",
         ),
+        fix: None,
     },
 ]

@@ -1,18 +1,22 @@
-use anyhow::Result;
+use anyhow::{Context, Result};
 use line_index::LineIndex;
 use log::info;
 use lsp_server::{Connection, Message, Notification, Response};
 use lsp_types::{
-    CodeDescription, Diagnostic, DiagnosticSeverity, DidChangeTextDocumentParams,
-    DidCloseTextDocumentParams, DidOpenTextDocumentParams, GotoDefinitionParams,
-    GotoDefinitionResponse, InitializeParams, Location, Position, PublishDiagnosticsParams, Range,
-    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+    CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams,
+    CodeActionProviderCapability, CodeActionResponse, CodeDescription, Diagnostic,
+    DiagnosticSeverity, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
+    DidOpenTextDocumentParams, GotoDefinitionParams, GotoDefinitionResponse, InitializeParams,
+    Location, Position, PublishDiagnosticsParams, Range, ServerCapabilities,
+    TextDocumentSyncCapability, TextDocumentSyncKind, TextEdit, Url, WorkDoneProgressOptions,
+    WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
     },
-    request::{GotoDefinition, Request},
+    request::{CodeActionRequest, GotoDefinition, Request},
 };
+use serde::{Deserialize, Serialize};
 use squawk_linter::Linter;
 use squawk_syntax::{Parse, SourceFile};
 use std::collections::HashMap;
@@ -32,6 +36,13 @@ pub fn run() -> Result<()> {
         text_document_sync: Some(TextDocumentSyncCapability::Kind(
             TextDocumentSyncKind::INCREMENTAL,
         )),
+        code_action_provider: Some(CodeActionProviderCapability::Options(CodeActionOptions {
+            code_action_kinds: Some(vec![CodeActionKind::QUICKFIX]),
+            work_done_progress_options: WorkDoneProgressOptions {
+                work_done_progress: None,
+            },
+            resolve_provider: None,
+        })),
         // definition_provider: Some(OneOf::Left(true)),
         ..Default::default()
     })
@@ -72,6 +83,9 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                 match req.method.as_ref() {
                     GotoDefinition::METHOD => {
                         handle_goto_definition(&connection, req)?;
+                    }
+                    CodeActionRequest::METHOD => {
+                        handle_code_action(&connection, req, &documents)?;
                     }
                     "squawk/syntaxTree" => {
                         handle_syntax_tree(&connection, req, &documents)?;
@@ -118,6 +132,54 @@ fn handle_goto_definition(connection: &Connection, req: lsp_server::Request) -> 
     };
 
     let result = GotoDefinitionResponse::Scalar(location);
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&result).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}
+
+fn handle_code_action(
+    connection: &Connection,
+    req: lsp_server::Request,
+    _documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
+    let params: CodeActionParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document.uri;
+
+    let mut actions = Vec::new();
+
+    for mut diagnostic in params.context.diagnostics {
+        if let Some(data) = diagnostic.data.take() {
+            let associated_data: AssociatedDiagnosticData =
+                serde_json::from_value(data).context("deserializing diagnostic data")?;
+
+            let fix_action = CodeAction {
+                title: associated_data.title,
+                kind: Some(CodeActionKind::QUICKFIX),
+                diagnostics: Some(vec![diagnostic.clone()]),
+                edit: Some(WorkspaceEdit {
+                    changes: Some({
+                        let mut changes = HashMap::new();
+                        changes.insert(uri.clone(), associated_data.edits);
+                        changes
+                    }),
+                    ..Default::default()
+                }),
+                command: None,
+                is_preferred: Some(true),
+                disabled: None,
+                data: None,
+            };
+
+            actions.push(CodeActionOrCommand::CodeAction(fix_action));
+        };
+    }
+
+    let result: CodeActionResponse = actions;
     let resp = Response {
         id: req.id,
         result: Some(serde_json::to_value(&result).unwrap()),
@@ -223,6 +285,18 @@ fn handle_did_close(
     Ok(())
 }
 
+// Based on Ruff's setup for LSP diagnostic edits
+// see: https://github.com/astral-sh/ruff/blob/1a368b0bf97c3d0246390679166bbd2d589acf39/crates/ruff_server/src/lint.rs#L31
+/// This is serialized on the diagnostic `data` field.
+#[derive(Serialize, Deserialize, Debug, Clone)]
+struct AssociatedDiagnosticData {
+    /// The message describing what the fix does, if it exists, or the diagnostic name otherwise.
+    title: String,
+    /// Edits to fix the diagnostic. If this is empty, a fix
+    /// does not exist.
+    edits: Vec<lsp_types::TextEdit>,
+}
+
 fn lint(content: &str) -> Vec<Diagnostic> {
     let parse: Parse<SourceFile> = SourceFile::parse(content);
     let parse_errors = parse.errors();
@@ -271,6 +345,27 @@ fn lint(content: &str) -> Vec<Diagnostic> {
             end_line_col.col += 1;
         }
 
+        let data = if let Some(fix) = violation.fix {
+            Some(AssociatedDiagnosticData {
+                title: fix.title,
+                edits: fix
+                    .edits
+                    .into_iter()
+                    .filter_map(|x| {
+                        let start_line = line_index.try_line_col(x.text_range.start())?;
+                        let end_line = line_index.try_line_col(x.text_range.end())?;
+                        let range = Range::new(
+                            Position::new(start_line.line, start_line.col),
+                            Position::new(end_line.line, end_line.col),
+                        );
+                        Some(TextEdit::new(range, x.text.unwrap_or_default()))
+                    })
+                    .collect(),
+            })
+        } else {
+            None
+        };
+
         let diagnostic = Diagnostic {
             range: Range::new(
                 Position::new(start_line_col.line, start_line_col.col),
@@ -285,6 +380,7 @@ fn lint(content: &str) -> Vec<Diagnostic> {
             }),
             source: Some("squawk".to_string()),
             message: violation.message,
+            data: data.map(|d| serde_json::to_value(d).unwrap()),
             ..Default::default()
         };
         diagnostics.push(diagnostic);
@@ -306,7 +402,7 @@ fn handle_syntax_tree(
     let params: SyntaxTreeParams = serde_json::from_value(req.params)?;
     let uri = params.text_document.uri;
 
-    info!("Generating syntax tree for: {}", uri);
+    info!("Generating syntax tree for: {uri}");
 
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
 
@@ -337,7 +433,7 @@ fn handle_tokens(
     let params: TokensParams = serde_json::from_value(req.params)?;
     let uri = params.text_document.uri;
 
-    info!("Generating tokens for: {}", uri);
+    info!("Generating tokens for: {uri}");
 
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
 

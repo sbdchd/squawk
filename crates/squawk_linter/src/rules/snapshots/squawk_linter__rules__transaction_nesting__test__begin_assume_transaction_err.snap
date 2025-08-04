@@ -10,6 +10,7 @@ expression: errors
         help: Some(
             "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
         ),
+        fix: None,
     },
     Violation {
         code: TransactionNesting,
@@ -18,6 +19,7 @@ expression: errors
         help: Some(
             "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
         ),
+        fix: None,
     },
     Violation {
         code: TransactionNesting,
@@ -26,5 +28,6 @@ expression: errors
         help: Some(
             "Put migration statements in separate files to have them be in separate transactions or don't use the assume-in-transaction setting.",
         ),
+        fix: None,
     },
 ]

@@ -3347,10 +3347,6 @@ pub struct DropConstraint {
 }
 impl DropConstraint {
     #[inline]
-    pub fn constraint(&self) -> Option<Constraint> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
     }
@@ -3361,6 +3357,10 @@ impl DropConstraint {
     #[inline]
     pub fn cascade_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
+    pub fn constraint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
     #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {

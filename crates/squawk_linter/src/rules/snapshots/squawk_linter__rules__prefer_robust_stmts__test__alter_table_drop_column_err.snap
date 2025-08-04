@@ -8,5 +8,18 @@ expression: errors
         message: "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.",
         text_range: 54..75,
         help: None,
+        fix: Some(
+            Fix {
+                title: "Insert `if exists`",
+                edits: [
+                    Edit {
+                        text_range: 65..65,
+                        text: Some(
+                            " if exists",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]

@@ -10,5 +10,6 @@ expression: errors
         help: Some(
             "Drop the index `CONCURRENTLY`.",
         ),
+        fix: None,
     },
 ]
