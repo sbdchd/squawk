@@ -25,17 +25,15 @@ pub(crate) fn ban_truncate_cascade(ctx: &mut Linter, parse: &Parse<SourceFile>) 
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
-    use squawk_syntax::SourceFile;
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn err() {
         let sql = r#"
         truncate a, b, c cascade;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanTruncateCascade]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanTruncateCascade);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -46,9 +44,7 @@ mod test {
         truncate a, b, c;
         truncate a;
         "#;
-        let file = SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanTruncateCascade]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanTruncateCascade);
         assert_eq!(errors.len(), 0);
     }
 }

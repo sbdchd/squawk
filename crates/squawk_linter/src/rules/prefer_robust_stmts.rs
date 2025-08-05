@@ -251,14 +251,15 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::{assert_debug_snapshot, assert_snapshot};
 
-    use crate::{Edit, Linter, Rule};
+    use crate::{Edit, Linter, Rule, test_utils::{lint, lint_with_assume_in_transaction}};
 
     fn fix(sql: &str) -> String {
         let file = squawk_syntax::SourceFile::parse(sql);
+        assert_eq!(file.errors().len(), 0);
         assert_eq!(file.errors().len(), 0, "Shouldn't start with syntax errors");
         let mut linter = Linter::from([Rule::PreferRobustStmts]);
         let errors = linter.lint(file, sql);
-        assert!(errors.len() > 0, "Should start with linter errors");
+        assert!(!errors.is_empty(), "Should start with linter errors");
 
         let fixes = errors.into_iter().flat_map(|x| x.fix).collect::<Vec<_>>();
 
@@ -386,9 +387,7 @@ ALTER TABLE users DROP CONSTRAINT pk_users;
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -398,9 +397,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_id
 select 1; -- so we don't skip checking
 DROP INDEX CONCURRENTLY IF EXISTS "email_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -411,9 +408,7 @@ ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "fk_user";
 ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES "app_user" ("id") DEFERRABLE INITIALLY DEFERRED NOT VALID;
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -424,9 +419,7 @@ BEGIN;
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -436,9 +429,7 @@ COMMIT;
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" ADD COLUMN IF NOT EXISTS "answer_id" integer NULL;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -448,9 +439,7 @@ ALTER TABLE "core_foo" ADD COLUMN IF NOT EXISTS "answer_id" integer NULL;
 select 1; -- so we don't skip checking
 CREATE INDEX CONCURRENTLY IF NOT EXISTS "core_foo_idx" ON "core_foo" ("answer_id");
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -464,9 +453,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -478,9 +465,7 @@ CREATE TABLE IF NOT EXISTS "core_bar" (
     "bravo" text NOT NULL
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -494,9 +479,7 @@ DROP TABLE "core_bar";
 DROP TYPE foo;
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -507,9 +490,7 @@ COMMIT;
 select 1; -- so we don't skip checking
 SELECT 1;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -520,9 +501,7 @@ SELECT 1;
 select 1; -- so we don't skip checking
 INSERT INTO tbl VALUES (a);
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -533,9 +512,7 @@ INSERT INTO tbl VALUES (a);
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -545,10 +522,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT IF EXISTS "core_foo_idx";
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -559,10 +533,7 @@ DROP INDEX "core_bar_foo_id_idx";
 DROP TABLE "core_bar";
 DROP TYPE foo;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -574,10 +545,7 @@ CREATE TABLE "core_bar" (
     "bravo" text NOT NULL
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -588,10 +556,7 @@ CREATE TABLE "core_bar" (
         let sql = r#"
 CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -601,10 +566,7 @@ CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
 CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
 CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -623,10 +585,7 @@ ALTER TABLE "D" DROP CONSTRAINT "UQ_468cad3743146a81c94b0b114ac";
 
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -636,9 +595,7 @@ COMMIT;
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -649,9 +606,7 @@ ALTER TABLE "core_foo" ADD COLUMN "answer_id" integer NULL;
 select 1; -- so we don't skip checking
 CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -662,9 +617,7 @@ CREATE INDEX CONCURRENTLY "core_foo_idx" ON "core_foo" ("answer_id");
 select 1; -- so we don't skip checking
 alter table t drop column c cascade;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -675,9 +628,7 @@ alter table t drop column c cascade;
 select 1; -- so we don't skip checking
 alter table t drop column if exists c cascade;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -687,9 +638,7 @@ alter table t drop column if exists c cascade;
 select 1; -- so we don't skip checking
 CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NULL);
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -700,9 +649,7 @@ CREATE TABLE "core_bar" ( "id" serial NOT NULL PRIMARY KEY, "bravo" text NOT NUL
 select 1; -- so we don't skip checking
 ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -713,9 +660,7 @@ ALTER TABLE "core_foo" DROP CONSTRAINT "core_foo_idx";
 select 1; -- so we don't skip checking
 CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_eq!(errors.len(), 0);
     }
 
@@ -725,9 +670,7 @@ CREATE INDEX CONCURRENTLY ON "table_name" ("field_name");
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE IF EXISTS test ENABLE ROW LEVEL SECURITY;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -738,9 +681,7 @@ ALTER TABLE IF EXISTS test ENABLE ROW LEVEL SECURITY;
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE test ENABLE ROW LEVEL SECURITY;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -751,9 +692,7 @@ ALTER TABLE test ENABLE ROW LEVEL SECURITY;
 CREATE TABLE IF NOT EXISTS test();
 ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -764,11 +703,9 @@ ALTER TABLE IF EXISTS test DISABLE ROW LEVEL SECURITY;
 ALTER TABLE "app_email" DROP CONSTRAINT IF EXISTS "email_uniq";
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
 -- this second add constraint should error because it's not robust
-ALTER TABLE "app_email" ADD CONSTRAIN "email_uniq" UNIQUE USING INDEX "email_idx";
+ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -779,9 +716,7 @@ ALTER TABLE "app_email" ADD CONSTRAIN "email_uniq" UNIQUE USING INDEX "email_idx
 select 1; -- so we don't skip checking
 alter table t alter column c set not null;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -792,9 +727,7 @@ alter table t alter column c set not null;
 select 1; -- so we don't skip checking
 DROP INDEX CONCURRENTLY "email_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferRobustStmts);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }

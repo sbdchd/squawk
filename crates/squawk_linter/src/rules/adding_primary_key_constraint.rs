@@ -54,16 +54,15 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn serial_primary_key() {
         let sql = r#"
         ALTER TABLE a ADD COLUMN b SERIAL PRIMARY KEY;
     "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingSerialPrimaryKeyField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingSerialPrimaryKeyField);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -73,9 +72,7 @@ mod test {
         let sql = r#"
 ALTER TABLE items ADD PRIMARY KEY (id);
     "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingSerialPrimaryKeyField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingSerialPrimaryKeyField);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -86,9 +83,7 @@ ALTER TABLE items ADD PRIMARY KEY (id);
 ALTER TABLE items ADD CONSTRAINT items_pk PRIMARY KEY USING INDEX items_pk;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingSerialPrimaryKeyField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingSerialPrimaryKeyField);
         assert!(errors.is_empty());
     }
 }

@@ -25,6 +25,12 @@ impl Version {
     }
 }
 
+impl Default for Version {
+    fn default() -> Version {
+        Version::new(15, 0, 0)
+    }
+}
+
 // Allow us to deserialize our version from a string in .squawk.toml.
 // from https://stackoverflow.com/a/46755370/
 impl<'de> Deserialize<'de> for Version {

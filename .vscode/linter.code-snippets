@@ -26,9 +26,7 @@
 "$2",
 "    \"#;",
 "",
-"    let file = SourceFile::parse(&sql);",
-"    let mut linter = Linter::new([Rule::$3]);",
-"    let errors = linter.lint(file, sql);",
+"    let errors = lint(sql, Rule::$3);",
 "    assert_debug_snapshot!(errors);",
 "}",
 

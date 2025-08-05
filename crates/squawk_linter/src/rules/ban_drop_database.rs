@@ -24,7 +24,8 @@ pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn ban_drop_database() {
@@ -33,9 +34,7 @@ mod test {
         DROP DATABASE IF EXISTS "table_name";
         DROP DATABASE IF EXISTS "table_name"
                 "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanDropDatabase]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanDropDatabase);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }

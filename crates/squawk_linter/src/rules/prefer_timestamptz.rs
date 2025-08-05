@@ -66,7 +66,8 @@ pub(crate) fn prefer_timestamptz(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn create_table_with_timestamp_err() {
@@ -80,9 +81,7 @@ create table app.accounts
     created_ts timestamp without time zone
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTimestampTz]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTimestampTz);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -95,9 +94,7 @@ alter table app.users
 alter table app.accounts
     alter column created_ts type timestamp without time zone;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTimestampTz]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTimestampTz);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -114,9 +111,7 @@ create table app.accounts
     created_ts timestamp with time zone
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTimestampTz]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTimestampTz);
         assert_eq!(errors.len(), 0);
     }
 
@@ -132,9 +127,7 @@ create table app.accounts
     created_ts timestamp with time zone
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTimestampTz]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTimestampTz);
         assert_eq!(errors.len(), 0);
     }
 }

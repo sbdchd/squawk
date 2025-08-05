@@ -6,7 +6,6 @@ use enum_iterator::all;
 pub use ignore::Ignore;
 use ignore::find_ignores;
 use ignore_index::IgnoreIndex;
-use lazy_static::lazy_static;
 use rowan::TextRange;
 use rowan::TextSize;
 use serde::{Deserialize, Serialize};
@@ -22,6 +21,9 @@ mod visitors;
 
 mod identifier;
 mod rules;
+
+#[cfg(test)]
+mod test_utils;
 use rules::adding_field_with_default;
 use rules::adding_foreign_key_constraint;
 use rules::adding_not_null_field;
@@ -278,13 +280,10 @@ impl Violation {
     }
 }
 
+#[derive(Default)]
 pub struct LinterSettings {
     pub pg_version: Version,
     pub assume_in_transaction: bool,
-}
-
-lazy_static! {
-    static ref DEFAULT_PG_VERSION: Version = Version::new(15, 0, 0);
 }
 
 pub struct Linter {
@@ -440,10 +439,7 @@ impl Linter {
             errors: vec![],
             ignores: vec![],
             rules: rules.into(),
-            settings: LinterSettings {
-                pg_version: *DEFAULT_PG_VERSION,
-                assume_in_transaction: false,
-            },
+            settings: LinterSettings::default(),
         }
     }
 }

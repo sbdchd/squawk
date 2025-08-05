@@ -71,7 +71,8 @@ pub(crate) fn prefer_text_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS
     /// EXCLUSIVE lock
@@ -85,9 +86,7 @@ BEGIN;
 ALTER TABLE "core_foo" ALTER COLUMN "kind" TYPE varchar(1000) USING "kind"::varchar(1000);
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTextField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTextField);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -105,9 +104,7 @@ CREATE TABLE "core_bar" (
 );
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTextField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTextField);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -120,9 +117,7 @@ create table t (
     "alpha" pg_catalog.varchar(100) NOT NULL
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTextField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTextField);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -134,9 +129,7 @@ BEGIN;
 ALTER TABLE "foo_table" ADD COLUMN "foo_column" varchar(256) NULL;
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTextField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTextField);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -146,9 +139,7 @@ COMMIT;
         let sql = r#"
 CREATE TABLE IF NOT EXISTS foo_table(bar_col varchar);
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTextField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTextField);
         assert_eq!(errors.len(), 0);
     }
 
@@ -169,9 +160,7 @@ CREATE TABLE "core_bar" (
 ALTER TABLE "core_bar" ADD CONSTRAINT "text_size" CHECK (LENGTH("bravo") <= 100);
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferTextField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferTextField);
         assert_eq!(errors.len(), 0);
     }
 }

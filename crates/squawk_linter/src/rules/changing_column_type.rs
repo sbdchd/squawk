@@ -29,7 +29,8 @@ pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) 
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn err() {
@@ -41,9 +42,7 @@ BEGIN;
 ALTER TABLE "core_recipe" ALTER COLUMN "edits" TYPE text USING "edits"::text;
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ChangingColumnType]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::ChangingColumnType);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -59,9 +58,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE varchar(255) USING "foo"::varc
 ALTER TABLE "core_recipe" ALTER COLUMN "foo" TYPE text USING "foo"::text;
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ChangingColumnType]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::ChangingColumnType);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
