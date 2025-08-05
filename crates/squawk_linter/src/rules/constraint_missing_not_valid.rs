@@ -144,7 +144,7 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::{Rule, test_utils::{lint, lint_with_assume_in_transaction}};
 
     #[test]
     fn not_valid_validate_transaction_err() {
@@ -154,9 +154,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCE
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::ConstraintMissingNotValid);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -167,10 +165,7 @@ COMMIT;
 ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCES "app_user" (id) NOT VALID;
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::ConstraintMissingNotValid);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -182,10 +177,7 @@ ALTER TABLE "app_email" ADD CONSTRAINT "fk_user" FOREIGN KEY (user_id) REFERENCE
 ALTER TABLE "app_email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::ConstraintMissingNotValid);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -196,9 +188,7 @@ COMMIT;
 -- instead of
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address);
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::ConstraintMissingNotValid);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -210,9 +200,7 @@ ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES 
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::ConstraintMissingNotValid);
         assert_eq!(errors.len(), 0);
     }
 
@@ -222,10 +210,7 @@ ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
 -- instead of
 ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::ConstraintMissingNotValid);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -237,9 +222,7 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0);
 ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) NOT VALID;
 ALTER TABLE accounts VALIDATE CONSTRAINT positive_balance;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::ConstraintMissingNotValid);
         assert_eq!(errors.len(), 0);
     }
 
@@ -254,9 +237,7 @@ CREATE TABLE "core_foo" (
 ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::ConstraintMissingNotValid);
         assert_eq!(errors.len(), 0);
     }
 
@@ -269,10 +250,7 @@ CREATE TABLE "core_foo" (
 );
 ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::ConstraintMissingNotValid);
         assert_eq!(errors.len(), 0);
     }
 
@@ -285,10 +263,7 @@ CREATE TABLE "core_foo" (
 );
 ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::ConstraintMissingNotValid);
         assert_eq!(errors.len(), 0);
     }
 
@@ -297,9 +272,7 @@ ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
         let sql = r#"
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::ConstraintMissingNotValid]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::ConstraintMissingNotValid);
         assert_eq!(errors.len(), 0);
     }
 }

@@ -59,7 +59,8 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
 
 #[cfg(test)]
 mod test {
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn create_table_with_foreign_key_constraint() {
@@ -77,9 +78,7 @@ mod test {
         COMMIT;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
         assert!(errors.is_empty());
     }
 
@@ -93,9 +92,7 @@ ALTER TABLE "email" VALIDATE CONSTRAINT "fk_user";
 COMMIT;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
         assert!(errors.is_empty());
     }
 
@@ -108,9 +105,7 @@ ALTER TABLE "email" ADD CONSTRAINT "fk_user" FOREIGN KEY ("user_id") REFERENCES 
 COMMIT;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
         assert_eq!(errors.len(), 1);
         assert_eq!(errors[0].code, Rule::AddingForeignKeyConstraint);
     }
@@ -123,9 +118,7 @@ ALTER TABLE "emails" ADD COLUMN "user_id" INT REFERENCES "user" ("id");
 COMMIT;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingForeignKeyConstraint]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingForeignKeyConstraint);
         assert_eq!(errors.len(), 1);
         assert_eq!(errors[0].code, Rule::AddingForeignKeyConstraint);
     }

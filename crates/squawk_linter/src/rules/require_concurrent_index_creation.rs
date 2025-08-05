@@ -37,7 +37,7 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::{Rule, test_utils::{lint, lint_with_assume_in_transaction}};
 
     /// ```sql
     /// -- instead of
@@ -51,9 +51,7 @@ mod test {
 -- instead of
 CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexCreation]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::RequireConcurrentIndexCreation);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -64,9 +62,7 @@ CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
 -- use CONCURRENTLY
 CREATE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexCreation]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::RequireConcurrentIndexCreation);
         assert_eq!(errors.len(), 0);
     }
 
@@ -81,9 +77,7 @@ CREATE TABLE "core_foo" (
 CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
 COMMIT;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexCreation]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::RequireConcurrentIndexCreation);
         assert_eq!(errors.len(), 0);
     }
 
@@ -96,10 +90,7 @@ CREATE TABLE "core_foo" (
 );
 CREATE INDEX "core_foo_tenant_id_4d397ef9" ON "core_foo" ("tenant_id");
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexCreation]);
-        linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = lint_with_assume_in_transaction(sql, Rule::RequireConcurrentIndexCreation);
         assert_eq!(errors.len(), 0);
     }
 }

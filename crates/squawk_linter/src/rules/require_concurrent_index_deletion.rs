@@ -25,7 +25,8 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn drop_index_missing_concurrently_err() {
@@ -33,9 +34,7 @@ mod test {
   -- instead of
   DROP INDEX IF EXISTS "field_name_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexDeletion]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
         assert_eq!(errors.len(), 1);
         assert_eq!(errors[0].code, Rule::RequireConcurrentIndexDeletion);
         assert_debug_snapshot!(errors);
@@ -46,9 +45,7 @@ mod test {
         let sql = r#"
 DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexDeletion]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
         assert_eq!(errors.len(), 0);
     }
 
@@ -57,9 +54,7 @@ DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
         let sql = r#"
 DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexDeletion]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
         assert_eq!(errors.len(), 0);
     }
 
@@ -68,9 +63,7 @@ DROP INDEX CONCURRENTLY IF EXISTS "field_name_idx";
         let sql = r#"
 DROP TABLE IF EXISTS some_table;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexDeletion]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
         assert_eq!(errors.len(), 0);
     }
 
@@ -79,9 +72,7 @@ DROP TABLE IF EXISTS some_table;
         let sql = r#"
 DROP TRIGGER IF EXISTS trigger on foo_table;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::RequireConcurrentIndexDeletion]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::RequireConcurrentIndexDeletion);
         assert_eq!(errors.len(), 0);
     }
 }

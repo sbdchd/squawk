@@ -58,16 +58,15 @@ fn has_not_null_and_no_default_constraint(constraints: ast::AstChildren<ast::Con
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn nullable_ok() {
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean;
   "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingRequiredField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingRequiredField);
         assert!(errors.is_empty());
     }
 
@@ -76,9 +75,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean;
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
   "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingRequiredField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingRequiredField);
         assert!(errors.is_empty());
     }
 
@@ -87,9 +84,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL DEFAULT true;
         let sql = r#"
 ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
   "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingRequiredField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingRequiredField);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -100,9 +95,7 @@ ALTER TABLE "recipe" ADD COLUMN "public" boolean NOT NULL;
 ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED NOT NULL;
   "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingRequiredField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingRequiredField);
         assert!(errors.is_empty());
     }
 
@@ -112,9 +105,7 @@ ALTER TABLE foo
  ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED ;
   "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingRequiredField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingRequiredField);
         assert!(errors.is_empty());
     }
 }

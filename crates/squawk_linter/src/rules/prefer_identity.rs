@@ -44,7 +44,8 @@ pub(crate) fn prefer_identity(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn err() {
@@ -71,9 +72,7 @@ create table users (
     id BIGSERIAL
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferIdentity]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferIdentity);
         assert_ne!(errors.len(), 0);
         assert_eq!(errors.len(), 7);
         assert_eq!(
@@ -96,9 +95,7 @@ create table users (
     id "bigserial"
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferIdentity]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferIdentity);
         assert_eq!(errors.len(), 2);
         assert_debug_snapshot!(errors);
     }
@@ -113,9 +110,7 @@ create table users (
     id  bigint generated always as identity primary key
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::PreferIdentity]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::PreferIdentity);
         assert_eq!(errors.len(), 0);
     }
 }

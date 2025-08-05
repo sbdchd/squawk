@@ -27,16 +27,15 @@ pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn err() {
         let sql = r#"
 ALTER TABLE "bar_tbl" DROP COLUMN "foo_col" CASCADE;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanDropColumn]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanDropColumn);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }

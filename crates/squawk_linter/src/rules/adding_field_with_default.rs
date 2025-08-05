@@ -101,7 +101,8 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn docs_example_ok_post_pg_11() {
@@ -113,9 +114,7 @@ mod test {
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -130,9 +129,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 -- remove nullability
             "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -143,9 +140,7 @@ ALTER TABLE "core_recipe" ALTER COLUMN "foo" SET DEFAULT 10;
 alter table t set logged, add column c integer default uuid();
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -156,9 +151,7 @@ alter table t set logged, add column c integer default uuid();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -170,9 +163,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT uuid();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
             "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -184,9 +175,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT random();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
             "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -198,9 +187,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
 ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
             "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -212,9 +199,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" text DEFAULT 'some-str';
 ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-variant';
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -226,9 +211,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" some_enum_type DEFAULT 'my-enum-varia
 ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT '{}'::jsonb;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -240,9 +223,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT '{}'::jsonb;
 ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT myjsonb();
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -254,9 +235,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT myjsonb();
 ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -267,9 +246,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
 ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(errors.is_empty());
         assert_debug_snapshot!(errors);
     }
@@ -281,9 +258,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
 alter table account_metadata add column blah integer default 2 + 2;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert_debug_snapshot!(errors);
     }
 
@@ -294,9 +269,7 @@ ALTER TABLE foo
 ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;
         "#;
 
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::AddingFieldWithDefault]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }

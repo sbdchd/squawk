@@ -23,7 +23,8 @@ pub(crate) fn ban_drop_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn err() {
@@ -32,9 +33,7 @@ DROP TABLE "table_name";
 DROP TABLE IF EXISTS "table_name";
 DROP TABLE IF EXISTS "table_name"
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanDropTable]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanDropTable);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }

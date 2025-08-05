@@ -31,16 +31,15 @@ pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn err() {
         let sql = r#"
 ALTER TABLE "bar_tbl" ALTER COLUMN "foo_col" DROP NOT NULL;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanDropNotNull]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanDropNotNull);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }

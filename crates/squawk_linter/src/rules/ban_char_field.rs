@@ -71,7 +71,8 @@ pub(crate) fn ban_char_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Linter, Rule};
+    use crate::Rule;
+    use crate::test_utils::lint;
 
     #[test]
     fn creating_table_with_char_errors() {
@@ -84,9 +85,7 @@ CREATE TABLE "core_bar" (
     "delta" character NOT NULL
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanCharField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanCharField);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -100,9 +99,7 @@ CREATE TABLE "core_bar" (
     "beta" text NOT NULL
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanCharField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanCharField);
         assert_eq!(errors.len(), 0);
     }
 
@@ -126,9 +123,7 @@ create table t (
     p char[]
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanCharField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanCharField);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -140,9 +135,7 @@ create table t (
   a char[]
 );
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanCharField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanCharField);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -152,9 +145,7 @@ create table t (
         let sql = r#"
 alter table t add column c char;
         "#;
-        let file = squawk_syntax::SourceFile::parse(sql);
-        let mut linter = Linter::from([Rule::BanCharField]);
-        let errors = linter.lint(file, sql);
+        let errors = lint(sql, Rule::BanCharField);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
