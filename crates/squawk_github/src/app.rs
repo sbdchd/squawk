@@ -54,6 +54,13 @@ pub(crate) fn create_comment(
     comment: CommentArgs,
     secret: &str,
 ) -> Result<(), GithubError> {
+    // Check comment size before attempting to send
+    if comment.body.len() > 65_536 {
+        return Err(GithubError::CommentTooLarge(format!(
+            "Comment body is too large ({} characters). GitHub API limit is 65,536 characters.",
+            comment.body.len()
+        )));
+    }
     let comment_body = CommentBody { body: comment.body };
     reqwest::Client::new()
         .post(&format!(
@@ -93,6 +100,9 @@ impl std::fmt::Display for GithubError {
             }
             Self::HttpError(ref err) => {
                 write!(f, "Problem calling GitHub API: {err}")
+            }
+            Self::CommentTooLarge(ref msg) => {
+                write!(f, "Comment size error: {msg}")
             }
         }
     }
@@ -180,6 +190,14 @@ pub(crate) fn update_comment(
     body: String,
     secret: &str,
 ) -> Result<(), GithubError> {
+    // Check comment size before attempting to send
+    if body.len() > 65_536 {
+        return Err(GithubError::CommentTooLarge(format!(
+            "Comment body is too large ({} characters). GitHub API limit is 65,536 characters.",
+            body.len()
+        )));
+    }
+
     reqwest::Client::new()
         .patch(&format!(
             "{github_api_url}/repos/{owner}/{repo}/issues/comments/{comment_id}",
