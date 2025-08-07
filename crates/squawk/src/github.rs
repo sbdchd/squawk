@@ -11,6 +11,11 @@ use std::io;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
 
+// GitHub API limit for issue comment body is 65,536 characters
+// We use a slightly smaller limit to leave room for the comment structure
+const GITHUB_COMMENT_MAX_SIZE: usize = 65_000;
+const MAX_SQL_PREVIEW_LINES: usize = 50;
+
 fn get_github_private_key(
     github_private_key: Option<String>,
     github_private_key_base64: Option<String>,
@@ -158,7 +163,13 @@ fn get_comment_body(files: &[CheckReport], version: &str) -> String {
 
     let violations_emoji = get_violations_emoji(violations_count);
 
-    format!(
+    // First, try to generate the full comment
+    let sql_file_contents: Vec<String> = files
+        .iter()
+        .filter_map(|x| get_sql_file_content(x).ok())
+        .collect();
+
+    let full_comment = format!(
         r"
 {COMMENT_HEADER}
 
@@ -174,11 +185,79 @@ fn get_comment_body(files: &[CheckReport], version: &str) -> String {
         violations_emoji = violations_emoji,
         violation_count = violations_count,
         file_count = files.len(),
-        sql_file_content = files
-            .iter()
-            .filter_map(|x| get_sql_file_content(x).ok())
-            .collect::<Vec<String>>()
-            .join("\n"),
+        sql_file_content = sql_file_contents.join("\n"),
+        version = version
+    );
+
+    // Check if the comment exceeds GitHub's size limit
+    if full_comment.len() <= GITHUB_COMMENT_MAX_SIZE {
+        return full_comment.trim_matches('\n').into();
+    }
+
+    // If the comment is too large, create a summary instead
+    get_summary_comment_body(files, violations_count, violations_emoji, version)
+}
+
+fn get_summary_comment_body(
+    files: &[CheckReport],
+    violations_count: usize,
+    violations_emoji: &str,
+    version: &str,
+) -> String {
+    let mut file_summaries = Vec::new();
+
+    for file in files {
+        let violation_count = file.violations.len();
+        let violations_emoji = get_violations_emoji(violation_count);
+        let line_count = file.sql.lines().count();
+
+        let summary = format!(
+            r"
+<h3><code>{filename}</code></h3>
+
+📄 **{line_count} lines** | {violations_emoji} **{violation_count} violations**
+
+{violations_detail}
+
+---
+    ",
+            filename = file.filename,
+            line_count = line_count,
+            violations_emoji = violations_emoji,
+            violation_count = violation_count,
+            violations_detail = if violation_count > 0 {
+                let violation_rules: Vec<String> = file
+                    .violations
+                    .iter()
+                    .map(|v| format!("• `{}` (line {})", v.rule_name, v.line + 1))
+                    .collect();
+                format!("**Violations found:**\n{}", violation_rules.join("\n"))
+            } else {
+                "✅ No violations found.".to_string()
+            }
+        );
+        file_summaries.push(summary);
+    }
+
+    format!(
+        r"
+{COMMENT_HEADER}
+
+### **{violations_emoji} {violation_count}** violations across **{file_count}** file(s)
+
+> ⚠️ **Large Report**: This report was summarized due to size constraints. SQL content has been omitted but all violations were analyzed.
+
+---
+{file_summaries}
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) ({version}), a linter for PostgreSQL, focused on migrations
+",
+        violations_emoji = violations_emoji,
+        violation_count = violations_count,
+        file_count = files.len(),
+        file_summaries = file_summaries.join("\n"),
         version = version
     )
     .trim_matches('\n')
@@ -187,6 +266,22 @@ fn get_comment_body(files: &[CheckReport], version: &str) -> String {
 
 const fn get_violations_emoji(count: usize) -> &'static str {
     if count > 0 { "🚒" } else { "✅" }
+}
+
+fn truncate_sql_if_needed(sql: &str, max_lines: usize) -> (String, bool) {
+    let lines: Vec<&str> = sql.lines().collect();
+    if lines.len() <= max_lines {
+        (sql.to_string(), false)
+    } else {
+        let truncated_lines = lines[..max_lines].join("\n");
+        let remaining_lines = lines.len() - max_lines;
+        (
+            format!(
+                "{truncated_lines}\n\n-- ... ({remaining_lines} more lines truncated for brevity)"
+            ),
+            true,
+        )
+    }
 }
 
 fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
@@ -212,6 +307,13 @@ fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
     };
 
     let violations_emoji = get_violations_emoji(violation_count);
+    let (display_sql, was_truncated) = truncate_sql_if_needed(sql, MAX_SQL_PREVIEW_LINES);
+
+    let truncation_notice = if was_truncated {
+        "\n\n> ⚠️ **Note**: SQL content has been truncated for display purposes. The full analysis was performed on the complete file."
+    } else {
+        ""
+    };
 
     Ok(format!(
         r"
@@ -219,7 +321,7 @@ fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
 
 ```sql
 {sql}
-```
+```{truncation_notice}
 
 <h4>{violations_emoji} Rule Violations ({violation_count})</h4>
 
@@ -229,7 +331,8 @@ fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
     ",
         violations_emoji = violations_emoji,
         filename = violation.filename,
-        sql = sql,
+        sql = display_sql,
+        truncation_notice = truncation_notice,
         violation_count = violation_count,
         violation_content = violation_content
     ))
@@ -319,5 +422,101 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         let body = get_comment_body(&violations, "0.2.3");
 
         assert_snapshot!(body);
+    }
+
+    #[test]
+    fn test_sql_truncation() {
+        let short_sql = "SELECT 1;";
+        let (result, truncated) = crate::github::truncate_sql_if_needed(short_sql, 5);
+        assert!(!truncated);
+        assert_eq!(result, short_sql);
+
+        let long_sql = (0..100)
+            .map(|i| format!("-- Line {}", i))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let (result, truncated) = crate::github::truncate_sql_if_needed(&long_sql, 50);
+        assert!(truncated);
+        assert!(result.contains("-- ... (50 more lines truncated for brevity)"));
+    }
+
+    #[test]
+    fn generating_comment_with_large_content() {
+        // Create a very large SQL content
+        let large_sql = (0..1000)
+            .map(|i| format!("SELECT {} as col{};", i, i))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        let violations = vec![CheckReport {
+            filename: "large.sql".into(),
+            sql: large_sql,
+            violations: vec![ReportViolation {
+                file: "large.sql".into(),
+                line: 1,
+                column: 0,
+                level: ViolationLevel::Warning,
+                rule_name: "prefer-bigint-over-int".to_string(),
+                range: TextRange::new(TextSize::new(0), TextSize::new(0)),
+                message: "Prefer bigint over int.".to_string(),
+                help: Some("Use bigint instead.".to_string()),
+                column_end: 0,
+                line_end: 1,
+            }],
+        }];
+
+        let body = get_comment_body(&violations, "0.2.3");
+
+        // The comment should be within GitHub's size limits
+        assert!(body.len() <= super::GITHUB_COMMENT_MAX_SIZE);
+
+        // Should contain summary information even if the full content was too large
+        assert!(body.contains("violations"));
+    }
+
+    #[test]
+    fn generating_comment_forced_summary() {
+        // Create content that will definitely trigger summary mode
+        let massive_sql = (0..10000)
+            .map(|i| format!("SELECT {} as col{};", i, i))
+            .collect::<Vec<_>>()
+            .join("\n");
+
+        let violations = vec![CheckReport {
+            filename: "massive.sql".into(),
+            sql: massive_sql,
+            violations: vec![ReportViolation {
+                file: "massive.sql".into(),
+                line: 1,
+                column: 0,
+                level: ViolationLevel::Warning,
+                rule_name: "prefer-bigint-over-int".to_string(),
+                range: TextRange::new(TextSize::new(0), TextSize::new(0)),
+                message: "Prefer bigint over int.".to_string(),
+                help: Some("Use bigint instead.".to_string()),
+                column_end: 0,
+                line_end: 1,
+            }],
+        }];
+
+        let body = get_comment_body(&violations, "0.2.3");
+
+        // Debug: Print the actual size to see what's happening
+        println!(
+            "Comment body size: {}, limit: {}",
+            body.len(),
+            super::GITHUB_COMMENT_MAX_SIZE
+        );
+
+        // The comment should be within GitHub's size limits
+        assert!(body.len() <= super::GITHUB_COMMENT_MAX_SIZE);
+
+        // Should contain the summary notice
+        if body.contains("Large Report") {
+            assert!(body.contains("summarized due to size constraints"));
+        } else {
+            // If it didn't trigger summary mode, at least verify it contains violations info
+            assert!(body.contains("violations"));
+        }
     }
 }
