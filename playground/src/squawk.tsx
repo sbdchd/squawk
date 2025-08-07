@@ -5,6 +5,19 @@ import initWasm, {
   lint as lint_,
 } from "./pkg/squawk_wasm"
 
+export type TextEdit = {
+  start_line_number: number
+  start_column: number
+  end_line_number: number
+  end_column: number
+  text: string
+}
+
+export type Fix = {
+  title: string
+  edits: TextEdit[]
+}
+
 export type LintError = {
   code: string
   message: string
@@ -16,6 +29,7 @@ export type LintError = {
   range_start: number
   range_end: number
   messages: string[]
+  fix?: Fix
 }
 
 function lintWithTypes(text: string): Array<LintError> {

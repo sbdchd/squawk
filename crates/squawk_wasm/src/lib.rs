@@ -64,6 +64,22 @@ struct LintError {
     range_end: usize,
     // used for the linter tab
     messages: Vec<String>,
+    fix: Option<Fix>,
+}
+
+#[derive(Serialize)]
+struct Fix {
+    title: String,
+    edits: Vec<TextEdit>,
+}
+
+#[derive(Serialize)]
+struct TextEdit {
+    start_line_number: u32,
+    start_column: u32,
+    end_line_number: u32,
+    end_column: u32,
+    text: String,
 }
 
 #[wasm_bindgen]
@@ -97,6 +113,7 @@ pub fn lint(text: String) -> Result<JsValue, Error> {
             range_start: range_start.into(),
             range_end: range_end.into(),
             messages: vec![],
+            fix: None,
         }
     });
 
@@ -116,6 +133,36 @@ pub fn lint(text: String) -> Result<JsValue, Error> {
             None => vec![],
         };
 
+        let fix = x.fix.map(|fix| {
+            let edits = fix
+                .edits
+                .into_iter()
+                .filter_map(|edit| {
+                    let start_pos = line_index.line_col(edit.text_range.start());
+                    let end_pos = line_index.line_col(edit.text_range.end());
+                    let start_wide = line_index
+                        .to_wide(line_index::WideEncoding::Utf16, start_pos)
+                        .unwrap();
+                    let end_wide = line_index
+                        .to_wide(line_index::WideEncoding::Utf16, end_pos)
+                        .unwrap();
+
+                    Some(TextEdit {
+                        start_line_number: start_wide.line,
+                        start_column: start_wide.col,
+                        end_line_number: end_wide.line,
+                        end_column: end_wide.col,
+                        text: edit.text.unwrap_or_default(),
+                    })
+                })
+                .collect();
+
+            Fix {
+                title: fix.title,
+                edits,
+            }
+        });
+
         LintError {
             code: x.code.to_string(),
             range_start: x.text_range.start().into(),
@@ -128,6 +175,7 @@ pub fn lint(text: String) -> Result<JsValue, Error> {
             start_column: start.col,
             end_line_number: end.line,
             end_column: end.col,
+            fix,
         }
     });
 

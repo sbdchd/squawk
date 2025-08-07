@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef } from "react"
 import * as monaco from "monaco-editor"
-import { LintError, useDumpCst, useDumpTokens, useErrors } from "./squawk"
+import { LintError, Fix, useDumpCst, useDumpTokens, useErrors } from "./squawk"
 import {
   compress,
   compressToEncodedURIComponent,
@@ -231,7 +231,7 @@ function Editor({
   onChange?: (_: string) => void
   onSave?: (_: string) => void
   settings: monaco.editor.IStandaloneEditorConstructionOptions
-  markers?: monaco.editor.IMarkerData[]
+  markers?: Marker[]
 }) {
   const onChangeRef = useRef<((_: string) => void) | undefined>(null)
   const onSaveRef = useRef<((_: string) => void) | undefined>(null)
@@ -239,6 +239,8 @@ function Editor({
   const autoFocusRef = useRef(autoFocus)
   const settingsInitial = useRef(settings)
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
+  const fixesRef = useRef<Map<string, Fix>>(new Map())
+
   // TODO: replace with useEventEffect
   useEffect(() => {
     onChangeRef.current = onChange
@@ -251,6 +253,16 @@ function Editor({
     if (markers == null) {
       return
     }
+
+    const fixesMap = new Map<string, Fix>()
+    for (const marker of markers) {
+      if (marker.fix) {
+        const key = createMarkerKey(marker)
+        fixesMap.set(key, marker.fix)
+      }
+    }
+    fixesRef.current = fixesMap
+
     const model = editorRef.current?.getModel()
     if (model != null) {
       monaco.editor.setModelMarkers(model, "squawk", markers)
@@ -269,7 +281,7 @@ function Editor({
       onSaveRef.current?.(editor.getValue())
     })
     monaco.languages.register({ id: "rast" })
-    monaco.languages.setMonarchTokensProvider("rast", {
+    const tokenProvider = monaco.languages.setMonarchTokensProvider("rast", {
       tokenizer: {
         // via: https://github.com/rust-lang/rust-analyzer/blob/9691da7707ea7c50922fe1647b1c2af47934b9fa/editors/code/ra_syntax_tree.tmGrammar.json#L16C17-L16C17
         root: [
@@ -284,6 +296,55 @@ function Editor({
         ],
       },
     })
+
+    const codeActionProvider = monaco.languages.registerCodeActionProvider(
+      "pgsql",
+      {
+        provideCodeActions: (model, _range, context) => {
+          const actions: monaco.languages.CodeAction[] = []
+          for (const marker of context.markers) {
+            if (marker.source === "squawk") {
+              const key = createMarkerKey(marker)
+              const fix = fixesRef.current.get(key)
+              if (fix) {
+                const edits = fix.edits.map(
+                  (edit): monaco.languages.IWorkspaceTextEdit => {
+                    return {
+                      resource: model.uri,
+                      versionId: model.getVersionId(),
+                      textEdit: {
+                        range: new monaco.Range(
+                          edit.start_line_number + 1,
+                          edit.start_column + 1,
+                          edit.end_line_number + 1,
+                          edit.end_column + 1,
+                        ),
+                        text: edit.text,
+                      },
+                    }
+                  },
+                )
+                actions.push({
+                  title: fix.title,
+                  diagnostics: [marker],
+                  kind: "quickfix",
+                  edit: {
+                    edits,
+                  },
+                  isPreferred: true,
+                })
+              }
+            }
+          }
+
+          return {
+            actions,
+            dispose: () => {},
+          }
+        },
+      },
+    )
+
     editor.onDidChangeModelContent(() => {
       onChangeRef.current?.(editor.getValue())
     })
@@ -293,7 +354,9 @@ function Editor({
     editorRef.current = editor
     return () => {
       editorRef.current = null
+      codeActionProvider.dispose()
       editor?.dispose()
+      tokenProvider.dispose()
     }
   }, [])
   useEffect(() => {
@@ -330,6 +393,18 @@ type Marker = monaco.editor.IMarkerData & {
   range_start: number
   range_end: number
   messages: string[]
+  fix?: Fix
+}
+
+function createMarkerKey(marker: {
+  startLineNumber: number
+  startColumn: number
+  endLineNumber: number
+  endColumn: number
+  message: string
+}): string {
+  // TODO: probably a better way to do this
+  return `${marker.startLineNumber}:${marker.startColumn}:${marker.endLineNumber}:${marker.endColumn}:${marker.message}`
 }
 
 function SyntaxTreePanel({ text }: { text: string }) {
@@ -372,6 +447,7 @@ function useMarkers(text: string): Array<Marker> {
       range_start: x.range_start,
       range_end: x.range_end,
       messages: x.messages,
+      fix: x.fix,
       code: {
         value: x.code,
         target: monaco.Uri.parse(
