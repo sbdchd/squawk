@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.22.0 - 2025-08-07
+
+## Added
+
+- linter: add fixes for prefer-robust-stmts (currently LSP server only) (#602)
+
+- playground: add quick fix support (#606)
+
+## Fixed
+
+- linter: fix comparison edge cases with identifiers (#600), (#601). Thanks @gilbsgilbs!
+
 ## v2.21.1 - 2025-07-23
 
 ## Fixed
