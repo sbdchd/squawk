@@ -12,6 +12,7 @@ use serde::{Deserialize, Serialize};
 pub enum GithubError {
     JsonWebTokenCreation(jsonwebtoken::errors::Error),
     HttpError(reqwest::Error),
+    CommentTooLarge(String),
 }
 
 impl Error for GithubError {
@@ -19,6 +20,7 @@ impl Error for GithubError {
         match self {
             GithubError::JsonWebTokenCreation(err) => Some(err),
             GithubError::HttpError(err) => Some(err),
+            GithubError::CommentTooLarge(_) => None,
         }
     }
 }
