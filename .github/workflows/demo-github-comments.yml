@@ -1,0 +1,47 @@
+name: Demo GitHub Comment Generation
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths: 
+      - 'migrations/**'
+      - 'DEMO_README.md'
+
+jobs:
+  test-github-comments:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Rust
+      uses: dtolnay/rust-toolchain@stable
+      
+    - name: Build Squawk
+      run: cargo build --release
+      
+    - name: Test Migration 1 (Normal Comment)
+      run: |
+        echo "Testing normal comment generation..."
+        ./target/release/squawk migrations/001_demo_normal_comment.sql
+        
+    - name: Test Migration 2 (SQL Truncation)  
+      run: |
+        echo "Testing SQL truncation..."
+        ./target/release/squawk migrations/002_demo_sql_truncation.sql
+        
+    - name: Comment on PR - Migration 1
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "Would comment on PR with results from migration 1"
+        # In a real scenario, this would use the upload-to-github command
+        # ./target/release/squawk upload-to-github migrations/001_demo_normal_comment.sql
+        
+    - name: Comment on PR - Migration 2
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "Would comment on PR with results from migration 2"  
+        # In a real scenario, this would use the upload-to-github command
+        # ./target/release/squawk upload-to-github migrations/002_demo_sql_truncation.sql
