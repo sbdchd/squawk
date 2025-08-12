@@ -4,7 +4,7 @@ use log::info;
 use lsp_server::{Connection, Message, Notification, Response};
 use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams,
-    CodeActionProviderCapability, CodeActionResponse, CodeDescription, Diagnostic,
+    CodeActionProviderCapability, CodeActionResponse, CodeDescription, Command, Diagnostic,
     DiagnosticSeverity, DidChangeTextDocumentParams, DidCloseTextDocumentParams,
     DidOpenTextDocumentParams, GotoDefinitionParams, GotoDefinitionResponse, InitializeParams,
     Location, Position, PublishDiagnosticsParams, Range, ServerCapabilities,
@@ -142,6 +142,8 @@ fn handle_goto_definition(connection: &Connection, req: lsp_server::Request) -> 
     Ok(())
 }
 
+const DIAGNOSTIC_NAME: &str = "squawk";
+
 fn handle_code_action(
     connection: &Connection,
     req: lsp_server::Request,
@@ -152,7 +154,41 @@ fn handle_code_action(
 
     let mut actions = Vec::new();
 
-    for mut diagnostic in params.context.diagnostics {
+    for mut diagnostic in params
+        .context
+        .diagnostics
+        .into_iter()
+        .filter(|diagnostic| diagnostic.source.as_deref() == Some(DIAGNOSTIC_NAME))
+    {
+        if let Some(code) = diagnostic.code.as_ref() {
+            let rule_name = match code {
+                lsp_types::NumberOrString::String(s) => s.clone(),
+                lsp_types::NumberOrString::Number(n) => n.to_string(),
+            };
+
+            let title = format!("Show documentation for {}", rule_name);
+
+            let documentation_action = CodeAction {
+                title: title.clone(),
+                kind: Some(CodeActionKind::QUICKFIX),
+                diagnostics: Some(vec![diagnostic.clone()]),
+                edit: None,
+                command: Some(Command {
+                    title,
+                    command: "vscode.open".to_string(),
+                    arguments: Some(vec![serde_json::to_value(format!(
+                        "https://squawkhq.com/docs/{}",
+                        rule_name
+                    ))?]),
+                }),
+                is_preferred: Some(false),
+                disabled: None,
+                data: None,
+            };
+
+            actions.push(CodeActionOrCommand::CodeAction(documentation_action));
+        }
+
         if let Some(data) = diagnostic.data.take() {
             let associated_data: AssociatedDiagnosticData =
                 serde_json::from_value(data).context("deserializing diagnostic data")?;
@@ -328,7 +364,7 @@ fn lint(content: &str) -> Vec<Diagnostic> {
             code_description: Some(CodeDescription {
                 href: Url::parse("https://squawkhq.com/docs/syntax-error").unwrap(),
             }),
-            source: Some("squawk".to_string()),
+            source: Some(DIAGNOSTIC_NAME.to_string()),
             message: error.message().to_string(),
             ..Default::default()
         };
@@ -378,7 +414,7 @@ fn lint(content: &str) -> Vec<Diagnostic> {
             code_description: Some(CodeDescription {
                 href: Url::parse(&format!("https://squawkhq.com/docs/{}", violation.code)).unwrap(),
             }),
-            source: Some("squawk".to_string()),
+            source: Some(DIAGNOSTIC_NAME.to_string()),
             message: violation.message,
             data: data.map(|d| serde_json::to_value(d).unwrap()),
             ..Default::default()
