@@ -32,6 +32,9 @@ pub struct UploadToGithubArgs {
     github_private_key: Option<String>,
     #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
     github_private_key_base64: Option<String>,
+    /// GitHub API url.
+    #[structopt(long, env = "SQUAWK_GITHUB_API_URL")]
+    github_api_url: Option<String>,
     #[structopt(long, env = "SQUAWK_GITHUB_TOKEN")]
     github_token: Option<String>,
     /// GitHub App Id.
