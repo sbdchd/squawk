@@ -8,6 +8,8 @@ use std::error::Error;
 use log::info;
 use serde::{Deserialize, Serialize};
 
+pub(crate) const DEFAULT_GITHUB_API_URL: &'static str = "https://api.github.com";
+
 #[derive(Debug)]
 pub enum GithubError {
     JsonWebTokenCreation(jsonwebtoken::errors::Error),

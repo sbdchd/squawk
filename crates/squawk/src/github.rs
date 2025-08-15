@@ -33,6 +33,7 @@ fn get_github_private_key(
 }
 
 fn create_gh_app(
+    github_api_url: Option<String>,
     github_install_id: Option<i64>,
     github_app_id: Option<i64>,
     github_token: Option<String>,
@@ -51,7 +52,11 @@ fn create_gh_app(
 
     if let Some(github_token) = github_token {
         info!("using github actions client");
-        return Ok(Box::new(actions::GitHub::new(&github_token)));
+        let client = match github_api_url {
+            Some(github_api_url) => actions::GitHub::new_with_url(&github_api_url, &github_token),
+            None => actions::GitHub::new(&github_token),
+        };
+        return Ok(Box::new(client));
     };
     bail!(
         "Missing GitHub credentials:
@@ -84,6 +89,7 @@ pub fn check_and_comment_on_pr(
         paths,
         fail_on_violations,
         github_private_key,
+        github_api_url,
         github_token,
         github_app_id,
         github_install_id,
@@ -101,6 +107,7 @@ pub fn check_and_comment_on_pr(
         };
 
     let github_app = create_gh_app(
+        github_api_url,
         github_install_id,
         github_app_id,
         github_token,

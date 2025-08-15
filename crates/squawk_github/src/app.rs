@@ -1,7 +1,7 @@
 #![allow(clippy::doc_markdown)]
 #![allow(clippy::missing_errors_doc)]
 #![allow(clippy::single_match_else)]
-use crate::{Comment, GitHubApi, GithubError};
+use crate::{Comment, DEFAULT_GITHUB_API_URL, GitHubApi, GithubError};
 use jsonwebtoken::{Algorithm, EncodingKey, Header};
 
 use log::info;
@@ -32,10 +32,14 @@ pub struct GithubAccessToken {
     pub token: String,
 }
 /// https://developer.github.com/v3/apps/#create-an-installation-access-token-for-an-app
-fn create_access_token(jwt: &str, install_id: i64) -> Result<GithubAccessToken, GithubError> {
+fn create_access_token(
+    github_api_url: &str,
+    jwt: &str,
+    install_id: i64,
+) -> Result<GithubAccessToken, GithubError> {
     Ok(reqwest::Client::new()
         .post(&format!(
-            "https://api.github.com/app/installations/{install_id}/access_tokens",
+            "{github_api_url}/app/installations/{install_id}/access_tokens",
         ))
         .header(AUTHORIZATION, format!("Bearer {jwt}"))
         .header(ACCEPT, "application/vnd.github.machine-man-preview+json")
@@ -45,11 +49,15 @@ fn create_access_token(jwt: &str, install_id: i64) -> Result<GithubAccessToken, 
 }
 
 /// https://developer.github.com/v3/issues/comments/#create-an-issue-comment
-pub(crate) fn create_comment(comment: CommentArgs, secret: &str) -> Result<(), GithubError> {
+pub(crate) fn create_comment(
+    github_api_url: &str,
+    comment: CommentArgs,
+    secret: &str,
+) -> Result<(), GithubError> {
     let comment_body = CommentBody { body: comment.body };
     reqwest::Client::new()
         .post(&format!(
-            "https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/comments",
+            "{github_api_url}/repos/{owner}/{repo}/issues/{issue_number}/comments",
             owner = comment.owner,
             repo = comment.repo,
             issue_number = comment.issue
@@ -68,9 +76,9 @@ pub struct GitHubAppInfo {
 }
 
 /// Get the bot name for finding existing comments on a PR
-pub fn get_app_info(jwt: &str) -> Result<GitHubAppInfo, GithubError> {
+pub fn get_app_info(github_api_url: &str, jwt: &str) -> Result<GitHubAppInfo, GithubError> {
     Ok(reqwest::Client::new()
-        .get("https://api.github.com/app")
+        .get(&format!("{github_api_url}/app"))
         .header(AUTHORIZATION, format!("Bearer {jwt}"))
         .send()?
         .error_for_status()?
@@ -142,12 +150,16 @@ pub struct PullRequest {
 }
 
 /// https://developer.github.com/v3/issues/comments/#list-issue-comments
-pub(crate) fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Comment>, GithubError> {
+pub(crate) fn list_comments(
+    github_api_url: &str,
+    pr: &PullRequest,
+    secret: &str,
+) -> Result<Vec<Comment>, GithubError> {
     // TODO(sbdchd): use the next links to get _all_ the comments
     // see: https://developer.github.com/v3/guides/traversing-with-pagination/
     Ok(reqwest::Client::new()
         .get(&format!(
-            "https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/comments",
+            "{github_api_url}/repos/{owner}/{repo}/issues/{issue_number}/comments",
             owner = pr.owner,
             repo = pr.repo,
             issue_number = pr.issue
@@ -161,6 +173,7 @@ pub(crate) fn list_comments(pr: &PullRequest, secret: &str) -> Result<Vec<Commen
 
 /// https://developer.github.com/v3/issues/comments/#update-an-issue-comment
 pub(crate) fn update_comment(
+    github_api_url: &str,
     owner: &str,
     repo: &str,
     comment_id: i64,
@@ -169,7 +182,7 @@ pub(crate) fn update_comment(
 ) -> Result<(), GithubError> {
     reqwest::Client::new()
         .patch(&format!(
-            "https://api.github.com/repos/{owner}/{repo}/issues/comments/{comment_id}",
+            "{github_api_url}/repos/{owner}/{repo}/issues/comments/{comment_id}",
         ))
         .header(AUTHORIZATION, format!("Bearer {secret}"))
         .json(&CommentBody { body })
@@ -179,19 +192,30 @@ pub(crate) fn update_comment(
 }
 
 pub struct GitHub {
+    github_api_url: String,
     slug_name: String,
     installation_access_token: String,
 }
 
 impl GitHub {
     pub fn new(private_key: &str, app_id: i64, installation_id: i64) -> Result<Self, GithubError> {
+        Self::new_with_url(DEFAULT_GITHUB_API_URL, private_key, app_id, installation_id)
+    }
+
+    pub fn new_with_url(
+        github_api_url: &str,
+        private_key: &str,
+        app_id: i64,
+        installation_id: i64,
+    ) -> Result<Self, GithubError> {
         info!("generating jwt");
         let jwt = generate_jwt(private_key, app_id)?;
         info!("getting app info");
-        let app_info = get_app_info(&jwt)?;
-        let access_token = create_access_token(&jwt, installation_id)?;
+        let app_info = get_app_info(github_api_url, &jwt)?;
+        let access_token = create_access_token(github_api_url, &jwt, installation_id)?;
 
         Ok(GitHub {
+            github_api_url: github_api_url.to_string(),
             slug_name: format!("{}[bot]", app_info.slug),
             installation_access_token: access_token.token,
         })
@@ -210,6 +234,7 @@ impl GitHubApi for GitHub {
         body: &str,
     ) -> Result<(), GithubError> {
         create_comment(
+            &self.github_api_url,
             CommentArgs {
                 owner: owner.to_string(),
                 repo: repo.to_string(),
@@ -226,6 +251,7 @@ impl GitHubApi for GitHub {
         issue_id: i64,
     ) -> Result<Vec<Comment>, GithubError> {
         list_comments(
+            &self.github_api_url,
             &PullRequest {
                 owner: owner.to_string(),
                 repo: repo.to_string(),
@@ -242,6 +268,7 @@ impl GitHubApi for GitHub {
         body: &str,
     ) -> Result<(), GithubError> {
         update_comment(
+            &self.github_api_url,
             owner,
             repo,
             comment_id,
