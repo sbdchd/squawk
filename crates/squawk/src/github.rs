@@ -167,7 +167,6 @@ pub fn check_and_comment_on_pr(
 
 fn get_comment_body(files: &[CheckReport], version: &str) -> String {
     let violations_count: usize = files.iter().map(|x| x.violations.len()).sum();
-
     let violations_emoji = get_violations_emoji(violations_count);
 
     // First, try to generate the full comment
@@ -176,29 +175,19 @@ fn get_comment_body(files: &[CheckReport], version: &str) -> String {
         .filter_map(|x| get_sql_file_content(x).ok())
         .collect();
 
-    let full_comment = format!(
-        r"
-{COMMENT_HEADER}
-
-### **{violations_emoji} {violation_count}** violations across **{file_count}** file(s)
-
----
-{sql_file_content}
-
-[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) ({version}), a linter for PostgreSQL, focused on migrations
-",
-        violations_emoji = violations_emoji,
-        violation_count = violations_count,
-        file_count = files.len(),
-        sql_file_content = sql_file_contents.join("\n"),
-        version = version
+    let content = sql_file_contents.join("\n");
+    let full_comment = format_comment(
+        violations_emoji,
+        violations_count,
+        files.len(),
+        &content,
+        version,
+        None, // No summary notice for full comments
     );
 
     // Check if the comment exceeds GitHub's size limit
     if full_comment.len() <= GITHUB_COMMENT_MAX_SIZE {
-        return full_comment.trim_matches('\n').into();
+        return full_comment;
     }
 
     // If the comment is too large, create a summary instead
@@ -246,45 +235,72 @@ fn get_summary_comment_body(
         file_summaries.push(summary);
     }
 
-    format!(
-        r"
-{COMMENT_HEADER}
-
-### **{violations_emoji} {violation_count}** violations across **{file_count}** file(s)
-
-> ⚠️ **Large Report**: This report was summarized due to size constraints. SQL content has been omitted but all violations were analyzed.
-
----
-{file_summaries}
-
-[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
-
-⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) ({version}), a linter for PostgreSQL, focused on migrations
-",
-        violations_emoji = violations_emoji,
-        violation_count = violations_count,
-        file_count = files.len(),
-        file_summaries = file_summaries.join("\n"),
-        version = version
+    let summary_notice = Some("⚠️ **Large Report**: This report was summarized due to size constraints. SQL content has been omitted but all violations were analyzed.");
+    
+    format_comment(
+        violations_emoji,
+        violations_count,
+        files.len(),
+        &file_summaries.join("\n"),
+        version,
+        summary_notice,
     )
-    .trim_matches('\n')
-    .into()
 }
 
 const fn get_violations_emoji(count: usize) -> &'static str {
     if count > 0 { "🚒" } else { "✅" }
 }
 
-fn truncate_sql_if_needed(sql: &str, max_lines: usize) -> (String, bool) {
+fn format_comment(
+    violations_emoji: &str,
+    violation_count: usize,
+    file_count: usize,
+    content: &str,
+    version: &str,
+    summary_notice: Option<&str>,
+) -> String {
+    let notice_section = if let Some(notice) = summary_notice {
+        format!("\n> {}\n", notice)
+    } else {
+        String::new()
+    };
+
+    format!(
+        r"
+{COMMENT_HEADER}
+
+### **{violations_emoji} {violation_count}** violations across **{file_count}** file(s){notice_section}
+---
+{content}
+
+[📚 More info on rules](https://github.com/sbdchd/squawk#rules)
+
+⚡️ Powered by [`Squawk`](https://github.com/sbdchd/squawk) ({version}), a linter for PostgreSQL, focused on migrations
+",
+        violations_emoji = violations_emoji,
+        violation_count = violation_count,
+        file_count = file_count,
+        notice_section = notice_section,
+        content = content,
+        version = version
+    )
+    .trim_matches('\n')
+    .into()
+}
+
+fn truncate_sql_if_needed(sql: &str) -> (String, bool) {
     let lines: Vec<&str> = sql.lines().collect();
-    if lines.len() <= max_lines {
+    if lines.len() <= MAX_SQL_PREVIEW_LINES {
         (sql.to_string(), false)
     } else {
-        let truncated_lines = lines[..max_lines].join("\n");
-        let remaining_lines = lines.len() - max_lines;
+        let truncated_lines = lines[..MAX_SQL_PREVIEW_LINES].join("
+");
+        let remaining_lines = lines.len() - MAX_SQL_PREVIEW_LINES;
         (
             format!(
-                "{truncated_lines}\n\n-- ... ({remaining_lines} more lines truncated for brevity)"
+                "{truncated_lines}
+
+-- ... ({remaining_lines} more lines truncated for brevity)"
             ),
             true,
         )
@@ -314,7 +330,7 @@ fn get_sql_file_content(violation: &CheckReport) -> Result<String> {
     };
 
     let violations_emoji = get_violations_emoji(violation_count);
-    let (display_sql, was_truncated) = truncate_sql_if_needed(sql, MAX_SQL_PREVIEW_LINES);
+    let (display_sql, was_truncated) = truncate_sql_if_needed(sql);
 
     let truncation_notice = if was_truncated {
         "\n\n> ⚠️ **Note**: SQL content has been truncated for display purposes. The full analysis was performed on the complete file."
@@ -432,9 +448,9 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
     }
 
     #[test]
-    fn test_sql_truncation() {
+    fn sql_truncation() {
         let short_sql = "SELECT 1;";
-        let (result, truncated) = crate::github::truncate_sql_if_needed(short_sql, 5);
+        let (result, truncated) = crate::github::truncate_sql_if_needed(short_sql);
         assert!(!truncated);
         assert_eq!(result, short_sql);
 
@@ -442,7 +458,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
             .map(|i| format!("-- Line {}", i))
             .collect::<Vec<_>>()
             .join("\n");
-        let (result, truncated) = crate::github::truncate_sql_if_needed(&long_sql, 50);
+        let (result, truncated) = crate::github::truncate_sql_if_needed(&long_sql);
         assert!(truncated);
         assert!(result.contains("-- ... (50 more lines truncated for brevity)"));
     }
@@ -507,13 +523,6 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         }];
 
         let body = get_comment_body(&violations, "0.2.3");
-
-        // Debug: Print the actual size to see what's happening
-        println!(
-            "Comment body size: {}, limit: {}",
-            body.len(),
-            super::GITHUB_COMMENT_MAX_SIZE
-        );
 
         // The comment should be within GitHub's size limits
         assert!(body.len() <= super::GITHUB_COMMENT_MAX_SIZE);
