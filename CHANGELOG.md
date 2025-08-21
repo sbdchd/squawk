@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.23.0 - 2025-08-20
+
+## Added
+
+- github: support overriding api url for github enterprise usage (#611). Thanks @jvatic!
+
+- lsp server: quick fix to open documentation for rule violation (#610)
+
+- lsp server: quick fixes to ignore rules for a line or entire file (#613)
+
+## Fixed
+
+- linter: violations no longer include leading whitespace & comments in their range. (#612)
+
 ## v2.22.0 - 2025-08-07
 
 ## Added
