@@ -98,7 +98,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                             let end = start + TextSize::new(trimmed.len() as u32);
                             let range = TextRange::new(start, end);
 
-                            ctx.report(Violation::new(
+                            ctx.report(Violation::for_range(
                                 Rule::UnusedIgnore,
                                 format!("unknown name {trimmed}"),
                                 range,
@@ -142,6 +142,37 @@ alter table t drop column c cascade;
         assert_eq!(linter.ignores.len(), 1);
         let ignore = &linter.ignores[0];
         assert!(ignore.violation_names.contains(&Rule::BanDropColumn));
+    }
+
+    #[test]
+    fn multiple_sql_comments_with_ignore_is_ok() {
+        let sql = "
+-- fooo bar
+-- buzz
+-- squawk-ignore prefer-robust-stmts
+create table x();
+
+select 1;
+";
+
+        let parse = squawk_syntax::SourceFile::parse(sql);
+        let mut linter = Linter::with_all_rules();
+        find_ignores(&mut linter, &parse.syntax_node());
+
+        assert_eq!(linter.ignores.len(), 1);
+        let ignore = &linter.ignores[0];
+        assert!(
+            ignore.violation_names.contains(&Rule::PreferRobustStmts),
+            "Make sure we picked up the ignore"
+        );
+
+        let errors = linter.lint(&parse, sql);
+
+        assert_eq!(
+            errors,
+            vec![],
+            "We shouldn't have any errors because we have the ignore setup"
+        );
     }
 
     #[test]
@@ -217,7 +248,7 @@ create table users (
 "#;
 
         let parse = squawk_syntax::SourceFile::parse(sql);
-        let errors = linter.lint(parse, sql);
+        let errors = linter.lint(&parse, sql);
         assert_eq!(errors.len(), 0);
     }
 
@@ -227,7 +258,7 @@ create table users (
         let sql = r#"alter table t add column c char;"#;
 
         let parse = squawk_syntax::SourceFile::parse(sql);
-        let errors = linter.lint(parse, sql);
+        let errors = linter.lint(&parse, sql);
         assert_eq!(errors.len(), 1);
     }
 
@@ -244,7 +275,7 @@ create table test_table (
         "#;
 
         let parse = squawk_syntax::SourceFile::parse(sql);
-        let errors = linter.lint(parse, sql);
+        let errors = linter.lint(&parse, sql);
         assert_eq!(errors.len(), 0);
     }
 
@@ -282,7 +313,7 @@ alter table t drop column c cascade;
         assert!(ignore.violation_names.is_empty());
 
         let errors: Vec<_> = linter
-            .lint(parse, sql)
+            .lint(&parse, sql)
             .into_iter()
             .map(|x| x.code)
             .collect();
@@ -353,7 +384,7 @@ alter table t2 drop column c2 cascade;
 
         let parse = squawk_syntax::SourceFile::parse(sql);
         let errors: Vec<_> = linter
-            .lint(parse, sql)
+            .lint(&parse, sql)
             .into_iter()
             .map(|x| x.code)
             .collect();
@@ -377,7 +408,7 @@ alter table t2 drop column c2 cascade;
 
         let parse = squawk_syntax::SourceFile::parse(sql);
         let errors: Vec<_> = linter
-            .lint(parse, sql)
+            .lint(&parse, sql)
             .into_iter()
             .map(|x| x.code)
             .collect();

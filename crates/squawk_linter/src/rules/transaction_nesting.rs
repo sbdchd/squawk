@@ -14,17 +14,17 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         match stmt {
             ast::Stmt::Begin(_) => {
                 if ctx.settings.assume_in_transaction {
-                    ctx.report(Violation::new(
+                    ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
                         "There is an existing transaction already in progress, managed by your migration tool.".to_string(),
-                        stmt.syntax().text_range(),
+                        stmt.syntax(),
                         assume_in_transaction_help.to_string()
                     ));
                 } else if in_explicit_transaction {
-                    ctx.report(Violation::new(
+                    ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
                         "There is an existing transaction already in progress.".to_string(),
-                        stmt.syntax().text_range(),
+                        stmt.syntax(),
                         assume_in_transaction_help.to_string(),
                     ));
                 }
@@ -32,18 +32,18 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             }
             ast::Stmt::Commit(_) | ast::Stmt::Rollback(_) => {
                 if ctx.settings.assume_in_transaction {
-                    ctx.report(Violation::new(
+                    ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
                         "Attempting to end the transaction that is managed by your migration tool"
                             .to_string(),
-                        stmt.syntax().text_range(),
+                        stmt.syntax(),
                         assume_in_transaction_help.to_string(),
                     ));
                 } else if !in_explicit_transaction {
-                    ctx.report(Violation::new(
+                    ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
                         "There is no transaction to `COMMIT` or `ROLLBACK`.".to_string(),
-                        stmt.syntax().text_range(),
+                        stmt.syntax(),
                         "`BEGIN` a transaction at an earlier point in the migration or remove this statement.".to_string()
                     ));
                 }
@@ -71,7 +71,7 @@ COMMIT;
         "#;
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::TransactionNesting]);
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -86,7 +86,7 @@ COMMIT;
         "#;
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::TransactionNesting]);
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -100,7 +100,7 @@ COMMIT;
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::TransactionNesting]);
         linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -115,7 +115,7 @@ ROLLBACK;
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::TransactionNesting]);
         linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -131,7 +131,7 @@ COMMIT;
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::TransactionNesting]);
         linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -145,7 +145,7 @@ COMMIT;
         "#;
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::TransactionNesting]);
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert_eq!(errors.len(), 0);
     }
 
@@ -163,7 +163,7 @@ COMMIT;
         "#;
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::TransactionNesting]);
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert_eq!(errors.len(), 0);
     }
 
@@ -175,7 +175,7 @@ SELECT 1;
         let file = SourceFile::parse(sql);
         let mut linter = Linter::from([Rule::TransactionNesting]);
         linter.settings.assume_in_transaction = true;
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert_eq!(errors.len(), 0);
     }
 }

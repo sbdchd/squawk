@@ -25,7 +25,7 @@ pub(crate) fn {rule_name_snake}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
                 ctx.report(Violation::new(
                     Rule::{rule_name_pascal},
                     "todo".to_string(),
-                    create_table.syntax().text_range(),
+                    create_table.syntax(),
                     "todo or none".to_string(),
                 ));
                 todo!();

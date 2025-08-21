@@ -10,6 +10,7 @@ use rowan::TextRange;
 use rowan::TextSize;
 use serde::{Deserialize, Serialize};
 
+use squawk_syntax::SyntaxNode;
 use squawk_syntax::{Parse, SourceFile};
 
 pub use version::Version;
@@ -259,7 +260,33 @@ impl Edit {
 
 impl Violation {
     #[must_use]
-    pub fn new(
+    pub fn for_node(
+        code: Rule,
+        message: String,
+        node: &SyntaxNode,
+        help: impl Into<Option<String>>,
+    ) -> Self {
+        let range = node.text_range();
+
+        let start = node
+            .children_with_tokens()
+            .filter(|x| !x.kind().is_trivia())
+            .next()
+            .map(|x| x.text_range().start())
+            // Not sure we actually hit this, but just being safe
+            .unwrap_or_else(|| range.start());
+
+        Self {
+            code,
+            text_range: TextRange::new(start, range.end()),
+            message,
+            help: help.into(),
+            fix: None,
+        }
+    }
+
+    #[must_use]
+    pub fn for_range(
         code: Rule,
         message: String,
         text_range: TextRange,
@@ -303,7 +330,7 @@ impl Linter {
     }
 
     #[must_use]
-    pub fn lint(&mut self, file: Parse<SourceFile>, text: &str) -> Vec<Violation> {
+    pub fn lint(&mut self, file: &Parse<SourceFile>, text: &str) -> Vec<Violation> {
         if self.rules.contains(&Rule::AddingFieldWithDefault) {
             adding_field_with_default(self, &file);
         }

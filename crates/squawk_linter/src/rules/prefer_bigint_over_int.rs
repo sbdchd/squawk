@@ -23,10 +23,10 @@ lazy_static! {
 fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_valid_int_type(&ty, &INT_TYPES) {
-            ctx.report(Violation::new(
+            ctx.report(Violation::for_node(
                 Rule::PreferBigintOverInt,
                 "Using 32-bit integer fields can result in hitting the max `int` limit.".into(),
-                ty.syntax().text_range(),
+                ty.syntax(),
                 "Use 64-bit integer values instead to prevent hitting this limit.".to_string(),
             ));
         };

@@ -14,10 +14,10 @@ pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     if let Some(ast::AlterColumnOption::DropNotNull(drop_not_null)) =
                         alter_column.option()
                     {
-                        ctx.report(Violation::new(
+                        ctx.report(Violation::for_node(
                             Rule::BanDropNotNull,
                             "Dropping a `NOT NULL` constraint may break existing clients.".into(),
-                            drop_not_null.syntax().text_range(),
+                            drop_not_null.syntax(),
                             None,
                         ));
                     }

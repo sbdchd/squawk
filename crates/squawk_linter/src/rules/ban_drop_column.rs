@@ -11,10 +11,10 @@ pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::DropColumn(drop_column) = action {
-                    ctx.report(Violation::new(
+                    ctx.report(Violation::for_node(
                         Rule::BanDropColumn,
                         "Dropping a column may break existing clients.".into(),
-                        drop_column.syntax().text_range(),
+                        drop_column.syntax(),
                         None,
                     ));
                 }

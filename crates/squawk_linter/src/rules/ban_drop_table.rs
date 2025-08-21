@@ -9,10 +9,10 @@ pub(crate) fn ban_drop_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for stmt in file.stmts() {
         if let ast::Stmt::DropTable(drop_table) = stmt {
-            ctx.report(Violation::new(
+            ctx.report(Violation::for_node(
                 Rule::BanDropTable,
                 "Dropping a table may break existing clients.".into(),
-                drop_table.syntax().text_range(),
+                drop_table.syntax(),
                 None,
             ));
         }

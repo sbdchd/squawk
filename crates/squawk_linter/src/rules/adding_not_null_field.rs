@@ -16,11 +16,11 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                     };
 
                     if matches!(option, ast::AlterColumnOption::SetNotNull(_)) {
-                        ctx.report(Violation::new(
+                        ctx.report(Violation::for_node(
                             Rule::AddingNotNullableField,
                             "Setting a column `NOT NULL` blocks reads while the table is scanned."
                                 .into(),
-                            option.syntax().text_range(),
+                            option.syntax(),
                             "Make the field nullable and use a `CHECK` constraint instead."
                                 .to_string(),
                         ));

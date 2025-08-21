@@ -21,10 +21,10 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
                 if create_index.concurrently_token().is_none()
                     && !tables_created.contains(&Identifier::new(&table_name.text()))
                 {
-                    ctx.report(Violation::new(
+                    ctx.report(Violation::for_node(
                         Rule::RequireConcurrentIndexCreation,
                 "During normal index creation, table updates are blocked, but reads are still allowed.".into(),
-                        create_index.syntax().text_range(),
+                        create_index.syntax(),
                         "Use `CONCURRENTLY` to avoid blocking writes.".to_string(),
                     ));
                 }

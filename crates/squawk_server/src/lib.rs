@@ -337,7 +337,7 @@ fn lint(content: &str) -> Vec<Diagnostic> {
     let parse: Parse<SourceFile> = SourceFile::parse(content);
     let parse_errors = parse.errors();
     let mut linter = Linter::with_all_rules();
-    let violations = linter.lint(parse, content);
+    let violations = linter.lint(&parse, content);
     let line_index = LineIndex::new(content);
 
     let mut diagnostics = Vec::with_capacity(violations.len() + parse_errors.len());

@@ -34,7 +34,7 @@ fn check_sql(
     linter.settings.assume_in_transaction = assume_in_transaction;
     let parse = SourceFile::parse(sql);
     let parse_errors = parse.errors();
-    let errors = linter.lint(parse, sql);
+    let errors = linter.lint(&parse, sql);
     let line_index = LineIndex::new(sql);
 
     let mut violations = Vec::with_capacity(parse_errors.len() + errors.len());
