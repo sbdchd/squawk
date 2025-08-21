@@ -14,7 +14,6 @@ pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 Rule::BanDropDatabase,
                 "Dropping a database may break existing clients.".into(),
                 drop_database.syntax(),
-                None,
             ));
         }
     }

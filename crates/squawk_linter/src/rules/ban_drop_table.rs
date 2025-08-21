@@ -13,7 +13,6 @@ pub(crate) fn ban_drop_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 Rule::BanDropTable,
                 "Dropping a table may break existing clients.".into(),
                 drop_table.syntax(),
-                None,
             ));
         }
     }

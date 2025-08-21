@@ -102,7 +102,6 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
                                 Rule::UnusedIgnore,
                                 format!("unknown name {trimmed}"),
                                 range,
-                                None,
                             ));
                         }
 

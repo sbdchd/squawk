@@ -16,7 +16,6 @@ pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) 
                             Rule::ChangingColumnType,
                             "Changing a column type requires an `ACCESS EXCLUSIVE` lock on the table which blocks reads and writes while the table is rewritten. Changing the type of the column may also break other clients reading from the table.".into(),
                             set_type.syntax(),
-                            None,
                         ));
                     }
                 }

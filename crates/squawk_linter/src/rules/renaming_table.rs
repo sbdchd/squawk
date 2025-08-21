@@ -15,7 +15,6 @@ pub(crate) fn renaming_table(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         Rule::RenamingTable,
                         "Renaming a table may break existing clients.".into(),
                         rename_table.syntax(),
-                        None,
                     ));
                 }
             }

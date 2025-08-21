@@ -15,7 +15,6 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         Rule::RenamingColumn,
                         "Renaming a column may break existing clients.".into(),
                         rename_column.syntax(),
-                        None,
                     ));
                 }
             }

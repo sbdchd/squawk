@@ -142,13 +142,8 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     };
 
                     ctx.report(
-                        Violation::for_node(
-                            Rule::PreferRobustStmts,
-                            message,
-                            action.syntax(),
-                            None,
-                        )
-                        .with_fix(fix),
+                        Violation::for_node(Rule::PreferRobustStmts, message, action.syntax())
+                            .fix(fix),
                     );
                 }
             }
@@ -168,8 +163,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     create_index.syntax(),
-                    "Use an explicit name for a concurrently created index".to_string(),
-                ).with_fix(fix));
+                ).help("Use an explicit name for a concurrently created index").fix(fix));
             }
             ast::Stmt::CreateTable(create_table)
                 if create_table.if_not_exists().is_none() && !inside_transaction =>
@@ -186,8 +180,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     create_table.syntax(),
-                    None,
-                ).with_fix(fix));
+                ).fix(fix));
             }
             ast::Stmt::DropIndex(drop_index)
                 if drop_index.if_exists().is_none() && !inside_transaction =>
@@ -204,8 +197,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     Rule::PreferRobustStmts,
                     "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     drop_index.syntax(),
-                    None,
-                ).with_fix(fix));
+                ).fix(fix));
             }
             ast::Stmt::DropTable(drop_table)
                 if drop_table.if_exists().is_none() && !inside_transaction =>
@@ -221,8 +213,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     Rule::PreferRobustStmts,
                     "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     drop_table.syntax(),
-                    None,
-                ).with_fix(fix));
+                ).fix(fix));
             }
             ast::Stmt::DropType(drop_type)
                 if drop_type.if_exists().is_none() && !inside_transaction =>
@@ -239,8 +230,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     Rule::PreferRobustStmts,
                     "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
                     drop_type.syntax(),
-                    None,
-                ).with_fix(fix));
+                ).fix(fix));
             }
             _ => (),
         }
@@ -251,7 +241,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 mod test {
     use insta::{assert_debug_snapshot, assert_snapshot};
 
-    use crate::{Edit, Linter, Rule, test_utils::{lint, lint_with_assume_in_transaction}};
+    use crate::{
+        Edit, Linter, Rule,
+        test_utils::{lint, lint_with_assume_in_transaction},
+    };
 
     fn fix(sql: &str) -> String {
         let file = squawk_syntax::SourceFile::parse(sql);

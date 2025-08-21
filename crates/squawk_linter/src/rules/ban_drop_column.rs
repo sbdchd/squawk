@@ -15,7 +15,6 @@ pub(crate) fn ban_drop_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         Rule::BanDropColumn,
                         "Dropping a column may break existing clients.".into(),
                         drop_column.syntax(),
-                        None,
                     ));
                 }
             }

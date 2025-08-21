@@ -16,7 +16,6 @@ pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, parse: &Par
                     Rule::BanAlterDomainWithAddConstraint,
                         "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
                         add_constraint.syntax(),
-                        None,
                     ))
             }
         }

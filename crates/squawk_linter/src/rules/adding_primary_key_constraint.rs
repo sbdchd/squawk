@@ -18,12 +18,14 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                             add_constraint.constraint()
                         {
                             if primary_key_constraint.using_index().is_none() {
-                                ctx.report(Violation::for_node(
-                                    Rule::AddingSerialPrimaryKeyField,
-                                    message.to_string(),
-                                    primary_key_constraint.syntax(),
-                                    help.to_string(),
-                                ));
+                                ctx.report(
+                                    Violation::for_node(
+                                        Rule::AddingSerialPrimaryKeyField,
+                                        message.to_string(),
+                                        primary_key_constraint.syntax(),
+                                    )
+                                    .help(help),
+                                );
                             }
                         }
                     }
@@ -33,12 +35,14 @@ pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                 constraint
                             {
                                 if primary_key_constraint.using_index().is_none() {
-                                    ctx.report(Violation::for_node(
-                                        Rule::AddingSerialPrimaryKeyField,
-                                        message.to_string(),
-                                        primary_key_constraint.syntax(),
-                                        help.to_string(),
-                                    ));
+                                    ctx.report(
+                                        Violation::for_node(
+                                            Rule::AddingSerialPrimaryKeyField,
+                                            message.to_string(),
+                                            primary_key_constraint.syntax(),
+                                        )
+                                        .help(help),
+                                    );
                                 }
                             }
                         }

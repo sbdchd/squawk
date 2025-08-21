@@ -32,12 +32,14 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                             if unique_constraint.using_index().is_none()
                                 && !tables_created.contains(&Identifier::new(&table_name))
                             {
-                                ctx.report(Violation::for_node(
-                                    Rule::DisallowedUniqueConstraint,
-                                    message.to_string(),
-                                    unique_constraint.syntax(),
-                                    help.to_string(),
-                                ));
+                                ctx.report(
+                                    Violation::for_node(
+                                        Rule::DisallowedUniqueConstraint,
+                                        message.to_string(),
+                                        unique_constraint.syntax(),
+                                    )
+                                    .help(help),
+                                );
                             }
                         }
                     }
@@ -45,12 +47,14 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                         for constraint in add_column.constraints() {
                             if let ast::Constraint::UniqueConstraint(unique_constraint) = constraint
                             {
-                                ctx.report(Violation::for_node(
-                                    Rule::DisallowedUniqueConstraint,
-                                    message.to_string(),
-                                    unique_constraint.syntax(),
-                                    help.to_string(),
-                                ));
+                                ctx.report(
+                                    Violation::for_node(
+                                        Rule::DisallowedUniqueConstraint,
+                                        message.to_string(),
+                                        unique_constraint.syntax(),
+                                    )
+                                    .help(help),
+                                );
                             }
                         }
                     }
@@ -65,7 +69,10 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Rule, test_utils::{lint, lint_with_assume_in_transaction}};
+    use crate::{
+        Rule,
+        test_utils::{lint, lint_with_assume_in_transaction},
+    };
 
     #[test]
     fn adding_unique_constraint_err() {
