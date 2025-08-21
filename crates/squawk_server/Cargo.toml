@@ -19,6 +19,7 @@ squawk_lexer.workspace = true
 squawk_linter.workspace = true
 squawk_syntax.workspace = true
 line-index.workspace = true
+insta.workspace = true
 
 [lints]
 workspace = true

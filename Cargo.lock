@@ -2673,6 +2673,7 @@ name = "squawk_server"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "insta",
  "line-index",
  "log",
  "lsp-server",

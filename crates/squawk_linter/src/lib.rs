@@ -15,7 +15,7 @@ use squawk_syntax::{Parse, SourceFile};
 
 pub use version::Version;
 
-mod ignore;
+pub mod ignore;
 mod ignore_index;
 mod version;
 mod visitors;
@@ -250,7 +250,7 @@ pub struct Edit {
     pub text: Option<String>,
 }
 impl Edit {
-    fn insert<T: Into<String>>(text: T, at: TextSize) -> Self {
+    pub fn insert<T: Into<String>>(text: T, at: TextSize) -> Self {
         Self {
             text_range: TextRange::new(at, at),
             text: Some(text.into()),
