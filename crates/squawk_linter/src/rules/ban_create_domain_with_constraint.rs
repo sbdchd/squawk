@@ -27,7 +27,6 @@ pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<
                 Rule::BanCreateDomainWithConstraint,
                     "Domains with constraints have poor support for online migrations. Use table and column constraints instead.".into(),
                     range,
-                    None,
                 ))
             }
         }

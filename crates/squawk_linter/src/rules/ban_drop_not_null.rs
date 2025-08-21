@@ -18,7 +18,6 @@ pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                             Rule::BanDropNotNull,
                             "Dropping a `NOT NULL` constraint may break existing clients.".into(),
                             drop_not_null.syntax(),
-                            None,
                         ));
                     }
                 }

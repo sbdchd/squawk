@@ -19,8 +19,7 @@ pub(crate) fn adding_required_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             Rule::AddingRequiredField,
                             "Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.".into(),
                             add_column.syntax(),
-                            "Make the field nullable or add a non-VOLATILE DEFAULT".to_string(),
-                        ));
+                        ).help("Make the field nullable or add a non-VOLATILE DEFAULT"));
                     }
                 }
             }

@@ -51,8 +51,7 @@ fn check_ty_for_timestamp(ctx: &mut Linter, ty: Option<ast::Type>) {
                 Rule::PreferTimestampTz,
             "When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.".into(),
                 ty.syntax(),
-                "Use timestamptz instead of timestamp for your column type.".to_string(),
-            ));
+            ).help("Use timestamptz instead of timestamp for your column type."));
         };
     }
 }

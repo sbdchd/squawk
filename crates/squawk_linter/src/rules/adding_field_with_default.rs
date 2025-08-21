@@ -73,20 +73,24 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                 if is_const_expr(&expr) || is_non_volatile(&expr) {
                                     continue;
                                 }
-                                ctx.report(Violation::for_node(
-                                    Rule::AddingFieldWithDefault,
-                                    message.into(),
-                                    expr.syntax(),
-                                    help.to_string(),
-                                ))
+                                ctx.report(
+                                    Violation::for_node(
+                                        Rule::AddingFieldWithDefault,
+                                        message.into(),
+                                        expr.syntax(),
+                                    )
+                                    .help(help),
+                                )
                             }
                             ast::Constraint::GeneratedConstraint(generated) => {
-                                ctx.report(Violation::for_node(
-                                    Rule::AddingFieldWithDefault,
-                                    message.into(),
-                                    generated.syntax(),
-                                    help.to_string(),
-                                ));
+                                ctx.report(
+                                    Violation::for_node(
+                                        Rule::AddingFieldWithDefault,
+                                        message.into(),
+                                        generated.syntax(),
+                                    )
+                                    .help(help),
+                                );
                             }
                             _ => (),
                         }

@@ -25,12 +25,14 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                 ast::Constraint::ForeignKeyConstraint(_)
                                     | ast::Constraint::ReferencesConstraint(_)
                             ) {
-                                ctx.report(Violation::for_node(
-                                    Rule::AddingForeignKeyConstraint,
-                                    message.into(),
-                                    constraint.syntax(),
-                                    help.to_string(),
-                                ))
+                                ctx.report(
+                                    Violation::for_node(
+                                        Rule::AddingForeignKeyConstraint,
+                                        message.into(),
+                                        constraint.syntax(),
+                                    )
+                                    .help(help),
+                                )
                             }
                         }
                     }
@@ -41,12 +43,14 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                 ast::Constraint::ForeignKeyConstraint(_)
                                     | ast::Constraint::ReferencesConstraint(_)
                             ) {
-                                ctx.report(Violation::for_node(
-                                    Rule::AddingForeignKeyConstraint,
-                                    message.into(),
-                                    constraint.syntax(),
-                                    help.to_string(),
-                                ))
+                                ctx.report(
+                                    Violation::for_node(
+                                        Rule::AddingForeignKeyConstraint,
+                                        message.into(),
+                                        constraint.syntax(),
+                                    )
+                                    .help(help),
+                                )
                             }
                         }
                     }

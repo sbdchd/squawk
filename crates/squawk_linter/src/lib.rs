@@ -220,16 +220,6 @@ impl fmt::Display for Rule {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct Violation {
-    // TODO: should this be String instead?
-    pub code: Rule,
-    pub message: String,
-    pub text_range: TextRange,
-    pub help: Option<String>,
-    pub fix: Option<Fix>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Fix {
     pub title: String,
     pub edits: Vec<Edit>,
@@ -258,14 +248,19 @@ impl Edit {
     }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Violation {
+    // TODO: should this be String instead?
+    pub code: Rule,
+    pub message: String,
+    pub text_range: TextRange,
+    pub help: Option<String>,
+    pub fix: Option<Fix>,
+}
+
 impl Violation {
     #[must_use]
-    pub fn for_node(
-        code: Rule,
-        message: String,
-        node: &SyntaxNode,
-        help: impl Into<Option<String>>,
-    ) -> Self {
+    pub fn for_node(code: Rule, message: String, node: &SyntaxNode) -> Self {
         let range = node.text_range();
 
         let start = node
@@ -280,29 +275,28 @@ impl Violation {
             code,
             text_range: TextRange::new(start, range.end()),
             message,
-            help: help.into(),
+            help: None,
             fix: None,
         }
     }
 
     #[must_use]
-    pub fn for_range(
-        code: Rule,
-        message: String,
-        text_range: TextRange,
-        help: impl Into<Option<String>>,
-    ) -> Self {
+    pub fn for_range(code: Rule, message: String, text_range: TextRange) -> Self {
         Self {
             code,
             text_range,
             message,
-            help: help.into(),
+            help: None,
             fix: None,
         }
     }
 
-    fn with_fix(mut self, fix: Option<Fix>) -> Violation {
+    fn fix(mut self, fix: Option<Fix>) -> Violation {
         self.fix = fix;
+        self
+    }
+    fn help(mut self, help: impl Into<String>) -> Violation {
+        self.help = Some(help.into());
         self
     }
 }

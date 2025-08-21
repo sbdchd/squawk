@@ -21,9 +21,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             "Setting a column `NOT NULL` blocks reads while the table is scanned."
                                 .into(),
                             option.syntax(),
-                            "Make the field nullable and use a `CHECK` constraint instead."
-                                .to_string(),
-                        ));
+                        ).help("Make the field nullable and use a `CHECK` constraint instead."));
                     }
                 }
             }

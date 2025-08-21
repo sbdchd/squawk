@@ -18,15 +18,16 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         Rule::TransactionNesting,
                         "There is an existing transaction already in progress, managed by your migration tool.".to_string(),
                         stmt.syntax(),
-                        assume_in_transaction_help.to_string()
-                    ));
+                    ).help(assume_in_transaction_help));
                 } else if in_explicit_transaction {
-                    ctx.report(Violation::for_node(
-                        Rule::TransactionNesting,
-                        "There is an existing transaction already in progress.".to_string(),
-                        stmt.syntax(),
-                        assume_in_transaction_help.to_string(),
-                    ));
+                    ctx.report(
+                        Violation::for_node(
+                            Rule::TransactionNesting,
+                            "There is an existing transaction already in progress.".to_string(),
+                            stmt.syntax(),
+                        )
+                        .help(assume_in_transaction_help),
+                    );
                 }
                 in_explicit_transaction = true;
             }
@@ -37,15 +38,13 @@ pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         "Attempting to end the transaction that is managed by your migration tool"
                             .to_string(),
                         stmt.syntax(),
-                        assume_in_transaction_help.to_string(),
-                    ));
+                    ).help(assume_in_transaction_help));
                 } else if !in_explicit_transaction {
                     ctx.report(Violation::for_node(
                         Rule::TransactionNesting,
                         "There is no transaction to `COMMIT` or `ROLLBACK`.".to_string(),
                         stmt.syntax(),
-                        "`BEGIN` a transaction at an earlier point in the migration or remove this statement.".to_string()
-                    ));
+                    ).help("`BEGIN` a transaction at an earlier point in the migration or remove this statement."));
                 }
                 in_explicit_transaction = false;
             }

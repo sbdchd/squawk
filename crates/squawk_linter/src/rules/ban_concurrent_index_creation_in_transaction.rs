@@ -26,8 +26,7 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
                             Rule::BanConcurrentIndexCreationInTransaction,
                             "While regular index creation can happen inside a transaction, this is not allowed when the `CONCURRENTLY` option is used.".into(),
                             concurrently.text_range(),
-                            "Build the index outside any transactions.".to_string(),
-                        ));
+                        ).help("Build the index outside any transactions."));
                     }
                 }
             }
@@ -45,7 +44,10 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
 mod test {
     use insta::assert_debug_snapshot;
 
-    use crate::{Rule, test_utils::{lint, lint_with_assume_in_transaction}};
+    use crate::{
+        Rule,
+        test_utils::{lint, lint_with_assume_in_transaction},
+    };
 
     #[test]
     fn ban_concurrent_index_creation_in_transaction_err() {
@@ -77,7 +79,8 @@ mod test {
   CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
   ALTER TABLE "table_name" ADD CONSTRAINT "field_name_id" UNIQUE USING INDEX "field_name_idx";
     "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::BanConcurrentIndexCreationInTransaction);
+        let errors =
+            lint_with_assume_in_transaction(sql, Rule::BanConcurrentIndexCreationInTransaction);
         assert_ne!(errors.len(), 0);
         assert_debug_snapshot!(errors);
     }
@@ -88,7 +91,8 @@ mod test {
   -- run index creation in a standalone migration
   CREATE UNIQUE INDEX CONCURRENTLY "field_name_idx" ON "table_name" ("field_name");
         "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::BanConcurrentIndexCreationInTransaction);
+        let errors =
+            lint_with_assume_in_transaction(sql, Rule::BanConcurrentIndexCreationInTransaction);
         assert_eq!(errors.len(), 0);
     }
 
@@ -101,7 +105,8 @@ mod test {
   BEGIN;
   ALTER TABLE "table_name" ADD CONSTRAINT "field_name_id" UNIQUE USING INDEX "field_name_idx";
     "#;
-        let errors = lint_with_assume_in_transaction(sql, Rule::BanConcurrentIndexCreationInTransaction);
+        let errors =
+            lint_with_assume_in_transaction(sql, Rule::BanConcurrentIndexCreationInTransaction);
         assert_eq!(errors.len(), 0);
     }
 }

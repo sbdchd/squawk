@@ -14,8 +14,7 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
                     Rule::RequireConcurrentIndexDeletion,
             "A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can complete.".into(),
                     drop_index.syntax(),
-                    "Drop the index `CONCURRENTLY`.".to_string(),
-                ));
+                ).help("Drop the index `CONCURRENTLY`."));
             }
         }
     }

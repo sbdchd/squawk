@@ -56,8 +56,7 @@ fn check_ty_for_varchar(ctx: &mut Linter, ty: Option<ast::Type>) {
                 Rule::PreferTextField,
                "Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.".to_string(),
                 ty.syntax(),
-                "Use a `TEXT` field with a `CHECK` constraint.".to_string(),
-            ));
+            ).help("Use a `TEXT` field with a `CHECK` constraint."));
         };
     }
 }
