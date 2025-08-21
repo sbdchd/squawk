@@ -64,7 +64,7 @@ mod test {
     use crate::{diagnostic::AssociatedDiagnosticData, lint::lint};
 
     #[test]
-    fn ignore_line_edit_works() {
+    fn ignore_line() {
         let sql = "
 create table a (
   a int
@@ -106,6 +106,51 @@ create table c (
       b int
     );
     ");
+    }
+
+    #[test]
+    fn ignore_file() {
+        let sql = "
+-- some existing comment
+create table a (
+  a int
+);
+
+create table b (
+  b int
+);
+
+create table c (
+  b int
+);
+";
+        let ignore_line_edits = lint(sql)
+            .into_iter()
+            .flat_map(|x| {
+                let data = x.data?;
+                let associated_data: AssociatedDiagnosticData =
+                    serde_json::from_value(data).unwrap();
+                associated_data.ignore_file_edit
+            })
+            .collect::<Vec<_>>();
+        insta::assert_snapshot!(apply_text_edits(sql, ignore_line_edits), @r"
+        -- squawk-ignore-file prefer-robust-stmts
+        -- squawk-ignore-file prefer-robust-stmts
+        -- squawk-ignore-file prefer-robust-stmts
+
+        -- some existing comment
+        create table a (
+          a int
+        );
+
+        create table b (
+          b int
+        );
+
+        create table c (
+          b int
+        );
+        ");
     }
 
     fn apply_text_edits(sql: &str, mut edits: Vec<lsp_types::TextEdit>) -> String {
