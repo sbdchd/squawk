@@ -22,7 +22,7 @@ pub(crate) fn {rule_name_snake}(ctx: &mut Linter, parse: &Parse<SourceFile>) {{
         match stmt {{
             // TODO: update to the stmt you want to check
             ast::Stmt::CreateTable(create_table) => {{
-                ctx.report(Violation::new(
+                ctx.report(Violation::for_node(
                     Rule::{rule_name_pascal},
                     "todo".to_string(),
                     create_table.syntax(),
