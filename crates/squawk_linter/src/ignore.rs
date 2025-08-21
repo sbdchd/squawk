@@ -42,10 +42,10 @@ fn comment_body(token: &SyntaxToken) -> Option<(&str, TextRange)> {
 }
 
 // TODO: maybe in a future version we can rename this to squawk-ignore-line
-const IGNORE_LINE_TEXT: &str = "squawk-ignore";
-const IGNORE_FILE_TEXT: &str = "squawk-ignore-file";
+pub const IGNORE_LINE_TEXT: &str = "squawk-ignore";
+pub const IGNORE_FILE_TEXT: &str = "squawk-ignore-file";
 
-fn ignore_rule_names(token: &SyntaxToken) -> Option<(&str, TextRange, IgnoreKind)> {
+pub fn ignore_rule_info(token: &SyntaxToken) -> Option<(&str, TextRange, IgnoreKind)> {
     if let Some((comment_body, range)) = comment_body(token) {
         let without_start = comment_body.trim_start();
         let trim_start_size = comment_body.len() - without_start.len();
@@ -74,7 +74,7 @@ pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
             rowan::WalkEvent::Enter(NodeOrToken::Token(token))
                 if token.kind() == SyntaxKind::COMMENT =>
             {
-                if let Some((rule_names, range, kind)) = ignore_rule_names(&token) {
+                if let Some((rule_names, range, kind)) = ignore_rule_info(&token) {
                     let mut set = HashSet::new();
                     let mut offset = 0usize;
 
