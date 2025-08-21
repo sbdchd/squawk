@@ -15,10 +15,10 @@ pub(crate) fn adding_required_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         continue;
                     }
                     if has_not_null_and_no_default_constraint(add_column.constraints()) {
-                        ctx.report(Violation::new(
+                        ctx.report(Violation::for_node(
                             Rule::AddingRequiredField,
                             "Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.".into(),
-                            add_column.syntax().text_range(),
+                            add_column.syntax(),
                             "Make the field nullable or add a non-VOLATILE DEFAULT".to_string(),
                         ));
                     }

@@ -10,10 +10,10 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
     for stmt in file.stmts() {
         if let ast::Stmt::DropIndex(drop_index) = stmt {
             if drop_index.concurrently_token().is_none() {
-                ctx.report(Violation::new(
+                ctx.report(Violation::for_node(
                     Rule::RequireConcurrentIndexDeletion,
             "A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can complete.".into(),
-                    drop_index.syntax().text_range(),
+                    drop_index.syntax(),
                     "Drop the index `CONCURRENTLY`.".to_string(),
                 ));
             }

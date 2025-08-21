@@ -25,10 +25,10 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                 ast::Constraint::ForeignKeyConstraint(_)
                                     | ast::Constraint::ReferencesConstraint(_)
                             ) {
-                                ctx.report(Violation::new(
+                                ctx.report(Violation::for_node(
                                     Rule::AddingForeignKeyConstraint,
                                     message.into(),
-                                    constraint.syntax().text_range(),
+                                    constraint.syntax(),
                                     help.to_string(),
                                 ))
                             }
@@ -41,10 +41,10 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                 ast::Constraint::ForeignKeyConstraint(_)
                                     | ast::Constraint::ReferencesConstraint(_)
                             ) {
-                                ctx.report(Violation::new(
+                                ctx.report(Violation::for_node(
                                     Rule::AddingForeignKeyConstraint,
                                     message.into(),
-                                    constraint.syntax().text_range(),
+                                    constraint.syntax(),
                                     help.to_string(),
                                 ))
                             }

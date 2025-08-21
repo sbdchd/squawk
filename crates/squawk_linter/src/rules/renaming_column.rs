@@ -11,10 +11,10 @@ pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::RenameColumn(rename_column) = action {
-                    ctx.report(Violation::new(
+                    ctx.report(Violation::for_node(
                         Rule::RenamingColumn,
                         "Renaming a column may break existing clients.".into(),
-                        rename_column.syntax().text_range(),
+                        rename_column.syntax(),
                         None,
                     ));
                 }

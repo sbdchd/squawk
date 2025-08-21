@@ -10,10 +10,10 @@ pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for stmt in file.stmts() {
         if let ast::Stmt::DropDatabase(drop_database) = stmt {
-            ctx.report(Violation::new(
+            ctx.report(Violation::for_node(
                 Rule::BanDropDatabase,
                 "Dropping a database may break existing clients.".into(),
-                drop_database.syntax().text_range(),
+                drop_database.syntax(),
                 None,
             ));
         }

@@ -117,7 +117,7 @@ pub fn lint(text: String) -> Result<JsValue, Error> {
         }
     });
 
-    let lint_errors = linter.lint(parse, &text);
+    let lint_errors = linter.lint(&parse, &text);
     let errors = lint_errors.into_iter().map(|x| {
         let start = line_index.line_col(x.text_range.start());
         let end = line_index.line_col(x.text_range.end());

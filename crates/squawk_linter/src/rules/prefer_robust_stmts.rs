@@ -142,10 +142,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     };
 
                     ctx.report(
-                        Violation::new(
+                        Violation::for_node(
                             Rule::PreferRobustStmts,
                             message,
-                            action.syntax().text_range(),
+                            action.syntax(),
                             None,
                         )
                         .with_fix(fix),
@@ -164,10 +164,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 } else {
                     None
                 };
-                ctx.report(Violation::new(
+                ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
-                    create_index.syntax().text_range(),
+                    create_index.syntax(),
                     "Use an explicit name for a concurrently created index".to_string(),
                 ).with_fix(fix));
             }
@@ -182,10 +182,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     None
                 };
 
-                ctx.report(Violation::new(
+                ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
-                    create_table.syntax().text_range(),
+                    create_table.syntax(),
                     None,
                 ).with_fix(fix));
             }
@@ -200,10 +200,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     None
                 };
 
-                ctx.report(Violation::new(
+                ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
                     "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
-                    drop_index.syntax().text_range(),
+                    drop_index.syntax(),
                     None,
                 ).with_fix(fix));
             }
@@ -217,10 +217,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                 } else {
                     None
                 };
-                ctx.report(Violation::new(
+                ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
                     "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
-                    drop_table.syntax().text_range(),
+                    drop_table.syntax(),
                     None,
                 ).with_fix(fix));
             }
@@ -235,10 +235,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     None
                 };
 
-                ctx.report(Violation::new(
+                ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
                     "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
-                    drop_type.syntax().text_range(),
+                    drop_type.syntax(),
                     None,
                 ).with_fix(fix));
             }
@@ -258,7 +258,7 @@ mod test {
         assert_eq!(file.errors().len(), 0);
         assert_eq!(file.errors().len(), 0, "Shouldn't start with syntax errors");
         let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, sql);
+        let errors = linter.lint(&file, sql);
         assert!(!errors.is_empty(), "Should start with linter errors");
 
         let fixes = errors.into_iter().flat_map(|x| x.fix).collect::<Vec<_>>();
@@ -283,7 +283,7 @@ mod test {
             "Shouldn't introduce any syntax errors"
         );
         let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(file, &result);
+        let errors = linter.lint(&file, &result);
         assert_eq!(
             errors.len(),
             0,

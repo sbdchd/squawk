@@ -52,10 +52,10 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
 fn check_ty_for_varchar(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_allowed_varchar(&ty) {
-            ctx.report(Violation::new(
+            ctx.report(Violation::for_node(
                 Rule::PreferTextField,
                "Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.".to_string(),
-                ty.syntax().text_range(),
+                ty.syntax(),
                 "Use a `TEXT` field with a `CHECK` constraint.".to_string(),
             ));
         };
