@@ -3,15 +3,33 @@
 # fastmod: https://github.com/facebookincubator/fastmod
 
 
-function main {
+main() {
     NEW_VERSION="$1"
+
+    if [ -z "$NEW_VERSION" ]; then
+        echo "Error: NEW_VERSION is required. Usage: $0 <version>"
+        exit 1
+    fi
+
+    echo "Checking out master branch..."
+    if ! git checkout master; then
+        echo "Error: Failed to checkout master branch"
+        exit 1
+    fi
+
+    echo "Creating new release branch: release-$NEW_VERSION"
+    git checkout -b "release-$NEW_VERSION"
     echo "updating version to '$NEW_VERSION'..."
     fastmod --accept-all '^version = ".*"' 'version = "'$NEW_VERSION'"' crates/squawk/Cargo.toml
     fastmod --accept-all -m '(name = "squawk"\n)version = ".*?"' '${1}version = "'$NEW_VERSION'"' Cargo.lock
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' package.json
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' squawk-vscode/package.json
     fastmod --accept-all -m '(pname = "squawk";.*?)version = ".*?"' '${1}version = "'$NEW_VERSION'"' flake.nix
+    
+    echo "Updating CHANGELOG.md..."
+    CURRENT_DATE=$(date +"%Y-%m-%d")
+    sed -i '' "s/^## \[Unreleased\]$/## [Unreleased]\n\n## v$NEW_VERSION - $CURRENT_DATE/" CHANGELOG.md
 }
 
 
-main $@
+main "$@"
