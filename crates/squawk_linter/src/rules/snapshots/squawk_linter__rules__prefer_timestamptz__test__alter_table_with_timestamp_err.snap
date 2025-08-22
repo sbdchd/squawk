@@ -8,17 +8,41 @@ expression: errors
         message: "When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.",
         text_range: 56..65,
         help: Some(
-            "Use timestamptz instead of timestamp for your column type.",
+            "Use `timestamptz` instead of `timestamp` for your column type.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `timestamptz`",
+                edits: [
+                    Edit {
+                        text_range: 56..65,
+                        text: Some(
+                            "timestamptz",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
     Violation {
         code: PreferTimestampTz,
         message: "When Postgres stores a datetime in a `timestamp` field, Postgres drops the UTC offset. This means 2019-10-11 21:11:24+02 and 2019-10-11 21:11:24-06 will both be stored as 2019-10-11 21:11:24 in the database, even though they are eight hours apart in time.",
         text_range: 125..152,
         help: Some(
-            "Use timestamptz instead of timestamp for your column type.",
+            "Use `timestamptz` instead of `timestamp` for your column type.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `timestamptz`",
+                edits: [
+                    Edit {
+                        text_range: 125..152,
+                        text: Some(
+                            "timestamptz",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]

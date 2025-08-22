@@ -242,48 +242,12 @@ mod test {
     use insta::{assert_debug_snapshot, assert_snapshot};
 
     use crate::{
-        Edit, Linter, Rule,
-        test_utils::{lint, lint_with_assume_in_transaction},
+        Rule,
+        test_utils::{fix_sql, lint, lint_with_assume_in_transaction},
     };
 
     fn fix(sql: &str) -> String {
-        let file = squawk_syntax::SourceFile::parse(sql);
-        assert_eq!(file.errors().len(), 0);
-        assert_eq!(file.errors().len(), 0, "Shouldn't start with syntax errors");
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(&file, sql);
-        assert!(!errors.is_empty(), "Should start with linter errors");
-
-        let fixes = errors.into_iter().flat_map(|x| x.fix).collect::<Vec<_>>();
-
-        let mut result = sql.to_string();
-
-        let mut all_edits: Vec<&Edit> = fixes.iter().flat_map(|fix| &fix.edits).collect();
-
-        all_edits.sort_by(|a, b| b.text_range.start().cmp(&a.text_range.start()));
-
-        for edit in all_edits {
-            let start: usize = edit.text_range.start().into();
-            let end: usize = edit.text_range.end().into();
-            let text = edit.text.as_ref().map_or("", |v| v);
-            result.replace_range(start..end, text);
-        }
-
-        let file = squawk_syntax::SourceFile::parse(&result);
-        assert_eq!(
-            file.errors().len(),
-            0,
-            "Shouldn't introduce any syntax errors"
-        );
-        let mut linter = Linter::from([Rule::PreferRobustStmts]);
-        let errors = linter.lint(&file, &result);
-        assert_eq!(
-            errors.len(),
-            0,
-            "Fixes should remove all the linter errors."
-        );
-
-        result
+        fix_sql(sql, Rule::PreferRobustStmts)
     }
 
     #[test]
