@@ -246,6 +246,12 @@ impl Edit {
             text: Some(text.into()),
         }
     }
+    pub fn replace<T: Into<String>>(text_range: TextRange, text: T) -> Self {
+        Self {
+            text_range,
+            text: Some(text.into()),
+        }
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
