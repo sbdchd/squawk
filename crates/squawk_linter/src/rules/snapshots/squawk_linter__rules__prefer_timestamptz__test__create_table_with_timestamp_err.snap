@@ -10,7 +10,19 @@ expression: errors
         help: Some(
             "Use timestamptz instead of timestamp for your column type.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `timestamptz`",
+                edits: [
+                    Edit {
+                        text_range: 43..52,
+                        text: Some(
+                            "timestamptz",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
     Violation {
         code: PreferTimestampTz,
@@ -19,6 +31,18 @@ expression: errors
         help: Some(
             "Use timestamptz instead of timestamp for your column type.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `timestamptz`",
+                edits: [
+                    Edit {
+                        text_range: 99..126,
+                        text: Some(
+                            "timestamptz",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]
