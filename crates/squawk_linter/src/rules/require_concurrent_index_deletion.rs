@@ -6,13 +6,10 @@ use squawk_syntax::{
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
 fn concurrently_fix(drop_index: &ast::DropIndex) -> Option<Fix> {
-    if let Some(index_token) = drop_index.index_token() {
-        let at = index_token.text_range().end();
-        let edit = Edit::insert(" concurrently", at);
-        Some(Fix::new("Add `concurrently`", vec![edit]))
-    } else {
-        None
-    }
+    let index_token = drop_index.index_token()?;
+    let at = index_token.text_range().end();
+    let edit = Edit::insert(" concurrently", at);
+    Some(Fix::new("Add `concurrently`", vec![edit]))
 }
 
 pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<SourceFile>) {

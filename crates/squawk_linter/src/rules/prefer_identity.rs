@@ -32,13 +32,10 @@ fn replace_serial(serial_type: &str) -> &'static str {
 }
 
 fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
-    if let Some(type_name) = ty.syntax().first_token() {
-        let text = replace_serial(type_name.text());
-        let edit = Edit::replace(ty.syntax().text_range(), text);
-        Some(Fix::new("Replace with IDENTITY column", vec![edit]))
-    } else {
-        None
-    }
+    let type_name = ty.syntax().first_token()?;
+    let text = replace_serial(type_name.text());
+    let edit = Edit::replace(ty.syntax().text_range(), text);
+    Some(Fix::new("Replace with IDENTITY column", vec![edit]))
 }
 
 fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {

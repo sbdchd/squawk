@@ -128,10 +128,7 @@ pub fn lint(text: String) -> Result<JsValue, Error> {
             .to_wide(line_index::WideEncoding::Utf16, end)
             .unwrap();
 
-        let messages = match x.help {
-            Some(help) => vec![help],
-            None => vec![],
-        };
+        let messages = x.help.into_iter().collect();
 
         let fix = x.fix.map(|fix| {
             let edits = fix

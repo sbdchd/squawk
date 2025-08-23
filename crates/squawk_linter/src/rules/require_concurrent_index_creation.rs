@@ -8,13 +8,10 @@ use crate::{Edit, Fix, Linter, Rule, Violation, identifier::Identifier};
 use super::constraint_missing_not_valid::tables_created_in_transaction;
 
 fn concurrently_fix(create_index: &ast::CreateIndex) -> Option<Fix> {
-    if let Some(index_token) = create_index.index_token() {
-        let at = index_token.text_range().end();
-        let edit = Edit::insert(" concurrently", at);
-        Some(Fix::new("Add `concurrently`", vec![edit]))
-    } else {
-        None
-    }
+    let index_token = create_index.index_token()?;
+    let at = index_token.text_range().end();
+    let edit = Edit::insert(" concurrently", at);
+    Some(Fix::new("Add `concurrently`", vec![edit]))
 }
 
 pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<SourceFile>) {
