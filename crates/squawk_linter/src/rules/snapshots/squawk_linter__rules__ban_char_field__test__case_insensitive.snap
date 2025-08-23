@@ -1,0 +1,13 @@
+---
+source: crates/squawk_linter/src/rules/ban_char_field.rs
+expression: errors
+---
+[
+    Violation {
+        code: BanCharField,
+        message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
+        text_range: 22..26,
+        help: None,
+        fix: None,
+    },
+]
