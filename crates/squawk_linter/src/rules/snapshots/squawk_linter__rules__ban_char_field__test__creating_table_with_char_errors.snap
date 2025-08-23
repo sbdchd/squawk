@@ -5,30 +5,78 @@ expression: errors
 [
     Violation {
         code: BanCharField,
-        message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
+        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 77..86,
         help: None,
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `varchar`",
+                edits: [
+                    Edit {
+                        text_range: 77..81,
+                        text: Some(
+                            "varchar",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
     Violation {
         code: BanCharField,
-        message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
+        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 108..122,
         help: None,
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `varchar`",
+                edits: [
+                    Edit {
+                        text_range: 108..117,
+                        text: Some(
+                            "varchar",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
     Violation {
         code: BanCharField,
-        message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
+        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 147..151,
         help: None,
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `text`",
+                edits: [
+                    Edit {
+                        text_range: 147..151,
+                        text: Some(
+                            "text",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
     Violation {
         code: BanCharField,
-        message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
+        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 174..183,
         help: None,
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `text`",
+                edits: [
+                    Edit {
+                        text_range: 174..183,
+                        text: Some(
+                            "text",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]
