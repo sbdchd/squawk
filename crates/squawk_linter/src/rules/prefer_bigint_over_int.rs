@@ -32,16 +32,13 @@ fn int_to_bigint_replacement(int_type: &str) -> &'static str {
 }
 
 fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
-    if let Some(type_name) = ty.syntax().first_token() {
-        let i64 = int_to_bigint_replacement(type_name.text());
-        let edit = Edit::replace(ty.syntax().text_range(), i64);
-        Some(Fix::new(
-            format!("Replace with a 64-bit integer type: `{i64}`"),
-            vec![edit],
-        ))
-    } else {
-        None
-    }
+    let type_name = ty.syntax().first_token()?;
+    let i64 = int_to_bigint_replacement(type_name.text());
+    let edit = Edit::replace(ty.syntax().text_range(), i64);
+    Some(Fix::new(
+        format!("Replace with a 64-bit integer type: `{i64}`"),
+        vec![edit],
+    ))
 }
 
 fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {

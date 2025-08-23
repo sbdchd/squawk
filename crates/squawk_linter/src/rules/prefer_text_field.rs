@@ -50,26 +50,25 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
 }
 
 fn create_varchar_to_text_fix(ty: &ast::Type) -> Option<Fix> {
-    match ty {
+    let range = match ty {
         ast::Type::PathType(path_type) => {
             // we'll replace the entire path type, including args
             // so: `"varchar"(100)` becomes `text`
-            let edit = Edit::replace(path_type.syntax().text_range(), "text");
-            Some(Fix::new("Replace with `text`", vec![edit]))
+            path_type.syntax().text_range()
         }
         ast::Type::CharType(char_type) => {
             // we'll replace the entire char type, including args
             // so: `varchar(100)` becomes `text`
-            let edit = Edit::replace(char_type.syntax().text_range(), "text");
-            Some(Fix::new("Replace with `text`", vec![edit]))
+            char_type.syntax().text_range()
         }
         ast::Type::ArrayType(array_type) => {
             let ty = array_type.ty()?;
-            let edit = Edit::replace(ty.syntax().text_range(), "text");
-            Some(Fix::new("Replace with `text`", vec![edit]))
+            ty.syntax().text_range()
         }
-        _ => None,
-    }
+        _ => return None,
+    };
+    let edit = Edit::replace(range, "text");
+    Some(Fix::new("Replace with `text`", vec![edit]))
 }
 
 fn check_ty_for_varchar(ctx: &mut Linter, ty: Option<ast::Type>) {
