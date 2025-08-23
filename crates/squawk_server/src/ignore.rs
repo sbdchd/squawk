@@ -142,8 +142,11 @@ create table c (
             })
             .collect::<Vec<_>>();
         insta::assert_snapshot!(apply_text_edits(sql, ignore_line_edits), @r"
+        -- squawk-ignore-file prefer-bigint-over-int
         -- squawk-ignore-file prefer-robust-stmts
+        -- squawk-ignore-file prefer-bigint-over-int
         -- squawk-ignore-file prefer-robust-stmts
+        -- squawk-ignore-file prefer-bigint-over-int
         -- squawk-ignore-file prefer-robust-stmts
 
         -- some existing comment
