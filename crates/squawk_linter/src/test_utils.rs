@@ -39,8 +39,8 @@ pub(crate) fn fix_sql(sql: &str, rule: Rule) -> String {
 
     let file = squawk_syntax::SourceFile::parse(&result);
     assert_eq!(
-        file.errors().len(),
-        0,
+        file.errors(),
+        vec![],
         "Shouldn't introduce any syntax errors"
     );
     let mut linter = Linter::from([rule]);
