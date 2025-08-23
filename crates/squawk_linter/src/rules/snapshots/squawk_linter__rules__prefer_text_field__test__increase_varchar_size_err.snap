@@ -10,6 +10,18 @@ expression: errors
         help: Some(
             "Use a `TEXT` field with a `CHECK` constraint.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `text`",
+                edits: [
+                    Edit {
+                        text_range: 89..102,
+                        text: Some(
+                            "text",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]
