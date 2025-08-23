@@ -1,16 +1,25 @@
+use std::collections::HashSet;
+
 use squawk_syntax::{
     Parse, SourceFile, TokenText,
     ast::{self, AstNode},
 };
 
-use crate::visitors::check_not_allowed_types;
 use crate::{Linter, Rule, Violation};
+use crate::{identifier::Identifier, visitors::check_not_allowed_types};
+
+use lazy_static::lazy_static;
+
+lazy_static! {
+    static ref CHAR_TYPES: HashSet<Identifier> = HashSet::from([
+        Identifier::new("char"),
+        Identifier::new("character"),
+        Identifier::new("bpchar"),
+    ]);
+}
 
 fn is_char_type(x: TokenText<'_>) -> bool {
-    if x == "char" || x == "character" || x == "bpchar" {
-        return true;
-    }
-    false
+    CHAR_TYPES.contains(&Identifier::new(&x.to_string()))
 }
 
 fn check_path_type(ctx: &mut Linter, path_type: ast::PathType) {
@@ -119,6 +128,18 @@ create table t (
     m int array[],
     o pg_catalog.char,
     p char[]
+);
+        "#;
+        let errors = lint(sql, Rule::BanCharField);
+        assert_ne!(errors.len(), 0);
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn case_insensitive() {
+        let sql = r#"
+create table t (
+  a Char
 );
         "#;
         let errors = lint(sql, Rule::BanCharField);
