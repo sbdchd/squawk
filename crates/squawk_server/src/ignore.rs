@@ -28,13 +28,18 @@ pub(crate) fn ignore_line_edit(
 
     match previous_line_token.kind() {
         SyntaxKind::COMMENT if is_ignore_comment(&previous_line_token) => {
-            let (_str, range, _ignore_kind) =
+            let (_str, ignore_comment_range, _ignore_kind) =
                 squawk_linter::ignore::ignore_rule_info(&previous_line_token)?;
-            Some(Edit::insert(format!(" {rule_name},"), range.start()))
+            Some(Edit::insert(
+                format!(" {rule_name},"),
+                ignore_comment_range.start(),
+            ))
         }
+
+        // TODO: we need to handle indenting correctly
         _ => Some(Edit::insert(
             format!("-- {IGNORE_LINE_TEXT} {rule_name}\n"),
-            violation.text_range.start(),
+            line_index.line(violation_line.line)?.start(),
         )),
     }
 }
@@ -90,22 +95,25 @@ create table c (
             })
             .collect::<Vec<_>>();
         insta::assert_snapshot!(apply_text_edits(sql, ignore_line_edits), @r"
-    -- squawk-ignore prefer-robust-stmts
-    create table a (
-      a int
-    );
+        -- squawk-ignore prefer-robust-stmts
+        create table a (
+        -- squawk-ignore prefer-bigint-over-int
+          a int
+        );
 
-    -- an existing comment that shouldn't get in the way of us adding a new ignore
-    -- squawk-ignore prefer-robust-stmts
-    create table b (
-      b int
-    );
+        -- an existing comment that shouldn't get in the way of us adding a new ignore
+        -- squawk-ignore prefer-robust-stmts
+        create table b (
+        -- squawk-ignore prefer-bigint-over-int
+          b int
+        );
 
-    -- squawk-ignore prefer-robust-stmts, prefer-text-field
-    create table c (
-      b int
-    );
-    ");
+        -- squawk-ignore prefer-robust-stmts, prefer-text-field
+        create table c (
+        -- squawk-ignore prefer-bigint-over-int
+          b int
+        );
+        ");
     }
 
     #[test]
