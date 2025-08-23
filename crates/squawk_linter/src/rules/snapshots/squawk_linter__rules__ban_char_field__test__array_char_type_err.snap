@@ -5,9 +5,21 @@ expression: errors
 [
     Violation {
         code: BanCharField,
-        message: "Using `character` is likey a mistake and should almost always be replaced by `text` or `varchar`.",
+        message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
         text_range: 22..26,
         help: None,
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with `text`",
+                edits: [
+                    Edit {
+                        text_range: 22..26,
+                        text: Some(
+                            "text",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]
