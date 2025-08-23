@@ -3,18 +3,30 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation};
+use crate::{Edit, Fix, Linter, Rule, Violation};
+
+fn concurrently_fix(drop_index: &ast::DropIndex) -> Option<Fix> {
+    if let Some(index_token) = drop_index.index_token() {
+        let at = index_token.text_range().end();
+        let edit = Edit::insert(" concurrently", at);
+        Some(Fix::new("Add `concurrently`", vec![edit]))
+    } else {
+        None
+    }
+}
 
 pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for stmt in file.stmts() {
         if let ast::Stmt::DropIndex(drop_index) = stmt {
             if drop_index.concurrently_token().is_none() {
+                let fix = concurrently_fix(&drop_index);
+
                 ctx.report(Violation::for_node(
                     Rule::RequireConcurrentIndexDeletion,
             "A normal `DROP INDEX` acquires an `ACCESS EXCLUSIVE` lock on the table, blocking other accesses until the index drop can complete.".into(),
                     drop_index.syntax(),
-                ).help("Drop the index `CONCURRENTLY`."));
+                ).help("Drop the index `CONCURRENTLY`.").fix(fix));
             }
         }
     }
@@ -22,10 +34,37 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, assert_snapshot};
 
-    use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::{
+        Rule,
+        test_utils::{fix_sql, lint},
+    };
+
+    fn fix(sql: &str) -> String {
+        fix_sql(sql, Rule::RequireConcurrentIndexDeletion)
+    }
+
+    #[test]
+    fn fix_add_concurrently_simple() {
+        let sql = "drop index i;";
+        let result = fix(sql);
+        assert_snapshot!(result, @"drop index concurrently i;");
+    }
+
+    #[test]
+    fn fix_add_concurrently_if_exists() {
+        let sql = r#"DROP INDEX IF EXISTS "field_name_idx";"#;
+        let result = fix(sql);
+        assert_snapshot!(result, @r#"DROP INDEX concurrently IF EXISTS "field_name_idx";"#);
+    }
+
+    #[test]
+    fn fix_add_concurrently_multiple_indexes() {
+        let sql = r#"DROP INDEX "idx1", "idx2";"#;
+        let result = fix(sql);
+        assert_snapshot!(result, @r#"DROP INDEX concurrently "idx1", "idx2";"#);
+    }
 
     #[test]
     fn drop_index_missing_concurrently_err() {

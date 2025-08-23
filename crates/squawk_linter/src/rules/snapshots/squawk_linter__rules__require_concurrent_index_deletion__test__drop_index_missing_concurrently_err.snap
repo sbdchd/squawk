@@ -10,6 +10,18 @@ expression: errors
         help: Some(
             "Drop the index `CONCURRENTLY`.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Add `concurrently`",
+                edits: [
+                    Edit {
+                        text_range: 29..29,
+                        text: Some(
+                            " concurrently",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]
