@@ -11,6 +11,9 @@ use squawk_linter::Linter;
 use squawk_linter::Rule;
 use squawk_linter::Version;
 use squawk_syntax::SourceFile;
+use std::hash::DefaultHasher;
+use std::hash::Hash;
+use std::hash::Hasher;
 use std::io;
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -359,6 +362,86 @@ pub fn fmt_github_annotations<W: io::Write>(f: &mut W, reports: &[CheckReport]) 
     Ok(())
 }
 
+#[derive(Serialize)]
+struct GitLabLines {
+    begin: usize,
+    end: usize,
+}
+
+#[derive(Serialize)]
+struct GitLabLocation {
+    path: String,
+    lines: GitLabLines,
+}
+
+#[derive(Serialize)]
+struct GitLabIssue {
+    description: String,
+    severity: String,
+    fingerprint: String,
+    location: GitLabLocation,
+    check_name: String,
+}
+
+impl From<&ViolationLevel> for String {
+    fn from(level: &ViolationLevel) -> Self {
+        match level {
+            ViolationLevel::Warning => "minor".to_string(),
+            ViolationLevel::Error => "major".to_string(),
+        }
+    }
+}
+
+fn make_fingerprint(v: &ReportViolation) -> String {
+    let key = format!(
+        "{}:{}-{}:{}:{}:{}",
+        v.file, v.line, v.line_end, v.rule_name, v.message, v.level
+    );
+    let mut hasher = DefaultHasher::new();
+    key.hash(&mut hasher);
+    format!("{:x}", hasher.finish())
+}
+
+fn to_gitlab_issue(v: &ReportViolation) -> GitLabIssue {
+    let mut desc = v.message.clone();
+    if let Some(help) = &v.help {
+        if !help.trim().is_empty() {
+            desc.push_str(" Suggestion: ");
+            desc.push_str(help.trim());
+        }
+    }
+
+    GitLabIssue {
+        description: desc,
+        severity: String::from(&v.level),
+        fingerprint: make_fingerprint(v),
+        location: GitLabLocation {
+            path: v.file.clone(),
+            lines: GitLabLines {
+                begin: v.line,
+                end: if v.line_end >= v.line {
+                    v.line_end
+                } else {
+                    v.line
+                },
+            },
+        },
+        check_name: v.rule_name.clone(),
+    }
+}
+
+fn fmt_gitlab<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> {
+    let issues: Vec<GitLabIssue> = reports
+        .into_iter()
+        .flat_map(|r| r.violations.into_iter())
+        .map(|v| to_gitlab_issue(&v))
+        .collect();
+
+    let json = serde_json::to_string(&issues)?;
+    writeln!(f, "{json}")?;
+    Ok(())
+}
+
 #[derive(Debug)]
 pub struct CheckReport {
     pub filename: String,
@@ -379,6 +462,7 @@ pub fn print_violations<W: io::Write>(
         Reporter::Gcc => fmt_gcc(writer, &reports),
         Reporter::Json => fmt_json(writer, reports),
         Reporter::Tty => fmt_tty(writer, &reports),
+        Reporter::Gitlab => fmt_gitlab(writer, reports),
     }
 }
 

@@ -80,6 +80,7 @@ arg_enum! {
         Tty,
         Gcc,
         Json,
+        Gitlab,
     }
 }
 
