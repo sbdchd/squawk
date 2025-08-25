@@ -179,7 +179,7 @@ You can also ignore multiple rules by making a comma seperated list:
 alter table t drop column c cascade;
 ```
 
-To ignore a rule for the entire rule, use `squawk-ignore-file`:
+To ignore a rule for the entire file, use `squawk-ignore-file`:
 
 ```sql
 -- squawk-ignore-file ban-drop-column

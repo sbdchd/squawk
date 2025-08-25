@@ -10,7 +10,19 @@ expression: errors
         help: Some(
             "Use 64-bit integer values instead to prevent hitting this limit.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with a 64-bit integer type: `bigint`",
+                edits: [
+                    Edit {
+                        text_range: 29..37,
+                        text: Some(
+                            "bigint",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
     Violation {
         code: PreferBigintOverSmallint,
@@ -19,7 +31,19 @@ expression: errors
         help: Some(
             "Use 64-bit integer values instead to prevent hitting this limit.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with a 64-bit integer type: `int8`",
+                edits: [
+                    Edit {
+                        text_range: 69..73,
+                        text: Some(
+                            "int8",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
     Violation {
         code: PreferBigintOverSmallint,
@@ -28,7 +52,19 @@ expression: errors
         help: Some(
             "Use 64-bit integer values instead to prevent hitting this limit.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with a 64-bit integer type: `bigserial`",
+                edits: [
+                    Edit {
+                        text_range: 105..116,
+                        text: Some(
+                            "bigserial",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
     Violation {
         code: PreferBigintOverSmallint,
@@ -37,6 +73,18 @@ expression: errors
         help: Some(
             "Use 64-bit integer values instead to prevent hitting this limit.",
         ),
-        fix: None,
+        fix: Some(
+            Fix {
+                title: "Replace with a 64-bit integer type: `serial8`",
+                edits: [
+                    Edit {
+                        text_range: 148..155,
+                        text: Some(
+                            "serial8",
+                        ),
+                    },
+                ],
+            },
+        ),
     },
 ]

@@ -5,7 +5,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, identifier::Identifier};
+use crate::{Edit, Fix, Linter, Rule, Violation, identifier::Identifier};
 
 use crate::visitors::check_not_allowed_types;
 
@@ -49,14 +49,37 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
     }
 }
 
+fn create_varchar_to_text_fix(ty: &ast::Type) -> Option<Fix> {
+    let range = match ty {
+        ast::Type::PathType(path_type) => {
+            // we'll replace the entire path type, including args
+            // so: `"varchar"(100)` becomes `text`
+            path_type.syntax().text_range()
+        }
+        ast::Type::CharType(char_type) => {
+            // we'll replace the entire char type, including args
+            // so: `varchar(100)` becomes `text`
+            char_type.syntax().text_range()
+        }
+        ast::Type::ArrayType(array_type) => {
+            let ty = array_type.ty()?;
+            ty.syntax().text_range()
+        }
+        _ => return None,
+    };
+    let edit = Edit::replace(range, "text");
+    Some(Fix::new("Replace with `text`", vec![edit]))
+}
+
 fn check_ty_for_varchar(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty {
         if is_not_allowed_varchar(&ty) {
+            let fix = create_varchar_to_text_fix(&ty);
             ctx.report(Violation::for_node(
                 Rule::PreferTextField,
                "Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.".to_string(),
                 ty.syntax(),
-            ).help("Use a `TEXT` field with a `CHECK` constraint."));
+            ).help("Use a `TEXT` field with a `CHECK` constraint.").fix(fix));
         };
     }
 }
@@ -68,10 +91,16 @@ pub(crate) fn prefer_text_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, assert_snapshot};
 
-    use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::{
+        Rule,
+        test_utils::{fix_sql, lint},
+    };
+
+    fn fix(sql: &str) -> String {
+        fix_sql(sql, Rule::PreferTextField)
+    }
 
     /// Changing a column of varchar(255) to varchar(1000) requires an ACCESS
     /// EXCLUSIVE lock
@@ -161,5 +190,42 @@ COMMIT;
         "#;
         let errors = lint(sql, Rule::PreferTextField);
         assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn fix_varchar_with_length() {
+        assert_snapshot!(fix("CREATE TABLE t (c varchar(100));"), @"CREATE TABLE t (c text);");
+        assert_snapshot!(fix("CREATE TABLE t (c varchar(255));"), @"CREATE TABLE t (c text);");
+        assert_snapshot!(fix("CREATE TABLE t (c varchar(50));"), @"CREATE TABLE t (c text);");
+    }
+
+    #[test]
+    fn fix_mixed_case_varchar() {
+        assert_snapshot!(fix("CREATE TABLE t (c VARCHAR(100));"), @"CREATE TABLE t (c text);");
+        assert_snapshot!(fix("CREATE TABLE t (c Varchar(50));"), @"CREATE TABLE t (c text);");
+        assert_snapshot!(fix("CREATE TABLE t (c VarChar(255));"), @"CREATE TABLE t (c text);");
+    }
+
+    #[test]
+    fn fix_varchar_arrays() {
+        assert_snapshot!(fix("CREATE TABLE t (c varchar(100)[]);"), @"CREATE TABLE t (c text[]);");
+        assert_snapshot!(fix("CREATE TABLE t (c varchar(255)[5]);"), @"CREATE TABLE t (c text[5]);");
+        assert_snapshot!(fix("CREATE TABLE t (c varchar(50)[3][4]);"), @"CREATE TABLE t (c text[3][4]);");
+    }
+
+    #[test]
+    fn fix_alter_table() {
+        assert_snapshot!(fix("ALTER TABLE t ADD COLUMN c varchar(100);"), @"ALTER TABLE t ADD COLUMN c text;");
+        assert_snapshot!(fix("ALTER TABLE t ALTER COLUMN c TYPE varchar(256);"), @"ALTER TABLE t ALTER COLUMN c TYPE text;");
+    }
+
+    #[test]
+    fn fix_multiple_varchar_columns() {
+        assert_snapshot!(fix("CREATE TABLE t (a varchar(100), b varchar(255), c varchar(50));"), @"CREATE TABLE t (a text, b text, c text);");
+    }
+
+    #[test]
+    fn fix_pgcatalog_varchar() {
+        assert_snapshot!(fix("CREATE TABLE t (c pg_catalog.varchar(100));"), @"CREATE TABLE t (c text);");
     }
 }

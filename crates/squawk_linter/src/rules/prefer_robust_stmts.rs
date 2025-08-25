@@ -58,15 +58,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                 continue;
                             }
 
-                            let fix = if let Some(constraint_token) =
-                                drop_constraint.constraint_token()
-                            {
+                            let fix = drop_constraint.constraint_token().map(|constraint_token| {
                                 let at = constraint_token.text_range().end();
                                 let edit = Edit::insert(" if exists", at);
-                                Some(Fix::new("Insert `if exists`", vec![edit]))
-                            } else {
-                                None
-                            };
+                                Fix::new("Insert `if exists`", vec![edit])
+                            });
 
                             (ActionErrorMessage::IfExists, fix)
                         }
@@ -75,13 +71,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                 continue;
                             }
 
-                            let fix = if let Some(column_token) = add_column.column_token() {
+                            let fix = add_column.column_token().map(|column_token| {
                                 let at = column_token.text_range().end();
                                 let edit = Edit::insert(" if not exists", at);
-                                Some(Fix::new("Insert `if not exists`", vec![edit]))
-                            } else {
-                                None
-                            };
+                                Fix::new("Insert `if not exists`", vec![edit])
+                            });
                             (ActionErrorMessage::IfNotExists, fix)
                         }
                         ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
@@ -113,13 +107,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                 continue;
                             }
 
-                            let fix = if let Some(column_token) = drop_column.column_token() {
+                            let fix = drop_column.column_token().map(|column_token| {
                                 let at = column_token.text_range().end();
                                 let edit = Edit::insert(" if exists", at);
-                                Some(Fix::new("Insert `if exists`", vec![edit]))
-                            } else {
-                                None
-                            };
+                                Fix::new("Insert `if exists`", vec![edit])
+                            });
                             (ActionErrorMessage::IfExists, fix)
                         }
                         _ => (ActionErrorMessage::None, None),
@@ -152,13 +144,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                     && create_index.name().is_some()
                     && (create_index.concurrently_token().is_some() || !inside_transaction) =>
             {
-                let fix = if let Some(name) = create_index.name() {
+                let fix = create_index.name().map(|name| {
                     let at = name.syntax().text_range().start();
                     let edit = Edit::insert("if not exists ", at);
-                    Some(Fix::new("Insert `if not exists`", vec![edit]))
-                } else {
-                    None
-                };
+                    Fix::new("Insert `if not exists`", vec![edit])
+                });
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
                     "Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.".into(),
@@ -168,13 +158,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::CreateTable(create_table)
                 if create_table.if_not_exists().is_none() && !inside_transaction =>
             {
-                let fix = if let Some(table_token) = create_table.table_token() {
+                let fix = create_table.table_token().map(|table_token| {
                     let at = table_token.text_range().end();
                     let edit = Edit::insert(" if not exists", at);
-                    Some(Fix::new("Insert `if not exists`", vec![edit]))
-                } else {
-                    None
-                };
+                    Fix::new("Insert `if not exists`", vec![edit])
+                });
 
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
@@ -185,13 +173,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropIndex(drop_index)
                 if drop_index.if_exists().is_none() && !inside_transaction =>
             {
-                let fix = if let Some(first_index) = drop_index.paths().next() {
+                let fix = drop_index.paths().next().map(|first_index| {
                     let at = first_index.syntax().text_range().start();
                     let edit = Edit::insert("if exists ", at);
-                    Some(Fix::new("Insert `if exists`", vec![edit]))
-                } else {
-                    None
-                };
+                    Fix::new("Insert `if exists`", vec![edit])
+                });
 
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
@@ -202,13 +188,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropTable(drop_table)
                 if drop_table.if_exists().is_none() && !inside_transaction =>
             {
-                let fix = if let Some(table_token) = drop_table.table_token() {
+                let fix = drop_table.table_token().map(|table_token| {
                     let at = table_token.text_range().end();
                     let edit = Edit::insert(" if exists", at);
-                    Some(Fix::new("Insert `if exists`", vec![edit]))
-                } else {
-                    None
-                };
+                    Fix::new("Insert `if exists`", vec![edit])
+                });
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,
                     "Missing `IF EXISTS`, the migration can't be rerun if it fails part way through.".into(),
@@ -218,13 +202,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             ast::Stmt::DropType(drop_type)
                 if drop_type.if_exists().is_none() && !inside_transaction =>
             {
-                let fix = if let Some(type_token) = drop_type.type_token() {
+                let fix = drop_type.type_token().map(|type_token| {
                     let at = type_token.text_range().end();
                     let edit = Edit::insert(" if exists", at);
-                    Some(Fix::new("Insert `if exists`", vec![edit]))
-                } else {
-                    None
-                };
+                    Fix::new("Insert `if exists`", vec![edit])
+                });
 
                 ctx.report(Violation::for_node(
                     Rule::PreferRobustStmts,

@@ -3,9 +3,16 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation, identifier::Identifier};
+use crate::{Edit, Fix, Linter, Rule, Violation, identifier::Identifier};
 
 use super::constraint_missing_not_valid::tables_created_in_transaction;
+
+fn concurrently_fix(create_index: &ast::CreateIndex) -> Option<Fix> {
+    let index_token = create_index.index_token()?;
+    let at = index_token.text_range().end();
+    let edit = Edit::insert(" concurrently", at);
+    Some(Fix::new("Add `concurrently`", vec![edit]))
+}
 
 pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
@@ -21,11 +28,15 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
                 if create_index.concurrently_token().is_none()
                     && !tables_created.contains(&Identifier::new(&table_name.text()))
                 {
+                    let fix = concurrently_fix(&create_index);
+
                     ctx.report(Violation::for_node(
                         Rule::RequireConcurrentIndexCreation,
                 "During normal index creation, table updates are blocked, but reads are still allowed.".into(),
                         create_index.syntax(),
-                    ).help("Use `CONCURRENTLY` to avoid blocking writes."));
+                    )
+                    .help("Use `concurrently` to avoid blocking writes.")
+                    .fix(fix));
                 }
             }
         }
@@ -34,12 +45,28 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, parse: &Parse<
 
 #[cfg(test)]
 mod test {
-    use insta::assert_debug_snapshot;
+    use insta::{assert_debug_snapshot, assert_snapshot};
 
     use crate::{
         Rule,
-        test_utils::{lint, lint_with_assume_in_transaction},
+        test_utils::{fix_sql, lint, lint_with_assume_in_transaction},
     };
+
+    fn fix(sql: &str) -> String {
+        fix_sql(sql, Rule::RequireConcurrentIndexCreation)
+    }
+
+    #[test]
+    fn fix_add_concurrently_named_index() {
+        assert_snapshot!(fix("CREATE INDEX i ON t (c);"), @"CREATE INDEX concurrently i ON t (c);");
+    }
+
+    #[test]
+    fn fix_add_concurrently_unnamed_index() {
+        assert_snapshot!(fix("
+CREATE INDEX ON t (a);
+"), @"CREATE INDEX concurrently ON t (a);");
+    }
 
     /// ```sql
     /// -- instead of

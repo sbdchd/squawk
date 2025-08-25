@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.24.0 - 2025-08-24
+
+## Added
+
+- linter: quick fixes for prefer-text-field (#621), ban-char-field (#620), prefer-bigint-over-int, prefer-bigint-over-small-int (#618), and prefer-timestamptz (#617).
+
+## Fixed
+
+- Fixed typos in linter docs (#623). Thanks @benedikt-bartscher!
+
+- linter: fix ban-char-field to be case insensitive (#619).
+
 ## v2.23.0 - 2025-08-20
 
 ## Added
