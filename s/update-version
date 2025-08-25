@@ -7,8 +7,13 @@ main() {
     NEW_VERSION="$1"
 
     if [ -z "$NEW_VERSION" ]; then
-        echo "Error: NEW_VERSION is required. Usage: $0 <version>"
-        exit 1
+        NEW_VERSION=$(awk -F'[".]' '/^version = / {print $2 "." ($3+1) ".0"}' crates/squawk/Cargo.toml)
+        if [ -z "$NEW_VERSION" ]; then
+            echo "Error: Could not determine current version"
+            exit 1
+        fi
+        
+        echo "Auto-incrementing to $NEW_VERSION"
     fi
 
     echo "Checking out master branch..."
