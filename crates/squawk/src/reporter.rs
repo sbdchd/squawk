@@ -609,6 +609,30 @@ SELECT 1;
     }
 
     #[test]
+    fn display_violations_gitlab() {
+        let sql = r#"
+   ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
+SELECT 1;
+"#;
+        let filename = "main.sql";
+        let mut buff = Vec::new();
+
+        let res = print_violations(
+            &mut buff,
+            vec![check_sql(sql, filename, &[], None, false)],
+            &Reporter::Gitlab,
+            false,
+        );
+
+        assert!(res.is_ok());
+
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r###"
+        [{"description":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required. Suggestion: Make the field nullable or add a non-VOLATILE DEFAULT","severity":"minor","fingerprint":"87fbb54d93cdb8c9","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"adding-required-field"},{"description":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","severity":"minor","fingerprint":"21df0ee3817ad84","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"prefer-robust-stmts"},{"description":"Using 32-bit integer fields can result in hitting the max `int` limit. Suggestion: Use 64-bit integer values instead to prevent hitting this limit.","severity":"minor","fingerprint":"3d0e81dc13bc8757","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"prefer-bigint-over-int"},{"description":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required. Suggestion: Make the field nullable or add a non-VOLATILE DEFAULT","severity":"minor","fingerprint":"4bdd655ad8e102ad","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"adding-required-field"},{"description":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","severity":"minor","fingerprint":"1b2e8c81e717c442","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"prefer-robust-stmts"},{"description":"Using 32-bit integer fields can result in hitting the max `int` limit. Suggestion: Use 64-bit integer values instead to prevent hitting this limit.","severity":"minor","fingerprint":"2bed2a431803b811","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"prefer-bigint-over-int"}]
+        "###);
+    }
+
+    #[test]
     fn span_offsets() {
         let sql = r#"
 
