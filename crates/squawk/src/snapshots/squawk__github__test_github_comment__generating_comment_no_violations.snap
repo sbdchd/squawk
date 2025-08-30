@@ -1,11 +1,10 @@
 ---
-source: crates/cli/src/github.rs
+source: crates/squawk/src/github.rs
 expression: body
 ---
 # Squawk Report
 
 ### **✅ 0** violations across **2** file(s)
-
 ---
 
 <h3><code>alpha.sql</code></h3>
