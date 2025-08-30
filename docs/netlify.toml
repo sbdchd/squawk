@@ -1,2 +1,2 @@
 [build]
-  environment = { NODE_VERSION = "20.18.0" }
+  environment = { NODE_VERSION = "20.18.1" }
