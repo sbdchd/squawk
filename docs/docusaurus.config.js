@@ -10,29 +10,29 @@ module.exports = {
   projectName: "squawk", // Usually your repo name.
   themeConfig: {
     prism: {
-      additionalLanguages: ['toml'],
-      theme: require('prism-react-renderer/themes/oceanicNext'),
+      additionalLanguages: ["toml"],
+      theme: require("prism-react-renderer/themes/oceanicNext"),
     },
     algolia: {
       appId: process.env.ALGOLIA_APP_ID,
       apiKey: process.env.ALGOLIA_API_KEY,
       indexName: process.env.ALGOLIA_INDEX_NAME,
     },
-    sidebarCollapsible: false,
     colorMode: {
       defaultMode: "light",
       disableSwitch: true,
       respectPrefersColorScheme: false,
     },
-    image: 'img/squawk-wordmark.png',
-    metadatas: [
+    image: "img/squawk-wordmark.png",
+    metadata: [
       {
-        name: 'title',
-        content: 'Squawk — a linter for Postgres migrations'
+        name: "title",
+        content: "Squawk — a linter for Postgres migrations",
       },
       {
-        name: 'description',
-        content: 'Reveal blocking schema changes with the Squawk CLI and GitHub App.'
+        name: "description",
+        content:
+          "Reveal blocking schema changes with the Squawk CLI and GitHub App.",
       },
     ],
     navbar: {
@@ -113,6 +113,7 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve("./sidebars.js"),
+          sidebarCollapsible: false,
           // Please change this to your repo.
           editUrl: "https://github.com/sbdchd/squawk/edit/master/docs/",
         },
