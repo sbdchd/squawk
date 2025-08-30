@@ -11,11 +11,11 @@ use squawk_linter::{Rule, Version};
 use structopt::clap::arg_enum;
 
 use crate::file_finding::find_paths;
-use std::io::IsTerminal;
 use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
 use std::io;
+use std::io::IsTerminal;
 use std::panic;
 use std::path::PathBuf;
 use std::process::{self, ExitCode};

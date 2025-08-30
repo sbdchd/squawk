@@ -51,7 +51,7 @@ fn ensure_rustfmt(sh: &Shell) {
 fn reformat(text: String) -> String {
     let sh = Shell::new().unwrap();
     ensure_rustfmt(&sh);
-    let mut stdout = cmd!(sh, "rustup run stable rustfmt")
+    let mut stdout = cmd!(sh, "rustup run stable rustfmt --edition=2024")
         .stdin(text)
         .read()
         .unwrap();
