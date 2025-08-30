@@ -41,6 +41,16 @@ impl ast::Constraint {
     }
 }
 
+impl ast::BinExpr {
+    pub fn lhs(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+
+    pub fn rhs(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).nth(1)
+    }
+}
+
 impl ast::NameRef {
     #[inline]
     pub fn text(&self) -> TokenText<'_> {

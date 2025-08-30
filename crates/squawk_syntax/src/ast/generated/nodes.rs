@@ -1348,15 +1348,7 @@ pub struct BinExpr {
 }
 impl BinExpr {
     #[inline]
-    pub fn lhs(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn op(&self) -> Option<Op> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn rhs(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
 }
