@@ -21,7 +21,6 @@ tempfile.workspace = true
 serde.workspace = true
 structopt.workspace = true
 console.workspace = true
-atty.workspace = true
 base64.workspace = true
 simplelog.workspace = true
 log.workspace = true
