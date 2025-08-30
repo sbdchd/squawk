@@ -11,7 +11,7 @@ use squawk_linter::{Rule, Version};
 use structopt::clap::arg_enum;
 
 use crate::file_finding::find_paths;
-use atty::Stream;
+use std::io::IsTerminal;
 use config::Config;
 use log::info;
 use simplelog::CombinedLogger;
@@ -219,7 +219,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
     info!("assume in a transaction: {assume_in_transaction:?}");
 
     let mut clap_app = Opt::clap();
-    let is_stdin = !atty::is(Stream::Stdin);
+    let is_stdin = !io::stdin().is_terminal();
     let github_annotations = std::env::var("GITHUB_ACTIONS").is_ok()
         && std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_err();
     match opts.cmd {
