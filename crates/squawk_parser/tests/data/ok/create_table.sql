@@ -351,3 +351,7 @@ create table t (
   d int storage main,
   e int storage default
 );
+
+create table operator (
+  x int
+);
