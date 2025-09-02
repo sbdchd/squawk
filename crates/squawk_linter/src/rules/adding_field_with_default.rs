@@ -6,7 +6,7 @@ use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile};
 
 use crate::identifier::Identifier;
-use crate::{Linter, Rule, Violation};
+use crate::{Linter, Rule, Version, Violation};
 
 fn is_const_expr(expr: &ast::Expr) -> bool {
     match expr {
@@ -55,8 +55,7 @@ fn is_non_volatile(expr: &ast::Expr) -> bool {
 const NON_VOLATILE_BUILT_IN_FUNCTIONS: &str = include_str!("non_volatile_built_in_functions.txt");
 
 pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let message =
-        "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock.";
+    let message = "Adding a generated column requires a table rewrite with an `ACCESS EXCLUSIVE` lock. In Postgres versions 11+, non-VOLATILE DEFAULTs can be added without a rewrite.";
     let help = "Add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead.";
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
@@ -70,7 +69,9 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                 let Some(expr) = default.expr() else {
                                     continue;
                                 };
-                                if is_const_expr(&expr) || is_non_volatile(&expr) {
+                                if ctx.settings.pg_version > Version::new(11, None, None)
+                                    && (is_const_expr(&expr) || is_non_volatile(&expr))
+                                {
                                     continue;
                                 }
                                 ctx.report(
@@ -106,13 +107,10 @@ mod test {
     use insta::assert_debug_snapshot;
 
     use crate::Rule;
-    use crate::test_utils::lint;
+    use crate::test_utils::{lint, lint_with_postgres_version};
 
     #[test]
     fn docs_example_ok_post_pg_11() {
-        // TODO: differing from squawk because we aren't checking the postgres
-        // version, maybe we should be default to a more recent version like 15
-        // instead of 11?
         let sql = r#"
 -- instead of
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
@@ -274,6 +272,18 @@ ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;
         "#;
 
         let errors = lint(sql, Rule::AddingFieldWithDefault);
+        assert!(!errors.is_empty());
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn docs_example_error_on_pg_11() {
+        let sql = r#"
+-- instead of
+ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
+        "#;
+
+        let errors = lint_with_postgres_version(sql, Rule::AddingFieldWithDefault, "11");
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
