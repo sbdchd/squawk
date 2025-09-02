@@ -3379,4 +3379,30 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
   SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          OPERATOR_KW "operator"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "x"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
   WHITESPACE "\n"
