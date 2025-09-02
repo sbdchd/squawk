@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.25.0 - 2025-09-02
+
+## Added
+
+- linter: `--no-error-on-unmatched-pattern` argument to not exit with an error if no files are matched (default: false) (#639). Thanks @PascalFrenz!
+- linter: gitlab reporter (#624). Thanks @benedikt-bartscher!
+
+## Fixed
+
+- linter: adding-field-with-default now checks that the postgres version is `<= 11` before reporting an error for non-volatile defaults (#637). Thanks @ermakov-oleg!
+
+- linter: github commenting truncates when too large (#605). Thanks @ienugr!
+
+- parser: parsing path's named `operator` now works (#640).
+
+  Previously the following would error:
+
+  ```sql
+  create table operator();
+  ```
+
+- squawk_syntax: `ast::BinExpr` `lhs` & `rhs` properties now work correctly (#634).
+- internal: bumped a bunch of outdated JS & Rust dependencies (#630), (#631), (#632), (#633).
+
 ## v2.24.0 - 2025-08-24
 
 ## Added
