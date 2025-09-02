@@ -29,7 +29,7 @@
     "typescript": "^3.9.5"
   },
   "dependencies": {
-    "node-fetch": "^2.6.0"
+    "node-fetch": "2.6.7"
   },
   "volta": {
     "node": "20.18.0"

@@ -11,6 +11,9 @@ use squawk_linter::Linter;
 use squawk_linter::Rule;
 use squawk_linter::Version;
 use squawk_syntax::SourceFile;
+use std::hash::DefaultHasher;
+use std::hash::Hash;
+use std::hash::Hasher;
 use std::io;
 use std::path::PathBuf;
 use std::process::ExitCode;
@@ -359,6 +362,86 @@ pub fn fmt_github_annotations<W: io::Write>(f: &mut W, reports: &[CheckReport]) 
     Ok(())
 }
 
+#[derive(Serialize)]
+struct GitLabLines {
+    begin: usize,
+    end: usize,
+}
+
+#[derive(Serialize)]
+struct GitLabLocation {
+    path: String,
+    lines: GitLabLines,
+}
+
+#[derive(Serialize)]
+struct GitLabIssue {
+    description: String,
+    severity: String,
+    fingerprint: String,
+    location: GitLabLocation,
+    check_name: String,
+}
+
+impl From<&ViolationLevel> for String {
+    fn from(level: &ViolationLevel) -> Self {
+        match level {
+            ViolationLevel::Warning => "minor".to_string(),
+            ViolationLevel::Error => "major".to_string(),
+        }
+    }
+}
+
+fn make_fingerprint(v: &ReportViolation) -> String {
+    let key = format!(
+        "{}:{}-{}:{}:{}:{}",
+        v.file, v.line, v.line_end, v.rule_name, v.message, v.level
+    );
+    let mut hasher = DefaultHasher::new();
+    key.hash(&mut hasher);
+    format!("{:x}", hasher.finish())
+}
+
+fn to_gitlab_issue(v: &ReportViolation) -> GitLabIssue {
+    let mut desc = v.message.clone();
+    if let Some(help) = &v.help {
+        if !help.trim().is_empty() {
+            desc.push_str(" Suggestion: ");
+            desc.push_str(help.trim());
+        }
+    }
+
+    GitLabIssue {
+        description: desc,
+        severity: String::from(&v.level),
+        fingerprint: make_fingerprint(v),
+        location: GitLabLocation {
+            path: v.file.clone(),
+            lines: GitLabLines {
+                begin: v.line,
+                end: if v.line_end >= v.line {
+                    v.line_end
+                } else {
+                    v.line
+                },
+            },
+        },
+        check_name: v.rule_name.clone(),
+    }
+}
+
+fn fmt_gitlab<W: io::Write>(f: &mut W, reports: Vec<CheckReport>) -> Result<()> {
+    let issues: Vec<GitLabIssue> = reports
+        .into_iter()
+        .flat_map(|r| r.violations.into_iter())
+        .map(|v| to_gitlab_issue(&v))
+        .collect();
+
+    let json = serde_json::to_string(&issues)?;
+    writeln!(f, "{json}")?;
+    Ok(())
+}
+
 #[derive(Debug)]
 pub struct CheckReport {
     pub filename: String,
@@ -379,6 +462,7 @@ pub fn print_violations<W: io::Write>(
         Reporter::Gcc => fmt_gcc(writer, &reports),
         Reporter::Json => fmt_json(writer, reports),
         Reporter::Tty => fmt_tty(writer, &reports),
+        Reporter::Gitlab => fmt_gitlab(writer, reports),
     }
 }
 
@@ -522,6 +606,30 @@ SELECT 1;
 
         assert!(res.is_ok());
         assert_snapshot!(String::from_utf8_lossy(&buff), @r#"[{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field","column_end":62,"line_end":1},{"file":"main.sql","line":1,"column":29,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","help":null,"rule_name":"prefer-robust-stmts","column_end":62,"line_end":1},{"file":"main.sql","line":1,"column":46,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int","column_end":53,"line_end":1},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.","help":"Make the field nullable or add a non-VOLATILE DEFAULT","rule_name":"adding-required-field","column_end":56,"line_end":2},{"file":"main.sql","line":2,"column":23,"level":"Warning","message":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","help":null,"rule_name":"prefer-robust-stmts","column_end":56,"line_end":2},{"file":"main.sql","line":2,"column":40,"level":"Warning","message":"Using 32-bit integer fields can result in hitting the max `int` limit.","help":"Use 64-bit integer values instead to prevent hitting this limit.","rule_name":"prefer-bigint-over-int","column_end":47,"line_end":2}]"#);
+    }
+
+    #[test]
+    fn display_violations_gitlab() {
+        let sql = r#"
+   ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+ALTER TABLE "core_foo" ADD COLUMN "bar" integer NOT NULL;
+SELECT 1;
+"#;
+        let filename = "main.sql";
+        let mut buff = Vec::new();
+
+        let res = print_violations(
+            &mut buff,
+            vec![check_sql(sql, filename, &[], None, false)],
+            &Reporter::Gitlab,
+            false,
+        );
+
+        assert!(res.is_ok());
+
+        assert_snapshot!(String::from_utf8_lossy(&buff), @r###"
+        [{"description":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required. Suggestion: Make the field nullable or add a non-VOLATILE DEFAULT","severity":"minor","fingerprint":"87fbb54d93cdb8c9","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"adding-required-field"},{"description":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","severity":"minor","fingerprint":"21df0ee3817ad84","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"prefer-robust-stmts"},{"description":"Using 32-bit integer fields can result in hitting the max `int` limit. Suggestion: Use 64-bit integer values instead to prevent hitting this limit.","severity":"minor","fingerprint":"3d0e81dc13bc8757","location":{"path":"main.sql","lines":{"begin":1,"end":1}},"check_name":"prefer-bigint-over-int"},{"description":"Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required. Suggestion: Make the field nullable or add a non-VOLATILE DEFAULT","severity":"minor","fingerprint":"4bdd655ad8e102ad","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"adding-required-field"},{"description":"Missing `IF NOT EXISTS`, the migration can't be rerun if it fails part way through.","severity":"minor","fingerprint":"1b2e8c81e717c442","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"prefer-robust-stmts"},{"description":"Using 32-bit integer fields can result in hitting the max `int` limit. Suggestion: Use 64-bit integer values instead to prevent hitting this limit.","severity":"minor","fingerprint":"2bed2a431803b811","location":{"path":"main.sql","lines":{"begin":2,"end":2}},"check_name":"prefer-bigint-over-int"}]
+        "###);
     }
 
     #[test]

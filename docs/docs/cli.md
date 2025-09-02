@@ -130,49 +130,60 @@ USAGE:
     squawk [FLAGS] [OPTIONS] [path]... [SUBCOMMAND]
 
 FLAGS:
-        --assume-in-transaction
+        --assume-in-transaction            
             Assume that a transaction will wrap each SQL file when run by a migration tool
-
+            
             Use --no-assume-in-transaction to override any config file that sets this
-    -h, --help
+    -h, --help                             
             Prints help information
 
-    -V, --version
+        --no-error-on-unmatched-pattern    
+            Do not exit with an error when provided path patterns do not match any files
+
+    -V, --version                          
             Prints version information
 
-        --verbose
+        --verbose                          
             Enable debug logging output
 
 
 OPTIONS:
-    -c, --config <config-path>
+    -c, --config <config-path>               
             Path to the squawk config file (.squawk.toml)
 
-        --debug <format>
-            Output debug format [possible values: Lex, Parsed]
+        --debug <format>                     
+            Output debug format [possible values: Lex, Parse, Ast]
 
-    -e, --exclude <rule>...
+        --exclude-path <excluded-path>...    
+            Paths to exclude
+            
+            For example:
+            
+            `--exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql`
+            
+            `--exclude-path='*user_ids.sql'`
+    -e, --exclude <rule>...                  
             Exclude specific warnings
-
+            
             For example: --exclude=require-concurrent-index-creation,ban-drop-database
-
-        --pg-version <pg-version>
+        --pg-version <pg-version>            
             Specify postgres version
-
+            
             For example: --pg-version=13.0
-        --reporter <reporter>
-            Style of error reporting [possible values: Tty, Gcc, Json]
+        --reporter <reporter>                
+            Style of error reporting [possible values: Tty, Gcc, Json, Gitlab]
 
-        --stdin-filepath <filepath>
+        --stdin-filepath <filepath>          
             Path to use in reporting for stdin
 
 
 ARGS:
-    <path>...
-            Paths to search
+    <path>...    
+            Paths or patterns to search
 
 
 SUBCOMMANDS:
     help                Prints this message or the help of the given subcommand(s)
+    server              Run the language server
     upload-to-github    Comment on a PR with Squawk's results
 ```

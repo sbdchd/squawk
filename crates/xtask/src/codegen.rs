@@ -51,7 +51,7 @@ fn ensure_rustfmt(sh: &Shell) {
 fn reformat(text: String) -> String {
     let sh = Shell::new().unwrap();
     ensure_rustfmt(&sh);
-    let mut stdout = cmd!(sh, "rustup run stable rustfmt")
+    let mut stdout = cmd!(sh, "rustup run stable rustfmt --edition=2024")
         .stdin(text)
         .read()
         .unwrap();
@@ -624,7 +624,7 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
         }
         Rule::Labeled { label: l, rule } => {
             assert!(label.is_none());
-            let manually_implemented = matches!(l.as_str(), "value");
+            let manually_implemented = matches!(l.as_str(), "value" | "lhs" | "rhs");
             if manually_implemented {
                 return;
             }

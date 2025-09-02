@@ -37,7 +37,7 @@ fn create_access_token(
     jwt: &str,
     install_id: i64,
 ) -> Result<GithubAccessToken, GithubError> {
-    Ok(reqwest::Client::new()
+    Ok(reqwest::blocking::Client::new()
         .post(&format!(
             "{github_api_url}/app/installations/{install_id}/access_tokens",
         ))
@@ -62,7 +62,7 @@ pub(crate) fn create_comment(
         )));
     }
     let comment_body = CommentBody { body: comment.body };
-    reqwest::Client::new()
+    reqwest::blocking::Client::new()
         .post(&format!(
             "{github_api_url}/repos/{owner}/{repo}/issues/{issue_number}/comments",
             owner = comment.owner,
@@ -84,7 +84,7 @@ pub struct GitHubAppInfo {
 
 /// Get the bot name for finding existing comments on a PR
 pub fn get_app_info(github_api_url: &str, jwt: &str) -> Result<GitHubAppInfo, GithubError> {
-    Ok(reqwest::Client::new()
+    Ok(reqwest::blocking::Client::new()
         .get(&format!("{github_api_url}/app"))
         .header(AUTHORIZATION, format!("Bearer {jwt}"))
         .send()?
@@ -167,7 +167,7 @@ pub(crate) fn list_comments(
 ) -> Result<Vec<Comment>, GithubError> {
     // TODO(sbdchd): use the next links to get _all_ the comments
     // see: https://developer.github.com/v3/guides/traversing-with-pagination/
-    Ok(reqwest::Client::new()
+    Ok(reqwest::blocking::Client::new()
         .get(&format!(
             "{github_api_url}/repos/{owner}/{repo}/issues/{issue_number}/comments",
             owner = pr.owner,
@@ -198,7 +198,7 @@ pub(crate) fn update_comment(
         )));
     }
 
-    reqwest::Client::new()
+    reqwest::blocking::Client::new()
         .patch(&format!(
             "{github_api_url}/repos/{owner}/{repo}/issues/comments/{comment_id}",
         ))
