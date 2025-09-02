@@ -1552,7 +1552,12 @@ fn opt_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 fn path_segment(p: &mut Parser<'_>, kind: SyntaxKind) {
     let m = p.start();
     // TODO: does this need to be flagged?
-    if current_operator(p).is_some() {
+    // Might want to disallow operators in some paths.
+    // Like `create table +()` doesn't make sense.
+    if !p.at(OPERATOR_KW) && current_operator(p).is_some() {
+        // check for operator kw so we can parse things like:
+        //   create table operator();
+
         // skip
     } else if p.at_ts(COL_LABEL_FIRST) {
         let m = p.start();
