@@ -147,6 +147,9 @@ struct Opt {
         global = true
     )]
     no_assume_in_transaction: bool,
+    /// Do not exit with an error when provided path patterns do not match any files
+    #[structopt(long = "no-error-on-unmatched-pattern", global = true)]
+    no_error_on_unmatched_pattern: bool,
 }
 
 #[allow(clippy::too_many_lines)]
@@ -213,10 +216,17 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
         conf.assume_in_transaction.unwrap_or_default()
     };
 
+    let no_error_on_unmatched_pattern = if opts.no_error_on_unmatched_pattern {
+        opts.no_error_on_unmatched_pattern
+    } else {
+        false
+    };
+
     info!("pg version: {pg_version:?}");
     info!("excluded rules: {:?}", &excluded_rules);
     info!("excluded paths: {:?}", &excluded_paths);
     info!("assume in a transaction: {assume_in_transaction:?}");
+    info!("no error on unmatched pattern: {no_error_on_unmatched_pattern:?}");
 
     let mut clap_app = Opt::clap();
     let is_stdin = !io::stdin().is_terminal();
@@ -251,7 +261,9 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
                     "Failed to find files for provided patterns: {:?}",
                     opts.path_patterns
                 );
-                process::exit(1);
+                if !no_error_on_unmatched_pattern {
+                    process::exit(1);
+                }
             }
             if !found_paths.is_empty() || is_stdin {
                 let stdout = io::stdout();
@@ -275,7 +287,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
                     )?;
                     return Ok(exit_code);
                 }
-            } else {
+            } else if !no_error_on_unmatched_pattern {
                 clap_app.print_long_help()?;
                 println!();
             }
