@@ -30,10 +30,14 @@ main() {
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' package.json
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' squawk-vscode/package.json
     fastmod --accept-all -m '(pname = "squawk";.*?)version = ".*?"' '${1}version = "'$NEW_VERSION'"' flake.nix
+    fastmod --accept-all 'pub(crate) const SQUAWK_USER_AGENT: &str = "squawk/.*"' 'pub(crate) const SQUAWK_USER_AGENT: &str = "squawk/'$NEW_VERSION'"' crates/squawk_github/src/app.rs
     
     echo "Updating CHANGELOG.md..."
     CURRENT_DATE=$(date +"%Y-%m-%d")
     sed -i '' "s/^## \[Unreleased\]$/## [Unreleased]\n\n## v$NEW_VERSION - $CURRENT_DATE/" CHANGELOG.md
+    
+    echo "Opening CHANGELOG.md for editing..."
+    ${EDITOR:-vi} CHANGELOG.md
 }
 
 

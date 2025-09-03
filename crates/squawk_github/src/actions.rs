@@ -1,4 +1,7 @@
+use log::info;
+
 use crate::app;
+use crate::app::SQUAWK_USER_AGENT;
 use crate::{Comment, DEFAULT_GITHUB_API_URL, GitHubApi, GithubError};
 
 pub struct GitHub {
@@ -13,6 +16,7 @@ impl GitHub {
 
     #[must_use]
     pub fn new_with_url(github_api_url: &str, github_token: &str) -> Self {
+        info!("github user agent {SQUAWK_USER_AGENT}");
         GitHub {
             github_api_url: github_api_url.to_string(),
             github_token: github_token.to_string(),

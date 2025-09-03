@@ -5,11 +5,13 @@ use crate::{Comment, DEFAULT_GITHUB_API_URL, GitHubApi, GithubError};
 use jsonwebtoken::{Algorithm, EncodingKey, Header};
 
 use log::info;
-use reqwest::header::{ACCEPT, AUTHORIZATION};
+use reqwest::header::{ACCEPT, AUTHORIZATION, USER_AGENT};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::time::Duration;
 use std::time::{SystemTime, UNIX_EPOCH};
+
+pub(crate) const SQUAWK_USER_AGENT: &str = "squawk/2.25.0";
 
 #[derive(Debug, Serialize)]
 struct CommentBody {
@@ -43,6 +45,7 @@ fn create_access_token(
         ))
         .header(AUTHORIZATION, format!("Bearer {jwt}"))
         .header(ACCEPT, "application/vnd.github.machine-man-preview+json")
+        .header(USER_AGENT, SQUAWK_USER_AGENT)
         .send()?
         .error_for_status()?
         .json::<GithubAccessToken>()?)
@@ -70,6 +73,7 @@ pub(crate) fn create_comment(
             issue_number = comment.issue
         ))
         .header(AUTHORIZATION, format!("Bearer {secret}"))
+        .header(USER_AGENT, SQUAWK_USER_AGENT)
         .json(&comment_body)
         .send()?
         .error_for_status()?;
@@ -87,6 +91,7 @@ pub fn get_app_info(github_api_url: &str, jwt: &str) -> Result<GitHubAppInfo, Gi
     Ok(reqwest::blocking::Client::new()
         .get(&format!("{github_api_url}/app"))
         .header(AUTHORIZATION, format!("Bearer {jwt}"))
+        .header(USER_AGENT, SQUAWK_USER_AGENT)
         .send()?
         .error_for_status()?
         .json::<GitHubAppInfo>()?)
@@ -176,6 +181,7 @@ pub(crate) fn list_comments(
         ))
         .query(&[("per_page", 100)])
         .header(AUTHORIZATION, format!("Bearer {secret}",))
+        .header(USER_AGENT, SQUAWK_USER_AGENT)
         .send()?
         .error_for_status()?
         .json::<Vec<Comment>>()?)
@@ -203,6 +209,7 @@ pub(crate) fn update_comment(
             "{github_api_url}/repos/{owner}/{repo}/issues/comments/{comment_id}",
         ))
         .header(AUTHORIZATION, format!("Bearer {secret}"))
+        .header(USER_AGENT, SQUAWK_USER_AGENT)
         .json(&CommentBody { body })
         .send()?
         .error_for_status()?;
