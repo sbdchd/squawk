@@ -171,6 +171,8 @@ impl std::fmt::Display for UnknownRuleName {
     }
 }
 
+impl std::error::Error for UnknownRuleName {}
+
 impl std::str::FromStr for Rule {
     type Err = UnknownRuleName;
     fn from_str(s: &str) -> Result<Self, Self::Err> {

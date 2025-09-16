@@ -86,6 +86,8 @@ impl std::fmt::Display for ParseVersionError {
     }
 }
 
+impl std::error::Error for ParseVersionError {}
+
 impl FromStr for Version {
     type Err = ParseVersionError;
 
