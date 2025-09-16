@@ -10,9 +10,7 @@ expression: body
 <h3><code>alpha.sql</code></h3>
 
 ```sql
-
 SELECT 1;
-                
 ```
 
 <h4>🚒 Rule Violations (1)</h4>
@@ -20,10 +18,12 @@ SELECT 1;
 
 ```
 warning[adding-not-nullable-field]: Adding a NOT NULL field requires exclusive locks and table rewrites.
---> alpha.sql:1:1
- |
- |
- = help: Make the field nullable.
+  ╭▸ alpha.sql:1:8
+  │
+1 │ SELECT 1;
+  │        ━
+  │
+  ╰ help: Make the field nullable.
 ```
     
 ---

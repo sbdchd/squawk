@@ -1,6 +1,6 @@
-use annotate_snippets::Level;
-use annotate_snippets::Renderer;
-use annotate_snippets::Snippet;
+use annotate_snippets::{
+    Annotation, AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle,
+};
 use anyhow::Result;
 use console::style;
 use line_index::LineIndex;
@@ -92,27 +92,28 @@ fn render_lint_error<W: std::io::Write>(
     filename: &str,
     sql: &str,
 ) -> Result<()> {
-    let renderer = Renderer::styled();
+    let renderer = Renderer::styled().decor_style(DecorStyle::Unicode);
     let error_name = &err.rule_name;
 
     let title = &err.message;
 
     let level = match err.level {
-        ViolationLevel::Warning => Level::Warning,
-        ViolationLevel::Error => Level::Error,
+        ViolationLevel::Warning => Level::WARNING,
+        ViolationLevel::Error => Level::ERROR,
     };
 
-    let mut message = level.title(title).id(error_name).snippet(
+    let mut group = level.primary_title(title).id(error_name).element(
         Snippet::source(sql)
-            .origin(filename)
+            .path(filename)
             .fold(true)
-            .annotation(level.span(err.range.into())),
+            .annotation(AnnotationKind::Primary.span(err.range.into())),
     );
+
     if let Some(help) = &err.help {
-        message = message.footer(Level::Help.title(help));
+        group = group.element(Level::HELP.message(help));
     }
 
-    writeln!(f, "{}", renderer.render(message))?;
+    writeln!(f, "{}", renderer.render(&[group]))?;
     Ok(())
 }
 

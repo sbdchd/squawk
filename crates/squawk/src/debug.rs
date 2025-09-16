@@ -1,6 +1,8 @@
 use std::{io, path::PathBuf};
 
-use annotate_snippets::{Level, Message, Renderer, Snippet};
+use annotate_snippets::{
+    Annotation, AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle,
+};
 use anyhow::Result;
 use serde_json::json;
 use squawk_syntax::{ast::AstNode, syntax_error::SyntaxError};
@@ -55,11 +57,8 @@ pub(crate) fn debug<W: io::Write>(
                         }
                     }
                     writeln!(f, "{snap}")?;
-                    let renderer = Renderer::styled();
-                    render_syntax_errors(&errors, filename, sql, |message| {
-                        writeln!(f, "{}", renderer.render(message))?;
-                        Ok(())
-                    })?;
+                    let renderer = Renderer::styled().decor_style(DecorStyle::Unicode);
+                    render_syntax_errors(&errors, filename, sql, &renderer, f)?;
                 }
             }
             DebugOption::Ast => {
@@ -109,18 +108,19 @@ fn render_syntax_errors(
     errors: &[SyntaxError],
     filename: &str,
     sql: &str,
-    mut render: impl FnMut(Message<'_>) -> Result<()>,
+    renderer: &Renderer,
+    f: &mut dyn std::io::Write,
 ) -> Result<()> {
     for err in errors {
         let text = err.message();
         let span = err.range().into();
-        let message = Level::Error.title(text).id("syntax-error").snippet(
+        let report = &[Level::ERROR.primary_title(text).id("syntax-error").element(
             Snippet::source(sql)
-                .origin(filename)
+                .path(filename)
                 .fold(true)
-                .annotation(Level::Error.span(span)),
-        );
-        render(message)?;
+                .annotation(AnnotationKind::Primary.span(span)),
+        )];
+        writeln!(f, "{}", renderer.render(report))?;
     }
     Ok(())
 }
