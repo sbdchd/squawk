@@ -58,18 +58,19 @@ squawk example-migration.sql
 ```
 ❯ squawk example-migration.sql
 warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
- --> example-migration.sql:2:24
-  |
-2 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
-  |                        --------------------------------------------------------
-  |
+  ╭▸ example-migration.sql:2:24
+  │
+2 │ ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+  │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
 warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
- --> example-migration.sql:2:28
-  |
-2 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
-  |                            ----------------------------------------------------
-  |
-  = help: Create an index CONCURRENTLY and create the constraint using the index.
+  ╭▸ example-migration.sql:2:28
+  │
+2 │ ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+  │                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: Create an index `CONCURRENTLY` and create the constraint using the index.
 
 Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
 Found 2 issues in 1 file (checked 1 source file)

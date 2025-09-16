@@ -14,11 +14,10 @@ trailing comma
 ```sql
 select f(1,2,);
 -- error[syntax-error]: unexpected trailing comma
---  --> stdin:1:13
---   |
--- 1 | select f(1,2,);
---   |             ^
---   |
+--   ╭▸ stdin:1:13
+--   │
+-- 1 │ select f(1,2,);
+--   ╰╴            ━
 ```
 
 missing semicolon
@@ -27,11 +26,10 @@ missing semicolon
 select * from t
 select id from users where email = email;
 -- error[syntax-error]: expected SEMICOLON
---  --> stdin:1:16
---   |
--- 1 | select * from t
---   |                ^
---   |
+--   ╭▸ stdin:1:16
+--   │
+-- 1 │ select * from t
+--   ╰╴               ━
 ```
 
 ## solutions
