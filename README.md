@@ -45,50 +45,50 @@ Use the WASM powered playground to check your SQL locally in the browser!
 ```shell
 ❯ squawk example.sql
 warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
- --> example.sql:6:10
-  |
-6 |     "id" serial NOT NULL PRIMARY KEY,
-  |          ------
-  |
-  = help: Use 64-bit integer values instead to prevent hitting this limit.
+  ╭▸ example.sql:6:10
+  │
+6 │     "id" serial NOT NULL PRIMARY KEY,
+  │          ━━━━━━
+  │
+  ╰ help: Use 64-bit integer values instead to prevent hitting this limit.
 warning[prefer-identity]: Serial types make schema, dependency, and permission management difficult.
- --> example.sql:6:10
-  |
-6 |     "id" serial NOT NULL PRIMARY KEY,
-  |          ------
-  |
-  = help: Use Identity columns instead.
+  ╭▸ example.sql:6:10
+  │
+6 │     "id" serial NOT NULL PRIMARY KEY,
+  │          ━━━━━━
+  │
+  ╰ help: Use an `IDENTITY` column instead.
 warning[prefer-text-field]: Changing the size of a `varchar` field requires an `ACCESS EXCLUSIVE` lock, that will prevent all reads and writes to the table.
- --> example.sql:7:13
-  |
-7 |     "alpha" varchar(100) NOT NULL
-  |             ------------
-  |
-  = help: Use a `TEXT` field with a `CHECK` constraint.
+  ╭▸ example.sql:7:13
+  │
+7 │     "alpha" varchar(100) NOT NULL
+  │             ━━━━━━━━━━━━
+  │
+  ╰ help: Use a `TEXT` field with a `CHECK` constraint.
 warning[require-concurrent-index-creation]: During normal index creation, table updates are blocked, but reads are still allowed.
-  --> example.sql:10:1
-   |
-10 | CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
-   | ------------------------------------------------------------
-   |
-   = help: Use `CONCURRENTLY` to avoid blocking writes.
+   ╭▸ example.sql:10:1
+   │
+10 │ CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
+   │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: Use `concurrently` to avoid blocking writes.
 warning[constraint-missing-not-valid]: By default new constraints require a table scan and block writes to the table while that scan occurs.
-  --> example.sql:12:24
-   |
-12 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
-   |                        --------------------------------------------------------
-   |
-   = help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
+   ╭▸ example.sql:12:24
+   │
+12 │ ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+   │                        ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: Use `NOT VALID` with a later `VALIDATE CONSTRAINT` call.
 warning[disallowed-unique-constraint]: Adding a `UNIQUE` constraint requires an `ACCESS EXCLUSIVE` lock which blocks reads and writes to the table while the index is built.
-  --> example.sql:12:28
-   |
-12 | ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
-   |                            ----------------------------------------------------
-   |
-   = help: Create an index `CONCURRENTLY` and create the constraint using the index.
+   ╭▸ example.sql:12:28
+   │
+12 │ ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);
+   │                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   │
+   ╰ help: Create an index `CONCURRENTLY` and create the constraint using the index.
 
 Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
-Found 7 issues in 1 file (checked 1 source file)
+Found 6 issues in 1 file (checked 1 source file)
 ```
 
 ### `squawk --help`
