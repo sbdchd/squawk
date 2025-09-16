@@ -202,3 +202,92 @@ SOURCE_FILE
       R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- https://github.com/sbdchd/squawk/issues/646"
+  WHITESPACE "\n"
+  CREATE_MATERIALIZED_VIEW
+    CREATE_KW "CREATE"
+    WHITESPACE " "
+    MATERIALIZED_KW "MATERIALIZED"
+    WHITESPACE " "
+    VIEW_KW "VIEW"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "\"public\""
+      DOT "."
+      PATH_SEGMENT
+        NAME
+          IDENT "\"user_countries_view\""
+    WHITESPACE " \n"
+    AS_KW "AS"
+    WHITESPACE " "
+    PAREN_SELECT
+      L_PAREN "("
+      WHITESPACE "\n    "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          DISTINCT_CLAUSE
+            DISTINCT_KW "distinct"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              NAME_REF
+                IDENT "\"client_id\""
+            COMMA ","
+            WHITESPACE " "
+            TARGET
+              BIN_EXPR
+                NAME_REF
+                  IDENT "\"address\""
+                CUSTOM_OP
+                  MINUS "-"
+                  R_ANGLE ">"
+                  R_ANGLE ">"
+                LITERAL
+                  STRING "'country'"
+              WHITESPACE " "
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "\"country\""
+        WHITESPACE " \n    "
+        FROM_CLAUSE
+          FROM_KW "from"
+          WHITESPACE " "
+          FROM_ITEM
+            NAME_REF
+              IDENT "\"users\""
+        WHITESPACE " "
+        WHERE_CLAUSE
+          WHERE_KW "where"
+          WHITESPACE " "
+          BIN_EXPR
+            BIN_EXPR
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "\"users\""
+                DOT "."
+                NAME_REF
+                  IDENT "\"address\""
+              CUSTOM_OP
+                MINUS "-"
+                R_ANGLE ">"
+                R_ANGLE ">"
+              LITERAL
+                STRING "'country'"
+            WHITESPACE " "
+            IS_NOT
+              IS_KW "IS"
+              WHITESPACE " "
+              NOT_KW "NOT"
+            WHITESPACE " "
+            LITERAL
+              NULL_KW "NULL"
+      WHITESPACE "\n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
