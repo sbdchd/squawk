@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.26.0 - 2025-09-15
+
+## Added
+
+- linter: `adding-field-with-default` now allows more cases (#652).
+
+  ```sql
+  alter table t add column c text[] default array[]::text[];
+  alter table t add column c timestamptz default current_timestamp;
+
+  -- const/non-volatile binary expressions are also allowed
+  alter table t add column c timestamptz default now() - interval '100 years';
+  ```
+
+
+## Fixed
+
+- parser: parse materialized views using a paren select (#651).
+
+  The following now parses:
+
+  ```sql
+  create materialized view v
+  as (select * from t);
+  ```
+
+## Changed
+
+- cli now uses unicode for snippet annotations (#654).
+
 ## v2.25.1 - 2025-09-03
 
 ## Fixed
