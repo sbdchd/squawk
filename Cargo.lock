@@ -1861,7 +1861,7 @@ dependencies = [
 
 [[package]]
 name = "squawk_github"
-version = "0.0.0"
+version = "2.25.0"
 dependencies = [
  "jsonwebtoken",
  "log",
@@ -1872,14 +1872,14 @@ dependencies = [
 
 [[package]]
 name = "squawk_lexer"
-version = "0.0.0"
+version = "2.25.0"
 dependencies = [
  "insta",
 ]
 
 [[package]]
 name = "squawk_linter"
-version = "0.0.0"
+version = "2.25.0"
 dependencies = [
  "enum-iterator",
  "insta",
@@ -1893,7 +1893,7 @@ dependencies = [
 
 [[package]]
 name = "squawk_parser"
-version = "0.0.0"
+version = "2.25.0"
 dependencies = [
  "camino",
  "dir-test",
@@ -1906,7 +1906,7 @@ dependencies = [
 
 [[package]]
 name = "squawk_server"
-version = "0.0.0"
+version = "2.25.0"
 dependencies = [
  "anyhow",
  "insta",
@@ -1924,7 +1924,7 @@ dependencies = [
 
 [[package]]
 name = "squawk_syntax"
-version = "0.0.0"
+version = "2.25.0"
 dependencies = [
  "camino",
  "dir-test",
@@ -1936,7 +1936,7 @@ dependencies = [
 
 [[package]]
 name = "squawk_wasm"
-version = "0.1.0"
+version = "2.25.0"
 dependencies = [
  "console_error_panic_hook",
  "console_log",
@@ -2800,7 +2800,7 @@ checksum = "32ac00cd3f8ec9c1d33fb3e7958a82df6989c42d747bd326c822b1d625283547"
 
 [[package]]
 name = "xtask"
-version = "0.1.0"
+version = "2.25.0"
 dependencies = [
  "anyhow",
  "camino",

@@ -120,6 +120,10 @@ sql for benchmarks maybe?
 
   https://github.com/pgvector/pgvector/blob/master/sql/vector.sql
 
+- doomql
+
+  https://github.com/cedardb/DOOMQL
+
 ### CLI
 
 from `deno`

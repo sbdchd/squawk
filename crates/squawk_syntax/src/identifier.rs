@@ -2,7 +2,7 @@
 ///
 /// This type handles the casing rules for us to make comparisions easier.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub(crate) struct Identifier(String);
+pub struct Identifier(String);
 
 impl Identifier {
     // TODO: we need to handle more advanced identifiers like:

@@ -1,9 +1,8 @@
 use std::collections::HashSet;
 
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::{Parse, SourceFile, ast};
+use squawk_syntax::{Parse, SourceFile, ast, identifier::Identifier};
 
-use crate::identifier::Identifier;
 use crate::{Edit, Fix, Linter, Rule, Violation};
 
 use crate::visitors::check_not_allowed_types;

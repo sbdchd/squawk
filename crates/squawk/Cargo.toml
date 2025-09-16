@@ -1,6 +1,6 @@
 [package]
 name = "squawk"
-version = "2.25.1"
+version.workspace = true
 default-run = "squawk"
 
 authors.workspace = true

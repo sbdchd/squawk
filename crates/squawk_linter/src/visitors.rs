@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
-use squawk_syntax::ast;
+use squawk_syntax::{ast, identifier::Identifier};
 
-use crate::{Linter, identifier::Identifier};
+use crate::Linter;
 
 pub(crate) fn is_not_valid_int_type(
     ty: &ast::Type,

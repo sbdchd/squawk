@@ -4,10 +4,11 @@ use rowan::TextRange;
 use squawk_syntax::{
     Parse, SourceFile, TokenText,
     ast::{self, AstNode},
+    identifier::Identifier,
 };
 
 use crate::visitors::check_not_allowed_types;
-use crate::{Edit, Fix, Linter, Rule, Violation, identifier::Identifier};
+use crate::{Edit, Fix, Linter, Rule, Violation};
 
 use lazy_static::lazy_static;
 

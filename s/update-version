@@ -7,9 +7,9 @@ main() {
     NEW_VERSION="$1"
 
     if [ -z "$NEW_VERSION" ]; then
-        NEW_VERSION=$(awk -F'[".]' '/^version = / {print $2 "." ($3+1) ".0"}' crates/squawk/Cargo.toml)
+        NEW_VERSION=$(awk -F'[".]' '/^version = / {print $2 "." ($3+1) ".0"}' Cargo.toml)
         if [ -z "$NEW_VERSION" ]; then
-            echo "Error: Could not determine current version"
+            echo "Error: Could not determine current version from workspace Cargo.toml"
             exit 1
         fi
         
@@ -25,7 +25,7 @@ main() {
     echo "Creating new release branch: release-$NEW_VERSION"
     git checkout -b "release-$NEW_VERSION"
     echo "updating version to '$NEW_VERSION'..."
-    fastmod --accept-all '^version = ".*"' 'version = "'$NEW_VERSION'"' crates/squawk/Cargo.toml
+    fastmod --accept-all '^version = ".*"' 'version = "'$NEW_VERSION'"' Cargo.toml
     fastmod --accept-all -m '(name = "squawk"\n)version = ".*?"' '${1}version = "'$NEW_VERSION'"' Cargo.lock
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' package.json
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' squawk-vscode/package.json
