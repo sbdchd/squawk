@@ -2,18 +2,10 @@ use lazy_static::lazy_static;
 use std::collections::HashSet;
 
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::{Parse, SourceFile};
+use squawk_syntax::{Parse, SourceFile, SyntaxKind};
 use squawk_syntax::{ast, identifier::Identifier};
 
 use crate::{Linter, Rule, Version, Violation};
-
-fn is_const_expr(expr: &ast::Expr) -> bool {
-    match expr {
-        ast::Expr::Literal(_) => true,
-        ast::Expr::CastExpr(cast) => matches!(cast.expr(), Some(ast::Expr::Literal(_))),
-        _ => false,
-    }
-}
 
 lazy_static! {
     static ref NON_VOLATILE_FUNCS: HashSet<Identifier> = {
@@ -26,8 +18,18 @@ lazy_static! {
     };
 }
 
-fn is_non_volatile(expr: &ast::Expr) -> bool {
+fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
     match expr {
+        ast::Expr::Literal(_) => true,
+        ast::Expr::ArrayExpr(_) => true,
+        ast::Expr::BinExpr(bin_expr) => {
+            if let Some(lhs) = bin_expr.lhs() {
+                if let Some(rhs) = bin_expr.rhs() {
+                    return is_non_volatile_or_const(&lhs) && is_non_volatile_or_const(&rhs);
+                }
+            }
+            false
+        }
         ast::Expr::CallExpr(call_expr) => {
             if let Some(arglist) = call_expr.arg_list() {
                 let no_args = arglist.args().count() == 0;
@@ -44,6 +46,24 @@ fn is_non_volatile(expr: &ast::Expr) -> bool {
             } else {
                 false
             }
+        }
+        // array[]::t[] is non-volatile. We don't check for a plain array expr
+        // since postgres will reject it as a default unless it's cast to a type.
+        ast::Expr::CastExpr(cast_expr) => {
+            if let Some(inner_expr) = cast_expr.expr() {
+                is_non_volatile_or_const(&inner_expr)
+            } else {
+                false
+            }
+        }
+        // current_timestamp is the same as calling now()
+        ast::Expr::NameRef(name_ref) => {
+            if let Some(child) = name_ref.syntax().first_child_or_token() {
+                if child.kind() == SyntaxKind::CURRENT_TIMESTAMP_KW {
+                    return true;
+                }
+            }
+            false
         }
         _ => false,
     }
@@ -69,7 +89,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                     continue;
                                 };
                                 if ctx.settings.pg_version > Version::new(11, None, None)
-                                    && (is_const_expr(&expr) || is_non_volatile(&expr))
+                                    && is_non_volatile_or_const(&expr)
                                 {
                                     continue;
                                 }
@@ -182,6 +202,33 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" boolean DEFAULT true;
     }
 
     #[test]
+    fn default_empty_array_ok() {
+        let sql = r#"
+alter table t add column a double precision[] default array[]::double precision[];
+
+alter table t add column b bigint[] default cast(array[] as bigint[]);
+
+alter table t add column c text[] default array['foo', 'bar']::text[];
+            "#;
+
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
+        assert!(errors.is_empty());
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn default_with_const_bin_expr() {
+        let sql = r#"
+ALTER TABLE assessments
+ADD COLUMN statistics_last_updated_at timestamptz NOT NULL DEFAULT now() - interval '100 years';
+            "#;
+
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
+        assert!(errors.is_empty());
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
     fn default_str_ok() {
         let sql = r#"
 -- NON-VOLATILE
@@ -240,11 +287,23 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
         assert!(!errors.is_empty());
         assert_debug_snapshot!(errors);
     }
+
     #[test]
     fn default_func_now_ok() {
         let sql = r#"
 -- NON-VOLATILE
 ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now();
+        "#;
+
+        let errors = lint(sql, Rule::AddingFieldWithDefault);
+        assert!(errors.is_empty());
+        assert_debug_snapshot!(errors);
+    }
+
+    #[test]
+    fn default_func_current_timestamp_ok() {
+        let sql = r#"
+alter table t add column c timestamptz default current_timestamp;
         "#;
 
         let errors = lint(sql, Rule::AddingFieldWithDefault);
