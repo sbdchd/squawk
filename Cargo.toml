@@ -3,6 +3,7 @@ members = ["crates/*"]
 resolver = "2"
 
 [workspace.package]
+version = "2.25.0"
 edition = "2024"
 rust-version = "1.88.0"
 authors = ["Squawk Team & Contributors"]
@@ -53,12 +54,12 @@ xshell = "0.2.7"
 proc-macro2 = "1.0.95"
 
 # local
-squawk_github = { version = "0.0.0", path = "./crates/squawk_github" }
-squawk_lexer = { version = "0.0.0", path = "./crates/squawk_lexer" }
-squawk_parser = { version = "0.0.0", path = "./crates/squawk_parser" }
-squawk_syntax = { version = "0.0.0", path = "./crates/squawk_syntax" }
-squawk_linter = { version = "0.0.0", path = "./crates/squawk_linter" }
-squawk_server = { version = "0.0.0", path = "./crates/squawk_server" }
+squawk_github = { path = "./crates/squawk_github" }
+squawk_lexer = { path = "./crates/squawk_lexer" }
+squawk_parser = { path = "./crates/squawk_parser" }
+squawk_syntax = { path = "./crates/squawk_syntax" }
+squawk_linter = { path = "./crates/squawk_linter" }
+squawk_server = { path = "./crates/squawk_server" }
 
 [workspace.lints.clippy]
 collapsible_else_if = "allow"

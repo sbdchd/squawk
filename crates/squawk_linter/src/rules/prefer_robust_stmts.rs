@@ -3,9 +3,10 @@ use std::collections::HashMap;
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
+    identifier::Identifier,
 };
 
-use crate::{Edit, Fix, Linter, Rule, Violation, identifier::Identifier};
+use crate::{Edit, Fix, Linter, Rule, Violation};
 
 #[derive(PartialEq)]
 enum Constraint {

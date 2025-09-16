@@ -3,9 +3,10 @@ use std::collections::HashSet;
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
+    identifier::Identifier,
 };
 
-use crate::{Linter, Rule, Violation, identifier::Identifier};
+use crate::{Linter, Rule, Violation};
 
 pub fn tables_created_in_transaction(
     assume_in_transaction: bool,

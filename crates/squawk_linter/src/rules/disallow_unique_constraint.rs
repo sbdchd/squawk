@@ -1,9 +1,10 @@
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
+    identifier::Identifier,
 };
 
-use crate::{Linter, Rule, Violation, identifier::Identifier};
+use crate::{Linter, Rule, Violation};
 
 use super::constraint_missing_not_valid::tables_created_in_transaction;
 

@@ -3,9 +3,10 @@ use std::collections::HashSet;
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
+    identifier::Identifier,
 };
 
-use crate::{Edit, Fix, Linter, Rule, Violation, identifier::Identifier};
+use crate::{Edit, Fix, Linter, Rule, Violation};
 
 use crate::visitors::check_not_allowed_types;
 

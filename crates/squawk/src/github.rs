@@ -235,8 +235,10 @@ fn get_summary_comment_body(
         file_summaries.push(summary);
     }
 
-    let summary_notice = Some("⚠️ **Large Report**: This report was summarized due to size constraints. SQL content has been omitted but all violations were analyzed.");
-    
+    let summary_notice = Some(
+        "⚠️ **Large Report**: This report was summarized due to size constraints. SQL content has been omitted but all violations were analyzed.",
+    );
+
     format_comment(
         violations_emoji,
         violations_count,
@@ -293,8 +295,10 @@ fn truncate_sql_if_needed(sql: &str) -> (String, bool) {
     if lines.len() <= MAX_SQL_PREVIEW_LINES {
         (sql.to_string(), false)
     } else {
-        let truncated_lines = lines[..MAX_SQL_PREVIEW_LINES].join("
-");
+        let truncated_lines = lines[..MAX_SQL_PREVIEW_LINES].join(
+            "
+",
+        );
         let remaining_lines = lines.len() - MAX_SQL_PREVIEW_LINES;
         (
             format!(

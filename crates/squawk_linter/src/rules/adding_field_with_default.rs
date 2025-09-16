@@ -1,11 +1,10 @@
 use lazy_static::lazy_static;
 use std::collections::HashSet;
 
-use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile};
+use squawk_syntax::{ast, identifier::Identifier};
 
-use crate::identifier::Identifier;
 use crate::{Linter, Rule, Version, Violation};
 
 fn is_const_expr(expr: &ast::Expr) -> bool {

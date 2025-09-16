@@ -25,6 +25,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 pub mod ast;
+pub mod identifier;
 mod parsing;
 pub mod syntax_error;
 mod syntax_node;

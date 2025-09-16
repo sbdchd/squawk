@@ -1,10 +1,11 @@
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
+    identifier::Identifier,
 };
 
+use crate::visitors::check_not_allowed_types;
 use crate::{Edit, Fix, Linter, Rule, Violation};
-use crate::{identifier::Identifier, visitors::check_not_allowed_types};
 
 pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
     match ty {

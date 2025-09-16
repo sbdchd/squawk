@@ -20,7 +20,6 @@ mod ignore_index;
 mod version;
 mod visitors;
 
-mod identifier;
 mod rules;
 
 #[cfg(test)]
