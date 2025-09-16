@@ -4,60 +4,58 @@ mod file;
 mod file_finding;
 mod github;
 mod reporter;
-use anyhow::{Context, Result};
-use debug::debug;
-use reporter::check_and_dump_files;
-use squawk_linter::{Rule, Version};
-use structopt::clap::arg_enum;
-
 use crate::file_finding::find_paths;
+use anyhow::{Context, Result};
+use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 use config::Config;
+use debug::debug;
 use log::info;
+use reporter::check_and_dump_files;
 use simplelog::CombinedLogger;
+use squawk_linter::{Rule, Version};
 use std::io;
 use std::io::IsTerminal;
 use std::panic;
 use std::path::PathBuf;
 use std::process::{self, ExitCode};
-use structopt::StructOpt;
 
-#[derive(StructOpt, Debug)]
+#[derive(Parser, Debug)]
 pub struct UploadToGithubArgs {
     /// Paths to search
     paths: Vec<String>,
     /// Exits with an error if violations are found
-    #[structopt(long)]
+    #[arg(long)]
     fail_on_violations: bool,
-    #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
+    #[arg(long, env = "SQUAWK_GITHUB_PRIVATE_KEY")]
     github_private_key: Option<String>,
-    #[structopt(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
+    #[arg(long, env = "SQUAWK_GITHUB_PRIVATE_KEY_BASE64")]
     github_private_key_base64: Option<String>,
     /// GitHub API url.
-    #[structopt(long, env = "SQUAWK_GITHUB_API_URL")]
+    #[arg(long, env = "SQUAWK_GITHUB_API_URL")]
     github_api_url: Option<String>,
-    #[structopt(long, env = "SQUAWK_GITHUB_TOKEN")]
+    #[arg(long, env = "SQUAWK_GITHUB_TOKEN")]
     github_token: Option<String>,
     /// GitHub App Id.
-    #[structopt(long, env = "SQUAWK_GITHUB_APP_ID")]
+    #[arg(long, env = "SQUAWK_GITHUB_APP_ID")]
     github_app_id: Option<i64>,
     /// GitHub Install Id. The installation that squawk is acting on.
-    #[structopt(long, env = "SQUAWK_GITHUB_INSTALL_ID")]
+    #[arg(long, env = "SQUAWK_GITHUB_INSTALL_ID")]
     github_install_id: Option<i64>,
     /// GitHub Repo Owner
     /// github.com/sbdchd/squawk, sbdchd is the owner
-    #[structopt(long, env = "SQUAWK_GITHUB_REPO_OWNER")]
+    #[arg(long, env = "SQUAWK_GITHUB_REPO_OWNER")]
     github_repo_owner: String,
     /// GitHub Repo Name
     /// github.com/sbdchd/squawk, squawk is the name
-    #[structopt(long, env = "SQUAWK_GITHUB_REPO_NAME")]
+    #[arg(long, env = "SQUAWK_GITHUB_REPO_NAME")]
     github_repo_name: String,
     /// GitHub Pull Request Number
     /// github.com/sbdchd/squawk/pull/10, 10 is the PR number
-    #[structopt(long, env = "SQUAWK_GITHUB_PR_NUMBER")]
+    #[arg(long, env = "SQUAWK_GITHUB_PR_NUMBER")]
     github_pr_number: i64,
 }
 
-#[derive(StructOpt, Debug)]
+#[derive(Subcommand, Debug)]
 pub enum Command {
     /// Run the language server
     Server,
@@ -65,31 +63,28 @@ pub enum Command {
     UploadToGithub(UploadToGithubArgs),
 }
 
-arg_enum! {
-    #[derive(Debug, StructOpt)]
-    pub enum DebugOption {
-        Lex,
-        Parse,
-        Ast
-    }
+#[derive(Debug, ValueEnum, Clone)]
+pub enum DebugOption {
+    Lex,
+    Parse,
+    Ast,
 }
 
-arg_enum! {
-    #[derive(Debug, StructOpt)]
-    pub enum Reporter {
-        Tty,
-        Gcc,
-        Json,
-        Gitlab,
-    }
+#[derive(Debug, ValueEnum, Clone)]
+pub enum Reporter {
+    Tty,
+    Gcc,
+    Json,
+    Gitlab,
 }
 
 /// Find problems in your SQL
 #[allow(clippy::struct_excessive_bools)]
-#[derive(StructOpt, Debug)]
+#[derive(Parser, Debug)]
+#[command(version)]
 struct Opt {
     /// Paths or patterns to search
-    #[structopt(value_name = "path")]
+    #[arg(value_name = "path")]
     path_patterns: Vec<String>,
     /// Paths to exclude
     ///
@@ -98,17 +93,17 @@ struct Opt {
     /// `--exclude-path=005_user_ids.sql --exclude-path=009_account_emails.sql`
     ///
     /// `--exclude-path='*user_ids.sql'`
-    #[structopt(long = "exclude-path", global = true)]
+    #[arg(long = "exclude-path", global = true)]
     excluded_path: Option<Vec<String>>,
     /// Exclude specific warnings
     ///
     /// For example:
     /// --exclude=require-concurrent-index-creation,ban-drop-database
-    #[structopt(
-        short = "e",
+    #[arg(
+        short = 'e',
         long = "exclude",
         value_name = "rule",
-        use_delimiter = true,
+        value_delimiter = ',',
         global = true
     )]
     excluded_rules: Option<Vec<Rule>>,
@@ -116,39 +111,39 @@ struct Opt {
     ///
     /// For example:
     /// --pg-version=13.0
-    #[structopt(long, global = true)]
+    #[arg(long, global = true)]
     pg_version: Option<Version>,
     /// Output debug format
-    #[structopt(long,value_name ="format", possible_values = &DebugOption::variants(), case_insensitive = true)]
+    #[arg(long, value_name = "format", ignore_case = true)]
     debug: Option<DebugOption>,
     /// Style of error reporting
-    #[structopt(long, possible_values = &Reporter::variants(), case_insensitive = true)]
+    #[arg(long, ignore_case = true)]
     reporter: Option<Reporter>,
-    #[structopt(long, value_name = "filepath")]
+    #[arg(long, value_name = "filepath")]
     /// Path to use in reporting for stdin
     stdin_filepath: Option<String>,
-    #[structopt(subcommand)]
+    #[command(subcommand)]
     cmd: Option<Command>,
     /// Enable debug logging output
-    #[structopt(long, global = true)]
+    #[arg(long, global = true)]
     verbose: bool,
     /// Path to the squawk config file (.squawk.toml)
-    #[structopt(short = "c", long = "config", global = true)]
+    #[arg(short = 'c', long = "config", global = true)]
     config_path: Option<PathBuf>,
     /// Assume that a transaction will wrap each SQL file when run by a migration tool
     ///
     /// Use --no-assume-in-transaction to override any config file that sets this
-    #[structopt(long, global = true)]
+    #[arg(long, global = true)]
     assume_in_transaction: bool,
-    #[structopt(
+    #[arg(
         long,
-        hidden = true,
-        conflicts_with = "assume-in-transaction",
+        hide = true,
+        conflicts_with = "assume_in_transaction",
         global = true
     )]
     no_assume_in_transaction: bool,
     /// Do not exit with an error when provided path patterns do not match any files
-    #[structopt(long = "no-error-on-unmatched-pattern", global = true)]
+    #[arg(long = "no-error-on-unmatched-pattern", global = true)]
     no_error_on_unmatched_pattern: bool,
 }
 
@@ -170,7 +165,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
         writeln!(stderr, "{panic_info}\n{backtrace}\n{open_an_issue}").ok();
     }));
 
-    let opts = Opt::from_args();
+    let opts = Opt::parse();
 
     if opts.verbose {
         CombinedLogger::init(vec![simplelog::TermLogger::new(
@@ -228,7 +223,6 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
     info!("assume in a transaction: {assume_in_transaction:?}");
     info!("no error on unmatched pattern: {no_error_on_unmatched_pattern:?}");
 
-    let mut clap_app = Opt::clap();
     let is_stdin = !io::stdin().is_terminal();
     let github_annotations = std::env::var("GITHUB_ACTIONS").is_ok()
         && std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_err();
@@ -288,7 +282,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
                     return Ok(exit_code);
                 }
             } else if !no_error_on_unmatched_pattern {
-                clap_app.print_long_help()?;
+                Opt::command().print_long_help()?;
                 println!();
             }
         }
