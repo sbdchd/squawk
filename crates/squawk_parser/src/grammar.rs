@@ -8674,7 +8674,7 @@ fn create_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
     // A SELECT, TABLE, or VALUES command.
     let statement = stmt(p, &StmtRestrictions::default());
     match statement.map(|x| x.kind()) {
-        Some(SELECT | SELECT_INTO | COMPOUND_SELECT | TABLE | VALUES) => (),
+        Some(SELECT | SELECT_INTO | COMPOUND_SELECT | PAREN_SELECT | TABLE | VALUES) => (),
         Some(kind) => {
             p.error(format!(
                 "expected SELECT, TABLE, or VALUES statement, got {kind:?}"

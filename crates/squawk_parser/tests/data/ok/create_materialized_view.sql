@@ -19,3 +19,9 @@ create materialized view t
 create materialized view t
   as values (1), (2, 2);
 
+-- https://github.com/sbdchd/squawk/issues/646
+CREATE MATERIALIZED VIEW "public"."user_countries_view" 
+AS (
+    select distinct "client_id", "address"->>'country' as "country" 
+    from "users" where "users"."address"->>'country' IS NOT NULL
+);
