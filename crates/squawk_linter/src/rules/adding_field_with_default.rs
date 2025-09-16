@@ -313,12 +313,12 @@ alter table t add column c timestamptz default current_timestamp;
 
     #[test]
     fn add_numbers_ok() {
-        // This should be okay, but we don't handle expressions like this at the moment.
         let sql = r#"
 alter table account_metadata add column blah integer default 2 + 2;
         "#;
 
         let errors = lint(sql, Rule::AddingFieldWithDefault);
+        assert!(errors.is_empty());
         assert_debug_snapshot!(errors);
     }
 
