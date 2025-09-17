@@ -44,12 +44,25 @@ set search_path to myschema;
 
 set foo = bar;
 
+set schema 'foo';
+
+set catalog 'foo';
+
+set xml option document;
+set xml option content;
+
+set role foo;
+
 set time zone 'America/Los_Angeles';
 set time zone default;
 set time zone local;
 
+set foo from current;
+set foo.bar from current;
+
 set foo = default;
 set foo to a, 10.0, 1, 'foo', true, false;
+set foo to default;
 
 -- operator
 -- binary

@@ -12986,15 +12986,21 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
         if !p.eat(LOCAL_KW) && !config_value(p) {
             p.error(format!("expected config value, got {:?}", p.current()));
         }
+    } else if p.eat(CATALOG_KW) || p.eat(SCHEMA_KW) {
+        string_literal(p);
     // configuration_parameter { TO | = } { value | 'value' | DEFAULT }
     } else {
         // configuration_parameter
         path_name_ref(p);
-        // { TO | = }
-        let _ = p.eat(TO_KW) || p.expect(EQ);
-        // { value | 'value' | DEFAULT }
-        if !config_value(p) {
-            p.error(format!("expected config value, got {:?}", p.current()));
+        if p.eat(FROM_KW) {
+            p.expect(CURRENT_KW);
+        } else {
+            // { TO | = }
+            let _ = p.eat(TO_KW) || p.expect(EQ);
+            // { value | 'value' | DEFAULT }
+            if !config_value(p) {
+                p.error(format!("expected config value, got {:?}", p.current()));
+            }
         }
     }
     m.complete(p, SET)

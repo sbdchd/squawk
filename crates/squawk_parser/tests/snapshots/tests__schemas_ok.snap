@@ -418,6 +418,52 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    CATALOG_KW "catalog"
+    WHITESPACE " "
+    LITERAL
+      STRING "'foo'"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    XML_KW "xml"
+    WHITESPACE " "
+    OPTION_KW "option"
+    WHITESPACE " "
+    DOCUMENT_KW "document"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    XML_KW "xml"
+    WHITESPACE " "
+    OPTION_KW "option"
+    WHITESPACE " "
+    CONTENT_KW "content"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET_ROLE
+    SET_KW "set"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    IDENT "foo"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
     TIME_KW "time"
     WHITESPACE " "
     ZONE_KW "zone"
@@ -444,6 +490,37 @@ SOURCE_FILE
     ZONE_KW "zone"
     WHITESPACE " "
     LOCAL_KW "local"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    CURRENT_KW "current"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      DOT "."
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "bar"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    CURRENT_KW "current"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SET
@@ -490,6 +567,19 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       FALSE_KW "false"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "foo"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- operator"
