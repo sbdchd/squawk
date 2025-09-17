@@ -46,8 +46,6 @@ set foo = bar;
 
 set schema 'foo';
 
-set catalog 'foo';
-
 set xml option document;
 set xml option content;
 

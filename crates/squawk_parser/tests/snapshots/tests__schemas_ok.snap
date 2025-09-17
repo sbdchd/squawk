@@ -427,15 +427,6 @@ SOURCE_FILE
   SET
     SET_KW "set"
     WHITESPACE " "
-    CATALOG_KW "catalog"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
-  SEMICOLON ";"
-  WHITESPACE "\n\n"
-  SET
-    SET_KW "set"
-    WHITESPACE " "
     XML_KW "xml"
     WHITESPACE " "
     OPTION_KW "option"
