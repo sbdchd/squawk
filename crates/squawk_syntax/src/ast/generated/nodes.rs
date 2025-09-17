@@ -122,6 +122,10 @@ pub struct Alias {
 }
 impl Alias {
     #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AS_KW)
     }
@@ -1642,6 +1646,10 @@ pub struct ColumnList {
     pub(crate) syntax: SyntaxNode,
 }
 impl ColumnList {
+    #[inline]
+    pub fn columns(&self) -> AstChildren<Column> {
+        support::children(&self.syntax)
+    }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
@@ -4767,12 +4775,44 @@ pub struct FromItem {
 }
 impl FromItem {
     #[inline]
+    pub fn alias(&self) -> Option<Alias> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn call_expr(&self) -> Option<CallExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn paren_select(&self) -> Option<ParenSelect> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn lateral_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LATERAL_KW)
+    }
+    #[inline]
     pub fn only_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ONLY_KW)
+    }
+    #[inline]
+    pub fn rows_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROWS_KW)
     }
 }
 
@@ -5572,6 +5612,10 @@ pub struct Join {
     pub(crate) syntax: SyntaxNode,
 }
 impl Join {
+    #[inline]
+    pub fn from_item(&self) -> Option<FromItem> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn join_type(&self) -> Option<JoinType> {
         support::child(&self.syntax)
@@ -8282,6 +8326,10 @@ impl Select {
     pub fn window_clause(&self) -> Option<WindowClause> {
         support::child(&self.syntax)
     }
+    #[inline]
+    pub fn with_clause(&self) -> Option<WithClause> {
+        support::child(&self.syntax)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -9104,8 +9152,16 @@ impl Target {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn star_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::STAR)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
     }
 }
 
@@ -9441,6 +9497,10 @@ pub struct WhereClause {
 }
 impl WhereClause {
     #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn where_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WHERE_KW)
     }
@@ -9623,7 +9683,15 @@ pub struct WithTable {
 }
 impl WithTable {
     #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn materialized(&self) -> Option<Materialized> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9631,8 +9699,20 @@ impl WithTable {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn with_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::WITH_KW)
+    pub fn query(&self) -> Option<WithQuery> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
     }
 }
 
@@ -10215,6 +10295,16 @@ pub enum Type {
     PathType(PathType),
     PercentType(PercentType),
     TimeType(TimeType),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum WithQuery {
+    Delete(Delete),
+    Insert(Insert),
+    Merge(Merge),
+    Select(Select),
+    Update(Update),
+    Values(Values),
 }
 impl AstNode for AddColumn {
     #[inline]
@@ -22653,5 +22743,81 @@ impl From<TimeType> for Type {
     #[inline]
     fn from(node: TimeType) -> Type {
         Type::TimeType(node)
+    }
+}
+impl AstNode for WithQuery {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::DELETE
+                | SyntaxKind::INSERT
+                | SyntaxKind::MERGE
+                | SyntaxKind::SELECT
+                | SyntaxKind::UPDATE
+                | SyntaxKind::VALUES
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::DELETE => WithQuery::Delete(Delete { syntax }),
+            SyntaxKind::INSERT => WithQuery::Insert(Insert { syntax }),
+            SyntaxKind::MERGE => WithQuery::Merge(Merge { syntax }),
+            SyntaxKind::SELECT => WithQuery::Select(Select { syntax }),
+            SyntaxKind::UPDATE => WithQuery::Update(Update { syntax }),
+            SyntaxKind::VALUES => WithQuery::Values(Values { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            WithQuery::Delete(it) => &it.syntax,
+            WithQuery::Insert(it) => &it.syntax,
+            WithQuery::Merge(it) => &it.syntax,
+            WithQuery::Select(it) => &it.syntax,
+            WithQuery::Update(it) => &it.syntax,
+            WithQuery::Values(it) => &it.syntax,
+        }
+    }
+}
+impl From<Delete> for WithQuery {
+    #[inline]
+    fn from(node: Delete) -> WithQuery {
+        WithQuery::Delete(node)
+    }
+}
+impl From<Insert> for WithQuery {
+    #[inline]
+    fn from(node: Insert) -> WithQuery {
+        WithQuery::Insert(node)
+    }
+}
+impl From<Merge> for WithQuery {
+    #[inline]
+    fn from(node: Merge) -> WithQuery {
+        WithQuery::Merge(node)
+    }
+}
+impl From<Select> for WithQuery {
+    #[inline]
+    fn from(node: Select) -> WithQuery {
+        WithQuery::Select(node)
+    }
+}
+impl From<Update> for WithQuery {
+    #[inline]
+    fn from(node: Update) -> WithQuery {
+        WithQuery::Update(node)
+    }
+}
+impl From<Values> for WithQuery {
+    #[inline]
+    fn from(node: Values) -> WithQuery {
+        WithQuery::Values(node)
     }
 }

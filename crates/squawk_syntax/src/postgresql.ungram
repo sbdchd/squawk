@@ -499,7 +499,7 @@ LikeClause =
   'like'
 
 WhereClause =
-  'where'
+  'where' Expr
 
 GroupByClause =
   'group' 'by' ('all' | 'distinct') (GroupingRollup | GroupingCube | GroupingSets | GroupingExpr)
@@ -539,7 +539,7 @@ DistinctClause =
 
 Target =
   '*'
-| Expr
+| (Expr ('as' Name)?)
 
 TargetList =
   Target (',' Target)*
@@ -567,13 +567,13 @@ UsingClause =
   'using'
 
 Alias =
-  'as'?
+  'as'? ColumnList?
 
 SequenceOptionList =
   '(' ')'
 
 ColumnList =
-  '(' ')'
+  '(' (Column (',' Column)*) ')'
 
 ConstraintIncludeClause =
   'include'
@@ -613,7 +613,7 @@ JoinUsingClause =
   'using' ColumnList Alias?
 
 Join =
-  'natural'? JoinType (using_clause:JoinUsingClause | OnClause)?
+  'natural'? JoinType FromItem (using_clause:JoinUsingClause | OnClause)?
 
 JoinExpr =
   (FromItem | JoinExpr) Join
@@ -625,6 +625,7 @@ ParenSelect =
  ')'
 
 Select =
+ WithClause?
  SelectClause
  FromClause?
  WhereClause?
@@ -1036,8 +1037,16 @@ Materialized =
 NotMaterialized =
   'not' 'materialized'
 
+WithQuery =
+  Select
+| Values
+| Insert
+| Update
+| Delete
+| Merge
+
 WithTable =
-  'with' (Materialized | NotMaterialized)?
+  Name ColumnList? 'as'? (Materialized | NotMaterialized)? '(' query:WithQuery ')'
 
 WithClause =
   'with' 'recursive'? (WithTable (',' WithTable)*)
@@ -1092,7 +1101,10 @@ OrderByClause =
   'order' 'by' (SortBy (',' SortBy)*)
 
 FromItem =
-  'only'? NameRef
+  'only'? NameRef Alias?
+| 'lateral'? ParenSelect Alias?
+| 'lateral'? CallExpr Alias?
+| 'lateral'? 'rows' 'from' '(' CallExpr ')' Alias?
 
 FromClause =
   'from'
