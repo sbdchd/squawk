@@ -657,5 +657,4 @@ SELECT 1;
         let filename = "main.sql";
         assert_debug_snapshot!(check_sql(sql, filename, &[], None, false));
     }
-
 }
