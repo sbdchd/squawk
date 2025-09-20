@@ -1,6 +1,4 @@
-use annotate_snippets::{
-    Annotation, AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle,
-};
+use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use anyhow::Result;
 use console::style;
 use line_index::LineIndex;

@@ -20,6 +20,16 @@ jobs:
         with:
           paths_ignore: '["docs/**", "*.md"]'
 
+  lint_pre_job:
+    runs-on: ubuntu-22.04
+    outputs:
+      should_skip_lint: ${{ steps.skip_check_lint.outputs.should_skip }}
+    steps:
+      - id: skip_check_lint
+        uses: fkirc/skip-duplicate-actions@c449d86cf33a2a6c7a4193264cc2578e2c3266d4 # pin@v4
+        with:
+          paths: '["**/*.rs", "**/Cargo.toml", "Cargo.lock", "s/lint"]'
+
   build:
     needs: pre_job
     if: needs.pre_job.outputs.should_skip != 'true' || startsWith(github.ref, 'refs/tags/')
@@ -273,8 +283,8 @@ jobs:
           NETLIFY_SITE_ID: ${{ secrets.PLAYGROUND_NETLIFY_SITE_ID }}
 
   lint:
-    needs: pre_job
-    if: needs.pre_job.outputs.should_skip != 'true'
+    needs: lint_pre_job
+    if: needs.lint_pre_job.outputs.should_skip_lint != 'true'
 
     runs-on: ubuntu-22.04
 

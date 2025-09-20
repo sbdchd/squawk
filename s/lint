@@ -2,8 +2,9 @@
 set -e
 
 if [ -z "$CI" ]; then
-  cargo fmt -- --check
-  cargo clippy --all-targets --all-features -- -D warnings
+  cargo fmt -- --check || exit 1
+  # without the exit 1, we're exiting with status code 101, which isn't causing the github action to fail
+  cargo clippy --all-targets --all-features -- -D warnings || exit 1
 else
   cargo fmt 
   cargo clippy --fix --allow-staged --allow-dirty --all-targets --all-features -- -D warnings
