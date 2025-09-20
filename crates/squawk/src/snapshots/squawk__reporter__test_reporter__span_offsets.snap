@@ -19,6 +19,7 @@ CheckReport {
             rule_name: "adding-required-field",
             column_end: 62,
             line_end: 2,
+            fix: None,
         },
         ReportViolation {
             file: "main.sql",
@@ -31,6 +32,19 @@ CheckReport {
             rule_name: "prefer-robust-stmts",
             column_end: 62,
             line_end: 2,
+            fix: Some(
+                Fix {
+                    title: "Insert `if not exists`",
+                    edits: [
+                        Edit {
+                            text_range: 41..41,
+                            text: Some(
+                                " if not exists",
+                            ),
+                        },
+                    ],
+                },
+            ),
         },
         ReportViolation {
             file: "main.sql",
@@ -45,6 +59,19 @@ CheckReport {
             rule_name: "prefer-bigint-over-int",
             column_end: 53,
             line_end: 2,
+            fix: Some(
+                Fix {
+                    title: "Replace with a 64-bit integer type: `bigint`",
+                    edits: [
+                        Edit {
+                            text_range: 48..55,
+                            text: Some(
+                                "bigint",
+                            ),
+                        },
+                    ],
+                },
+            ),
         },
         ReportViolation {
             file: "main.sql",
@@ -59,6 +86,7 @@ CheckReport {
             rule_name: "adding-required-field",
             column_end: 56,
             line_end: 3,
+            fix: None,
         },
         ReportViolation {
             file: "main.sql",
@@ -71,6 +99,19 @@ CheckReport {
             rule_name: "prefer-robust-stmts",
             column_end: 56,
             line_end: 3,
+            fix: Some(
+                Fix {
+                    title: "Insert `if not exists`",
+                    edits: [
+                        Edit {
+                            text_range: 99..99,
+                            text: Some(
+                                " if not exists",
+                            ),
+                        },
+                    ],
+                },
+            ),
         },
         ReportViolation {
             file: "main.sql",
@@ -85,6 +126,19 @@ CheckReport {
             rule_name: "prefer-bigint-over-int",
             column_end: 47,
             line_end: 3,
+            fix: Some(
+                Fix {
+                    title: "Replace with a 64-bit integer type: `bigint`",
+                    edits: [
+                        Edit {
+                            text_range: 106..113,
+                            text: Some(
+                                "bigint",
+                            ),
+                        },
+                    ],
+                },
+            ),
         },
     ],
 }

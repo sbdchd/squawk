@@ -394,6 +394,7 @@ mod test_github_comment {
                 help: Some("Make the field nullable.".to_string()),
                 column_end: 9,
                 line_end: 1,
+                fix: None,
             }],
         }];
 
@@ -486,6 +487,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
                 help: Some("Use bigint instead.".to_string()),
                 column_end: 0,
                 line_end: 1,
+                fix: None,
             }],
         }];
 
@@ -520,6 +522,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
                 help: Some("Use bigint instead.".to_string()),
                 column_end: 0,
                 line_end: 1,
+                fix: None,
             }],
         }];
 

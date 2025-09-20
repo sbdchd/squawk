@@ -1,13 +1,11 @@
-use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
+use annotate_snippets::{AnnotationKind, Level, Patch, Renderer, Snippet, renderer::DecorStyle};
 use anyhow::Result;
 use console::style;
 use line_index::LineIndex;
 use line_index::TextRange;
 use log::info;
 use serde::Serialize;
-use squawk_linter::Linter;
-use squawk_linter::Rule;
-use squawk_linter::Version;
+use squawk_linter::{Fix, Linter, Rule, Version};
 use squawk_syntax::SourceFile;
 use std::hash::DefaultHasher;
 use std::hash::Hash;
@@ -56,6 +54,7 @@ fn check_sql(
             range: e.range(),
             message: e.message().to_string(),
             rule_name: "syntax-error".to_string(),
+            fix: None,
         })
     }
     for e in errors {
@@ -74,6 +73,7 @@ fn check_sql(
             level: ViolationLevel::Warning,
             message: e.message,
             rule_name: e.code.to_string(),
+            fix: e.fix,
         })
     }
 
@@ -100,15 +100,28 @@ fn render_lint_error<W: std::io::Write>(
         ViolationLevel::Error => Level::ERROR,
     };
 
-    let mut group = level.primary_title(title).id(error_name).element(
-        Snippet::source(sql)
-            .path(filename)
-            .fold(true)
-            .annotation(AnnotationKind::Primary.span(err.range.into())),
-    );
+    let snippet = Snippet::source(sql)
+        .path(filename)
+        .fold(true)
+        .annotation(AnnotationKind::Primary.span(err.range.into()));
+
+    let mut group = level.primary_title(title).id(error_name).element(snippet);
 
     if let Some(help) = &err.help {
         group = group.element(Level::HELP.message(help));
+    }
+
+    if let Some(fix) = &err.fix {
+        let mut patch_snippet = Snippet::source(sql).path(filename).fold(true);
+
+        for edit in &fix.edits {
+            let start: usize = edit.text_range.start().into();
+            let end: usize = edit.text_range.end().into();
+            let replacement = edit.text.as_deref().unwrap_or("");
+            patch_snippet = patch_snippet.patch(Patch::new(start..end, replacement));
+        }
+
+        group = group.element(patch_snippet);
     }
 
     writeln!(f, "{}", renderer.render(&[group]))?;
@@ -286,6 +299,8 @@ pub struct ReportViolation {
     pub rule_name: String,
     pub column_end: usize,
     pub line_end: usize,
+    #[serde(skip_serializing)]
+    pub fix: Option<Fix>,
 }
 
 fn fmt_gcc<W: io::Write>(f: &mut W, reports: &[CheckReport]) -> Result<()> {

@@ -40,6 +40,7 @@ lsp-types.workspace = true
 
 [dev-dependencies]
 insta.workspace = true
+snapbox.workspace = true
 
 [lints]
 workspace = true
