@@ -8,6 +8,11 @@ on:
       - "**"
   pull_request:
 
+env:
+  RUST_BACKTRACE: 1
+  CARGO_TERM_COLOR: always
+  CLICOLOR: 1
+
 jobs:
   pre_job:
     runs-on: ubuntu-22.04
