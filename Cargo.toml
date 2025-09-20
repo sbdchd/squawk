@@ -53,12 +53,13 @@ xshell = "0.2.7"
 proc-macro2 = "1.0.95"
 
 # local
-squawk_github = { path = "./crates/squawk_github" }
-squawk_lexer = { path = "./crates/squawk_lexer" }
-squawk_parser = { path = "./crates/squawk_parser" }
-squawk_syntax = { path = "./crates/squawk_syntax" }
-squawk_linter = { path = "./crates/squawk_linter" }
-squawk_server = { path = "./crates/squawk_server" }
+# we have to make the versions explicit otherwise `cargo publish` won't work
+squawk_github = { path = "./crates/squawk_github", version = "2.26.0" }
+squawk_lexer = { path = "./crates/squawk_lexer", version = "2.26.0" }
+squawk_parser = { path = "./crates/squawk_parser", version = "2.26.0" }
+squawk_syntax = { path = "./crates/squawk_syntax", version = "2.26.0" }
+squawk_linter = { path = "./crates/squawk_linter", version = "2.26.0" }
+squawk_server = { path = "./crates/squawk_server", version = "2.26.0" }
 
 [workspace.lints.clippy]
 collapsible_else_if = "allow"
