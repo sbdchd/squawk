@@ -60,7 +60,7 @@ pub enum Command {
     /// Run the language server
     Server,
     /// Comment on a PR with Squawk's results.
-    UploadToGithub(UploadToGithubArgs),
+    UploadToGithub(Box<UploadToGithubArgs>),
 }
 
 #[derive(Debug, ValueEnum, Clone)]
@@ -232,7 +232,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
         }
         Some(Command::UploadToGithub(args)) => {
             github::check_and_comment_on_pr(
-                args,
+                *args,
                 &conf,
                 is_stdin,
                 opts.stdin_filepath,

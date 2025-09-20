@@ -272,8 +272,7 @@ impl Violation {
 
         let start = node
             .children_with_tokens()
-            .filter(|x| !x.kind().is_trivia())
-            .next()
+            .find(|x| !x.kind().is_trivia())
             .map(|x| x.text_range().start())
             // Not sure we actually hit this, but just being safe
             .unwrap_or_else(|| range.start());
@@ -333,91 +332,91 @@ impl Linter {
     #[must_use]
     pub fn lint(&mut self, file: &Parse<SourceFile>, text: &str) -> Vec<Violation> {
         if self.rules.contains(&Rule::AddingFieldWithDefault) {
-            adding_field_with_default(self, &file);
+            adding_field_with_default(self, file);
         }
         if self.rules.contains(&Rule::AddingForeignKeyConstraint) {
-            adding_foreign_key_constraint(self, &file);
+            adding_foreign_key_constraint(self, file);
         }
         if self.rules.contains(&Rule::AddingNotNullableField) {
-            adding_not_null_field(self, &file);
+            adding_not_null_field(self, file);
         }
         if self.rules.contains(&Rule::AddingSerialPrimaryKeyField) {
-            adding_primary_key_constraint(self, &file);
+            adding_primary_key_constraint(self, file);
         }
         if self.rules.contains(&Rule::AddingRequiredField) {
-            adding_required_field(self, &file);
+            adding_required_field(self, file);
         }
         if self.rules.contains(&Rule::BanDropDatabase) {
-            ban_drop_database(self, &file);
+            ban_drop_database(self, file);
         }
         if self.rules.contains(&Rule::BanCharField) {
-            ban_char_field(self, &file);
+            ban_char_field(self, file);
         }
         if self
             .rules
             .contains(&Rule::BanConcurrentIndexCreationInTransaction)
         {
-            ban_concurrent_index_creation_in_transaction(self, &file);
+            ban_concurrent_index_creation_in_transaction(self, file);
         }
         if self.rules.contains(&Rule::BanDropColumn) {
-            ban_drop_column(self, &file);
+            ban_drop_column(self, file);
         }
         if self.rules.contains(&Rule::BanDropNotNull) {
-            ban_drop_not_null(self, &file);
+            ban_drop_not_null(self, file);
         }
         if self.rules.contains(&Rule::BanDropTable) {
-            ban_drop_table(self, &file);
+            ban_drop_table(self, file);
         }
         if self.rules.contains(&Rule::ChangingColumnType) {
-            changing_column_type(self, &file);
+            changing_column_type(self, file);
         }
         if self.rules.contains(&Rule::ConstraintMissingNotValid) {
-            constraint_missing_not_valid(self, &file);
+            constraint_missing_not_valid(self, file);
         }
         if self.rules.contains(&Rule::DisallowedUniqueConstraint) {
-            disallow_unique_constraint(self, &file);
+            disallow_unique_constraint(self, file);
         }
         if self.rules.contains(&Rule::PreferBigintOverInt) {
-            prefer_bigint_over_int(self, &file);
+            prefer_bigint_over_int(self, file);
         }
         if self.rules.contains(&Rule::PreferBigintOverSmallint) {
-            prefer_bigint_over_smallint(self, &file);
+            prefer_bigint_over_smallint(self, file);
         }
         if self.rules.contains(&Rule::PreferIdentity) {
-            prefer_identity(self, &file);
+            prefer_identity(self, file);
         }
         if self.rules.contains(&Rule::PreferRobustStmts) {
-            prefer_robust_stmts(self, &file);
+            prefer_robust_stmts(self, file);
         }
         if self.rules.contains(&Rule::PreferTextField) {
-            prefer_text_field(self, &file);
+            prefer_text_field(self, file);
         }
         if self.rules.contains(&Rule::PreferTimestampTz) {
-            prefer_timestamptz(self, &file);
+            prefer_timestamptz(self, file);
         }
         if self.rules.contains(&Rule::RenamingColumn) {
-            renaming_column(self, &file);
+            renaming_column(self, file);
         }
         if self.rules.contains(&Rule::RenamingTable) {
-            renaming_table(self, &file);
+            renaming_table(self, file);
         }
         if self.rules.contains(&Rule::RequireConcurrentIndexCreation) {
-            require_concurrent_index_creation(self, &file);
+            require_concurrent_index_creation(self, file);
         }
         if self.rules.contains(&Rule::RequireConcurrentIndexDeletion) {
-            require_concurrent_index_deletion(self, &file);
+            require_concurrent_index_deletion(self, file);
         }
         if self.rules.contains(&Rule::BanCreateDomainWithConstraint) {
-            ban_create_domain_with_constraint(self, &file);
+            ban_create_domain_with_constraint(self, file);
         }
         if self.rules.contains(&Rule::BanAlterDomainWithAddConstraint) {
-            ban_alter_domain_with_add_constraint(self, &file);
+            ban_alter_domain_with_add_constraint(self, file);
         }
         if self.rules.contains(&Rule::TransactionNesting) {
-            transaction_nesting(self, &file);
+            transaction_nesting(self, file);
         }
         if self.rules.contains(&Rule::BanTruncateCascade) {
-            ban_truncate_cascade(self, &file);
+            ban_truncate_cascade(self, file);
         }
         // xtask:new-rule:rule-call
 
