@@ -19,14 +19,21 @@ warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be re
   ╭▸ main.sql:2:30
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
-  ╰╴                             ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │                              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+2 │    ALTER TABLE "core_recipe" ADD COLUMN if not exists "foo" integer NOT NULL;
+  ╰╴                                        +++++++++++++
 warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
   ╭▸ main.sql:2:47
   │
 2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
   │                                               ━━━━━━━
   │
-  ╰ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ╭╴
+2 -    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+2 +    ALTER TABLE "core_recipe" ADD COLUMN "foo" bigint NOT NULL;
+  ╰╴
 warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
   ╭▸ main.sql:5:3
   │
@@ -40,14 +47,21 @@ warning[prefer-robust-stmts]: Missing `IF NOT EXISTS`, the migration can't be re
   │
 5 │ ┏   ADD COLUMN "bar" 
 6 │ ┃     integer NOT NULL;
-  ╰╴┗━━━━━━━━━━━━━━━━━━━━┛
+  │ ┗━━━━━━━━━━━━━━━━━━━━┛
+  ╭╴
+5 │   ADD COLUMN if not exists "bar" 
+  ╰╴             +++++++++++++
 warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitting the max `int` limit.
   ╭▸ main.sql:6:5
   │
 6 │     integer NOT NULL;
   │     ━━━━━━━
   │
-  ╰ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ├ help: Use 64-bit integer values instead to prevent hitting this limit.
+  ╭╴
+6 -     integer NOT NULL;
+6 +     bigint NOT NULL;
+  ╰╴
 
 Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
 Found 6 issues in 1 file (checked 1 source file)
