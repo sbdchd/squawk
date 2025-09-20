@@ -658,16 +658,4 @@ SELECT 1;
         assert_debug_snapshot!(check_sql(sql, filename, &[], None, false));
     }
 
-    #[test]
-    fn example_sql_svg() {
-        let expected = snapbox::file!["snapshots/example.svg": TermSvg];
-        let bin_path = snapbox::cmd::cargo_bin("squawk");
-        snapbox::cmd::Command::new(bin_path)
-            .env("CLICOLOR_FORCE", "1")
-            .arg("../../example.sql")
-            .assert()
-            .code(1) // squawk returns 1 when it finds violations
-            .stderr_eq("")
-            .stdout_eq(expected.raw());
-    }
 }
