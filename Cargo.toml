@@ -5,7 +5,7 @@ resolver = "2"
 [workspace.package]
 version = "2.26.0"
 edition = "2024"
-rust-version = "1.88.0"
+rust-version = "1.90.0"
 authors = ["Squawk Team & Contributors"]
 license = "Apache-2.0 OR MIT"
 
