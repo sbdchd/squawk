@@ -134,7 +134,7 @@ pub fn lint(text: String) -> Result<JsValue, Error> {
             let edits = fix
                 .edits
                 .into_iter()
-                .filter_map(|edit| {
+                .map(|edit| {
                     let start_pos = line_index.line_col(edit.text_range.start());
                     let end_pos = line_index.line_col(edit.text_range.end());
                     let start_wide = line_index
@@ -144,13 +144,13 @@ pub fn lint(text: String) -> Result<JsValue, Error> {
                         .to_wide(line_index::WideEncoding::Utf16, end_pos)
                         .unwrap();
 
-                    Some(TextEdit {
+                    TextEdit {
                         start_line_number: start_wide.line,
                         start_column: start_wide.col,
                         end_line_number: end_wide.line,
                         end_column: end_wide.col,
                         text: edit.text.unwrap_or_default(),
-                    })
+                    }
                 })
                 .collect();
 

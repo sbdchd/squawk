@@ -3,7 +3,7 @@
 set -ex
 
 main() {
-  if [ -z "$CI" ]; then
+  if [ -n "$CI" ]; then
     ./node_modules/.bin/prettier --check '**/*.{js,md,yml,json}'
   else
     ./node_modules/.bin/prettier '**/*.{js,md,yml,json}' --write

@@ -61,7 +61,7 @@ pub(crate) fn ignore_file_edit(
 
 fn is_ignore_comment(token: &SyntaxToken) -> bool {
     assert_eq!(token.kind(), SyntaxKind::COMMENT);
-    squawk_linter::ignore::ignore_rule_info(&token).is_some()
+    squawk_linter::ignore::ignore_rule_info(token).is_some()
 }
 
 #[cfg(test)]

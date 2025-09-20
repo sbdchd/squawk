@@ -1,8 +1,6 @@
 use std::{io, path::PathBuf};
 
-use annotate_snippets::{
-    Annotation, AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle,
-};
+use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use anyhow::Result;
 use serde_json::json;
 use squawk_syntax::{ast::AstNode, syntax_error::SyntaxError};

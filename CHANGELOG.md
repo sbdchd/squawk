@@ -21,7 +21,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   alter table t add column c timestamptz default now() - interval '100 years';
   ```
 
-
 ## Fixed
 
 - parser: parse materialized views using a paren select (#651).

@@ -8,3 +8,5 @@ coverage/
 .pytest_cache/
 target/
 docs
+squawk-vscode/.vscode-test/
+squawk-vscode/dist/

@@ -1,7 +1,7 @@
 #!/bin/sh
 set -e
 
-if [ -z "$CI" ]; then
+if [ -n "$CI" ]; then
   cargo fmt -- --check
   cargo clippy --all-targets --all-features -- -D warnings
 else
