@@ -1,3 +1,3 @@
 [toolchain]
 targets = ["x86_64-unknown-linux-gnu", "x86_64-apple-darwin", "aarch64-apple-darwin"]
-channel = "1.88.0"
+channel = "1.90.0"
