@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.27.0 - 2025-09-23
+
+## Added
+
+- cli: rendering of diffs for suggestions in output. (#662)
+
+  We now include a diff below the rule error.
+
+  ```
+  warning[require-concurrent-index-creation]: During normal index creation, table updates are blocked, but reads are still allowed.
+     ╭▸ example.sql:10:1
+     │
+  10 │ CREATE INDEX "field_name_idx" ON "table_name" ("field_name");
+     │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+     │
+     ├ help: Use `concurrently` to avoid blocking writes.
+     ╭╴
+  10 │ CREATE INDEX concurrently "field_name_idx" ON "table_name" ("field_name");
+     ╰╴             ++++++++++++
+  ```
+
+## Fixed
+
+- parser: parsing some `set` related commands. (#657)
+
+  The following now parse:
+
+  ```sql
+  set schema 'foo';
+  set foo.bar from current;
+  set bar from current;
+  ```
+
+## Changed
+
+- internal: bump rust to 1.90.0 (#659)
+- syntax: fill out more of the ast (#658)
+
 ## v2.26.0 - 2025-09-15
 
 ## Added
