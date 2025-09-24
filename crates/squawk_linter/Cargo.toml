@@ -1,13 +1,17 @@
 [package]
-name = "squawk_linter"
+name = "squawk-linter"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
 
 [dependencies]
-squawk_syntax.workspace = true
+squawk-syntax.workspace = true
 
 rowan.workspace = true
 serde.workspace = true

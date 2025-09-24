@@ -1849,17 +1849,17 @@ dependencies = [
  "serde_json",
  "simplelog",
  "snapbox",
- "squawk_github",
- "squawk_lexer",
- "squawk_linter",
- "squawk_server",
- "squawk_syntax",
+ "squawk-github",
+ "squawk-lexer",
+ "squawk-linter",
+ "squawk-server",
+ "squawk-syntax",
  "tempfile",
  "toml",
 ]
 
 [[package]]
-name = "squawk_github"
+name = "squawk-github"
 version = "2.27.0"
 dependencies = [
  "jsonwebtoken",
@@ -1870,7 +1870,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "squawk_ide"
+name = "squawk-ide"
 version = "2.27.0"
 dependencies = [
  "annotate-snippets",
@@ -1878,18 +1878,18 @@ dependencies = [
  "line-index",
  "log",
  "rowan",
- "squawk_syntax",
+ "squawk-syntax",
 ]
 
 [[package]]
-name = "squawk_lexer"
+name = "squawk-lexer"
 version = "2.27.0"
 dependencies = [
  "insta",
 ]
 
 [[package]]
-name = "squawk_linter"
+name = "squawk-linter"
 version = "2.27.0"
 dependencies = [
  "enum-iterator",
@@ -1899,11 +1899,11 @@ dependencies = [
  "rowan",
  "serde",
  "serde_plain",
- "squawk_syntax",
+ "squawk-syntax",
 ]
 
 [[package]]
-name = "squawk_parser"
+name = "squawk-parser"
 version = "2.27.0"
 dependencies = [
  "camino",
@@ -1911,12 +1911,12 @@ dependencies = [
  "drop_bomb",
  "insta",
  "pg_query",
- "squawk_lexer",
+ "squawk-lexer",
  "xshell",
 ]
 
 [[package]]
-name = "squawk_server"
+name = "squawk-server"
 version = "2.27.0"
 dependencies = [
  "anyhow",
@@ -1928,13 +1928,13 @@ dependencies = [
  "serde",
  "serde_json",
  "simplelog",
- "squawk_lexer",
- "squawk_linter",
- "squawk_syntax",
+ "squawk-lexer",
+ "squawk-linter",
+ "squawk-syntax",
 ]
 
 [[package]]
-name = "squawk_syntax"
+name = "squawk-syntax"
 version = "2.27.0"
 dependencies = [
  "camino",
@@ -1942,11 +1942,11 @@ dependencies = [
  "insta",
  "rowan",
  "smol_str",
- "squawk_parser",
+ "squawk-parser",
 ]
 
 [[package]]
-name = "squawk_wasm"
+name = "squawk-wasm"
 version = "2.27.0"
 dependencies = [
  "console_error_panic_hook",
@@ -1955,9 +1955,9 @@ dependencies = [
  "log",
  "serde",
  "serde-wasm-bindgen",
- "squawk_lexer",
- "squawk_linter",
- "squawk_syntax",
+ "squawk-lexer",
+ "squawk-linter",
+ "squawk-syntax",
  "wasm-bindgen",
  "wasm-bindgen-test",
  "web-sys",

@@ -1,11 +1,14 @@
 [package]
-name = "squawk_server"
+name = "squawk-server"
 version.workspace = true
 
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "LSP server for Squawk"
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
 
 [dependencies]
 anyhow.workspace = true
@@ -15,9 +18,9 @@ lsp-server.workspace = true
 lsp-types.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-squawk_lexer.workspace = true
-squawk_linter.workspace = true
-squawk_syntax.workspace = true
+squawk-lexer.workspace = true
+squawk-linter.workspace = true
+squawk-syntax.workspace = true
 line-index.workspace = true
 insta.workspace = true
 

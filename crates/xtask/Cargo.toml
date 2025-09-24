@@ -1,6 +1,7 @@
 [package]
 name = "xtask"
 version.workspace = true
+publish = false
 
 authors.workspace = true
 edition.workspace = true

@@ -8,6 +8,10 @@ edition = "2024"
 rust-version = "1.90.0"
 authors = ["Squawk Team & Contributors"]
 license = "Apache-2.0 OR MIT"
+description = "Linter for Postgres migrations & SQL"
+documentation = "https://squawkhq.com/docs/"
+homepage = "https://squawkhq.com"
+repository = "https://github.com/sbdchd/squawk"
 
 [workspace.dependencies]
 # third party
@@ -55,12 +59,12 @@ snapbox = { version = "0.6.0", features = ["diff", "term-svg", "cmd"] }
 
 # local
 # we have to make the versions explicit otherwise `cargo publish` won't work
-squawk_github = { path = "./crates/squawk_github", version = "2.27.0" }
-squawk_lexer = { path = "./crates/squawk_lexer", version = "2.27.0" }
-squawk_parser = { path = "./crates/squawk_parser", version = "2.27.0" }
-squawk_syntax = { path = "./crates/squawk_syntax", version = "2.27.0" }
-squawk_linter = { path = "./crates/squawk_linter", version = "2.27.0" }
-squawk_server = { path = "./crates/squawk_server", version = "2.27.0" }
+squawk-github = { path = "./crates/squawk_github", version = "2.27.0" }
+squawk-lexer = { path = "./crates/squawk_lexer", version = "2.27.0" }
+squawk-parser = { path = "./crates/squawk_parser", version = "2.27.0" }
+squawk-syntax = { path = "./crates/squawk_syntax", version = "2.27.0" }
+squawk-linter = { path = "./crates/squawk_linter", version = "2.27.0" }
+squawk-server = { path = "./crates/squawk_server", version = "2.27.0" }
 
 [workspace.lints.clippy]
 collapsible_else_if = "allow"
