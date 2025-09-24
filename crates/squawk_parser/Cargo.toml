@@ -1,7 +1,10 @@
 [package]
-name = "squawk_parser"
+name = "squawk-parser"
 version.workspace = true
-description = "TBD"
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
 
 authors.workspace = true
 edition.workspace = true
@@ -12,7 +15,7 @@ rust-version.workspace = true
 doctest = false
 
 [dependencies]
-squawk_lexer.workspace = true
+squawk-lexer.workspace = true
 drop_bomb.workspace = true
 
 [dev-dependencies]

@@ -1,10 +1,14 @@
 [package]
-name = "squawk_wasm"
+name = "squawk-wasm"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 authors.workspace = true
 license.workspace = true
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
 
 [lib]
 crate-type = ["cdylib", "rlib"]
@@ -14,9 +18,9 @@ default = ["console_error_panic_hook"]
 
 [dependencies]
 
-squawk_syntax.workspace = true
-squawk_linter.workspace = true
-squawk_lexer.workspace = true
+squawk-syntax.workspace = true
+squawk-linter.workspace = true
+squawk-lexer.workspace = true
 
 wasm-bindgen.workspace = true
 serde-wasm-bindgen.workspace = true

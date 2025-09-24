@@ -1,11 +1,13 @@
 [package]
-name = "squawk_github"
+name = "squawk-github"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
 description = "Postgres SQL linter Github APIs used in Squawk"
-repository = "https://github.com/sbdchd/squawk"
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
 readme = "README.md"
 keywords = ["bot", "github", "linter"]
 
