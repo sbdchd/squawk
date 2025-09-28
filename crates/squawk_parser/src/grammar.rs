@@ -3796,7 +3796,7 @@ fn on_delete_action(p: &mut Parser<'_>) {
     m.complete(p, ON_DELETE_ACTION);
 }
 
-const LIKE_OPTION: TokenSet = TokenSet::new(&[
+const LIKE_OPTION_FIRST: TokenSet = TokenSet::new(&[
     COMMENTS_KW,
     COMPRESSION_KW,
     CONSTRAINTS_KW,
@@ -3815,7 +3815,7 @@ fn opt_like_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(INCLUDING_KW) || p.at(EXCLUDING_KW) {
         let m = p.start();
         p.bump_any();
-        if p.at_ts(LIKE_OPTION) {
+        if p.at_ts(LIKE_OPTION_FIRST) {
             p.bump_any();
         } else {
             p.err_and_bump(&format!("expected like option, got {:?}", p.current()));

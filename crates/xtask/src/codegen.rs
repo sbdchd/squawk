@@ -242,13 +242,14 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> Result<String> {
         .map(|(_token, name)| format_ident!("{}", name))
         .collect::<Vec<_>>();
 
-    let x = |&name| match name {
-        "Self" => format_ident!("SELF_TYPE_KW"),
-        name => format_ident!("{}_KW", name.to_case(Case::UpperSnake)),
-    };
-
     let all_keywords_values = grammar.keywords.to_vec();
-    let all_keywords = all_keywords_values.iter().map(x).collect::<Vec<_>>();
+    let all_keywords = all_keywords_values
+        .iter()
+        .map(|&name| match name {
+            "Self" => format_ident!("SELF_TYPE_KW"),
+            name => format_ident!("{}_KW", name.to_case(Case::UpperSnake)),
+        })
+        .collect::<Vec<_>>();
 
     let literals = grammar
         .literals
