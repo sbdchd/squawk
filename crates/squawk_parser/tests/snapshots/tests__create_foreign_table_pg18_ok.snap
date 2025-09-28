@@ -1,0 +1,94 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/create_foreign_table_pg18.sql
+---
+SOURCE_FILE
+  COMMENT "-- like clause is >=pg18"
+  WHITESPACE "\n"
+  CREATE_FOREIGN_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "u"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    LIKE_CLAUSE
+      LIKE_KW "like"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "s"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- like clause is >=pg18"
+  WHITESPACE "\n"
+  CREATE_FOREIGN_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "remote_users"
+    WHITESPACE " "
+    L_PAREN "("
+    WHITESPACE "\n  "
+    LIKE_CLAUSE
+      LIKE_KW "like"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "local_users"
+      WHITESPACE "\n    "
+      LIKE_OPTION
+        INCLUDING_KW "including"
+        WHITESPACE " "
+        DEFAULTS_KW "defaults"
+      WHITESPACE "\n    "
+      LIKE_OPTION
+        INCLUDING_KW "including"
+        WHITESPACE " "
+        CONSTRAINTS_KW "constraints"
+      WHITESPACE "\n    "
+      LIKE_OPTION
+        EXCLUDING_KW "excluding"
+        WHITESPACE " "
+        GENERATED_KW "generated"
+      WHITESPACE "\n    "
+      LIKE_OPTION
+        EXCLUDING_KW "excluding"
+        WHITESPACE " "
+        STATISTICS_KW "statistics"
+      WHITESPACE "\n    "
+      LIKE_OPTION
+        EXCLUDING_KW "excluding"
+        WHITESPACE " "
+        ALL_KW "all"
+    WHITESPACE "\n"
+    R_PAREN ")"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    NAME_REF
+      IDENT "remote_server"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"

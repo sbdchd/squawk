@@ -495,8 +495,18 @@ Truncate =
   ('restart' 'identity' | 'continue' 'identity')?
   ('cascade' | 'restrict')?
 
+LikeOption =
+  ('including' | 'excluding') 
+  ('comments'
+  | 'compression'
+  | 'constraints'
+  | 'defaults'
+  | 'generated'
+  | 'identity'
+  | 'indexes')
+
 LikeClause =
-  'like'
+  'like' LikeOption*
 
 WhereClause =
   'where' Expr

@@ -791,6 +791,22 @@ type: string
 -- id of the customer that rents the CPU
 ```
 
+#### Star
+
+```sql
+select * from (select case
+--     ^$ hover
+  when random() > 0.5 then
+  	true
+  else
+    false
+  end)
+```
+
+```
+("case": boolean)
+```
+
 ### Semantic Syntax Highlighting
 
 https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide
