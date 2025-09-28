@@ -6185,8 +6185,55 @@ pub struct LikeClause {
 }
 impl LikeClause {
     #[inline]
+    pub fn like_options(&self) -> AstChildren<LikeOption> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn like_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LIKE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct LikeOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl LikeOption {
+    #[inline]
+    pub fn comments_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMENTS_KW)
+    }
+    #[inline]
+    pub fn compression_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMPRESSION_KW)
+    }
+    #[inline]
+    pub fn constraints_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINTS_KW)
+    }
+    #[inline]
+    pub fn defaults_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULTS_KW)
+    }
+    #[inline]
+    pub fn excluding_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXCLUDING_KW)
+    }
+    #[inline]
+    pub fn generated_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GENERATED_KW)
+    }
+    #[inline]
+    pub fn identity_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENTITY_KW)
+    }
+    #[inline]
+    pub fn including_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INCLUDING_KW)
+    }
+    #[inline]
+    pub fn indexes_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INDEXES_KW)
     }
 }
 
@@ -15512,6 +15559,24 @@ impl AstNode for LikeClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::LIKE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for LikeOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::LIKE_OPTION
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

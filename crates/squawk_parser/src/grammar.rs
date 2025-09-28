@@ -3811,17 +3811,18 @@ const LIKE_OPTION: TokenSet = TokenSet::new(&[
 
 // where like_option is:
 //   { INCLUDING | EXCLUDING } { COMMENTS | COMPRESSION | CONSTRAINTS | DEFAULTS | GENERATED | IDENTITY | INDEXES | STATISTICS | STORAGE | ALL }
-fn like_option(p: &mut Parser<'_>) -> bool {
+fn opt_like_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(INCLUDING_KW) || p.at(EXCLUDING_KW) {
+        let m = p.start();
         p.bump_any();
         if p.at_ts(LIKE_OPTION) {
             p.bump_any();
         } else {
-            p.error("expected like option");
+            p.err_and_bump(&format!("expected like option, got {:?}", p.current()));
         }
-        true
+        Some(m.complete(p, LIKE_OPTION))
     } else {
-        false
+        None
     }
 }
 
@@ -4235,7 +4236,7 @@ fn like_clause(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(LIKE_KW);
     path_name_ref(p);
     while !p.at(EOF) {
-        if !like_option(p) {
+        if opt_like_option(p).is_none() {
             break;
         }
     }
@@ -8522,6 +8523,8 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
         while !p.at(EOF) && !p.at(R_PAREN) {
             if p.at_ts(TABLE_CONSTRAINT_FIRST) {
                 table_constraint(p);
+            } else if p.at(LIKE_KW) {
+                like_clause(p);
             } else {
                 name(p);
                 type_name(p);
