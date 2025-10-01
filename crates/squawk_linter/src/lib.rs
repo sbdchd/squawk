@@ -8,7 +8,7 @@ use ignore::find_ignores;
 use ignore_index::IgnoreIndex;
 use rowan::TextRange;
 use rowan::TextSize;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 
 use squawk_syntax::SyntaxNode;
 use squawk_syntax::{Parse, SourceFile};
@@ -54,65 +54,36 @@ use rules::require_concurrent_index_deletion;
 use rules::transaction_nesting;
 // xtask:new-rule:rule-import
 
-#[derive(Debug, PartialEq, Clone, Copy, Serialize, Hash, Eq, Sequence)]
+#[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, Sequence)]
 pub enum Rule {
-    #[serde(rename = "require-concurrent-index-creation")]
     RequireConcurrentIndexCreation,
-    #[serde(rename = "require-concurrent-index-deletion")]
     RequireConcurrentIndexDeletion,
-    #[serde(rename = "constraint-missing-not-valid")]
     ConstraintMissingNotValid,
-    #[serde(rename = "adding-field-with-default")]
     AddingFieldWithDefault,
-    #[serde(rename = "adding-foreign-key-constraint")]
     AddingForeignKeyConstraint,
-    #[serde(rename = "changing-column-type")]
     ChangingColumnType,
-    #[serde(rename = "adding-not-nullable-field")]
     AddingNotNullableField,
-    #[serde(rename = "adding-serial-primary-key-field")]
     AddingSerialPrimaryKeyField,
-    #[serde(rename = "renaming-column")]
     RenamingColumn,
-    #[serde(rename = "renaming-table")]
     RenamingTable,
-    #[serde(rename = "disallowed-unique-constraint")]
     DisallowedUniqueConstraint,
-    #[serde(rename = "ban-drop-database")]
     BanDropDatabase,
-    #[serde(rename = "prefer-bigint-over-int")]
     PreferBigintOverInt,
-    #[serde(rename = "prefer-bigint-over-smallint")]
     PreferBigintOverSmallint,
-    #[serde(rename = "prefer-identity")]
     PreferIdentity,
-    #[serde(rename = "prefer-robust-stmts")]
     PreferRobustStmts,
-    #[serde(rename = "prefer-text-field")]
     PreferTextField,
-    #[serde(rename = "prefer-timestamptz")]
     PreferTimestampTz,
-    #[serde(rename = "ban-char-field")]
     BanCharField,
-    #[serde(rename = "ban-drop-column")]
     BanDropColumn,
-    #[serde(rename = "ban-drop-table")]
     BanDropTable,
-    #[serde(rename = "ban-drop-not-null")]
     BanDropNotNull,
-    #[serde(rename = "transaction-nesting")]
     TransactionNesting,
-    #[serde(rename = "adding-required-field")]
     AddingRequiredField,
-    #[serde(rename = "ban-concurrent-index-creation-in-transaction")]
     BanConcurrentIndexCreationInTransaction,
-    #[serde(rename = "unused-ignore")]
     UnusedIgnore,
-    #[serde(rename = "ban-create-domain-with-constraint")]
     BanCreateDomainWithConstraint,
-    #[serde(rename = "ban-alter-domain-with-add-constraint")]
     BanAlterDomainWithAddConstraint,
-    #[serde(rename = "ban-truncate-cascade")]
     BanTruncateCascade,
     // xtask:new-rule:error-name
 }
