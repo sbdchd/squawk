@@ -105,8 +105,7 @@ fn update_lib(name: &str) -> Result<()> {
         (
             "// xtask:new-rule:error-name",
             format!(
-                r#"#[serde(rename = "{name_kebab}")]
-    {name_pascal},
+                r#"{name_pascal},
     "#
             ),
         ),
