@@ -51,6 +51,18 @@ parse and warn, helps with copy pasting examples
 
 support Trino, BigQuery, Aurora DSLQ, etc.
 
+### Check `format()` calls
+
+https://www.postgresql.org/docs/18/functions-string.html#FUNCTIONS-STRING-FORMAT
+
+```sql
+SELECT format('Hello %s', 'World');
+-- ok
+
+SELECT format('Hello %s %s', 'World');
+-- error                ^^
+```
+
 ### Formatter
 
 ```shell
@@ -386,6 +398,24 @@ with t(name) as (select '1 month'::interval)
 select count(*) from t where t.name in ('1 month', '2 month')
 -- type checks!
 ```
+
+### Rule: no-unncesssary-parens
+
+```sql
+select (((x * 2)));
+-- becomes
+select x * 2;
+```
+
+```sql
+-- ok, indexes on expressions require extra parens
+create index foo on t((1));
+
+-- ok
+select (x * 2) + 4;
+```
+
+related: https://eslint.style/rules/no-extra-parens
 
 ### Rule: dialect: now() to dest
 

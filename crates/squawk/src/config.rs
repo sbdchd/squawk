@@ -137,4 +137,14 @@ fail_on_violations = true
         fs::write(&squawk_toml, file).expect("Unable to write file");
         assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
     }
+    #[test]
+    fn load_excluded_rules_with_alias() {
+        let squawk_toml = NamedTempFile::new().expect("generate tempFile");
+        let file = r#"
+excluded_rules = ["prefer-timestamp-tz", "prefer-timestamptz"]
+
+        "#;
+        fs::write(&squawk_toml, file).expect("Unable to write file");
+        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+    }
 }

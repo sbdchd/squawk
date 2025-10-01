@@ -54,7 +54,7 @@ use rules::require_concurrent_index_deletion;
 use rules::transaction_nesting;
 // xtask:new-rule:rule-import
 
-#[derive(Debug, PartialEq, Clone, Copy, Serialize, Hash, Eq, Deserialize, Sequence)]
+#[derive(Debug, PartialEq, Clone, Copy, Serialize, Hash, Eq, Sequence)]
 pub enum Rule {
     #[serde(rename = "require-concurrent-index-creation")]
     RequireConcurrentIndexCreation,
@@ -176,7 +176,7 @@ impl std::error::Error for UnknownRuleName {}
 impl std::str::FromStr for Rule {
     type Err = UnknownRuleName;
     fn from_str(s: &str) -> Result<Self, Self::Err> {
-        serde_plain::from_str(s).map_err(|_| UnknownRuleName { val: s.to_string() })
+        Rule::try_from(s).map_err(|_| UnknownRuleName { val: s.to_string() })
     }
 }
 
@@ -217,6 +217,16 @@ impl fmt::Display for Rule {
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
+    }
+}
+
+impl<'de> Deserialize<'de> for Rule {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+        s.parse().map_err(serde::de::Error::custom)
     }
 }
 
@@ -468,5 +478,26 @@ impl Linter {
             rules: rules.into(),
             settings: LinterSettings::default(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use insta::assert_debug_snapshot;
+
+    use super::*;
+
+    #[test]
+    fn prefer_timestamp_aliases() {
+        let rule1: Rule = "prefer-timestamp-tz".parse().unwrap();
+        let rule2: Rule = "prefer-timestamptz".parse().unwrap();
+        assert_eq!(rule1, rule2);
+        assert_debug_snapshot!(rule1, @"PreferTimestampTz");
+    }
+
+    #[test]
+    fn invalid_rule_name() {
+        let result: Result<Rule, _> = "invalid-rule-name".parse();
+        assert!(result.is_err());
     }
 }
