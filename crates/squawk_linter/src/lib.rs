@@ -15,6 +15,7 @@ use squawk_syntax::{Parse, SourceFile};
 
 pub use version::Version;
 
+pub mod analyze;
 pub mod ignore;
 mod ignore_index;
 mod version;
@@ -51,6 +52,7 @@ use rules::renaming_column;
 use rules::renaming_table;
 use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
+use rules::require_timeout_settings;
 use rules::transaction_nesting;
 // xtask:new-rule:rule-import
 
@@ -85,6 +87,7 @@ pub enum Rule {
     BanCreateDomainWithConstraint,
     BanAlterDomainWithAddConstraint,
     BanTruncateCascade,
+    RequireTimeoutSettings,
     // xtask:new-rule:error-name
 }
 
@@ -125,6 +128,7 @@ impl TryFrom<&str> for Rule {
             "ban-create-domain-with-constraint" => Ok(Rule::BanCreateDomainWithConstraint),
             "ban-alter-domain-with-add-constraint" => Ok(Rule::BanAlterDomainWithAddConstraint),
             "ban-truncate-cascade" => Ok(Rule::BanTruncateCascade),
+            "require-timeout-settings" => Ok(Rule::RequireTimeoutSettings),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -185,6 +189,7 @@ impl fmt::Display for Rule {
             Rule::UnusedIgnore => "unused-ignore",
             Rule::BanAlterDomainWithAddConstraint => "ban-alter-domain-with-add-constraint",
             Rule::BanTruncateCascade => "ban-truncate-cascade",
+            Rule::RequireTimeoutSettings => "require-timeout-settings",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -398,6 +403,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::BanTruncateCascade) {
             ban_truncate_cascade(self, file);
+        }
+        if self.rules.contains(&Rule::RequireTimeoutSettings) {
+            require_timeout_settings(self, file);
         }
         // xtask:new-rule:rule-call
 

@@ -9,6 +9,60 @@ CheckReport {
         ReportViolation {
             file: "main.sql",
             line: 2,
+            column: 3,
+            range: 5..64,
+            level: Warning,
+            message: "Missing `set lock_timeout` before potentially slow operations",
+            help: Some(
+                "Configure a `lock_timeout` before this statement.",
+            ),
+            rule_name: "require-timeout-settings",
+            column_end: 62,
+            line_end: 2,
+            fix: Some(
+                Fix {
+                    title: "Add lock timeout",
+                    edits: [
+                        Edit {
+                            text_range: 5..5,
+                            text: Some(
+                                "set lock_timeout = '1s';\n",
+                            ),
+                        },
+                    ],
+                },
+            ),
+        },
+        ReportViolation {
+            file: "main.sql",
+            line: 2,
+            column: 3,
+            range: 5..64,
+            level: Warning,
+            message: "Missing `set statement_timeout` before potentially slow operations",
+            help: Some(
+                "Configure a `statement_timeout` before this statement",
+            ),
+            rule_name: "require-timeout-settings",
+            column_end: 62,
+            line_end: 2,
+            fix: Some(
+                Fix {
+                    title: "Add statement timeout",
+                    edits: [
+                        Edit {
+                            text_range: 5..5,
+                            text: Some(
+                                "set statement_timeout = '5s';\n",
+                            ),
+                        },
+                    ],
+                },
+            ),
+        },
+        ReportViolation {
+            file: "main.sql",
+            line: 2,
             column: 29,
             range: 31..64,
             level: Warning,
