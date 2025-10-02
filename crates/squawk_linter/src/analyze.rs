@@ -134,7 +134,7 @@ pub fn possibly_slow_stmt(stmt: &ast::Stmt) -> bool {
         | ast::Stmt::DropType(_)
         | ast::Stmt::DropUser(_)
         | ast::Stmt::DropUserMapping(_)
-        | ast::Stmt::DropView(_) 
+        | ast::Stmt::DropView(_)
         // non-Alter, Create, Drop statements
         | ast::Stmt::Cluster(_)
         | ast::Stmt::CommentOn(_)
@@ -204,12 +204,11 @@ mod tests {
         assert!(possibly_slow_stmt(&stmts));
     }
 
-
     #[test]
     fn select() {
         let sql = "select 1;";
         let file = SourceFile::parse(sql);
         let stmts = file.tree().stmts().next().unwrap();
-        assert_eq!(possibly_slow_stmt(&stmts), false);
+        assert!(!possibly_slow_stmt(&stmts));
     }
 }

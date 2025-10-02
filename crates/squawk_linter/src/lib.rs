@@ -405,7 +405,7 @@ impl Linter {
             ban_truncate_cascade(self, file);
         }
         if self.rules.contains(&Rule::RequireTimeoutSettings) {
-            require_timeout_settings(self, &file);
+            require_timeout_settings(self, file);
         }
         // xtask:new-rule:rule-call
 
