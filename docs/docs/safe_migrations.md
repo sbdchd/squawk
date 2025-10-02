@@ -37,12 +37,12 @@ With a short `lock_timeout` of 1 second, queries will be blocked for up to 1 sec
 
 ### `statement_timeout`
 
-While not as essentially as `lock_timeout`, it's still recommended to use a `statement_timeout` whenever you're querying your database.
+It's recommended to use a `statement_timeout` whenever you're querying your database.
 
 For migrations, you want to ensure there's an upper bound on how long your
 queries take. This prevents runaway migrations from using too many resources.
 
-Some queries will take a while, like concurrently creating an index, and that's okay, so you may have to tweak this based on your database size:
+Some queries will take a while, like concurrently creating an index on a large table, and that's okay, so you may have to tweak this based on your database size:
 
 ```sql
 set statement_timeout = '5s';
