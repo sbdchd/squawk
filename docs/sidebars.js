@@ -32,6 +32,7 @@ module.exports = {
       "ban-alter-domain-with-add-constraint",
       "ban-truncate-cascade",
       "syntax-error",
+      "require-timeout-settings",
       // xtask:new-rule:error-name
     ],
   },

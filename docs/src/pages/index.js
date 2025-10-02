@@ -193,6 +193,11 @@ const rules = [
     tags: ["backwards compatibility"],
     description: "Truncate cascade will recursively truncate all related tables!",
   },
+  {
+    name: "require-timeout-settings",
+    tags: ["locking"],
+    description: "Require lock and statement timeouts",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 

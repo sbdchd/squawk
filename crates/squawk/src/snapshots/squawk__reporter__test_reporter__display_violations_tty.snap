@@ -2,6 +2,26 @@
 source: crates/squawk/src/reporter.rs
 expression: "strip_ansi_codes(&String::from_utf8_lossy(&buff))"
 ---
+warning[require-timeout-settings]: Missing `set lock_timeout` before potentially slow operations
+  ╭▸ main.sql:2:4
+  │
+2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+  │    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Configure a `lock_timeout` before this statement.
+  ╭╴
+2 +    set lock_timeout = '1s';
+  ╰╴
+warning[require-timeout-settings]: Missing `set statement_timeout` before potentially slow operations
+  ╭▸ main.sql:2:4
+  │
+2 │    ALTER TABLE "core_recipe" ADD COLUMN "foo" integer NOT NULL;
+  │    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ help: Configure a `statement_timeout` before this statement
+  ╭╴
+2 +    set statement_timeout = '5s';
+  ╰╴
 warning[adding-required-field]: Adding a new column that is `NOT NULL` and has no default value to an existing table effectively makes it required.
   ╭▸ main.sql:2:30
   │
@@ -56,4 +76,4 @@ warning[prefer-bigint-over-int]: Using 32-bit integer fields can result in hitti
   ╰╴
 
 Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
-Found 6 issues in 1 file (checked 1 source file)
+Found 8 issues in 1 file (checked 1 source file)
