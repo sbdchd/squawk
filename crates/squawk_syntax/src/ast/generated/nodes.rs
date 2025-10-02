@@ -8497,12 +8497,44 @@ pub struct Set {
 }
 impl Set {
     #[inline]
-    pub fn set_options(&self) -> Option<SetOptions> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+    #[inline]
+    pub fn local_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LOCAL_KW)
+    }
+    #[inline]
+    pub fn session_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SESSION_KW)
     }
     #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+    #[inline]
+    pub fn time_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TIME_KW)
+    }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
+    #[inline]
+    pub fn zone_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ZONE_KW)
     }
 }
 

@@ -26,6 +26,7 @@ pub(crate) mod renaming_table;
 pub(crate) mod require_concurrent_index_creation;
 pub(crate) mod require_concurrent_index_deletion;
 pub(crate) mod transaction_nesting;
+pub(crate) mod require_timeout_settings;
 // xtask:new-rule:mod-decl
 
 pub(crate) use adding_field_with_default::adding_field_with_default;
@@ -56,4 +57,5 @@ pub(crate) use renaming_table::renaming_table;
 pub(crate) use require_concurrent_index_creation::require_concurrent_index_creation;
 pub(crate) use require_concurrent_index_deletion::require_concurrent_index_deletion;
 pub(crate) use transaction_nesting::transaction_nesting;
+pub(crate) use require_timeout_settings::require_timeout_settings;
 // xtask:new-rule:export

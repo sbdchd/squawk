@@ -1602,7 +1602,10 @@ CreateExtension =
   'create' 'extension'
 
 Set =
-  'set' SetOptions
+  'set' 
+  ('session' | 'local')? 
+  ('time' 'zone' | (Path ('to' | '='))) 
+  (Expr | 'local' | 'default')
 
 Show =
   'show'

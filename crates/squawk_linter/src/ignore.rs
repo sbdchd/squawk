@@ -148,7 +148,7 @@ alter table t drop column c cascade;
         let sql = "
 -- fooo bar
 -- buzz
--- squawk-ignore prefer-robust-stmts
+-- squawk-ignore prefer-robust-stmts, require-timeout-settings
 create table x();
 
 select 1;
@@ -233,7 +233,7 @@ alter table t drop column c cascade;
     fn ignore_multiple_stmts() {
         let mut linter = Linter::with_all_rules();
         let sql = r#"
--- squawk-ignore ban-char-field,prefer-robust-stmts
+-- squawk-ignore ban-char-field,prefer-robust-stmts,require-timeout-settings
 alter table t add column c char;
 
 ALTER TABLE foo
@@ -258,14 +258,78 @@ create table users (
 
         let parse = squawk_syntax::SourceFile::parse(sql);
         let errors = linter.lint(&parse, sql);
-        assert_eq!(errors.len(), 1);
+        assert_debug_snapshot!(errors, @r#"
+        [
+            Violation {
+                code: RequireTimeoutSettings,
+                message: "Missing `set lock_timeout` before possibly slow operations",
+                text_range: 0..31,
+                help: Some(
+                    "Configure a `lock_timeout` before this statement.",
+                ),
+                fix: Some(
+                    Fix {
+                        title: "Add lock timeout",
+                        edits: [
+                            Edit {
+                                text_range: 0..0,
+                                text: Some(
+                                    "set lock_timeout = '1s';\n",
+                                ),
+                            },
+                        ],
+                    },
+                ),
+            },
+            Violation {
+                code: RequireTimeoutSettings,
+                message: "Missing `set statement_timeout` before possibly slow operations",
+                text_range: 0..31,
+                help: Some(
+                    "Configure a `statement_timeout` before this statement",
+                ),
+                fix: Some(
+                    Fix {
+                        title: "Add statement timeout",
+                        edits: [
+                            Edit {
+                                text_range: 0..0,
+                                text: Some(
+                                    "set statement_timeout = '5s';\n",
+                                ),
+                            },
+                        ],
+                    },
+                ),
+            },
+            Violation {
+                code: BanCharField,
+                message: "Using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`.",
+                text_range: 27..31,
+                help: None,
+                fix: Some(
+                    Fix {
+                        title: "Replace with `text`",
+                        edits: [
+                            Edit {
+                                text_range: 27..31,
+                                text: Some(
+                                    "text",
+                                ),
+                            },
+                        ],
+                    },
+                ),
+            },
+        ]
+        "#);
     }
 
     #[test]
     fn regression_unknown_name() {
         let mut linter = Linter::with_all_rules();
         let sql = r#"
--- squawk-ignore prefer-robust-stmts
+-- squawk-ignore prefer-robust-stmts, require-timeout-settings
 create table test_table (
   -- squawk-ignore prefer-timestamp-tz
   created_at timestamp default current_timestamp,
@@ -275,6 +339,7 @@ create table test_table (
 
         let parse = squawk_syntax::SourceFile::parse(sql);
         let errors = linter.lint(&parse, sql);
+        assert_debug_snapshot!(errors, @"[]");
         assert_eq!(errors.len(), 0);
     }
 
@@ -390,6 +455,8 @@ alter table t2 drop column c2 cascade;
 
         assert_debug_snapshot!(errors, @r"
         [
+            RequireTimeoutSettings,
+            RequireTimeoutSettings,
             PreferRobustStmts,
             PreferRobustStmts,
         ]
@@ -414,6 +481,8 @@ alter table t2 drop column c2 cascade;
 
         assert_debug_snapshot!(errors, @r"
         [
+            RequireTimeoutSettings,
+            RequireTimeoutSettings,
             PreferRobustStmts,
             PreferRobustStmts,
         ]

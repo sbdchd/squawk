@@ -10,7 +10,8 @@ To safely apply a migration you must set a `lock_timeout` in Postgres. See below
 ## safety requirements
 
 1. Use Squawk to lint your migrations. Follow the advice.
-2. Set a short `lock_timeout` (e.g. 2 seconds) within Postgres when running your migrations. If you hit the `lock_timeout`, great, retry your migration until it succeeds.
+2. Set a short `lock_timeout` (e.g. 1 second) within Postgres when running your migrations. If you hit the `lock_timeout`, great, retry your migration until it succeeds.
+3. _Recommended_: Set a `statement_timeout` (e.g. 5 seconds) to prevent runaway migrations from using too many resources & holding locks for too long.
 
 ### `lock_timeout`
 
@@ -29,10 +30,23 @@ SET lock_timeout = '1s';
 ```
 
 ```bash
-PGOPTIONS='-c lock_timeout=10s' ./migrate_db
+PGOPTIONS='-c lock_timeout=1s' ./migrate_db
 ```
 
 With a short `lock_timeout` of 1 second, queries will be blocked for up to 1 second. If your migration hits the lock timeout, it will be cancelled and error, allowing the waiting queries to proceed. You should retry a migration that hits the lock timeout until it succeeds.
+
+### `statement_timeout`
+
+While not as essentially as `lock_timeout`, it's still recommended to use a `statement_timeout` whenever you're querying your database.
+
+For migrations, you want to ensure there's an upper bound on how long your
+queries take. This prevents runaway migrations from using too many resources.
+
+Some queries will take a while, like concurrently creating an index, and that's okay, so you may have to tweak this based on your database size:
+
+```sql
+set statement_timeout = '5s';
+```
 
 ### example
 
@@ -45,7 +59,6 @@ ALTER TABLE "accounts" ADD CONSTRAINT "positive_balance" CHECK ("balance" >= 0) 
 If there is a long running query or open transaction, this `ALTER TABLE` statement could be blocked while it waits for an `AccessExclusiveLock` lock. While the statement waits for a lock, all other reads and writes sent after will wait for this statement too, bringing your application to a halt.
 
 With a short `lock_timeout` of 1 second, queries will be blocked for up to 1 second. If your migration hits the lock timeout, it will be cancelled and error, allowing the waiting queries to proceed. You should retry a migration that hits the lock timeout until it succeeds.
-
 
 ## further reading
 
