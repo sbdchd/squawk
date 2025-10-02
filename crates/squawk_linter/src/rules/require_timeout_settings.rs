@@ -76,7 +76,7 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                     ctx.report(
                         Violation::for_node(
                             Rule::RequireTimeoutSettings,
-                            "Missing `set lock_timeout` before possibly slow operations"
+                            "Missing `set lock_timeout` before potentially slow operations"
                                 .to_string(),
                             stmt.syntax(),
                         )
@@ -89,7 +89,7 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                     ctx.report(
                         Violation::for_node(
                             Rule::RequireTimeoutSettings,
-                            "Missing `set statement_timeout` before possibly slow operations"
+                            "Missing `set statement_timeout` before potentially slow operations"
                                 .to_string(),
                             stmt.syntax(),
                         )
@@ -128,7 +128,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         [
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before possibly slow operations",
+                message: "Missing `set lock_timeout` before potentially slow operations",
                 text_range: 1..35,
                 help: Some(
                     "Configure a `lock_timeout` before this statement.",
@@ -149,7 +149,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
             },
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before possibly slow operations",
+                message: "Missing `set statement_timeout` before potentially slow operations",
                 text_range: 1..35,
                 help: Some(
                     "Configure a `statement_timeout` before this statement",
@@ -184,7 +184,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         [
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before possibly slow operations",
+                message: "Missing `set lock_timeout` before potentially slow operations",
                 text_range: 31..65,
                 help: Some(
                     "Configure a `lock_timeout` before this statement.",
@@ -219,7 +219,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         [
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before possibly slow operations",
+                message: "Missing `set statement_timeout` before potentially slow operations",
                 text_range: 26..60,
                 help: Some(
                     "Configure a `statement_timeout` before this statement",
@@ -286,7 +286,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
         [
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before possibly slow operations",
+                message: "Missing `set lock_timeout` before potentially slow operations",
                 text_range: 64..98,
                 help: Some(
                     "Configure a `lock_timeout` before this statement.",
@@ -307,7 +307,7 @@ ALTER TABLE t ADD COLUMN c BOOLEAN;
             },
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before possibly slow operations",
+                message: "Missing `set statement_timeout` before potentially slow operations",
                 text_range: 64..98,
                 help: Some(
                     "Configure a `statement_timeout` before this statement",
@@ -342,7 +342,7 @@ SET statement_timeout = '5s';
         [
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before possibly slow operations",
+                message: "Missing `set lock_timeout` before potentially slow operations",
                 text_range: 1..35,
                 help: Some(
                     "Configure a `lock_timeout` before this statement.",
@@ -363,7 +363,7 @@ SET statement_timeout = '5s';
             },
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before possibly slow operations",
+                message: "Missing `set statement_timeout` before potentially slow operations",
                 text_range: 1..35,
                 help: Some(
                     "Configure a `statement_timeout` before this statement",
@@ -397,7 +397,7 @@ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
         [
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before possibly slow operations",
+                message: "Missing `set lock_timeout` before potentially slow operations",
                 text_range: 1..48,
                 help: Some(
                     "Configure a `lock_timeout` before this statement.",
@@ -418,7 +418,7 @@ CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');
             },
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before possibly slow operations",
+                message: "Missing `set statement_timeout` before potentially slow operations",
                 text_range: 1..48,
                 help: Some(
                     "Configure a `statement_timeout` before this statement",

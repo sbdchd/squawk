@@ -262,7 +262,7 @@ create table users (
         [
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set lock_timeout` before possibly slow operations",
+                message: "Missing `set lock_timeout` before potentially slow operations",
                 text_range: 0..31,
                 help: Some(
                     "Configure a `lock_timeout` before this statement.",
@@ -283,7 +283,7 @@ create table users (
             },
             Violation {
                 code: RequireTimeoutSettings,
-                message: "Missing `set statement_timeout` before possibly slow operations",
+                message: "Missing `set statement_timeout` before potentially slow operations",
                 text_range: 0..31,
                 help: Some(
                     "Configure a `statement_timeout` before this statement",

@@ -12,7 +12,7 @@ CheckReport {
             column: 3,
             range: 5..64,
             level: Warning,
-            message: "Missing `set lock_timeout` before possibly slow operations",
+            message: "Missing `set lock_timeout` before potentially slow operations",
             help: Some(
                 "Configure a `lock_timeout` before this statement.",
             ),
@@ -39,7 +39,7 @@ CheckReport {
             column: 3,
             range: 5..64,
             level: Warning,
-            message: "Missing `set statement_timeout` before possibly slow operations",
+            message: "Missing `set statement_timeout` before potentially slow operations",
             help: Some(
                 "Configure a `statement_timeout` before this statement",
             ),
