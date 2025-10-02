@@ -1,4 +1,10 @@
-import { useState, useEffect, useLayoutEffect, useRef } from "react"
+import {
+  useState,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useEffectEvent,
+} from "react"
 import * as monaco from "monaco-editor"
 import { LintError, Fix, useDumpCst, useDumpTokens, useErrors } from "./squawk"
 import {
@@ -233,21 +239,17 @@ function Editor({
   settings: monaco.editor.IStandaloneEditorConstructionOptions
   markers?: Marker[]
 }) {
-  const onChangeRef = useRef<((_: string) => void) | undefined>(null)
-  const onSaveRef = useRef<((_: string) => void) | undefined>(null)
+  const onChangeText = useEffectEvent((text: string) => {
+    onChange?.(text)
+  })
+  const onSaveText = useEffectEvent((text: string) => {
+    onSave?.(text)
+  })
   const divRef = useRef<HTMLDivElement>(null)
   const autoFocusRef = useRef(autoFocus)
   const settingsInitial = useRef(settings)
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>(null)
   const fixesRef = useRef<Map<string, Fix>>(new Map())
-
-  // TODO: replace with useEventEffect
-  useEffect(() => {
-    onChangeRef.current = onChange
-  }, [onChange])
-  useEffect(() => {
-    onSaveRef.current = onSave
-  }, [onSave])
 
   useEffect(() => {
     if (markers == null) {
@@ -275,10 +277,10 @@ function Editor({
       settingsInitial.current,
     )
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () =>
-      onSaveRef.current?.(editor.getValue()),
+      onSaveText(editor.getValue()),
     )
     editor.onDidBlurEditorText(() => {
-      onSaveRef.current?.(editor.getValue())
+      onSaveText(editor.getValue())
     })
     monaco.languages.register({ id: "rast" })
     const tokenProvider = monaco.languages.setMonarchTokensProvider("rast", {
@@ -346,7 +348,7 @@ function Editor({
     )
 
     editor.onDidChangeModelContent(() => {
-      onChangeRef.current?.(editor.getValue())
+      onChangeText(editor.getValue())
     })
     if (autoFocusRef.current) {
       editor.focus()
