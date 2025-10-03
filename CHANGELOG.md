@@ -39,7 +39,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - cli: parsing rule alises i.e., prefer-timestamptz and prefer-timestamp-tz both work. (#668)
 
-
 ## v2.27.0 - 2025-09-23
 
 ## Added
