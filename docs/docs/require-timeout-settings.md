@@ -5,7 +5,7 @@ title: require-timeout-settings
 
 ## problem
 
-You must configure a `lock_timeout` to safely apply migrations. See (see ["Safety requirements"](./safe_migrations.md#safety-requirements))
+You must configure a `lock_timeout` to safely apply migrations. See ["Safety requirements"](./safe_migrations.md#safety-requirements)
 
 Additionally, a statement_timeout also helps prevent long migrations that consume too many database resources.
 

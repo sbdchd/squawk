@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.28.0 - 2025-10-02
+
+## Added
+
+- New rule: require-timeout-settings (#671)
+
+  It's important to configure lock & statement timeouts to ensure safe migrations.
+  See [Safety Requirements](https://squawkhq.com/docs/safe_migrations#safety-requirements)
+
+  So the following will error:
+
+  ```sql
+  alter table t add column c boolean;
+  ```
+
+  but this is okay:
+
+  ```sql
+  set lock_timeout = '1s';
+  set statement_timeout = '5s';
+  alter table t add column c boolean;
+  ```
+
+  If you've already configured timeouts for your migrations, you can safely
+  ignore this rule.
+
+## Fixed
+
+- parser: pg18 `like` clause in `create foreign table` now parses (#666)
+
+- cli: parsing rule alises i.e., prefer-timestamptz and prefer-timestamp-tz both work. (#668)
+
+
 ## v2.27.0 - 2025-09-23
 
 ## Added
