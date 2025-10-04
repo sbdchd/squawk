@@ -1492,6 +1492,10 @@ impl CheckConstraint {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn no_inherit(&self) -> Option<NoInherit> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -1616,11 +1620,43 @@ impl Column {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn constraint(&self) -> Option<ColumnConstraint> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn deferrable_constraint_option(&self) -> Option<DeferrableConstraintOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn enforced(&self) -> Option<Enforced> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn index_expr(&self) -> Option<IndexExpr> {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn initially_deferred_constraint_option(
+        &self,
+    ) -> Option<InitiallyDeferredConstraintOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn initially_immediate_constraint_option(
+        &self,
+    ) -> Option<InitiallyImmediateConstraintOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn not_deferrable_constraint_option(&self) -> Option<NotDeferrableConstraintOption> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn not_enforced(&self) -> Option<NotEnforced> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -6657,6 +6693,10 @@ impl NotNullConstraint {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn no_inherit(&self) -> Option<NoInherit> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn constraint_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
     }
@@ -10039,6 +10079,16 @@ pub enum AlterTableAction {
     SetWithoutCluster(SetWithoutCluster),
     SetWithoutOids(SetWithoutOids),
     ValidateConstraint(ValidateConstraint),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ColumnConstraint {
+    CheckConstraint(CheckConstraint),
+    ExcludeConstraint(ExcludeConstraint),
+    NotNullConstraint(NotNullConstraint),
+    PrimaryKeyConstraint(PrimaryKeyConstraint),
+    ReferencesConstraint(ReferencesConstraint),
+    UniqueConstraint(UniqueConstraint),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -19917,6 +19967,94 @@ impl From<ValidateConstraint> for AlterTableAction {
     #[inline]
     fn from(node: ValidateConstraint) -> AlterTableAction {
         AlterTableAction::ValidateConstraint(node)
+    }
+}
+impl AstNode for ColumnConstraint {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::CHECK_CONSTRAINT
+                | SyntaxKind::EXCLUDE_CONSTRAINT
+                | SyntaxKind::NOT_NULL_CONSTRAINT
+                | SyntaxKind::PRIMARY_KEY_CONSTRAINT
+                | SyntaxKind::REFERENCES_CONSTRAINT
+                | SyntaxKind::UNIQUE_CONSTRAINT
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::CHECK_CONSTRAINT => {
+                ColumnConstraint::CheckConstraint(CheckConstraint { syntax })
+            }
+            SyntaxKind::EXCLUDE_CONSTRAINT => {
+                ColumnConstraint::ExcludeConstraint(ExcludeConstraint { syntax })
+            }
+            SyntaxKind::NOT_NULL_CONSTRAINT => {
+                ColumnConstraint::NotNullConstraint(NotNullConstraint { syntax })
+            }
+            SyntaxKind::PRIMARY_KEY_CONSTRAINT => {
+                ColumnConstraint::PrimaryKeyConstraint(PrimaryKeyConstraint { syntax })
+            }
+            SyntaxKind::REFERENCES_CONSTRAINT => {
+                ColumnConstraint::ReferencesConstraint(ReferencesConstraint { syntax })
+            }
+            SyntaxKind::UNIQUE_CONSTRAINT => {
+                ColumnConstraint::UniqueConstraint(UniqueConstraint { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ColumnConstraint::CheckConstraint(it) => &it.syntax,
+            ColumnConstraint::ExcludeConstraint(it) => &it.syntax,
+            ColumnConstraint::NotNullConstraint(it) => &it.syntax,
+            ColumnConstraint::PrimaryKeyConstraint(it) => &it.syntax,
+            ColumnConstraint::ReferencesConstraint(it) => &it.syntax,
+            ColumnConstraint::UniqueConstraint(it) => &it.syntax,
+        }
+    }
+}
+impl From<CheckConstraint> for ColumnConstraint {
+    #[inline]
+    fn from(node: CheckConstraint) -> ColumnConstraint {
+        ColumnConstraint::CheckConstraint(node)
+    }
+}
+impl From<ExcludeConstraint> for ColumnConstraint {
+    #[inline]
+    fn from(node: ExcludeConstraint) -> ColumnConstraint {
+        ColumnConstraint::ExcludeConstraint(node)
+    }
+}
+impl From<NotNullConstraint> for ColumnConstraint {
+    #[inline]
+    fn from(node: NotNullConstraint) -> ColumnConstraint {
+        ColumnConstraint::NotNullConstraint(node)
+    }
+}
+impl From<PrimaryKeyConstraint> for ColumnConstraint {
+    #[inline]
+    fn from(node: PrimaryKeyConstraint) -> ColumnConstraint {
+        ColumnConstraint::PrimaryKeyConstraint(node)
+    }
+}
+impl From<ReferencesConstraint> for ColumnConstraint {
+    #[inline]
+    fn from(node: ReferencesConstraint) -> ColumnConstraint {
+        ColumnConstraint::ReferencesConstraint(node)
+    }
+}
+impl From<UniqueConstraint> for ColumnConstraint {
+    #[inline]
+    fn from(node: UniqueConstraint) -> ColumnConstraint {
+        ColumnConstraint::UniqueConstraint(node)
     }
 }
 impl AstNode for Constraint {

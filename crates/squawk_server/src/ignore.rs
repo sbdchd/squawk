@@ -95,8 +95,6 @@ create table c (
             })
             .collect::<Vec<_>>();
         insta::assert_snapshot!(apply_text_edits(sql, ignore_line_edits), @r"
-        -- squawk-ignore require-timeout-settings
-        -- squawk-ignore require-timeout-settings
         -- squawk-ignore prefer-robust-stmts
         create table a (
         -- squawk-ignore prefer-bigint-over-int
@@ -149,8 +147,6 @@ create table c (
         -- squawk-ignore-file prefer-bigint-over-int
         -- squawk-ignore-file prefer-robust-stmts
         -- squawk-ignore-file prefer-bigint-over-int
-        -- squawk-ignore-file require-timeout-settings
-        -- squawk-ignore-file require-timeout-settings
         -- squawk-ignore-file prefer-robust-stmts
 
         -- some existing comment
