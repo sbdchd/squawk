@@ -1,0 +1,20 @@
+[package]
+name = "squawk-ide"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[dependencies]
+squawk-syntax.workspace = true
+rowan.workspace = true
+line-index.workspace = true
+annotate-snippets.workspace = true
+log.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+
+[lints]
+workspace = true

@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use line_index::LineIndex;
 use log::info;
 use lsp_server::{Connection, Message, Notification, Response};
 use lsp_types::{
@@ -6,14 +7,16 @@ use lsp_types::{
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
     GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, Location, Position,
-    PublishDiagnosticsParams, Range, ServerCapabilities, TextDocumentSyncCapability,
-    TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
+    PublishDiagnosticsParams, Range, SelectionRangeParams, SelectionRangeProviderCapability,
+    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+    WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
     },
-    request::{CodeActionRequest, GotoDefinition, Request},
+    request::{CodeActionRequest, GotoDefinition, Request, SelectionRangeRequest},
 };
+use rowan::TextRange;
 use squawk_syntax::{Parse, SourceFile};
 use std::collections::HashMap;
 
@@ -46,6 +49,7 @@ pub fn run() -> Result<()> {
             },
             resolve_provider: None,
         })),
+        selection_range_provider: Some(SelectionRangeProviderCapability::Simple(true)),
         // definition_provider: Some(OneOf::Left(true)),
         ..Default::default()
     })
@@ -89,6 +93,9 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
                     }
                     CodeActionRequest::METHOD => {
                         handle_code_action(&connection, req, &documents)?;
+                    }
+                    SelectionRangeRequest::METHOD => {
+                        handle_selection_range(&connection, req, &documents)?;
                     }
                     "squawk/syntaxTree" => {
                         handle_syntax_tree(&connection, req, &documents)?;
@@ -138,6 +145,63 @@ fn handle_goto_definition(connection: &Connection, req: lsp_server::Request) -> 
     let resp = Response {
         id: req.id,
         result: Some(serde_json::to_value(&result).unwrap()),
+        error: None,
+    };
+
+    connection.sender.send(Message::Response(resp))?;
+    Ok(())
+}
+
+fn handle_selection_range(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
+    let params: SelectionRangeParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document.uri;
+
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let root = parse.syntax_node();
+    let line_index = LineIndex::new(content);
+
+    let mut selection_ranges = vec![];
+
+    for position in params.positions {
+        let Some(offset) = lsp_utils::offset(&line_index, position) else {
+            continue;
+        };
+
+        let mut ranges = Vec::new();
+        {
+            let mut range = TextRange::new(offset, offset);
+            loop {
+                ranges.push(range);
+                let next = squawk_ide::expand_selection::extend_selection(&root, range);
+                if next == range {
+                    break;
+                } else {
+                    range = next
+                }
+            }
+        }
+
+        let mut range = lsp_types::SelectionRange {
+            range: lsp_utils::range(&line_index, *ranges.last().unwrap()),
+            parent: None,
+        };
+        for &r in ranges.iter().rev().skip(1) {
+            range = lsp_types::SelectionRange {
+                range: lsp_utils::range(&line_index, r),
+                parent: Some(Box::new(range)),
+            }
+        }
+        selection_ranges.push(range);
+    }
+
+    let resp = Response {
+        id: req.id,
+        result: Some(serde_json::to_value(&selection_ranges).unwrap()),
         error: None,
     };
 
