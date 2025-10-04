@@ -495,7 +495,11 @@ struct AstEnumSrc {
 }
 
 fn lower(grammar: &Grammar) -> AstSrc {
-    let tokens = vec![("Null", "NULL_KW"), ("String", "STRING")];
+    let tokens = vec![
+        ("Null", "NULL_KW"),
+        ("String", "STRING"),
+        ("Comment", "COMMENT"),
+    ];
     let mut res = AstSrc {
         tokens,
         ..Default::default()

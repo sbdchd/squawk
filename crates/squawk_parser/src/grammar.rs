@@ -5227,12 +5227,12 @@ fn begin(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(BEGIN_KW) {
         // [ WORK | TRANSACTION ]
         let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
-        transaction_mode_list(p);
+        opt_transaction_mode_list(p);
     } else {
         // START TRANSACTION [ transaction_mode [, ...] ]
         p.bump(START_KW);
         p.expect(TRANSACTION_KW);
-        transaction_mode_list(p);
+        opt_transaction_mode_list(p);
     }
     m.complete(p, BEGIN)
 }
@@ -10833,9 +10833,13 @@ fn set_session_auth(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, SET_SESSION_AUTH)
 }
 
-fn transaction_mode_list(p: &mut Parser<'_>) {
+fn opt_transaction_mode_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // TODO: generalize
     // transaction_mode [, ...]
+    if !p.at_ts(TRANSACTION_MODE_FIRST) {
+        return None;
+    }
+    let m = p.start();
     while !p.at(EOF) && p.at_ts(TRANSACTION_MODE_FIRST) {
         if !opt_transaction_mode(p) {
             p.error("expected transaction mode");
@@ -10843,6 +10847,7 @@ fn transaction_mode_list(p: &mut Parser<'_>) {
         // historical pg syntax doesn't require commas
         p.eat(COMMA);
     }
+    Some(m.complete(p, TRANSACTION_MODE_LIST))
 }
 
 // SET TRANSACTION transaction_mode [, ...]
@@ -10861,14 +10866,14 @@ fn set_transaction(p: &mut Parser<'_>) -> CompletedMarker {
         p.expect(CHARACTERISTICS_KW);
         p.expect(AS_KW);
         p.expect(TRANSACTION_KW);
-        transaction_mode_list(p);
+        opt_transaction_mode_list(p);
     } else {
         p.expect(TRANSACTION_KW);
         // [ SNAPSHOT snapshot_id ]
         if p.eat(SNAPSHOT_KW) {
             string_literal(p);
         } else {
-            transaction_mode_list(p);
+            opt_transaction_mode_list(p);
         }
     }
     m.complete(p, SET_TRANSACTION)

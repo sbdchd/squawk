@@ -17,7 +17,8 @@ fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
         None
     }
 }
-fn offset(index: &LineIndex, position: lsp_types::Position) -> Option<TextSize> {
+
+pub(crate) fn offset(index: &LineIndex, position: lsp_types::Position) -> Option<TextSize> {
     let line_range = index.line(position.line)?;
 
     let col = TextSize::from(position.character);
@@ -33,6 +34,16 @@ fn offset(index: &LineIndex, position: lsp_types::Position) -> Option<TextSize> 
     }
 
     Some(line_range.start() + clamped_len)
+}
+
+pub(crate) fn range(line_index: &LineIndex, range: TextRange) -> lsp_types::Range {
+    let start = line_index.line_col(range.start());
+    let end = line_index.line_col(range.end());
+
+    lsp_types::Range::new(
+        lsp_types::Position::new(start.line, start.col),
+        lsp_types::Position::new(end.line, end.col),
+    )
 }
 
 // base on rust-analyzer's
