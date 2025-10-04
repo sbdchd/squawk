@@ -26,7 +26,7 @@ main() {
     git checkout -b "release-$NEW_VERSION"
     echo "updating version to '$NEW_VERSION'..."
     fastmod --accept-all '^version = ".*"' 'version = "'$NEW_VERSION'"' Cargo.toml
-    fastmod --accept-all '(squawk_[a-z_]+ = \{ path = "[^"]+", )version = "[^"]+"' '${1}version = "'$NEW_VERSION'"' Cargo.toml
+    fastmod --accept-all '(squawk-[a-z_]+ = \{ path = "[^"]+", )version = "[^"]+"' '${1}version = "'$NEW_VERSION'"' Cargo.toml
     fastmod --accept-all -m '(name = "squawk"\n)version = ".*?"' '${1}version = "'$NEW_VERSION'"' Cargo.lock
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' package.json
     fastmod --accept-all '"version": ".*"' '"version": "'$NEW_VERSION'"' squawk-vscode/package.json

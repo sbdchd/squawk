@@ -1,10 +1,15 @@
 [package]
 name = "squawk-ide"
 version.workspace = true
-edition.workspace = true
-rust-version.workspace = true
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
 authors.workspace = true
+edition.workspace = true
 license.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 squawk-syntax.workspace = true
