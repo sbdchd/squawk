@@ -8,7 +8,7 @@ fn has_foreign_key_constraint(create_table: &ast::CreateTable) -> bool {
                     return true;
                 }
                 ast::TableArg::Column(column) => {
-                    if let Some(ast::ColumnConstraint::ForeignKeyConstraint(_)) =
+                    if let Some(ast::ColumnConstraint::ReferencesConstraint(_)) =
                         column.constraint()
                     {
                         return true;

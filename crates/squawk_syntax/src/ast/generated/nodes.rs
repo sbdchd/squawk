@@ -10085,9 +10085,9 @@ pub enum AlterTableAction {
 pub enum ColumnConstraint {
     CheckConstraint(CheckConstraint),
     ExcludeConstraint(ExcludeConstraint),
-    ForeignKeyConstraint(ForeignKeyConstraint),
     NotNullConstraint(NotNullConstraint),
     PrimaryKeyConstraint(PrimaryKeyConstraint),
+    ReferencesConstraint(ReferencesConstraint),
     UniqueConstraint(UniqueConstraint),
 }
 
@@ -19976,9 +19976,9 @@ impl AstNode for ColumnConstraint {
             kind,
             SyntaxKind::CHECK_CONSTRAINT
                 | SyntaxKind::EXCLUDE_CONSTRAINT
-                | SyntaxKind::FOREIGN_KEY_CONSTRAINT
                 | SyntaxKind::NOT_NULL_CONSTRAINT
                 | SyntaxKind::PRIMARY_KEY_CONSTRAINT
+                | SyntaxKind::REFERENCES_CONSTRAINT
                 | SyntaxKind::UNIQUE_CONSTRAINT
         )
     }
@@ -19991,14 +19991,14 @@ impl AstNode for ColumnConstraint {
             SyntaxKind::EXCLUDE_CONSTRAINT => {
                 ColumnConstraint::ExcludeConstraint(ExcludeConstraint { syntax })
             }
-            SyntaxKind::FOREIGN_KEY_CONSTRAINT => {
-                ColumnConstraint::ForeignKeyConstraint(ForeignKeyConstraint { syntax })
-            }
             SyntaxKind::NOT_NULL_CONSTRAINT => {
                 ColumnConstraint::NotNullConstraint(NotNullConstraint { syntax })
             }
             SyntaxKind::PRIMARY_KEY_CONSTRAINT => {
                 ColumnConstraint::PrimaryKeyConstraint(PrimaryKeyConstraint { syntax })
+            }
+            SyntaxKind::REFERENCES_CONSTRAINT => {
+                ColumnConstraint::ReferencesConstraint(ReferencesConstraint { syntax })
             }
             SyntaxKind::UNIQUE_CONSTRAINT => {
                 ColumnConstraint::UniqueConstraint(UniqueConstraint { syntax })
@@ -20014,9 +20014,9 @@ impl AstNode for ColumnConstraint {
         match self {
             ColumnConstraint::CheckConstraint(it) => &it.syntax,
             ColumnConstraint::ExcludeConstraint(it) => &it.syntax,
-            ColumnConstraint::ForeignKeyConstraint(it) => &it.syntax,
             ColumnConstraint::NotNullConstraint(it) => &it.syntax,
             ColumnConstraint::PrimaryKeyConstraint(it) => &it.syntax,
+            ColumnConstraint::ReferencesConstraint(it) => &it.syntax,
             ColumnConstraint::UniqueConstraint(it) => &it.syntax,
         }
     }
@@ -20033,12 +20033,6 @@ impl From<ExcludeConstraint> for ColumnConstraint {
         ColumnConstraint::ExcludeConstraint(node)
     }
 }
-impl From<ForeignKeyConstraint> for ColumnConstraint {
-    #[inline]
-    fn from(node: ForeignKeyConstraint) -> ColumnConstraint {
-        ColumnConstraint::ForeignKeyConstraint(node)
-    }
-}
 impl From<NotNullConstraint> for ColumnConstraint {
     #[inline]
     fn from(node: NotNullConstraint) -> ColumnConstraint {
@@ -20049,6 +20043,12 @@ impl From<PrimaryKeyConstraint> for ColumnConstraint {
     #[inline]
     fn from(node: PrimaryKeyConstraint) -> ColumnConstraint {
         ColumnConstraint::PrimaryKeyConstraint(node)
+    }
+}
+impl From<ReferencesConstraint> for ColumnConstraint {
+    #[inline]
+    fn from(node: ReferencesConstraint) -> ColumnConstraint {
+        ColumnConstraint::ReferencesConstraint(node)
     }
 }
 impl From<UniqueConstraint> for ColumnConstraint {

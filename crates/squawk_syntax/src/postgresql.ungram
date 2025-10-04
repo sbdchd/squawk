@@ -322,7 +322,7 @@ ColumnConstraint =
 | UniqueConstraint
 | PrimaryKeyConstraint
 | ExcludeConstraint
-| ForeignKeyConstraint
+| ReferencesConstraint
 
 NullsDistinct =
   'nulls' 'distinct'
