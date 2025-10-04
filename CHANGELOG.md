@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.28.1 - 2025-10-03
+
+## Added
+
+- lsp server: expand selection support. (#674)
+
+## Fixed
+
+- linter: fix require-timeout-settings false positives with `create table`
+  statements that do not have foreign keys. (#675)
+
 ## v2.28.0 - 2025-10-02
 
 ## Added
