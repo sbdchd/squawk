@@ -186,9 +186,8 @@ fn extend_comments(comment: ast::Comment) -> Option<TextRange> {
 fn adj_comments(comment: &ast::Comment, dir: Direction) -> ast::Comment {
     let mut res = comment.clone();
     for element in comment.syntax().siblings_with_tokens(dir) {
-        let token = match element.as_token() {
-            None => break,
-            Some(token) => token,
+        let Some(token) = element.as_token() else {
+            break;
         };
         if let Some(c) = ast::Comment::cast(token.clone()) {
             res = c
@@ -259,7 +258,7 @@ fn extend_list_item(node: &SyntaxNode) -> Option<TextRange> {
             .next_sibling_or_token()
             .and_then(|n| n.into_token())
             .filter(is_single_line_ws)
-            .unwrap_or_else(|| comma);
+            .unwrap_or(comma);
 
         return Some(TextRange::new(
             node.text_range().start(),

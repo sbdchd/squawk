@@ -7,9 +7,9 @@ use lsp_types::{
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
     GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, Location, Position,
-    PublishDiagnosticsParams, Range, SelectionRange, SelectionRangeParams,
-    SelectionRangeProviderCapability, ServerCapabilities, TextDocumentSyncCapability,
-    TextDocumentSyncKind, Url, WorkDoneProgressOptions, WorkspaceEdit,
+    PublishDiagnosticsParams, Range, SelectionRangeParams, SelectionRangeProviderCapability,
+    ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
+    WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
         DidChangeTextDocument, DidCloseTextDocument, DidOpenTextDocument, Notification as _,
         PublishDiagnostics,
@@ -163,7 +163,7 @@ fn handle_selection_range(
     let content = documents.get(&uri).map_or("", |doc| &doc.content);
     let parse: Parse<SourceFile> = SourceFile::parse(content);
     let root = parse.syntax_node();
-    let line_index = LineIndex::new(&content);
+    let line_index = LineIndex::new(content);
 
     let mut selection_ranges = vec![];
 
