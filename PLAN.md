@@ -73,7 +73,7 @@ example:
 
 ```sql
 -- some query comment
-SELECT name username, email,
+SELECT name username, "email",
         "weird-column-name"
     FROM    bar
 ```
@@ -96,6 +96,7 @@ config ideas:
 
 - lower / upper case keywords (default lowercase)
 - indent (default 2)
+- quoted idents (default avoid)
 
 links:
 
@@ -421,12 +422,30 @@ related: https://eslint.style/rules/no-extra-parens
 
 should support various fixes so people can write in one dialect of SQL and have it easily convert to the other one
 
+### Rule: group by all
+
+[requires pg >=19](https://www.depesz.com/2025/10/02/waiting-for-postgresql-19-add-group-by-all/)
+
+```sql
+SELECT customer_id, merchant_id, request_id, count(*) from t
+group by 1, 2, 3;
+--       ^^^^^^^ implicit group by all
+```
+
+becomes:
+
+```sql
+SELECT customer_id, merchant_id, request_id, count(*) from t
+group by all;
+```
+
 ### Rule: unused column
 
 ```sql
 SELECT customer_id, total_amount
 FROM (
   SELECT customer_id, SUM(amount) AS total_amount, min(created_at)
+--                                                 ^^^^^^^^^^^^^^^ unused
   FROM orders
   GROUP BY customer_id
 ) AS customer_totals
