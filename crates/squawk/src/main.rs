@@ -168,11 +168,17 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
     let opts = Opt::parse();
 
     if opts.verbose {
+        // ANSI codes don't render properly in the VSCode output pane
+        let color_choice = if matches!(opts.cmd, Some(Command::Server)) {
+            simplelog::ColorChoice::Never
+        } else {
+            simplelog::ColorChoice::Auto
+        };
         CombinedLogger::init(vec![simplelog::TermLogger::new(
             simplelog::LevelFilter::Info,
             simplelog::Config::default(),
             simplelog::TerminalMode::Stderr,
-            simplelog::ColorChoice::Auto,
+            color_choice,
         )])
         .expect("problem creating logger");
     }
