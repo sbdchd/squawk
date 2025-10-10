@@ -12,3 +12,12 @@ select * from t order by ordercol;
 with t as (select 1)
 search depth first by a, b c set ordercol
 select * from t order by ordercol;
+
+with 
+   a as (
+      select 1
+   ) -- <-- missing a comma
+   b as (
+      select 3
+   )
+select 2;
