@@ -70,9 +70,7 @@ impl Cmd {
             return Cmd::None;
         }
     }
-}
 
-impl Cmd {
     pub(crate) fn from(opts: crate::Opts) -> Cmd {
         match opts.cmd {
             Some(Command::Server) => Cmd::Server,
