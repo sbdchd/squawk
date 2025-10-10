@@ -1,10 +1,10 @@
 ---
-source: crates/cli/src/config.rs
-expression: "Config::parse(Some(squawk_toml.path().to_path_buf()))"
+source: crates/squawk/src/config.rs
+expression: "ConfigFile::parse(Some(squawk_toml.path().to_path_buf()))"
 ---
 Ok(
     Some(
-        Config {
+        ConfigFile {
             excluded_paths: [],
             excluded_rules: [],
             pg_version: Some(

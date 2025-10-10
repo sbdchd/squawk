@@ -2,11 +2,10 @@ use crate::UploadToGithubArgs;
 use crate::config::Config;
 use crate::reporter::{CheckReport, fmt_github_annotations, fmt_tty_violation};
 use crate::{file_finding::find_paths, reporter::check_files};
-use anyhow::{Result, anyhow, bail};
+use anyhow::{Context, Result, anyhow, bail};
 use console::strip_ansi_codes;
 use log::info;
 use squawk_github::{GitHubApi, actions, app, comment_on_pr};
-use squawk_linter::{Rule, Version};
 use std::io;
 
 const VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -38,19 +37,21 @@ fn get_github_private_key(
 }
 
 fn create_gh_app(
-    github_api_url: Option<String>,
-    github_install_id: Option<i64>,
-    github_app_id: Option<i64>,
-    github_token: Option<String>,
-    github_private_key: Option<String>,
-    github_private_key_base64: Option<String>,
+    github_api_url: &Option<String>,
+    github_install_id: &Option<i64>,
+    github_app_id: &Option<i64>,
+    github_token: &Option<String>,
+    github_private_key: &Option<String>,
+    github_private_key_base64: &Option<String>,
 ) -> Result<Box<dyn GitHubApi>> {
     if let Some(github_install_id) = github_install_id {
         if let Some(github_app_id) = github_app_id {
             info!("using github app client");
-            let gh_private_key =
-                get_github_private_key(github_private_key, github_private_key_base64)?;
-            let app = app::GitHub::new(&gh_private_key, github_app_id, github_install_id)?;
+            let gh_private_key = get_github_private_key(
+                github_private_key.clone(),
+                github_private_key_base64.clone(),
+            )?;
+            let app = app::GitHub::new(&gh_private_key, *github_app_id, *github_install_id)?;
             return Ok(Box::new(app));
         }
     }
@@ -58,8 +59,8 @@ fn create_gh_app(
     if let Some(github_token) = github_token {
         info!("using github actions client");
         let client = match github_api_url {
-            Some(github_api_url) => actions::GitHub::new_with_url(&github_api_url, &github_token),
-            None => actions::GitHub::new(&github_token),
+            Some(github_api_url) => actions::GitHub::new_with_url(github_api_url, github_token),
+            None => actions::GitHub::new(github_token),
         };
         return Ok(Box::new(client));
     };
@@ -79,17 +80,10 @@ fn create_gh_app(
 
 const COMMENT_HEADER: &str = "# Squawk Report";
 
-pub fn check_and_comment_on_pr(
-    args: UploadToGithubArgs,
-    cfg: &Config,
-    is_stdin: bool,
-    stdin_path: Option<String>,
-    exclude: &[Rule],
-    exclude_paths: &[String],
-    pg_version: Option<Version>,
-    assume_in_transaction: bool,
-    github_annotations: bool,
-) -> Result<()> {
+pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
+    let args = cfg
+        .upload_to_github_args
+        .context("Should always have args for the github command")?;
     let UploadToGithubArgs {
         paths,
         fail_on_violations,
@@ -112,24 +106,24 @@ pub fn check_and_comment_on_pr(
         };
 
     let github_app = create_gh_app(
-        github_api_url,
-        github_install_id,
-        github_app_id,
-        github_token,
-        github_private_key,
-        github_private_key_base64,
+        &github_api_url,
+        &github_install_id,
+        &github_app_id,
+        &github_token,
+        &github_private_key,
+        &github_private_key_base64,
     )?;
 
-    let found_paths = find_paths(&paths, exclude_paths)?;
+    let found_paths = find_paths(&paths, &cfg.excluded_paths)?;
 
     info!("checking files");
     let file_results = check_files(
         &found_paths,
-        is_stdin,
-        stdin_path,
-        exclude,
-        pg_version,
-        assume_in_transaction,
+        cfg.is_stdin,
+        &cfg.stdin_filepath,
+        &cfg.excluded_rules,
+        cfg.pg_version,
+        cfg.assume_in_transaction,
     )?;
 
     // We should only leave a comment when there are files checked.
@@ -149,7 +143,7 @@ pub fn check_and_comment_on_pr(
         COMMENT_HEADER,
     )?;
 
-    if github_annotations {
+    if cfg.github_annotations {
         let stdout = io::stdout();
         let mut handle = stdout.lock();
         fmt_github_annotations(&mut handle, &file_results)?;
