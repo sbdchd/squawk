@@ -1,0 +1,32 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/reindex.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing commas"
+  WHITESPACE "\n"
+  REINDEX
+    REINDEX_KW "reindex"
+    WHITESPACE " "
+    L_PAREN "("
+    CONCURRENTLY_KW "concurrently"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    WHITESPACE " "
+    TABLESPACE_KW "tablespace"
+    WHITESPACE " "
+    NAME
+      IDENT "t"
+    R_PAREN ")"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "i"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@39: expected COMMA
+ERROR@47: expected COMMA

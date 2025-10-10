@@ -1160,14 +1160,17 @@ XmlColumnOption =
 ConstraintIndexMethod =
   'using'
 
-ConstraintExclusions =
+ConstraintExclusionList =
   'exclude'
+
+ConstraintExclusion = 
+ 'with'
 
 ConstraintWhereClause =
   'where'
 
 ExcludeConstraint =
-  'exclude' ConstraintIndexMethod? ConstraintExclusions
+  'exclude' ConstraintIndexMethod? ConstraintExclusionList
 
 FrameClause =
   ('range' | 'rows' | 'groups')
@@ -1587,8 +1590,15 @@ Fetch =
 Close =
   'close'
 
+VacuumOptionList =
+ '(' (VacuumOption (',' VacuumOption)*)? ')'
+
 Vacuum =
   'vacuum'
+  VacuumOptionList?
+
+VacuumOption =
+  'full'
 
 Copy =
   'copy'

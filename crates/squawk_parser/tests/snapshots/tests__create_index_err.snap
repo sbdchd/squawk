@@ -1,0 +1,47 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/create_index.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing comma"
+  WHITESPACE "\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    NAME
+      IDENT "i"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    INDEX_PARAMS
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "a"
+        WHITESPACE " "
+        NULLS_FIRST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          FIRST_KW "first"
+      WHITESPACE " "
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "b"
+        WHITESPACE " "
+        NULLS_FIRST
+          NULLS_KW "nulls"
+          WHITESPACE " "
+          FIRST_KW "first"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@51: expected COMMA

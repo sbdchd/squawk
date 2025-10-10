@@ -3,13 +3,67 @@ source: crates/squawk_parser/tests/tests.rs
 input_file: crates/squawk_parser/tests/data/err/create_function.sql
 ---
 SOURCE_FILE
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE "\n"
+    COMMENT "-- missing comma"
+    WHITESPACE "\n"
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      L_PAREN "("
+      NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              TEXT_KW "text"
+      WHITESPACE "  "
+      NAME_REF
+        IDENT "b"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE "\n"
+    FUNC_OPTION_LIST
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        SQL_KW "sql"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- regression partial definition"
   WHITESPACE "\n"
   CREATE_FUNCTION
     CREATE_KW "create"
     WHITESPACE " "
     FUNCTION_KW "function"
-  WHITESPACE "\n"
+  WHITESPACE "\n\n"
 ---
-ERROR@48: expected path name
-ERROR@48: expected L_PAREN
+ERROR@58: expected COMMA
+ERROR@136: expected path name
+ERROR@136: expected L_PAREN

@@ -1,0 +1,47 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/copy.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing a couple commas"
+  WHITESPACE "\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "x"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "i"
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "y"
+      R_PAREN ")"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    LITERAL
+      STRING "'/tmp/input.file'"
+    WHITESPACE " "
+    L_PAREN "("
+    NAME
+      IDENT "on_error"
+    WHITESPACE " "
+    IDENT "ignore"
+    WHITESPACE "  "
+    NAME
+      IDENT "log_verbosity"
+    WHITESPACE " "
+    VERBOSE_KW "verbose"
+    R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@36: expected COMMA
+ERROR@79: expected COMMA

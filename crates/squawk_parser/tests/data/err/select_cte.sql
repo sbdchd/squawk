@@ -21,3 +21,19 @@ with
       select 3
    )
 select 2;
+
+-- table name isn't an plain ident
+with 
+   a as (
+      select 1
+   ) -- <-- missing a comma
+   row as (select 1)
+select 1;
+
+
+-- extra comma with values (we didn't support values before)
+with 
+   a as (
+      select 1
+   ), -- <-- extra comma
+values (2);

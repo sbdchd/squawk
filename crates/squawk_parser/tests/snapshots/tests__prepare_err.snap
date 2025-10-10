@@ -1,0 +1,75 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/prepare.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing commas"
+  WHITESPACE "\n"
+  PREPARE
+    PREPARE_KW "PREPARE"
+    WHITESPACE " "
+    NAME
+      IDENT "fooplan"
+    WHITESPACE " "
+    L_PAREN "("
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            INT_KW "int"
+    WHITESPACE "  "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            TEXT_KW "text"
+    WHITESPACE "  "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bool"
+    COMMA ","
+    WHITESPACE " "
+    PATH_TYPE
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            NUMERIC_KW "numeric"
+    R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "AS"
+    WHITESPACE "\n    "
+    INSERT
+      INSERT_KW "INSERT"
+      WHITESPACE " "
+      INTO_KW "INTO"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "foo"
+      WHITESPACE " "
+      VALUES
+        VALUES_KW "VALUES"
+        L_PAREN "("
+        LITERAL
+          POSITIONAL_PARAM "$1"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          POSITIONAL_PARAM "$2"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          POSITIONAL_PARAM "$3"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          POSITIONAL_PARAM "$4"
+        R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+---
+ERROR@38: expected COMMA
+ERROR@44: expected COMMA

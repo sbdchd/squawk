@@ -14,12 +14,15 @@ SOURCE_FILE
   VACUUM
     VACUUM_KW "VACUUM"
     WHITESPACE " "
-    L_PAREN "("
-    VERBOSE_KW "VERBOSE"
-    COMMA ","
-    WHITESPACE " "
-    ANALYZE_KW "ANALYZE"
-    R_PAREN ")"
+    VACUUM_OPTION_LIST
+      L_PAREN "("
+      VACUUM_OPTION
+        VERBOSE_KW "VERBOSE"
+      COMMA ","
+      WHITESPACE " "
+      VACUUM_OPTION
+        ANALYZE_KW "ANALYZE"
+      R_PAREN ")"
     WHITESPACE " "
     RELATION_NAME
       PATH
@@ -33,161 +36,192 @@ SOURCE_FILE
   VACUUM
     VACUUM_KW "VACUUM"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n    "
-    FULL_KW "full"
-    COMMA ","
-    WHITESPACE " \n    "
-    FULL_KW "full"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE " \n    "
-    FULL_KW "full"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE " \n    "
-    ANALYZE_KW "analyze"
-    COMMA ","
-    WHITESPACE "\n    "
-    ANALYZE_KW "analyze"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n    "
-    ANALYZE_KW "analyze"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "disable_page_skipping"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "disable_page_skipping"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "disable_page_skipping"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "skip_locked"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "skip_locked"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "skip_locked"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "index_cleanup"
-    WHITESPACE " "
-    IDENT "auto"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "index_cleanup"
-    WHITESPACE " "
-    ON_KW "on"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "index_cleanup"
-    WHITESPACE " "
-    OFF_KW "off"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "process_main"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "process_main"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "process_main"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n    "
-    TRUNCATE_KW "truncate"
-    COMMA ","
-    WHITESPACE "\n    "
-    TRUNCATE_KW "truncate"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n    "
-    TRUNCATE_KW "truncate"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n    "
-    PARALLEL_KW "parallel"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "skip_database_stats"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "skip_database_stats"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "skip_database_stats"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "only_database_stats"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "only_database_stats"
-    WHITESPACE " "
-    LITERAL
-      TRUE_KW "true"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "only_database_stats"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "buffer_usage_limit"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
-    COMMA ","
-    WHITESPACE "\n    "
-    IDENT "buffer_usage_limit"
-    WHITESPACE " "
-    LITERAL
-      STRING "'10 TB'"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    VACUUM_OPTION_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        FULL_KW "full"
+      COMMA ","
+      WHITESPACE " \n    "
+      VACUUM_OPTION
+        FULL_KW "full"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE " \n    "
+      VACUUM_OPTION
+        FULL_KW "full"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE " \n    "
+      VACUUM_OPTION
+        ANALYZE_KW "analyze"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        ANALYZE_KW "analyze"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        ANALYZE_KW "analyze"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "disable_page_skipping"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "disable_page_skipping"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "disable_page_skipping"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "skip_locked"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "skip_locked"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "skip_locked"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "index_cleanup"
+        WHITESPACE " "
+        IDENT "auto"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "index_cleanup"
+        WHITESPACE " "
+        ON_KW "on"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "index_cleanup"
+        WHITESPACE " "
+        OFF_KW "off"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "process_main"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "process_main"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "process_main"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        TRUNCATE_KW "truncate"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        TRUNCATE_KW "truncate"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        TRUNCATE_KW "truncate"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        PARALLEL_KW "parallel"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "skip_database_stats"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "skip_database_stats"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "skip_database_stats"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "only_database_stats"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "only_database_stats"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "only_database_stats"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "buffer_usage_limit"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+      COMMA ","
+      WHITESPACE "\n    "
+      VACUUM_OPTION
+        IDENT "buffer_usage_limit"
+        WHITESPACE " "
+        LITERAL
+          STRING "'10 TB'"
+      WHITESPACE "\n"
+      R_PAREN ")"
     WHITESPACE " "
     RELATION_NAME
       PATH
