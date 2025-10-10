@@ -2511,7 +2511,11 @@ fn with_query_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
             break;
         }
         if !p.eat(COMMA) {
-            break;
+            if p.at(IDENT) {
+                p.error("missing comma");
+            } else {
+                break;
+            }
         }
     }
     Some(m.complete(p, WITH_CLAUSE))
