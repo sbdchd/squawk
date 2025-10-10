@@ -1,21 +1,22 @@
+mod cmd;
 mod config;
 mod debug;
 mod file;
 mod file_finding;
 mod github;
 mod reporter;
-use crate::config::Config;
-use crate::file_finding::find_paths;
+use crate::cmd::Cmd;
+use crate::reporter::LintArgs;
 use anyhow::{Context, Result};
 use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 use debug::debug;
-use reporter::check_and_dump_files;
+use reporter::lint_and_report;
 use simplelog::CombinedLogger;
 use squawk_linter::{Rule, Version};
 use std::io;
 use std::panic;
 use std::path::PathBuf;
-use std::process::{self, ExitCode};
+use std::process::ExitCode;
 
 #[derive(Parser, Debug)]
 pub struct UploadToGithubArgs {
@@ -182,58 +183,29 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
         .expect("problem creating logger");
     }
 
-    match opts.cmd {
-        Some(Command::Server) => {
+    match Cmd::from(opts) {
+        Cmd::Server => {
             squawk_server::run().context("language server failed")?;
         }
-        Some(Command::UploadToGithub(_)) => {
-            let conf = Config::from(opts);
-            github::check_and_comment_on_pr(conf).context("Upload to GitHub failed")?;
+        Cmd::UploadToGithub(config) => {
+            github::check_and_comment_on_pr(config).context("Upload to GitHub failed")?;
         }
-        None => {
-            let conf = Config::from(opts);
-            // TODO: do we need to do the same thing for the github command?
-            let found_paths =
-                find_paths(&conf.path_patterns, &conf.excluded_paths).unwrap_or_else(|e| {
-                    eprintln!("Failed to find files: {e}");
-                    process::exit(1);
-                });
-            if found_paths.is_empty() && !conf.path_patterns.is_empty() {
-                eprintln!(
-                    "Failed to find files for provided patterns: {:?}",
-                    conf.path_patterns
-                );
-                if !conf.no_error_on_unmatched_pattern {
-                    process::exit(1);
-                }
-            }
-            if !found_paths.is_empty() || conf.is_stdin {
-                let stdout = io::stdout();
-                let mut handle = stdout.lock();
-
-                let read_stdin = found_paths.is_empty() && conf.is_stdin;
-                if let Some(kind) = conf.debug {
-                    debug(&mut handle, &found_paths, read_stdin, &kind, conf.verbose)?;
-                } else {
-                    let reporter = conf.reporter;
-                    let exit_code = check_and_dump_files(
-                        &mut handle,
-                        &found_paths,
-                        read_stdin,
-                        conf.stdin_filepath,
-                        &conf.excluded_rules,
-                        conf.pg_version,
-                        conf.assume_in_transaction,
-                        &reporter,
-                        conf.github_annotations,
-                    )?;
-                    return Ok(exit_code);
-                }
-            } else if !conf.no_error_on_unmatched_pattern {
-                Opts::command().print_long_help()?;
-                println!();
-            }
+        Cmd::Debug(debug_args) => {
+            let stdout = io::stdout();
+            let mut handle = stdout.lock();
+            debug(&mut handle, debug_args)?;
         }
+        Cmd::Lint(lint_args) => {
+            let stdout = io::stdout();
+            let mut handle = stdout.lock();
+            return lint_and_report(&mut handle, lint_args);
+        }
+        Cmd::Help => {
+            Opts::command().print_long_help()?;
+            println!();
+        }
+        Cmd::None => (),
     }
+
     Ok(ExitCode::SUCCESS)
 }

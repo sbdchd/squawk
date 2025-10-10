@@ -1,7 +1,8 @@
-use crate::UploadToGithubArgs;
+use crate::cmd::Input;
 use crate::config::Config;
 use crate::reporter::{CheckReport, fmt_github_annotations, fmt_tty_violation};
-use crate::{file_finding::find_paths, reporter::check_files};
+use crate::{LintArgs, UploadToGithubArgs};
+use crate::{file_finding::find_paths, reporter::lint_files};
 use anyhow::{Context, Result, anyhow, bail};
 use console::strip_ansi_codes;
 use log::info;
@@ -117,14 +118,14 @@ pub fn check_and_comment_on_pr(cfg: Config) -> Result<()> {
     let found_paths = find_paths(&paths, &cfg.excluded_paths)?;
 
     info!("checking files");
-    let file_results = check_files(
-        &found_paths,
-        cfg.is_stdin,
-        &cfg.stdin_filepath,
-        &cfg.excluded_rules,
-        cfg.pg_version,
-        cfg.assume_in_transaction,
-    )?;
+    let file_results = lint_files(&LintArgs {
+        input: Input::Paths(found_paths),
+        excluded_rules: cfg.excluded_rules,
+        pg_version: cfg.pg_version,
+        assume_in_transaction: cfg.assume_in_transaction,
+        reporter: cfg.reporter,
+        github_annotations: cfg.github_annotations,
+    })?;
 
     // We should only leave a comment when there are files checked.
     if paths.is_empty() {

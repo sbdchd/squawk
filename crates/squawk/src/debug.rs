@@ -1,4 +1,4 @@
-use std::{io, path::PathBuf};
+use std::io;
 
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use anyhow::Result;
@@ -7,23 +7,24 @@ use squawk_syntax::{ast::AstNode, syntax_error::SyntaxError};
 
 use crate::{
     DebugOption,
+    cmd::Input,
     file::{sql_from_path, sql_from_stdin},
 };
 
-pub(crate) fn debug<W: io::Write>(
-    f: &mut W,
-    paths: &[PathBuf],
-    read_stdin: bool,
-    debug_option: &DebugOption,
-    verbose: bool,
-) -> Result<()> {
+pub(crate) struct DebugArgs {
+    pub(crate) input: Input,
+    pub(crate) debug_option: DebugOption,
+    pub(crate) verbose: bool,
+}
+
+pub(crate) fn debug<W: io::Write>(f: &mut W, args: DebugArgs) -> Result<()> {
     let process_dump_ast = |sql: &str, filename: &str, f: &mut W| -> Result<()> {
-        match debug_option {
+        match args.debug_option {
             DebugOption::Lex => {
                 let tokens = squawk_lexer::tokenize(sql);
                 let mut start = 0;
                 for token in tokens {
-                    if verbose {
+                    if args.verbose {
                         let content = &sql[start as usize..(start + token.len) as usize];
                         start += token.len;
                         writeln!(f, "{content:?} @ {:?}", token.kind)?;
@@ -34,7 +35,7 @@ pub(crate) fn debug<W: io::Write>(
             }
             DebugOption::Parse => {
                 let parse = squawk_syntax::SourceFile::parse(sql);
-                if verbose {
+                if args.verbose {
                     writeln!(f, "{}\n---", parse.syntax_node())?;
                 }
                 writeln!(f, "{:#?}", parse.syntax_node())?;
@@ -65,16 +66,20 @@ pub(crate) fn debug<W: io::Write>(
         }
         Ok(())
     };
-    if read_stdin {
-        let sql = sql_from_stdin()?;
-        process_dump_ast(&sql, "stdin", f)?;
-        return Ok(());
-    }
 
-    for path in paths {
-        let sql = sql_from_path(path)?;
-        process_dump_ast(&sql, &path.to_string_lossy(), f)?;
-    }
+    match args.input {
+        Input::Stdin(_) => {
+            let sql = sql_from_stdin()?;
+            process_dump_ast(&sql, "stdin", f)?;
+        }
+        Input::Paths(path_bufs) => {
+            for path in path_bufs {
+                let sql = sql_from_path(&path)?;
+                process_dump_ast(&sql, &path.to_string_lossy(), f)?;
+            }
+        }
+    };
+
     Ok(())
 }
 
