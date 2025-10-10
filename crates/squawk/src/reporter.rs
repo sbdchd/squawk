@@ -131,7 +131,7 @@ fn render_lint_error<W: std::io::Write>(
 pub fn check_files(
     path_patterns: &[PathBuf],
     read_stdin: bool,
-    stdin_path: Option<String>,
+    stdin_path: &Option<String>,
     excluded_rules: &[Rule],
     pg_version: Option<Version>,
     assume_in_transaction: bool,
@@ -144,7 +144,7 @@ pub fn check_files(
         if sql.trim().is_empty() {
             info!("ignoring empty stdin");
         } else {
-            let path = stdin_path.unwrap_or_else(|| "stdin".into());
+            let path = stdin_path.clone().unwrap_or_else(|| "stdin".into());
             let content = check_sql(
                 &sql,
                 &path,
@@ -186,7 +186,7 @@ pub fn check_and_dump_files<W: io::Write>(
     let violations = check_files(
         path_patterns,
         read_stdin,
-        stdin_path,
+        &stdin_path,
         excluded_rules,
         pg_version,
         assume_in_transaction,

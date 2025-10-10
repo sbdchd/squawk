@@ -2,7 +2,14 @@ use anyhow::{Context, Result};
 use log::info;
 use serde::Deserialize;
 use squawk_linter::{Rule, Version};
-use std::{env, path::Path, path::PathBuf};
+use std::{
+    env,
+    io::{self, IsTerminal},
+    path::{Path, PathBuf},
+    process,
+};
+
+use crate::{Command, DebugOption, Opts, Reporter, UploadToGithubArgs};
 
 const FILE_NAME: &str = ".squawk.toml";
 
@@ -13,7 +20,7 @@ pub struct UploadToGitHubConfig {
 }
 
 #[derive(Debug, Default, Deserialize)]
-pub struct Config {
+pub struct ConfigFile {
     #[serde(default)]
     pub excluded_paths: Vec<String>,
     #[serde(default)]
@@ -26,7 +33,7 @@ pub struct Config {
     pub upload_to_github: UploadToGitHubConfig,
 }
 
-impl Config {
+impl ConfigFile {
     pub fn parse(custom_path: Option<PathBuf>) -> Result<Option<Self>> {
         let path = if let Some(path) = custom_path {
             Some(path)
@@ -43,6 +50,107 @@ impl Config {
 
         info!("no config file found");
         Ok(None)
+    }
+}
+
+pub struct Config {
+    pub excluded_paths: Vec<String>,
+    pub excluded_rules: Vec<Rule>,
+    pub pg_version: Option<Version>,
+    pub assume_in_transaction: bool,
+    pub upload_to_github: UploadToGitHubConfig,
+    pub upload_to_github_args: Option<UploadToGithubArgs>,
+    pub no_error_on_unmatched_pattern: bool,
+    pub is_stdin: bool,
+    pub stdin_filepath: Option<String>,
+    pub github_annotations: bool,
+    pub reporter: Reporter,
+    pub verbose: bool,
+    pub debug: Option<DebugOption>,
+    pub path_patterns: Vec<String>,
+}
+
+impl Config {
+    pub fn from(opts: Opts) -> Config {
+        let conf = ConfigFile::parse(opts.config_path)
+            .unwrap_or_else(|e| {
+                eprintln!("Configuration error: {e}");
+                process::exit(1);
+            })
+            .unwrap_or_default();
+
+        // the --exclude flag completely overrides the configuration file.
+        let excluded_rules = if let Some(excluded_rules) = opts.excluded_rules {
+            excluded_rules
+        } else {
+            conf.excluded_rules.clone()
+        };
+
+        // the --exclude-path flag completely overrides the configuration file.
+        let excluded_paths = if let Some(excluded_paths) = opts.excluded_path {
+            excluded_paths
+        } else {
+            conf.excluded_paths.clone()
+        };
+        let pg_version = if let Some(pg_version) = opts.pg_version {
+            Some(pg_version)
+        } else {
+            conf.pg_version
+        };
+
+        let assume_in_transaction = if opts.assume_in_transaction {
+            opts.assume_in_transaction
+        } else if opts.no_assume_in_transaction {
+            !opts.no_assume_in_transaction
+        } else {
+            conf.assume_in_transaction.unwrap_or_default()
+        };
+
+        let no_error_on_unmatched_pattern = if opts.no_error_on_unmatched_pattern {
+            opts.no_error_on_unmatched_pattern
+        } else {
+            // TODO: we should have config support for these
+            false
+        };
+
+        info!("pg version: {pg_version:?}");
+        info!("excluded rules: {:?}", &excluded_rules);
+        info!("excluded paths: {:?}", &excluded_paths);
+        info!("assume in a transaction: {assume_in_transaction:?}");
+        info!("no error on unmatched pattern: {no_error_on_unmatched_pattern:?}");
+
+        let is_stdin = !io::stdin().is_terminal();
+        let github_annotations = std::env::var("GITHUB_ACTIONS").is_ok()
+            && std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_err();
+
+        // TODO: we should support all of these in the config file as well
+        let debug = opts.debug;
+        let verbose = opts.verbose;
+        let path_patterns = opts.path_patterns;
+        let reporter = opts.reporter.unwrap_or_default();
+        let stdin_filepath = opts.stdin_filepath;
+        let upload_to_github = conf.upload_to_github;
+        let upload_to_github_args = match opts.cmd {
+            Some(Command::UploadToGithub(args)) => Some(*args),
+            _ => None,
+        };
+
+        Config {
+            excluded_paths,
+            excluded_rules,
+            pg_version,
+            assume_in_transaction,
+            upload_to_github,
+            upload_to_github_args,
+            no_error_on_unmatched_pattern,
+            is_stdin,
+            stdin_filepath,
+            github_annotations,
+            reporter,
+            verbose,
+            debug,
+            path_patterns,
+        }
     }
 }
 
@@ -85,7 +193,7 @@ assume_in_transaction = true
         
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
-        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
     fn load_pg_version() {
@@ -95,7 +203,7 @@ pg_version = "19.1"
         
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
-        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
     fn load_excluded_rules() {
@@ -105,7 +213,7 @@ excluded_rules = ["require-concurrent-index-creation"]
         
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
-        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
     fn load_excluded_paths() {
@@ -115,7 +223,7 @@ excluded_paths = ["example.sql"]
         
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
-        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
     fn load_assume_in_transaction() {
@@ -125,7 +233,7 @@ assume_in_transaction = false
         
         ";
         fs::write(&squawk_toml, file).expect("Unable to write file");
-        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
     fn load_fail_on_violations() {
@@ -135,7 +243,7 @@ assume_in_transaction = false
 fail_on_violations = true        
         ";
         fs::write(&squawk_toml, file).expect("Unable to write file");
-        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
     }
     #[test]
     fn load_excluded_rules_with_alias() {
@@ -145,6 +253,6 @@ excluded_rules = ["prefer-timestamp-tz", "prefer-timestamptz"]
 
         "#;
         fs::write(&squawk_toml, file).expect("Unable to write file");
-        assert_debug_snapshot!(Config::parse(Some(squawk_toml.path().to_path_buf())));
+        assert_debug_snapshot!(ConfigFile::parse(Some(squawk_toml.path().to_path_buf())));
     }
 }
