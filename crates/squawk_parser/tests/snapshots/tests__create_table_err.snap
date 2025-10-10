@@ -423,6 +423,82 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
+    COMMENT "-- exclude missing a comma"
+    WHITESPACE "\n"
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n  "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_INDEX_METHOD
+          USING_KW "using"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "btree"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          WHITESPACE " "
+          CONSTRAINT_EXCLUSION
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            PATH
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "buzz"
+              DOT "."
+              PATH_SEGMENT
+            R_ANGLE ">"
+          WHITESPACE " "
+          CONSTRAINT_EXCLUSION
+            NAME_REF
+              IDENT "b"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            L_ANGLE "<"
+          R_PAREN ")"
+      WHITESPACE " \n"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
     CREATE_KW "create"
     WHITESPACE " "
     TABLE_KW "table"
@@ -495,4 +571,5 @@ ERROR@198: unexpected comma
 ERROR@199: unexpected comma
 ERROR@200: unexpected comma
 ERROR@201: unexpected comma
-ERROR@947: expected SEMICOLON
+ERROR@1021: expected COMMA
+ERROR@1063: expected SEMICOLON

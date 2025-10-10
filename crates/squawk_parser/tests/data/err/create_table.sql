@@ -46,6 +46,13 @@ create unlogged table t (
   )
 );
 
+-- exclude missing a comma
+create table t (
+  a int,
+  b text,
+  exclude using btree ( a with buzz.> b with <) 
+);
+
 create table z (
   a int
 )
