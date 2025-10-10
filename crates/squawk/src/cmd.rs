@@ -19,7 +19,7 @@ pub(crate) enum Cmd {
     Help,
     None,
     Server,
-    UploadToGithub(Config),
+    UploadToGithub(Box<Config>),
 }
 
 impl Cmd {
@@ -76,7 +76,7 @@ impl Cmd {
             Some(Command::Server) => Cmd::Server,
             Some(Command::UploadToGithub(_)) => {
                 let conf = Config::from(opts);
-                Cmd::UploadToGithub(conf)
+                Cmd::UploadToGithub(Box::new(conf))
             }
             None => {
                 let conf = Config::from(opts);

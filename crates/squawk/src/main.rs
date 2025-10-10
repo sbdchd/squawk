@@ -188,7 +188,7 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
             squawk_server::run().context("language server failed")?;
         }
         Cmd::UploadToGithub(config) => {
-            github::check_and_comment_on_pr(config).context("Upload to GitHub failed")?;
+            github::check_and_comment_on_pr(*config).context("Upload to GitHub failed")?;
         }
         Cmd::Debug(debug_args) => {
             let stdout = io::stdout();
