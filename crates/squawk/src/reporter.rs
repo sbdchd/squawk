@@ -11,9 +11,9 @@ use std::hash::DefaultHasher;
 use std::hash::Hash;
 use std::hash::Hasher;
 use std::io;
-use std::path::PathBuf;
 use std::process::ExitCode;
 
+use crate::cmd::Input;
 use crate::{
     Reporter,
     file::{sql_from_path, sql_from_stdin},
@@ -128,73 +128,60 @@ fn render_lint_error<W: std::io::Write>(
     Ok(())
 }
 
-pub fn check_files(
-    path_patterns: &[PathBuf],
-    read_stdin: bool,
-    stdin_path: &Option<String>,
-    excluded_rules: &[Rule],
-    pg_version: Option<Version>,
-    assume_in_transaction: bool,
-) -> Result<Vec<CheckReport>> {
+pub(crate) struct LintArgs {
+    pub(crate) input: Input,
+    pub(crate) excluded_rules: Vec<Rule>,
+    pub(crate) pg_version: Option<Version>,
+    pub(crate) assume_in_transaction: bool,
+    pub(crate) reporter: Reporter,
+    pub(crate) github_annotations: bool,
+}
+
+pub fn lint_files(args: &LintArgs) -> Result<Vec<CheckReport>> {
     let mut violations = vec![];
-    if read_stdin {
-        info!("reading content from stdin");
-        let sql = sql_from_stdin()?;
-        // ignore stdin if it's empty.
-        if sql.trim().is_empty() {
-            info!("ignoring empty stdin");
-        } else {
-            let path = stdin_path.clone().unwrap_or_else(|| "stdin".into());
-            let content = check_sql(
-                &sql,
-                &path,
-                excluded_rules,
-                pg_version,
-                assume_in_transaction,
-            );
-            violations.push(content);
+    match &args.input {
+        Input::Stdin(stdin) => {
+            info!("reading content from stdin");
+            let sql = sql_from_stdin()?;
+            // ignore stdin if it's empty.
+            if sql.trim().is_empty() {
+                info!("ignoring empty stdin");
+            } else {
+                let path = stdin.path.clone().unwrap_or_else(|| "stdin".into());
+                let content = check_sql(
+                    &sql,
+                    &path,
+                    &args.excluded_rules,
+                    args.pg_version,
+                    args.assume_in_transaction,
+                );
+                violations.push(content);
+            }
+        }
+        Input::Paths(path_bufs) => {
+            for path in path_bufs {
+                info!("checking file path: {}", path.display());
+                let sql = sql_from_path(path)?;
+                let content = check_sql(
+                    &sql,
+                    path.to_str().unwrap(),
+                    &args.excluded_rules,
+                    args.pg_version,
+                    args.assume_in_transaction,
+                );
+                violations.push(content);
+            }
         }
     }
-
-    for path in path_patterns {
-        info!("checking file path: {}", path.display());
-        let sql = sql_from_path(path)?;
-        let content = check_sql(
-            &sql,
-            path.to_str().unwrap(),
-            excluded_rules,
-            pg_version,
-            assume_in_transaction,
-        );
-        violations.push(content);
-    }
-
     Ok(violations)
 }
 
-pub fn check_and_dump_files<W: io::Write>(
-    f: &mut W,
-    path_patterns: &[PathBuf],
-    read_stdin: bool,
-    stdin_path: Option<String>,
-    excluded_rules: &[Rule],
-    pg_version: Option<Version>,
-    assume_in_transaction: bool,
-    reporter: &Reporter,
-    github_annotations: bool,
-) -> Result<ExitCode> {
-    let violations = check_files(
-        path_patterns,
-        read_stdin,
-        &stdin_path,
-        excluded_rules,
-        pg_version,
-        assume_in_transaction,
-    )?;
+pub fn lint_and_report<W: io::Write>(f: &mut W, args: LintArgs) -> Result<ExitCode> {
+    let violations = lint_files(&args)?;
 
     let ok = violations.iter().map(|x| x.violations.len()).sum::<usize>() == 0;
 
-    print_violations(f, violations, reporter, github_annotations)?;
+    print_violations(f, violations, &args.reporter, args.github_annotations)?;
 
     Ok(if ok {
         ExitCode::SUCCESS
