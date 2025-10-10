@@ -1781,10 +1781,21 @@ impl CompressionMethod {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct ConstraintExclusions {
+pub struct ConstraintExclusion {
     pub(crate) syntax: SyntaxNode,
 }
-impl ConstraintExclusions {
+impl ConstraintExclusion {
+    #[inline]
+    pub fn with_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WITH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConstraintExclusionList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConstraintExclusionList {
     #[inline]
     pub fn exclude_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXCLUDE_KW)
@@ -4579,7 +4590,7 @@ pub struct ExcludeConstraint {
 }
 impl ExcludeConstraint {
     #[inline]
-    pub fn constraint_exclusions(&self) -> Option<ConstraintExclusions> {
+    pub fn constraint_exclusion_list(&self) -> Option<ConstraintExclusionList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -9545,8 +9556,42 @@ pub struct Vacuum {
 }
 impl Vacuum {
     #[inline]
+    pub fn vacuum_option_list(&self) -> Option<VacuumOptionList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn vacuum_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VACUUM_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VacuumOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VacuumOption {
+    #[inline]
+    pub fn full_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FULL_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VacuumOptionList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VacuumOptionList {
+    #[inline]
+    pub fn vacuum_options(&self) -> AstChildren<VacuumOption> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -11947,10 +11992,28 @@ impl AstNode for CompressionMethod {
         &self.syntax
     }
 }
-impl AstNode for ConstraintExclusions {
+impl AstNode for ConstraintExclusion {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::CONSTRAINT_EXCLUSIONS
+        kind == SyntaxKind::CONSTRAINT_EXCLUSION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConstraintExclusionList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONSTRAINT_EXCLUSION_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -18791,6 +18854,42 @@ impl AstNode for Vacuum {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::VACUUM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for VacuumOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VACUUM_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for VacuumOptionList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VACUUM_OPTION_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

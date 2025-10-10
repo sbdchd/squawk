@@ -2401,35 +2401,37 @@ SOURCE_FILE
       EXCLUDE_CONSTRAINT
         EXCLUDE_KW "exclude"
         WHITESPACE " "
-        CONSTRAINT_EXCLUSIONS
+        CONSTRAINT_EXCLUSION_LIST
           L_PAREN "("
           WHITESPACE "\n  "
-          NAME_REF
-            IDENT "a"
-          WHITESPACE " "
-          WITH_KW "with"
-          WHITESPACE " "
-          EQ "="
+          CONSTRAINT_EXCLUSION
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            EQ "="
           COMMA ","
           WHITESPACE "\n  "
-          CALL_EXPR
-            NAME_REF
-              IDENT "tsrange"
-            ARG_LIST
-              L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            CALL_EXPR
               NAME_REF
-                IDENT "b"
-              COMMA ","
-              WHITESPACE " "
-              NAME_REF
-                IDENT "c"
-              R_PAREN ")"
-          WHITESPACE " "
-          WITH_KW "with"
-          WHITESPACE " "
-          CUSTOM_OP
-            AMP "&"
-            AMP "&"
+                IDENT "tsrange"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "b"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
+                R_PAREN ")"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
           WHITESPACE "\n"
           R_PAREN ")"
   SEMICOLON ";"
@@ -2457,35 +2459,37 @@ SOURCE_FILE
           NAME_REF
             IDENT "gist"
         WHITESPACE " "
-        CONSTRAINT_EXCLUSIONS
+        CONSTRAINT_EXCLUSION_LIST
           L_PAREN "("
           WHITESPACE "\n  "
-          NAME_REF
-            IDENT "a"
-          WHITESPACE " "
-          WITH_KW "with"
-          WHITESPACE " "
-          EQ "="
+          CONSTRAINT_EXCLUSION
+            NAME_REF
+              IDENT "a"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            EQ "="
           COMMA ","
           WHITESPACE "\n  "
-          CALL_EXPR
-            NAME_REF
-              IDENT "tsrange"
-            ARG_LIST
-              L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            CALL_EXPR
               NAME_REF
-                IDENT "b"
-              COMMA ","
-              WHITESPACE " "
-              NAME_REF
-                IDENT "c"
-              R_PAREN ")"
-          WHITESPACE " "
-          WITH_KW "with"
-          WHITESPACE " "
-          CUSTOM_OP
-            AMP "&"
-            AMP "&"
+                IDENT "tsrange"
+              ARG_LIST
+                L_PAREN "("
+                NAME_REF
+                  IDENT "b"
+                COMMA ","
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "c"
+                R_PAREN ")"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            CUSTOM_OP
+              AMP "&"
+              AMP "&"
           WHITESPACE "\n"
           R_PAREN ")"
         WHITESPACE " "
