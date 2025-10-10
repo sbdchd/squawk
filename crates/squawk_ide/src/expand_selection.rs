@@ -551,7 +551,7 @@ $0
         ];
 
         let generated_list_kinds: Vec<SyntaxKind> = (0..SyntaxKind::__LAST as u16)
-            .map(|n| SyntaxKind::from(n))
+            .map(SyntaxKind::from)
             .filter(|kind| {
                 format!("{:?}", kind).ends_with("_LIST") && !EXCLUDED_LIST_KINDS.contains(kind)
             })
