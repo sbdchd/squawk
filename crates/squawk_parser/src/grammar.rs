@@ -10983,7 +10983,7 @@ fn reindex(p: &mut Parser<'_>) -> CompletedMarker {
             COMMA,
             || "unexpected comma".to_string(),
             REINDEX_OPTION_FIRST,
-            |p| opt_reindex_option(p),
+            opt_reindex_option,
         );
     }
     let name_required = match p.current() {
@@ -11084,7 +11084,7 @@ fn prepare(p: &mut Parser<'_>) -> CompletedMarker {
             COMMA,
             || "unexpected comma".to_string(),
             NAME_REF_FIRST,
-            |p| opt_type_name(p),
+            opt_type_name,
         );
     }
     p.expect(AS_KW);
@@ -11537,7 +11537,7 @@ fn copy_option_list(p: &mut Parser<'_>) {
         COMMA,
         || "unexpected comma".to_string(),
         COL_LABEL_FIRST,
-        |p| opt_copy_option(p),
+        opt_copy_option,
     );
 }
 
