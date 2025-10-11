@@ -43,6 +43,8 @@ const ALL_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::JSON_TABLE_COLUMN_LIST,
     SyntaxKind::OPTIONS_LIST,
     SyntaxKind::PARAM_LIST,
+    SyntaxKind::PARTITION_ITEM_LIST,
+    SyntaxKind::ROW_LIST,
     // only separated by whitespace
     // SyntaxKind::SEQUENCE_OPTION_LIST,
     SyntaxKind::SET_OPTIONS_LIST,
