@@ -40,7 +40,7 @@ pub fn dump_tokens(text: String) -> String {
     out
 }
 
-#[allow(dead_code)]
+#[expect(unused)]
 #[derive(Serialize)]
 enum Severity {
     Hint,

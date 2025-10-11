@@ -1627,6 +1627,19 @@ IndexParams =
 CreateType =
   'create' 'type' Type
 
+  (('as' 'enum' VariantList)
+| ('as' 'range' )
+| ('as' '(' ')')
+| ('(' ')'))
+
+VariantList =
+  '('
+  (Variant (',' Variant)*)
+  ')'
+
+Variant =
+  Literal
+
 CreateExtension =
   'create' 'extension'
 

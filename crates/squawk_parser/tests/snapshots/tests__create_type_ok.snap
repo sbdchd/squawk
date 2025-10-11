@@ -125,8 +125,9 @@ SOURCE_FILE
     WHITESPACE " "
     ENUM_KW "enum"
     WHITESPACE " "
-    L_PAREN "("
-    R_PAREN ")"
+    VARIANT_LIST
+      L_PAREN "("
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_TYPE
@@ -143,10 +144,12 @@ SOURCE_FILE
     WHITESPACE " "
     ENUM_KW "enum"
     WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      STRING "'a'"
-    R_PAREN ")"
+    VARIANT_LIST
+      L_PAREN "("
+      VARIANT
+        LITERAL
+          STRING "'a'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_TYPE
@@ -163,18 +166,22 @@ SOURCE_FILE
     WHITESPACE " "
     ENUM_KW "enum"
     WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      STRING "'a'"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      STRING "'b'"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      STRING "'c'"
-    R_PAREN ")"
+    VARIANT_LIST
+      L_PAREN "("
+      VARIANT
+        LITERAL
+          STRING "'a'"
+      COMMA ","
+      WHITESPACE " "
+      VARIANT
+        LITERAL
+          STRING "'b'"
+      COMMA ","
+      WHITESPACE " "
+      VARIANT
+        LITERAL
+          STRING "'c'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_type_as_range"

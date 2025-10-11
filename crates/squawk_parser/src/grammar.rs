@@ -12926,15 +12926,7 @@ fn create_type(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(AS_KW) {
         // AS ENUM
         if p.eat(ENUM_KW) {
-            delimited(
-                p,
-                L_PAREN,
-                R_PAREN,
-                COMMA,
-                || "unexpected comma".to_string(),
-                STRING_FIRST,
-                |p| opt_string_literal(p).is_some(),
-            );
+            variant_list(p);
             // AS RANGE
         } else if p.eat(RANGE_KW) {
             attribute_list(p);
@@ -12957,6 +12949,30 @@ fn create_type(p: &mut Parser<'_>) -> CompletedMarker {
         attribute_list(p);
     }
     m.complete(p, CREATE_TYPE)
+}
+
+fn opt_variant(p: &mut Parser<'_>) -> bool {
+    let m = p.start();
+    if opt_string_literal(p).is_none() {
+        m.abandon(p);
+        return false;
+    }
+    m.complete(p, VARIANT);
+    true
+}
+
+fn variant_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        STRING_FIRST,
+        opt_variant,
+    );
+    m.complete(p, VARIANT_LIST);
 }
 
 // CREATE EXTENSION [ IF NOT EXISTS ] extension_name
