@@ -33,20 +33,16 @@ use squawk_syntax::{
     ast::{self, AstToken},
 };
 
-const ALL_LIST_KINDS: &[SyntaxKind] = &[
+const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::ARG_LIST,
     SyntaxKind::ATTRIBUTE_LIST,
     SyntaxKind::COLUMN_LIST,
     SyntaxKind::CONSTRAINT_EXCLUSION_LIST,
-    // only separated by whitespace
-    // SyntaxKind::FUNC_OPTION_LIST,
     SyntaxKind::JSON_TABLE_COLUMN_LIST,
     SyntaxKind::OPTIONS_LIST,
     SyntaxKind::PARAM_LIST,
     SyntaxKind::PARTITION_ITEM_LIST,
     SyntaxKind::ROW_LIST,
-    // only separated by whitespace
-    // SyntaxKind::SEQUENCE_OPTION_LIST,
     SyntaxKind::SET_OPTIONS_LIST,
     SyntaxKind::TABLE_ARG_LIST,
     SyntaxKind::TABLE_LIST,
@@ -54,8 +50,6 @@ const ALL_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::TRANSACTION_MODE_LIST,
     SyntaxKind::VACUUM_OPTION_LIST,
     SyntaxKind::VARIANT_LIST,
-    // only separated by whitespace
-    // SyntaxKind::XML_COLUMN_OPTION_LIST,
     SyntaxKind::XML_TABLE_COLUMN_LIST,
 ];
 
@@ -119,7 +113,7 @@ fn try_extend_selection(root: &SyntaxNode, range: TextRange) -> Option<TextRange
 
     if node
         .parent()
-        .is_some_and(|n| ALL_LIST_KINDS.contains(&n.kind()))
+        .is_some_and(|n| DELIMITED_LIST_KINDS.contains(&n.kind()))
     {
         if let Some(range) = extend_list_item(&node) {
             return Some(range);
@@ -546,47 +540,26 @@ $0
 
     #[test]
     fn list_variants() {
-        // only separated by whitespace
-        const EXCLUDED_LIST_KINDS: &[SyntaxKind] = &[
+        let delimited_ws_list_kinds = &[
             SyntaxKind::FUNC_OPTION_LIST,
             SyntaxKind::SEQUENCE_OPTION_LIST,
             SyntaxKind::XML_COLUMN_OPTION_LIST,
+            SyntaxKind::WHEN_CLAUSE_LIST,
         ];
 
         let generated_list_kinds: Vec<SyntaxKind> = (0..SyntaxKind::__LAST as u16)
             .map(SyntaxKind::from)
             .filter(|kind| {
-                format!("{:?}", kind).ends_with("_LIST") && !EXCLUDED_LIST_KINDS.contains(kind)
+                format!("{:?}", kind).ends_with("_LIST") && !delimited_ws_list_kinds.contains(kind)
             })
             .collect();
 
-        assert_debug_snapshot!(generated_list_kinds, @r"
-        [
-            ARG_LIST,
-            ATTRIBUTE_LIST,
-            COLUMN_LIST,
-            CONSTRAINT_EXCLUSION_LIST,
-            JSON_TABLE_COLUMN_LIST,
-            OPTIONS_LIST,
-            PARAM_LIST,
-            PARTITION_ITEM_LIST,
-            ROW_LIST,
-            SET_OPTIONS_LIST,
-            TABLE_ARG_LIST,
-            TABLE_LIST,
-            TARGET_LIST,
-            TRANSACTION_MODE_LIST,
-            VACUUM_OPTION_LIST,
-            VARIANT_LIST,
-            WHEN_CLAUSE_LIST,
-            XML_TABLE_COLUMN_LIST,
-        ]
-        ");
+        let diff: Vec<SyntaxKind> = generated_list_kinds
+            .iter()
+            .filter(|kind| !DELIMITED_LIST_KINDS.contains(kind))
+            .copied()
+            .collect();
 
-        assert_eq!(
-            ALL_LIST_KINDS,
-            generated_list_kinds.as_slice(),
-            "ALL_LIST_KINDS constant is out of sync with actual _LIST variants"
-        );
+        assert_eq!(diff, vec![], "We shouldn't have any unhandled list kinds")
     }
 }
