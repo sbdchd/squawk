@@ -183,20 +183,35 @@ fn case_expr(p: &mut Parser<'_>) -> CompletedMarker {
     if !p.at(WHEN_KW) && expr(p).is_none() {
         p.error("expected an expression");
     }
+    when_clause_list(p);
+    opt_else_clause(p);
+    p.expect(END_KW);
+    m.complete(p, CASE_EXPR)
+}
+
+fn when_clause_list(p: &mut Parser<'_>) {
+    let m = p.start();
     while !p.at(EOF) {
         when_clause(p);
         if !p.at(WHEN_KW) {
             break;
         }
     }
-    // case_default
-    //     | ELSE a_expr
-    //     | /* empty */
+    m.complete(p, WHEN_CLAUSE_LIST);
+}
+
+// case_default
+//     | ELSE a_expr
+//     | /* empty */
+fn opt_else_clause(p: &mut Parser<'_>) {
+    if !p.at(ELSE_KW) {
+        return;
+    }
+    let m = p.start();
     if p.eat(ELSE_KW) && expr(p).is_none() {
         p.error("expected an expression");
     }
-    p.expect(END_KW);
-    m.complete(p, CASE_EXPR)
+    m.complete(p, ELSE_CLAUSE);
 }
 
 // when_clause:
@@ -10917,21 +10932,23 @@ fn set_transaction(p: &mut Parser<'_>) -> CompletedMarker {
 fn values(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     let m = m.unwrap_or_else(|| p.start());
     p.bump(VALUES_KW);
-    // TODO: generalize this
+    row_list(p);
+    opt_order_by_clause(p);
+    opt_limit_clause(p);
+    opt_offset_clause(p);
+    opt_fetch_clause(p);
+    m.complete(p, VALUES)
+}
+
+// ( expression [, ...] ) [, ...]
+fn row_list(p: &mut Parser<'_>) {
+    let m = p.start();
     while !p.at(EOF) {
         if !p.at(L_PAREN) {
             p.err_and_bump("expected L_PAREN");
             continue;
         }
-        delimited(
-            p,
-            L_PAREN,
-            R_PAREN,
-            COMMA,
-            || "expected expression".to_string(),
-            EXPR_FIRST,
-            |p| expr(p).is_some(),
-        );
+        row(p);
         if !p.eat(COMMA) {
             if p.at(L_PAREN) {
                 p.error("expected COMMA");
@@ -10940,11 +10957,22 @@ fn values(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
             }
         }
     }
-    opt_order_by_clause(p);
-    opt_limit_clause(p);
-    opt_offset_clause(p);
-    opt_fetch_clause(p);
-    m.complete(p, VALUES)
+    m.complete(p, ROW_LIST);
+}
+
+// ( expression [, ...] )
+fn row(p: &mut Parser<'_>) {
+    let m = p.start();
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "expected expression".to_string(),
+        EXPR_FIRST,
+        |p| expr(p).is_some(),
+    );
+    m.complete(p, ROW);
 }
 
 const REINDEX_OPTION_FIRST: TokenSet = TokenSet::new(&[CONCURRENTLY_KW, VERBOSE_KW, TABLESPACE_KW]);
@@ -12375,19 +12403,13 @@ fn create_index(p: &mut Parser<'_>) -> CompletedMarker {
     //   [ NULLS { FIRST | LAST } ]
     //   [, ...]
     // )
-    index_params(p);
+    partition_items(p, true);
     opt_include_columns(p);
     opt_nulls_not_distinct(p);
     opt_with_params(p);
     opt_tablespace(p);
     opt_where_clause(p);
     m.complete(p, CREATE_INDEX)
-}
-
-fn index_params(p: &mut Parser<'_>) {
-    let m = p.start();
-    partition_items(p, true);
-    m.complete(p, INDEX_PARAMS);
 }
 
 // (
@@ -12407,6 +12429,7 @@ fn index_params(p: &mut Parser<'_>) {
 //   [, ...]
 // )
 fn partition_items(p: &mut Parser<'_>, allow_extra_params: bool) {
+    let m = p.start();
     delimited(
         p,
         L_PAREN,
@@ -12416,6 +12439,7 @@ fn partition_items(p: &mut Parser<'_>, allow_extra_params: bool) {
         EXPR_FIRST,
         |p| opt_partition_item(p, allow_extra_params).is_some(),
     );
+    m.complete(p, PARTITION_ITEM_LIST);
 }
 
 // [ argmode ]

@@ -34,18 +34,20 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "3"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "3"
+          R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -86,18 +88,20 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "3"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "3"
+          R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "
@@ -140,19 +144,21 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "4"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "5"
-      WHITESPACE "  "
-      LITERAL
-        INT_NUMBER "6"
-      ERROR
-        COMMA ","
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "4"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "5"
+          WHITESPACE "  "
+          LITERAL
+            INT_NUMBER "6"
+          ERROR
+            COMMA ","
+          R_PAREN ")"
     WHITESPACE "\n  "
     ON_KW "on"
     WHITESPACE " "

@@ -2556,10 +2556,12 @@ SOURCE_FILE
               VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
-                R_PAREN ")"
+                ROW_LIST
+                  ROW
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "1"
+                    R_PAREN ")"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

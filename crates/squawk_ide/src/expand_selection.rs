@@ -567,6 +567,8 @@ $0
             JSON_TABLE_COLUMN_LIST,
             OPTIONS_LIST,
             PARAM_LIST,
+            PARTITION_ITEM_LIST,
+            ROW_LIST,
             SET_OPTIONS_LIST,
             TABLE_ARG_LIST,
             TABLE_LIST,
@@ -574,6 +576,7 @@ $0
             TRANSACTION_MODE_LIST,
             VACUUM_OPTION_LIST,
             VARIANT_LIST,
+            WHEN_CLAUSE_LIST,
             XML_TABLE_COLUMN_LIST,
         ]
         ");

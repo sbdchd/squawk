@@ -186,20 +186,23 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "1"
-      R_PAREN ")"
-      COMMA ","
-      WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "2"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
+        COMMA ","
+        WHITESPACE " "
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- https://github.com/sbdchd/squawk/issues/646"

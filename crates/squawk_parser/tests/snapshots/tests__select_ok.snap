@@ -815,16 +815,19 @@ SOURCE_FILE
               VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
-                R_PAREN ")"
-                COMMA ","
-                WHITESPACE " "
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "3"
-                R_PAREN ")"
+                ROW_LIST
+                  ROW
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "1"
+                    R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  ROW
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "3"
+                    R_PAREN ")"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -995,34 +998,38 @@ SOURCE_FILE
               VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "1"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
-                R_PAREN ")"
-                COMMA ","
-                WHITESPACE " "
-                L_PAREN "("
-                NAME_REF
-                  IDENT "b"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "3"
-                R_PAREN ")"
-                COMMA ","
-                WHITESPACE " "
-                L_PAREN "("
-                NAME_REF
-                  IDENT "c"
-                COMMA ","
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "d"
-                R_PAREN ")"
+                ROW_LIST
+                  ROW
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "1"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "2"
+                    R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  ROW
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "b"
+                    COMMA ","
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "3"
+                    R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  ROW
+                    L_PAREN "("
+                    NAME_REF
+                      IDENT "c"
+                    COMMA ","
+                    WHITESPACE " "
+                    NAME_REF
+                      IDENT "d"
+                    R_PAREN ")"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1149,27 +1156,28 @@ SOURCE_FILE
           CASE_EXPR
             CASE_KW "case"
             WHITESPACE " "
-            WHEN_CLAUSE
-              WHEN_KW "when"
+            WHEN_CLAUSE_LIST
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                LITERAL
+                  POSITIONAL_PARAM "$1"
+                WHITESPACE " "
+                THEN_KW "then"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
               WHITESPACE " "
-              LITERAL
-                POSITIONAL_PARAM "$1"
-              WHITESPACE " "
-              THEN_KW "then"
-              WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
-            WHITESPACE " "
-            WHEN_CLAUSE
-              WHEN_KW "when"
-              WHITESPACE " "
-              LITERAL
-                POSITIONAL_PARAM "$2"
-              WHITESPACE " "
-              THEN_KW "then"
-              WHITESPACE " "
-              LITERAL
-                INT_NUMBER "2"
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                LITERAL
+                  POSITIONAL_PARAM "$2"
+                WHITESPACE " "
+                THEN_KW "then"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2"
             WHITESPACE " "
             END_KW "end"
     WHITESPACE " "
@@ -1197,44 +1205,46 @@ SOURCE_FILE
           CASE_EXPR
             CASE_KW "case"
             WHITESPACE " "
-            WHEN_CLAUSE
-              WHEN_KW "when"
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "a"
+            WHEN_CLAUSE_LIST
+              WHEN_CLAUSE
+                WHEN_KW "when"
                 WHITESPACE " "
-                EQ "="
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "1"
-              WHITESPACE " "
-              THEN_KW "then"
-              WHITESPACE " "
-              LITERAL
-                STRING "'one'"
-            WHITESPACE "\n    "
-            WHEN_CLAUSE
-              WHEN_KW "when"
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "a"
-                WHITESPACE " "
-                EQ "="
+                THEN_KW "then"
                 WHITESPACE " "
                 LITERAL
-                  INT_NUMBER "2"
-              WHITESPACE " "
-              THEN_KW "then"
+                  STRING "'one'"
+              WHITESPACE "\n    "
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "2"
+                WHITESPACE " "
+                THEN_KW "then"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'two'"
+            WHITESPACE "\n    "
+            ELSE_CLAUSE
+              ELSE_KW "else"
               WHITESPACE " "
               LITERAL
-                STRING "'two'"
-            WHITESPACE "\n    "
-            ELSE_KW "else"
-            WHITESPACE " "
-            LITERAL
-              STRING "'other'"
+                STRING "'other'"
             WHITESPACE "\n  "
             END_KW "end"
     WHITESPACE "\n"
@@ -1262,39 +1272,40 @@ SOURCE_FILE
           CASE_EXPR
             CASE_KW "case"
             WHITESPACE " "
-            WHEN_CLAUSE
-              WHEN_KW "when"
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "a"
+            WHEN_CLAUSE_LIST
+              WHEN_CLAUSE
+                WHEN_KW "when"
                 WHITESPACE " "
-                EQ "="
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
                 WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "1"
-              WHITESPACE " "
-              THEN_KW "then"
-              WHITESPACE " "
-              LITERAL
-                STRING "'one'"
-            WHITESPACE "\n    "
-            WHEN_CLAUSE
-              WHEN_KW "when"
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "a"
-                WHITESPACE " "
-                EQ "="
+                THEN_KW "then"
                 WHITESPACE " "
                 LITERAL
-                  INT_NUMBER "2"
-              WHITESPACE " "
-              THEN_KW "then"
-              WHITESPACE " "
-              LITERAL
-                STRING "'two'"
+                  STRING "'one'"
+              WHITESPACE "\n    "
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "a"
+                  WHITESPACE " "
+                  EQ "="
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "2"
+                WHITESPACE " "
+                THEN_KW "then"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'two'"
             WHITESPACE "\n  "
             END_KW "end"
     WHITESPACE "\n"
@@ -1325,32 +1336,34 @@ SOURCE_FILE
             NAME_REF
               IDENT "a"
             WHITESPACE " "
-            WHEN_CLAUSE
-              WHEN_KW "when"
-              WHITESPACE " "
-              LITERAL
-                INT_NUMBER "1"
-              WHITESPACE " "
-              THEN_KW "then"
-              WHITESPACE " "
-              LITERAL
-                STRING "'one'"
+            WHEN_CLAUSE_LIST
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "1"
+                WHITESPACE " "
+                THEN_KW "then"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'one'"
+              WHITESPACE "\n    "
+              WHEN_CLAUSE
+                WHEN_KW "when"
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "2"
+                WHITESPACE " "
+                THEN_KW "then"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'two'"
             WHITESPACE "\n    "
-            WHEN_CLAUSE
-              WHEN_KW "when"
+            ELSE_CLAUSE
+              ELSE_KW "else"
               WHITESPACE " "
               LITERAL
-                INT_NUMBER "2"
-              WHITESPACE " "
-              THEN_KW "then"
-              WHITESPACE " "
-              LITERAL
-                STRING "'two'"
-            WHITESPACE "\n    "
-            ELSE_KW "else"
-            WHITESPACE " "
-            LITERAL
-              STRING "'other'"
+                STRING "'other'"
             WHITESPACE "\n  "
             END_KW "end"
     WHITESPACE "\n"
