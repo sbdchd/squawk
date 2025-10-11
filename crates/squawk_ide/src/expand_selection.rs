@@ -51,10 +51,10 @@ const ALL_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::TARGET_LIST,
     SyntaxKind::TRANSACTION_MODE_LIST,
     SyntaxKind::VACUUM_OPTION_LIST,
+    SyntaxKind::VARIANT_LIST,
     // only separated by whitespace
     // SyntaxKind::XML_COLUMN_OPTION_LIST,
     SyntaxKind::XML_TABLE_COLUMN_LIST,
-    SyntaxKind::VARIANT_LIST,
 ];
 
 pub fn extend_selection(root: &SyntaxNode, range: TextRange) -> TextRange {
