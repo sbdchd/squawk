@@ -6462,8 +6462,205 @@ pub struct Merge {
 }
 impl Merge {
     #[inline]
+    pub fn alias(&self) -> Option<Alias> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn merge_when_clauses(&self) -> AstChildren<MergeWhenClause> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_clause(&self) -> Option<UsingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn star_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::STAR)
+    }
+    #[inline]
+    pub fn into_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INTO_KW)
+    }
+    #[inline]
     pub fn merge_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MERGE_KW)
+    }
+    #[inline]
+    pub fn only_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ONLY_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MergeDelete {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MergeDelete {
+    #[inline]
+    pub fn delete_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DELETE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MergeDoNothing {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MergeDoNothing {
+    #[inline]
+    pub fn do_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DO_KW)
+    }
+    #[inline]
+    pub fn nothing_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOTHING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MergeInsert {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MergeInsert {
+    #[inline]
+    pub fn insert_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INSERT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MergeUpdate {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MergeUpdate {
+    #[inline]
+    pub fn set_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+    #[inline]
+    pub fn update_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UPDATE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MergeWhenMatched {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MergeWhenMatched {
+    #[inline]
+    pub fn condition(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn merge_action(&self) -> Option<MergeAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn and_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AND_KW)
+    }
+    #[inline]
+    pub fn matched_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATCHED_KW)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MergeWhenNotMatchedSource {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MergeWhenNotMatchedSource {
+    #[inline]
+    pub fn condition(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn merge_action(&self) -> Option<MergeAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn and_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AND_KW)
+    }
+    #[inline]
+    pub fn by_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BY_KW)
+    }
+    #[inline]
+    pub fn matched_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATCHED_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn source_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SOURCE_KW)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct MergeWhenNotMatchedTarget {
+    pub(crate) syntax: SyntaxNode,
+}
+impl MergeWhenNotMatchedTarget {
+    #[inline]
+    pub fn condition(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn merge_action(&self) -> Option<MergeAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn and_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AND_KW)
+    }
+    #[inline]
+    pub fn by_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::BY_KW)
+    }
+    #[inline]
+    pub fn matched_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MATCHED_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+    #[inline]
+    pub fn target_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TARGET_KW)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+    #[inline]
+    pub fn when_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHEN_KW)
     }
 }
 
@@ -10339,6 +10536,21 @@ pub enum MatchType {
     MatchFull(MatchFull),
     MatchPartial(MatchPartial),
     MatchSimple(MatchSimple),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MergeAction {
+    MergeDelete(MergeDelete),
+    MergeDoNothing(MergeDoNothing),
+    MergeInsert(MergeInsert),
+    MergeUpdate(MergeUpdate),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum MergeWhenClause {
+    MergeWhenMatched(MergeWhenMatched),
+    MergeWhenNotMatchedSource(MergeWhenNotMatchedSource),
+    MergeWhenNotMatchedTarget(MergeWhenNotMatchedTarget),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -16082,6 +16294,132 @@ impl AstNode for Merge {
         &self.syntax
     }
 }
+impl AstNode for MergeDelete {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MERGE_DELETE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MergeDoNothing {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MERGE_DO_NOTHING
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MergeInsert {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MERGE_INSERT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MergeUpdate {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MERGE_UPDATE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MergeWhenMatched {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MERGE_WHEN_MATCHED
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MergeWhenNotMatchedSource {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MERGE_WHEN_NOT_MATCHED_SOURCE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for MergeWhenNotMatchedTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::MERGE_WHEN_NOT_MATCHED_TARGET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Move {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -21035,6 +21373,119 @@ impl From<MatchSimple> for MatchType {
     #[inline]
     fn from(node: MatchSimple) -> MatchType {
         MatchType::MatchSimple(node)
+    }
+}
+impl AstNode for MergeAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::MERGE_DELETE
+                | SyntaxKind::MERGE_DO_NOTHING
+                | SyntaxKind::MERGE_INSERT
+                | SyntaxKind::MERGE_UPDATE
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::MERGE_DELETE => MergeAction::MergeDelete(MergeDelete { syntax }),
+            SyntaxKind::MERGE_DO_NOTHING => MergeAction::MergeDoNothing(MergeDoNothing { syntax }),
+            SyntaxKind::MERGE_INSERT => MergeAction::MergeInsert(MergeInsert { syntax }),
+            SyntaxKind::MERGE_UPDATE => MergeAction::MergeUpdate(MergeUpdate { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            MergeAction::MergeDelete(it) => &it.syntax,
+            MergeAction::MergeDoNothing(it) => &it.syntax,
+            MergeAction::MergeInsert(it) => &it.syntax,
+            MergeAction::MergeUpdate(it) => &it.syntax,
+        }
+    }
+}
+impl From<MergeDelete> for MergeAction {
+    #[inline]
+    fn from(node: MergeDelete) -> MergeAction {
+        MergeAction::MergeDelete(node)
+    }
+}
+impl From<MergeDoNothing> for MergeAction {
+    #[inline]
+    fn from(node: MergeDoNothing) -> MergeAction {
+        MergeAction::MergeDoNothing(node)
+    }
+}
+impl From<MergeInsert> for MergeAction {
+    #[inline]
+    fn from(node: MergeInsert) -> MergeAction {
+        MergeAction::MergeInsert(node)
+    }
+}
+impl From<MergeUpdate> for MergeAction {
+    #[inline]
+    fn from(node: MergeUpdate) -> MergeAction {
+        MergeAction::MergeUpdate(node)
+    }
+}
+impl AstNode for MergeWhenClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::MERGE_WHEN_MATCHED
+                | SyntaxKind::MERGE_WHEN_NOT_MATCHED_SOURCE
+                | SyntaxKind::MERGE_WHEN_NOT_MATCHED_TARGET
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::MERGE_WHEN_MATCHED => {
+                MergeWhenClause::MergeWhenMatched(MergeWhenMatched { syntax })
+            }
+            SyntaxKind::MERGE_WHEN_NOT_MATCHED_SOURCE => {
+                MergeWhenClause::MergeWhenNotMatchedSource(MergeWhenNotMatchedSource { syntax })
+            }
+            SyntaxKind::MERGE_WHEN_NOT_MATCHED_TARGET => {
+                MergeWhenClause::MergeWhenNotMatchedTarget(MergeWhenNotMatchedTarget { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            MergeWhenClause::MergeWhenMatched(it) => &it.syntax,
+            MergeWhenClause::MergeWhenNotMatchedSource(it) => &it.syntax,
+            MergeWhenClause::MergeWhenNotMatchedTarget(it) => &it.syntax,
+        }
+    }
+}
+impl From<MergeWhenMatched> for MergeWhenClause {
+    #[inline]
+    fn from(node: MergeWhenMatched) -> MergeWhenClause {
+        MergeWhenClause::MergeWhenMatched(node)
+    }
+}
+impl From<MergeWhenNotMatchedSource> for MergeWhenClause {
+    #[inline]
+    fn from(node: MergeWhenNotMatchedSource) -> MergeWhenClause {
+        MergeWhenClause::MergeWhenNotMatchedSource(node)
+    }
+}
+impl From<MergeWhenNotMatchedTarget> for MergeWhenClause {
+    #[inline]
+    fn from(node: MergeWhenNotMatchedTarget) -> MergeWhenClause {
+        MergeWhenClause::MergeWhenNotMatchedTarget(node)
     }
 }
 impl AstNode for OnCommitAction {

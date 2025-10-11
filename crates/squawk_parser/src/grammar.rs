@@ -10261,22 +10261,35 @@ fn merge(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
 // and merge_delete is:
 // DELETE
 fn merge_when_clause(p: &mut Parser<'_>) {
+    let m = p.start();
     p.expect(WHEN_KW);
-    match p.current() {
+    let kind = match p.current() {
         MATCHED_KW => {
             p.bump(MATCHED_KW);
+            MERGE_WHEN_MATCHED
         }
         NOT_KW => {
             p.bump(NOT_KW);
             p.expect(MATCHED_KW);
-            // TODO: need a validation to check these
             // BY SOURCE | BY TARGET
             if p.eat(BY_KW) {
-                let _ = p.eat(SOURCE_KW) || p.eat(TARGET_KW);
+                if p.eat(SOURCE_KW) {
+                    MERGE_WHEN_NOT_MATCHED_SOURCE
+                } else if p.eat(TARGET_KW) {
+                    MERGE_WHEN_NOT_MATCHED_TARGET
+                } else {
+                    p.error("expected SOURCE or TARGET");
+                    MERGE_WHEN_NOT_MATCHED_TARGET
+                }
+            } else {
+                MERGE_WHEN_NOT_MATCHED_TARGET
             }
         }
-        _ => p.error("expected MATCHED, or NOT MATCHED"),
-    }
+        _ => {
+            p.error("expected MATCHED, or NOT MATCHED");
+            MERGE_WHEN_NOT_MATCHED_TARGET
+        }
+    };
     // [ AND condition ]
     if p.eat(AND_KW) {
         if expr(p).is_none() {
@@ -10284,16 +10297,24 @@ fn merge_when_clause(p: &mut Parser<'_>) {
         }
     }
     p.expect(THEN_KW);
-    // merge_update | merge_delete | merge_insert | DO NOTHING
-    match p.current() {
+    merge_action(p);
+    m.complete(p, kind);
+}
+
+// merge_update | merge_delete | merge_insert | DO NOTHING
+fn merge_action(p: &mut Parser<'_>) {
+    let m = p.start();
+    let kind = match p.current() {
         // merge_delete
         DELETE_KW => {
             p.bump(DELETE_KW);
+            MERGE_DELETE
         }
         // merge_update
         UPDATE_KW => {
             p.bump(UPDATE_KW);
             set_clause(p);
+            MERGE_UPDATE
         }
         // merge_insert
         INSERT_KW => {
@@ -10315,14 +10336,20 @@ fn merge_when_clause(p: &mut Parser<'_>) {
             } else {
                 p.error("expected VALUES or DEFAULT VALUES");
             }
+            MERGE_INSERT
         }
         // DO NOTHING
         DO_KW => {
             p.bump(DO_KW);
             p.expect(NOTHING_KW);
+            MERGE_DO_NOTHING
         }
-        _ => p.error("expected INSERT, UPDATE, DELETE, or DO NOTHING"),
-    }
+        _ => {
+            p.error("expected INSERT, UPDATE, DELETE, or DO NOTHING");
+            MERGE_DO_NOTHING
+        }
+    };
+    m.complete(p, kind);
 }
 
 // REASSIGN OWNED BY { old_role | CURRENT_ROLE | CURRENT_USER | SESSION_USER } [, ...]

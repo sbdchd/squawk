@@ -547,19 +547,18 @@ $0
             SyntaxKind::WHEN_CLAUSE_LIST,
         ];
 
-        let generated_list_kinds: Vec<SyntaxKind> = (0..SyntaxKind::__LAST as u16)
+        let unhandled_list_kinds = (0..SyntaxKind::__LAST as u16)
             .map(SyntaxKind::from)
             .filter(|kind| {
                 format!("{:?}", kind).ends_with("_LIST") && !delimited_ws_list_kinds.contains(kind)
             })
-            .collect();
-
-        let diff: Vec<SyntaxKind> = generated_list_kinds
-            .iter()
             .filter(|kind| !DELIMITED_LIST_KINDS.contains(kind))
-            .copied()
-            .collect();
+            .collect::<Vec<_>>();
 
-        assert_eq!(diff, vec![], "We shouldn't have any unhandled list kinds")
+        assert_eq!(
+            unhandled_list_kinds,
+            vec![],
+            "We shouldn't have any unhandled list kinds"
+        )
     }
 }

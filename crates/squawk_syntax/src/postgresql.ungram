@@ -928,8 +928,45 @@ Delete =
 Notify =
   'notify'
 
+MergeWhenMatched =
+  'when' 'matched' 
+  ('and' condition:Expr) 'then' MergeAction
+
+MergeWhenNotMatchedSource =
+  'when' 'not' 'matched' 'by' 'source' 
+  ('and' condition:Expr) 'then' MergeAction
+
+MergeWhenNotMatchedTarget =
+  'when' 'not' 'matched' ('by' 'target')? 
+  ('and' condition:Expr) 'then' MergeAction
+
+MergeWhenClause =
+  MergeWhenMatched
+| MergeWhenNotMatchedSource
+| MergeWhenNotMatchedTarget
+
+MergeDelete =
+ 'delete'
+
+MergeUpdate =
+  'update' 'set'
+
+MergeInsert =
+  'insert'
+
+MergeDoNothing =
+  'do' 'nothing'
+
+MergeAction =
+  MergeDelete
+| MergeUpdate
+| MergeInsert
+| MergeDoNothing
+
 Merge =
-  'merge'
+  'merge' 'into' 'only'? NameRef '*'? Alias? 
+  UsingClause
+  MergeWhenClause*
 
 Declare =
   'declare'
