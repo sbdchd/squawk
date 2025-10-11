@@ -2856,8 +2856,32 @@ impl CreateType {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn variant_list(&self) -> Option<VariantList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+    #[inline]
     pub fn create_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CREATE_KW)
+    }
+    #[inline]
+    pub fn enum_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ENUM_KW)
+    }
+    #[inline]
+    pub fn range_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RANGE_KW)
     }
     #[inline]
     pub fn type_token(&self) -> Option<SyntaxToken> {
@@ -9622,6 +9646,36 @@ impl Values {
     #[inline]
     pub fn values_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VALUES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Variant {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Variant {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct VariantList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl VariantList {
+    #[inline]
+    pub fn variants(&self) -> AstChildren<Variant> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -18926,6 +18980,42 @@ impl AstNode for Values {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::VALUES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for Variant {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VARIANT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for VariantList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::VARIANT_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
