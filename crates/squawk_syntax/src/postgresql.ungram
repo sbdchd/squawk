@@ -203,8 +203,11 @@ IsJsonScalar =
 BinExpr =
   lhs:Expr Op rhs:Expr
 
+WhenClauseList =
+  WhenClause WhenClause*
+
 CaseExpr =
-  'case'
+  'case' Expr? WhenClauseList ElseClause?
 
 FieldExpr =
   Expr '.' (NameRef | '*')
@@ -340,7 +343,7 @@ UniqueConstraint =
 
 PrimaryKeyConstraint =
   ('constraint' NameRef)
-  'primary' 'key' (UsingIndex | ColumnList IndexParams)
+  'primary' 'key' (UsingIndex | ColumnList PartitionItemList)
 
 SetNullColumns =
   'set' 'null' ColumnList?
@@ -590,7 +593,10 @@ TableArgList =
   '(' args:((TableArg (',' TableArg)*)?) ')'
 
 WhenClause =
-  'when'
+  'when' Expr 'then' Expr
+
+ElseClause =
+  'else' Expr
 
 UsingClause =
   'using'
@@ -893,8 +899,14 @@ AlterTable =
 Revoke =
   'revoke'
 
+Row =
+  (Expr (',' Expr)*)
+
+RowList =
+  (Row (',' Row)*)
+
 Values =
-  'values'
+  'values' RowList
 
 Table =
   'table'
@@ -1621,7 +1633,7 @@ DropTrigger =
 PartitionItem =
   Expr Collate?
 
-IndexParams =
+PartitionItemList =
   '(' (PartitionItem (',' PartitionItem)*) ')'
 
 CreateType =

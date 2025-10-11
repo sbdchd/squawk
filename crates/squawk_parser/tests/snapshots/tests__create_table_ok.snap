@@ -453,63 +453,64 @@ SOURCE_FILE
       WHITESPACE " "
       RANGE_KW "range"
       WHITESPACE " "
-      L_PAREN "("
-      WHITESPACE "\n  "
-      PARTITION_ITEM
-        BIN_EXPR
-          NAME_REF
-            IDENT "foo"
-          WHITESPACE " "
-          COLLATE_KW "collate"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "\"fr_FR\""
-        WHITESPACE " "
-        IDENT "text_pattern_ops"
-      COMMA ","
-      WHITESPACE " \n  "
-      PARTITION_ITEM
-        NAME_REF
-          IDENT "bar"
-      COMMA ","
-      WHITESPACE "\n  "
-      PARTITION_ITEM
-        CALL_EXPR
-          NAME_REF
-            EXTRACT_KW "extract"
-          ARG_LIST
-            L_PAREN "("
-            MONTH_KW "month"
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        WHITESPACE "\n  "
+        PARTITION_ITEM
+          BIN_EXPR
+            NAME_REF
+              IDENT "foo"
             WHITESPACE " "
-            FROM_KW "from"
+            COLLATE_KW "collate"
             WHITESPACE " "
             NAME_REF
-              IDENT "b"
-            R_PAREN ")"
-      COMMA ","
-      WHITESPACE "\n  "
-      PARTITION_ITEM
-        BIN_EXPR
-          PAREN_EXPR
-            L_PAREN "("
-            BIN_EXPR
-              NAME_REF
-                IDENT "a"
+              IDENT "\"fr_FR\""
+          WHITESPACE " "
+          IDENT "text_pattern_ops"
+        COMMA ","
+        WHITESPACE " \n  "
+        PARTITION_ITEM
+          NAME_REF
+            IDENT "bar"
+        COMMA ","
+        WHITESPACE "\n  "
+        PARTITION_ITEM
+          CALL_EXPR
+            NAME_REF
+              EXTRACT_KW "extract"
+            ARG_LIST
+              L_PAREN "("
+              MONTH_KW "month"
               WHITESPACE " "
-              CUSTOM_OP
-                PIPE "|"
-                PIPE "|"
+              FROM_KW "from"
               WHITESPACE " "
               NAME_REF
                 IDENT "b"
-            R_PAREN ")"
-          WHITESPACE " "
-          COLLATE_KW "collate"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "buzz"
-      WHITESPACE "\n"
-      R_PAREN ")"
+              R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n  "
+        PARTITION_ITEM
+          BIN_EXPR
+            PAREN_EXPR
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "a"
+                WHITESPACE " "
+                CUSTOM_OP
+                  PIPE "|"
+                  PIPE "|"
+                WHITESPACE " "
+                NAME_REF
+                  IDENT "b"
+              R_PAREN ")"
+            WHITESPACE " "
+            COLLATE_KW "collate"
+            WHITESPACE " "
+            NAME_REF
+              IDENT "buzz"
+        WHITESPACE "\n"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -544,11 +545,12 @@ SOURCE_FILE
       WHITESPACE " "
       IDENT "hash"
       WHITESPACE " "
-      L_PAREN "("
-      PARTITION_ITEM
-        NAME_REF
-          IDENT "z"
-      R_PAREN ")"
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        PARTITION_ITEM
+          NAME_REF
+            IDENT "z"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -583,16 +585,17 @@ SOURCE_FILE
       WHITESPACE " "
       IDENT "list"
       WHITESPACE " "
-      L_PAREN "("
-      PARTITION_ITEM
-        NAME_REF
-          IDENT "z"
-      COMMA ","
-      WHITESPACE " "
-      PARTITION_ITEM
-        NAME_REF
-          IDENT "b"
-      R_PAREN ")"
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        PARTITION_ITEM
+          NAME_REF
+            IDENT "z"
+        COMMA ","
+        WHITESPACE " "
+        PARTITION_ITEM
+          NAME_REF
+            IDENT "b"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE

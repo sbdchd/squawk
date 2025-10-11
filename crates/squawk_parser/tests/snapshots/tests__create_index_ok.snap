@@ -20,7 +20,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -64,7 +64,7 @@ SOURCE_FILE
     NAME_REF
       IDENT "bar"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -87,7 +87,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         BIN_EXPR
@@ -122,7 +122,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -153,7 +153,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       PARTITION_ITEM
@@ -218,7 +218,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         PAREN_EXPR
@@ -261,7 +261,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -345,7 +345,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -393,7 +393,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -421,7 +421,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -447,7 +447,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -486,7 +486,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -522,7 +522,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         PAREN_EXPR
@@ -555,7 +555,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         BIN_EXPR
@@ -585,7 +585,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -616,7 +616,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -660,7 +660,7 @@ SOURCE_FILE
     NAME_REF
       IDENT "GIN"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -699,7 +699,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "films"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -734,7 +734,7 @@ SOURCE_FILE
     NAME_REF
       IDENT "gist"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         CALL_EXPR
@@ -769,7 +769,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "sales_table"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF

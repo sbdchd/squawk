@@ -21,7 +21,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "t"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF

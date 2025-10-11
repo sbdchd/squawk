@@ -8,34 +8,38 @@ SOURCE_FILE
   VALUES
     VALUES_KW "VALUES"
     WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      INT_NUMBER "1"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      STRING "'one'"
-    R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      INT_NUMBER "2"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      STRING "'two'"
-    R_PAREN ")"
-    COMMA ","
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      INT_NUMBER "3"
-    COMMA ","
-    WHITESPACE " "
-    LITERAL
-      STRING "'three'"
-    R_PAREN ")"
+    ROW_LIST
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'one'"
+        R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "2"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'two'"
+        R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "3"
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          STRING "'three'"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- union_with_select"
@@ -118,56 +122,59 @@ SOURCE_FILE
     VALUES
       VALUES_KW "VALUES"
       WHITESPACE "\n    "
-      L_PAREN "("
-      LITERAL
-        STRING "'UA502'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        STRING "'Bananas'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "105"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        DEFAULT_KW "DEFAULT"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        STRING "'Comedy'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        STRING "'82 minutes'"
-      R_PAREN ")"
-      COMMA ","
-      WHITESPACE "\n    "
-      L_PAREN "("
-      LITERAL
-        STRING "'T_601'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        STRING "'Yojimbo'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "106"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        DEFAULT_KW "DEFAULT"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        STRING "'Drama'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        DEFAULT_KW "DEFAULT"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            STRING "'UA502'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'Bananas'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "105"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            DEFAULT_KW "DEFAULT"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'Comedy'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'82 minutes'"
+          R_PAREN ")"
+        COMMA ","
+        WHITESPACE "\n    "
+        ROW
+          L_PAREN "("
+          LITERAL
+            STRING "'T_601'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'Yojimbo'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "106"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            DEFAULT_KW "DEFAULT"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'Drama'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            DEFAULT_KW "DEFAULT"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- in_select_from_position"
@@ -201,24 +208,27 @@ SOURCE_FILE
           L_PAREN "("
           VALUES
             VALUES_KW "VALUES"
-            L_PAREN "("
-            LITERAL
-              STRING "'MGM'"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              STRING "'Horror'"
-            R_PAREN ")"
-            COMMA ","
-            WHITESPACE " "
-            L_PAREN "("
-            LITERAL
-              STRING "'UA'"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              STRING "'Sci-Fi'"
-            R_PAREN ")"
+            ROW_LIST
+              ROW
+                L_PAREN "("
+                LITERAL
+                  STRING "'MGM'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'Horror'"
+                R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              ROW
+                L_PAREN "("
+                LITERAL
+                  STRING "'UA'"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  STRING "'Sci-Fi'"
+                R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "
         ALIAS
@@ -319,32 +329,35 @@ SOURCE_FILE
           L_PAREN "("
           VALUES
             VALUES_KW "VALUES"
-            L_PAREN "("
-            LITERAL
-              INT_NUMBER "1"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "200000"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              FLOAT_NUMBER "1.2"
-            R_PAREN ")"
-            COMMA ","
-            WHITESPACE " "
-            L_PAREN "("
-            LITERAL
-              INT_NUMBER "2"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "400000"
-            COMMA ","
-            WHITESPACE " "
-            LITERAL
-              FLOAT_NUMBER "1.4"
-            R_PAREN ")"
+            ROW_LIST
+              ROW
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "1"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "200000"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "1.2"
+                R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              ROW
+                L_PAREN "("
+                LITERAL
+                  INT_NUMBER "2"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  INT_NUMBER "400000"
+                COMMA ","
+                WHITESPACE " "
+                LITERAL
+                  FLOAT_NUMBER "1.4"
+                R_PAREN ")"
           R_PAREN ")"
         WHITESPACE " "
         ALIAS
@@ -441,28 +454,32 @@ SOURCE_FILE
           L_PAREN "("
           VALUES
             VALUES_KW "VALUES"
-            L_PAREN "("
-            CAST_EXPR
-              LITERAL
-                STRING "'192.168.0.1'"
-              COLON_COLON
-                COLON ":"
-                COLON ":"
-              NAME_REF
-                IDENT "inet"
-            R_PAREN ")"
-            COMMA ","
-            WHITESPACE " "
-            L_PAREN "("
-            LITERAL
-              STRING "'192.168.0.10'"
-            R_PAREN ")"
-            COMMA ","
-            WHITESPACE " "
-            L_PAREN "("
-            LITERAL
-              STRING "'192.168.1.43'"
-            R_PAREN ")"
+            ROW_LIST
+              ROW
+                L_PAREN "("
+                CAST_EXPR
+                  LITERAL
+                    STRING "'192.168.0.1'"
+                  COLON_COLON
+                    COLON ":"
+                    COLON ":"
+                  NAME_REF
+                    IDENT "inet"
+                R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              ROW
+                L_PAREN "("
+                LITERAL
+                  STRING "'192.168.0.10'"
+                R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              ROW
+                L_PAREN "("
+                LITERAL
+                  STRING "'192.168.1.43'"
+                R_PAREN ")"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -472,28 +489,32 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
     WHITESPACE " "
     UNION_KW "union"
     WHITESPACE " "
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "3"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "4"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "3"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "4"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- union_select_values"
@@ -502,10 +523,12 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "1"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          R_PAREN ")"
     WHITESPACE " "
     UNION_KW "union"
     WHITESPACE " "
@@ -513,10 +536,12 @@ SOURCE_FILE
       VALUES
         VALUES_KW "values"
         WHITESPACE " "
-        L_PAREN "("
-        LITERAL
-          INT_NUMBER "2"
-        R_PAREN ")"
+        ROW_LIST
+          ROW
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
       WHITESPACE " "
       UNION_KW "union"
       WHITESPACE " "
@@ -549,10 +574,12 @@ SOURCE_FILE
               VALUES
                 VALUES_KW "values"
                 WHITESPACE " "
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "2"
-                R_PAREN ")"
+                ROW_LIST
+                  ROW
+                    L_PAREN "("
+                    LITERAL
+                      INT_NUMBER "2"
+                    R_PAREN ")"
               WHITESPACE " "
               UNION_KW "union"
               WHITESPACE " "

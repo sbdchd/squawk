@@ -573,38 +573,40 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        DEFAULT_KW "default"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "3"
-      COMMA ","
-      WHITESPACE " "
-      BIN_EXPR
-        BIN_EXPR
+      ROW_LIST
+        ROW
+          L_PAREN "("
           LITERAL
-            INT_NUMBER "10"
-          WHITESPACE " "
-          STAR "*"
+            INT_NUMBER "1"
+          COMMA ","
           WHITESPACE " "
           LITERAL
-            INT_NUMBER "10"
-        WHITESPACE " "
-        PLUS "+"
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "2"
-      R_PAREN ")"
+            INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            DEFAULT_KW "default"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "3"
+          COMMA ","
+          WHITESPACE " "
+          BIN_EXPR
+            BIN_EXPR
+              LITERAL
+                INT_NUMBER "10"
+              WHITESPACE " "
+              STAR "*"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+            WHITESPACE " "
+            PLUS "+"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- merge_update"
@@ -1017,22 +1019,24 @@ SOURCE_FILE
     VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
-      L_PAREN "("
-      FIELD_EXPR
-        NAME_REF
-          IDENT "t"
-        DOT "."
-        NAME_REF
-          IDENT "customer_id"
-      COMMA ","
-      WHITESPACE " "
-      FIELD_EXPR
-        NAME_REF
-          IDENT "t"
-        DOT "."
-        NAME_REF
-          IDENT "transaction_value"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "customer_id"
+          COMMA ","
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "transaction_value"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_2"
@@ -1154,22 +1158,24 @@ SOURCE_FILE
     VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
-      L_PAREN "("
-      FIELD_EXPR
-        NAME_REF
-          IDENT "t"
-        DOT "."
-        NAME_REF
-          IDENT "customer_id"
-      COMMA ","
-      WHITESPACE " "
-      FIELD_EXPR
-        NAME_REF
-          IDENT "t"
-        DOT "."
-        NAME_REF
-          IDENT "transaction_value"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "customer_id"
+          COMMA ","
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "t"
+            DOT "."
+            NAME_REF
+              IDENT "transaction_value"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_3"
@@ -1246,22 +1252,24 @@ SOURCE_FILE
     WHITESPACE " "
     VALUES
       VALUES_KW "VALUES"
-      L_PAREN "("
-      FIELD_EXPR
-        NAME_REF
-          IDENT "s"
-        DOT "."
-        NAME_REF
-          IDENT "winename"
-      COMMA ","
-      WHITESPACE " "
-      FIELD_EXPR
-        NAME_REF
-          IDENT "s"
-        DOT "."
-        NAME_REF
-          IDENT "stock_delta"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "winename"
+          COMMA ","
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "stock_delta"
+          R_PAREN ")"
     WHITESPACE "\n"
     WHEN_KW "WHEN"
     WHITESPACE " "
@@ -1412,22 +1420,24 @@ SOURCE_FILE
     WHITESPACE " "
     VALUES
       VALUES_KW "VALUES"
-      L_PAREN "("
-      FIELD_EXPR
-        NAME_REF
-          IDENT "s"
-        DOT "."
-        NAME_REF
-          IDENT "winename"
-      COMMA ","
-      WHITESPACE " "
-      FIELD_EXPR
-        NAME_REF
-          IDENT "s"
-        DOT "."
-        NAME_REF
-          IDENT "stock"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "winename"
+          COMMA ","
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "s"
+            DOT "."
+            NAME_REF
+              IDENT "stock"
+          R_PAREN ")"
     WHITESPACE "\n"
     WHEN_KW "WHEN"
     WHITESPACE " "

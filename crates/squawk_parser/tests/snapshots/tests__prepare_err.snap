@@ -52,22 +52,24 @@ SOURCE_FILE
       WHITESPACE " "
       VALUES
         VALUES_KW "VALUES"
-        L_PAREN "("
-        LITERAL
-          POSITIONAL_PARAM "$1"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          POSITIONAL_PARAM "$2"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          POSITIONAL_PARAM "$3"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          POSITIONAL_PARAM "$4"
-        R_PAREN ")"
+        ROW_LIST
+          ROW
+            L_PAREN "("
+            LITERAL
+              POSITIONAL_PARAM "$1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              POSITIONAL_PARAM "$2"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              POSITIONAL_PARAM "$3"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              POSITIONAL_PARAM "$4"
+            R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
 ---

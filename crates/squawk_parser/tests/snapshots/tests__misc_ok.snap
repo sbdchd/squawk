@@ -169,48 +169,52 @@ SOURCE_FILE
     VALUES
       VALUES_KW "VALUES"
       WHITESPACE " \n  "
-      L_PAREN "("
-      LITERAL
-        POSITIONAL_PARAM "$1"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        POSITIONAL_PARAM "$2"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        POSITIONAL_PARAM "$3"
-      R_PAREN ")"
-      COMMA ","
-      WHITESPACE " \n  "
-      L_PAREN "("
-      LITERAL
-        POSITIONAL_PARAM "$4"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        POSITIONAL_PARAM "$5"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        POSITIONAL_PARAM "$6"
-      R_PAREN ")"
-      COMMA ","
-      WHITESPACE " \n  "
-      COMMENT "--  ..., "
-      WHITESPACE "\n  "
-      L_PAREN "("
-      LITERAL
-        POSITIONAL_PARAM "$2998"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        POSITIONAL_PARAM "$2999"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        POSITIONAL_PARAM "$3000"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            POSITIONAL_PARAM "$1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            POSITIONAL_PARAM "$2"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            POSITIONAL_PARAM "$3"
+          R_PAREN ")"
+        COMMA ","
+        WHITESPACE " \n  "
+        ROW
+          L_PAREN "("
+          LITERAL
+            POSITIONAL_PARAM "$4"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            POSITIONAL_PARAM "$5"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            POSITIONAL_PARAM "$6"
+          R_PAREN ")"
+        COMMA ","
+        WHITESPACE " \n  "
+        COMMENT "--  ..., "
+        WHITESPACE "\n  "
+        ROW
+          L_PAREN "("
+          LITERAL
+            POSITIONAL_PARAM "$2998"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            POSITIONAL_PARAM "$2999"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            POSITIONAL_PARAM "$3000"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.timescale.com/blog/combining-semantic-search-and-full-text-search-in-postgresql-with-cohere-pgvector-and-pgai/"
@@ -1231,16 +1235,18 @@ SOURCE_FILE
     VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
-      L_PAREN "("
-      CAST_EXPR
-        LITERAL
-          STRING "'2024-12-25'"
-        COLON_COLON
-          COLON ":"
-          COLON ":"
-        NAME_REF
-          IDENT "date"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'2024-12-25'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            NAME_REF
+              IDENT "date"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -1302,16 +1308,18 @@ SOURCE_FILE
     VALUES
       VALUES_KW "VALUES"
       WHITESPACE " "
-      L_PAREN "("
-      CAST_EXPR
-        LITERAL
-          STRING "'2024-12-25'"
-        COLON_COLON
-          COLON ":"
-          COLON ":"
-        NAME_REF
-          IDENT "date"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          CAST_EXPR
+            LITERAL
+              STRING "'2024-12-25'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            NAME_REF
+              IDENT "date"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2356,7 +2364,7 @@ SOURCE_FILE
     NAME_REF
       IDENT "brin"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -2627,7 +2635,7 @@ SOURCE_FILE
     NAME_REF
       IDENT "brin"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -2740,7 +2748,7 @@ SOURCE_FILE
     NAME_REF
       IDENT "brin"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -3629,18 +3637,20 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      WHITESPACE "\n  "
-      CAST_EXPR
-        LITERAL
-          STRING "'{\n     \"start\": \"2025-01-01T23:30:00.000Z\",\n     \"eventTypeId\": 1398027,\n     \"attendee\": {\n       \"name\": \"Elon Musk\",\n       \"email\": \"elon.musk@x.com\",\n       \"timeZone\": \"America/New_York\"\n     }\n  }'"
-        COLON_COLON
-          COLON ":"
-          COLON ":"
-        NAME_REF
-          IDENT "jsonb"
-      WHITESPACE "\n"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          WHITESPACE "\n  "
+          CAST_EXPR
+            LITERAL
+              STRING "'{\n     \"start\": \"2025-01-01T23:30:00.000Z\",\n     \"eventTypeId\": 1398027,\n     \"attendee\": {\n       \"name\": \"Elon Musk\",\n       \"email\": \"elon.musk@x.com\",\n       \"timeZone\": \"America/New_York\"\n     }\n  }'"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            NAME_REF
+              IDENT "jsonb"
+          WHITESPACE "\n"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n\n"
   COMMENT "-- https://www.tinybird.co/blog-posts/outgrowing-postgres-how-to-run-olap-workloads-on-postgres"
@@ -3747,7 +3757,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "hourly_stats"
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -3809,11 +3819,12 @@ SOURCE_FILE
       WHITESPACE " "
       RANGE_KW "RANGE"
       WHITESPACE " "
-      L_PAREN "("
-      PARTITION_ITEM
-        NAME_REF
-          IDENT "event_time"
-      R_PAREN ")"
+      PARTITION_ITEM_LIST
+        L_PAREN "("
+        PARTITION_ITEM
+          NAME_REF
+            IDENT "event_time"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
@@ -4980,44 +4991,46 @@ SOURCE_FILE
                 CASE_EXPR
                   CASE_KW "CASE"
                   WHITESPACE " \n        "
-                  WHEN_CLAUSE
-                    WHEN_KW "WHEN"
-                    WHITESPACE " "
-                    BIN_EXPR
-                      NAME_REF
-                        IDENT "lifetime_value"
+                  WHEN_CLAUSE_LIST
+                    WHEN_CLAUSE
+                      WHEN_KW "WHEN"
                       WHITESPACE " "
-                      R_ANGLE ">"
+                      BIN_EXPR
+                        NAME_REF
+                          IDENT "lifetime_value"
+                        WHITESPACE " "
+                        R_ANGLE ">"
+                        WHITESPACE " "
+                        LITERAL
+                          INT_NUMBER "1000"
                       WHITESPACE " "
-                      LITERAL
-                        INT_NUMBER "1000"
-                    WHITESPACE " "
-                    THEN_KW "THEN"
-                    WHITESPACE " "
-                    LITERAL
-                      STRING "'high'"
-                  WHITESPACE "\n        "
-                  WHEN_CLAUSE
-                    WHEN_KW "WHEN"
-                    WHITESPACE " "
-                    BIN_EXPR
-                      NAME_REF
-                        IDENT "lifetime_value"
-                      WHITESPACE " "
-                      R_ANGLE ">"
+                      THEN_KW "THEN"
                       WHITESPACE " "
                       LITERAL
-                        INT_NUMBER "100"
-                    WHITESPACE " "
-                    THEN_KW "THEN"
+                        STRING "'high'"
+                    WHITESPACE "\n        "
+                    WHEN_CLAUSE
+                      WHEN_KW "WHEN"
+                      WHITESPACE " "
+                      BIN_EXPR
+                        NAME_REF
+                          IDENT "lifetime_value"
+                        WHITESPACE " "
+                        R_ANGLE ">"
+                        WHITESPACE " "
+                        LITERAL
+                          INT_NUMBER "100"
+                      WHITESPACE " "
+                      THEN_KW "THEN"
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "'medium'"
+                  WHITESPACE "\n        "
+                  ELSE_CLAUSE
+                    ELSE_KW "ELSE"
                     WHITESPACE " "
                     LITERAL
-                      STRING "'medium'"
-                  WHITESPACE "\n        "
-                  ELSE_KW "ELSE"
-                  WHITESPACE " "
-                  LITERAL
-                    STRING "'low'"
+                      STRING "'low'"
                   WHITESPACE "\n    "
                   END_KW "END"
                 WHITESPACE " "
@@ -5602,7 +5615,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "events"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       WHITESPACE "\n  "
       PARTITION_ITEM
@@ -5642,7 +5655,7 @@ SOURCE_FILE
     WHITESPACE " "
     NAME_REF
       IDENT "brin"
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -5900,7 +5913,7 @@ SOURCE_FILE
           NAME_REF
             IDENT "recent_product_sales"
     WHITESPACE " "
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -5938,7 +5951,7 @@ SOURCE_FILE
         PATH_SEGMENT
           NAME_REF
             IDENT "recent_product_sales"
-    INDEX_PARAMS
+    PARTITION_ITEM_LIST
       L_PAREN "("
       PARTITION_ITEM
         NAME_REF
@@ -6791,44 +6804,46 @@ SOURCE_FILE
           CASE_EXPR
             CASE_KW "CASE"
             WHITESPACE " \n        "
-            WHEN_CLAUSE
-              WHEN_KW "WHEN"
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "avg_price"
+            WHEN_CLAUSE_LIST
+              WHEN_CLAUSE
+                WHEN_KW "WHEN"
                 WHITESPACE " "
-                R_ANGLE ">"
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "avg_price"
+                  WHITESPACE " "
+                  R_ANGLE ">"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "price_75th"
                 WHITESPACE " "
-                NAME_REF
-                  IDENT "price_75th"
-              WHITESPACE " "
-              THEN_KW "THEN"
+                THEN_KW "THEN"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'SELL'"
+              WHITESPACE "\n        "
+              WHEN_CLAUSE
+                WHEN_KW "WHEN"
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "avg_price"
+                  WHITESPACE " "
+                  L_ANGLE "<"
+                  WHITESPACE " "
+                  NAME_REF
+                    IDENT "price_75th"
+                WHITESPACE " "
+                THEN_KW "THEN"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'BUY'"
+            WHITESPACE "\n        "
+            ELSE_CLAUSE
+              ELSE_KW "ELSE"
               WHITESPACE " "
               LITERAL
-                STRING "'SELL'"
-            WHITESPACE "\n        "
-            WHEN_CLAUSE
-              WHEN_KW "WHEN"
-              WHITESPACE " "
-              BIN_EXPR
-                NAME_REF
-                  IDENT "avg_price"
-                WHITESPACE " "
-                L_ANGLE "<"
-                WHITESPACE " "
-                NAME_REF
-                  IDENT "price_75th"
-              WHITESPACE " "
-              THEN_KW "THEN"
-              WHITESPACE " "
-              LITERAL
-                STRING "'BUY'"
-            WHITESPACE "\n        "
-            ELSE_KW "ELSE"
-            WHITESPACE " "
-            LITERAL
-              STRING "'HOLD'"
+                STRING "'HOLD'"
             WHITESPACE "\n    "
             END_KW "END"
           WHITESPACE " "

@@ -131,14 +131,16 @@ SOURCE_FILE
       VALUES
         VALUES_KW "values"
         WHITESPACE " "
-        L_PAREN "("
-        LITERAL
-          INT_NUMBER "1"
-        COMMA ","
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "2"
-        R_PAREN ")"
+        ROW_LIST
+          ROW
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
     SEMICOLON ";"
     WHITESPACE "\n    "
     DELETE
@@ -156,14 +158,16 @@ SOURCE_FILE
     VALUES
       VALUES_KW "values"
       WHITESPACE " "
-      L_PAREN "("
-      LITERAL
-        INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "2"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          R_PAREN ")"
     SEMICOLON ";"
     WHITESPACE "\n    "
     UPDATE

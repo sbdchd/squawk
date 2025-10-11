@@ -1419,6 +1419,18 @@ pub struct CaseExpr {
 }
 impl CaseExpr {
     #[inline]
+    pub fn else_clause(&self) -> Option<ElseClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn when_clause_list(&self) -> Option<WhenClauseList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn case_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::CASE_KW)
     }
@@ -4469,6 +4481,21 @@ impl DropView {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ElseClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ElseClause {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn else_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ELSE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct EnableAlwaysRule {
     pub(crate) syntax: SyntaxNode,
 }
@@ -5178,25 +5205,6 @@ impl IndexExpr {
     #[inline]
     pub fn r_brack_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_BRACK)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct IndexParams {
-    pub(crate) syntax: SyntaxNode,
-}
-impl IndexParams {
-    #[inline]
-    pub fn partition_items(&self) -> AstChildren<PartitionItem> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
 }
 
@@ -7600,6 +7608,25 @@ impl PartitionItem {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct PartitionItemList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl PartitionItemList {
+    #[inline]
+    pub fn partition_items(&self) -> AstChildren<PartitionItem> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PartitionOf {
     pub(crate) syntax: SyntaxNode,
 }
@@ -7778,11 +7805,11 @@ impl PrimaryKeyConstraint {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn index_params(&self) -> Option<IndexParams> {
+    pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn partition_item_list(&self) -> Option<PartitionItemList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -8336,6 +8363,28 @@ impl Rollback {
     #[inline]
     pub fn rollback_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ROLLBACK_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Row {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Row {
+    #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RowList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RowList {
+    #[inline]
+    pub fn rows(&self) -> AstChildren<Row> {
+        support::children(&self.syntax)
     }
 }
 
@@ -9644,6 +9693,10 @@ pub struct Values {
 }
 impl Values {
     #[inline]
+    pub fn row_list(&self) -> Option<RowList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn values_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::VALUES_KW)
     }
@@ -9704,8 +9757,31 @@ pub struct WhenClause {
 }
 impl WhenClause {
     #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn then_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::THEN_KW)
+    }
+    #[inline]
     pub fn when_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::WHEN_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct WhenClauseList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl WhenClauseList {
+    #[inline]
+    pub fn when_clause(&self) -> Option<WhenClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn when_clauses(&self) -> AstChildren<WhenClause> {
+        support::children(&self.syntax)
     }
 }
 
@@ -14134,6 +14210,24 @@ impl AstNode for DropView {
         &self.syntax
     }
 }
+impl AstNode for ElseClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ELSE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for EnableAlwaysRule {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -14750,24 +14844,6 @@ impl AstNode for IndexExpr {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::INDEX_EXPR
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for IndexParams {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::INDEX_PARAMS
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -17014,6 +17090,24 @@ impl AstNode for PartitionItem {
         &self.syntax
     }
 }
+impl AstNode for PartitionItemList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::PARTITION_ITEM_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for PartitionOf {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -17720,6 +17814,42 @@ impl AstNode for Rollback {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ROLLBACK
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for Row {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROW
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RowList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROW_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -19052,6 +19182,24 @@ impl AstNode for WhenClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::WHEN_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for WhenClauseList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WHEN_CLAUSE_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

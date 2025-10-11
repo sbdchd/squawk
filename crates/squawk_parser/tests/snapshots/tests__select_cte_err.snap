@@ -322,10 +322,12 @@ SOURCE_FILE
     WHITESPACE "\n"
     VALUES_KW "values"
     WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      INT_NUMBER "2"
-    R_PAREN ")"
+    ROW_LIST
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "2"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
 ---

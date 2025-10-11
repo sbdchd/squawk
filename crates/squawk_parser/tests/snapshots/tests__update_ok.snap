@@ -1026,14 +1026,16 @@ SOURCE_FILE
     WHITESPACE " "
     VALUES
       VALUES_KW "VALUES"
-      L_PAREN "("
-      LITERAL
-        STRING "'Chateau Lafite 2003'"
-      COMMA ","
-      WHITESPACE " "
-      LITERAL
-        STRING "'24'"
-      R_PAREN ")"
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            STRING "'Chateau Lafite 2003'"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            STRING "'24'"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   COMMENT "-- Assume the above fails because of a unique key violation,"

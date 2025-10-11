@@ -9,17 +9,20 @@ SOURCE_FILE
   VALUES
     VALUES_KW "values"
     WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      INT_NUMBER "1"
-    ERROR
-      COMMA ","
-    R_PAREN ")"
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      INT_NUMBER "1"
-    R_PAREN ")"
+    ROW_LIST
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        ERROR
+          COMMA ","
+        R_PAREN ")"
+      WHITESPACE " "
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extra comma, aka missing tuple"
@@ -27,18 +30,21 @@ SOURCE_FILE
   VALUES
     VALUES_KW "values"
     WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      INT_NUMBER "1"
-    R_PAREN ")"
-    COMMA ","
-    ERROR
+    ROW_LIST
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "1"
+        R_PAREN ")"
       COMMA ","
-    WHITESPACE " "
-    L_PAREN "("
-    LITERAL
-      INT_NUMBER "2"
-    R_PAREN ")"
+      ERROR
+        COMMA ","
+      WHITESPACE " "
+      ROW
+        L_PAREN "("
+        LITERAL
+          INT_NUMBER "2"
+        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
 ---
