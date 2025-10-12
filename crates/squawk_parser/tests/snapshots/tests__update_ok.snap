@@ -1120,7 +1120,8 @@ SOURCE_FILE
     WHITESPACE " "
     OF_KW "OF"
     WHITESPACE " "
-    IDENT "c_films"
+    NAME_REF
+      IDENT "c_films"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE

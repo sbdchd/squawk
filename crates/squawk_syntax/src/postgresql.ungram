@@ -909,10 +909,13 @@ Values =
   'values' RowList
 
 Table =
-  'table'
+  'table' RelationName
 
 Insert =
-  'insert'
+  'insert' 'into' RelationName Alias? ColumnList?
+  ('overriding' ('system' | 'user') 'value')?
+  ('default' 'values' | Values | Stmt)
+  ('on' 'conflict')?
 
 Update =
   'update'
@@ -923,7 +926,10 @@ ReturningClause =
   TargetList?
 
 Delete =
-  'delete'
+  'delete' 'from' RelationName Alias?
+  UsingClause?
+  ('where' Expr | 'where' 'current' 'of' NameRef)?
+  ReturningClause?
 
 Notify =
   'notify'
@@ -964,7 +970,7 @@ MergeAction =
 | MergeDoNothing
 
 Merge =
-  'merge' 'into' 'only'? NameRef '*'? Alias? 
+  'merge' 'into' RelationName Alias? 
   UsingClause
   MergeWhenClause*
 
@@ -2115,6 +2121,7 @@ Stmt =
 | Show
 // We don't include this and instead merge it into Begin
 // | StartTransaction
+| Table
 | Truncate
 | Unlisten
 | Update

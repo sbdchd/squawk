@@ -11361,7 +11361,7 @@ fn move_(p: &mut Parser<'_>) -> CompletedMarker {
     opt_direction(p);
     let _ = p.eat(FROM_KW) || p.eat(IN_KW);
     // cursor_name
-    name(p);
+    name_ref(p);
     m.complete(p, MOVE)
 }
 
@@ -11388,7 +11388,7 @@ fn fetch(p: &mut Parser<'_>) -> CompletedMarker {
     opt_direction(p);
     let _ = p.eat(FROM_KW) || p.eat(IN_KW);
     // cursor_name
-    name(p);
+    name_ref(p);
     m.complete(p, FETCH)
 }
 
@@ -12272,7 +12272,7 @@ fn opt_where_current_of(p: &mut Parser<'_>) {
     if p.eat(WHERE_KW) {
         if p.eat(CURRENT_KW) {
             p.expect(OF_KW);
-            ident(p);
+            name_ref(p);
         }
     }
 }
