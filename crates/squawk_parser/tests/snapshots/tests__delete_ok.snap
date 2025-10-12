@@ -481,7 +481,8 @@ SOURCE_FILE
     WHITESPACE " "
     OF_KW "of"
     WHITESPACE " "
-    IDENT "invoice_cursor"
+    NAME_REF
+      IDENT "invoice_cursor"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- returning"
@@ -934,7 +935,8 @@ SOURCE_FILE
     WHITESPACE " "
     OF_KW "OF"
     WHITESPACE " "
-    IDENT "c_tasks"
+    NAME_REF
+      IDENT "c_tasks"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   DELETE

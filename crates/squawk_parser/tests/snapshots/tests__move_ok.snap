@@ -12,7 +12,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -23,7 +23,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "from"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -34,7 +34,7 @@ SOURCE_FILE
     WHITESPACE " "
     IN_KW "in"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -43,7 +43,7 @@ SOURCE_FILE
     WHITESPACE " "
     PRIOR_KW "prior"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -54,7 +54,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -65,7 +65,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -76,7 +76,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -87,7 +87,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -101,7 +101,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -115,7 +115,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -127,7 +127,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -138,7 +138,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -149,7 +149,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -163,7 +163,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -176,7 +176,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -187,7 +187,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -201,7 +201,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n"
@@ -214,7 +214,7 @@ SOURCE_FILE
     WHITESPACE " "
     FROM_KW "FROM"
     WHITESPACE " "
-    NAME
+    NAME_REF
       IDENT "cursor_name"
   SEMICOLON ";"
   WHITESPACE "\n\n"

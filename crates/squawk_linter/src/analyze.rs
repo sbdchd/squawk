@@ -207,6 +207,7 @@ pub fn possibly_slow_stmt(stmt: &ast::Stmt) -> bool {
         | ast::Stmt::SetSessionAuth(_)
         | ast::Stmt::SetTransaction(_)
         | ast::Stmt::Show(_)
+        | ast::Stmt::Table(_)
         | ast::Stmt::Unlisten(_)
         | ast::Stmt::Update(_)
         | ast::Stmt::Values(_) => false,

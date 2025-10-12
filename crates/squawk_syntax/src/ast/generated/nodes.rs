@@ -3130,8 +3130,48 @@ pub struct Delete {
 }
 impl Delete {
     #[inline]
+    pub fn alias(&self) -> Option<Alias> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn relation_name(&self) -> Option<RelationName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn returning_clause(&self) -> Option<ReturningClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_clause(&self) -> Option<UsingClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn current_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_KW)
+    }
+    #[inline]
     pub fn delete_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DELETE_KW)
+    }
+    #[inline]
+    pub fn from_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn of_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OF_KW)
+    }
+    #[inline]
+    pub fn where_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHERE_KW)
     }
 }
 
@@ -5278,8 +5318,64 @@ pub struct Insert {
 }
 impl Insert {
     #[inline]
+    pub fn alias(&self) -> Option<Alias> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn relation_name(&self) -> Option<RelationName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn stmt(&self) -> Option<Stmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn values(&self) -> Option<Values> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn conflict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONFLICT_KW)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+    #[inline]
     pub fn insert_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INSERT_KW)
+    }
+    #[inline]
+    pub fn into_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INTO_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+    #[inline]
+    pub fn overriding_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OVERRIDING_KW)
+    }
+    #[inline]
+    pub fn system_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SYSTEM_KW)
+    }
+    #[inline]
+    pub fn user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USER_KW)
+    }
+    #[inline]
+    pub fn value_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUE_KW)
+    }
+    #[inline]
+    pub fn values_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUES_KW)
     }
 }
 
@@ -6470,16 +6566,12 @@ impl Merge {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn relation_name(&self) -> Option<RelationName> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn using_clause(&self) -> Option<UsingClause> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn star_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::STAR)
     }
     #[inline]
     pub fn into_token(&self) -> Option<SyntaxToken> {
@@ -6488,10 +6580,6 @@ impl Merge {
     #[inline]
     pub fn merge_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::MERGE_KW)
-    }
-    #[inline]
-    pub fn only_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ONLY_KW)
     }
 }
 
@@ -9492,6 +9580,10 @@ pub struct Table {
 }
 impl Table {
     #[inline]
+    pub fn relation_name(&self) -> Option<RelationName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
     }
@@ -10760,6 +10852,7 @@ pub enum Stmt {
     SetSessionAuth(SetSessionAuth),
     SetTransaction(SetTransaction),
     Show(Show),
+    Table(Table),
     Truncate(Truncate),
     Unlisten(Unlisten),
     Update(Update),
@@ -21906,6 +21999,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::SET_SESSION_AUTH
                 | SyntaxKind::SET_TRANSACTION
                 | SyntaxKind::SHOW
+                | SyntaxKind::TABLE
                 | SyntaxKind::TRUNCATE
                 | SyntaxKind::UNLISTEN
                 | SyntaxKind::UPDATE
@@ -22157,6 +22251,7 @@ impl AstNode for Stmt {
             SyntaxKind::SET_SESSION_AUTH => Stmt::SetSessionAuth(SetSessionAuth { syntax }),
             SyntaxKind::SET_TRANSACTION => Stmt::SetTransaction(SetTransaction { syntax }),
             SyntaxKind::SHOW => Stmt::Show(Show { syntax }),
+            SyntaxKind::TABLE => Stmt::Table(Table { syntax }),
             SyntaxKind::TRUNCATE => Stmt::Truncate(Truncate { syntax }),
             SyntaxKind::UNLISTEN => Stmt::Unlisten(Unlisten { syntax }),
             SyntaxKind::UPDATE => Stmt::Update(Update { syntax }),
@@ -22344,6 +22439,7 @@ impl AstNode for Stmt {
             Stmt::SetSessionAuth(it) => &it.syntax,
             Stmt::SetTransaction(it) => &it.syntax,
             Stmt::Show(it) => &it.syntax,
+            Stmt::Table(it) => &it.syntax,
             Stmt::Truncate(it) => &it.syntax,
             Stmt::Unlisten(it) => &it.syntax,
             Stmt::Update(it) => &it.syntax,
@@ -23388,6 +23484,12 @@ impl From<Show> for Stmt {
     #[inline]
     fn from(node: Show) -> Stmt {
         Stmt::Show(node)
+    }
+}
+impl From<Table> for Stmt {
+    #[inline]
+    fn from(node: Table) -> Stmt {
+        Stmt::Table(node)
     }
 }
 impl From<Truncate> for Stmt {
