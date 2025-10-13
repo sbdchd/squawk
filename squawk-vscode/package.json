@@ -76,7 +76,8 @@
         "aliases": [
           "SQL",
           "sql"
-        ]
+        ],
+        "configuration": "./sql-language-configuration.json"
       },
       {
         "id": "postgres",
@@ -86,7 +87,8 @@
         "aliases": [
           "PostgreSQL",
           "postgres"
-        ]
+        ],
+        "configuration": "./sql-language-configuration.json"
       }
     ],
     "configuration": {
