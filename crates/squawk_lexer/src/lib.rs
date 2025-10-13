@@ -387,7 +387,6 @@ impl Cursor<'_> {
         while let Some(c) = self.bump() {
             match c {
                 '$' => {
-                    self.bump();
                     break;
                 }
                 _ => {
@@ -754,5 +753,14 @@ U&"d!0061t!+000061" UESCAPE '!'
         assert_debug_snapshot!(lex(r#"
 "foo "" bar"
 "#))
+    }
+
+    #[test]
+    fn dollar_quoted_string() {
+        assert_debug_snapshot!(lex("$$$$"), @r#"
+        [
+            "$$$$" @ Literal { kind: DollarQuotedString { terminated: true } },
+        ]
+        "#);
     }
 }
