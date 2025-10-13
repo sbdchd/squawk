@@ -522,10 +522,11 @@ SOURCE_FILE
                     WHITESPACE "\n    "
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "AS"
-                WHITESPACE " "
-                NAME
-                  IDENT "embedding"
+                AS_NAME
+                  AS_KW "AS"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "embedding"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -616,10 +617,11 @@ SOURCE_FILE
             LITERAL
               STRING "'text'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "\"text\""
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "\"text\""
         COMMA ","
         WHITESPACE "\n    "
         TARGET
@@ -975,10 +977,11 @@ SOURCE_FILE
               WHITESPACE " "
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "interaction_date"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "interaction_date"
         COMMA ","
         WHITESPACE "\n    "
         TARGET
@@ -1030,10 +1033,11 @@ SOURCE_FILE
                   STRING "'a'"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "a_counts"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "a_counts"
         COMMA ","
         WHITESPACE "\n    "
         TARGET
@@ -1085,10 +1089,11 @@ SOURCE_FILE
                   STRING "'b'"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "b_counts"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "b_counts"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -3352,10 +3357,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'name'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "profile"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "profile"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -3369,10 +3375,11 @@ SOURCE_FILE
             LITERAL
               STRING "'id'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "id"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "id"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -3386,10 +3393,11 @@ SOURCE_FILE
             LITERAL
               STRING "'title'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "title"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "title"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "from"
@@ -3497,10 +3505,11 @@ SOURCE_FILE
             LITERAL
               STRING "'id'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "id"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "id"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -3514,10 +3523,11 @@ SOURCE_FILE
             LITERAL
               STRING "'title'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "title"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "title"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -3537,10 +3547,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'name'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            NAME_KW "name"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              NAME_KW "name"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -3554,10 +3565,11 @@ SOURCE_FILE
             LITERAL
               STRING "'startTime'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "start_time"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "start_time"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "from"
@@ -3688,10 +3700,11 @@ SOURCE_FILE
                   IDENT "event_time"
                 R_PAREN ")"
             WHITESPACE " "
-            AS_KW "as"
-            WHITESPACE " "
-            NAME
-              HOUR_KW "hour"
+            AS_NAME
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                HOUR_KW "hour"
           COMMA ","
           WHITESPACE "\n    "
           TARGET
@@ -3703,10 +3716,11 @@ SOURCE_FILE
                 STAR "*"
                 R_PAREN ")"
             WHITESPACE " "
-            AS_KW "as"
-            WHITESPACE " "
-            NAME
-              IDENT "events"
+            AS_NAME
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "events"
           COMMA ","
           WHITESPACE "\n    "
           TARGET
@@ -3721,10 +3735,11 @@ SOURCE_FILE
                   IDENT "user_id"
                 R_PAREN ")"
             WHITESPACE " "
-            AS_KW "as"
-            WHITESPACE " "
-            NAME
-              IDENT "users"
+            AS_NAME
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "users"
       WHITESPACE "\n"
       FROM_CLAUSE
         FROM_KW "FROM"
@@ -4639,10 +4654,11 @@ SOURCE_FILE
             WHITESPACE "\n  "
             R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "rolling_avg"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "rolling_avg"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -4716,10 +4732,11 @@ SOURCE_FILE
               WHITESPACE "\n  "
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "rolling_avg"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "rolling_avg"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -4748,10 +4765,11 @@ SOURCE_FILE
                 TIMESTAMP_KW "timestamp"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            MONTH_KW "month"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              MONTH_KW "month"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -4769,10 +4787,11 @@ SOURCE_FILE
                 IDENT "revenue"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "revenue"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "revenue"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -4825,10 +4844,11 @@ SOURCE_FILE
               WHITESPACE "\n  "
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "running_total"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "running_total"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -4885,10 +4905,11 @@ SOURCE_FILE
                       TIMESTAMP_KW "timestamp"
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  MONTH_KW "month"
+                AS_NAME
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    MONTH_KW "month"
               COMMA ","
               WHITESPACE "\n    "
               TARGET
@@ -4903,10 +4924,11 @@ SOURCE_FILE
                       IDENT "user_id"
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "users"
+                AS_NAME
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "users"
               COMMA ","
               WHITESPACE "\n    "
               TARGET
@@ -4919,10 +4941,11 @@ SOURCE_FILE
                       IDENT "revenue"
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "revenue"
+                AS_NAME
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "revenue"
           WHITESPACE "\n  "
           FROM_CLAUSE
             FROM_KW "FROM"
@@ -5034,10 +5057,11 @@ SOURCE_FILE
                   WHITESPACE "\n    "
                   END_KW "END"
                 WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "segment"
+                AS_NAME
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "segment"
           WHITESPACE "\n  "
           FROM_CLAUSE
             FROM_KW "FROM"
@@ -5078,10 +5102,11 @@ SOURCE_FILE
                   IDENT "user_id"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "users"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "users"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -5094,10 +5119,11 @@ SOURCE_FILE
                 IDENT "revenue"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "revenue"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "revenue"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -5182,10 +5208,11 @@ SOURCE_FILE
                   TIMESTAMP_KW "timestamp"
                 R_PAREN ")"
             WHITESPACE " "
-            AS_KW "as"
-            WHITESPACE " "
-            NAME
-              MONTH_KW "month"
+            AS_NAME
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                MONTH_KW "month"
           COMMA ","
           WHITESPACE "\n  "
           TARGET
@@ -5197,10 +5224,11 @@ SOURCE_FILE
                 STAR "*"
                 R_PAREN ")"
             WHITESPACE " "
-            AS_KW "as"
-            WHITESPACE " "
-            NAME
-              IDENT "events"
+            AS_NAME
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "events"
           COMMA ","
           WHITESPACE "\n  "
           TARGET
@@ -5215,10 +5243,11 @@ SOURCE_FILE
                   IDENT "user_id"
                 R_PAREN ")"
             WHITESPACE " "
-            AS_KW "as"
-            WHITESPACE " "
-            NAME
-              IDENT "users"
+            AS_NAME
+              AS_KW "as"
+              WHITESPACE " "
+              NAME
+                IDENT "users"
       WHITESPACE "\n"
       FROM_CLAUSE
         FROM_KW "FROM"
@@ -5773,10 +5802,11 @@ SOURCE_FILE
                     IDENT "qty"
                 R_PAREN ")"
             WHITESPACE " "
-            AS_KW "AS"
-            WHITESPACE " "
-            NAME
-              IDENT "total_quantity"
+            AS_NAME
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "total_quantity"
       WHITESPACE "\n"
       FROM_CLAUSE
         FROM_KW "FROM"
@@ -6114,10 +6144,11 @@ SOURCE_FILE
                 TIME_KW "time"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            DAY_KW "day"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              DAY_KW "day"
         COMMA ","
         WHITESPACE "\n    "
         TARGET
@@ -6141,10 +6172,11 @@ SOURCE_FILE
                   CURRENT_KW "current"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "actual_power"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "actual_power"
         COMMA ","
         WHITESPACE "\n    "
         TARGET
@@ -6186,10 +6218,11 @@ SOURCE_FILE
                 INT_NUMBER "100"
             R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "performance_ratio"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "performance_ratio"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -6311,10 +6344,11 @@ SOURCE_FILE
                       IDENT "vibration_level"
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "avg_vibration"
+                AS_NAME
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "avg_vibration"
               COMMA ","
               WHITESPACE "\n    "
               TARGET
@@ -6327,10 +6361,11 @@ SOURCE_FILE
                       IDENT "vibration_level"
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "as"
-                WHITESPACE " "
-                NAME
-                  IDENT "stddev_vibration"
+                AS_NAME
+                  AS_KW "as"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "stddev_vibration"
           WHITESPACE "\n  "
           FROM_CLAUSE
             FROM_KW "FROM"
@@ -6394,10 +6429,11 @@ SOURCE_FILE
                 TIME_KW "time"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "bucket"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "bucket"
         COMMA ","
         WHITESPACE "\n    "
         TARGET
@@ -6429,10 +6465,11 @@ SOURCE_FILE
             NAME_REF
               IDENT "stddev_vibration"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "z_score"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "z_score"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -6549,10 +6586,11 @@ SOURCE_FILE
                 TIME_KW "time"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            INTERVAL_KW "interval"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              INTERVAL_KW "interval"
         COMMA ","
         WHITESPACE "\n    "
         TARGET
@@ -6570,10 +6608,11 @@ SOURCE_FILE
                 IDENT "available_power"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "total_power"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "total_power"
         COMMA ","
         WHITESPACE "\n    "
         TARGET
@@ -6586,10 +6625,11 @@ SOURCE_FILE
                 IDENT "storage_capacity"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "total_storage"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "total_storage"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
@@ -6684,10 +6724,11 @@ SOURCE_FILE
                       TIME_KW "time"
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "AS"
-                WHITESPACE " "
-                NAME
-                  HOUR_KW "hour"
+                AS_NAME
+                  AS_KW "AS"
+                  WHITESPACE " "
+                  NAME
+                    HOUR_KW "hour"
               COMMA ","
               WHITESPACE "\n    "
               TARGET
@@ -6700,10 +6741,11 @@ SOURCE_FILE
                       IDENT "price"
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "AS"
-                WHITESPACE " "
-                NAME
-                  IDENT "avg_price"
+                AS_NAME
+                  AS_KW "AS"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "avg_price"
               COMMA ","
               WHITESPACE "\n    "
               TARGET
@@ -6732,10 +6774,11 @@ SOURCE_FILE
                           IDENT "price"
                     R_PAREN ")"
                 WHITESPACE " "
-                AS_KW "AS"
-                WHITESPACE " "
-                NAME
-                  IDENT "price_75th"
+                AS_NAME
+                  AS_KW "AS"
+                  WHITESPACE " "
+                  NAME
+                    IDENT "price_75th"
           WHITESPACE "\n  "
           FROM_CLAUSE
             FROM_KW "FROM"
@@ -6847,10 +6890,11 @@ SOURCE_FILE
             WHITESPACE "\n    "
             END_KW "END"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "trading_signal"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "trading_signal"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"

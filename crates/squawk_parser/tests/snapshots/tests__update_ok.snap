@@ -361,10 +361,11 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "2"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "bar"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "bar"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pg_docs"

@@ -377,18 +377,20 @@ SOURCE_FILE
           NAME_REF
             IDENT "u"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "bar"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "bar"
         COMMA ","
         WHITESPACE " "
         TARGET
           NAME_REF
             IDENT "t"
           WHITESPACE " "
-          NAME
-            IDENT "b"
+          AS_NAME
+            NAME
+              IDENT "b"
         COMMA ","
         WHITESPACE " "
         TARGET

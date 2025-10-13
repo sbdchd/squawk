@@ -571,7 +571,10 @@ DistinctClause =
 
 Target =
   '*'
-| (Expr ('as' Name)?)
+| Expr AsName?
+
+AsName =
+  'as'? Name
 
 TargetList =
   Target (',' Target)*

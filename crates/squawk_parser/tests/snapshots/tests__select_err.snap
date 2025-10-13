@@ -14,10 +14,11 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "42"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "x"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "x"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -38,20 +39,22 @@ SOURCE_FILE
               COMMA ","
             R_BRACK "]"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "y"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "y"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
           LITERAL
             STRING "'hello world'"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "z"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "z"
         ERROR
           COMMA ","
   WHITESPACE "\n"
@@ -105,8 +108,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "b"
           WHITESPACE " "
-          NAME
-            IDENT "c"
+          AS_NAME
+            NAME
+              IDENT "c"
         WHITESPACE "  "
         TARGET
           NAME_REF

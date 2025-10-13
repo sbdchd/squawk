@@ -52,10 +52,11 @@ SOURCE_FILE
               LITERAL
                 STRING "'Hello World'"
             WHITESPACE " "
-            AS_KW "AS"
-            WHITESPACE " "
-            NAME
-              IDENT "hello"
+            AS_NAME
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "hello"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_VIEW
@@ -233,10 +234,11 @@ SOURCE_FILE
                     IDENT "country_code"
                 R_PAREN ")"
             WHITESPACE " "
-            AS_KW "AS"
-            WHITESPACE " "
-            NAME
-              IDENT "country"
+            AS_NAME
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "country"
           COMMA ","
           WHITESPACE "\n           "
           TARGET
@@ -293,10 +295,11 @@ SOURCE_FILE
                         IDENT "id"
               R_PAREN ")"
             WHITESPACE " "
-            AS_KW "AS"
-            WHITESPACE " "
-            NAME
-              IDENT "avg_rating"
+            AS_NAME
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "avg_rating"
       WHITESPACE "\n    "
       FROM_CLAUSE
         FROM_KW "FROM"

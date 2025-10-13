@@ -1632,8 +1632,9 @@ SOURCE_FILE
             NAME_REF
               NFD_KW "nfd"
           WHITESPACE " "
-          NAME
-            NORMALIZED_KW "normalized"
+          AS_NAME
+            NAME
+              NORMALIZED_KW "normalized"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pattern_matching"

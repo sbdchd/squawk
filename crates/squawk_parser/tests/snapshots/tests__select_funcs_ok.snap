@@ -3477,10 +3477,11 @@ SOURCE_FILE
               STAR "*"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "unfiltered"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "unfiltered"
         COMMA ","
         WHITESPACE "\n  "
         TARGET
@@ -3508,10 +3509,11 @@ SOURCE_FILE
                   INT_NUMBER "5"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "filtered"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "filtered"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "from"
@@ -3776,10 +3778,11 @@ SOURCE_FILE
                   IDENT "b"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "c"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "c"
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "from"

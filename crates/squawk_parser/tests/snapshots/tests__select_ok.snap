@@ -1386,10 +1386,11 @@ SOURCE_FILE
           NAME_REF
             IDENT "foo"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            IDENT "bar"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              IDENT "bar"
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "from"
@@ -1408,8 +1409,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "foo"
           WHITESPACE " "
-          NAME
-            IDENT "bar"
+          AS_NAME
+            NAME
+              IDENT "bar"
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "from"
@@ -1428,8 +1430,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "foo"
           WHITESPACE " "
-          NAME
-            IDENT "bar"
+          AS_NAME
+            NAME
+              IDENT "bar"
         COMMA ","
         WHITESPACE " "
         TARGET
@@ -1441,8 +1444,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "x"
           WHITESPACE " "
-          NAME
-            IDENT "y"
+          AS_NAME
+            NAME
+              IDENT "y"
     WHITESPACE " "
     FROM_CLAUSE
       FROM_KW "from"
@@ -5189,10 +5193,11 @@ SOURCE_FILE
             NAME_REF
               NAME_KW "name"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "mname"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "mname"
         COMMA ","
         WHITESPACE " "
         TARGET
@@ -5590,10 +5595,11 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            SELECT_KW "select"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              SELECT_KW "select"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -5605,10 +5611,11 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            FROM_KW "from"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              FROM_KW "from"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -5620,10 +5627,11 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           WHITESPACE " "
-          AS_KW "as"
-          WHITESPACE " "
-          NAME
-            WHERE_KW "where"
+          AS_NAME
+            AS_KW "as"
+            WHITESPACE " "
+            NAME
+              WHERE_KW "where"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -5635,8 +5643,9 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
           WHITESPACE " "
-          NAME
-            ALL_KW "all"
+          AS_NAME
+            NAME
+              ALL_KW "all"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- column labels that are also operators"
@@ -5706,8 +5715,9 @@ SOURCE_FILE
             NAME_REF
               IDENT "bar"
           WHITESPACE " "
-          NAME
-            NULL_KW "null"
+          AS_NAME
+            NAME
+              NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -5723,8 +5733,9 @@ SOURCE_FILE
             NAME_REF
               IDENT "bar"
           WHITESPACE " "
-          NAME
-            DEFAULT_KW "default"
+          AS_NAME
+            NAME
+              DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -5746,8 +5757,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "c"
           WHITESPACE " "
-          NAME
-            DEFAULT_KW "default"
+          AS_NAME
+            NAME
+              DEFAULT_KW "default"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -5769,8 +5781,9 @@ SOURCE_FILE
           NAME_REF
             IDENT "c"
           WHITESPACE " "
-          NAME
-            NULL_KW "null"
+          AS_NAME
+            NAME
+              NULL_KW "null"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select_special_funcs"
@@ -5949,10 +5962,11 @@ SOURCE_FILE
                 IDENT "ts"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            DAY_KW "day"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              DAY_KW "day"
         COMMA ","
         WHITESPACE " "
         TARGET
@@ -5965,10 +5979,11 @@ SOURCE_FILE
                 VALUE_KW "value"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "max_value"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "max_value"
         COMMA ","
         WHITESPACE " "
         TARGET
@@ -5981,10 +5996,11 @@ SOURCE_FILE
                 VALUE_KW "value"
               R_PAREN ")"
           WHITESPACE " "
-          AS_KW "AS"
-          WHITESPACE " "
-          NAME
-            IDENT "min_value"
+          AS_NAME
+            AS_KW "AS"
+            WHITESPACE " "
+            NAME
+              IDENT "min_value"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"
