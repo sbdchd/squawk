@@ -1,0 +1,78 @@
+// Based on https://github.com/microsoft/vscode/blob/bb0294ffca5583a768e5ea44350ecc4e9c6e3791/extensions/sql/language-configuration.json
+{
+  "comments": {
+    "lineComment": "--",
+    "blockComment": ["/*", "*/"]
+  },
+  "brackets": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"]
+  ],
+  "autoClosingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    { "open": "\"", "close": "\"", "notIn": ["string"] },
+    { "open": "$$", "close": "$$", "notIn": ["string", "comment"] },
+    { "open": "E'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "e'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "U&'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "u&'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "B'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "b'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "X'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "x'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "N'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "'", "close": "'", "notIn": ["string", "comment"] },
+    { "open": "/*", "close": " */", "notIn": ["string", "comment"] }
+  ],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"],
+    ["\"", "\""],
+    ["'", "'"],
+    ["`", "`"],
+    ["$$", "$$"]
+  ],
+  "folding": {
+    "offSide": true,
+    "markers": {
+      "start": "^\\s*--\\s*#region\\b",
+      "end": "^\\s*--\\s*#endregion\\b"
+    }
+  },
+  "onEnterRules": [
+    {
+      "beforeText": "^\\s*--.*$",
+      "afterText": "\\S",
+      "action": {
+        "indent": "none",
+        "appendText": "-- "
+      }
+    },
+    {
+      "beforeText": "^\\s*\\/\\*",
+      "afterText": "^\\s*\\*\\/$",
+      "action": {
+        "indent": "indentOutdent",
+        "appendText": " * "
+      }
+    },
+    {
+      "beforeText": "^\\s*\\/\\*(?!.*\\*\\/).*$",
+      "action": {
+        "indent": "none",
+        "appendText": " * "
+      }
+    },
+    {
+      "beforeText": "^\\s*\\*(?!\\/).*$",
+      "action": {
+        "indent": "none",
+        "appendText": "* "
+      }
+    }
+  ]
+}
