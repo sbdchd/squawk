@@ -54,20 +54,22 @@ SOURCE_FILE
             LITERAL
               INT_NUMBER "1"
             WHITESPACE " "
-            AS_KW "AS"
-            WHITESPACE " "
-            NAME
-              IDENT "column1"
+            AS_NAME
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "column1"
           COMMA ","
           WHITESPACE " "
           TARGET
             LITERAL
               STRING "'one'"
             WHITESPACE " "
-            AS_KW "AS"
-            WHITESPACE " "
-            NAME
-              IDENT "column2"
+            AS_NAME
+              AS_KW "AS"
+              WHITESPACE " "
+              NAME
+                IDENT "column2"
     WHITESPACE "\n"
     UNION_KW "UNION"
     WHITESPACE " "

@@ -308,10 +308,11 @@ SOURCE_FILE
                         IDENT "login_time"
                       R_PAREN ")"
                   WHITESPACE " "
-                  AS_KW "as"
-                  WHITESPACE " "
-                  NAME
-                    IDENT "last_login"
+                  AS_NAME
+                    AS_KW "as"
+                    WHITESPACE " "
+                    NAME
+                      IDENT "last_login"
             WHITESPACE "\n  "
             FROM_CLAUSE
               FROM_KW "from"

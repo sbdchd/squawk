@@ -1202,6 +1202,21 @@ impl AsFuncOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AsName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AsName {
+    #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn as_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AtTimeZone {
     pub(crate) syntax: SyntaxNode,
 }
@@ -9640,20 +9655,16 @@ pub struct Target {
 }
 impl Target {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
+    pub fn as_name(&self) -> Option<AsName> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name(&self) -> Option<Name> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn star_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::STAR)
-    }
-    #[inline]
-    pub fn as_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::AS_KW)
     }
 }
 
@@ -11891,6 +11902,24 @@ impl AstNode for AsFuncOption {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::AS_FUNC_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AsName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::AS_NAME
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

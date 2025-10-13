@@ -253,10 +253,11 @@ SOURCE_FILE
                 LITERAL
                   STRING "'country'"
               WHITESPACE " "
-              AS_KW "as"
-              WHITESPACE " "
-              NAME
-                IDENT "\"country\""
+              AS_NAME
+                AS_KW "as"
+                WHITESPACE " "
+                NAME
+                  IDENT "\"country\""
         WHITESPACE " \n    "
         FROM_CLAUSE
           FROM_KW "from"

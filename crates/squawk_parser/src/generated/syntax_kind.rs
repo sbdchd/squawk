@@ -596,6 +596,7 @@ pub enum SyntaxKind {
     ARRAY_EXPR,
     ARRAY_TYPE,
     AS_FUNC_OPTION,
+    AS_NAME,
     ATTACH_PARTITION,
     ATTRIBUTE_LIST,
     ATTRIBUTE_OPTION,

@@ -4714,23 +4714,23 @@ fn opt_target_el(p: &mut Parser) -> Option<CompletedMarker> {
     Some(m.complete(p, TARGET))
 }
 
-fn opt_as_col_label(p: &mut Parser<'_>) -> bool {
+fn opt_as_col_label(p: &mut Parser<'_>) {
+    let m = p.start();
     if p.eat(AS_KW) {
         if p.at_ts(COL_LABEL_FIRST) {
             col_label(p);
-            true
+            m.complete(p, AS_NAME);
         } else {
             p.err_and_bump(&format!("expected column label, got {:?}", p.current()));
-            false
+            m.abandon(p);
         }
+    } else if p.at(FORMAT_KW) && p.nth_at(1, JSON_KW) {
+        m.abandon(p);
+    } else if p.at_ts(BARE_COL_LABEL_FIRST) {
+        col_label(p);
+        m.complete(p, AS_NAME);
     } else {
-        if p.at(FORMAT_KW) && p.nth_at(1, JSON_KW) {
-            return true;
-        }
-        if p.at_ts(BARE_COL_LABEL_FIRST) {
-            col_label(p);
-        }
-        true
+        m.abandon(p);
     }
 }
 
