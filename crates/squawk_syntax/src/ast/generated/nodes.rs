@@ -7733,6 +7733,10 @@ impl ParenExpr {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn select(&self) -> Option<Select> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -10591,6 +10595,10 @@ pub enum Expr {
     IndexExpr(IndexExpr),
     Literal(Literal),
     NameRef(NameRef),
+    ParenExpr(ParenExpr),
+    PostfixExpr(PostfixExpr),
+    PrefixExpr(PrefixExpr),
+    TupleExpr(TupleExpr),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -20986,6 +20994,10 @@ impl AstNode for Expr {
                 | SyntaxKind::INDEX_EXPR
                 | SyntaxKind::LITERAL
                 | SyntaxKind::NAME_REF
+                | SyntaxKind::PAREN_EXPR
+                | SyntaxKind::POSTFIX_EXPR
+                | SyntaxKind::PREFIX_EXPR
+                | SyntaxKind::TUPLE_EXPR
         )
     }
     #[inline]
@@ -21001,6 +21013,10 @@ impl AstNode for Expr {
             SyntaxKind::INDEX_EXPR => Expr::IndexExpr(IndexExpr { syntax }),
             SyntaxKind::LITERAL => Expr::Literal(Literal { syntax }),
             SyntaxKind::NAME_REF => Expr::NameRef(NameRef { syntax }),
+            SyntaxKind::PAREN_EXPR => Expr::ParenExpr(ParenExpr { syntax }),
+            SyntaxKind::POSTFIX_EXPR => Expr::PostfixExpr(PostfixExpr { syntax }),
+            SyntaxKind::PREFIX_EXPR => Expr::PrefixExpr(PrefixExpr { syntax }),
+            SyntaxKind::TUPLE_EXPR => Expr::TupleExpr(TupleExpr { syntax }),
             _ => {
                 return None;
             }
@@ -21020,6 +21036,10 @@ impl AstNode for Expr {
             Expr::IndexExpr(it) => &it.syntax,
             Expr::Literal(it) => &it.syntax,
             Expr::NameRef(it) => &it.syntax,
+            Expr::ParenExpr(it) => &it.syntax,
+            Expr::PostfixExpr(it) => &it.syntax,
+            Expr::PrefixExpr(it) => &it.syntax,
+            Expr::TupleExpr(it) => &it.syntax,
         }
     }
 }
@@ -21081,6 +21101,30 @@ impl From<NameRef> for Expr {
     #[inline]
     fn from(node: NameRef) -> Expr {
         Expr::NameRef(node)
+    }
+}
+impl From<ParenExpr> for Expr {
+    #[inline]
+    fn from(node: ParenExpr) -> Expr {
+        Expr::ParenExpr(node)
+    }
+}
+impl From<PostfixExpr> for Expr {
+    #[inline]
+    fn from(node: PostfixExpr) -> Expr {
+        Expr::PostfixExpr(node)
+    }
+}
+impl From<PrefixExpr> for Expr {
+    #[inline]
+    fn from(node: PrefixExpr) -> Expr {
+        Expr::PrefixExpr(node)
+    }
+}
+impl From<TupleExpr> for Expr {
+    #[inline]
+    fn from(node: TupleExpr) -> Expr {
+        Expr::TupleExpr(node)
     }
 }
 impl AstNode for FuncOption {
