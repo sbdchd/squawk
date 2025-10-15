@@ -223,6 +223,10 @@ Expr =
 | FieldExpr
 | IndexExpr
 | BetweenExpr
+| ParenExpr
+| TupleExpr
+| PrefixExpr
+| PostfixExpr
 
 ArrayType =
   // int array[]
@@ -1005,7 +1009,7 @@ ReleaseSavepoint =
   'release' 'savepoint' NameRef
 
 ParenExpr =
-  '(' Expr ')'
+  '(' Expr | Select ')'
 
 TupleExpr =
   '(' ')'
