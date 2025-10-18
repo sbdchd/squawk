@@ -126,6 +126,13 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
                                 continue;
                             }
                         }
+                        if let Some(ast::Constraint::PrimaryKeyConstraint(pk)) =
+                            add_constraint.constraint()
+                        {
+                            if pk.using_index().is_some() {
+                                continue;
+                            }
+                        }
 
                         ctx.report(Violation::for_node(
                             Rule::ConstraintMissingNotValid,
@@ -201,6 +208,15 @@ ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES 
 -- use `NOT VALID`
 ALTER TABLE distributors ADD CONSTRAINT distfk FOREIGN KEY (address) REFERENCES addresses (address) NOT VALID;
 ALTER TABLE distributors VALIDATE CONSTRAINT distfk;
+        "#;
+        let errors = lint(sql, Rule::ConstraintMissingNotValid);
+        assert_eq!(errors.len(), 0);
+    }
+
+    #[test]
+    fn adding_using_index_ok() {
+        let sql = r#"
+ALTER TABLE account ADD CONSTRAINT account_pk PRIMARY KEY USING INDEX account_pk_idx;
         "#;
         let errors = lint(sql, Rule::ConstraintMissingNotValid);
         assert_eq!(errors.len(), 0);
