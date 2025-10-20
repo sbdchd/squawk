@@ -553,7 +553,7 @@ GroupingExpr =
   Expr
 
 HavingClause =
-  'having'
+  'having' Expr
 
 WindowDef =
   Name 'as' '(' WindowSpec ')'
@@ -562,16 +562,22 @@ WindowClause =
   'window' (WindowDef (',' WindowDef)*)
 
 LimitClause =
-  'limit'
+  'limit' ('all' | Expr)
 
 FetchClause =
   'fetch'
+  ('first' | 'next')
+  Expr? 
+  ('row' | 'rows') 
+  ('only' | 'with' 'ties')
 
 OffsetClause =
   'offset'
+  Expr
+  ('row' | 'rows')?
 
 DistinctClause =
-  'distinct'
+  'distinct' 'on' '(' (Expr (',' Expr)*) ')'
 
 Target =
   '*'

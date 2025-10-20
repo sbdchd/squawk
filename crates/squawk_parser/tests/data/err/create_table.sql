@@ -46,6 +46,14 @@ create unlogged table t (
   )
 );
 
+create table t partition of u
+    -- missing some commas
+    for values from ('2024-01-01'  1) to ('2024-04-01'  5);
+
+create table t partition of u
+    -- missing some commas
+    for values in (1  2  3);
+
 -- exclude missing a comma
 create table t (
   a int,

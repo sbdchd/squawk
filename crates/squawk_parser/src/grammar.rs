@@ -4333,41 +4333,48 @@ fn group_by_list(p: &mut Parser<'_>) {
     // an arbitrary expression formed from input-column values. In case of
     // ambiguity, a GROUP BY name will be interpreted as an input-column name
     // rather than an output column name.
+
     while !p.at(EOF) && !p.at(SEMICOLON) {
-        group_by_item(p);
+        if opt_group_by_item(p).is_none() {
+            p.error("expected group by item");
+        }
         if !p.eat(COMMA) {
             break;
         }
     }
 }
 
-fn group_by_item(p: &mut Parser<'_>) {
+const GROUP_BY_ITEM_FIRST: TokenSet =
+    TokenSet::new(&[ROLLUP_KW, CUBE_KW, GROUPING_KW]).union(EXPR_FIRST);
+
+fn opt_group_by_item(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(GROUP_BY_ITEM_FIRST) {
+        return None;
+    }
     let m = p.start();
     let kind = match p.current() {
         ROLLUP_KW => {
             p.bump_any();
-            p.expect(L_PAREN);
-            if !expr_list(p) {
-                p.error("expected expression list");
-            };
-            p.expect(R_PAREN);
+            paren_expr_list(p);
             GROUPING_ROLLUP
         }
         CUBE_KW => {
             p.bump_any();
-            p.expect(L_PAREN);
-            if !expr_list(p) {
-                p.error("expected expression list");
-            };
-            p.expect(R_PAREN);
+            paren_expr_list(p);
             GROUPING_CUBE
         }
         GROUPING_KW if p.nth_at(1, SETS_KW) => {
             p.bump(GROUPING_KW);
             p.bump(SETS_KW);
-            p.expect(L_PAREN);
-            group_by_list(p);
-            p.expect(R_PAREN);
+            delimited(
+                p,
+                L_PAREN,
+                R_PAREN,
+                COMMA,
+                || "unexpected comma".to_string(),
+                GROUP_BY_ITEM_FIRST,
+                |p| opt_group_by_item(p).is_some(),
+            );
             GROUPING_SETS
         }
         _ => {
@@ -4377,7 +4384,7 @@ fn group_by_item(p: &mut Parser<'_>) {
             GROUPING_EXPR
         }
     };
-    m.complete(p, kind);
+    Some(m.complete(p, kind))
 }
 
 /// <https://www.postgresql.org/docs/17/sql-select.html#SQL-HAVING>
@@ -4575,16 +4582,24 @@ fn opt_all_or_distinct(p: &mut Parser) {
     let m = p.start();
     if p.eat(DISTINCT_KW) {
         if p.eat(ON_KW) {
-            p.expect(L_PAREN);
-            if !expr_list(p) {
-                p.error("expected expression in paren_expr_list");
-            }
-            p.expect(R_PAREN);
+            paren_expr_list(p);
         }
         m.complete(p, DISTINCT_CLAUSE);
     } else {
         m.abandon(p);
     }
+}
+
+fn paren_expr_list(p: &mut Parser<'_>) {
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        EXPR_FIRST,
+        |p| opt_expr(p).is_some(),
+    );
 }
 
 /// All keywords
@@ -4908,25 +4923,13 @@ fn partition_option(p: &mut Parser<'_>) {
             PARTITION_FOR_VALUES_WITH
         // FOR VALUES IN '(' expr_list ')'
         } else if p.eat(IN_KW) {
-            p.expect(L_PAREN);
-            if !expr_list(p) {
-                p.error("expected expr list");
-            }
-            p.expect(R_PAREN);
+            paren_expr_list(p);
             PARTITION_FOR_VALUES_IN
         // FOR VALUES FROM '(' expr_list ')' TO '(' expr_list ')'
         } else if p.eat(FROM_KW) {
-            p.expect(L_PAREN);
-            if !expr_list(p) {
-                p.error("expected expr list");
-            }
-            p.expect(R_PAREN);
+            paren_expr_list(p);
             p.expect(TO_KW);
-            p.expect(L_PAREN);
-            if !expr_list(p) {
-                p.error("expected expr list");
-            }
-            p.expect(R_PAREN);
+            paren_expr_list(p);
             PARTITION_FOR_VALUES_FROM
         } else {
             p.error("expected partition option");

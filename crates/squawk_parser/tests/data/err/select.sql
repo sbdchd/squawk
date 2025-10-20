@@ -13,6 +13,17 @@ select a, b c  d, e from t;
 --          ^ ^ comma missing
 --          \-- this is a label
 
+-- distinct on missing a comma
+SELECT DISTINCT ON (a b) a, b, c
+    FROM t
+    order by a, b desc; 
+
+-- group bys with missing commas
+select * from t group by rollup (1 2 3);
+select * from t group by cube (1 2 3);
+select * from u
+  group by grouping sets((1 2) grouping sets((), grouping sets(())));
+
 -- trailing comma in args
 select f(1,);
 

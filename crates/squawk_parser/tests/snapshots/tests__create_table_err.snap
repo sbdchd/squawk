@@ -423,6 +423,95 @@ SOURCE_FILE
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    WHITESPACE "\n    "
+    COMMENT "-- missing some commas"
+    WHITESPACE "\n    "
+    PARTITION_FOR_VALUES_FROM
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      FROM_KW "from"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'2024-01-01'"
+      WHITESPACE "  "
+      LITERAL
+        INT_NUMBER "1"
+      R_PAREN ")"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        STRING "'2024-04-01'"
+      WHITESPACE "  "
+      LITERAL
+        INT_NUMBER "5"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    PATH
+      PATH_SEGMENT
+        NAME
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "u"
+    WHITESPACE "\n    "
+    COMMENT "-- missing some commas"
+    WHITESPACE "\n    "
+    PARTITION_FOR_VALUES_IN
+      FOR_KW "for"
+      WHITESPACE " "
+      VALUES_KW "values"
+      WHITESPACE " "
+      IN_KW "in"
+      WHITESPACE " "
+      L_PAREN "("
+      LITERAL
+        INT_NUMBER "1"
+      WHITESPACE "  "
+      LITERAL
+        INT_NUMBER "2"
+      WHITESPACE "  "
+      LITERAL
+        INT_NUMBER "3"
+      R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
     COMMENT "-- exclude missing a comma"
     WHITESPACE "\n"
     CREATE_KW "create"
@@ -571,5 +660,9 @@ ERROR@198: unexpected comma
 ERROR@199: unexpected comma
 ERROR@200: unexpected comma
 ERROR@201: unexpected comma
-ERROR@1021: expected COMMA
-ERROR@1063: expected SEMICOLON
+ERROR@1011: expected COMMA
+ERROR@1032: expected COMMA
+ERROR@1116: expected COMMA
+ERROR@1119: expected COMMA
+ERROR@1226: expected COMMA
+ERROR@1268: expected SEMICOLON
