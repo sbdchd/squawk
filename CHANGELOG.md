@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.29.0 - 2025-10-19
+
+## Added
+
+- parser: improve error recovery for option lists in `reindex`, `prepare`,
+  `vacuum`, `copy`, `drop database`, `create type`, `create function`,
+  `create table`, `create index` (#684)
+
+- parser: improved error recovery for CTEs (#683)
+
+  ```sql
+  with
+    a as (
+       select 1
+    ) -- <-- missing a comma
+    b as (
+       select 3
+    )
+  select 2;
+  ```
+
+  squawk now identifies the missing comma correctly:
+
+  ```
+    error[syntax-error]: missing comma
+    ╭▸ stdin:4:6
+    │
+  4 │     ) -- <-- missing a comma
+    ╰╴     ━
+  ```
+
+- parser: improve error recovery of group by & distinct on (#695)
+
+- vscode: improved commenting behavior (#690)
+
+## Fixed
+
+- linter: fixed false positive with `constraint-missing-not-valid` (#694)
+
+- lexer: lex empty dollar quoted strings (`$$$$`) correctly (#691)
+
+- linter: identify `table` statement as fast (#688)
+
+- lsp: server logs no longer contain ansi codes which vscode garbles (#681)
+
 ## v2.28.1 - 2025-10-03
 
 ## Added
