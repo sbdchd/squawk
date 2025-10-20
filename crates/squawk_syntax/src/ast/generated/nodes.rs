@@ -3310,8 +3310,24 @@ pub struct DistinctClause {
 }
 impl DistinctClause {
     #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
     pub fn distinct_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DISTINCT_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
     }
 }
 
@@ -4763,8 +4779,40 @@ pub struct FetchClause {
 }
 impl FetchClause {
     #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn fetch_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FETCH_KW)
+    }
+    #[inline]
+    pub fn first_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FIRST_KW)
+    }
+    #[inline]
+    pub fn next_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NEXT_KW)
+    }
+    #[inline]
+    pub fn only_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ONLY_KW)
+    }
+    #[inline]
+    pub fn row_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROW_KW)
+    }
+    #[inline]
+    pub fn rows_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROWS_KW)
+    }
+    #[inline]
+    pub fn ties_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TIES_KW)
+    }
+    #[inline]
+    pub fn with_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WITH_KW)
     }
 }
 
@@ -5177,6 +5225,10 @@ pub struct HavingClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl HavingClause {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn having_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::HAVING_KW)
@@ -6433,6 +6485,14 @@ pub struct LimitClause {
 }
 impl LimitClause {
     #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn all_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ALL_KW)
+    }
+    #[inline]
     pub fn limit_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LIMIT_KW)
     }
@@ -7217,8 +7277,20 @@ pub struct OffsetClause {
 }
 impl OffsetClause {
     #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn offset_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OFFSET_KW)
+    }
+    #[inline]
+    pub fn row_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROW_KW)
+    }
+    #[inline]
+    pub fn rows_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROWS_KW)
     }
 }
 
