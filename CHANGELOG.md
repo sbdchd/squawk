@@ -42,7 +42,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - vscode: improved commenting behavior (#690)
 
-
 ## Fixed
 
 - linter: fixed false positive with `constraint-missing-not-valid` (#694)
