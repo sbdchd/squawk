@@ -18,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - parser: improved error recovery for CTEs (#683)
 
   ```sql
-  with 
+  with
     a as (
        select 1
     ) -- <-- missing a comma
@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   error[syntax-error]: missing comma
   ╭▸ stdin:4:6
   │
-4 │     ) -- <-- missing a comma
+  4 │     ) -- <-- missing a comma
   ╰╴     ━
   ```
 
