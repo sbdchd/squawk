@@ -31,11 +31,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   squawk now identifies the missing comma correctly:
 
   ```
-  error[syntax-error]: missing comma
-  ╭▸ stdin:4:6
-  │
+    error[syntax-error]: missing comma
+    ╭▸ stdin:4:6
+    │
   4 │     ) -- <-- missing a comma
-  ╰╴     ━
+    ╰╴     ━
   ```
 
 - parser: improve error recovery of group by & distinct on (#695)
