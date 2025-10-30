@@ -5104,19 +5104,7 @@ pub struct GroupByClause {
 }
 impl GroupByClause {
     #[inline]
-    pub fn grouping_cube(&self) -> Option<GroupingCube> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn grouping_expr(&self) -> Option<GroupingExpr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn grouping_rollup(&self) -> Option<GroupingRollup> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn grouping_sets(&self) -> Option<GroupingSets> {
+    pub fn group_by_list(&self) -> Option<GroupByList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5134,6 +5122,17 @@ impl GroupByClause {
     #[inline]
     pub fn group_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::GROUP_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct GroupByList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl GroupByList {
+    #[inline]
+    pub fn group_bys(&self) -> AstChildren<GroupBy> {
+        support::children(&self.syntax)
     }
 }
 
@@ -7624,8 +7623,8 @@ pub struct OrderByClause {
 }
 impl OrderByClause {
     #[inline]
-    pub fn sort_bys(&self) -> AstChildren<SortBy> {
-        support::children(&self.syntax)
+    pub fn sort_by_list(&self) -> Option<SortByList> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn by_token(&self) -> Option<SyntaxToken> {
@@ -9564,6 +9563,17 @@ impl SortBy {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SortByList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SortByList {
+    #[inline]
+    pub fn sort_bys(&self) -> AstChildren<SortBy> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SortDesc {
     pub(crate) syntax: SyntaxNode,
 }
@@ -10691,6 +10701,14 @@ pub enum FuncOption {
     TransformFuncOption(TransformFuncOption),
     VolatilityFuncOption(VolatilityFuncOption),
     WindowFuncOption(WindowFuncOption),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum GroupBy {
+    GroupingCube(GroupingCube),
+    GroupingExpr(GroupingExpr),
+    GroupingRollup(GroupingRollup),
+    GroupingSets(GroupingSets),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -15092,6 +15110,24 @@ impl AstNode for GroupByClause {
         &self.syntax
     }
 }
+impl AstNode for GroupByList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::GROUP_BY_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for GroupingCube {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -19142,6 +19178,24 @@ impl AstNode for SortBy {
         &self.syntax
     }
 }
+impl AstNode for SortByList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SORT_BY_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SortDesc {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -21387,6 +21441,64 @@ impl From<WindowFuncOption> for FuncOption {
     #[inline]
     fn from(node: WindowFuncOption) -> FuncOption {
         FuncOption::WindowFuncOption(node)
+    }
+}
+impl AstNode for GroupBy {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::GROUPING_CUBE
+                | SyntaxKind::GROUPING_EXPR
+                | SyntaxKind::GROUPING_ROLLUP
+                | SyntaxKind::GROUPING_SETS
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::GROUPING_CUBE => GroupBy::GroupingCube(GroupingCube { syntax }),
+            SyntaxKind::GROUPING_EXPR => GroupBy::GroupingExpr(GroupingExpr { syntax }),
+            SyntaxKind::GROUPING_ROLLUP => GroupBy::GroupingRollup(GroupingRollup { syntax }),
+            SyntaxKind::GROUPING_SETS => GroupBy::GroupingSets(GroupingSets { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            GroupBy::GroupingCube(it) => &it.syntax,
+            GroupBy::GroupingExpr(it) => &it.syntax,
+            GroupBy::GroupingRollup(it) => &it.syntax,
+            GroupBy::GroupingSets(it) => &it.syntax,
+        }
+    }
+}
+impl From<GroupingCube> for GroupBy {
+    #[inline]
+    fn from(node: GroupingCube) -> GroupBy {
+        GroupBy::GroupingCube(node)
+    }
+}
+impl From<GroupingExpr> for GroupBy {
+    #[inline]
+    fn from(node: GroupingExpr) -> GroupBy {
+        GroupBy::GroupingExpr(node)
+    }
+}
+impl From<GroupingRollup> for GroupBy {
+    #[inline]
+    fn from(node: GroupingRollup) -> GroupBy {
+        GroupBy::GroupingRollup(node)
+    }
+}
+impl From<GroupingSets> for GroupBy {
+    #[inline]
+    fn from(node: GroupingSets) -> GroupBy {
+        GroupBy::GroupingSets(node)
     }
 }
 impl AstNode for JoinType {

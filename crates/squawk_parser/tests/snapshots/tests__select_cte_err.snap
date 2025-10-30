@@ -110,9 +110,10 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          IDENT "ordercol"
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "ordercol"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- search depth missing comma"
@@ -180,9 +181,10 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          IDENT "ordercol"
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "ordercol"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT

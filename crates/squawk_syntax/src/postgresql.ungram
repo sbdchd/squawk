@@ -538,7 +538,16 @@ WhereClause =
   'where' Expr
 
 GroupByClause =
-  'group' 'by' ('all' | 'distinct') (GroupingRollup | GroupingCube | GroupingSets | GroupingExpr)
+  'group' 'by' ('all' | 'distinct') GroupByList
+
+GroupByList =
+  GroupBy (',' GroupBy)*
+
+GroupBy =
+  GroupingExpr
+| GroupingRollup
+| GroupingCube
+| GroupingSets
 
 GroupingRollup =
   'rollup' Expr
@@ -1195,7 +1204,10 @@ SortBy =
   Expr (SortAsc | SortDesc | SortUsing)? (NullsFirst | NullsLast)?
 
 OrderByClause =
-  'order' 'by' (SortBy (',' SortBy)*)
+  'order' 'by' SortByList
+
+SortByList =
+  SortBy (',' SortBy)*
 
 FromItem =
   'only'? NameRef Alias?

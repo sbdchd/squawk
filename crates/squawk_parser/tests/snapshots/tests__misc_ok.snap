@@ -408,58 +408,59 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      SORT_BY
-        CALL_EXPR
-          NAME_REF
-            IDENT "ts_rank_cd"
-          ARG_LIST
-            L_PAREN "("
-            CALL_EXPR
-              NAME_REF
-                IDENT "to_tsvector"
-              ARG_LIST
-                L_PAREN "("
-                LITERAL
-                  STRING "'english'"
-                COMMA ","
-                WHITESPACE " "
-                BIN_EXPR
-                  NAME_REF
-                    IDENT "title"
-                  WHITESPACE " "
-                  CUSTOM_OP
-                    PIPE "|"
-                    PIPE "|"
+      SORT_BY_LIST
+        SORT_BY
+          CALL_EXPR
+            NAME_REF
+              IDENT "ts_rank_cd"
+            ARG_LIST
+              L_PAREN "("
+              CALL_EXPR
+                NAME_REF
+                  IDENT "to_tsvector"
+                ARG_LIST
+                  L_PAREN "("
+                  LITERAL
+                    STRING "'english'"
+                  COMMA ","
                   WHITESPACE " "
                   BIN_EXPR
-                    LITERAL
-                      STRING "' '"
+                    NAME_REF
+                      IDENT "title"
                     WHITESPACE " "
                     CUSTOM_OP
                       PIPE "|"
                       PIPE "|"
                     WHITESPACE " "
-                    CALL_EXPR
-                      NAME_REF
-                        COALESCE_KW "COALESCE"
-                      ARG_LIST
-                        L_PAREN "("
+                    BIN_EXPR
+                      LITERAL
+                        STRING "' '"
+                      WHITESPACE " "
+                      CUSTOM_OP
+                        PIPE "|"
+                        PIPE "|"
+                      WHITESPACE " "
+                      CALL_EXPR
                         NAME_REF
-                          IDENT "overview"
-                        COMMA ","
-                        WHITESPACE " "
-                        LITERAL
-                          STRING "''"
-                        R_PAREN ")"
-                R_PAREN ")"
-            COMMA ","
-            WHITESPACE " "
-            NAME_REF
-              IDENT "query"
-            R_PAREN ")"
-        WHITESPACE " "
-        SORT_DESC
-          DESC_KW "DESC"
+                          COALESCE_KW "COALESCE"
+                        ARG_LIST
+                          L_PAREN "("
+                          NAME_REF
+                            IDENT "overview"
+                          COMMA ","
+                          WHITESPACE " "
+                          LITERAL
+                            STRING "''"
+                          R_PAREN ")"
+                  R_PAREN ")"
+              COMMA ","
+              WHITESPACE " "
+              NAME_REF
+                IDENT "query"
+              R_PAREN ")"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "DESC"
     WHITESPACE "\n"
     LIMIT_CLAUSE
       LIMIT_KW "LIMIT"
@@ -560,26 +561,27 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      SORT_BY
-        BIN_EXPR
-          FIELD_EXPR
-            NAME_REF
-              IDENT "movies"
-            DOT "."
-            NAME_REF
-              IDENT "embedding"
-          WHITESPACE " "
-          CUSTOM_OP
-            L_ANGLE "<"
-            EQ "="
-            R_ANGLE ">"
-          WHITESPACE " "
-          FIELD_EXPR
-            NAME_REF
-              IDENT "query_embedding"
-            DOT "."
-            NAME_REF
-              IDENT "embedding"
+      SORT_BY_LIST
+        SORT_BY
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "movies"
+              DOT "."
+              NAME_REF
+                IDENT "embedding"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              EQ "="
+              R_ANGLE ">"
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "query_embedding"
+              DOT "."
+              NAME_REF
+                IDENT "embedding"
     WHITESPACE "\n"
     LIMIT_CLAUSE
       LIMIT_KW "LIMIT"
@@ -748,12 +750,13 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          IDENT "relevance_score"
-        WHITESPACE " "
-        SORT_DESC
-          DESC_KW "DESC"
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "relevance_score"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "DESC"
     WHITESPACE "\n"
     LIMIT_CLAUSE
       LIMIT_KW "LIMIT"
@@ -1107,38 +1110,40 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "2"
-      COMMA ","
-      WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "3"
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "2"
+        COMMA ","
+        WHITESPACE " "
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "3"
     WHITESPACE "\n"
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      SORT_BY
-        LITERAL
-          INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      SORT_BY
-        LITERAL
-          INT_NUMBER "2"
-      COMMA ","
-      WHITESPACE " "
-      SORT_BY
-        LITERAL
-          INT_NUMBER "3"
+      SORT_BY_LIST
+        SORT_BY
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        SORT_BY
+          LITERAL
+            INT_NUMBER "2"
+        COMMA ","
+        WHITESPACE " "
+        SORT_BY
+          LITERAL
+            INT_NUMBER "3"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FUNCTION
@@ -2114,43 +2119,44 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      SORT_BY
-        BIN_EXPR
-          NAME_REF
-            IDENT "vec"
-          WHITESPACE " "
-          CUSTOM_OP
-            L_ANGLE "<"
-            MINUS "-"
-            R_ANGLE ">"
-          WHITESPACE " "
-          PAREN_EXPR
-            L_PAREN "("
-            SELECT
-              SELECT_CLAUSE
-                SELECT_KW "SELECT"
-                WHITESPACE " "
-                TARGET_LIST
-                  TARGET
-                    CAST_EXPR
-                      CALL_EXPR
-                        FIELD_EXPR
-                          NAME_REF
-                            IDENT "openai"
-                          DOT "."
-                          NAME_REF
-                            IDENT "vector"
-                        ARG_LIST
-                          L_PAREN "("
-                          LITERAL
-                            STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
-                          R_PAREN ")"
-                      COLON_COLON
-                        COLON ":"
-                        COLON ":"
-                      NAME_REF
-                        IDENT "vector"
-            R_PAREN ")"
+      SORT_BY_LIST
+        SORT_BY
+          BIN_EXPR
+            NAME_REF
+              IDENT "vec"
+            WHITESPACE " "
+            CUSTOM_OP
+              L_ANGLE "<"
+              MINUS "-"
+              R_ANGLE ">"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "SELECT"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      CAST_EXPR
+                        CALL_EXPR
+                          FIELD_EXPR
+                            NAME_REF
+                              IDENT "openai"
+                            DOT "."
+                            NAME_REF
+                              IDENT "vector"
+                          ARG_LIST
+                            L_PAREN "("
+                            LITERAL
+                              STRING "'What is the Star Trek episode where Deanna and her mother are kidnapped?'"
+                            R_PAREN ")"
+                        COLON_COLON
+                          COLON ":"
+                          COLON ":"
+                        NAME_REF
+                          IDENT "vector"
+              R_PAREN ")"
     WHITESPACE "\n"
     LIMIT_CLAUSE
       LIMIT_KW "LIMIT"
@@ -2551,21 +2557,23 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "1"
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "1"
     WHITESPACE " "
     ORDER_BY_CLAUSE
       ORDER_KW "order"
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      SORT_BY
-        LITERAL
-          INT_NUMBER "2"
-        WHITESPACE " "
-        SORT_DESC
-          DESC_KW "desc"
+      SORT_BY_LIST
+        SORT_BY
+          LITERAL
+            INT_NUMBER "2"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "desc"
     WHITESPACE " "
     LIMIT_CLAUSE
       LIMIT_KW "limit"
@@ -2820,9 +2828,10 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      SORT_BY
-        LITERAL
-          INT_NUMBER "1"
+      SORT_BY_LIST
+        SORT_BY
+          LITERAL
+            INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "/* define a function that wraps a COPY TO command to export data */"
@@ -3113,12 +3122,13 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      SORT_BY
-        LITERAL
-          INT_NUMBER "1"
-        WHITESPACE " "
-        SORT_DESC
-          DESC_KW "desc"
+      SORT_BY_LIST
+        SORT_BY
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "desc"
     WHITESPACE " "
     LIMIT_CLAUSE
       LIMIT_KW "limit"
@@ -3753,9 +3763,10 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE " "
-        GROUPING_EXPR
-          LITERAL
-            INT_NUMBER "1"
+        GROUP_BY_LIST
+          GROUPING_EXPR
+            LITERAL
+              INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_INDEX
@@ -4710,9 +4721,10 @@ SOURCE_FILE
                   WHITESPACE " "
                   BY_KW "BY"
                   WHITESPACE " "
-                  SORT_BY
-                    NAME_REF
-                      MONTH_KW "month"
+                  SORT_BY_LIST
+                    SORT_BY
+                      NAME_REF
+                        MONTH_KW "month"
                 WHITESPACE " \n    "
                 FRAME_CLAUSE
                   ROWS_KW "ROWS"
@@ -4828,19 +4840,20 @@ SOURCE_FILE
                   WHITESPACE " "
                   BY_KW "BY"
                   WHITESPACE " "
-                  SORT_BY
-                    CALL_EXPR
-                      NAME_REF
-                        IDENT "date_trunc"
-                      ARG_LIST
-                        L_PAREN "("
-                        LITERAL
-                          STRING "'month'"
-                        COMMA ","
-                        WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      CALL_EXPR
                         NAME_REF
-                          TIMESTAMP_KW "timestamp"
-                        R_PAREN ")"
+                          IDENT "date_trunc"
+                        ARG_LIST
+                          L_PAREN "("
+                          LITERAL
+                            STRING "'month'"
+                          COMMA ","
+                          WHITESPACE " "
+                          NAME_REF
+                            TIMESTAMP_KW "timestamp"
+                          R_PAREN ")"
               WHITESPACE "\n  "
               R_PAREN ")"
           WHITESPACE " "
@@ -4862,14 +4875,15 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "2"
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Use CTEs to break down complex analytics"
@@ -4985,9 +4999,10 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            GROUPING_EXPR
-              LITERAL
-                INT_NUMBER "1"
+            GROUP_BY_LIST
+              GROUPING_EXPR
+                LITERAL
+                  INT_NUMBER "1"
         WHITESPACE "\n"
         R_PAREN ")"
       COMMA ","
@@ -5174,14 +5189,15 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "1"
-      COMMA ","
-      WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "2"
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "2"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   EXPLAIN
@@ -5261,9 +5277,10 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE " "
-        GROUPING_EXPR
-          LITERAL
-            INT_NUMBER "1"
+        GROUP_BY_LIST
+          GROUPING_EXPR
+            LITERAL
+              INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Key settings for parallel queries"
@@ -5413,9 +5430,10 @@ SOURCE_FILE
               WHITESPACE " "
               BY_KW "BY"
               WHITESPACE " "
-              SORT_BY
-                NAME_REF
-                  TIMESTAMP_KW "timestamp"
+              SORT_BY_LIST
+                SORT_BY
+                  NAME_REF
+                    TIMESTAMP_KW "timestamp"
           WHITESPACE "\n"
           R_PAREN ")"
         WHITESPACE " "
@@ -5428,9 +5446,10 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "1"
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Remove unnecessary ORDER BY"
@@ -5491,9 +5510,10 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      GROUPING_EXPR
-        LITERAL
-          INT_NUMBER "1"
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          LITERAL
+            INT_NUMBER "1"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Gets all rows then filters"
@@ -5570,9 +5590,10 @@ SOURCE_FILE
               WHITESPACE " "
               BY_KW "BY"
               WHITESPACE " "
-              GROUPING_EXPR
-                NAME_REF
-                  IDENT "user_id"
+              GROUP_BY_LIST
+                GROUPING_EXPR
+                  NAME_REF
+                    IDENT "user_id"
           WHITESPACE "\n"
           R_PAREN ")"
   SEMICOLON ";"
@@ -5615,17 +5636,18 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          IDENT "user_id"
-      COMMA ","
-      WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          TIMESTAMP_KW "timestamp"
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "user_id"
+        COMMA ","
         WHITESPACE " "
-        SORT_DESC
-          DESC_KW "DESC"
+        SORT_BY
+          NAME_REF
+            TIMESTAMP_KW "timestamp"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "DESC"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -5906,25 +5928,27 @@ SOURCE_FILE
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE "\n    "
-        GROUPING_EXPR
-          FIELD_EXPR
-            NAME_REF
-              IDENT "p"
-            DOT "."
-            NAME_REF
-              IDENT "sku"
+        GROUP_BY_LIST
+          GROUPING_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "p"
+              DOT "."
+              NAME_REF
+                IDENT "sku"
       WHITESPACE "\n"
       ORDER_BY_CLAUSE
         ORDER_KW "ORDER"
         WHITESPACE " "
         BY_KW "BY"
         WHITESPACE "\n    "
-        SORT_BY
-          LITERAL
-            INT_NUMBER "2"
-          WHITESPACE " "
-          SORT_DESC
-            DESC_KW "DESC"
+        SORT_BY_LIST
+          SORT_BY
+            LITERAL
+              INT_NUMBER "2"
+            WHITESPACE " "
+            SORT_DESC
+              DESC_KW "DESC"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_INDEX
@@ -6283,19 +6307,20 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      GROUPING_EXPR
-        NAME_REF
-          DAY_KW "day"
-      COMMA ","
-      WHITESPACE " "
-      GROUPING_EXPR
-        NAME_REF
-          IDENT "panel_id"
-      COMMA ","
-      WHITESPACE " "
-      GROUPING_EXPR
-        NAME_REF
-          IDENT "expected_power"
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          NAME_REF
+            DAY_KW "day"
+        COMMA ","
+        WHITESPACE " "
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "panel_id"
+        COMMA ","
+        WHITESPACE " "
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "expected_power"
     WHITESPACE "\n"
     HAVING_CLAUSE
       HAVING_KW "HAVING"
@@ -6405,9 +6430,10 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            GROUPING_EXPR
-              NAME_REF
-                IDENT "turbine_id"
+            GROUP_BY_LIST
+              GROUPING_EXPR
+                NAME_REF
+                  IDENT "turbine_id"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -6669,26 +6695,28 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      GROUPING_EXPR
-        NAME_REF
-          INTERVAL_KW "interval"
-      COMMA ","
-      WHITESPACE " "
-      GROUPING_EXPR
-        NAME_REF
-          IDENT "resource_type"
+      GROUP_BY_LIST
+        GROUPING_EXPR
+          NAME_REF
+            INTERVAL_KW "interval"
+        COMMA ","
+        WHITESPACE " "
+        GROUPING_EXPR
+          NAME_REF
+            IDENT "resource_type"
     WHITESPACE "\n"
     ORDER_BY_CLAUSE
       ORDER_KW "ORDER"
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          INTERVAL_KW "interval"
-        WHITESPACE " "
-        SORT_DESC
-          DESC_KW "DESC"
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            INTERVAL_KW "interval"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "DESC"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Identify optimal trading windows"
@@ -6769,9 +6797,10 @@ SOURCE_FILE
                       WHITESPACE " "
                       BY_KW "BY"
                       WHITESPACE " "
-                      SORT_BY
-                        NAME_REF
-                          IDENT "price"
+                      SORT_BY_LIST
+                        SORT_BY
+                          NAME_REF
+                            IDENT "price"
                     R_PAREN ")"
                 WHITESPACE " "
                 AS_NAME
@@ -6818,9 +6847,10 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            GROUPING_EXPR
-              NAME_REF
-                HOUR_KW "hour"
+            GROUP_BY_LIST
+              GROUPING_EXPR
+                NAME_REF
+                  HOUR_KW "hour"
         WHITESPACE "\n"
         R_PAREN ")"
     WHITESPACE "\n"
@@ -6908,8 +6938,9 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "BY"
       WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          HOUR_KW "hour"
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            HOUR_KW "hour"
   SEMICOLON ";"
   WHITESPACE "\n"
