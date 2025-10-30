@@ -326,9 +326,10 @@ SOURCE_FILE
               WHITESPACE " "
               BY_KW "by"
               WHITESPACE " "
-              GROUPING_EXPR
-                NAME_REF
-                  IDENT "user_id"
+              GROUP_BY_LIST
+                GROUPING_EXPR
+                  NAME_REF
+                    IDENT "user_id"
           R_PAREN ")"
         WHITESPACE " "
         ALIAS
@@ -999,13 +1000,14 @@ SOURCE_FILE
             WHITESPACE " "
             BY_KW "BY"
             WHITESPACE " "
-            SORT_BY
-              FIELD_EXPR
-                NAME_REF
-                  IDENT "l"
-                DOT "."
-                NAME_REF
-                  IDENT "creation_date"
+            SORT_BY_LIST
+              SORT_BY
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "l"
+                  DOT "."
+                  NAME_REF
+                    IDENT "creation_date"
           WHITESPACE "\n    "
           LOCKING_CLAUSE
             FOR_KW "FOR"

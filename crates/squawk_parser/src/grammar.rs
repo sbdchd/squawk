@@ -2727,14 +2727,20 @@ fn opt_order_by_clause(p: &mut Parser<'_>) -> bool {
         return false;
     }
     p.expect(BY_KW);
+    sort_by_list(p);
+    m.complete(p, ORDER_BY_CLAUSE);
+    true
+}
+
+fn sort_by_list(p: &mut Parser<'_>) {
+    let m = p.start();
     while !p.at(EOF) {
         sort_by(p);
         if !p.eat(COMMA) {
             break;
         }
     }
-    m.complete(p, ORDER_BY_CLAUSE);
-    true
+    m.complete(p, SORT_BY_LIST);
 }
 
 fn sort_by(p: &mut Parser<'_>) {
@@ -4334,6 +4340,7 @@ fn group_by_list(p: &mut Parser<'_>) {
     // ambiguity, a GROUP BY name will be interpreted as an input-column name
     // rather than an output column name.
 
+    let m = p.start();
     while !p.at(EOF) && !p.at(SEMICOLON) {
         if opt_group_by_item(p).is_none() {
             p.error("expected group by item");
@@ -4342,6 +4349,7 @@ fn group_by_list(p: &mut Parser<'_>) {
             break;
         }
     }
+    m.complete(p, GROUP_BY_LIST);
 }
 
 const GROUP_BY_ITEM_FIRST: TokenSet =

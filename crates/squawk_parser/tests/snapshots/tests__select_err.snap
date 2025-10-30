@@ -179,17 +179,18 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          IDENT "a"
-      COMMA ","
-      WHITESPACE " "
-      SORT_BY
-        NAME_REF
-          IDENT "b"
+      SORT_BY_LIST
+        SORT_BY
+          NAME_REF
+            IDENT "a"
+        COMMA ","
         WHITESPACE " "
-        SORT_DESC
-          DESC_KW "desc"
+        SORT_BY
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          SORT_DESC
+            DESC_KW "desc"
   SEMICOLON ";"
   WHITESPACE " \n\n"
   COMMENT "-- group bys with missing commas"
@@ -214,19 +215,20 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      GROUPING_ROLLUP
-        ROLLUP_KW "rollup"
-        WHITESPACE " "
-        L_PAREN "("
-        LITERAL
-          INT_NUMBER "1"
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "2"
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "3"
-        R_PAREN ")"
+      GROUP_BY_LIST
+        GROUPING_ROLLUP
+          ROLLUP_KW "rollup"
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "3"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -249,19 +251,20 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      GROUPING_CUBE
-        CUBE_KW "cube"
-        WHITESPACE " "
-        L_PAREN "("
-        LITERAL
-          INT_NUMBER "1"
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "2"
-        WHITESPACE " "
-        LITERAL
-          INT_NUMBER "3"
-        R_PAREN ")"
+      GROUP_BY_LIST
+        GROUPING_CUBE
+          CUBE_KW "cube"
+          WHITESPACE " "
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "3"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -284,21 +287,7 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      GROUPING_SETS
-        GROUPING_KW "grouping"
-        WHITESPACE " "
-        SETS_KW "sets"
-        L_PAREN "("
-        GROUPING_EXPR
-          TUPLE_EXPR
-            L_PAREN "("
-            LITERAL
-              INT_NUMBER "1"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "2"
-            R_PAREN ")"
-        WHITESPACE " "
+      GROUP_BY_LIST
         GROUPING_SETS
           GROUPING_KW "grouping"
           WHITESPACE " "
@@ -307,8 +296,12 @@ SOURCE_FILE
           GROUPING_EXPR
             TUPLE_EXPR
               L_PAREN "("
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "2"
               R_PAREN ")"
-          COMMA ","
           WHITESPACE " "
           GROUPING_SETS
             GROUPING_KW "grouping"
@@ -319,9 +312,20 @@ SOURCE_FILE
               TUPLE_EXPR
                 L_PAREN "("
                 R_PAREN ")"
+            COMMA ","
+            WHITESPACE " "
+            GROUPING_SETS
+              GROUPING_KW "grouping"
+              WHITESPACE " "
+              SETS_KW "sets"
+              L_PAREN "("
+              GROUPING_EXPR
+                TUPLE_EXPR
+                  L_PAREN "("
+                  R_PAREN ")"
+              R_PAREN ")"
             R_PAREN ")"
           R_PAREN ")"
-        R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- trailing comma in args"

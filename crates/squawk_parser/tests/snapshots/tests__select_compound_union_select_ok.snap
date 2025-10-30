@@ -63,12 +63,13 @@ SOURCE_FILE
                     WHITESPACE " "
                     BY_KW "BY"
                     WHITESPACE " "
-                    SORT_BY
-                      NAME_REF
-                        IDENT "\"id\""
-                      WHITESPACE " "
-                      SORT_ASC
-                        ASC_KW "ASC"
+                    SORT_BY_LIST
+                      SORT_BY
+                        NAME_REF
+                          IDENT "\"id\""
+                        WHITESPACE " "
+                        SORT_ASC
+                          ASC_KW "ASC"
                   WHITESPACE " "
                   LIMIT_CLAUSE
                     LIMIT_KW "LIMIT"
@@ -114,12 +115,13 @@ SOURCE_FILE
                     WHITESPACE " "
                     BY_KW "BY"
                     WHITESPACE " "
-                    SORT_BY
-                      NAME_REF
-                        IDENT "\"id\""
-                      WHITESPACE " "
-                      SORT_ASC
-                        ASC_KW "ASC"
+                    SORT_BY_LIST
+                      SORT_BY
+                        NAME_REF
+                          IDENT "\"id\""
+                        WHITESPACE " "
+                        SORT_ASC
+                          ASC_KW "ASC"
                   WHITESPACE " "
                   LIMIT_CLAUSE
                     LIMIT_KW "LIMIT"
@@ -199,12 +201,13 @@ SOURCE_FILE
                     WHITESPACE " "
                     BY_KW "BY"
                     WHITESPACE " "
-                    SORT_BY
-                      NAME_REF
-                        IDENT "\"id\""
-                      WHITESPACE " "
-                      SORT_ASC
-                        ASC_KW "ASC"
+                    SORT_BY_LIST
+                      SORT_BY
+                        NAME_REF
+                          IDENT "\"id\""
+                        WHITESPACE " "
+                        SORT_ASC
+                          ASC_KW "ASC"
                   WHITESPACE " "
                   LIMIT_CLAUSE
                     LIMIT_KW "LIMIT"
@@ -248,12 +251,13 @@ SOURCE_FILE
                 WHITESPACE " "
                 BY_KW "BY"
                 WHITESPACE " "
-                SORT_BY
-                  NAME_REF
-                    IDENT "\"id\""
-                  WHITESPACE " "
-                  SORT_ASC
-                    ASC_KW "ASC"
+                SORT_BY_LIST
+                  SORT_BY
+                    NAME_REF
+                      IDENT "\"id\""
+                    WHITESPACE " "
+                    SORT_ASC
+                      ASC_KW "ASC"
               WHITESPACE " "
               LIMIT_CLAUSE
                 LIMIT_KW "LIMIT"

@@ -4139,23 +4139,24 @@ SOURCE_FILE
       WHITESPACE " "
       BY_KW "by"
       WHITESPACE " "
-      SORT_BY
-        BIN_EXPR
-          NAME_REF
-            IDENT "a"
-          WHITESPACE " "
-          CUSTOM_OP
-            PIPE "|"
-            PIPE "|"
-          WHITESPACE " "
+      SORT_BY_LIST
+        SORT_BY
           BIN_EXPR
             NAME_REF
-              IDENT "b"
+              IDENT "a"
             WHITESPACE " "
-            COLLATE_KW "collate"
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
             WHITESPACE " "
-            NAME_REF
-              IDENT "\"fr_FR\""
+            BIN_EXPR
+              NAME_REF
+                IDENT "b"
+              WHITESPACE " "
+              COLLATE_KW "collate"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "\"fr_FR\""
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
