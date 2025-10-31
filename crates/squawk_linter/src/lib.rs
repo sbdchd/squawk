@@ -39,6 +39,7 @@ use rules::ban_drop_database;
 use rules::ban_drop_not_null;
 use rules::ban_drop_table;
 use rules::ban_truncate_cascade;
+use rules::ban_uncommitted_transaction;
 use rules::changing_column_type;
 use rules::constraint_missing_not_valid;
 use rules::disallow_unique_constraint;
@@ -88,6 +89,7 @@ pub enum Rule {
     BanAlterDomainWithAddConstraint,
     BanTruncateCascade,
     RequireTimeoutSettings,
+    BanUncommittedTransaction,
     // xtask:new-rule:error-name
 }
 
@@ -129,6 +131,7 @@ impl TryFrom<&str> for Rule {
             "ban-alter-domain-with-add-constraint" => Ok(Rule::BanAlterDomainWithAddConstraint),
             "ban-truncate-cascade" => Ok(Rule::BanTruncateCascade),
             "require-timeout-settings" => Ok(Rule::RequireTimeoutSettings),
+            "ban-uncommitted-transaction" => Ok(Rule::BanUncommittedTransaction),
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -190,6 +193,7 @@ impl fmt::Display for Rule {
             Rule::BanAlterDomainWithAddConstraint => "ban-alter-domain-with-add-constraint",
             Rule::BanTruncateCascade => "ban-truncate-cascade",
             Rule::RequireTimeoutSettings => "require-timeout-settings",
+            Rule::BanUncommittedTransaction => "ban-uncommitted-transaction",
             // xtask:new-rule:variant-to-name
         };
         write!(f, "{val}")
@@ -406,6 +410,9 @@ impl Linter {
         }
         if self.rules.contains(&Rule::RequireTimeoutSettings) {
             require_timeout_settings(self, file);
+        }
+        if self.rules.contains(&Rule::BanUncommittedTransaction) {
+            ban_uncommitted_transaction(self, file);
         }
         // xtask:new-rule:rule-call
 
