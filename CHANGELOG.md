@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.30.0 - 2025-10-30
+
+## Added
+
+- linter: new rule `ban-uncommitted-transaction`
+
+  Squawk now warns about missing `commit` statements like:
+
+  ```sql
+  begin;
+  create table t(id bigint);
+  ```
+
+  ```
+  warning[ban-uncommitted-transaction]: Transaction never committed or rolled back.
+    ╭▸ stdin:1:1
+    │
+  1 │ begin;
+    │ ━━━━━
+    │
+    ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
+    ╭╴
+  2 ±
+  3 + COMMIT;
+    ╰╴
+  ```
+
 ## v2.29.0 - 2025-10-19
 
 ## Added
