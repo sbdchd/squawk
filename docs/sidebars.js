@@ -33,7 +33,7 @@ module.exports = {
       "ban-truncate-cascade",
       "syntax-error",
       "require-timeout-settings",
-      "ban-uncommitted-transactions",
+      "ban-uncommitted-transaction",
       // xtask:new-rule:error-name
     ],
   },

@@ -199,7 +199,7 @@ const rules = [
     description: "Require lock and statement timeouts",
   },
   {
-    name: "ban-uncommitted-transactions",
+    name: "ban-uncommitted-transaction",
     tags: ["schema"],
     description: "Ensure all transactions are committed",
   },
