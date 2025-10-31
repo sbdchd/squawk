@@ -39,6 +39,7 @@ use rules::ban_drop_database;
 use rules::ban_drop_not_null;
 use rules::ban_drop_table;
 use rules::ban_truncate_cascade;
+use rules::ban_uncommitted_transaction;
 use rules::changing_column_type;
 use rules::constraint_missing_not_valid;
 use rules::disallow_unique_constraint;
@@ -54,7 +55,6 @@ use rules::require_concurrent_index_creation;
 use rules::require_concurrent_index_deletion;
 use rules::require_timeout_settings;
 use rules::transaction_nesting;
-use rules::ban_uncommitted_transaction;
 // xtask:new-rule:rule-import
 
 #[derive(Debug, PartialEq, Clone, Copy, Hash, Eq, Sequence)]
@@ -412,7 +412,7 @@ impl Linter {
             require_timeout_settings(self, file);
         }
         if self.rules.contains(&Rule::BanUncommittedTransaction) {
-            ban_uncommitted_transaction(self, &file);
+            ban_uncommitted_transaction(self, file);
         }
         // xtask:new-rule:rule-call
 
