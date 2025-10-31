@@ -198,6 +198,11 @@ const rules = [
     tags: ["locking"],
     description: "Require lock and statement timeouts",
   },
+  {
+    name: "ban-uncommitted-transactions",
+    tags: ["schema"],
+    description: "Ensure all transactions are committed",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 
