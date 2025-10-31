@@ -29,11 +29,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     │
     ├ help: Add a `COMMIT` or `ROLLBACK` statement to complete the transaction.
     ╭╴
-  2 ± 
+  2 ±
   3 + COMMIT;
     ╰╴
   ```
-
 
 ## v2.29.0 - 2025-10-19
 
