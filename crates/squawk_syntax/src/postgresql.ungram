@@ -210,7 +210,9 @@ CaseExpr =
   'case' Expr? WhenClauseList ElseClause?
 
 FieldExpr =
-  Expr '.' (NameRef | '*')
+  // We manually implement these as we have NameRef as a variant of Expr.
+  // Rust analyzer avoids this by having a PathExpr instead that wraps NameRef.
+  base:Expr '.' (field:NameRef | '*')
 
 Expr =
   CallExpr
@@ -939,8 +941,27 @@ Insert =
   ('default' 'values' | Values | Stmt)
   ('on' 'conflict')?
 
+SetClause =
+  'set' SetColumnList
+
+SetColumnList =
+  SetColumn (',' SetColumn)
+
+SetColumn = 
+  (Column | ColumnList) 
+  '=' 
+  (SetExprList | ParenSelect)
+
+SetExprList =
+ 'row'? '(' (SetExpr (',' SetExpr)*) ')'
+
+SetExpr =
+  Expr
+| 'default'
+
 Update =
   'update'
+  SetClause
   ReturningClause?
 
 ReturningClause =
@@ -1027,7 +1048,7 @@ ParenExpr =
   '(' Expr | Select ')'
 
 TupleExpr =
-  '(' ')'
+  '(' (Expr (',' Expr)*) ')'
 
 PrefixExpr =
   Expr
@@ -1042,7 +1063,7 @@ IndexExpr =
   base:Expr '[' index:Expr ']'
 
 BetweenExpr =
-  target:Expr 'between' (start:Expr) 'and' (end:Expr)
+  target:Expr 'between' start:Expr 'and' end:Expr
 
 JsonTableColumn =
   Name 'for' 'ordinality'
@@ -1253,7 +1274,7 @@ ExcludeConstraint =
   'exclude' ConstraintIndexMethod? ConstraintExclusionList
 
 FrameClause =
-  ('range' | 'rows' | 'groups')
+  'range' | 'rows' | 'groups'
 
 WindowSpec =
   '#ident'? ('partition' 'by' (Expr (',' Expr)*))? OrderByClause? FrameClause?

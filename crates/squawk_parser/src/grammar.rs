@@ -81,8 +81,8 @@ impl Default for SelectRestrictions {
     }
 }
 
-fn opt_paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    let m = p.start();
+fn opt_paren_select(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
+    let m = m.unwrap_or_else(|| p.start());
     if !p.eat(L_PAREN) {
         m.abandon(p);
         return None;
@@ -98,7 +98,7 @@ fn opt_paren_select(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         {
             break;
         }
-        if opt_paren_select(p).is_none() {
+        if opt_paren_select(p, None).is_none() {
             break;
         }
         if !p.at(R_PAREN) {
@@ -234,16 +234,14 @@ const EXTRACT_ARG_FIRST_: TokenSet =
 
 // IDENT | YEAR_P | MONTH_P | DAY_P | HOUR_P | MINUTE_P | SECOND_P | Sconst
 const EXTRACT_ARG_FIRST: TokenSet = IDENTS.union(EXTRACT_ARG_FIRST_);
-fn extract_arg(p: &mut Parser<'_>) -> bool {
+fn extract_arg(p: &mut Parser<'_>) {
     if p.at_ts(EXTRACT_ARG_FIRST) {
         p.bump_any();
-        true
     } else {
         p.error(format!(
             "expected ident, year, month, day, hour, minute, second, or string, got {:?}",
             p.current()
         ));
-        false
     }
 }
 
@@ -2559,7 +2557,7 @@ fn compound_select(p: &mut Parser<'_>, cm: CompletedMarker) -> CompletedMarker {
         p.eat(DISTINCT_KW);
     }
     if p.at(L_PAREN) {
-        opt_paren_select(p);
+        opt_paren_select(p, None);
     } else {
         if p.at_ts(SELECT_FIRST) {
             select(
@@ -3161,7 +3159,7 @@ fn xml_namespace_element(p: &mut Parser<'_>) {
 fn paren_data_source(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     assert!(p.at(L_PAREN));
     if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
-        return opt_paren_select(p);
+        return opt_paren_select(p, None);
     }
     let m = p.start();
     p.bump(L_PAREN);
@@ -3417,7 +3415,7 @@ fn opt_sequence_options(p: &mut Parser<'_>) -> bool {
 
 enum ColumnDefKind {
     Name,
-    Ref,
+    NameRef,
     WithData,
 }
 
@@ -3469,7 +3467,7 @@ fn column(p: &mut Parser<'_>, kind: &ColumnDefKind) -> CompletedMarker {
     p.eat(PERIOD_KW);
     match kind {
         ColumnDefKind::Name => name(p),
-        ColumnDefKind::Ref => {
+        ColumnDefKind::NameRef => {
             // supports parsing things like:
             // INSERT INTO tictactoe (game, board[1:3][1:3])
             name_ref(p).map(|lhs| postfix_expr(p, lhs, true));
@@ -3489,7 +3487,7 @@ fn column(p: &mut Parser<'_>, kind: &ColumnDefKind) -> CompletedMarker {
 
 // [ ( column_name [, ... ] ) ]
 fn opt_column_list(p: &mut Parser<'_>) -> bool {
-    opt_column_list_with(p, ColumnDefKind::Ref)
+    opt_column_list_with(p, ColumnDefKind::NameRef)
 }
 
 fn column_list(p: &mut Parser<'_>) {
@@ -5608,7 +5606,7 @@ fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMarker> {
         (INSERT_KW, _) => Some(insert(p, None)),
         (L_PAREN, _) if p.nth_at_ts(1, SELECT_FIRST) || p.at(L_PAREN) => {
             // can have select nested in parens, i.e., ((select 1));
-            opt_paren_select(p)
+            opt_paren_select(p, None)
         }
         (LISTEN_KW, _) => Some(listen(p)),
         (LOAD_KW, _) => Some(load(p)),
@@ -12009,7 +12007,7 @@ fn create_schema(p: &mut Parser<'_>) -> CompletedMarker {
 fn query(p: &mut Parser<'_>) {
     // TODO: this needs to be more general
     if (!p.at_ts(SELECT_FIRST) || select(p, None, &SelectRestrictions::default()).is_none())
-        && opt_paren_select(p).is_none()
+        && opt_paren_select(p, None).is_none()
     {
         p.error("expected select stmt")
     }
@@ -12111,54 +12109,81 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
 //       ( column_name [, ...] ) = ( sub-SELECT )
 //     } [, ...]
 fn set_clause(p: &mut Parser<'_>) {
+    let m = p.start();
     p.expect(SET_KW);
-    // TODO: generalize
-    while !p.at(EOF) {
-        // ( column_name [, ...] ) = [ ROW ] ( { expression | DEFAULT } [, ...] ) |
-        // ( column_name [, ...] ) = ( sub-SELECT )
-        if p.eat(L_PAREN) {
-            while !p.at(EOF) {
-                name_ref(p).map(|lhs| postfix_expr(p, lhs, true));
-                if !p.eat(COMMA) {
-                    break;
-                }
+    set_column_list(p);
+    m.complete(p, SET_CLAUSE);
+}
+
+fn set_column_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    separated(
+        p,
+        COMMA,
+        || "unexpected comma".to_string(),
+        SET_COLUMN_FIRST,
+        SET_COLUMN_FOLLOW,
+        |p| opt_set_column(p).is_some(),
+    );
+    m.complete(p, SET_COLUMN_LIST);
+}
+
+const SET_COLUMN_FIRST: TokenSet = TokenSet::new(&[L_PAREN]).union(COLUMN_FIRST);
+const SET_COLUMN_FOLLOW: TokenSet = TokenSet::new(&[FROM_KW, WHERE_KW, RETURNING_KW]);
+
+fn opt_set_column(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(SET_COLUMN_FIRST) {
+        return None;
+    }
+    let m = p.start();
+    // ( column_name [, ...] ) = [ ROW ] ( { expression | DEFAULT } [, ...] ) |
+    // ( column_name [, ...] ) = ( sub-SELECT )
+    if p.at(L_PAREN) {
+        column_list(p);
+        p.expect(EQ);
+        set_expr_list_or_paren_select(p);
+    } else {
+        // column_name = { expression | DEFAULT }
+        column(p, &ColumnDefKind::NameRef);
+        p.expect(EQ);
+        set_expr(p);
+    }
+    Some(m.complete(p, SET_COLUMN))
+}
+
+// [ ROW ] ( { expression | DEFAULT } [, ...] )
+// ( sub-SELECT )
+fn set_expr_list_or_paren_select(p: &mut Parser<'_>) {
+    let m = p.start();
+    p.eat(ROW_KW);
+    if p.at(L_PAREN) {
+        if p.nth_at(1, SELECT_KW) {
+            if opt_paren_select(p, Some(m)).is_none() {
+                p.error("expected sub-SELECT");
             }
-            p.expect(R_PAREN);
-            p.expect(EQ);
-            // [ ROW ] ( { expression | DEFAULT } [, ...] )
-            // ( sub-SELECT )
-            let found_row = p.eat(ROW_KW);
-            if p.eat(L_PAREN) {
-                // ( sub-SELECT )
-                if p.at(SELECT_KW) && !found_row {
-                    if select(p, None, &SelectRestrictions::default()).is_none() {
-                        p.error("expected sub-SELECT");
-                    }
-                } else {
-                    // ( { expression | DEFAULT } [, ...] )
-                    while !p.at(EOF) {
-                        if !p.eat(DEFAULT_KW) && expr(p).is_none() {
-                            p.error("expected expression");
-                        }
-                        if !p.eat(COMMA) {
-                            break;
-                        }
-                    }
-                }
-                p.expect(R_PAREN);
-            }
-            // column_name = { expression | DEFAULT }
         } else {
-            name_ref(p).map(|lhs| postfix_expr(p, lhs, true));
-            p.expect(EQ);
-            // { expression | DEFAULT }
-            if !p.eat(DEFAULT_KW) && expr(p).is_none() {
-                p.error("expected expression");
-            }
+            set_expr_list(p, m);
         }
+    }
+}
+
+fn set_expr_list(p: &mut Parser<'_>, m: Marker) {
+    assert!(p.at(L_PAREN));
+    p.expect(L_PAREN);
+    // ( { expression | DEFAULT } [, ...] )
+    while !p.at(EOF) {
+        set_expr(p);
         if !p.eat(COMMA) {
             break;
         }
+    }
+    p.expect(R_PAREN);
+    m.complete(p, SET_EXPR_LIST);
+}
+
+fn set_expr(p: &mut Parser<'_>) {
+    if !p.eat(DEFAULT_KW) && expr(p).is_none() {
+        p.error("expected expression");
     }
 }
 

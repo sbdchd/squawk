@@ -1417,15 +1417,19 @@ SOURCE_FILE
           NAME_REF
             IDENT "notification"
     WHITESPACE "\n"
-    SET_KW "SET"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "dismissed_at"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    NAME_REF
-      CURRENT_TIMESTAMP_KW "current_timestamp"
+    SET_CLAUSE
+      SET_KW "SET"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_COLUMN
+          COLUMN
+            NAME_REF
+              IDENT "dismissed_at"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          NAME_REF
+            CURRENT_TIMESTAMP_KW "current_timestamp"
     WHITESPACE "\n"
     WHERE_CLAUSE
       WHERE_KW "WHERE"

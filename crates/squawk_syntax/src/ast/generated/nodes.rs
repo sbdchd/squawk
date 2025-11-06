@@ -1340,18 +1340,6 @@ pub struct BetweenExpr {
 }
 impl BetweenExpr {
     #[inline]
-    pub fn end(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn start(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn target(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn and_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AND_KW)
     }
@@ -4822,14 +4810,6 @@ pub struct FieldExpr {
 }
 impl FieldExpr {
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn star_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::STAR)
     }
@@ -5296,14 +5276,6 @@ pub struct IndexExpr {
     pub(crate) syntax: SyntaxNode,
 }
 impl IndexExpr {
-    #[inline]
-    pub fn base(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn index(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn l_brack_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_BRACK)
@@ -9061,6 +9033,63 @@ impl SetAccessMethod {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetClause {
+    #[inline]
+    pub fn set_column_list(&self) -> Option<SetColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetColumn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetColumn {
+    #[inline]
+    pub fn column(&self) -> Option<Column> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn paren_select(&self) -> Option<ParenSelect> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_expr_list(&self) -> Option<SetExprList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetColumnList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetColumnList {
+    #[inline]
+    pub fn set_column(&self) -> Option<SetColumn> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SetCompression {
     pub(crate) syntax: SyntaxNode,
 }
@@ -9125,6 +9154,44 @@ impl SetDefaultColumns {
     #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetExpr {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetExprList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetExprList {
+    #[inline]
+    pub fn set_exprs(&self) -> AstChildren<SetExpr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn row_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROW_KW)
     }
 }
 
@@ -9863,6 +9930,10 @@ pub struct TupleExpr {
 }
 impl TupleExpr {
     #[inline]
+    pub fn exprs(&self) -> AstChildren<Expr> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
     }
@@ -9956,6 +10027,10 @@ pub struct Update {
 impl Update {
     #[inline]
     pub fn returning_clause(&self) -> Option<ReturningClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_clause(&self) -> Option<SetClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -18638,6 +18713,60 @@ impl AstNode for SetAccessMethod {
         &self.syntax
     }
 }
+impl AstNode for SetClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SetColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_COLUMN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SetColumnList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_COLUMN_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SetCompression {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -18696,6 +18825,42 @@ impl AstNode for SetDefaultColumns {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SET_DEFAULT_COLUMNS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SetExpr {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_EXPR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SetExprList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_EXPR_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

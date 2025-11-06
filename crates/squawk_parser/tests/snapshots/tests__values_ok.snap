@@ -303,25 +303,29 @@ SOURCE_FILE
           NAME_REF
             IDENT "employees"
     WHITESPACE " "
-    SET_KW "SET"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "salary"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    BIN_EXPR
-      NAME_REF
-        IDENT "salary"
+    SET_CLAUSE
+      SET_KW "SET"
       WHITESPACE " "
-      STAR "*"
-      WHITESPACE " "
-      FIELD_EXPR
-        NAME_REF
-          IDENT "v"
-        DOT "."
-        NAME_REF
-          IDENT "increase"
+      SET_COLUMN_LIST
+        SET_COLUMN
+          COLUMN
+            NAME_REF
+              IDENT "salary"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          BIN_EXPR
+            NAME_REF
+              IDENT "salary"
+            WHITESPACE " "
+            STAR "*"
+            WHITESPACE " "
+            FIELD_EXPR
+              NAME_REF
+                IDENT "v"
+              DOT "."
+              NAME_REF
+                IDENT "increase"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"

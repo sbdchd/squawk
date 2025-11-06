@@ -232,15 +232,19 @@ SOURCE_FILE
             NAME_REF
               IDENT "foo"
       WHITESPACE " "
-      SET_KW "set"
-      WHITESPACE " "
-      NAME_REF
-        IDENT "x"
-      WHITESPACE " "
-      EQ "="
-      WHITESPACE " "
-      LITERAL
-        INT_NUMBER "1"
+      SET_CLAUSE
+        SET_KW "set"
+        WHITESPACE " "
+        SET_COLUMN_LIST
+          SET_COLUMN
+            COLUMN
+              NAME_REF
+                IDENT "x"
+            WHITESPACE " "
+            EQ "="
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "1"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "where"

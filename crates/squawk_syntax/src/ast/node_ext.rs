@@ -42,12 +42,54 @@ impl ast::Constraint {
 }
 
 impl ast::BinExpr {
+    #[inline]
     pub fn lhs(&self) -> Option<ast::Expr> {
         support::children(self.syntax()).next()
     }
 
+    #[inline]
     pub fn rhs(&self) -> Option<ast::Expr> {
         support::children(self.syntax()).nth(1)
+    }
+}
+
+impl ast::FieldExpr {
+    // We have NameRef as a variant of Expr which complicates things (and it
+    // might not be worth it).
+    // Rust analyzer doesn't do this so it doesn't have to special case this.
+    #[inline]
+    pub fn base(&self) -> Option<ast::Expr> {
+        support::children(self.syntax()).next()
+    }
+    #[inline]
+    pub fn field(&self) -> Option<ast::NameRef> {
+        support::children(self.syntax()).last()
+    }
+}
+
+impl ast::IndexExpr {
+    #[inline]
+    pub fn base(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).next()
+    }
+    #[inline]
+    pub fn index(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).nth(1)
+    }
+}
+
+impl ast::BetweenExpr {
+    #[inline]
+    pub fn target(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).nth(0)
+    }
+    #[inline]
+    pub fn start(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).nth(1)
+    }
+    #[inline]
+    pub fn end(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).nth(2)
     }
 }
 
