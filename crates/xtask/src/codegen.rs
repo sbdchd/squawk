@@ -511,23 +511,13 @@ fn lower(grammar: &Grammar) -> AstSrc {
         let rule = &grammar[node].rule;
         match lower_enum(grammar, rule) {
             Some(variants) => {
-                let enum_src = AstEnumSrc {
-                    // doc: Vec::new(),
-                    name,
-                    // traits: Vec::new(),
-                    variants,
-                };
+                let enum_src = AstEnumSrc { name, variants };
                 res.enums.push(enum_src);
             }
             None => {
                 let mut fields = Vec::new();
                 lower_rule(&mut fields, grammar, None, rule);
-                res.nodes.push(AstNodeSrc {
-                    // doc: Vec::new(),
-                    name,
-                    // traits: Vec::new(),
-                    fields,
-                });
+                res.nodes.push(AstNodeSrc { name, fields });
             }
         }
     }
@@ -537,14 +527,12 @@ fn lower(grammar: &Grammar) -> AstSrc {
     res.enums.sort_by_key(|it| it.name.clone());
     res.tokens.sort();
     res.nodes.iter_mut().for_each(|it| {
-        // it.traits.sort();
         it.fields.sort_by_key(|it| match it {
             Field::Token(name) => (true, name.clone()),
             Field::Node { name, .. } => (false, name.clone()),
         });
     });
     res.enums.iter_mut().for_each(|it| {
-        // it.traits.sort();
         it.variants.sort();
     });
 
@@ -629,7 +617,18 @@ fn lower_rule(acc: &mut Vec<Field>, grammar: &Grammar, label: Option<&String>, r
         }
         Rule::Labeled { label: l, rule } => {
             assert!(label.is_none());
-            let manually_implemented = matches!(l.as_str(), "value" | "lhs" | "rhs");
+            let manually_implemented = matches!(
+                l.as_str(),
+                "value" 
+                // bin expr fields
+                | "lhs" | "rhs" 
+                // between expr fields
+                | "target" | "start" | "end" 
+                // index expr fields
+                | "base" | "index"
+                // field expr fields
+                | /* "base" | */ "field"
+            );
             if manually_implemented {
                 return;
             }

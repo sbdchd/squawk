@@ -1,0 +1,84 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/update.sql
+---
+SOURCE_FILE
+  UPDATE
+    UPDATE_KW "update"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "set"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_COLUMN
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN
+              NAME_REF
+                IDENT "j"
+            WHITESPACE " "
+            COLUMN
+              NAME_REF
+                IDENT "k"
+            R_PAREN ")"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          SET_EXPR_LIST
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+            R_PAREN ")"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "--             ^ missing comma"
+  WHITESPACE "\n\n"
+  UPDATE
+    UPDATE_KW "update"
+    WHITESPACE " "
+    RELATION_NAME
+      PATH
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "t"
+    WHITESPACE " "
+    SET_CLAUSE
+      SET_KW "set"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_COLUMN
+          COLUMN
+            NAME_REF
+              IDENT "a"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+        WHITESPACE " "
+        SET_COLUMN
+          COLUMN
+            NAME_REF
+              IDENT "b"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+  SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT "--                ^ missing comma"
+  WHITESPACE "\n"
+---
+ERROR@15: expected COMMA
+ERROR@79: expected COMMA

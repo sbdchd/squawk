@@ -480,3 +480,95 @@ fn create_table() {
     ]
     "#)
 }
+
+#[test]
+fn index_expr() {
+    let source_code = "
+        select foo[bar];
+    ";
+    let parse = SourceFile::parse(source_code);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    let stmt = file.stmts().next().unwrap();
+    let select = match stmt {
+        ast::Stmt::Select(select) => select,
+        _ => unreachable!(),
+    };
+    let select_clause = select.select_clause().unwrap();
+    let target = select_clause
+        .target_list()
+        .unwrap()
+        .targets()
+        .next()
+        .unwrap();
+    let index_expr = match target.expr().unwrap() {
+        ast::Expr::IndexExpr(index_expr) => index_expr,
+        _ => unreachable!(),
+    };
+    let base = index_expr.base().unwrap();
+    let index = index_expr.index().unwrap();
+    assert_eq!(base.syntax().text(), "foo");
+    assert_eq!(index.syntax().text(), "bar");
+}
+
+#[test]
+fn field_expr() {
+    let source_code = "
+        select foo.bar;
+    ";
+    let parse = SourceFile::parse(source_code);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    let stmt = file.stmts().next().unwrap();
+    let select = match stmt {
+        ast::Stmt::Select(select) => select,
+        _ => unreachable!(),
+    };
+    let select_clause = select.select_clause().unwrap();
+    let target = select_clause
+        .target_list()
+        .unwrap()
+        .targets()
+        .next()
+        .unwrap();
+    let field_expr = match target.expr().unwrap() {
+        ast::Expr::FieldExpr(field_expr) => field_expr,
+        _ => unreachable!(),
+    };
+    let base = field_expr.base().unwrap();
+    let field = field_expr.field().unwrap();
+    assert_eq!(base.syntax().text(), "foo");
+    assert_eq!(field.syntax().text(), "bar");
+}
+
+#[test]
+fn between_expr() {
+    let source_code = "
+        select 2 between 1 and 3;
+    ";
+    let parse = SourceFile::parse(source_code);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    let stmt = file.stmts().next().unwrap();
+    let select = match stmt {
+        ast::Stmt::Select(select) => select,
+        _ => unreachable!(),
+    };
+    let select_clause = select.select_clause().unwrap();
+    let target = select_clause
+        .target_list()
+        .unwrap()
+        .targets()
+        .next()
+        .unwrap();
+    let between_expr = match target.expr().unwrap() {
+        ast::Expr::BetweenExpr(between_expr) => between_expr,
+        _ => unreachable!(),
+    };
+    let target = between_expr.target().unwrap();
+    let start = between_expr.start().unwrap();
+    let end = between_expr.end().unwrap();
+    assert_eq!(target.syntax().text(), "2");
+    assert_eq!(start.syntax().text(), "1");
+    assert_eq!(end.syntax().text(), "3");
+}

@@ -868,21 +868,25 @@ SOURCE_FILE
                 NAME_REF
                   IDENT "employees"
           WHITESPACE " "
-          SET_KW "SET"
-          WHITESPACE " "
-          NAME_REF
-            IDENT "sales_count"
-          WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          BIN_EXPR
-            NAME_REF
-              IDENT "sales_count"
+          SET_CLAUSE
+            SET_KW "SET"
             WHITESPACE " "
-            PLUS "+"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            SET_COLUMN_LIST
+              SET_COLUMN
+                COLUMN
+                  NAME_REF
+                    IDENT "sales_count"
+                WHITESPACE " "
+                EQ "="
+                WHITESPACE " "
+                BIN_EXPR
+                  NAME_REF
+                    IDENT "sales_count"
+                  WHITESPACE " "
+                  PLUS "+"
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "1"
           WHITESPACE " "
           WHERE_CLAUSE
             WHERE_KW "WHERE"
@@ -1023,19 +1027,23 @@ SOURCE_FILE
     WHITESPACE " "
     UPDATE_KW "UPDATE"
     WHITESPACE " "
-    SET_KW "SET"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "dname"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    FIELD_EXPR
-      NAME_REF
-        IDENT "EXCLUDED"
-      DOT "."
-      NAME_REF
-        IDENT "dname"
+    SET_CLAUSE
+      SET_KW "SET"
+      WHITESPACE " "
+      SET_COLUMN_LIST
+        SET_COLUMN
+          COLUMN
+            NAME_REF
+              IDENT "dname"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          FIELD_EXPR
+            NAME_REF
+              IDENT "EXCLUDED"
+            DOT "."
+            NAME_REF
+              IDENT "dname"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -1145,47 +1153,51 @@ SOURCE_FILE
     WHITESPACE " "
     UPDATE_KW "UPDATE"
     WHITESPACE "\n    "
-    SET_KW "SET"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "dname"
-    WHITESPACE " "
-    EQ "="
-    WHITESPACE " "
-    BIN_EXPR
-      FIELD_EXPR
-        NAME_REF
-          IDENT "EXCLUDED"
-        DOT "."
-        NAME_REF
-          IDENT "dname"
+    SET_CLAUSE
+      SET_KW "SET"
       WHITESPACE " "
-      CUSTOM_OP
-        PIPE "|"
-        PIPE "|"
-      WHITESPACE " "
-      BIN_EXPR
-        LITERAL
-          STRING "' (formerly '"
-        WHITESPACE " "
-        CUSTOM_OP
-          PIPE "|"
-          PIPE "|"
-        WHITESPACE " "
-        BIN_EXPR
-          FIELD_EXPR
-            NAME_REF
-              IDENT "d"
-            DOT "."
+      SET_COLUMN_LIST
+        SET_COLUMN
+          COLUMN
             NAME_REF
               IDENT "dname"
           WHITESPACE " "
-          CUSTOM_OP
-            PIPE "|"
-            PIPE "|"
+          EQ "="
           WHITESPACE " "
-          LITERAL
-            STRING "')'"
+          BIN_EXPR
+            FIELD_EXPR
+              NAME_REF
+                IDENT "EXCLUDED"
+              DOT "."
+              NAME_REF
+                IDENT "dname"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                STRING "' (formerly '"
+              WHITESPACE " "
+              CUSTOM_OP
+                PIPE "|"
+                PIPE "|"
+              WHITESPACE " "
+              BIN_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "d"
+                  DOT "."
+                  NAME_REF
+                    IDENT "dname"
+                WHITESPACE " "
+                CUSTOM_OP
+                  PIPE "|"
+                  PIPE "|"
+                WHITESPACE " "
+                LITERAL
+                  STRING "')'"
     WHITESPACE "\n    "
     WHERE_CLAUSE
       WHERE_KW "WHERE"
