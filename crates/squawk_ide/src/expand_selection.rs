@@ -44,6 +44,8 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::PARAM_LIST,
     SyntaxKind::PARTITION_ITEM_LIST,
     SyntaxKind::ROW_LIST,
+    SyntaxKind::SET_COLUMN_LIST,
+    SyntaxKind::SET_EXPR_LIST,
     SyntaxKind::SET_OPTIONS_LIST,
     SyntaxKind::SORT_BY_LIST,
     SyntaxKind::TABLE_ARG_LIST,
