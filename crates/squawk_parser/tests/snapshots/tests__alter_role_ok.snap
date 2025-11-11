@@ -12,9 +12,11 @@ SOURCE_FILE
     WHITESPACE " "
     IDENT "r"
     WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    IDENT "superuser"
+    ROLE_OPTION_LIST
+      WITH_KW "with"
+      WHITESPACE " "
+      ROLE_OPTION
+        IDENT "superuser"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- all_options"
@@ -26,67 +28,88 @@ SOURCE_FILE
     WHITESPACE " "
     IDENT "r"
     WHITESPACE "\n  "
-    WITH_KW "with"
-    WHITESPACE " "
-    IDENT "superuser"
-    WHITESPACE "\n  "
-    IDENT "nosuperuser"
-    WHITESPACE "\n  "
-    IDENT "nosuperuser"
-    WHITESPACE "\n  "
-    IDENT "createdb"
-    WHITESPACE "\n  "
-    IDENT "nocreatedb"
-    WHITESPACE "\n  "
-    IDENT "createrole"
-    WHITESPACE "\n  "
-    IDENT "nocreaterole"
-    WHITESPACE "\n  "
-    INHERIT_KW "inherit"
-    WHITESPACE "\n  "
-    IDENT "noinherit"
-    WHITESPACE "\n  "
-    IDENT "login"
-    WHITESPACE "\n  "
-    IDENT "nologin"
-    WHITESPACE "\n  "
-    IDENT "replication"
-    WHITESPACE "\n  "
-    IDENT "noreplication"
-    WHITESPACE "\n  "
-    IDENT "bypassrls"
-    WHITESPACE "\n  "
-    IDENT "nobypassrls"
-    WHITESPACE "\n  "
-    CONNECTION_KW "connection"
-    WHITESPACE " "
-    LIMIT_KW "limit"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "100"
-    WHITESPACE "\n  "
-    ENCRYPTED_KW "encrypted"
-    WHITESPACE " "
-    PASSWORD_KW "password"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
-    WHITESPACE "\n  "
-    PASSWORD_KW "password"
-    WHITESPACE " "
-    LITERAL
-      STRING "'bar'"
-    WHITESPACE " "
-    PASSWORD_KW "password"
-    WHITESPACE " "
-    NULL_KW "null"
-    WHITESPACE "\n  "
-    VALID_KW "valid"
-    WHITESPACE " "
-    UNTIL_KW "until"
-    WHITESPACE " "
-    LITERAL
-      STRING "'2042-02-22'"
+    ROLE_OPTION_LIST
+      WITH_KW "with"
+      WHITESPACE " "
+      ROLE_OPTION
+        IDENT "superuser"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "nosuperuser"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "nosuperuser"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "createdb"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "nocreatedb"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "createrole"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "nocreaterole"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        INHERIT_KW "inherit"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "noinherit"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "login"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "nologin"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "replication"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "noreplication"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "bypassrls"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        IDENT "nobypassrls"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        CONNECTION_KW "connection"
+        WHITESPACE " "
+        LIMIT_KW "limit"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        ENCRYPTED_KW "encrypted"
+        WHITESPACE " "
+        PASSWORD_KW "password"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        PASSWORD_KW "password"
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+      WHITESPACE " "
+      ROLE_OPTION
+        PASSWORD_KW "password"
+        WHITESPACE " "
+        NULL_KW "null"
+      WHITESPACE "\n  "
+      ROLE_OPTION
+        VALID_KW "valid"
+        WHITESPACE " "
+        UNTIL_KW "until"
+        WHITESPACE " "
+        LITERAL
+          STRING "'2042-02-22'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- rename"
@@ -257,9 +280,11 @@ SOURCE_FILE
     WHITESPACE " "
     CURRENT_USER_KW "current_user"
     WHITESPACE " "
-    WITH_KW "with"
-    WHITESPACE " "
-    IDENT "nologin"
+    ROLE_OPTION_LIST
+      WITH_KW "with"
+      WHITESPACE " "
+      ROLE_OPTION
+        IDENT "nologin"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- for_all_roles"

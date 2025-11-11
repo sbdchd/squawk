@@ -88,15 +88,17 @@ SOURCE_FILE
     NAME_REF
       IDENT "c"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "foo"
-    WHITESPACE " "
-    LITERAL
-      STRING "'bar'"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        NAME
+          IDENT "foo"
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options_multi"
@@ -123,22 +125,25 @@ SOURCE_FILE
     NAME_REF
       IDENT "c"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "foo"
-    WHITESPACE " "
-    LITERAL
-      STRING "'bar'"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "a"
-    WHITESPACE " "
-    LITERAL
-      STRING "'b'"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        NAME
+          IDENT "foo"
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        LITERAL
+          STRING "'b'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- doc_example_1"

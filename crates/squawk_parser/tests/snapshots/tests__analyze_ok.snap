@@ -72,21 +72,25 @@ SOURCE_FILE
   ANALYZE
     ANALYZE_KW "analyze"
     WHITESPACE " "
-    L_PAREN "("
-    VERBOSE_KW "verbose"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "skip_locked"
-    COMMA ","
-    WHITESPACE " "
-    IDENT "buffer_usage_limit"
-    WHITESPACE " "
-    LITERAL
-      INT_NUMBER "10"
-    R_PAREN ")"
+    OPTION_ITEM_LIST
+      L_PAREN "("
+      OPTION_ITEM
+        VERBOSE_KW "verbose"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      COMMA ","
+      WHITESPACE " "
+      OPTION_ITEM
+        IDENT "skip_locked"
+      COMMA ","
+      WHITESPACE " "
+      OPTION_ITEM
+        IDENT "buffer_usage_limit"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "10"
+      R_PAREN ")"
     WHITESPACE " "
     RELATION_NAME
       PATH

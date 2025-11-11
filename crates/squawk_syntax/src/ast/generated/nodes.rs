@@ -551,6 +551,44 @@ impl AlterOperatorFamily {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterOption {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn add_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ADD_KW)
+    }
+    #[inline]
+    pub fn drop_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn set_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct AlterOptionList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl AlterOptionList {
+    #[inline]
+    pub fn alter_options(&self) -> AstChildren<AlterOption> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct AlterPolicy {
     pub(crate) syntax: SyntaxNode,
 }
@@ -711,6 +749,10 @@ pub struct AlterServer {
     pub(crate) syntax: SyntaxNode,
 }
 impl AlterServer {
+    #[inline]
+    pub fn alter_option_list(&self) -> Option<AlterOptionList> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
@@ -1048,6 +1090,10 @@ pub struct Analyze {
     pub(crate) syntax: SyntaxNode,
 }
 impl Analyze {
+    #[inline]
+    pub fn option_item_list(&self) -> Option<OptionItemList> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn analyze_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ANALYZE_KW)
@@ -2210,6 +2256,10 @@ pub struct CreateGroup {
 impl CreateGroup {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn role_option_list(&self) -> Option<RoleOptionList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7556,10 +7606,29 @@ impl OperatorCall {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct OptionsList {
+pub struct OptionItem {
     pub(crate) syntax: SyntaxNode,
 }
-impl OptionsList {
+impl OptionItem {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OptionItemList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OptionItemList {
+    #[inline]
+    pub fn option_items(&self) -> AstChildren<OptionItem> {
+        support::children(&self.syntax)
+    }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
@@ -7567,10 +7636,6 @@ impl OptionsList {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn option_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OPTION_KW)
     }
 }
 
@@ -8695,6 +8760,32 @@ impl Role {
     #[inline]
     pub fn session_user_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SESSION_USER_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RoleOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RoleOption {
+    #[inline]
+    pub fn inherit_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INHERIT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RoleOptionList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RoleOptionList {
+    #[inline]
+    pub fn role_options(&self) -> AstChildren<RoleOption> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn with_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WITH_KW)
     }
 }
 
@@ -10699,7 +10790,7 @@ pub enum AlterTableAction {
     NoInherit(NoInherit),
     NotOf(NotOf),
     OfType(OfType),
-    OptionsList(OptionsList),
+    OptionItemList(OptionItemList),
     OwnerTo(OwnerTo),
     RenameColumn(RenameColumn),
     RenameConstraint(RenameConstraint),
@@ -11553,6 +11644,42 @@ impl AstNode for AlterOperatorFamily {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ALTER_OPERATOR_FAMILY
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AlterOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for AlterOptionList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ALTER_OPTION_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -17363,10 +17490,28 @@ impl AstNode for OperatorCall {
         &self.syntax
     }
 }
-impl AstNode for OptionsList {
+impl AstNode for OptionItem {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::OPTIONS_LIST
+        kind == SyntaxKind::OPTION_ITEM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OptionItemList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::OPTION_ITEM_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -18447,6 +18592,42 @@ impl AstNode for Role {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ROLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RoleOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROLE_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for RoleOptionList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ROLE_OPTION_LIST
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -20670,7 +20851,7 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::NO_INHERIT
                 | SyntaxKind::NOT_OF
                 | SyntaxKind::OF_TYPE
-                | SyntaxKind::OPTIONS_LIST
+                | SyntaxKind::OPTION_ITEM_LIST
                 | SyntaxKind::OWNER_TO
                 | SyntaxKind::RENAME_COLUMN
                 | SyntaxKind::RENAME_CONSTRAINT
@@ -20734,7 +20915,9 @@ impl AstNode for AlterTableAction {
             SyntaxKind::NO_INHERIT => AlterTableAction::NoInherit(NoInherit { syntax }),
             SyntaxKind::NOT_OF => AlterTableAction::NotOf(NotOf { syntax }),
             SyntaxKind::OF_TYPE => AlterTableAction::OfType(OfType { syntax }),
-            SyntaxKind::OPTIONS_LIST => AlterTableAction::OptionsList(OptionsList { syntax }),
+            SyntaxKind::OPTION_ITEM_LIST => {
+                AlterTableAction::OptionItemList(OptionItemList { syntax })
+            }
             SyntaxKind::OWNER_TO => AlterTableAction::OwnerTo(OwnerTo { syntax }),
             SyntaxKind::RENAME_COLUMN => AlterTableAction::RenameColumn(RenameColumn { syntax }),
             SyntaxKind::RENAME_CONSTRAINT => {
@@ -20800,7 +20983,7 @@ impl AstNode for AlterTableAction {
             AlterTableAction::NoInherit(it) => &it.syntax,
             AlterTableAction::NotOf(it) => &it.syntax,
             AlterTableAction::OfType(it) => &it.syntax,
-            AlterTableAction::OptionsList(it) => &it.syntax,
+            AlterTableAction::OptionItemList(it) => &it.syntax,
             AlterTableAction::OwnerTo(it) => &it.syntax,
             AlterTableAction::RenameColumn(it) => &it.syntax,
             AlterTableAction::RenameConstraint(it) => &it.syntax,
@@ -20969,10 +21152,10 @@ impl From<OfType> for AlterTableAction {
         AlterTableAction::OfType(node)
     }
 }
-impl From<OptionsList> for AlterTableAction {
+impl From<OptionItemList> for AlterTableAction {
     #[inline]
-    fn from(node: OptionsList) -> AlterTableAction {
-        AlterTableAction::OptionsList(node)
+    fn from(node: OptionItemList) -> AlterTableAction {
+        AlterTableAction::OptionItemList(node)
     }
 }
 impl From<OwnerTo> for AlterTableAction {

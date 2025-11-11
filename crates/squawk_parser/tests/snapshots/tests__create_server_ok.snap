@@ -59,22 +59,25 @@ SOURCE_FILE
     NAME_REF
       IDENT "f"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "bar"
-    WHITESPACE " "
-    LITERAL
-      STRING "'b'"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        NAME
+          IDENT "bar"
+        WHITESPACE " "
+        LITERAL
+          STRING "'b'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- docs_1"
@@ -96,28 +99,32 @@ SOURCE_FILE
     NAME_REF
       IDENT "postgres_fdw"
     WHITESPACE " "
-    OPTIONS_KW "OPTIONS"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "host"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "dbname"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foodb'"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "port"
-    WHITESPACE " "
-    LITERAL
-      STRING "'5432'"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "OPTIONS"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        NAME
+          IDENT "host"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        NAME
+          IDENT "dbname"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foodb'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        NAME
+          IDENT "port"
+        WHITESPACE " "
+        LITERAL
+          STRING "'5432'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
