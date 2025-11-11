@@ -7994,7 +7994,7 @@ fn opt_option_list(p: &mut Parser<'_>) {
         COMMA,
         || "unexpected comma".to_string(),
         OPTION_FIRST,
-        |p| opt_option(p),
+        opt_option,
     );
     m.complete(p, OPTION_ITEM_LIST);
 }
