@@ -5730,7 +5730,7 @@ fn alter_server(p: &mut Parser<'_>) -> CompletedMarker {
                 string_literal(p);
                 found_option = true;
             }
-            found_option |= opt_options_list(p);
+            found_option |= opt_alter_option_list(p);
             if !found_option {
                 p.error("expected ALTER SERVER option");
             }
@@ -5945,13 +5945,7 @@ fn alter_role(p: &mut Parser<'_>) -> CompletedMarker {
             }
         }
         _ => {
-            p.eat(WITH_KW);
-            if !opt_role_option(p) {
-                p.error("expected option");
-            }
-            while !p.at(EOF) && p.at_ts(ROLE_OPTION_FIRST) {
-                opt_role_option(p);
-            }
+            opt_role_option_list(p);
         }
     }
     m.complete(p, ALTER_ROLE)
@@ -6337,12 +6331,9 @@ fn alter_materialized_view(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn opt_alter_table_action_list(p: &mut Parser<'_>) {
     while !p.at(EOF) {
-        let m = p.start();
-        let Some(kind) = opt_alter_table_action(p) else {
-            m.abandon(p);
+        if opt_alter_table_action(p).is_none() {
             break;
         };
-        m.complete(p, kind);
         if !p.eat(COMMA) {
             if p.at_ts(ALTER_TABLE_ACTION_FIRST) {
                 p.error("missing comma");
@@ -7835,11 +7826,8 @@ fn alter_user(p: &mut Parser<'_>) -> CompletedMarker {
         role(p);
     }
     // be careful of the case where we're at the IN of IN DATABASE
-    if p.eat(WITH_KW) || (p.at_ts(ROLE_OPTION_FIRST) && !p.nth_at(1, DATABASE_KW)) {
-        opt_role_option(p);
-        while !p.at(EOF) && p.at_ts(ROLE_OPTION_FIRST) {
-            opt_role_option(p);
-        }
+    if p.at(WITH_KW) || (p.at_ts(ROLE_OPTION_FIRST) && !p.nth_at(1, DATABASE_KW)) {
+        opt_role_option_list(p);
         return m.complete(p, ALTER_USER);
     }
     // RENAME TO new_name
@@ -7880,13 +7868,20 @@ fn alter_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     role(p);
     p.expect(SERVER_KW);
     name_ref(p);
-    if !opt_options_list(p) {
+    if !opt_alter_option_list(p) {
         p.error("expected options");
     }
     m.complete(p, ALTER_USER_MAPPING)
 }
 
-fn alter_option(p: &mut Parser<'_>) {
+const ALTER_OPTION_FIRST: TokenSet =
+    TokenSet::new(&[DROP_KW, ADD_KW, SET_KW]).union(COL_LABEL_FIRST);
+
+fn opt_alter_option(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(ALTER_OPTION_FIRST) {
+        return None;
+    }
+    let m = p.start();
     let arg_required = match p.current() {
         DROP_KW => {
             p.bump(DROP_KW);
@@ -7898,13 +7893,11 @@ fn alter_option(p: &mut Parser<'_>) {
         }
         _ => true,
     };
-    if arg_required {
-        let _ = p.eat(ADD_KW) || p.eat(SET_KW);
-    }
     col_label(p);
     if arg_required {
         string_literal(p);
     }
+    Some(m.complete(p, ALTER_OPTION))
 }
 
 // ALTER VIEW [ IF EXISTS ] name ALTER [ COLUMN ] column_name SET DEFAULT expression
@@ -7983,16 +7976,27 @@ fn analyze(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump_any();
     if !p.eat(VERBOSE_KW) {
-        if p.eat(L_PAREN) {
-            cluster_option(p);
-            while !p.at(EOF) && p.eat(COMMA) {
-                cluster_option(p);
-            }
-            p.expect(R_PAREN);
-        }
+        opt_option_list(p);
     }
     opt_relation_list(p);
     m.complete(p, ANALYZE)
+}
+
+fn opt_option_list(p: &mut Parser<'_>) {
+    if !p.at(L_PAREN) {
+        return;
+    }
+    let m = p.start();
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        OPTION_FIRST,
+        opt_option,
+    );
+    m.complete(p, OPTION_ITEM_LIST);
 }
 
 // COMMENT ON
@@ -8176,12 +8180,8 @@ fn cluster(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(CLUSTER_KW);
     if p.eat(VERBOSE_KW) {
         // pass
-    } else if p.eat(L_PAREN) {
-        cluster_option(p);
-        while !p.at(EOF) && p.eat(COMMA) {
-            cluster_option(p);
-        }
-        p.expect(R_PAREN);
+    } else {
+        opt_option_list(p);
     }
     let has_name = opt_path_name_ref(p).is_some();
     if has_name && p.eat(ON_KW) {
@@ -8193,14 +8193,19 @@ fn cluster(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, CLUSTER)
 }
 
-fn cluster_option(p: &mut Parser<'_>) {
-    // option name
-    if p.at_ts(NON_RESERVED_WORD) || p.at(ANALYSE_KW) || p.at(ANALYZE_KW) || p.at(FORMAT_KW) {
-        p.bump_any();
-    } else {
-        p.error("expected cluster option");
+const OPTION_FIRST: TokenSet =
+    TokenSet::new(&[ANALYSE_KW, ANALYZE_KW, FORMAT_KW]).union(NON_RESERVED_WORD);
+
+fn opt_option(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(OPTION_FIRST) {
+        return false;
     }
+    let m = p.start();
+    // option name
+    p.bump_any();
     opt_option_value(p);
+    m.complete(p, OPTION_ITEM);
+    true
 }
 
 // CREATE ACCESS METHOD name
@@ -8582,7 +8587,7 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
             } else {
                 name(p);
                 type_name(p);
-                opt_options_list(p);
+                opt_alter_option_list(p);
                 opt_collate(p);
                 opt_column_constraint_list(p);
             }
@@ -8595,7 +8600,7 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     }
     p.expect(SERVER_KW);
     name_ref(p);
-    opt_options_list(p);
+    opt_alter_option_list(p);
     m.complete(p, CREATE_FOREIGN_TABLE)
 }
 
@@ -8627,14 +8632,14 @@ fn create_foreign_data_wrapper(p: &mut Parser<'_>) -> CompletedMarker {
             break;
         }
     }
-    opt_options_list(p);
+    opt_alter_option_list(p);
     m.complete(p, CREATE_FOREIGN_DATA_WRAPPER)
 }
 
 fn opt_fdw_option(p: &mut Parser<'_>) -> bool {
     match p.current() {
         OPTIONS_KW => {
-            if !opt_options_list(p) {
+            if !opt_alter_option_list(p) {
                 p.error("expected options");
             }
             true
@@ -9144,7 +9149,7 @@ fn create_server(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(DATA_KW);
     p.expect(WRAPPER_KW);
     name_ref(p);
-    opt_options_list(p);
+    opt_alter_option_list(p);
     m.complete(p, CREATE_SERVER)
 }
 
@@ -9341,7 +9346,7 @@ fn create_user_mapping(p: &mut Parser<'_>) -> CompletedMarker {
     p.eat(SERVER_KW);
     // server_name
     name_ref(p);
-    opt_options_list(p);
+    opt_alter_option_list(p);
     m.complete(p, CREATE_USER_MAPPING)
 }
 
@@ -9364,6 +9369,7 @@ fn opt_role_option(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(ROLE_OPTION_FIRST) {
         return false;
     }
+    let m = p.start();
     match p.current() {
         // SUPERUSER
         // NOSUPERUSER
@@ -9424,10 +9430,12 @@ fn opt_role_option(p: &mut Parser<'_>) -> bool {
             }
         }
         _ => {
+            m.abandon(p);
             p.err_and_bump("expected role option");
             return false;
         }
     }
+    m.complete(p, ROLE_OPTION);
     true
 }
 
@@ -9461,11 +9469,13 @@ fn create_user(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn opt_role_option_list(p: &mut Parser<'_>) {
     if p.at_ts(ROLE_OPTION_FIRST) {
+        let m = p.start();
         p.eat(WITH_KW);
         opt_role_option(p);
         while !p.at(EOF) && p.at_ts(ROLE_OPTION_FIRST) {
             opt_role_option(p);
         }
+        m.complete(p, ROLE_OPTION_LIST);
     }
 }
 
@@ -10088,18 +10098,29 @@ fn explain_option(p: &mut Parser<'_>) {
 }
 
 // [ OPTIONS ( option 'value' [, ... ] ) ]
-fn opt_options_list(p: &mut Parser<'_>) -> bool {
-    if p.eat(OPTIONS_KW) {
-        p.expect(L_PAREN);
-        alter_option(p);
-        while !p.at(EOF) && p.eat(COMMA) {
-            alter_option(p);
-        }
-        p.expect(R_PAREN);
-        true
-    } else {
-        false
+fn opt_alter_option_list(p: &mut Parser<'_>) -> bool {
+    if !p.at(OPTIONS_KW) {
+        return false;
     }
+    alter_option_list(p);
+    true
+}
+
+// [ OPTIONS ( option 'value' [, ... ] ) ]
+fn alter_option_list(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(OPTIONS_KW));
+    let m = p.start();
+    p.expect(OPTIONS_KW);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "expected alter option".to_string(),
+        EXPR_FIRST,
+        |p| opt_alter_option(p).is_some(),
+    );
+    m.complete(p, ALTER_OPTION_LIST)
 }
 
 // IMPORT FOREIGN SCHEMA remote_schema
@@ -10134,7 +10155,7 @@ fn import_foreign_schema(p: &mut Parser<'_>) -> CompletedMarker {
     // INTO local_schema
     p.expect(INTO_KW);
     name_ref(p);
-    opt_options_list(p);
+    opt_alter_option_list(p);
     m.complete(p, IMPORT_FOREIGN_SCHEMA)
 }
 
@@ -13357,20 +13378,22 @@ const ALTER_TABLE_ACTION_FIRST: TokenSet = TokenSet::new(&[
     OPTIONS_KW,
 ]);
 
-fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
+fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if !p.at_ts(ALTER_TABLE_ACTION_FIRST) {
         return None;
     }
-    let kind = match p.current() {
+    let cm = match p.current() {
         // VALIDATE CONSTRAINT constraint_name
         VALIDATE_KW => {
+            let m = p.start();
             p.bump(VALIDATE_KW);
             p.expect(CONSTRAINT_KW);
             name_ref(p);
-            VALIDATE_CONSTRAINT
+            m.complete(p, VALIDATE_CONSTRAINT)
         }
         // REPLICA IDENTITY { DEFAULT | USING INDEX index_name | FULL | NOTHING }
         REPLICA_KW => {
+            let m = p.start();
             p.bump(REPLICA_KW);
             p.expect(IDENTITY_KW);
             if !p.eat(DEFAULT_KW) && !p.eat(FULL_KW) && !p.eat(NOTHING_KW) {
@@ -13378,49 +13401,55 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 p.expect(INDEX_KW);
                 name_ref(p);
             }
-            REPLICA_IDENTITY
+            m.complete(p, REPLICA_IDENTITY)
         }
         // OF type_name
         OF_KW => {
+            let m = p.start();
             p.bump(OF_KW);
             simple_type_name(p);
-            OF_TYPE
+            m.complete(p, OF_TYPE)
         }
         // NOT OF
         NOT_KW if p.nth_at(1, OF_KW) => {
+            let m = p.start();
             p.bump(NOT_KW);
             p.bump(OF_KW);
-            NOT_OF
+            m.complete(p, NOT_OF)
         }
         // FORCE ROW LEVEL SECURITY
         FORCE_KW => {
+            let m = p.start();
             p.bump(FORCE_KW);
             p.expect(ROW_KW);
             p.expect(LEVEL_KW);
             p.expect(SECURITY_KW);
-            FORCE_RLS
+            m.complete(p, FORCE_RLS)
         }
         // NO FORCE ROW LEVEL SECURITY
         NO_KW if p.nth_at(1, FORCE_KW) => {
+            let m = p.start();
             p.bump(NO_KW);
             p.bump(FORCE_KW);
             p.expect(ROW_KW);
             p.expect(LEVEL_KW);
             p.expect(SECURITY_KW);
-            NO_FORCE_RLS
+            m.complete(p, NO_FORCE_RLS)
         }
         // INHERIT parent_table
         INHERIT_KW => {
+            let m = p.start();
             p.bump(INHERIT_KW);
             path_name_ref(p);
-            INHERIT
+            m.complete(p, INHERIT)
         }
         // NO INHERIT parent_table
         NO_KW if p.nth_at(1, INHERIT_KW) => {
+            let m = p.start();
             p.bump(NO_KW);
             p.bump(INHERIT_KW);
             path_name_ref(p);
-            NO_INHERIT
+            m.complete(p, NO_INHERIT)
         }
         // ENABLE TRIGGER [ trigger_name | ALL | USER ]
         // ENABLE REPLICA TRIGGER trigger_name
@@ -13430,8 +13459,9 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         // ENABLE RULE rewrite_rule_name
         // ENABLE ROW LEVEL SECURITY
         ENABLE_KW => {
+            let m = p.start();
             p.bump(ENABLE_KW);
-            match p.current() {
+            let kind = match p.current() {
                 TRIGGER_KW => {
                     p.bump(TRIGGER_KW);
                     if !p.eat(ALL_KW) && !p.eat(USER_KW) {
@@ -13477,14 +13507,16 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                     // TODO: just picking something for now
                     ENABLE_RLS
                 }
-            }
+            };
+            m.complete(p, kind)
         }
         // DISABLE TRIGGER [ trigger_name | ALL | USER ]
         // DISABLE RULE rewrite_rule_name
         // DISABLE ROW LEVEL SECURITY
         DISABLE_KW => {
+            let m = p.start();
             p.bump(DISABLE_KW);
-            match p.current() {
+            let kind = match p.current() {
                 TRIGGER_KW => {
                     p.bump(TRIGGER_KW);
                     if !p.eat(ALL_KW) && !p.eat(USER_KW) {
@@ -13508,23 +13540,27 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                     // TODO: just picking something for now
                     DISABLE_RULE
                 }
-            }
+            };
+            m.complete(p, kind)
         }
         // CLUSTER ON index_name
         CLUSTER_KW => {
+            let m = p.start();
             p.bump(CLUSTER_KW);
             p.bump(ON_KW);
             name_ref(p);
-            CLUSTER_ON
+            m.complete(p, CLUSTER_ON)
         }
         // OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
         OWNER_KW => {
+            let m = p.start();
             p.bump(OWNER_KW);
             p.bump(TO_KW);
             role(p);
-            OWNER_TO
+            m.complete(p, OWNER_TO)
         }
         DETACH_KW => {
+            let m = p.start();
             p.bump(DETACH_KW);
             p.expect(PARTITION_KW);
             // partition_name
@@ -13533,11 +13569,12 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             if !p.eat(CONCURRENTLY_KW) {
                 p.eat(FINALIZE_KW);
             }
-            DETACH_PARTITION
+            m.complete(p, DETACH_PARTITION)
         }
         // DROP [ COLUMN ] [ IF EXISTS ] column_name [ RESTRICT | CASCADE ]
         // DROP CONSTRAINT [ IF EXISTS ] constraint_name [ RESTRICT | CASCADE ]
         DROP_KW => {
+            let m = p.start();
             p.bump(DROP_KW);
             // CONSTRAINT [ IF EXISTS ] constraint_name [ RESTRICT | CASCADE ]
             let kind = if p.eat(CONSTRAINT_KW) {
@@ -13552,7 +13589,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 DROP_COLUMN
             };
             opt_cascade_or_restrict(p);
-            kind
+            m.complete(p, kind)
         }
         // ADD [ COLUMN ] [ IF NOT EXISTS ] column_name data_type [ COLLATE collation ] [ column_constraint [ ... ] ]
         // ADD table_constraint [ NOT VALID ]
@@ -13576,8 +13613,9 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         //   { UNIQUE | PRIMARY KEY } USING INDEX index_name
         //   [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
         ADD_KW => {
+            let m = p.start();
             p.bump(ADD_KW);
-            if p.at_ts(TABLE_CONSTRAINT_FIRST) {
+            let kind = if p.at_ts(TABLE_CONSTRAINT_FIRST) {
                 // at table_constraint or table_constraint_using_index
                 table_constraint(p);
                 ADD_CONSTRAINT
@@ -13589,21 +13627,23 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 // column_name
                 name_ref(p);
                 type_name(p);
-                opt_options_list(p);
+                opt_alter_option_list(p);
                 opt_collate(p);
                 opt_column_constraint_list(p);
                 ADD_COLUMN
-            }
+            };
+            m.complete(p, kind)
         }
         // ATTACH PARTITION partition_name { FOR VALUES partition_bound_spec | DEFAULT }
         ATTACH_KW => {
+            let m = p.start();
             p.bump(ATTACH_KW);
             p.expect(PARTITION_KW);
             // name
             path_name_ref(p);
             // { FOR VALUES partition_bound_spec | DEFAULT }
             partition_option(p);
-            ATTACH_PARTITION
+            m.complete(p, ATTACH_PARTITION)
         }
         // SET SCHEMA new_schema
         // SET TABLESPACE new_tablespace [ NOWAIT ]
@@ -13613,9 +13653,10 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         // SET { LOGGED | UNLOGGED }
         // SET ( storage_parameter [= value] [, ... ] )
         SET_KW => {
+            let m = p.start();
             p.expect(SET_KW);
             // SET SCHEMA new_schema
-            if p.eat(SCHEMA_KW) {
+            let kind = if p.eat(SCHEMA_KW) {
                 // name
                 name_ref(p);
                 SET_SCHEMA
@@ -13652,20 +13693,23 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             } else {
                 attribute_list(p);
                 SET_STORAGE_PARAMS
-            }
+            };
+            m.complete(p, kind)
         }
         RESET_KW => {
+            let m = p.start();
             p.bump(RESET_KW);
             attribute_list(p);
-            RESET_STORAGE_PARAMS
+            m.complete(p, RESET_STORAGE_PARAMS)
         }
         // RENAME CONSTRAINT constraint_name TO new_constraint_name
         // RENAME [ COLUMN ] column_name TO new_column_name
         // RENAME TO new_name
         RENAME_KW => {
+            let m = p.start();
             p.expect(RENAME_KW);
             // TO new_name
-            if p.eat(TO_KW) {
+            let kind = if p.eat(TO_KW) {
                 // name
                 name_ref(p);
                 RENAME_TABLE
@@ -13688,7 +13732,8 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 // name
                 name_ref(p);
                 RENAME_COLUMN
-            }
+            };
+            m.complete(p, kind)
         }
         // ALTER [ COLUMN ] column_name [ SET DATA ] TYPE data_type [ COLLATE collation ] [ USING expression ]
         // ALTER [ COLUMN ] column_name SET DEFAULT expression
@@ -13706,9 +13751,10 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         // ALTER [ COLUMN ] column_name SET COMPRESSION compression_method
         // ALTER CONSTRAINT constraint_name [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
         ALTER_KW => {
+            let m = p.start();
             p.bump(ALTER_KW);
             // ALTER CONSTRAINT constraint_name [ DEFERRABLE | NOT DEFERRABLE ] [ INITIALLY DEFERRED | INITIALLY IMMEDIATE ]
-            if p.eat(CONSTRAINT_KW) {
+            let kind = if p.eat(CONSTRAINT_KW) {
                 name_ref(p);
                 opt_constraint_option_list(p);
                 ALTER_CONSTRAINT
@@ -13727,17 +13773,13 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                     m.abandon(p);
                 }
                 ALTER_COLUMN
-            }
+            };
+            m.complete(p, kind)
         }
-        OPTIONS_KW => {
-            if !opt_options_list(p) {
-                p.error("expected options list");
-            }
-            OPTIONS_LIST
-        }
+        OPTIONS_KW => alter_option_list(p),
         _ => return None,
     };
-    Some(kind)
+    Some(cm)
 }
 
 // /* Column label --- allowed labels in "AS" clauses.
@@ -13954,7 +13996,7 @@ fn alter_column_option(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         }
         // OPTIONS ( [ ADD | SET | DROP ] option ['value'] [, ... ])
         OPTIONS_KW => {
-            if !opt_options_list(p) {
+            if !opt_alter_option_list(p) {
                 p.error("expected options");
             }
             SET_OPTIONS_LIST

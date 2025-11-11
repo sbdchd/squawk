@@ -3191,45 +3191,51 @@ SOURCE_FILE
     NAME_REF
       IDENT "wasm_wrapper"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n    "
-    NAME
-      IDENT "fdw_package_url"
-    WHITESPACE " "
-    LITERAL
-      STRING "'https://github.com/supabase/wrappers/releases/download/wasm_cal_fdw_v0.1.0/cal_fdw.wasm'"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "fdw_package_name"
-    WHITESPACE " "
-    LITERAL
-      STRING "'supabase:cal-fdw'"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "fdw_package_version"
-    WHITESPACE " "
-    LITERAL
-      STRING "'0.1.0'"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "fdw_package_checksum"
-    WHITESPACE " "
-    LITERAL
-      STRING "'4afe4fac8c51f2caa1de8483b3817d2cec3a14cd8a65a3942c8b4ff6c430f08a'"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "api_key"
-    WHITESPACE " "
-    LITERAL
-      STRING "'<your Cal.com API key>'"
-    WHITESPACE "\n  "
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n    "
+      ALTER_OPTION
+        NAME
+          IDENT "fdw_package_url"
+        WHITESPACE " "
+        LITERAL
+          STRING "'https://github.com/supabase/wrappers/releases/download/wasm_cal_fdw_v0.1.0/cal_fdw.wasm'"
+      COMMA ","
+      WHITESPACE "\n    "
+      ALTER_OPTION
+        NAME
+          IDENT "fdw_package_name"
+        WHITESPACE " "
+        LITERAL
+          STRING "'supabase:cal-fdw'"
+      COMMA ","
+      WHITESPACE "\n    "
+      ALTER_OPTION
+        NAME
+          IDENT "fdw_package_version"
+        WHITESPACE " "
+        LITERAL
+          STRING "'0.1.0'"
+      COMMA ","
+      WHITESPACE "\n    "
+      ALTER_OPTION
+        NAME
+          IDENT "fdw_package_checksum"
+        WHITESPACE " "
+        LITERAL
+          STRING "'4afe4fac8c51f2caa1de8483b3817d2cec3a14cd8a65a3942c8b4ff6c430f08a'"
+      COMMA ","
+      WHITESPACE "\n    "
+      ALTER_OPTION
+        NAME
+          IDENT "api_key"
+        WHITESPACE " "
+        LITERAL
+          STRING "'<your Cal.com API key>'"
+      WHITESPACE "\n  "
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_SCHEMA
@@ -3283,17 +3289,19 @@ SOURCE_FILE
     NAME_REF
       IDENT "cal_server"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n    "
-    NAME
-      OBJECT_KW "object"
-    WHITESPACE " "
-    LITERAL
-      STRING "'event-types'"
-    WHITESPACE "\n  "
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n    "
+      ALTER_OPTION
+        NAME
+          OBJECT_KW "object"
+        WHITESPACE " "
+        LITERAL
+          STRING "'event-types'"
+      WHITESPACE "\n  "
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_FOREIGN_TABLE
@@ -3331,24 +3339,27 @@ SOURCE_FILE
     NAME_REF
       IDENT "cal_server"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n    "
-    NAME
-      OBJECT_KW "object"
-    WHITESPACE " "
-    LITERAL
-      STRING "'bookings'"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "rowid_column"
-    WHITESPACE " "
-    LITERAL
-      STRING "'attrs'"
-    WHITESPACE "\n  "
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      WHITESPACE "\n    "
+      ALTER_OPTION
+        NAME
+          OBJECT_KW "object"
+        WHITESPACE " "
+        LITERAL
+          STRING "'bookings'"
+      COMMA ","
+      WHITESPACE "\n    "
+      ALTER_OPTION
+        NAME
+          IDENT "rowid_column"
+        WHITESPACE " "
+        LITERAL
+          STRING "'attrs'"
+      WHITESPACE "\n  "
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract event types"
@@ -4368,14 +4379,16 @@ SOURCE_FILE
     NAME_REF
       IDENT "cstore_server"
     WHITESPACE "\n"
-    OPTIONS_KW "OPTIONS"
-    L_PAREN "("
-    NAME
-      COMPRESSION_KW "compression"
-    WHITESPACE " "
-    LITERAL
-      STRING "'pglz'"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "OPTIONS"
+      L_PAREN "("
+      ALTER_OPTION
+        NAME
+          COMPRESSION_KW "compression"
+        WHITESPACE " "
+        LITERAL
+          STRING "'pglz'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION
@@ -4437,15 +4450,17 @@ SOURCE_FILE
     NAME_REF
       IDENT "parquet_server"
     WHITESPACE "\n"
-    OPTIONS_KW "OPTIONS"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "files"
-    WHITESPACE " "
-    LITERAL
-      STRING "'s3://bucket/metrics/*.parquet'"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "OPTIONS"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        NAME
+          IDENT "files"
+        WHITESPACE " "
+        LITERAL
+          STRING "'s3://bucket/metrics/*.parquet'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_EXTENSION

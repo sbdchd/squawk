@@ -34,13 +34,14 @@ use squawk_syntax::{
 };
 
 const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
+    SyntaxKind::ALTER_OPTION_LIST,
     SyntaxKind::ARG_LIST,
     SyntaxKind::ATTRIBUTE_LIST,
     SyntaxKind::COLUMN_LIST,
     SyntaxKind::CONSTRAINT_EXCLUSION_LIST,
     SyntaxKind::GROUP_BY_LIST,
     SyntaxKind::JSON_TABLE_COLUMN_LIST,
-    SyntaxKind::OPTIONS_LIST,
+    SyntaxKind::OPTION_ITEM_LIST,
     SyntaxKind::PARAM_LIST,
     SyntaxKind::PARTITION_ITEM_LIST,
     SyntaxKind::ROW_LIST,
@@ -546,6 +547,7 @@ $0
     fn list_variants() {
         let delimited_ws_list_kinds = &[
             SyntaxKind::FUNC_OPTION_LIST,
+            SyntaxKind::ROLE_OPTION_LIST,
             SyntaxKind::SEQUENCE_OPTION_LIST,
             SyntaxKind::XML_COLUMN_OPTION_LIST,
             SyntaxKind::WHEN_CLAUSE_LIST,

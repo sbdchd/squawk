@@ -14,12 +14,14 @@ SOURCE_FILE
   CLUSTER
     CLUSTER_KW "cluster"
     WHITESPACE " "
-    L_PAREN "("
-    VERBOSE_KW "verbose"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    R_PAREN ")"
+    OPTION_ITEM_LIST
+      L_PAREN "("
+      OPTION_ITEM
+        VERBOSE_KW "verbose"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      R_PAREN ")"
     WHITESPACE " "
     PATH
       PATH
@@ -42,12 +44,14 @@ SOURCE_FILE
   CLUSTER
     CLUSTER_KW "cluster"
     WHITESPACE " "
-    L_PAREN "("
-    VERBOSE_KW "verbose"
-    WHITESPACE " "
-    LITERAL
-      FALSE_KW "false"
-    R_PAREN ")"
+    OPTION_ITEM_LIST
+      L_PAREN "("
+      OPTION_ITEM
+        VERBOSE_KW "verbose"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_14"

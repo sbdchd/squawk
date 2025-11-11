@@ -64,21 +64,24 @@ SOURCE_FILE
     WHITESPACE " "
     VALIDATOR_KW "validator"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME
-      IDENT "a"
-    WHITESPACE " "
-    LITERAL
-      STRING "'foo'"
-    COMMA ","
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    WHITESPACE " "
-    LITERAL
-      STRING "'bar'"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        LITERAL
+          STRING "'foo'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        LITERAL
+          STRING "'bar'"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

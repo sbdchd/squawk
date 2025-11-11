@@ -505,11 +505,13 @@ AlterTableAction =
 | RenameColumn
 | AlterConstraint
 | AlterColumn
-| OptionsList
+| OptionItemList
 
-OptionsList =
- 'option' '(' ')'
+OptionItemList =
+ '(' (OptionItem (',' OptionItem)*) ')'
 
+OptionItem =
+ ('default' | Expr)
 
 RelationName =
   'only' ( '(' Path ')' | Path )
@@ -1283,7 +1285,15 @@ AlterStatistics =
   'alter' 'statistics' NameRef
 
 AlterServer =
-  'alter' 'server' NameRef
+  'alter' 'server' NameRef AlterOptionList
+
+AlterOptionList =
+  AlterOption (',' AlterOption)*
+
+AlterOption =
+  'add' NameRef Literal
+| 'set' NameRef Literal
+| 'drop' NameRef
 
 AlterSequence =
   'alter' 'sequence' NameRef
@@ -1400,7 +1410,7 @@ AlterView =
   'alter' 'view' NameRef
 
 Analyze =
-  'analyze' 'verbose'?
+  'analyze' 'verbose'? OptionItemList
 
 // suffix it with `On` to avoid conflicting with comment nodes
 CommentOn =
@@ -1437,7 +1447,13 @@ CreateForeignTable =
   'create' 'foreign' 'table' IfNotExists?
 
 CreateGroup =
-  'create' 'group' NameRef
+  'create' 'group' NameRef RoleOptionList
+
+RoleOptionList =
+  'with'? RoleOption*
+
+RoleOption =
+  'inherit'
 
 CreateLanguage =
   'create' 'language' NameRef

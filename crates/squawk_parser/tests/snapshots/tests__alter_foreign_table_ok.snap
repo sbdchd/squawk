@@ -935,38 +935,43 @@ SOURCE_FILE
       IDENT "c"
       WHITESPACE " "
       SET_OPTIONS_LIST
-        OPTIONS_KW "options"
-        L_PAREN "("
-        NAME
-          IDENT "b"
-        WHITESPACE " "
-        LITERAL
-          STRING "''"
-        COMMA ","
-        WHITESPACE " "
-        ADD_KW "add"
-        WHITESPACE " "
-        NAME
-          IDENT "c"
-        WHITESPACE " "
-        LITERAL
-          STRING "'c'"
-        COMMA ","
-        WHITESPACE " "
-        SET_KW "set"
-        WHITESPACE " "
-        NAME
-          IDENT "x"
-        WHITESPACE " "
-        LITERAL
-          STRING "''"
-        COMMA ","
-        WHITESPACE " "
-        DROP_KW "drop"
-        WHITESPACE " "
-        NAME
-          IDENT "x"
-        R_PAREN ")"
+        ALTER_OPTION_LIST
+          OPTIONS_KW "options"
+          L_PAREN "("
+          ALTER_OPTION
+            NAME
+              IDENT "b"
+            WHITESPACE " "
+            LITERAL
+              STRING "''"
+          COMMA ","
+          WHITESPACE " "
+          ALTER_OPTION
+            ADD_KW "add"
+            WHITESPACE " "
+            NAME
+              IDENT "c"
+            WHITESPACE " "
+            LITERAL
+              STRING "'c'"
+          COMMA ","
+          WHITESPACE " "
+          ALTER_OPTION
+            SET_KW "set"
+            WHITESPACE " "
+            NAME
+              IDENT "x"
+            WHITESPACE " "
+            LITERAL
+              STRING "''"
+          COMMA ","
+          WHITESPACE " "
+          ALTER_OPTION
+            DROP_KW "drop"
+            WHITESPACE " "
+            NAME
+              IDENT "x"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   ALTER_FOREIGN_TABLE
@@ -988,16 +993,18 @@ SOURCE_FILE
       IDENT "c"
       WHITESPACE " "
       SET_OPTIONS_LIST
-        OPTIONS_KW "options"
-        L_PAREN "("
-        SET_KW "set"
-        WHITESPACE " "
-        NAME
-          IDENT "x"
-        WHITESPACE " "
-        LITERAL
-          STRING "''"
-        R_PAREN ")"
+        ALTER_OPTION_LIST
+          OPTIONS_KW "options"
+          L_PAREN "("
+          ALTER_OPTION
+            SET_KW "set"
+            WHITESPACE " "
+            NAME
+              IDENT "x"
+            WHITESPACE " "
+            LITERAL
+              STRING "''"
+          R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- action_add_table_constraint"

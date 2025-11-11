@@ -21,31 +21,35 @@ SOURCE_FILE
     NAME_REF
       IDENT "s"
     WHITESPACE "\n    "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    ADD_KW "add"
-    WHITESPACE " "
-    NAME
-      IDENT "a"
-    WHITESPACE " "
-    LITERAL
-      STRING "'v'"
-    COMMA ","
-    WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    NAME
-      IDENT "b"
-    WHITESPACE " "
-    LITERAL
-      STRING "'w'"
-    COMMA ","
-    WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    NAME
-      IDENT "c"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        ADD_KW "add"
+        WHITESPACE " "
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        LITERAL
+          STRING "'v'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        LITERAL
+          STRING "'w'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        DROP_KW "drop"
+        WHITESPACE " "
+        NAME
+          IDENT "c"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

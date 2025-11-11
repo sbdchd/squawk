@@ -99,32 +99,36 @@ SOURCE_FILE
     NAME_REF
       IDENT "w"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    ADD_KW "add"
-    WHITESPACE " "
-    NAME
-      IDENT "o"
-    WHITESPACE " "
-    LITERAL
-      STRING "'v'"
-    COMMA ","
-    WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    NAME
-      IDENT "o"
-    WHITESPACE " "
-    LITERAL
-      STRING "'v'"
-    COMMA ","
-    WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    NAME
-      IDENT "o"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        ADD_KW "add"
+        WHITESPACE " "
+        NAME
+          IDENT "o"
+        WHITESPACE " "
+        LITERAL
+          STRING "'v'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        NAME
+          IDENT "o"
+        WHITESPACE " "
+        LITERAL
+          STRING "'v'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        DROP_KW "drop"
+        WHITESPACE " "
+        NAME
+          IDENT "o"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- multiple"
@@ -173,32 +177,36 @@ SOURCE_FILE
     WHITESPACE " "
     VALIDATOR_KW "validator"
     WHITESPACE "\n  "
-    OPTIONS_KW "options"
-    WHITESPACE " "
-    L_PAREN "("
-    ADD_KW "add"
-    WHITESPACE " "
-    NAME
-      IDENT "o"
-    WHITESPACE " "
-    LITERAL
-      STRING "'v'"
-    COMMA ","
-    WHITESPACE " "
-    SET_KW "set"
-    WHITESPACE " "
-    NAME
-      IDENT "o"
-    WHITESPACE " "
-    LITERAL
-      STRING "''"
-    COMMA ","
-    WHITESPACE " "
-    DROP_KW "drop"
-    WHITESPACE " "
-    NAME
-      IDENT "d"
-    R_PAREN ")"
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ALTER_OPTION
+        ADD_KW "add"
+        WHITESPACE " "
+        NAME
+          IDENT "o"
+        WHITESPACE " "
+        LITERAL
+          STRING "'v'"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        SET_KW "set"
+        WHITESPACE " "
+        NAME
+          IDENT "o"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      COMMA ","
+      WHITESPACE " "
+      ALTER_OPTION
+        DROP_KW "drop"
+        WHITESPACE " "
+        NAME
+          IDENT "d"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- owner"
