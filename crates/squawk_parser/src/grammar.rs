@@ -612,19 +612,22 @@ fn json_table_column_list(p: &mut Parser<'_>) {
     if p.at(COLUMNS_KW) {
         let m = p.start();
         p.bump(COLUMNS_KW);
-        p.expect(L_PAREN);
-        while !p.at(EOF) {
-            json_table_column(p);
-            if !p.eat(COMMA) {
-                break;
-            }
-        }
-        p.expect(R_PAREN);
+        delimited(
+            p,
+            L_PAREN,
+            R_PAREN,
+            COMMA,
+            || "unexpected comma".to_string(),
+            JSON_TABLE_COLUMN_FIRST,
+            opt_json_table_column,
+        );
         m.complete(p, JSON_TABLE_COLUMN_LIST);
     } else {
         p.error("expected json table columns");
     }
 }
+
+const JSON_TABLE_COLUMN_FIRST: TokenSet = TokenSet::new(&[NESTED_KW]).union(NAME_FIRST);
 
 // where json_table_column is:
 //   | name FOR ORDINALITY
@@ -638,7 +641,10 @@ fn json_table_column_list(p: &mut Parser<'_>) {
 //   | name type EXISTS [ PATH path_expression ]
 //         [ { ERROR | TRUE | FALSE | UNKNOWN } ON ERROR ]
 //   | NESTED [ PATH ] path_expression [ AS json_path_name ] COLUMNS ( json_table_column [, ...] )
-fn json_table_column(p: &mut Parser<'_>) {
+fn opt_json_table_column(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(JSON_TABLE_COLUMN_FIRST) {
+        return false;
+    }
     let m = p.start();
     // NESTED [ PATH ] path_expression [ AS json_path_name ] COLUMNS ( json_table_column [, ...] )
     if p.eat(NESTED_KW) {
@@ -684,6 +690,7 @@ fn json_table_column(p: &mut Parser<'_>) {
         }
     }
     m.complete(p, JSON_TABLE_COLUMN);
+    true
 }
 
 // json_array (
@@ -940,6 +947,7 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
         col_label(p);
         if p.eat(COMMA) {
             if p.eat(XMLATTRIBUTES_KW) {
+                // TODO: use delimited
                 p.expect(L_PAREN);
                 xml_attribute_list(p);
                 p.expect(R_PAREN);
@@ -954,6 +962,7 @@ fn xmlelement_fn(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn xml_attribute_list(p: &mut Parser<'_>) {
+    // TODO: use delimited
     while !p.at(EOF) && !p.at(R_PAREN) {
         if expr(p).is_none() {
             p.error("expected expression");
@@ -967,6 +976,7 @@ fn xml_attribute_list(p: &mut Parser<'_>) {
     }
 }
 
+// XMLFOREST '(' xml_attribute_list ')'
 fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(XMLFOREST_KW));
     custom_fn(p, XMLFOREST_KW, |p| {
@@ -1720,6 +1730,23 @@ fn char_type(p: &mut Parser<'_>) -> SyntaxKind {
     p.eat(VARYING_KW);
     CHAR_TYPE
 }
+
+const TYPE_NAME_FIRST: TokenSet = TokenSet::new(&[
+    BIT_KW,
+    NATIONAL_KW,
+    CHARACTER_KW,
+    CHAR_KW,
+    NCHAR_KW,
+    VARCHAR_KW,
+    TIMESTAMP_KW,
+    TIME_KW,
+    INTERVAL_KW,
+    DOUBLE_KW,
+    GENERATED_KW,
+    IDENT,
+])
+.union(TYPE_KEYWORDS);
+
 /*
 SimpleTypename ('[' (Iconst) ']')
 SET OF SimpleTypename ('[' (Iconst) ']')
@@ -1742,6 +1769,9 @@ SimpleTypename is:
 */
 #[must_use]
 fn opt_type_name_with(p: &mut Parser<'_>, type_args_enabled: bool) -> Option<CompletedMarker> {
+    if !p.at_ts(TYPE_NAME_FIRST) {
+        return None;
+    }
     let m = p.start();
     let wrapper_type = match p.current() {
         BIT_KW => {
@@ -3051,14 +3081,15 @@ fn data_source(p: &mut Parser<'_>) {
         ROWS_KW if p.nth_at(1, FROM_KW) => {
             p.bump(ROWS_KW);
             p.expect(FROM_KW);
-            p.expect(L_PAREN);
-            call_expr(p);
-            opt_alias(p);
-            while !p.at(EOF) && p.eat(COMMA) {
-                call_expr(p);
-                opt_alias(p);
-            }
-            p.expect(R_PAREN);
+            delimited(
+                p,
+                L_PAREN,
+                R_PAREN,
+                COMMA,
+                || "unexpected comma".to_string(),
+                EXPR_FIRST,
+                opt_row_from_expr,
+            );
             // [ WITH ORDINALITY ]
             if p.eat(WITH_KW) {
                 p.expect(ORDINALITY_KW);
@@ -3077,6 +3108,15 @@ fn data_source(p: &mut Parser<'_>) {
             p.error("expected table reference");
         }
     }
+}
+
+fn opt_row_from_expr(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(EXPR_FIRST) {
+        return false;
+    }
+    call_expr(p);
+    opt_alias(p);
+    true
 }
 
 fn xmltable_column_list(p: &mut Parser<'_>) {
@@ -3427,7 +3467,7 @@ enum ColumnDefKind {
 fn opt_column_list_with(p: &mut Parser<'_>, kind: ColumnDefKind) -> bool {
     if !p.at(L_PAREN) ||
         // we're probably at (select)
-        !p.nth_at_ts(1, COLUMN_FIRST)
+        !p.nth_at_ts(1, COLUMN_FIRST) && !p.nth_at(1, R_PAREN)
     {
         return false;
     }
@@ -4236,6 +4276,7 @@ fn opt_col_def(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         opt_compression_method(p);
     }
     opt_with_options(p);
+    opt_alter_option_list(p);
     opt_collate(p);
     opt_column_constraint_list(p);
     Some(m.complete(p, COLUMN))
@@ -8557,45 +8598,16 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     if p.eat(PARTITION_KW) {
         p.expect(OF_KW);
         path_name_ref(p);
-        if p.eat(L_PAREN) {
-            if p.at_ts(TABLE_CONSTRAINT_FIRST) {
-                table_constraint(p);
-            } else {
-                name_ref(p);
-                opt_with_options(p);
-                opt_column_constraint_list(p);
-            }
-            while !p.at(EOF) && p.eat(COMMA) {
-                if p.at_ts(TABLE_CONSTRAINT_FIRST) {
-                    table_constraint(p);
-                } else {
-                    name_ref(p);
-                    opt_with_options(p);
-                    opt_column_constraint_list(p);
-                }
-            }
-            p.expect(R_PAREN);
+        if p.at(L_PAREN) {
+            table_arg_list(p);
         }
         partition_option(p);
     } else {
-        p.expect(L_PAREN);
-        while !p.at(EOF) && !p.at(R_PAREN) {
-            if p.at_ts(TABLE_CONSTRAINT_FIRST) {
-                table_constraint(p);
-            } else if p.at(LIKE_KW) {
-                like_clause(p);
-            } else {
-                name(p);
-                type_name(p);
-                opt_alter_option_list(p);
-                opt_collate(p);
-                opt_column_constraint_list(p);
-            }
-            if !p.eat(COMMA) {
-                break;
-            }
+        if p.at(L_PAREN) {
+            table_arg_list(p);
+        } else {
+            p.error("expected table arg list");
         }
-        p.expect(R_PAREN);
         opt_inherits_tables(p);
     }
     p.expect(SERVER_KW);
@@ -8833,13 +8845,7 @@ fn operator_class_option(p: &mut Parser<'_>) {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected number");
             }
-            if p.eat(L_PAREN) {
-                type_name(p);
-                while !p.at(EOF) && p.eat(COMMA) {
-                    type_name(p);
-                }
-                p.expect(R_PAREN);
-            }
+            opt_type_name_list(p);
             path_name_ref(p);
             opt_param_list(p);
         }
@@ -8860,13 +8866,7 @@ fn operator_drop_class_option(p: &mut Parser<'_>) {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected number");
             }
-            if p.eat(L_PAREN) {
-                type_name(p);
-                while !p.at(EOF) && !p.at(R_PAREN) && p.eat(COMMA) {
-                    type_name(p);
-                }
-                p.expect(R_PAREN);
-            }
+            opt_type_name_list(p);
         }
         _ => p.error("expected OPERATOR, or FUNCTION"),
     }
@@ -9089,6 +9089,7 @@ fn create_rule(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(DO_KW);
     let _ = p.eat(ALSO_KW) || p.eat(INSTEAD_KW);
     if p.eat(L_PAREN) {
+        // TODO: use delimited
         // ( command ; command ... )
         while !p.at(EOF) && !p.at(R_PAREN) {
             select_insert_delete_update_or_notify(p);
@@ -10025,12 +10026,8 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(EXPLAIN_KW);
     let pre_pg_9_syntax = p.eat(ANALYZE_KW) || p.eat(VERBOSE_KW);
-    if !pre_pg_9_syntax && p.eat(L_PAREN) {
-        explain_option(p);
-        while !p.at(EOF) && p.eat(COMMA) {
-            explain_option(p);
-        }
-        p.expect(R_PAREN);
+    if !pre_pg_9_syntax {
+        opt_explain_option_list(p);
     }
     // statement is SELECT, INSERT, UPDATE, DELETE, MERGE, VALUES, EXECUTE, DECLARE, CREATE TABLE AS, or CREATE MATERIALIZED VIEW AS
     let statement = stmt(p, &StmtRestrictions::default());
@@ -10062,6 +10059,24 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, EXPLAIN)
 }
 
+fn opt_explain_option_list(p: &mut Parser<'_>) {
+    if !p.at(L_PAREN) {
+        return;
+    }
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        EXPLAIN_OPTION_FIRST,
+        opt_explain_option,
+    );
+}
+
+const EXPLAIN_OPTION_FIRST: TokenSet =
+    TokenSet::new(&[ANALYZE_KW, ANALYSE_KW, VERBOSE_KW, IDENT, FORMAT_KW]);
+
 // where option can be one of:
 //     ANALYZE [ boolean ]
 //     VERBOSE [ boolean ]
@@ -10075,26 +10090,25 @@ fn explain(p: &mut Parser<'_>) -> CompletedMarker {
 //     SUMMARY [ boolean ]
 //     MEMORY [ boolean ]
 //     FORMAT { TEXT | XML | JSON | YAML }
-fn explain_option(p: &mut Parser<'_>) {
+fn opt_explain_option(p: &mut Parser<'_>) -> bool {
     // TODO: we need a validation run for this since we're using IDENT
-    match p.current() {
-        ANALYZE_KW | VERBOSE_KW | IDENT | FORMAT_KW => {
-            p.bump_any();
-            //  WAL [ boolean ]
-            if opt_bool_literal(p) {
-                return;
-            }
-            // [ { NONE | TEXT | BINARY } ]
-            if p.eat(NONE_KW) || p.eat(TEXT_KW) || p.eat(BINARY_KW) {
-                return;
-            }
-            // { TEXT | XML | JSON | YAML }
-            if p.eat(TEXT_KW) || p.eat(XML_KW) || p.eat(JSON_KW) || opt_ident(p) {
-                return;
-            }
-        }
-        _ => p.error("expected option name"),
+    if !p.at_ts(EXPLAIN_OPTION_FIRST) {
+        return false;
     }
+    p.bump_any();
+    //  WAL [ boolean ]
+    if opt_bool_literal(p) {
+        return true;
+    }
+    // [ { NONE | TEXT | BINARY } ]
+    if p.eat(NONE_KW) || p.eat(TEXT_KW) || p.eat(BINARY_KW) {
+        return true;
+    }
+    // { TEXT | XML | JSON | YAML }
+    if p.eat(TEXT_KW) || p.eat(XML_KW) || p.eat(JSON_KW) || opt_ident(p) {
+        return true;
+    }
+    true
 }
 
 // [ OPTIONS ( option 'value' [, ... ] ) ]
@@ -11155,12 +11169,7 @@ fn execute(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, EXECUTE)
 }
 
-// PREPARE name [ ( data_type [, ...] ) ] AS statement
-fn prepare(p: &mut Parser<'_>) -> CompletedMarker {
-    assert!(p.at(PREPARE_KW));
-    let m = p.start();
-    p.bump(PREPARE_KW);
-    name(p);
+fn opt_type_name_list(p: &mut Parser<'_>) {
     if p.at(L_PAREN) {
         delimited(
             p,
@@ -11172,6 +11181,15 @@ fn prepare(p: &mut Parser<'_>) -> CompletedMarker {
             opt_type_name,
         );
     }
+}
+
+// PREPARE name [ ( data_type [, ...] ) ] AS statement
+fn prepare(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(PREPARE_KW));
+    let m = p.start();
+    p.bump(PREPARE_KW);
+    name(p);
+    opt_type_name_list(p);
     p.expect(AS_KW);
     preparable_stmt(p);
     m.complete(p, PREPARE)
@@ -12089,20 +12107,8 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
             p.expect(CONSTRAINT_KW);
             name_ref(p);
         // ( { index_column_name | ( index_expression ) } [ COLLATE collation ] [ opclass ] [, ...] ) [ WHERE index_predicate ]
-        } else if p.eat(L_PAREN) {
-            while !p.at(EOF) {
-                if expr(p).is_none() {
-                    p.error("expected expression");
-                }
-                opt_collate(p);
-                // [ opclass ]
-                opt_ident(p);
-                // [, ...]
-                if !p.eat(COMMA) {
-                    break;
-                }
-            }
-            p.expect(R_PAREN);
+        } else if p.at(L_PAREN) {
+            on_conflict_index_exprs(p);
             // [ WHERE index_predicate ]
             // TODO: be more strict?
             opt_where_clause(p);
@@ -12123,6 +12129,30 @@ fn insert(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
     opt_returning_clause(p);
     m.complete(p, INSERT)
+}
+
+fn on_conflict_index_exprs(p: &mut Parser<'_>) {
+    assert!(p.at(L_PAREN));
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        EXPR_FIRST,
+        |p| {
+            if !p.at_ts(EXPR_FIRST) {
+                return false;
+            }
+            if expr(p).is_none() {
+                p.error("expected expression");
+            }
+            opt_collate(p);
+            // [ opclass ]
+            opt_ident(p);
+            true
+        },
+    );
 }
 
 // SET { column_name = { expression | DEFAULT } |
@@ -12190,17 +12220,27 @@ fn set_expr_list_or_paren_select(p: &mut Parser<'_>) {
 
 fn set_expr_list(p: &mut Parser<'_>, m: Marker) {
     assert!(p.at(L_PAREN));
-    p.expect(L_PAREN);
-    // ( { expression | DEFAULT } [, ...] )
-    while !p.at(EOF) {
-        set_expr(p);
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        SET_EXPR_FIRST,
+        opt_set_expr,
+    );
     m.complete(p, SET_EXPR_LIST);
 }
+
+fn opt_set_expr(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(SET_EXPR_FIRST) {
+        return false;
+    }
+    set_expr(p);
+    true
+}
+
+const SET_EXPR_FIRST: TokenSet = TokenSet::new(&[DEFAULT_KW]).union(EXPR_FIRST);
 
 fn set_expr(p: &mut Parser<'_>) {
     if !p.eat(DEFAULT_KW) && expr(p).is_none() {
@@ -12338,14 +12378,7 @@ fn opt_returning_clause(p: &mut Parser<'_>) {
     if p.at(RETURNING_KW) {
         let m = p.start();
         p.bump(RETURNING_KW);
-        if p.eat(WITH_KW) {
-            p.expect(L_PAREN);
-            returning_option(p);
-            while !p.at(EOF) && p.eat(COMMA) {
-                returning_option(p);
-            }
-            p.expect(R_PAREN);
-        }
+        opt_returning_option_list(p);
         if opt_target_list(p).is_none() {
             p.error("expected target");
         }
@@ -12353,12 +12386,31 @@ fn opt_returning_clause(p: &mut Parser<'_>) {
     }
 }
 
-fn returning_option(p: &mut Parser<'_>) {
-    if !p.eat(OLD_KW) && !p.eat(NEW_KW) {
-        p.error("expected OLD or NEW");
+fn opt_returning_option_list(p: &mut Parser<'_>) {
+    if p.eat(WITH_KW) {
+        delimited(
+            p,
+            L_PAREN,
+            R_PAREN,
+            COMMA,
+            || "unexpected comma".to_string(),
+            RETURNING_OPTION_FIRST,
+            opt_returning_option,
+        );
     }
+}
+
+const RETURNING_OPTION_FIRST: TokenSet = TokenSet::new(&[OLD_KW, NEW_KW]);
+
+fn opt_returning_option(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(RETURNING_OPTION_FIRST) {
+        return false;
+    }
+    // OLD | NEW
+    p.bump_any();
     p.expect(AS_KW);
     name(p);
+    true
 }
 
 // DROP TYPE [ IF EXISTS ] name [, ...] [ CASCADE | RESTRICT ]
@@ -12526,8 +12578,13 @@ fn partition_items(p: &mut Parser<'_>, allow_extra_params: bool) {
     m.complete(p, PARTITION_ITEM_LIST);
 }
 
+const PARAM_MODE_FIRST: TokenSet = TokenSet::new(&[VARIADIC_KW, IN_KW, OUT_KW, INOUT_KW]);
+
 // [ argmode ]
 fn opt_param_mode(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(PARAM_MODE_FIRST) {
+        return None;
+    }
     let m = p.start();
     let mode = match p.current() {
         VARIADIC_KW => {
@@ -12598,6 +12655,16 @@ const TYPE_FUNC_NAME_KEYWORDS: TokenSet = TokenSet::new(&[
     TABLESAMPLE_KW,
     VERBOSE_KW,
 ]);
+
+const PARAM_FIRST: TokenSet = PARAM_MODE_FIRST.union(NAME_FIRST).union(TYPE_NAME_FIRST);
+
+fn opt_param(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(PARAM_FIRST) {
+        return false;
+    }
+    param(p);
+    true
+}
 
 // [ argmode ] [ argname ] argtype [ { DEFAULT | = } default_expr ]
 //
@@ -12922,19 +12989,21 @@ fn opt_param_list(p: &mut Parser<'_>) -> bool {
 }
 
 fn param_list(p: &mut Parser<'_>) {
-    let m = p.start();
-    // ( [ [ argmode ] [ argname ] argtype [ { DEFAULT | = } default_expr ] [, ...] ] )
-    if !p.expect(L_PAREN) {
-        m.abandon(p);
+    if !p.at(L_PAREN) {
+        p.error("expected param list");
         return;
     }
-    while !p.at(EOF) && !p.at(R_PAREN) {
-        param(p);
-        if !p.eat(COMMA) {
-            break;
-        }
-    }
-    p.expect(R_PAREN);
+    let m = p.start();
+    // ( [ [ argmode ] [ argname ] argtype [ { DEFAULT | = } default_expr ] [, ...] ] )
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        || "unexpected comma".to_string(),
+        PARAM_FIRST,
+        opt_param,
+    );
     m.complete(p, PARAM_LIST);
 }
 
@@ -13040,18 +13109,9 @@ fn create_type(p: &mut Parser<'_>) -> CompletedMarker {
             attribute_list(p);
             // AS
         } else {
-            p.expect(L_PAREN);
-            while !p.at(EOF) && !p.at(R_PAREN) {
-                // attribute_name
-                name_ref(p);
-                // data_type
-                type_name(p);
-                opt_collate(p);
-                if !p.eat(COMMA) {
-                    break;
-                }
+            if !opt_column_list_with(p, ColumnDefKind::WithData) {
+                p.error("expected column list");
             }
-            p.expect(R_PAREN);
         }
     } else if p.at(L_PAREN) {
         attribute_list(p);

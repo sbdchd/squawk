@@ -3271,18 +3271,20 @@ SOURCE_FILE
         NAME
           IDENT "event_types"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      IDENT "attrs"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "jsonb"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "attrs"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "jsonb"
+      WHITESPACE "\n"
+      R_PAREN ")"
     WHITESPACE "\n  "
     SERVER_KW "server"
     WHITESPACE " "
@@ -3321,18 +3323,20 @@ SOURCE_FILE
         NAME
           IDENT "bookings"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME
-      IDENT "attrs"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "jsonb"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "attrs"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "jsonb"
+      WHITESPACE "\n"
+      R_PAREN ")"
     WHITESPACE "\n  "
     SERVER_KW "server"
     WHITESPACE " "
@@ -4342,37 +4346,41 @@ SOURCE_FILE
         NAME
           IDENT "metrics_columnar"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n    "
-    NAME
-      DAY_KW "day"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "date"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "metric_name"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            TEXT_KW "text"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      VALUE_KW "value"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            NUMERIC_KW "numeric"
-    R_PAREN ")"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          DAY_KW "day"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "metric_name"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          VALUE_KW "value"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NUMERIC_KW "numeric"
+      R_PAREN ")"
     WHITESPACE " "
     SERVER_KW "SERVER"
     WHITESPACE " "
@@ -4412,38 +4420,42 @@ SOURCE_FILE
         NAME
           IDENT "metrics"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n    "
-    NAME
-      DAY_KW "day"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "date"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      IDENT "metric_name"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            TEXT_KW "text"
-    COMMA ","
-    WHITESPACE "\n    "
-    NAME
-      VALUE_KW "value"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            NUMERIC_KW "numeric"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          DAY_KW "day"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "date"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          IDENT "metric_name"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      COMMA ","
+      WHITESPACE "\n    "
+      COLUMN
+        NAME
+          VALUE_KW "value"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                NUMERIC_KW "numeric"
+      WHITESPACE "\n"
+      R_PAREN ")"
     WHITESPACE " "
     SERVER_KW "SERVER"
     WHITESPACE " "
