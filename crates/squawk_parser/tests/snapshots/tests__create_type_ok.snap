@@ -17,8 +17,9 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
-    L_PAREN "("
-    R_PAREN ")"
+    COLUMN_LIST
+      L_PAREN "("
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TYPE
@@ -33,26 +34,28 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME_REF
-      IDENT "a"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "int8"
-    WHITESPACE " "
-    COLLATE
-      COLLATE_KW "collate"
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "\"fr_FR\""
-    WHITESPACE "\n"
-    R_PAREN ")"
+    COLUMN_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"fr_FR\""
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_TYPE
@@ -67,46 +70,50 @@ SOURCE_FILE
     WHITESPACE " "
     AS_KW "as"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    NAME_REF
-      IDENT "a"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "int8"
-    WHITESPACE " "
-    COLLATE
-      COLLATE_KW "collate"
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "\"fr_FR\""
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME_REF
-      IDENT "b"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            INT_KW "int"
-    COMMA ","
-    WHITESPACE "\n  "
-    NAME_REF
-      IDENT "c"
-    WHITESPACE " "
-    PATH_TYPE
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            TEXT_KW "text"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    COLUMN_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "int8"
+        WHITESPACE " "
+        COLLATE
+          COLLATE_KW "collate"
+          WHITESPACE " "
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                IDENT "\"fr_FR\""
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "b"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n  "
+      COLUMN
+        NAME
+          IDENT "c"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH
+            PATH_SEGMENT
+              NAME_REF
+                TEXT_KW "text"
+      WHITESPACE "\n"
+      R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- create_type_as_enum"

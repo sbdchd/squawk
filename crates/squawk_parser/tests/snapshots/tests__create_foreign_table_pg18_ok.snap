@@ -17,17 +17,18 @@ SOURCE_FILE
         NAME
           IDENT "u"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    LIKE_CLAUSE
-      LIKE_KW "like"
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "t"
-    WHITESPACE "\n"
-    R_PAREN ")"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      LIKE_CLAUSE
+        LIKE_KW "like"
+        WHITESPACE " "
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "t"
+      WHITESPACE "\n"
+      R_PAREN ")"
     WHITESPACE " "
     SERVER_KW "server"
     WHITESPACE " "
@@ -49,42 +50,43 @@ SOURCE_FILE
         NAME
           IDENT "remote_users"
     WHITESPACE " "
-    L_PAREN "("
-    WHITESPACE "\n  "
-    LIKE_CLAUSE
-      LIKE_KW "like"
-      WHITESPACE " "
-      PATH
-        PATH_SEGMENT
-          NAME_REF
-            IDENT "local_users"
-      WHITESPACE "\n    "
-      LIKE_OPTION
-        INCLUDING_KW "including"
+    TABLE_ARG_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      LIKE_CLAUSE
+        LIKE_KW "like"
         WHITESPACE " "
-        DEFAULTS_KW "defaults"
-      WHITESPACE "\n    "
-      LIKE_OPTION
-        INCLUDING_KW "including"
-        WHITESPACE " "
-        CONSTRAINTS_KW "constraints"
-      WHITESPACE "\n    "
-      LIKE_OPTION
-        EXCLUDING_KW "excluding"
-        WHITESPACE " "
-        GENERATED_KW "generated"
-      WHITESPACE "\n    "
-      LIKE_OPTION
-        EXCLUDING_KW "excluding"
-        WHITESPACE " "
-        STATISTICS_KW "statistics"
-      WHITESPACE "\n    "
-      LIKE_OPTION
-        EXCLUDING_KW "excluding"
-        WHITESPACE " "
-        ALL_KW "all"
-    WHITESPACE "\n"
-    R_PAREN ")"
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "local_users"
+        WHITESPACE "\n    "
+        LIKE_OPTION
+          INCLUDING_KW "including"
+          WHITESPACE " "
+          DEFAULTS_KW "defaults"
+        WHITESPACE "\n    "
+        LIKE_OPTION
+          INCLUDING_KW "including"
+          WHITESPACE " "
+          CONSTRAINTS_KW "constraints"
+        WHITESPACE "\n    "
+        LIKE_OPTION
+          EXCLUDING_KW "excluding"
+          WHITESPACE " "
+          GENERATED_KW "generated"
+        WHITESPACE "\n    "
+        LIKE_OPTION
+          EXCLUDING_KW "excluding"
+          WHITESPACE " "
+          STATISTICS_KW "statistics"
+        WHITESPACE "\n    "
+        LIKE_OPTION
+          EXCLUDING_KW "excluding"
+          WHITESPACE " "
+          ALL_KW "all"
+      WHITESPACE "\n"
+      R_PAREN ")"
     WHITESPACE " "
     SERVER_KW "server"
     WHITESPACE " "
