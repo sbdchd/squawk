@@ -78,6 +78,34 @@ impl ast::IndexExpr {
     }
 }
 
+impl ast::SliceExpr {
+    #[inline]
+    pub fn base(&self) -> Option<ast::Expr> {
+        support::children(&self.syntax).next()
+    }
+
+    #[inline]
+    pub fn start(&self) -> Option<ast::Expr> {
+        // With `select x[1:]`, we have two exprs, `x` and `1`.
+        // We skip over the first one, and then we want the second one, but we
+        // want to make sure we don't choose the end expr if instead we had:
+        // `select x[:1]`
+        let colon = self.colon_token()?;
+        support::children(&self.syntax)
+            .skip(1)
+            .find(|expr: &ast::Expr| expr.syntax().text_range().end() <= colon.text_range().start())
+    }
+
+    #[inline]
+    pub fn end(&self) -> Option<ast::Expr> {
+        // We want to make sure we get the last expr after the `:` which is the
+        // end of the slice, i.e., `2` in: `select x[:2]`
+        let colon = self.colon_token()?;
+        support::children(&self.syntax)
+            .find(|expr: &ast::Expr| expr.syntax().text_range().start() >= colon.text_range().end())
+    }
+}
+
 impl ast::BetweenExpr {
     #[inline]
     pub fn target(&self) -> Option<ast::Expr> {

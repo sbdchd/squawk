@@ -1002,6 +1002,7 @@ pub enum SyntaxKind {
     SET_WITHOUT_OIDS,
     SHOW,
     SIMILAR_TO,
+    SLICE_EXPR,
     SORT_ASC,
     SORT_BY,
     SORT_BY_LIST,

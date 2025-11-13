@@ -224,6 +224,7 @@ Expr =
 | CaseExpr
 | FieldExpr
 | IndexExpr
+| SliceExpr
 | BetweenExpr
 | ParenExpr
 | TupleExpr
@@ -1063,6 +1064,9 @@ NonStandardParam =
 
 IndexExpr =
   base:Expr '[' index:Expr ']'
+
+SliceExpr =
+  base:Expr '[' start:Expr? ':' end:Expr? ']'
 
 BetweenExpr =
   target:Expr 'between' start:Expr 'and' end:Expr

@@ -510,6 +510,55 @@ fn index_expr() {
 }
 
 #[test]
+fn slice_expr() {
+    use insta::assert_snapshot;
+    let source_code = "
+        select x[1:2], x[2:], x[:3], x[:];
+    ";
+    let parse = SourceFile::parse(source_code);
+    assert!(parse.errors().is_empty());
+    let file: SourceFile = parse.tree();
+    let stmt = file.stmts().next().unwrap();
+    let ast::Stmt::Select(select) = stmt else {
+        unreachable!()
+    };
+    let select_clause = select.select_clause().unwrap();
+    let mut targets = select_clause.target_list().unwrap().targets();
+
+    let ast::Expr::SliceExpr(slice) = targets.next().unwrap().expr().unwrap() else {
+        unreachable!()
+    };
+    assert_snapshot!(slice.syntax(), @"x[1:2]");
+    assert_eq!(slice.base().unwrap().syntax().text(), "x");
+    assert_eq!(slice.start().unwrap().syntax().text(), "1");
+    assert_eq!(slice.end().unwrap().syntax().text(), "2");
+
+    let ast::Expr::SliceExpr(slice) = targets.next().unwrap().expr().unwrap() else {
+        unreachable!()
+    };
+    assert_snapshot!(slice.syntax(), @"x[2:]");
+    assert_eq!(slice.base().unwrap().syntax().text(), "x");
+    assert_eq!(slice.start().unwrap().syntax().text(), "2");
+    assert!(slice.end().is_none());
+
+    let ast::Expr::SliceExpr(slice) = targets.next().unwrap().expr().unwrap() else {
+        unreachable!()
+    };
+    assert_snapshot!(slice.syntax(), @"x[:3]");
+    assert_eq!(slice.base().unwrap().syntax().text(), "x");
+    assert!(slice.start().is_none());
+    assert_eq!(slice.end().unwrap().syntax().text(), "3");
+
+    let ast::Expr::SliceExpr(slice) = targets.next().unwrap().expr().unwrap() else {
+        unreachable!()
+    };
+    assert_snapshot!(slice.syntax(), @"x[:]");
+    assert_eq!(slice.base().unwrap().syntax().text(), "x");
+    assert!(slice.start().is_none());
+    assert!(slice.end().is_none());
+}
+
+#[test]
 fn field_expr() {
     let source_code = "
         select foo.bar;

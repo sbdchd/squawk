@@ -728,8 +728,8 @@ SOURCE_FILE
       COMMA ","
       WHITESPACE " "
       COLUMN
-        INDEX_EXPR
-          INDEX_EXPR
+        SLICE_EXPR
+          SLICE_EXPR
             NAME_REF
               IDENT "board"
             L_BRACK "["
