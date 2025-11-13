@@ -9679,6 +9679,25 @@ impl SimilarTo {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SliceExpr {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SliceExpr {
+    #[inline]
+    pub fn l_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_BRACK)
+    }
+    #[inline]
+    pub fn r_brack_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_BRACK)
+    }
+    #[inline]
+    pub fn colon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SortAsc {
     pub(crate) syntax: SyntaxNode,
 }
@@ -10846,6 +10865,7 @@ pub enum Expr {
     ParenExpr(ParenExpr),
     PostfixExpr(PostfixExpr),
     PrefixExpr(PrefixExpr),
+    SliceExpr(SliceExpr),
     TupleExpr(TupleExpr),
 }
 
@@ -19488,6 +19508,24 @@ impl AstNode for SimilarTo {
         &self.syntax
     }
 }
+impl AstNode for SliceExpr {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SLICE_EXPR
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SortAsc {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -21471,6 +21509,7 @@ impl AstNode for Expr {
                 | SyntaxKind::PAREN_EXPR
                 | SyntaxKind::POSTFIX_EXPR
                 | SyntaxKind::PREFIX_EXPR
+                | SyntaxKind::SLICE_EXPR
                 | SyntaxKind::TUPLE_EXPR
         )
     }
@@ -21490,6 +21529,7 @@ impl AstNode for Expr {
             SyntaxKind::PAREN_EXPR => Expr::ParenExpr(ParenExpr { syntax }),
             SyntaxKind::POSTFIX_EXPR => Expr::PostfixExpr(PostfixExpr { syntax }),
             SyntaxKind::PREFIX_EXPR => Expr::PrefixExpr(PrefixExpr { syntax }),
+            SyntaxKind::SLICE_EXPR => Expr::SliceExpr(SliceExpr { syntax }),
             SyntaxKind::TUPLE_EXPR => Expr::TupleExpr(TupleExpr { syntax }),
             _ => {
                 return None;
@@ -21513,6 +21553,7 @@ impl AstNode for Expr {
             Expr::ParenExpr(it) => &it.syntax,
             Expr::PostfixExpr(it) => &it.syntax,
             Expr::PrefixExpr(it) => &it.syntax,
+            Expr::SliceExpr(it) => &it.syntax,
             Expr::TupleExpr(it) => &it.syntax,
         }
     }
@@ -21593,6 +21634,12 @@ impl From<PrefixExpr> for Expr {
     #[inline]
     fn from(node: PrefixExpr) -> Expr {
         Expr::PrefixExpr(node)
+    }
+}
+impl From<SliceExpr> for Expr {
+    #[inline]
+    fn from(node: SliceExpr) -> Expr {
+        Expr::SliceExpr(node)
     }
 }
 impl From<TupleExpr> for Expr {

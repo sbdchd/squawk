@@ -1416,8 +1416,8 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          INDEX_EXPR
-            INDEX_EXPR
+          SLICE_EXPR
+            SLICE_EXPR
               NAME_REF
                 IDENT "b"
               L_BRACK "["
@@ -1444,8 +1444,8 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          INDEX_EXPR
-            INDEX_EXPR
+          SLICE_EXPR
+            SLICE_EXPR
               NAME_REF
                 IDENT "c"
               L_BRACK "["
@@ -1468,8 +1468,8 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          INDEX_EXPR
-            INDEX_EXPR
+          SLICE_EXPR
+            SLICE_EXPR
               NAME_REF
                 IDENT "schedule"
               L_BRACK "["
@@ -3931,7 +3931,7 @@ SOURCE_FILE
       WHITESPACE " "
       TARGET_LIST
         TARGET
-          INDEX_EXPR
+          SLICE_EXPR
             LITERAL
               POSITIONAL_PARAM "$1"
             L_BRACK "["

@@ -439,6 +439,36 @@ SELECT customer_id, merchant_id, request_id, count(*) from t
 group by all;
 ```
 
+and an action to go backwards:
+
+```sql
+SELECT customer_id, merchant_id, request_id, count(*) from t
+group by all;
+--        ^action:expand-group-by-all-names
+```
+
+becomes:
+
+```sql
+SELECT customer_id, merchant_id, request_id, count(*) from t
+group by customer_id, merchant_id, request_id;
+```
+
+or with column numbers:
+
+```sql
+SELECT customer_id, merchant_id, request_id, count(*) from t
+group by all;
+--        ^action:expand-group-by-all-numbers
+```
+
+becomes:
+
+```sql
+SELECT customer_id, merchant_id, request_id, count(*) from t
+group by 1, 2, 3;
+```
+
 ### Rule: unused column
 
 ```sql
@@ -1002,6 +1032,64 @@ select foo, "a" from t;
 -- gives
 
 select foo, 'a' from t;
+```
+
+### Quick Fix: Quote and Unquote columns, tables, etc.
+
+```sql
+select "x" from "t";
+--     ^ Quick Fix: unquote
+```
+
+gives
+
+```sql
+select x from "t";
+```
+
+and vice versa:
+
+```sql
+select x from "t";
+--     ^ Quick Fix: quote
+```
+
+gives:
+
+Note: we have to be mindful of casing here,
+
+```sql
+select "x" from "t";
+```
+
+Note: there's some gotchas with this that we need to handle:
+
+```sql
+-- okay
+with t("X") as (select 1)
+select "X" from t;
+
+-- err
+with t("X") as (select 1)
+select X from t;
+
+-- err
+with t("X") as (select 1)
+select x from t;
+```
+
+or invalid column names:
+
+```sql
+-- ok
+with t("a-b") as (select 1)
+select "a-b" from t;
+
+-- err
+with t("a-b") as (select 1)
+select a-b from t;
+-- Query 1 ERROR at Line 2: ERROR:  column "a" does not exist
+-- LINE 2: select a-b from t;
 ```
 
 ### Quick Fix: in array

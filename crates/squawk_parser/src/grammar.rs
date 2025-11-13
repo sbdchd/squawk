@@ -2120,14 +2120,14 @@ fn index_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
         if p.eat(COLON) {
             // foo[:]
             if p.eat(R_BRACK) {
-                return m.complete(p, INDEX_EXPR);
+                return m.complete(p, SLICE_EXPR);
             } else {
                 // foo[:b]
                 if expr(p).is_none() {
                     p.error("expected an expression");
                 }
                 p.expect(R_BRACK);
-                return m.complete(p, INDEX_EXPR);
+                return m.complete(p, SLICE_EXPR);
             }
         }
         // foo[a]
@@ -2139,12 +2139,14 @@ fn index_expr(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
         if p.eat(COLON) {
             // foo[a:]
             if p.eat(R_BRACK) {
-                return m.complete(p, INDEX_EXPR);
+                return m.complete(p, SLICE_EXPR);
             }
             // foo[a:b]
             if expr(p).is_none() {
                 p.error("expected an expression");
             }
+            p.expect(R_BRACK);
+            return m.complete(p, SLICE_EXPR);
         }
         p.expect(R_BRACK);
     }
