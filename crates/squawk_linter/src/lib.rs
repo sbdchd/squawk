@@ -228,6 +228,7 @@ impl Fix {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Edit {
     pub text_range: TextRange,
+    // TODO: does this need to be an Option?
     pub text: Option<String>,
 }
 impl Edit {
@@ -241,6 +242,12 @@ impl Edit {
         Self {
             text_range,
             text: Some(text.into()),
+        }
+    }
+    pub fn delete(text_range: TextRange) -> Self {
+        Self {
+            text_range,
+            text: None,
         }
     }
 }

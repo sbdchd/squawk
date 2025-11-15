@@ -38,24 +38,11 @@ fn token_from_offset(file: &ast::SourceFile, offset: TextSize) -> Option<SyntaxT
 #[cfg(test)]
 mod test {
     use crate::goto_definition::goto_definition;
+    use crate::test_utils::fixture;
     use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
     use insta::assert_snapshot;
     use log::info;
-    use rowan::TextSize;
     use squawk_syntax::ast;
-
-    // TODO: we should probably use something else since `$0` is valid syntax, maybe `%0`?
-    const MARKER: &str = "$0";
-
-    fn fixture(sql: &str) -> (Option<TextSize>, String) {
-        if let Some(pos) = sql.find(MARKER) {
-            return (
-                Some(TextSize::new((pos - 1) as u32)),
-                sql.replace(MARKER, ""),
-            );
-        }
-        (None, sql.to_string())
-    }
 
     #[track_caller]
     fn goto(sql: &str) -> String {
@@ -65,14 +52,13 @@ mod test {
     #[track_caller]
     fn goto_(sql: &str) -> Option<String> {
         info!("starting");
-        let (offset, sql) = fixture(sql);
+        let (mut offset, sql) = fixture(sql);
+        // For go to def we want the previous character since we usually put the
+        // marker after the item we're trying to go to def on.
+        offset = offset.checked_sub(1.into()).unwrap_or_default();
         let parse = ast::SourceFile::parse(&sql);
         assert_eq!(parse.errors(), vec![]);
         let file: ast::SourceFile = parse.tree();
-        let Some(offset) = offset else {
-            info!("offset not found, did you put a marker `$0` in the sql?");
-            return None;
-        };
         if let Some(result) = goto_definition(file, offset) {
             let offset: usize = offset.into();
             let group = Level::INFO.primary_title("definition").element(

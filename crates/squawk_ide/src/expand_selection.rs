@@ -281,8 +281,8 @@ fn extend_list_item(node: &SyntaxNode) -> Option<TextRange> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::test_utils::fixture;
     use insta::assert_debug_snapshot;
-    use rowan::TextSize;
     use squawk_syntax::{SourceFile, ast::AstNode};
 
     fn expand(sql: &str) -> Vec<String> {
@@ -304,14 +304,6 @@ mod tests {
         }
 
         results
-    }
-
-    fn fixture(sql: &str) -> (TextSize, String) {
-        const MARKER: &str = "$0";
-        if let Some(pos) = sql.find(MARKER) {
-            return (TextSize::new(pos as u32), sql.replace(MARKER, ""));
-        }
-        panic!("No marker found in test SQL");
     }
 
     #[test]

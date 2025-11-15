@@ -13,6 +13,7 @@ rust-version.workspace = true
 
 [dependencies]
 squawk-syntax.workspace = true
+squawk-linter.workspace = true
 rowan.workspace = true
 line-index.workspace = true
 annotate-snippets.workspace = true
