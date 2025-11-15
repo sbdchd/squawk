@@ -4993,10 +4993,14 @@ fn partition_option(p: &mut Parser<'_>) {
 }
 
 fn opt_inherits_tables(p: &mut Parser<'_>) {
+    let m = p.start();
     if p.eat(INHERITS_KW) {
         p.expect(L_PAREN);
         path_name_ref_list(p);
         p.expect(R_PAREN);
+        m.complete(p, INHERITS);
+    } else {
+        m.abandon(p);
     }
 }
 
@@ -12295,6 +12299,13 @@ fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     // [ FROM from_item [, ...] ]
     opt_from_clause(p);
     // [ WHERE condition | WHERE CURRENT OF cursor_name ]
+    opt_where_or_current_of(p);
+    // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
+    opt_returning_clause(p);
+    m.complete(p, UPDATE)
+}
+
+fn opt_where_or_current_of(p: &mut Parser<'_>) {
     if p.at(WHERE_KW) {
         if p.nth_at(1, CURRENT_KW) {
             opt_where_current_of(p);
@@ -12302,9 +12313,6 @@ fn update(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
             opt_where_clause(p);
         }
     }
-    // [ RETURNING { * | output_expression [ [ AS ] output_name ] } [, ...] ]
-    opt_returning_clause(p);
-    m.complete(p, UPDATE)
 }
 
 fn with(p: &mut Parser<'_>, m: Option<Marker>) -> Option<CompletedMarker> {
@@ -12355,24 +12363,22 @@ fn delete(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
         }
     }
     // [ WHERE condition | WHERE CURRENT OF cursor_name ]
-    if p.at(WHERE_KW) {
-        if p.nth_at(1, CURRENT_KW) {
-            opt_where_current_of(p);
-        } else {
-            opt_where_clause(p);
-        }
-    }
+    opt_where_or_current_of(p);
     opt_returning_clause(p);
     m.complete(p, DELETE)
 }
 
 // WHERE CURRENT OF cursor_name
 fn opt_where_current_of(p: &mut Parser<'_>) {
+    let m = p.start();
     if p.eat(WHERE_KW) {
         if p.eat(CURRENT_KW) {
             p.expect(OF_KW);
             name_ref(p);
         }
+        m.complete(p, WHERE_CURRENT_OF);
+    } else {
+        m.abandon(p);
     }
 }
 

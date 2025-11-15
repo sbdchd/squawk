@@ -1056,8 +1056,6 @@ select x from "t";
 
 gives:
 
-Note: we have to be mindful of casing here,
-
 ```sql
 select "x" from "t";
 ```
