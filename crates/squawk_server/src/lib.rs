@@ -17,6 +17,7 @@ use lsp_types::{
     request::{CodeActionRequest, GotoDefinition, Request, SelectionRangeRequest},
 };
 use rowan::TextRange;
+use squawk_ide::code_actions::code_actions;
 use squawk_ide::goto_definition::goto_definition;
 use squawk_syntax::{Parse, SourceFile};
 use std::collections::HashMap;
@@ -235,12 +236,25 @@ fn handle_selection_range(
 fn handle_code_action(
     connection: &Connection,
     req: lsp_server::Request,
-    _documents: &HashMap<Url, DocumentState>,
+    documents: &HashMap<Url, DocumentState>,
 ) -> Result<()> {
     let params: CodeActionParams = serde_json::from_value(req.params)?;
     let uri = params.text_document.uri;
 
-    let mut actions = Vec::new();
+    let mut actions: CodeActionResponse = Vec::new();
+
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let file = parse.tree();
+    let line_index = LineIndex::new(content);
+    let offset = lsp_utils::offset(&line_index, params.range.start).unwrap();
+
+    let ide_actions = code_actions(file, offset).unwrap_or_default();
+
+    for action in ide_actions {
+        let lsp_action = lsp_utils::code_action(&line_index, uri.clone(), action);
+        actions.push(CodeActionOrCommand::CodeAction(lsp_action));
+    }
 
     for mut diagnostic in params
         .context

@@ -1,7 +1,8 @@
-use std::ops::Range;
+use std::{collections::HashMap, ops::Range};
 
 use line_index::{LineIndex, TextRange, TextSize};
 use log::warn;
+use lsp_types::{CodeAction, CodeActionKind, Url, WorkspaceEdit};
 
 fn text_range(index: &LineIndex, range: lsp_types::Range) -> Option<TextRange> {
     let start = offset(index, range.start)?;
@@ -34,6 +35,38 @@ pub(crate) fn offset(index: &LineIndex, position: lsp_types::Position) -> Option
     }
 
     Some(line_range.start() + clamped_len)
+}
+
+pub(crate) fn code_action(
+    line_index: &LineIndex,
+    uri: Url,
+    action: squawk_ide::code_actions::CodeAction,
+) -> lsp_types::CodeAction {
+    CodeAction {
+        title: action.title,
+        kind: Some(CodeActionKind::QUICKFIX),
+        diagnostics: None,
+        edit: Some(WorkspaceEdit {
+            changes: Some({
+                let mut changes = HashMap::new();
+                let edits = action
+                    .edits
+                    .into_iter()
+                    .map(|edit| lsp_types::TextEdit {
+                        range: range(&line_index, edit.text_range),
+                        new_text: edit.text.unwrap_or_default(),
+                    })
+                    .collect();
+                changes.insert(uri, edits);
+                changes
+            }),
+            ..Default::default()
+        }),
+        command: None,
+        is_preferred: Some(true),
+        disabled: None,
+        data: None,
+    }
 }
 
 pub(crate) fn range(line_index: &LineIndex, range: TextRange) -> lsp_types::Range {
