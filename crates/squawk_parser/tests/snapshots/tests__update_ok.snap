@@ -1226,14 +1226,15 @@ SOURCE_FILE
           LITERAL
             STRING "'Dramatic'"
     WHITESPACE " "
-    WHERE_KW "WHERE"
-    WHITESPACE " "
-    CURRENT_KW "CURRENT"
-    WHITESPACE " "
-    OF_KW "OF"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "c_films"
+    WHERE_CURRENT_OF
+      WHERE_KW "WHERE"
+      WHITESPACE " "
+      CURRENT_KW "CURRENT"
+      WHITESPACE " "
+      OF_KW "OF"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "c_films"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   UPDATE

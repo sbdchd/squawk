@@ -3187,14 +3187,6 @@ impl Delete {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn relation_name(&self) -> Option<RelationName> {
         support::child(&self.syntax)
     }
@@ -3207,8 +3199,12 @@ impl Delete {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn current_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CURRENT_KW)
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_current_of(&self) -> Option<WhereCurrentOf> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn delete_token(&self) -> Option<SyntaxToken> {
@@ -3217,14 +3213,6 @@ impl Delete {
     #[inline]
     pub fn from_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FROM_KW)
-    }
-    #[inline]
-    pub fn of_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::OF_KW)
-    }
-    #[inline]
-    pub fn where_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::WHERE_KW)
     }
 }
 
@@ -10364,6 +10352,29 @@ impl WhereClause {
     #[inline]
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WHERE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct WhereCurrentOf {
+    pub(crate) syntax: SyntaxNode,
+}
+impl WhereCurrentOf {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn current_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CURRENT_KW)
+    }
+    #[inline]
+    pub fn of_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OF_KW)
     }
     #[inline]
     pub fn where_token(&self) -> Option<SyntaxToken> {
@@ -20196,6 +20207,24 @@ impl AstNode for WhereClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::WHERE_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for WhereCurrentOf {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WHERE_CURRENT_OF
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

@@ -189,25 +189,26 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     WHITESPACE "\n  "
-    INHERITS_KW "inherits"
-    WHITESPACE " "
-    L_PAREN "("
-    PATH
+    INHERITS
+      INHERITS_KW "inherits"
+      WHITESPACE " "
+      L_PAREN "("
+      PATH
+        PATH
+          PATH_SEGMENT
+            NAME_REF
+              IDENT "foo"
+        DOT "."
+        PATH_SEGMENT
+          NAME_REF
+            IDENT "bar"
+      COMMA ","
+      WHITESPACE " "
       PATH
         PATH_SEGMENT
           NAME_REF
-            IDENT "foo"
-      DOT "."
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
-    COMMA ","
-    WHITESPACE " "
-    PATH
-      PATH_SEGMENT
-        NAME_REF
-          IDENT "bar"
-    R_PAREN ")"
+            IDENT "bar"
+      R_PAREN ")"
     WHITESPACE "\n  "
     SERVER_KW "server"
     WHITESPACE " "

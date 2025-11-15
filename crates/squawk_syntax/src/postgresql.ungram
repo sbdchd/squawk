@@ -974,8 +974,11 @@ ReturningClause =
 Delete =
   'delete' 'from' RelationName Alias?
   UsingClause?
-  ('where' Expr | 'where' 'current' 'of' NameRef)?
+  (WhereClause | WhereCurrentOf)?
   ReturningClause?
+
+WhereCurrentOf =
+  'where' 'current' 'of' NameRef
 
 Notify =
   'notify'

@@ -6,7 +6,7 @@ use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams,
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, Location, Position,
+    GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, Location, OneOf, Position,
     PublishDiagnosticsParams, Range, SelectionRangeParams, SelectionRangeProviderCapability,
     ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
     WorkDoneProgressOptions, WorkspaceEdit,
@@ -17,6 +17,7 @@ use lsp_types::{
     request::{CodeActionRequest, GotoDefinition, Request, SelectionRangeRequest},
 };
 use rowan::TextRange;
+use squawk_ide::goto_definition::goto_definition;
 use squawk_syntax::{Parse, SourceFile};
 use std::collections::HashMap;
 
@@ -50,7 +51,7 @@ pub fn run() -> Result<()> {
             resolve_provider: None,
         })),
         selection_range_provider: Some(SelectionRangeProviderCapability::Simple(true)),
-        // definition_provider: Some(OneOf::Left(true)),
+        definition_provider: Some(OneOf::Left(true)),
         ..Default::default()
     })
     .unwrap();
@@ -89,7 +90,7 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
 
                 match req.method.as_ref() {
                     GotoDefinition::METHOD => {
-                        handle_goto_definition(&connection, req)?;
+                        handle_goto_definition(&connection, req, &documents)?;
                     }
                     CodeActionRequest::METHOD => {
                         handle_code_action(&connection, req, &documents)?;
@@ -133,15 +134,37 @@ fn main_loop(connection: Connection, params: serde_json::Value) -> Result<()> {
     Ok(())
 }
 
-fn handle_goto_definition(connection: &Connection, req: lsp_server::Request) -> Result<()> {
+fn handle_goto_definition(
+    connection: &Connection,
+    req: lsp_server::Request,
+    documents: &HashMap<Url, DocumentState>,
+) -> Result<()> {
     let params: GotoDefinitionParams = serde_json::from_value(req.params)?;
+    let uri = params.text_document_position_params.text_document.uri;
+    let position = params.text_document_position_params.position;
 
-    let location = Location {
-        uri: params.text_document_position_params.text_document.uri,
-        range: Range::new(Position::new(1, 2), Position::new(1, 3)),
+    let content = documents.get(&uri).map_or("", |doc| &doc.content);
+    let parse: Parse<SourceFile> = SourceFile::parse(content);
+    let file = parse.tree();
+    let line_index = LineIndex::new(content);
+    let offset = lsp_utils::offset(&line_index, position).unwrap();
+
+    let range = goto_definition(file, offset);
+
+    let result = match range {
+        Some(target_range) => {
+            debug_assert!(
+                !target_range.contains(offset),
+                "Our target destination range must not include the source range otherwise go to def won't work in vscode."
+            );
+            GotoDefinitionResponse::Scalar(Location {
+                uri: uri.clone(),
+                range: lsp_utils::range(&line_index, target_range),
+            })
+        }
+        None => GotoDefinitionResponse::Array(vec![]),
     };
 
-    let result = GotoDefinitionResponse::Scalar(location);
     let resp = Response {
         id: req.id,
         result: Some(serde_json::to_value(&result).unwrap()),
