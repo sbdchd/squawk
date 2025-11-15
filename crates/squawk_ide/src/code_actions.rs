@@ -31,13 +31,10 @@ fn remove_else_clause(
 
     let mut edits = vec![];
     edits.push(Edit::delete(else_clause.syntax().text_range()));
-    match else_token.prev_token() {
-        Some(it) => {
-            if it.kind() == SyntaxKind::WHITESPACE {
-                edits.push(Edit::delete(it.text_range()));
-            }
+    if let Some(token) = else_token.prev_token() {
+        if token.kind() == SyntaxKind::WHITESPACE {
+            edits.push(Edit::delete(token.text_range()));
         }
-        _ => (),
     }
 
     actions.push(CodeAction {

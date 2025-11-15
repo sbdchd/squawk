@@ -306,7 +306,6 @@ mod tests {
         results
     }
 
-
     #[test]
     fn simple() {
         assert_debug_snapshot!(expand(r#"select $01 + 1"#), @r#"

@@ -53,7 +53,7 @@ pub(crate) fn code_action(
                     .edits
                     .into_iter()
                     .map(|edit| lsp_types::TextEdit {
-                        range: range(&line_index, edit.text_range),
+                        range: range(line_index, edit.text_range),
                         new_text: edit.text.unwrap_or_default(),
                     })
                     .collect();
