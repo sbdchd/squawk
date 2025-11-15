@@ -6,8 +6,8 @@ use lsp_types::{
     CodeAction, CodeActionKind, CodeActionOptions, CodeActionOrCommand, CodeActionParams,
     CodeActionProviderCapability, CodeActionResponse, Command, Diagnostic,
     DidChangeTextDocumentParams, DidCloseTextDocumentParams, DidOpenTextDocumentParams,
-    GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, Location, OneOf, Position,
-    PublishDiagnosticsParams, Range, SelectionRangeParams, SelectionRangeProviderCapability,
+    GotoDefinitionParams, GotoDefinitionResponse, InitializeParams, Location, OneOf,
+    PublishDiagnosticsParams, SelectionRangeParams, SelectionRangeProviderCapability,
     ServerCapabilities, TextDocumentSyncCapability, TextDocumentSyncKind, Url,
     WorkDoneProgressOptions, WorkspaceEdit,
     notification::{
