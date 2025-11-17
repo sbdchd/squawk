@@ -2436,7 +2436,7 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
         let _ = expr_bp(p, op_bp, r);
         lhs = m.complete(
             p,
-            if matches!(op, COLON_COLON | AS_KW) {
+            if matches!(op, COLON_COLON) {
                 CAST_EXPR
             } else if matches!(op, FAT_ARROW | COLON_EQ) {
                 NAMED_ARG
