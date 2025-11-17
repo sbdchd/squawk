@@ -854,6 +854,28 @@ sum(expression interval) -> interval
 sum(expression numeric) -> numeric
 ```
 
+unnset
+
+```sql
+select * from unnest(ARRAY[1,2], ARRAY['foo','bar','baz']);
+--            ^$ hover
+```
+
+```sql
+-- Expands multiple arrays (possibly of different data types) into a set of rows. If the arrays are not all the same length then the shorter ones are padded with NULLs. This form is only allowed in a query's FROM clause;
+unnest(anyarray, anyarray [, ... ] ) -> setof anyelement, anyelement [, ... ]
+```
+
+```sql
+select * from unnest(ARRAY[1,2]);
+--            ^$ hover
+```
+
+```sql
+-- Expands an array into a set of rows. The array's elements are read out in storage order.
+unnest(anyarray) -> setof anyelement
+```
+
 #### Column Number
 
 another example:
@@ -872,6 +894,8 @@ type: string
 
 #### Star
 
+case expr
+
 ```sql
 select * from (select case
 --     ^$ hover
@@ -884,6 +908,17 @@ select * from (select case
 
 ```
 ("case": boolean)
+```
+
+unnest
+
+```sql
+select * from unnest(ARRAY[1,2], ARRAY['foo','bar','baz']);
+--     ^$ hover
+```
+
+```
+("unnest": integer, "unnest": text)
 ```
 
 ### Semantic Syntax Highlighting

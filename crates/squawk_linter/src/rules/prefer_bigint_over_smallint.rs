@@ -32,7 +32,7 @@ fn smallint_to_bigint(smallint_type: &str) -> &'static str {
 fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
     let type_name = ty.syntax().first_token()?;
     let i64 = smallint_to_bigint(type_name.text());
-    let edit = Edit::replace(ty.syntax().text_range(), i64);
+    let edit = Edit::replace(type_name.text_range(), i64);
     Some(Fix::new(
         format!("Replace with a 64-bit integer type: `{i64}`"),
         vec![edit],
@@ -99,6 +99,14 @@ mod test {
     #[test]
     fn fix_with_constraints() {
         assert_snapshot!(fix("create table users (id smallserial primary key, score smallint not null);"), @"create table users (id bigserial primary key, score bigint not null);");
+    }
+
+    #[test]
+    fn fix_array_types() {
+        assert_snapshot!(fix("create table users (ids smallint[]);"), @"create table users (ids bigint[]);");
+        assert_snapshot!(fix("create table users (ids int2[]);"), @"create table users (ids int8[]);");
+        assert_snapshot!(fix("create table users (ids smallserial[]);"), @"create table users (ids bigserial[]);");
+        assert_snapshot!(fix("create table users (ids serial2[]);"), @"create table users (ids serial8[]);");
     }
 
     #[test]

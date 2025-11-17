@@ -33,7 +33,7 @@ fn int_to_bigint_replacement(int_type: &str) -> &'static str {
 fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
     let type_name = ty.syntax().first_token()?;
     let i64 = int_to_bigint_replacement(type_name.text());
-    let edit = Edit::replace(ty.syntax().text_range(), i64);
+    let edit = Edit::replace(type_name.text_range(), i64);
     Some(Fix::new(
         format!("Replace with a 64-bit integer type: `{i64}`"),
         vec![edit],
@@ -103,6 +103,15 @@ mod test {
     #[test]
     fn fix_with_constraints() {
         assert_snapshot!(fix("create table users (id serial primary key, score int not null);"), @"create table users (id bigserial primary key, score bigint not null);");
+    }
+
+    #[test]
+    fn fix_array_types() {
+        assert_snapshot!(fix("create table users (ids int[]);"), @"create table users (ids bigint[]);");
+        assert_snapshot!(fix("create table users (ids integer[]);"), @"create table users (ids bigint[]);");
+        assert_snapshot!(fix("create table users (ids int4[]);"), @"create table users (ids int8[]);");
+        assert_snapshot!(fix("create table users (ids serial[]);"), @"create table users (ids bigserial[]);");
+        assert_snapshot!(fix("create table users (ids serial4[]);"), @"create table users (ids serial8[]);");
     }
 
     #[test]

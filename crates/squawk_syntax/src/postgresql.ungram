@@ -70,7 +70,9 @@ CallExpr =
   Expr ArgList
 
 CastExpr =
-  Expr (ColonColon? | 'as') Type
+  'cast' '(' Expr 'as' Type ')'
+| Expr ColonColon Type
+| Expr Type
 
 ArrayExpr =
   'array' '[' (Expr (',' Expr)*) ']'

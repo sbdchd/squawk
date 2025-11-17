@@ -1503,8 +1503,20 @@ impl CastExpr {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AS_KW)
+    }
+    #[inline]
+    pub fn cast_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CAST_KW)
     }
 }
 
