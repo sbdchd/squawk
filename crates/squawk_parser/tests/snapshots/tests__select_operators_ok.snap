@@ -105,8 +105,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1),(0,0)'"
@@ -114,8 +117,11 @@ SOURCE_FILE
             PLUS "+"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,0)'"
@@ -131,8 +137,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                PATH_KW "path"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      PATH_KW "path"
               WHITESPACE " "
               LITERAL
                 STRING "'[(0,0),(1,1)]'"
@@ -140,8 +149,11 @@ SOURCE_FILE
             PLUS "+"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                PATH_KW "path"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      PATH_KW "path"
               WHITESPACE " "
               LITERAL
                 STRING "'[(2,2),(3,3),(4,4)]'"
@@ -157,8 +169,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1),(0,0)'"
@@ -166,8 +181,11 @@ SOURCE_FILE
             MINUS "-"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,0)'"
@@ -183,8 +201,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                PATH_KW "path"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      PATH_KW "path"
               WHITESPACE " "
               LITERAL
                 STRING "'((0,0),(1,0),(1,1))'"
@@ -192,8 +213,11 @@ SOURCE_FILE
             STAR "*"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(3.0,0)'"
@@ -207,8 +231,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                PATH_KW "path"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      PATH_KW "path"
               WHITESPACE " "
               LITERAL
                 STRING "'((0,0),(1,0),(1,1))'"
@@ -251,8 +278,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                PATH_KW "path"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      PATH_KW "path"
               WHITESPACE " "
               LITERAL
                 STRING "'((0,0),(1,0),(1,1))'"
@@ -260,8 +290,11 @@ SOURCE_FILE
             SLASH "/"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(2.0,0)'"
@@ -275,8 +308,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                PATH_KW "path"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      PATH_KW "path"
               WHITESPACE " "
               LITERAL
                 STRING "'((0,0),(1,0),(1,1))'"
@@ -324,8 +360,11 @@ SOURCE_FILE
               AT "@"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                PATH_KW "path"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      PATH_KW "path"
               WHITESPACE " "
               LITERAL
                 STRING "'[(0,0),(1,0),(1,1)]'"
@@ -345,8 +384,11 @@ SOURCE_FILE
               AT "@"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
@@ -365,8 +407,11 @@ SOURCE_FILE
               POUND "#"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                PATH_KW "path"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      PATH_KW "path"
               WHITESPACE " "
               LITERAL
                 STRING "'((1,0),(0,1),(-1,0))'"
@@ -382,8 +427,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(0,0),(1,1)]'"
@@ -392,8 +440,11 @@ SOURCE_FILE
               POUND "#"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(1,0),(0,1)]'"
@@ -409,8 +460,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(-1,-1)'"
@@ -419,8 +473,11 @@ SOURCE_FILE
               POUND "#"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1),(-2,-2)'"
@@ -436,8 +493,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(0,0)'"
@@ -447,8 +507,11 @@ SOURCE_FILE
               POUND "#"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(2,0),(0,2)]'"
@@ -464,8 +527,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "circle"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "circle"
               WHITESPACE " "
               LITERAL
                 STRING "'<(0,0),1>'"
@@ -476,8 +542,11 @@ SOURCE_FILE
               R_ANGLE ">"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "circle"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "circle"
               WHITESPACE " "
               LITERAL
                 STRING "'<(5,0),1>'"
@@ -493,8 +562,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "circle"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "circle"
               WHITESPACE " "
               LITERAL
                 STRING "'<(0,0),2>'"
@@ -504,8 +576,11 @@ SOURCE_FILE
               R_ANGLE ">"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1)'"
@@ -521,8 +596,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1)'"
@@ -532,8 +610,11 @@ SOURCE_FILE
               AT "@"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "circle"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "circle"
               WHITESPACE " "
               LITERAL
                 STRING "'<(0,0),2>'"
@@ -549,8 +630,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1),(0,0)'"
@@ -560,8 +644,11 @@ SOURCE_FILE
               AMP "&"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
@@ -577,8 +664,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "circle"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "circle"
               WHITESPACE " "
               LITERAL
                 STRING "'<(0,0),1>'"
@@ -588,8 +678,11 @@ SOURCE_FILE
               L_ANGLE "<"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "circle"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "circle"
               WHITESPACE " "
               LITERAL
                 STRING "'<(5,0),1>'"
@@ -605,8 +698,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "circle"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "circle"
               WHITESPACE " "
               LITERAL
                 STRING "'<(5,0),1>'"
@@ -616,8 +712,11 @@ SOURCE_FILE
               R_ANGLE ">"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "circle"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "circle"
               WHITESPACE " "
               LITERAL
                 STRING "'<(0,0),1>'"
@@ -633,8 +732,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1),(0,0)'"
@@ -644,8 +746,11 @@ SOURCE_FILE
               L_ANGLE "<"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
@@ -661,8 +766,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(3,3),(0,0)'"
@@ -672,8 +780,11 @@ SOURCE_FILE
               R_ANGLE ">"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
@@ -689,8 +800,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(3,3),(0,0)'"
@@ -701,8 +815,11 @@ SOURCE_FILE
               PIPE "|"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(5,5),(3,4)'"
@@ -718,8 +835,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(3,3),(0,0)'"
@@ -730,8 +850,11 @@ SOURCE_FILE
               R_ANGLE ">"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(5,5),(3,4)'"
@@ -747,8 +870,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,1),(0,0)'"
@@ -759,8 +885,11 @@ SOURCE_FILE
               PIPE "|"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
@@ -776,8 +905,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(3,3),(0,0)'"
@@ -788,8 +920,11 @@ SOURCE_FILE
               R_ANGLE ">"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(0,0)'"
@@ -805,8 +940,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'((1,1),(0,0))'"
@@ -816,8 +954,11 @@ SOURCE_FILE
               CARET "^"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'((2,2),(1,1))'"
@@ -833,8 +974,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'((2,2),(1,1))'"
@@ -844,8 +988,11 @@ SOURCE_FILE
               CARET "^"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'((1,1),(0,0))'"
@@ -861,8 +1008,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(-1,0),(1,0)]'"
@@ -872,8 +1022,11 @@ SOURCE_FILE
               POUND "#"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "box"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "box"
               WHITESPACE " "
               LITERAL
                 STRING "'(2,2),(-2,-2)'"
@@ -893,8 +1046,11 @@ SOURCE_FILE
               MINUS "-"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(-1,0),(1,0)]'"
@@ -910,8 +1066,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(1,0)'"
@@ -921,8 +1080,11 @@ SOURCE_FILE
               MINUS "-"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(0,0)'"
@@ -942,8 +1104,11 @@ SOURCE_FILE
               PIPE "|"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(-1,0),(1,0)]'"
@@ -959,8 +1124,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(0,1)'"
@@ -970,8 +1138,11 @@ SOURCE_FILE
               PIPE "|"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "point"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "point"
               WHITESPACE " "
               LITERAL
                 STRING "'(0,0)'"
@@ -987,8 +1158,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(0,0),(0,1)]'"
@@ -999,8 +1173,11 @@ SOURCE_FILE
               PIPE "|"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(0,0),(1,0)]'"
@@ -1016,8 +1193,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(-1,0),(1,0)]'"
@@ -1028,8 +1208,11 @@ SOURCE_FILE
               PIPE "|"
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "lseg"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "lseg"
               WHITESPACE " "
               LITERAL
                 STRING "'[(-1,2),(1,2)]'"
@@ -1045,8 +1228,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "polygon"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "polygon"
               WHITESPACE " "
               LITERAL
                 STRING "'((0,0),(1,1))'"
@@ -1056,8 +1242,11 @@ SOURCE_FILE
               EQ "="
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "polygon"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "polygon"
               WHITESPACE " "
               LITERAL
                 STRING "'((1,1),(0,0))'"
@@ -1075,8 +1264,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "inet"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "inet"
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
@@ -1087,8 +1279,11 @@ SOURCE_FILE
               EQ "="
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "inet"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "inet"
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
@@ -1104,8 +1299,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "inet"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "inet"
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
@@ -1116,8 +1314,11 @@ SOURCE_FILE
               EQ "="
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "inet"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "inet"
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
@@ -1144,8 +1345,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "tsquery"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsquery"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- subnet contain or equal subnet"
@@ -1158,8 +1362,11 @@ SOURCE_FILE
         TARGET
           BIN_EXPR
             CAST_EXPR
-              NAME_REF
-                IDENT "inet"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "inet"
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
@@ -1170,8 +1377,11 @@ SOURCE_FILE
               EQ "="
             WHITESPACE " "
             CAST_EXPR
-              NAME_REF
-                IDENT "inet"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "inet"
               WHITESPACE " "
               LITERAL
                 STRING "'192.168.1/24'"
@@ -3115,8 +3325,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                JSON_KW "json"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               MINUS "-"
@@ -3139,8 +3352,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                JSON_KW "json"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               MINUS "-"
@@ -3165,8 +3381,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                JSON_KW "json"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               MINUS "-"
@@ -3190,8 +3409,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                JSON_KW "json"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               MINUS "-"
@@ -3217,8 +3439,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                JSON_KW "json"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               POUND "#"
@@ -3243,8 +3468,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                JSON_KW "json"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
             WHITESPACE " "
             CUSTOM_OP
               POUND "#"
@@ -3270,8 +3498,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               AT "@"
@@ -3283,8 +3514,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -3300,8 +3534,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               L_ANGLE "<"
@@ -3313,8 +3550,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- existence"
@@ -3332,8 +3572,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               QUESTION "?"
@@ -3355,8 +3598,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               QUESTION "?"
@@ -3380,8 +3626,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               QUESTION "?"
@@ -3414,8 +3663,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               QUESTION "?"
@@ -3448,8 +3700,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3461,8 +3716,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3478,8 +3736,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3491,8 +3752,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3508,8 +3772,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3521,8 +3788,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3538,8 +3808,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3551,8 +3824,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3568,8 +3844,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               PIPE "|"
@@ -3586,8 +3865,11 @@ SOURCE_FILE
                   COLON_COLON
                     COLON ":"
                     COLON ":"
-                  NAME_REF
-                    IDENT "jsonb"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "jsonb"
                 R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -3606,8 +3888,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             MINUS "-"
             WHITESPACE " "
@@ -3628,8 +3913,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             MINUS "-"
             WHITESPACE " "
@@ -3650,8 +3938,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             MINUS "-"
             WHITESPACE " "
@@ -3661,11 +3952,12 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              INDEX_EXPR
-                NAME_REF
-                  TEXT_KW "text"
-                L_BRACK "["
-                R_BRACK "]"
+              EXPR_TYPE
+                INDEX_EXPR
+                  NAME_REF
+                    TEXT_KW "text"
+                  L_BRACK "["
+                  R_BRACK "]"
   SEMICOLON ";"
   WHITESPACE "\n"
   SELECT
@@ -3681,8 +3973,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             MINUS "-"
             WHITESPACE " "
@@ -3705,8 +4000,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               POUND "#"
@@ -3731,8 +4029,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               AT "@"
@@ -3757,8 +4058,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "jsonb"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "jsonb"
             WHITESPACE " "
             CUSTOM_OP
               AT "@"
@@ -3815,8 +4119,11 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                NAME_REF
-                  IDENT "jsonb"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "jsonb"
               R_PAREN ")"
             L_BRACK "["
             LITERAL
@@ -3839,8 +4146,11 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                NAME_REF
-                  IDENT "jsonb"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "jsonb"
               R_PAREN ")"
             L_BRACK "["
             LITERAL
@@ -3865,8 +4175,11 @@ SOURCE_FILE
                     COLON_COLON
                       COLON ":"
                       COLON ":"
-                    NAME_REF
-                      IDENT "jsonb"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "jsonb"
                   R_PAREN ")"
                 L_BRACK "["
                 LITERAL
@@ -4261,8 +4574,11 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                NAME_REF
-                  IDENT "c"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "c"
             WHITESPACE " "
             COLLATE_KW "collate"
             WHITESPACE " "
@@ -4514,8 +4830,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                IDENT "tsrange"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "tsrange"
             WHITESPACE " "
             CUSTOM_OP
               AT "@"
@@ -4527,8 +4846,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                TIMESTAMP_KW "timestamp"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TIMESTAMP_KW "timestamp"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- first contained by second"
@@ -4968,16 +5290,22 @@ SOURCE_FILE
             TUPLE_EXPR
               L_PAREN "("
               CAST_EXPR
-                NAME_REF
-                  IDENT "date"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "date"
                 WHITESPACE " "
                 LITERAL
                   STRING "'2001-02-16'"
               COMMA ","
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
-                  IDENT "date"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "date"
                 WHITESPACE " "
                 LITERAL
                   STRING "'2001-12-21'"
@@ -4988,16 +5316,22 @@ SOURCE_FILE
             TUPLE_EXPR
               L_PAREN "("
               CAST_EXPR
-                NAME_REF
-                  IDENT "date"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "date"
                 WHITESPACE " "
                 LITERAL
                   STRING "'2001-10-30'"
               COMMA ","
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
-                  IDENT "date"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "date"
                 WHITESPACE " "
                 LITERAL
                   STRING "'2002-10-30'"

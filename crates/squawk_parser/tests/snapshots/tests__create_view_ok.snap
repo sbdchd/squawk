@@ -46,8 +46,11 @@ SOURCE_FILE
         TARGET_LIST
           TARGET
             CAST_EXPR
-              NAME_REF
-                TEXT_KW "text"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      TEXT_KW "text"
               WHITESPACE " "
               LITERAL
                 STRING "'Hello World'"

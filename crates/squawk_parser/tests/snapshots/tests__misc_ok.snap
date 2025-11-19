@@ -104,11 +104,12 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                INDEX_EXPR
-                  NAME_REF
-                    IDENT "timestamptz"
-                  L_BRACK "["
-                  R_BRACK "]"
+                EXPR_TYPE
+                  INDEX_EXPR
+                    NAME_REF
+                      IDENT "timestamptz"
+                    L_BRACK "["
+                    R_BRACK "]"
               COMMA ","
               WHITESPACE " \n    "
               CAST_EXPR
@@ -117,11 +118,12 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                INDEX_EXPR
-                  NAME_REF
-                    TEXT_KW "text"
-                  L_BRACK "["
-                  R_BRACK "]"
+                EXPR_TYPE
+                  INDEX_EXPR
+                    NAME_REF
+                      TEXT_KW "text"
+                    L_BRACK "["
+                    R_BRACK "]"
               COMMA ","
               WHITESPACE " \n    "
               CAST_EXPR
@@ -130,11 +132,12 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                INDEX_EXPR
-                  NAME_REF
-                    IDENT "float8"
-                  L_BRACK "["
-                  R_BRACK "]"
+                EXPR_TYPE
+                  INDEX_EXPR
+                    NAME_REF
+                      IDENT "float8"
+                    L_BRACK "["
+                    R_BRACK "]"
               WHITESPACE "\n"
               R_PAREN ")"
   SEMICOLON ";"
@@ -677,8 +680,11 @@ SOURCE_FILE
                     COLON_COLON
                       COLON ":"
                       COLON ":"
-                    NAME_REF
-                      IDENT "jsonb"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            IDENT "jsonb"
                   COMMA ","
                   WHITESPACE "\n        "
                   NAMED_ARG
@@ -1015,8 +1021,11 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                NAME_REF
-                  IDENT "int4"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "int4"
               COMMA ","
               WHITESPACE " "
               NAME_REF
@@ -1071,8 +1080,11 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                NAME_REF
-                  IDENT "int4"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "int4"
               COMMA ","
               WHITESPACE " "
               NAME_REF
@@ -1258,8 +1270,11 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            NAME_REF
-              IDENT "date"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "date"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -1331,8 +1346,11 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            NAME_REF
-              IDENT "date"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "date"
           R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -2102,8 +2120,11 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            NAME_REF
-              IDENT "vector"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "vector"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   SELECT
@@ -2162,8 +2183,11 @@ SOURCE_FILE
                         COLON_COLON
                           COLON ":"
                           COLON ":"
-                        NAME_REF
-                          IDENT "vector"
+                        PATH_TYPE
+                          PATH
+                            PATH_SEGMENT
+                              NAME_REF
+                                IDENT "vector"
               R_PAREN ")"
     WHITESPACE "\n"
     LIMIT_CLAUSE
@@ -2557,8 +2581,11 @@ SOURCE_FILE
           COLON_COLON
             COLON ":"
             COLON ":"
-          NAME_REF
-            IDENT "date"
+          PATH_TYPE
+            PATH
+              PATH_SEGMENT
+                NAME_REF
+                  IDENT "date"
     WHITESPACE " "
     GROUP_BY_CLAUSE
       GROUP_KW "group"
@@ -3476,8 +3503,11 @@ SOURCE_FILE
                     COLON_COLON
                       COLON ":"
                       COLON ":"
-                    NAME_REF
-                      JSON_KW "json"
+                    PATH_TYPE
+                      PATH
+                        PATH_SEGMENT
+                          NAME_REF
+                            JSON_KW "json"
                   R_PAREN ")"
               WHITESPACE " "
               ALIAS
@@ -3511,8 +3541,11 @@ SOURCE_FILE
                       COLON_COLON
                         COLON ":"
                         COLON ":"
-                      NAME_REF
-                        JSON_KW "json"
+                      PATH_TYPE
+                        PATH
+                          PATH_SEGMENT
+                            NAME_REF
+                              JSON_KW "json"
                     R_PAREN ")"
                 WHITESPACE " "
                 ALIAS
@@ -3647,8 +3680,11 @@ SOURCE_FILE
                   COLON_COLON
                     COLON ":"
                     COLON ":"
-                  NAME_REF
-                    JSON_KW "json"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          JSON_KW "json"
                 R_PAREN ")"
             WHITESPACE " "
             ALIAS
@@ -3692,8 +3728,11 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            NAME_REF
-              IDENT "jsonb"
+            PATH_TYPE
+              PATH
+                PATH_SEGMENT
+                  NAME_REF
+                    IDENT "jsonb"
           WHITESPACE "\n"
           R_PAREN ")"
   SEMICOLON ";"
@@ -5782,13 +5821,19 @@ SOURCE_FILE
                   COLON_COLON
                     COLON ":"
                     COLON ":"
-                  NAME_REF
-                    TEXT_KW "text"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                NAME_REF
-                  IDENT "float8"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float8"
               COMMA ","
               WHITESPACE " "
               CAST_EXPR
@@ -5798,13 +5843,19 @@ SOURCE_FILE
                   COLON_COLON
                     COLON ":"
                     COLON ":"
-                  NAME_REF
-                    TEXT_KW "text"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          TEXT_KW "text"
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                NAME_REF
-                  IDENT "float8"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "float8"
               R_PAREN ")"
     WHITESPACE " "
     FROM_CLAUSE

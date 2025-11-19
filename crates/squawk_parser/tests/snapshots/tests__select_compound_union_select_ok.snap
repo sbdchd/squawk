@@ -49,14 +49,15 @@ SOURCE_FILE
                           COLON_COLON
                             COLON ":"
                             COLON ":"
-                          CALL_EXPR
-                            NAME_REF
-                              CHAR_KW "char"
-                            ARG_LIST
-                              L_PAREN "("
-                              LITERAL
-                                INT_NUMBER "4"
-                              R_PAREN ")"
+                          EXPR_TYPE
+                            CALL_EXPR
+                              NAME_REF
+                                CHAR_KW "char"
+                              ARG_LIST
+                                L_PAREN "("
+                                LITERAL
+                                  INT_NUMBER "4"
+                                R_PAREN ")"
                   WHITESPACE " "
                   ORDER_BY_CLAUSE
                     ORDER_KW "ORDER"
@@ -187,14 +188,15 @@ SOURCE_FILE
                           COLON_COLON
                             COLON ":"
                             COLON ":"
-                          CALL_EXPR
-                            NAME_REF
-                              CHAR_KW "char"
-                            ARG_LIST
-                              L_PAREN "("
-                              LITERAL
-                                INT_NUMBER "4"
-                              R_PAREN ")"
+                          EXPR_TYPE
+                            CALL_EXPR
+                              NAME_REF
+                                CHAR_KW "char"
+                              ARG_LIST
+                                L_PAREN "("
+                                LITERAL
+                                  INT_NUMBER "4"
+                                R_PAREN ")"
                   WHITESPACE " "
                   ORDER_BY_CLAUSE
                     ORDER_KW "ORDER"

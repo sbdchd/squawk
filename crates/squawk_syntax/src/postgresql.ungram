@@ -288,11 +288,19 @@ Type =
   ArrayType
 | PercentType
 | PathType
+// TODO: I think we can probably simplify the AST nodes for Types & Exprs.
+| ExprType
 | CharType
 | BitType
 | DoubleType
 | TimeType
 | IntervalType
+
+// For when we're parsing expressions and then later we realize they're types.
+// e.g., `select pg_catalog.varchar(10) 'foo'`
+ExprType =
+  // TODO: really just FIELD_EXPR, CALL_EXPR, INDEX_EXPR
+  Expr
 
 Role =
   ('group'? '#ident')

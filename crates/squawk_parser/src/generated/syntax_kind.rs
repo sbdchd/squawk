@@ -756,6 +756,7 @@ pub enum SyntaxKind {
     EXCLUDE_CONSTRAINT,
     EXECUTE,
     EXPLAIN,
+    EXPR_TYPE,
     FAT_ARROW,
     FETCH,
     FETCH_CLAUSE,

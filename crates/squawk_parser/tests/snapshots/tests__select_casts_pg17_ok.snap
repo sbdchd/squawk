@@ -10,27 +10,28 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CAST_EXPR
-            CALL_EXPR
-              FIELD_EXPR
-                INDEX_EXPR
+            EXPR_TYPE
+              CALL_EXPR
+                FIELD_EXPR
+                  INDEX_EXPR
+                    NAME_REF
+                      IDENT "foo"
+                    L_BRACK "["
+                    LITERAL
+                      INT_NUMBER "10"
+                    R_BRACK "]"
+                  DOT "."
                   NAME_REF
-                    IDENT "foo"
-                  L_BRACK "["
+                    IDENT "bar"
+                ARG_LIST
+                  L_PAREN "("
                   LITERAL
                     INT_NUMBER "10"
-                  R_BRACK "]"
-                DOT "."
-                NAME_REF
-                  IDENT "bar"
-              ARG_LIST
-                L_PAREN "("
-                LITERAL
-                  INT_NUMBER "10"
-                COMMA ","
-                WHITESPACE " "
-                LITERAL
-                  INT_NUMBER "2"
-                R_PAREN ")"
+                  COMMA ","
+                  WHITESPACE " "
+                  LITERAL
+                    INT_NUMBER "2"
+                  R_PAREN ")"
             WHITESPACE " "
             LITERAL
               STRING "'100'"

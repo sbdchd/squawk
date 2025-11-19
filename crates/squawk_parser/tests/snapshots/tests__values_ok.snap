@@ -469,8 +469,11 @@ SOURCE_FILE
                   COLON_COLON
                     COLON ":"
                     COLON ":"
-                  NAME_REF
-                    IDENT "inet"
+                  PATH_TYPE
+                    PATH
+                      PATH_SEGMENT
+                        NAME_REF
+                          IDENT "inet"
                 R_PAREN ")"
               COMMA ","
               WHITESPACE " "
