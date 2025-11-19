@@ -2127,8 +2127,11 @@ SOURCE_FILE
               COMMA ","
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
-                  JSON_KW "json"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        JSON_KW "json"
                 WHITESPACE " "
                 LITERAL
                   STRING "'{\"a\":null}'"
@@ -2932,8 +2935,11 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
-                  IDENT "timestamptz"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "timestamptz"
                 WHITESPACE " "
                 LITERAL
                   STRING "'2013-07-01 12:00:00'"
@@ -3004,8 +3010,11 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
-                  IDENT "date"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "date"
                 WHITESPACE " "
                 LITERAL
                   STRING "'2006-01-01'"
@@ -3028,8 +3037,11 @@ SOURCE_FILE
               FROM_KW "from"
               WHITESPACE " "
               CAST_EXPR
-                NAME_REF
-                  IDENT "date"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "date"
                 WHITESPACE " "
                 LITERAL
                   STRING "'2006-01-01'"
@@ -3661,11 +3673,12 @@ SOURCE_FILE
                 COLON_COLON
                   COLON ":"
                   COLON ":"
-                INDEX_EXPR
-                  NAME_REF
-                    NUMERIC_KW "numeric"
-                  L_BRACK "["
-                  R_BRACK "]"
+                EXPR_TYPE
+                  INDEX_EXPR
+                    NAME_REF
+                      NUMERIC_KW "numeric"
+                    L_BRACK "["
+                    R_BRACK "]"
               R_PAREN ")"
   SEMICOLON ";"
   WHITESPACE "\n\n"

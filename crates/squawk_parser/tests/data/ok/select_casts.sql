@@ -7,6 +7,7 @@ select int8('1234');
 select 44::bit(3);
 select cast(-44 as bit(12));
 select '1110'::bit(4)::integer;
+select '{1}'::pg_catalog.varchar(1)[];
 
 select '{1,2,3}'::int[];
 select foo::int;
@@ -206,6 +207,8 @@ select '{1}'::pg_catalog.int8[];
 
 -- cast
 select cast(a as foo.bar);
+select cast('{1}' as pg_catalog.varchar(1)[]);
+
 
 -- treat
 select treat(a as foo.b);
@@ -268,3 +271,4 @@ select boolean 'false';
 
 select foo.bar '100';
 select foo.bar(10, 2) '100';
+select pg_catalog.varchar(100) '{123}';

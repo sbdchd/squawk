@@ -2017,7 +2017,18 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     // A type name followed by a string is a type cast so we insert a CAST_EXPR
     // preceding it to wrap the previously parsed data.
     // e.g., `select numeric '12312'`
-    if opt_string_literal(p).is_some() {
+    if p.at_ts(STRING_FIRST) {
+        // Wrap expr in type.
+        // TODO: can we unify types & exprs?
+        let cm = if kind == NAME_REF {
+            let path_segment = cm.precede(p).complete(p, PATH_SEGMENT);
+            let path = path_segment.precede(p).complete(p, PATH);
+            path.precede(p).complete(p, PATH_TYPE)
+        } else {
+            cm
+        };
+
+        string_literal(p);
         if kind == INTERVAL_TYPE {
             opt_interval_trailing(p);
         }
@@ -2045,11 +2056,18 @@ fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn call_expr_args(p: &mut Parser<'_>, lhs: CompletedMarker) -> CompletedMarker {
     assert!(p.at(L_PAREN));
+    let prev_kind = lhs.kind();
     let m = lhs.precede(p);
     arg_list(p);
     opt_agg_clauses(p);
-    let cm = m.complete(p, CALL_EXPR);
-    if opt_string_literal(p).is_some() {
+    let mut cm = m.complete(p, CALL_EXPR);
+    if p.at_ts(STRING_FIRST) {
+        // Wrap expr in type.
+        // TODO: can we unify types & exprs?
+        if prev_kind == FIELD_EXPR {
+            cm = cm.precede(p).complete(p, EXPR_TYPE);
+        }
+        string_literal(p);
         cm.precede(p).complete(p, CAST_EXPR)
     } else {
         cm
@@ -2199,9 +2217,13 @@ fn postfix_dot_expr(
 ) -> Result<CompletedMarker, CompletedMarker> {
     assert!(p.at(DOT));
     field_expr(p, Some(lhs), allow_calls).map(|cm| {
-        // A field followed by a literal is a type cast so we insert a CAST_EXPR
-        // preceding it to wrap the previously parsed data.
-        if opt_string_literal(p).is_some() {
+        if p.at_ts(STRING_FIRST) {
+            // wrap our previous expression in a type
+            // TODO: can we unify types & exprs?
+            let cm = cm.precede(p).complete(p, EXPR_TYPE);
+            string_literal(p);
+            // A field followed by a literal is a type cast so we insert a CAST_EXPR
+            // preceding it to wrap the previously parsed data.
             cm.precede(p).complete(p, CAST_EXPR)
         } else {
             cm
@@ -2433,17 +2455,29 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: &Restrictions) -> Option<CompletedMark
             Associativity::Left => op_bp + 1,
             Associativity::Right => op_bp,
         };
-        let _ = expr_bp(p, op_bp, r);
-        lhs = m.complete(
-            p,
-            if matches!(op, COLON_COLON) {
-                CAST_EXPR
-            } else if matches!(op, FAT_ARROW | COLON_EQ) {
-                NAMED_ARG
-            } else {
-                BIN_EXPR
-            },
-        );
+        let rhs = expr_bp(p, op_bp, r);
+        lhs = if matches!(op, COLON_COLON) {
+            if let Some(rhs) = rhs {
+                match rhs.kind() {
+                    NAME_REF => {
+                        // wrap our previous expression in a type
+                        // TODO: can we unify types & exprs?
+                        let path_segment = rhs.precede(p).complete(p, PATH_SEGMENT);
+                        let path = path_segment.precede(p).complete(p, PATH);
+                        path.precede(p).complete(p, PATH_TYPE);
+                    }
+                    FIELD_EXPR | CALL_EXPR | INDEX_EXPR => {
+                        rhs.precede(p).complete(p, EXPR_TYPE);
+                    }
+                    _ => {}
+                }
+            };
+            m.complete(p, CAST_EXPR)
+        } else if matches!(op, FAT_ARROW | COLON_EQ) {
+            m.complete(p, NAMED_ARG)
+        } else {
+            m.complete(p, BIN_EXPR)
+        };
     }
     Some(lhs)
 }

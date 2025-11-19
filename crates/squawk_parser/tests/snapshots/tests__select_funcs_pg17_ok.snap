@@ -431,8 +431,11 @@ SOURCE_FILE
               COLON_COLON
                 COLON ":"
                 COLON ":"
-              NAME_REF
-                JSON_KW "json"
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      JSON_KW "json"
             COMMA ","
             WHITESPACE " "
             LITERAL
@@ -1020,8 +1023,11 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               CAST_EXPR
-                NAME_REF
-                  IDENT "jsonb"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "jsonb"
                 WHITESPACE " "
                 LITERAL
                   STRING "'{\"key1\": [1,2,3]}'"
@@ -1056,8 +1062,11 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               CAST_EXPR
-                NAME_REF
-                  IDENT "jsonb"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "jsonb"
                 WHITESPACE " "
                 LITERAL
                   STRING "'{\"a\": [1,2,3]}'"
@@ -1088,8 +1097,11 @@ SOURCE_FILE
             ARG_LIST
               L_PAREN "("
               CAST_EXPR
-                NAME_REF
-                  IDENT "jsonb"
+                PATH_TYPE
+                  PATH
+                    PATH_SEGMENT
+                      NAME_REF
+                        IDENT "jsonb"
                 WHITESPACE " "
                 LITERAL
                   STRING "'{\"a\": [1,2,3]}'"

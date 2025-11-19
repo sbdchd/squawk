@@ -34,6 +34,7 @@ pub(crate) fn is_not_valid_int_type(
         ast::Type::DoubleType(_) => false,
         ast::Type::TimeType(_) => false,
         ast::Type::IntervalType(_) => false,
+        ast::Type::ExprType(_) => false,
     }
 }
 

@@ -42,6 +42,7 @@ pub fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
             false
         }
         ast::Type::IntervalType(_) => false,
+        ast::Type::ExprType(_) => false,
     }
 }
 

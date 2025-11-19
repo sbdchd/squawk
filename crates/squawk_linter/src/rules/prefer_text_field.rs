@@ -47,6 +47,7 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
         ast::Type::DoubleType(_) => false,
         ast::Type::TimeType(_) => false,
         ast::Type::IntervalType(_) => false,
+        ast::Type::ExprType(_) => false,
     }
 }
 

@@ -615,3 +615,102 @@ fn between_expr() {
     assert_eq!(start.syntax().text(), "1");
     assert_eq!(end.syntax().text(), "3");
 }
+
+#[test]
+fn cast_expr() {
+    use insta::assert_snapshot;
+
+    let cast = extract_expr("select cast('123' as int)");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"int");
+
+    let cast = extract_expr("select cast('123' as pg_catalog.int4)");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"pg_catalog.int4");
+
+    let cast = extract_expr("select int '123'");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"int");
+
+    let cast = extract_expr("select pg_catalog.int4 '123'");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"pg_catalog.int4");
+
+    let cast = extract_expr("select '123'::int");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"int");
+
+    let cast = extract_expr("select '123'::int4");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"int4");
+
+    let cast = extract_expr("select '123'::pg_catalog.int4");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'123'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"pg_catalog.int4");
+
+    let cast = extract_expr("select '{123}'::pg_catalog.varchar(10)[]");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'{123}'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"pg_catalog.varchar(10)[]");
+
+    let cast = extract_expr("select cast('{123}' as pg_catalog.varchar(10)[])");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'{123}'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"pg_catalog.varchar(10)[]");
+
+    let cast = extract_expr("select pg_catalog.varchar(10) '{123}'");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'{123}'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"pg_catalog.varchar(10)");
+
+    let cast = extract_expr("select interval '1' month");
+    assert!(cast.expr().is_some());
+    assert_snapshot!(cast.expr().unwrap().syntax(), @"'1'");
+    assert!(cast.ty().is_some());
+    assert_snapshot!(cast.ty().unwrap().syntax(), @"interval");
+
+    fn extract_expr(sql: &str) -> ast::CastExpr {
+        let parse = SourceFile::parse(sql);
+        assert!(parse.errors().is_empty());
+        let file: SourceFile = parse.tree();
+        let node = file
+            .stmts()
+            .map(|x| match x {
+                ast::Stmt::Select(select) => select
+                    .select_clause()
+                    .unwrap()
+                    .target_list()
+                    .unwrap()
+                    .targets()
+                    .next()
+                    .unwrap()
+                    .expr()
+                    .unwrap()
+                    .clone(),
+                _ => unreachable!(),
+            })
+            .next()
+            .unwrap();
+        match node {
+            ast::Expr::CastExpr(cast) => cast,
+            _ => unreachable!(),
+        }
+    }
+}

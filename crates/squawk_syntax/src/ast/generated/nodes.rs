@@ -4786,6 +4786,17 @@ impl Explain {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ExprType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ExprType {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct FatArrow {
     pub(crate) syntax: SyntaxNode,
 }
@@ -11218,6 +11229,7 @@ pub enum Type {
     BitType(BitType),
     CharType(CharType),
     DoubleType(DoubleType),
+    ExprType(ExprType),
     IntervalType(IntervalType),
     PathType(PathType),
     PercentType(PercentType),
@@ -15089,6 +15101,24 @@ impl AstNode for Explain {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::EXPLAIN
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ExprType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::EXPR_TYPE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -24478,6 +24508,7 @@ impl AstNode for Type {
                 | SyntaxKind::BIT_TYPE
                 | SyntaxKind::CHAR_TYPE
                 | SyntaxKind::DOUBLE_TYPE
+                | SyntaxKind::EXPR_TYPE
                 | SyntaxKind::INTERVAL_TYPE
                 | SyntaxKind::PATH_TYPE
                 | SyntaxKind::PERCENT_TYPE
@@ -24491,6 +24522,7 @@ impl AstNode for Type {
             SyntaxKind::BIT_TYPE => Type::BitType(BitType { syntax }),
             SyntaxKind::CHAR_TYPE => Type::CharType(CharType { syntax }),
             SyntaxKind::DOUBLE_TYPE => Type::DoubleType(DoubleType { syntax }),
+            SyntaxKind::EXPR_TYPE => Type::ExprType(ExprType { syntax }),
             SyntaxKind::INTERVAL_TYPE => Type::IntervalType(IntervalType { syntax }),
             SyntaxKind::PATH_TYPE => Type::PathType(PathType { syntax }),
             SyntaxKind::PERCENT_TYPE => Type::PercentType(PercentType { syntax }),
@@ -24508,6 +24540,7 @@ impl AstNode for Type {
             Type::BitType(it) => &it.syntax,
             Type::CharType(it) => &it.syntax,
             Type::DoubleType(it) => &it.syntax,
+            Type::ExprType(it) => &it.syntax,
             Type::IntervalType(it) => &it.syntax,
             Type::PathType(it) => &it.syntax,
             Type::PercentType(it) => &it.syntax,
@@ -24537,6 +24570,12 @@ impl From<DoubleType> for Type {
     #[inline]
     fn from(node: DoubleType) -> Type {
         Type::DoubleType(node)
+    }
+}
+impl From<ExprType> for Type {
+    #[inline]
+    fn from(node: ExprType) -> Type {
+        Type::ExprType(node)
     }
 }
 impl From<IntervalType> for Type {
