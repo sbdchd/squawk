@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.31.0 - 2025-11-24
+
+## Added
+
+- linter: adding_foreign_key_constraint: allow when create table in transaction (#713)
+- lsp: add code action for case else clause (#709). Thanks @cr4ftx!
+- lsp: go to def for case exprs (#708)
+- parser: fill out more ast nodes (#714)
+- parser: add slice expr node to syntax tree (#707)
+- parser: improve create function & create foreign table robustness (#704)
+- parser: improve option & role lists (#702)
+- parser: improve error recovery for update statements (#701)
+
+## Fixed
+
+- parser: fix nodes for casts so ast access works correctly (#711)
+- linter: fix autofix for int & smallint with array types (#710)
+
 ## v2.30.0 - 2025-10-30
 
 ## Added
