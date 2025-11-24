@@ -22,7 +22,7 @@ impl AddColumn {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn name_ref(&self) -> Option<NameRef> {
+    pub fn name(&self) -> Option<Name> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -126,6 +126,10 @@ impl Alias {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name(&self) -> Option<Name> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn as_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::AS_KW)
     }
@@ -174,6 +178,10 @@ pub struct AlterColumn {
     pub(crate) syntax: SyntaxNode,
 }
 impl AlterColumn {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn option(&self) -> Option<AlterColumnOption> {
         support::child(&self.syntax)
@@ -1449,6 +1457,18 @@ impl CallExpr {
     pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
+    #[inline]
+    pub fn filter_clause(&self) -> Option<FilterClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn over_clause(&self) -> Option<OverClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn within_clause(&self) -> Option<WithinClause> {
+        support::child(&self.syntax)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -1725,6 +1745,10 @@ impl Column {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn not_deferrable_constraint_option(&self) -> Option<NotDeferrableConstraintOption> {
         support::child(&self.syntax)
     }
@@ -1829,8 +1853,16 @@ pub struct CompoundSelect {
 }
 impl CompoundSelect {
     #[inline]
-    pub fn select(&self) -> Option<Select> {
-        support::child(&self.syntax)
+    pub fn except_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EXCEPT_KW)
+    }
+    #[inline]
+    pub fn intersect_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INTERSECT_KW)
+    }
+    #[inline]
+    pub fn union_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UNION_KW)
     }
 }
 
@@ -1850,6 +1882,116 @@ impl CompressionMethod {
     #[inline]
     pub fn ident_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConflictDoNothing {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConflictDoNothing {
+    #[inline]
+    pub fn do_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DO_KW)
+    }
+    #[inline]
+    pub fn nothing_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOTHING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConflictDoUpdateSet {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConflictDoUpdateSet {
+    #[inline]
+    pub fn set_clause(&self) -> Option<SetClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn do_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DO_KW)
+    }
+    #[inline]
+    pub fn update_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::UPDATE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConflictIndexItem {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConflictIndexItem {
+    #[inline]
+    pub fn collate(&self) -> Option<Collate> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConflictIndexItemList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConflictIndexItemList {
+    #[inline]
+    pub fn conflict_index_items(&self) -> AstChildren<ConflictIndexItem> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConflictOnConstraint {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConflictOnConstraint {
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn constraint_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONSTRAINT_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct ConflictOnIndex {
+    pub(crate) syntax: SyntaxNode,
+}
+impl ConflictOnIndex {
+    #[inline]
+    pub fn conflict_index_item_list(&self) -> Option<ConflictIndexItemList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
     }
 }
 
@@ -2290,6 +2432,10 @@ pub struct CreateIndex {
 }
 impl CreateIndex {
     #[inline]
+    pub fn constraint_include_clause(&self) -> Option<ConstraintIncludeClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn if_not_exists(&self) -> Option<IfNotExists> {
         support::child(&self.syntax)
     }
@@ -2298,7 +2444,35 @@ impl CreateIndex {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn nulls_distinct(&self) -> Option<NullsDistinct> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn nulls_not_distinct(&self) -> Option<NullsNotDistinct> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn partition_item_list(&self) -> Option<PartitionItemList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn relation_name(&self) -> Option<RelationName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn tablespace(&self) -> Option<Tablespace> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_method(&self) -> Option<UsingMethod> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn with_params(&self) -> Option<WithParams> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3524,12 +3698,24 @@ impl DropColumn {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn cascade_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CASCADE_KW)
+    }
+    #[inline]
     pub fn column_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COLUMN_KW)
     }
     #[inline]
     pub fn drop_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DROP_KW)
+    }
+    #[inline]
+    pub fn restrict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RESTRICT_KW)
     }
 }
 
@@ -3776,6 +3962,10 @@ pub struct DropFunction {
     pub(crate) syntax: SyntaxNode,
 }
 impl DropFunction {
+    #[inline]
+    pub fn function_sig_list(&self) -> Option<FunctionSigList> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
@@ -4780,6 +4970,10 @@ pub struct Explain {
 }
 impl Explain {
     #[inline]
+    pub fn explain_stmt(&self) -> Option<ExplainStmt> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn explain_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EXPLAIN_KW)
     }
@@ -4936,10 +5130,6 @@ pub struct ForeignKeyConstraint {
 }
 impl ForeignKeyConstraint {
     #[inline]
-    pub fn from_columns(&self) -> Option<ColumnList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn match_type(&self) -> Option<MatchType> {
         support::child(&self.syntax)
     }
@@ -4953,10 +5143,6 @@ impl ForeignKeyConstraint {
     }
     #[inline]
     pub fn path(&self) -> Option<Path> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn to_columns(&self) -> Option<ColumnList> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5025,6 +5211,10 @@ impl FromItem {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn field_expr(&self) -> Option<FieldExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
@@ -5065,6 +5255,32 @@ pub struct FuncOptionList {
 impl FuncOptionList {
     #[inline]
     pub fn options(&self) -> AstChildren<FuncOption> {
+        support::children(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FunctionSig {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FunctionSig {
+    #[inline]
+    pub fn param_list(&self) -> Option<ParamList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FunctionSigList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl FunctionSigList {
+    #[inline]
+    pub fn function_sigs(&self) -> AstChildren<FunctionSig> {
         support::children(&self.syntax)
     }
 }
@@ -5353,6 +5569,25 @@ pub struct Inherit {
 }
 impl Inherit {
     #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn inherit_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INHERIT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct InheritTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl InheritTable {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn inherit_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INHERIT_KW)
     }
@@ -5425,7 +5660,15 @@ impl Insert {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn relation_name(&self) -> Option<RelationName> {
+    pub fn on_conflict_clause(&self) -> Option<OnConflictClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn returning_clause(&self) -> Option<ReturningClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5435,10 +5678,6 @@ impl Insert {
     #[inline]
     pub fn values(&self) -> Option<Values> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn conflict_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::CONFLICT_KW)
     }
     #[inline]
     pub fn default_token(&self) -> Option<SyntaxToken> {
@@ -5451,10 +5690,6 @@ impl Insert {
     #[inline]
     pub fn into_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INTO_KW)
-    }
-    #[inline]
-    pub fn on_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ON_KW)
     }
     #[inline]
     pub fn overriding_token(&self) -> Option<SyntaxToken> {
@@ -6677,7 +6912,7 @@ impl Merge {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn using_clause(&self) -> Option<UsingClause> {
+    pub fn using_on_clause(&self) -> Option<UsingOnClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -6722,8 +6957,36 @@ pub struct MergeInsert {
 }
 impl MergeInsert {
     #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn values(&self) -> Option<Values> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+    #[inline]
     pub fn insert_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INSERT_KW)
+    }
+    #[inline]
+    pub fn overriding_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OVERRIDING_KW)
+    }
+    #[inline]
+    pub fn system_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SYSTEM_KW)
+    }
+    #[inline]
+    pub fn user_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USER_KW)
+    }
+    #[inline]
+    pub fn values_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::VALUES_KW)
     }
 }
 
@@ -6732,6 +6995,10 @@ pub struct MergeUpdate {
     pub(crate) syntax: SyntaxNode,
 }
 impl MergeUpdate {
+    #[inline]
+    pub fn set_clause(&self) -> Option<SetClause> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
@@ -6748,7 +7015,7 @@ pub struct MergeWhenMatched {
 }
 impl MergeWhenMatched {
     #[inline]
-    pub fn condition(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -6779,7 +7046,7 @@ pub struct MergeWhenNotMatchedSource {
 }
 impl MergeWhenNotMatchedSource {
     #[inline]
-    pub fn condition(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -6822,7 +7089,7 @@ pub struct MergeWhenNotMatchedTarget {
 }
 impl MergeWhenNotMatchedTarget {
     #[inline]
-    pub fn condition(&self) -> Option<Expr> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -6988,6 +7255,29 @@ pub struct NoInherit {
     pub(crate) syntax: SyntaxNode,
 }
 impl NoInherit {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn inherit_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::INHERIT_KW)
+    }
+    #[inline]
+    pub fn no_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NoInheritTable {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NoInheritTable {
+    #[inline]
+    pub fn path(&self) -> Option<Path> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn inherit_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INHERIT_KW)
@@ -7353,6 +7643,29 @@ impl OnCommit {
     #[inline]
     pub fn commit_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COMMIT_KW)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct OnConflictClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl OnConflictClause {
+    #[inline]
+    pub fn conflict_action(&self) -> Option<ConflictAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn conflict_target(&self) -> Option<ConflictTarget> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn conflict_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CONFLICT_KW)
     }
     #[inline]
     pub fn on_token(&self) -> Option<SyntaxToken> {
@@ -7871,7 +8184,7 @@ pub struct ParenSelect {
 }
 impl ParenSelect {
     #[inline]
-    pub fn select(&self) -> Option<Select> {
+    pub fn select(&self) -> Option<SelectVariant> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7890,12 +8203,24 @@ pub struct PartitionBy {
 }
 impl PartitionBy {
     #[inline]
+    pub fn partition_item_list(&self) -> Option<PartitionItemList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn by_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BY_KW)
     }
     #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+    #[inline]
     pub fn partition_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PARTITION_KW)
+    }
+    #[inline]
+    pub fn range_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::RANGE_KW)
     }
 }
 
@@ -8488,6 +8813,10 @@ impl RenameColumn {
     pub fn rename_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::RENAME_KW)
     }
+    #[inline]
+    pub fn to_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::TO_KW)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -8652,12 +8981,8 @@ pub struct ResetStorageParams {
 }
 impl ResetStorageParams {
     #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    pub fn attribute_list(&self) -> Option<AttributeList> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn reset_token(&self) -> Option<SyntaxToken> {
@@ -9031,10 +9356,37 @@ impl SelectInto {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SequenceOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SequenceOption {
+    #[inline]
+    pub fn cycle_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::CYCLE_KW)
+    }
+    #[inline]
+    pub fn maxvalue_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MAXVALUE_KW)
+    }
+    #[inline]
+    pub fn minvalue_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::MINVALUE_KW)
+    }
+    #[inline]
+    pub fn no_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NO_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SequenceOptionList {
     pub(crate) syntax: SyntaxNode,
 }
 impl SequenceOptionList {
+    #[inline]
+    pub fn sequence_options(&self) -> AstChildren<SequenceOption> {
+        support::children(&self.syntax)
+    }
     #[inline]
     pub fn l_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::L_PAREN)
@@ -9150,44 +9502,13 @@ impl SetClause {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct SetColumn {
-    pub(crate) syntax: SyntaxNode,
-}
-impl SetColumn {
-    #[inline]
-    pub fn column(&self) -> Option<Column> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn column_list(&self) -> Option<ColumnList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn paren_select(&self) -> Option<ParenSelect> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn set_expr_list(&self) -> Option<SetExprList> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn eq_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::EQ)
-    }
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SetColumnList {
     pub(crate) syntax: SyntaxNode,
 }
 impl SetColumnList {
     #[inline]
-    pub fn set_column(&self) -> Option<SetColumn> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn comma_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::COMMA)
+    pub fn set_columns(&self) -> AstChildren<SetColumn> {
+        support::children(&self.syntax)
     }
 }
 
@@ -9344,6 +9665,10 @@ pub struct SetGeneratedOptions {
 }
 impl SetGeneratedOptions {
     #[inline]
+    pub fn generated_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::GENERATED_KW)
+    }
+    #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
     }
@@ -9361,6 +9686,29 @@ impl SetLogged {
     #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetMultipleColumns {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetMultipleColumns {
+    #[inline]
+    pub fn column_list(&self) -> Option<ColumnList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn paren_select(&self) -> Option<ParenSelect> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_expr_list(&self) -> Option<SetExprList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
     }
 }
 
@@ -9427,12 +9775,12 @@ pub struct SetOptionsList {
 }
 impl SetOptionsList {
     #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    pub fn alter_option_list(&self) -> Option<AlterOptionList> {
+        support::child(&self.syntax)
     }
     #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    pub fn options_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::OPTIONS_KW)
     }
     #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
@@ -9505,6 +9853,25 @@ impl SetSessionAuth {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetSingleColumn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetSingleColumn {
+    #[inline]
+    pub fn column(&self) -> Option<Column> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_expr(&self) -> Option<SetExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn eq_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::EQ)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SetStatistics {
     pub(crate) syntax: SyntaxNode,
 }
@@ -9540,12 +9907,8 @@ pub struct SetStorageParams {
 }
 impl SetStorageParams {
     #[inline]
-    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::L_PAREN)
-    }
-    #[inline]
-    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    pub fn attribute_list(&self) -> Option<AttributeList> {
+        support::child(&self.syntax)
     }
     #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
@@ -10147,11 +10510,27 @@ pub struct Update {
 }
 impl Update {
     #[inline]
+    pub fn alias(&self) -> Option<Alias> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn from_clause(&self) -> Option<FromClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn relation_name(&self) -> Option<RelationName> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn returning_clause(&self) -> Option<ReturningClause> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn set_clause(&self) -> Option<SetClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn where_clause(&self) -> Option<WhereClause> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -10165,6 +10544,10 @@ pub struct UsingClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl UsingClause {
+    #[inline]
+    pub fn from_items(&self) -> AstChildren<FromItem> {
+        support::children(&self.syntax)
+    }
     #[inline]
     pub fn using_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::USING_KW)
@@ -10198,6 +10581,29 @@ impl UsingMethod {
     #[inline]
     pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn using_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::USING_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct UsingOnClause {
+    pub(crate) syntax: SyntaxNode,
+}
+impl UsingOnClause {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn from_item(&self) -> Option<FromItem> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn on_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ON_KW)
     }
     #[inline]
     pub fn using_token(&self) -> Option<SyntaxToken> {
@@ -10338,10 +10744,6 @@ pub struct WhenClause {
     pub(crate) syntax: SyntaxNode,
 }
 impl WhenClause {
-    #[inline]
-    pub fn expr(&self) -> Option<Expr> {
-        support::child(&self.syntax)
-    }
     #[inline]
     pub fn then_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::THEN_KW)
@@ -10795,6 +11197,7 @@ pub enum AlterColumnOption {
     SetGeneratedOptions(SetGeneratedOptions),
     SetNotNull(SetNotNull),
     SetOptions(SetOptions),
+    SetOptionsList(SetOptionsList),
     SetSequenceOption(SetSequenceOption),
     SetStatistics(SetStatistics),
     SetStorage(SetStorage),
@@ -10838,9 +11241,9 @@ pub enum AlterTableAction {
     EnableRule(EnableRule),
     EnableTrigger(EnableTrigger),
     ForceRls(ForceRls),
-    Inherit(Inherit),
+    InheritTable(InheritTable),
     NoForceRls(NoForceRls),
-    NoInherit(NoInherit),
+    NoInheritTable(NoInheritTable),
     NotOf(NotOf),
     OfType(OfType),
     OptionItemList(OptionItemList),
@@ -10872,6 +11275,18 @@ pub enum ColumnConstraint {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConflictAction {
+    ConflictDoNothing(ConflictDoNothing),
+    ConflictDoUpdateSet(ConflictDoUpdateSet),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ConflictTarget {
+    ConflictOnConstraint(ConflictOnConstraint),
+    ConflictOnIndex(ConflictOnIndex),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Constraint {
     CheckConstraint(CheckConstraint),
     DefaultConstraint(DefaultConstraint),
@@ -10882,6 +11297,24 @@ pub enum Constraint {
     PrimaryKeyConstraint(PrimaryKeyConstraint),
     ReferencesConstraint(ReferencesConstraint),
     UniqueConstraint(UniqueConstraint),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum ExplainStmt {
+    CompoundSelect(CompoundSelect),
+    CreateMaterializedView(CreateMaterializedView),
+    CreateTableAs(CreateTableAs),
+    Declare(Declare),
+    Delete(Delete),
+    Execute(Execute),
+    Insert(Insert),
+    Merge(Merge),
+    ParenSelect(ParenSelect),
+    Select(Select),
+    SelectInto(SelectInto),
+    Table(Table),
+    Update(Update),
+    Values(Values),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -11004,6 +11437,22 @@ pub enum RefAction {
     Restrict(Restrict),
     SetDefaultColumns(SetDefaultColumns),
     SetNullColumns(SetNullColumns),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SelectVariant {
+    CompoundSelect(CompoundSelect),
+    ParenSelect(ParenSelect),
+    Select(Select),
+    SelectInto(SelectInto),
+    Table(Table),
+    Values(Values),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum SetColumn {
+    SetMultipleColumns(SetMultipleColumns),
+    SetSingleColumn(SetSingleColumn),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -12797,6 +13246,114 @@ impl AstNode for CompressionMethod {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::COMPRESSION_METHOD
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConflictDoNothing {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFLICT_DO_NOTHING
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConflictDoUpdateSet {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFLICT_DO_UPDATE_SET
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConflictIndexItem {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFLICT_INDEX_ITEM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConflictIndexItemList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFLICT_INDEX_ITEM_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConflictOnConstraint {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFLICT_ON_CONSTRAINT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for ConflictOnIndex {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::CONFLICT_ON_INDEX
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -15331,6 +15888,42 @@ impl AstNode for FuncOptionList {
         &self.syntax
     }
 }
+impl AstNode for FunctionSig {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FUNCTION_SIG
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for FunctionSigList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::FUNCTION_SIG_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for GeneratedConstraint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -15587,6 +16180,24 @@ impl AstNode for Inherit {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::INHERIT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for InheritTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::INHERIT_TABLE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -17095,6 +17706,24 @@ impl AstNode for NoInherit {
         &self.syntax
     }
 }
+impl AstNode for NoInheritTable {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NO_INHERIT_TABLE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for NonStandardParam {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -17477,6 +18106,24 @@ impl AstNode for OnCommit {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::ON_COMMIT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for OnConflictClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::ON_CONFLICT_CLAUSE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -18895,6 +19542,24 @@ impl AstNode for SelectInto {
         &self.syntax
     }
 }
+impl AstNode for SequenceOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SEQUENCE_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SequenceOptionList {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -18971,24 +19636,6 @@ impl AstNode for SetClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SET_CLAUSE
-    }
-    #[inline]
-    fn cast(syntax: SyntaxNode) -> Option<Self> {
-        if Self::can_cast(syntax.kind()) {
-            Some(Self { syntax })
-        } else {
-            None
-        }
-    }
-    #[inline]
-    fn syntax(&self) -> &SyntaxNode {
-        &self.syntax
-    }
-}
-impl AstNode for SetColumn {
-    #[inline]
-    fn can_cast(kind: SyntaxKind) -> bool {
-        kind == SyntaxKind::SET_COLUMN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -19219,6 +19866,24 @@ impl AstNode for SetLogged {
         &self.syntax
     }
 }
+impl AstNode for SetMultipleColumns {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_MULTIPLE_COLUMNS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SetNotNull {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -19349,6 +20014,24 @@ impl AstNode for SetSessionAuth {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SET_SESSION_AUTH
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SetSingleColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_SINGLE_COLUMN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -20065,6 +20748,24 @@ impl AstNode for UsingMethod {
         &self.syntax
     }
 }
+impl AstNode for UsingOnClause {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::USING_ON_CLAUSE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Vacuum {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -20624,6 +21325,7 @@ impl AstNode for AlterColumnOption {
                 | SyntaxKind::SET_GENERATED_OPTIONS
                 | SyntaxKind::SET_NOT_NULL
                 | SyntaxKind::SET_OPTIONS
+                | SyntaxKind::SET_OPTIONS_LIST
                 | SyntaxKind::SET_SEQUENCE_OPTION
                 | SyntaxKind::SET_STATISTICS
                 | SyntaxKind::SET_STORAGE
@@ -20655,6 +21357,9 @@ impl AstNode for AlterColumnOption {
             }
             SyntaxKind::SET_NOT_NULL => AlterColumnOption::SetNotNull(SetNotNull { syntax }),
             SyntaxKind::SET_OPTIONS => AlterColumnOption::SetOptions(SetOptions { syntax }),
+            SyntaxKind::SET_OPTIONS_LIST => {
+                AlterColumnOption::SetOptionsList(SetOptionsList { syntax })
+            }
             SyntaxKind::SET_SEQUENCE_OPTION => {
                 AlterColumnOption::SetSequenceOption(SetSequenceOption { syntax })
             }
@@ -20686,6 +21391,7 @@ impl AstNode for AlterColumnOption {
             AlterColumnOption::SetGeneratedOptions(it) => &it.syntax,
             AlterColumnOption::SetNotNull(it) => &it.syntax,
             AlterColumnOption::SetOptions(it) => &it.syntax,
+            AlterColumnOption::SetOptionsList(it) => &it.syntax,
             AlterColumnOption::SetSequenceOption(it) => &it.syntax,
             AlterColumnOption::SetStatistics(it) => &it.syntax,
             AlterColumnOption::SetStorage(it) => &it.syntax,
@@ -20775,6 +21481,12 @@ impl From<SetOptions> for AlterColumnOption {
     #[inline]
     fn from(node: SetOptions) -> AlterColumnOption {
         AlterColumnOption::SetOptions(node)
+    }
+}
+impl From<SetOptionsList> for AlterColumnOption {
+    #[inline]
+    fn from(node: SetOptionsList) -> AlterColumnOption {
+        AlterColumnOption::SetOptionsList(node)
     }
 }
 impl From<SetSequenceOption> for AlterColumnOption {
@@ -20955,9 +21667,9 @@ impl AstNode for AlterTableAction {
                 | SyntaxKind::ENABLE_RULE
                 | SyntaxKind::ENABLE_TRIGGER
                 | SyntaxKind::FORCE_RLS
-                | SyntaxKind::INHERIT
+                | SyntaxKind::INHERIT_TABLE
                 | SyntaxKind::NO_FORCE_RLS
-                | SyntaxKind::NO_INHERIT
+                | SyntaxKind::NO_INHERIT_TABLE
                 | SyntaxKind::NOT_OF
                 | SyntaxKind::OF_TYPE
                 | SyntaxKind::OPTION_ITEM_LIST
@@ -21019,9 +21731,11 @@ impl AstNode for AlterTableAction {
             SyntaxKind::ENABLE_RULE => AlterTableAction::EnableRule(EnableRule { syntax }),
             SyntaxKind::ENABLE_TRIGGER => AlterTableAction::EnableTrigger(EnableTrigger { syntax }),
             SyntaxKind::FORCE_RLS => AlterTableAction::ForceRls(ForceRls { syntax }),
-            SyntaxKind::INHERIT => AlterTableAction::Inherit(Inherit { syntax }),
+            SyntaxKind::INHERIT_TABLE => AlterTableAction::InheritTable(InheritTable { syntax }),
             SyntaxKind::NO_FORCE_RLS => AlterTableAction::NoForceRls(NoForceRls { syntax }),
-            SyntaxKind::NO_INHERIT => AlterTableAction::NoInherit(NoInherit { syntax }),
+            SyntaxKind::NO_INHERIT_TABLE => {
+                AlterTableAction::NoInheritTable(NoInheritTable { syntax })
+            }
             SyntaxKind::NOT_OF => AlterTableAction::NotOf(NotOf { syntax }),
             SyntaxKind::OF_TYPE => AlterTableAction::OfType(OfType { syntax }),
             SyntaxKind::OPTION_ITEM_LIST => {
@@ -21087,9 +21801,9 @@ impl AstNode for AlterTableAction {
             AlterTableAction::EnableRule(it) => &it.syntax,
             AlterTableAction::EnableTrigger(it) => &it.syntax,
             AlterTableAction::ForceRls(it) => &it.syntax,
-            AlterTableAction::Inherit(it) => &it.syntax,
+            AlterTableAction::InheritTable(it) => &it.syntax,
             AlterTableAction::NoForceRls(it) => &it.syntax,
-            AlterTableAction::NoInherit(it) => &it.syntax,
+            AlterTableAction::NoInheritTable(it) => &it.syntax,
             AlterTableAction::NotOf(it) => &it.syntax,
             AlterTableAction::OfType(it) => &it.syntax,
             AlterTableAction::OptionItemList(it) => &it.syntax,
@@ -21231,10 +21945,10 @@ impl From<ForceRls> for AlterTableAction {
         AlterTableAction::ForceRls(node)
     }
 }
-impl From<Inherit> for AlterTableAction {
+impl From<InheritTable> for AlterTableAction {
     #[inline]
-    fn from(node: Inherit) -> AlterTableAction {
-        AlterTableAction::Inherit(node)
+    fn from(node: InheritTable) -> AlterTableAction {
+        AlterTableAction::InheritTable(node)
     }
 }
 impl From<NoForceRls> for AlterTableAction {
@@ -21243,10 +21957,10 @@ impl From<NoForceRls> for AlterTableAction {
         AlterTableAction::NoForceRls(node)
     }
 }
-impl From<NoInherit> for AlterTableAction {
+impl From<NoInheritTable> for AlterTableAction {
     #[inline]
-    fn from(node: NoInherit) -> AlterTableAction {
-        AlterTableAction::NoInherit(node)
+    fn from(node: NoInheritTable) -> AlterTableAction {
+        AlterTableAction::NoInheritTable(node)
     }
 }
 impl From<NotOf> for AlterTableAction {
@@ -21445,6 +22159,92 @@ impl From<UniqueConstraint> for ColumnConstraint {
         ColumnConstraint::UniqueConstraint(node)
     }
 }
+impl AstNode for ConflictAction {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::CONFLICT_DO_NOTHING | SyntaxKind::CONFLICT_DO_UPDATE_SET
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::CONFLICT_DO_NOTHING => {
+                ConflictAction::ConflictDoNothing(ConflictDoNothing { syntax })
+            }
+            SyntaxKind::CONFLICT_DO_UPDATE_SET => {
+                ConflictAction::ConflictDoUpdateSet(ConflictDoUpdateSet { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ConflictAction::ConflictDoNothing(it) => &it.syntax,
+            ConflictAction::ConflictDoUpdateSet(it) => &it.syntax,
+        }
+    }
+}
+impl From<ConflictDoNothing> for ConflictAction {
+    #[inline]
+    fn from(node: ConflictDoNothing) -> ConflictAction {
+        ConflictAction::ConflictDoNothing(node)
+    }
+}
+impl From<ConflictDoUpdateSet> for ConflictAction {
+    #[inline]
+    fn from(node: ConflictDoUpdateSet) -> ConflictAction {
+        ConflictAction::ConflictDoUpdateSet(node)
+    }
+}
+impl AstNode for ConflictTarget {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::CONFLICT_ON_CONSTRAINT | SyntaxKind::CONFLICT_ON_INDEX
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::CONFLICT_ON_CONSTRAINT => {
+                ConflictTarget::ConflictOnConstraint(ConflictOnConstraint { syntax })
+            }
+            SyntaxKind::CONFLICT_ON_INDEX => {
+                ConflictTarget::ConflictOnIndex(ConflictOnIndex { syntax })
+            }
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ConflictTarget::ConflictOnConstraint(it) => &it.syntax,
+            ConflictTarget::ConflictOnIndex(it) => &it.syntax,
+        }
+    }
+}
+impl From<ConflictOnConstraint> for ConflictTarget {
+    #[inline]
+    fn from(node: ConflictOnConstraint) -> ConflictTarget {
+        ConflictTarget::ConflictOnConstraint(node)
+    }
+}
+impl From<ConflictOnIndex> for ConflictTarget {
+    #[inline]
+    fn from(node: ConflictOnIndex) -> ConflictTarget {
+        ConflictTarget::ConflictOnIndex(node)
+    }
+}
 impl AstNode for Constraint {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -21560,6 +22360,156 @@ impl From<UniqueConstraint> for Constraint {
     #[inline]
     fn from(node: UniqueConstraint) -> Constraint {
         Constraint::UniqueConstraint(node)
+    }
+}
+impl AstNode for ExplainStmt {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::COMPOUND_SELECT
+                | SyntaxKind::CREATE_MATERIALIZED_VIEW
+                | SyntaxKind::CREATE_TABLE_AS
+                | SyntaxKind::DECLARE
+                | SyntaxKind::DELETE
+                | SyntaxKind::EXECUTE
+                | SyntaxKind::INSERT
+                | SyntaxKind::MERGE
+                | SyntaxKind::PAREN_SELECT
+                | SyntaxKind::SELECT
+                | SyntaxKind::SELECT_INTO
+                | SyntaxKind::TABLE
+                | SyntaxKind::UPDATE
+                | SyntaxKind::VALUES
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::COMPOUND_SELECT => ExplainStmt::CompoundSelect(CompoundSelect { syntax }),
+            SyntaxKind::CREATE_MATERIALIZED_VIEW => {
+                ExplainStmt::CreateMaterializedView(CreateMaterializedView { syntax })
+            }
+            SyntaxKind::CREATE_TABLE_AS => ExplainStmt::CreateTableAs(CreateTableAs { syntax }),
+            SyntaxKind::DECLARE => ExplainStmt::Declare(Declare { syntax }),
+            SyntaxKind::DELETE => ExplainStmt::Delete(Delete { syntax }),
+            SyntaxKind::EXECUTE => ExplainStmt::Execute(Execute { syntax }),
+            SyntaxKind::INSERT => ExplainStmt::Insert(Insert { syntax }),
+            SyntaxKind::MERGE => ExplainStmt::Merge(Merge { syntax }),
+            SyntaxKind::PAREN_SELECT => ExplainStmt::ParenSelect(ParenSelect { syntax }),
+            SyntaxKind::SELECT => ExplainStmt::Select(Select { syntax }),
+            SyntaxKind::SELECT_INTO => ExplainStmt::SelectInto(SelectInto { syntax }),
+            SyntaxKind::TABLE => ExplainStmt::Table(Table { syntax }),
+            SyntaxKind::UPDATE => ExplainStmt::Update(Update { syntax }),
+            SyntaxKind::VALUES => ExplainStmt::Values(Values { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            ExplainStmt::CompoundSelect(it) => &it.syntax,
+            ExplainStmt::CreateMaterializedView(it) => &it.syntax,
+            ExplainStmt::CreateTableAs(it) => &it.syntax,
+            ExplainStmt::Declare(it) => &it.syntax,
+            ExplainStmt::Delete(it) => &it.syntax,
+            ExplainStmt::Execute(it) => &it.syntax,
+            ExplainStmt::Insert(it) => &it.syntax,
+            ExplainStmt::Merge(it) => &it.syntax,
+            ExplainStmt::ParenSelect(it) => &it.syntax,
+            ExplainStmt::Select(it) => &it.syntax,
+            ExplainStmt::SelectInto(it) => &it.syntax,
+            ExplainStmt::Table(it) => &it.syntax,
+            ExplainStmt::Update(it) => &it.syntax,
+            ExplainStmt::Values(it) => &it.syntax,
+        }
+    }
+}
+impl From<CompoundSelect> for ExplainStmt {
+    #[inline]
+    fn from(node: CompoundSelect) -> ExplainStmt {
+        ExplainStmt::CompoundSelect(node)
+    }
+}
+impl From<CreateMaterializedView> for ExplainStmt {
+    #[inline]
+    fn from(node: CreateMaterializedView) -> ExplainStmt {
+        ExplainStmt::CreateMaterializedView(node)
+    }
+}
+impl From<CreateTableAs> for ExplainStmt {
+    #[inline]
+    fn from(node: CreateTableAs) -> ExplainStmt {
+        ExplainStmt::CreateTableAs(node)
+    }
+}
+impl From<Declare> for ExplainStmt {
+    #[inline]
+    fn from(node: Declare) -> ExplainStmt {
+        ExplainStmt::Declare(node)
+    }
+}
+impl From<Delete> for ExplainStmt {
+    #[inline]
+    fn from(node: Delete) -> ExplainStmt {
+        ExplainStmt::Delete(node)
+    }
+}
+impl From<Execute> for ExplainStmt {
+    #[inline]
+    fn from(node: Execute) -> ExplainStmt {
+        ExplainStmt::Execute(node)
+    }
+}
+impl From<Insert> for ExplainStmt {
+    #[inline]
+    fn from(node: Insert) -> ExplainStmt {
+        ExplainStmt::Insert(node)
+    }
+}
+impl From<Merge> for ExplainStmt {
+    #[inline]
+    fn from(node: Merge) -> ExplainStmt {
+        ExplainStmt::Merge(node)
+    }
+}
+impl From<ParenSelect> for ExplainStmt {
+    #[inline]
+    fn from(node: ParenSelect) -> ExplainStmt {
+        ExplainStmt::ParenSelect(node)
+    }
+}
+impl From<Select> for ExplainStmt {
+    #[inline]
+    fn from(node: Select) -> ExplainStmt {
+        ExplainStmt::Select(node)
+    }
+}
+impl From<SelectInto> for ExplainStmt {
+    #[inline]
+    fn from(node: SelectInto) -> ExplainStmt {
+        ExplainStmt::SelectInto(node)
+    }
+}
+impl From<Table> for ExplainStmt {
+    #[inline]
+    fn from(node: Table) -> ExplainStmt {
+        ExplainStmt::Table(node)
+    }
+}
+impl From<Update> for ExplainStmt {
+    #[inline]
+    fn from(node: Update) -> ExplainStmt {
+        ExplainStmt::Update(node)
+    }
+}
+impl From<Values> for ExplainStmt {
+    #[inline]
+    fn from(node: Values) -> ExplainStmt {
+        ExplainStmt::Values(node)
     }
 }
 impl AstNode for Expr {
@@ -22542,6 +23492,123 @@ impl From<SetNullColumns> for RefAction {
     #[inline]
     fn from(node: SetNullColumns) -> RefAction {
         RefAction::SetNullColumns(node)
+    }
+}
+impl AstNode for SelectVariant {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::COMPOUND_SELECT
+                | SyntaxKind::PAREN_SELECT
+                | SyntaxKind::SELECT
+                | SyntaxKind::SELECT_INTO
+                | SyntaxKind::TABLE
+                | SyntaxKind::VALUES
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::COMPOUND_SELECT => SelectVariant::CompoundSelect(CompoundSelect { syntax }),
+            SyntaxKind::PAREN_SELECT => SelectVariant::ParenSelect(ParenSelect { syntax }),
+            SyntaxKind::SELECT => SelectVariant::Select(Select { syntax }),
+            SyntaxKind::SELECT_INTO => SelectVariant::SelectInto(SelectInto { syntax }),
+            SyntaxKind::TABLE => SelectVariant::Table(Table { syntax }),
+            SyntaxKind::VALUES => SelectVariant::Values(Values { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            SelectVariant::CompoundSelect(it) => &it.syntax,
+            SelectVariant::ParenSelect(it) => &it.syntax,
+            SelectVariant::Select(it) => &it.syntax,
+            SelectVariant::SelectInto(it) => &it.syntax,
+            SelectVariant::Table(it) => &it.syntax,
+            SelectVariant::Values(it) => &it.syntax,
+        }
+    }
+}
+impl From<CompoundSelect> for SelectVariant {
+    #[inline]
+    fn from(node: CompoundSelect) -> SelectVariant {
+        SelectVariant::CompoundSelect(node)
+    }
+}
+impl From<ParenSelect> for SelectVariant {
+    #[inline]
+    fn from(node: ParenSelect) -> SelectVariant {
+        SelectVariant::ParenSelect(node)
+    }
+}
+impl From<Select> for SelectVariant {
+    #[inline]
+    fn from(node: Select) -> SelectVariant {
+        SelectVariant::Select(node)
+    }
+}
+impl From<SelectInto> for SelectVariant {
+    #[inline]
+    fn from(node: SelectInto) -> SelectVariant {
+        SelectVariant::SelectInto(node)
+    }
+}
+impl From<Table> for SelectVariant {
+    #[inline]
+    fn from(node: Table) -> SelectVariant {
+        SelectVariant::Table(node)
+    }
+}
+impl From<Values> for SelectVariant {
+    #[inline]
+    fn from(node: Values) -> SelectVariant {
+        SelectVariant::Values(node)
+    }
+}
+impl AstNode for SetColumn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(
+            kind,
+            SyntaxKind::SET_MULTIPLE_COLUMNS | SyntaxKind::SET_SINGLE_COLUMN
+        )
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::SET_MULTIPLE_COLUMNS => {
+                SetColumn::SetMultipleColumns(SetMultipleColumns { syntax })
+            }
+            SyntaxKind::SET_SINGLE_COLUMN => SetColumn::SetSingleColumn(SetSingleColumn { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            SetColumn::SetMultipleColumns(it) => &it.syntax,
+            SetColumn::SetSingleColumn(it) => &it.syntax,
+        }
+    }
+}
+impl From<SetMultipleColumns> for SetColumn {
+    #[inline]
+    fn from(node: SetMultipleColumns) -> SetColumn {
+        SetColumn::SetMultipleColumns(node)
+    }
+}
+impl From<SetSingleColumn> for SetColumn {
+    #[inline]
+    fn from(node: SetSingleColumn) -> SetColumn {
+        SetColumn::SetSingleColumn(node)
     }
 }
 impl AstNode for Stmt {

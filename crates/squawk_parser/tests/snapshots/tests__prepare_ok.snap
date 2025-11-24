@@ -236,15 +236,16 @@ SOURCE_FILE
         SET_KW "set"
         WHITESPACE " "
         SET_COLUMN_LIST
-          SET_COLUMN
+          SET_SINGLE_COLUMN
             COLUMN
               NAME_REF
                 IDENT "x"
             WHITESPACE " "
             EQ "="
             WHITESPACE " "
-            LITERAL
-              INT_NUMBER "1"
+            SET_EXPR
+              LITERAL
+                INT_NUMBER "1"
       WHITESPACE " "
       WHERE_CLAUSE
         WHERE_KW "where"
@@ -314,7 +315,7 @@ SOURCE_FILE
             NAME_REF
               IDENT "t1"
       WHITESPACE "\n  "
-      USING_CLAUSE
+      USING_ON_CLAUSE
         USING_KW "using"
         WHITESPACE " "
         FROM_ITEM

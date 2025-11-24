@@ -72,10 +72,11 @@ SOURCE_FILE
           IDENT "c"
       R_PAREN ")"
     WHITESPACE "\n  "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "u"
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "u"
     WHITESPACE "\n  "
     WITH_PARAMS
       WITH_KW "with"

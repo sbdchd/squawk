@@ -872,21 +872,22 @@ SOURCE_FILE
             SET_KW "SET"
             WHITESPACE " "
             SET_COLUMN_LIST
-              SET_COLUMN
+              SET_SINGLE_COLUMN
                 COLUMN
                   NAME_REF
                     IDENT "sales_count"
                 WHITESPACE " "
                 EQ "="
                 WHITESPACE " "
-                BIN_EXPR
-                  NAME_REF
-                    IDENT "sales_count"
-                  WHITESPACE " "
-                  PLUS "+"
-                  WHITESPACE " "
-                  LITERAL
-                    INT_NUMBER "1"
+                SET_EXPR
+                  BIN_EXPR
+                    NAME_REF
+                      IDENT "sales_count"
+                    WHITESPACE " "
+                    PLUS "+"
+                    WHITESPACE " "
+                    LITERAL
+                      INT_NUMBER "1"
           WHITESPACE " "
           WHERE_CLAUSE
             WHERE_KW "WHERE"
@@ -1014,36 +1015,42 @@ SOURCE_FILE
             STRING "'Associated Computing, Inc'"
           R_PAREN ")"
     WHITESPACE "\n    "
-    ON_KW "ON"
-    WHITESPACE " "
-    CONFLICT_KW "CONFLICT"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "did"
-    R_PAREN ")"
-    WHITESPACE " "
-    DO_KW "DO"
-    WHITESPACE " "
-    UPDATE_KW "UPDATE"
-    WHITESPACE " "
-    SET_CLAUSE
-      SET_KW "SET"
+    ON_CONFLICT_CLAUSE
+      ON_KW "ON"
       WHITESPACE " "
-      SET_COLUMN_LIST
-        SET_COLUMN
-          COLUMN
+      CONFLICT_KW "CONFLICT"
+      WHITESPACE " "
+      CONFLICT_ON_INDEX
+        CONFLICT_INDEX_ITEM_LIST
+          L_PAREN "("
+          CONFLICT_INDEX_ITEM
             NAME_REF
-              IDENT "dname"
+              IDENT "did"
+          R_PAREN ")"
+      WHITESPACE " "
+      CONFLICT_DO_UPDATE_SET
+        DO_KW "DO"
+        WHITESPACE " "
+        UPDATE_KW "UPDATE"
+        WHITESPACE " "
+        SET_CLAUSE
+          SET_KW "SET"
           WHITESPACE " "
-          EQ "="
-          WHITESPACE " "
-          FIELD_EXPR
-            NAME_REF
-              IDENT "EXCLUDED"
-            DOT "."
-            NAME_REF
-              IDENT "dname"
+          SET_COLUMN_LIST
+            SET_SINGLE_COLUMN
+              COLUMN
+                NAME_REF
+                  IDENT "dname"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              SET_EXPR
+                FIELD_EXPR
+                  NAME_REF
+                    IDENT "EXCLUDED"
+                  DOT "."
+                  NAME_REF
+                    IDENT "dname"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   INSERT
@@ -1082,18 +1089,92 @@ SOURCE_FILE
             STRING "'Redline GmbH'"
           R_PAREN ")"
     WHITESPACE "\n    "
-    ON_KW "ON"
+    ON_CONFLICT_CLAUSE
+      ON_KW "ON"
+      WHITESPACE " "
+      CONFLICT_KW "CONFLICT"
+      WHITESPACE " "
+      CONFLICT_ON_INDEX
+        CONFLICT_INDEX_ITEM_LIST
+          L_PAREN "("
+          CONFLICT_INDEX_ITEM
+            NAME_REF
+              IDENT "did"
+          R_PAREN ")"
+      WHITESPACE " "
+      CONFLICT_DO_NOTHING
+        DO_KW "DO"
+        WHITESPACE " "
+        NOTHING_KW "NOTHING"
+  SEMICOLON ";"
+  WHITESPACE "\n\n"
+  INSERT
+    INSERT_KW "insert"
     WHITESPACE " "
-    CONFLICT_KW "CONFLICT"
+    INTO_KW "into"
     WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "did"
-    R_PAREN ")"
+    PATH
+      PATH_SEGMENT
+        NAME_REF
+          IDENT "t"
     WHITESPACE " "
-    DO_KW "DO"
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN
+        NAME_REF
+          IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "b"
+      COMMA ","
+      WHITESPACE " "
+      COLUMN
+        NAME_REF
+          IDENT "c"
+      R_PAREN ")"
     WHITESPACE " "
-    NOTHING_KW "NOTHING"
+    VALUES
+      VALUES_KW "values"
+      WHITESPACE " "
+      ROW_LIST
+        ROW
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "2"
+          COMMA ","
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "3"
+          R_PAREN ")"
+    WHITESPACE "\n    "
+    ON_CONFLICT_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      CONFLICT_KW "conflict"
+      WHITESPACE " "
+      CONFLICT_ON_INDEX
+        CONFLICT_INDEX_ITEM_LIST
+          L_PAREN "("
+          CONFLICT_INDEX_ITEM
+            NAME_REF
+              IDENT "a"
+          COMMA ","
+          WHITESPACE " "
+          CONFLICT_INDEX_ITEM
+            NAME_REF
+              IDENT "b"
+          R_PAREN ")"
+      WHITESPACE " "
+      CONFLICT_DO_NOTHING
+        DO_KW "do"
+        WHITESPACE " "
+        NOTHING_KW "nothing"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Don't update existing distributors based in a certain ZIP code"
@@ -1140,80 +1221,86 @@ SOURCE_FILE
             STRING "'Anvil Distribution'"
           R_PAREN ")"
     WHITESPACE "\n    "
-    ON_KW "ON"
-    WHITESPACE " "
-    CONFLICT_KW "CONFLICT"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "did"
-    R_PAREN ")"
-    WHITESPACE " "
-    DO_KW "DO"
-    WHITESPACE " "
-    UPDATE_KW "UPDATE"
-    WHITESPACE "\n    "
-    SET_CLAUSE
-      SET_KW "SET"
+    ON_CONFLICT_CLAUSE
+      ON_KW "ON"
       WHITESPACE " "
-      SET_COLUMN_LIST
-        SET_COLUMN
-          COLUMN
+      CONFLICT_KW "CONFLICT"
+      WHITESPACE " "
+      CONFLICT_ON_INDEX
+        CONFLICT_INDEX_ITEM_LIST
+          L_PAREN "("
+          CONFLICT_INDEX_ITEM
             NAME_REF
-              IDENT "dname"
+              IDENT "did"
+          R_PAREN ")"
+      WHITESPACE " "
+      CONFLICT_DO_UPDATE_SET
+        DO_KW "DO"
+        WHITESPACE " "
+        UPDATE_KW "UPDATE"
+        WHITESPACE "\n    "
+        SET_CLAUSE
+          SET_KW "SET"
           WHITESPACE " "
-          EQ "="
+          SET_COLUMN_LIST
+            SET_SINGLE_COLUMN
+              COLUMN
+                NAME_REF
+                  IDENT "dname"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              SET_EXPR
+                BIN_EXPR
+                  FIELD_EXPR
+                    NAME_REF
+                      IDENT "EXCLUDED"
+                    DOT "."
+                    NAME_REF
+                      IDENT "dname"
+                  WHITESPACE " "
+                  CUSTOM_OP
+                    PIPE "|"
+                    PIPE "|"
+                  WHITESPACE " "
+                  BIN_EXPR
+                    LITERAL
+                      STRING "' (formerly '"
+                    WHITESPACE " "
+                    CUSTOM_OP
+                      PIPE "|"
+                      PIPE "|"
+                    WHITESPACE " "
+                    BIN_EXPR
+                      FIELD_EXPR
+                        NAME_REF
+                          IDENT "d"
+                        DOT "."
+                        NAME_REF
+                          IDENT "dname"
+                      WHITESPACE " "
+                      CUSTOM_OP
+                        PIPE "|"
+                        PIPE "|"
+                      WHITESPACE " "
+                      LITERAL
+                        STRING "')'"
+        WHITESPACE "\n    "
+        WHERE_CLAUSE
+          WHERE_KW "WHERE"
           WHITESPACE " "
           BIN_EXPR
             FIELD_EXPR
               NAME_REF
-                IDENT "EXCLUDED"
+                IDENT "d"
               DOT "."
               NAME_REF
-                IDENT "dname"
+                IDENT "zipcode"
             WHITESPACE " "
-            CUSTOM_OP
-              PIPE "|"
-              PIPE "|"
+            NEQB "<>"
             WHITESPACE " "
-            BIN_EXPR
-              LITERAL
-                STRING "' (formerly '"
-              WHITESPACE " "
-              CUSTOM_OP
-                PIPE "|"
-                PIPE "|"
-              WHITESPACE " "
-              BIN_EXPR
-                FIELD_EXPR
-                  NAME_REF
-                    IDENT "d"
-                  DOT "."
-                  NAME_REF
-                    IDENT "dname"
-                WHITESPACE " "
-                CUSTOM_OP
-                  PIPE "|"
-                  PIPE "|"
-                WHITESPACE " "
-                LITERAL
-                  STRING "')'"
-    WHITESPACE "\n    "
-    WHERE_CLAUSE
-      WHERE_KW "WHERE"
-      WHITESPACE " "
-      BIN_EXPR
-        FIELD_EXPR
-          NAME_REF
-            IDENT "d"
-          DOT "."
-          NAME_REF
-            IDENT "zipcode"
-        WHITESPACE " "
-        NEQB "<>"
-        WHITESPACE " "
-        LITERAL
-          STRING "'21201'"
+            LITERAL
+              STRING "'21201'"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- Name a constraint directly in the statement (uses associated"
@@ -1256,20 +1343,23 @@ SOURCE_FILE
             STRING "'Antwerp Design'"
           R_PAREN ")"
     WHITESPACE "\n    "
-    ON_KW "ON"
-    WHITESPACE " "
-    CONFLICT_KW "CONFLICT"
-    WHITESPACE " "
-    ON_KW "ON"
-    WHITESPACE " "
-    CONSTRAINT_KW "CONSTRAINT"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "distributors_pkey"
-    WHITESPACE " "
-    DO_KW "DO"
-    WHITESPACE " "
-    NOTHING_KW "NOTHING"
+    ON_CONFLICT_CLAUSE
+      ON_KW "ON"
+      WHITESPACE " "
+      CONFLICT_KW "CONFLICT"
+      WHITESPACE " "
+      CONFLICT_ON_CONSTRAINT
+        ON_KW "ON"
+        WHITESPACE " "
+        CONSTRAINT_KW "CONSTRAINT"
+        WHITESPACE " "
+        NAME_REF
+          IDENT "distributors_pkey"
+      WHITESPACE " "
+      CONFLICT_DO_NOTHING
+        DO_KW "DO"
+        WHITESPACE " "
+        NOTHING_KW "NOTHING"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- This statement could infer a partial unique index on \"did\""
@@ -1314,24 +1404,29 @@ SOURCE_FILE
             STRING "'Conrad International'"
           R_PAREN ")"
     WHITESPACE "\n    "
-    ON_KW "ON"
-    WHITESPACE " "
-    CONFLICT_KW "CONFLICT"
-    WHITESPACE " "
-    L_PAREN "("
-    NAME_REF
-      IDENT "did"
-    R_PAREN ")"
-    WHITESPACE " "
-    WHERE_CLAUSE
-      WHERE_KW "WHERE"
+    ON_CONFLICT_CLAUSE
+      ON_KW "ON"
       WHITESPACE " "
-      NAME_REF
-        IDENT "is_active"
-    WHITESPACE " "
-    DO_KW "DO"
-    WHITESPACE " "
-    NOTHING_KW "NOTHING"
+      CONFLICT_KW "CONFLICT"
+      WHITESPACE " "
+      CONFLICT_ON_INDEX
+        CONFLICT_INDEX_ITEM_LIST
+          L_PAREN "("
+          CONFLICT_INDEX_ITEM
+            NAME_REF
+              IDENT "did"
+          R_PAREN ")"
+        WHITESPACE " "
+        WHERE_CLAUSE
+          WHERE_KW "WHERE"
+          WHITESPACE " "
+          NAME_REF
+            IDENT "is_active"
+      WHITESPACE " "
+      CONFLICT_DO_NOTHING
+        DO_KW "DO"
+        WHITESPACE " "
+        NOTHING_KW "NOTHING"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- with schema"

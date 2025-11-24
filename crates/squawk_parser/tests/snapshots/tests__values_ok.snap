@@ -307,25 +307,26 @@ SOURCE_FILE
       SET_KW "SET"
       WHITESPACE " "
       SET_COLUMN_LIST
-        SET_COLUMN
+        SET_SINGLE_COLUMN
           COLUMN
             NAME_REF
               IDENT "salary"
           WHITESPACE " "
           EQ "="
           WHITESPACE " "
-          BIN_EXPR
-            NAME_REF
-              IDENT "salary"
-            WHITESPACE " "
-            STAR "*"
-            WHITESPACE " "
-            FIELD_EXPR
+          SET_EXPR
+            BIN_EXPR
               NAME_REF
-                IDENT "v"
-              DOT "."
-              NAME_REF
-                IDENT "increase"
+                IDENT "salary"
+              WHITESPACE " "
+              STAR "*"
+              WHITESPACE " "
+              FIELD_EXPR
+                NAME_REF
+                  IDENT "v"
+                DOT "."
+                NAME_REF
+                  IDENT "increase"
     WHITESPACE "\n"
     FROM_CLAUSE
       FROM_KW "FROM"

@@ -318,104 +318,122 @@ SOURCE_FILE
           SEQUENCE_OPTION_LIST
             L_PAREN "("
             WHITESPACE "\n    "
-            AS_KW "as"
-            WHITESPACE " "
-            PATH_TYPE
+            SEQUENCE_OPTION
+              AS_KW "as"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      BIGINT_KW "bigint"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              CACHE_KW "cache"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "100"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              INCREMENT_KW "increment"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              INCREMENT_KW "increment"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              SEQUENCE_KW "sequence"
+              WHITESPACE " "
+              NAME_KW "name"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "foo"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              RESTART_KW "restart"
+              WHITESPACE " "
+              WITH_KW "with"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "500"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              LOGGED_KW "logged"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              UNLOGGED_KW "unlogged"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              START_KW "start"
+              WHITESPACE " "
+              WITH_KW "with"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "10"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              START_KW "start"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "25"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              OWNED_KW "owned"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
+              NONE_KW "none"
+            WHITESPACE "\n    "
+            SEQUENCE_OPTION
+              OWNED_KW "owned"
+              WHITESPACE " "
+              BY_KW "by"
+              WHITESPACE " "
               PATH
+                PATH
+                  PATH_SEGMENT
+                    NAME_REF
+                      IDENT "fooo"
+                DOT "."
                 PATH_SEGMENT
                   NAME_REF
-                    BIGINT_KW "bigint"
+                    IDENT "bar"
             WHITESPACE "\n    "
-            CACHE_KW "cache"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "100"
+            SEQUENCE_OPTION
+              MAXVALUE_KW "maxvalue"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "70"
             WHITESPACE "\n    "
-            INCREMENT_KW "increment"
-            WHITESPACE " "
-            BY_KW "by"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "10"
+            SEQUENCE_OPTION
+              MINVALUE_KW "minvalue"
+              WHITESPACE " "
+              LITERAL
+                INT_NUMBER "150"
             WHITESPACE "\n    "
-            INCREMENT_KW "increment"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "10"
+            SEQUENCE_OPTION
+              NO_KW "no"
+              WHITESPACE " "
+              MINVALUE_KW "minvalue"
             WHITESPACE "\n    "
-            SEQUENCE_KW "sequence"
-            WHITESPACE " "
-            NAME_KW "name"
-            WHITESPACE " "
-            NAME_REF
-              IDENT "foo"
+            SEQUENCE_OPTION
+              NO_KW "no"
+              WHITESPACE " "
+              CYCLE_KW "cycle"
             WHITESPACE "\n    "
-            RESTART_KW "restart"
-            WHITESPACE " "
-            WITH_KW "with"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "500"
+            SEQUENCE_OPTION
+              NO_KW "no"
+              WHITESPACE " "
+              MAXVALUE_KW "maxvalue"
             WHITESPACE "\n    "
-            LOGGED_KW "logged"
-            WHITESPACE "\n    "
-            UNLOGGED_KW "unlogged"
-            WHITESPACE "\n    "
-            START_KW "start"
-            WHITESPACE " "
-            WITH_KW "with"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "10"
-            WHITESPACE "\n    "
-            START_KW "start"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "25"
-            WHITESPACE "\n    "
-            OWNED_KW "owned"
-            WHITESPACE " "
-            BY_KW "by"
-            WHITESPACE " "
-            NONE_KW "none"
-            WHITESPACE "\n    "
-            OWNED_KW "owned"
-            WHITESPACE " "
-            BY_KW "by"
-            WHITESPACE " "
-            PATH
-              PATH
-                PATH_SEGMENT
-                  NAME_REF
-                    IDENT "fooo"
-              DOT "."
-              PATH_SEGMENT
-                NAME_REF
-                  IDENT "bar"
-            WHITESPACE "\n    "
-            MAXVALUE_KW "maxvalue"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "70"
-            WHITESPACE "\n    "
-            MINVALUE_KW "minvalue"
-            WHITESPACE " "
-            LITERAL
-              INT_NUMBER "150"
-            WHITESPACE "\n    "
-            NO_KW "no"
-            WHITESPACE " "
-            MINVALUE_KW "minvalue"
-            WHITESPACE "\n    "
-            NO_KW "no"
-            WHITESPACE " "
-            CYCLE_KW "cycle"
-            WHITESPACE "\n    "
-            NO_KW "no"
-            WHITESPACE " "
-            MAXVALUE_KW "maxvalue"
-            WHITESPACE "\n    "
-            CYCLE_KW "cycle"
+            SEQUENCE_OPTION
+              CYCLE_KW "cycle"
             WHITESPACE "\n  "
             R_PAREN ")"
       WHITESPACE "\n"

@@ -288,7 +288,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STATISTICS
         SET_KW "set"
@@ -316,7 +317,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STATISTICS
         SET_KW "set"
@@ -346,7 +348,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STATISTICS
         SET_KW "set"
@@ -375,7 +378,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_OPTIONS
         SET_KW "set"
@@ -408,7 +412,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_OPTIONS
         SET_KW "set"
@@ -453,7 +458,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       RESET_OPTIONS
         RESET_KW "reset"
@@ -483,7 +489,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       RESET_OPTIONS
         RESET_KW "reset"
@@ -518,7 +525,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -543,7 +551,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -568,7 +577,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -593,7 +603,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -623,7 +634,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_STORAGE
         SET_KW "set"
@@ -650,7 +662,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_COMPRESSION
         SET_KW "set"
@@ -677,7 +690,8 @@ SOURCE_FILE
       WHITESPACE " "
       COLUMN_KW "column"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_COMPRESSION
         SET_KW "set"

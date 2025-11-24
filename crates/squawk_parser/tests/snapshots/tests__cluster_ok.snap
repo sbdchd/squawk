@@ -33,10 +33,11 @@ SOURCE_FILE
         NAME_REF
           IDENT "bar"
     WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "idx"
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "idx"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- options_only"
@@ -71,10 +72,11 @@ SOURCE_FILE
         NAME_REF
           IDENT "bar"
     WHITESPACE " "
-    USING_KW "using"
-    WHITESPACE " "
-    NAME_REF
-      IDENT "idx"
+    USING_METHOD
+      USING_KW "using"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "idx"
   SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- pre_17"

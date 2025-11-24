@@ -18,7 +18,8 @@ SOURCE_FILE
     ALTER_COLUMN
       ALTER_KW "alter"
       WHITESPACE " "
-      IDENT "c"
+      NAME_REF
+        IDENT "c"
       WHITESPACE " "
       SET_EXPRESSION
         SET_KW "set"
